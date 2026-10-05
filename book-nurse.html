@@ -3,20 +3,15 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Book Nurse - LOVE CARE GLOBAL</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111;padding-bottom:30px}
 .header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#eab308);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-.card{background:#fff;border-radius:16px;padding:14px;margin:10px 12px;border:2px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.btnSmall{padding:10px 12px;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:12px}
-.btnSubmit{width:100%;padding:14px;border:none;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer;margin-top:10px;display:flex;justify-content:center;align-items:center;gap:6px}
-label{font-size:12px;font-weight:800;margin:10px 0 4px;display:block;color:#111}
-input,select,textarea{width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;font-size:13px;background:#fff}
-textarea{resize:vertical}
+.card{background:#fff;border-radius:16px;padding:14px;margin:10px 12px;border:2px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.btnSmall{padding:12px 14px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
 .step{display:none}.step.active{display:block}
-.stepIndicator{display:flex;gap:6px;margin:10px 12px}.stepDot{flex:1;height:6px;background:#e5e7eb;border-radius:10px}.stepDot.active{background:#16a34a}.stepDot.done{background:#22c55e}
-.menuOverlay{position:fixed;top:0;left:-100%;width:285px;height:100%;background:#fff;z-index:3000;transition:.3s;overflow:auto;box-shadow:2px 0 30px rgba(0,0,0,.3)}.menuOverlay.open{left:0}.menuBg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:2999;display:none}.menuBg.show{display:block}
+.menuOverlay{position:fixed;top:0;left:-100%;width:290px;height:100%;background:#fff;z-index:3000;transition:.35s;overflow:auto}.menuOverlay.open{left:0}.menuBg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:2999;display:none}.menuBg.show{display:block}
+.serviceBtn{padding:10px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;font-size:12px;font-weight:700;text-align:left}.serviceBtn.selected{border-color:#16a34a;background:#f0fdf4}
+input,select,textarea{width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;margin:6px 0;font-size:13px}
 </style>
 </head>
 <body>
@@ -24,314 +19,174 @@ textarea{resize:vertical}
 <div class="header">
 <div style="display:flex;align-items:center;gap:8px">
 <button class="btnSmall" style="background:#facc15;color:#111;font-size:20px" onclick="toggleMenu()">☰</button>
-<div style="font-weight:900;font-size:13px;line-height:1">BOOK NURSE<br><span style="background:white;color:#16a34a;padding:2px 8px;border-radius:10px;font-size:10px">4 STEPS - CONTINUE</span></div>
+<div style="font-weight:900;font-size:13px;line-height:1.1">BOOK NURSE<br><span style="background:white;color:#16a34a;padding:2px 8px;border-radius:20px;font-size:10px">13 SERVICES</span></div>
 </div>
 <div style="display:flex;gap:6px">
-<a href="index.html" class="btnSmall" style="background:white;color:#111;text-decoration:none">🏠 Home</a>
-<a href="sos.html" class="btnSmall" style="background:#ef4444;color:white;text-decoration:none">SOS</a>
+<a href="index.html" class="btnSmall" style="background:white;color:#16a34a">🏠 Home</a>
+<a href="sos.html" class="btnSmall" style="background:#ef4444;color:white">SOS</a>
 </div>
 </div>
+
+<!-- ✅ SELECTED NURSE FROM MAP - FIXED, 1 LINE ONLY -->
+<div id="selectedNurseTopDisplay" style="display:none;background:#f0fdf4;border:3px solid #16a34a;padding:12px;border-radius:12px;margin:10px 12px;box-shadow:0 4px 12px rgba(22,163,74,.2)"></div>
 
 <div id="menuBg" class="menuBg" onclick="toggleMenu()"></div>
 <div id="menuOverlay" class="menuOverlay">
 <div style="padding:14px">
 <h3>LOVE CARE GLOBAL</h3>
-<button class="btnSmall" style="background:#f0fdf4;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./index.html'">🏠 Home</button>
-<button class="btnSmall" style="background:#eff6ff;width:100%;padding:12px;margin:4px 0;text-align:left;border:2px solid #2563eb" onclick="window.location.href='./book-nurse.html'">📅 Book Nurse - Here Now</button>
-<button class="btnSmall" style="background:#fef2f2;width:100%;padding:12px;margin:4px 0;text-align:left;border:2px solid #ef4444" onclick="window.location.href='./sos.html'">🚨 SOS Emergency</button>
-<button class="btnSmall" style="background:#f0fdf4;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./my-bookings.html'">📋 My Bookings</button>
-<button class="btnSmall" style="background:#111827;color:white;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./settings.html'">⚙️ Settings</button>
+<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;border:2px solid #16a34a;justify-content:flex-start" onclick="window.location.href='./index.html'">🏠 Home</button>
+<button class="btnSmall" style="background:#eff6ff;width:100%;margin:4px 0;border:2px solid #2563eb;justify-content:flex-start" onclick="window.location.href='./book-nurse.html'">📅 Book Nurse</button>
+<button class="btnSmall" style="background:#fef2f2;width:100%;margin:4px 0;border:2px solid #ef4444;justify-content:flex-start" onclick="window.location.href='./sos.html'">🚨 SOS</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./contact.html'">💬 Contact Support</button>
 <button onclick="toggleMenu()" class="btnSmall" style="width:100%;background:#6b7280;color:white;margin-top:10px">✕ Close</button>
 </div>
 </div>
 
-<div class="stepIndicator">
-<div id="dot1" class="stepDot active"></div>
-<div id="dot2" class="stepDot"></div>
-<div id="dot3" class="stepDot"></div>
-<div id="dot4" class="stepDot"></div>
+<!-- STEPS -->
+<div class="card">
+<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:900">
+<span id="s1" style="color:#16a34a">● Step 1 Service</span><span id="s2" style="color:#999">○ Step 2 Details</span><span id="s3" style="color:#999">○ Step 3 Confirm</span>
+</div>
 </div>
 
-<div id="selectedNurseTopDisplay" style="display:none;background:#f0fdf4;border:3px solid #16a34a;padding:12px;border-radius:12px;margin:10px 12px;font-size:12px"></div>
-
-<!-- STEP 1: Country + Service + Care Mode + Days -->
+<!-- STEP 1 -->
 <div id="step1" class="step active">
-<div class="card" style="border:3px solid #16a34a">
-<h2 style="font-size:15px">📅 Step 1/4: Country & Service & Duration</h2>
-
-<label>Country (8 Countries)</label>
-<select id="countrySelect" onchange="updateCountryPricing()">
-<option value="GH">🇬🇭 Ghana - GHS</option>
-<option value="NG">🇳🇬 Nigeria - NGN</option>
-<option value="ZA">🇿🇦 South Africa - ZAR</option>
-<option value="KE">🇰🇪 Kenya - KES</option>
-<option value="US">🇺🇸 USA - USD</option>
-<option value="UK">🇬🇧 UK - GBP</option>
-<option value="CA">🇨🇦 Canada - CAD</option>
-<option value="AU">🇦🇺 Australia - AUD</option>
-</select>
-
-<label>Service (13 Services)</label>
-<select id="serviceType">
-<option>Elderly Care</option><option>Post Surgery Care</option><option>Child/Pediatric Care</option><option>Chronic Disease Management</option><option>Physiotherapy Support</option><option>Wound Care & Dressing</option><option>General Nursing</option><option>ICU/Critical Care</option><option>Maternity & Newborn</option><option>Disability & Special Needs</option><option>Mental Health Support</option><option>Lab Sample Collection</option><option>Medication & Injection</option>
-</select>
-
-<label>Care Mode</label>
-<div style="display:flex;gap:6px">
-<button id="tabHourly" class="btnSmall" style="background:#16a34a;color:white;flex:1" onclick="switchRateTab('hourly')">Hourly</button>
-<button id="tabDaily" class="btnSmall" style="background:#e5e7eb;color:#111;flex:1" onclick="switchRateTab('daily')">Daily</button>
-<button id="tabWeekly" class="btnSmall" style="background:#e5e7eb;color:#111;flex:1" onclick="switchRateTab('weekly')">Weekly</button>
-<button id="tabMonthly" class="btnSmall" style="background:#e5e7eb;color:#111;flex:1" onclick="switchRateTab('monthly')">Monthly</button>
-</div>
-
-<div style="margin-top:12px;background:#f0fdf4;border:3px solid #16a34a;border-radius:14px;padding:12px">
-<label id="daysLabel" style="font-weight:900;font-size:15px">Days - How many days?</label>
-<div style="display:flex;gap:10px;align-items:center;margin-top:8px">
-<button type="button" style="background:#16a34a;color:white;border:none;border-radius:10px;padding:14px 20px;font-size:20px;font-weight:900" onclick="var e=document.getElementById('inputDays'); e.value=Math.max(1,(parseInt(e.value)||1)-1); calculateTotal();">-</button>
-<input type="number" id="inputDays" value="1" min="1" max="365" oninput="calculateTotal()" style="flex:1;text-align:center;font-weight:900;font-size:20px;padding:14px;border:3px solid #16a34a;border-radius:10px" placeholder="e.g. 4">
-<button type="button" style="background:#16a34a;color:white;border:none;border-radius:10px;padding:14px 20px;font-size:20px;font-weight:900" onclick="var e=document.getElementById('inputDays'); e.value=(parseInt(e.value)||1)+1; calculateTotal();">+</button>
-</div>
-<div id="durationHelp" style="font-size:12px;color:#065f46;font-weight:700;margin-top:6px">Tap + or - or type number e.g. 4</div>
-</div>
-
-<div id="rateInfo" style="background:#f0fdf4;padding:10px;border-radius:10px;margin:8px 0;font-size:11px;font-weight:800;border:2px solid #16a34a">Legal Rate / Hour: Loading... GH 50 GHS/hr - Daily 400 GHS</div>
-<div id="tierInfo" style="font-size:10px;color:#6b7280">Tier: SHORT (1-6 days) or LONG (7+ days) auto</div>
-
-<button class="btnSubmit" style="background:#16a34a;color:white" onclick="goStep(2)">Continue to Step 2 ➡️</button>
+<div class="card" style="border-left:4px solid #16a34a">
+<h3 style="font-size:14px">Step 1: Choose Service (13 Services)</h3>
+<p style="font-size:11px;color:#6b7280">Select one service you need</p>
+<div id="servicesGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"></div>
+<button class="btnSmall" style="background:#16a34a;color:white;width:100%;margin-top:12px;padding:14px" onclick="nextStep(2)">Continue →</button>
 </div>
 </div>
 
-<!-- STEP 2: Start Time & End Time + Live Location -->
+<!-- STEP 2 -->
 <div id="step2" class="step">
-<div class="card" style="border:3px solid #0e7490;background:#f0fdfa">
-<h2 style="font-size:15px">⏰ Step 2/4: Start Time & End Time & Location</h2>
-
-<label style="font-weight:900;color:#0e7490">⏰ Start Time & End Time Everyday - Especially for Live-Out</label>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div><label style="font-size:11px">Start Time (Begin)</label><input type="time" id="startTimeDaily" value="08:00" onchange="calculateWorkHours()"></div>
-<div><label style="font-size:11px">End Time (Close)</label><input type="time" id="endTimeDaily" value="17:00" onchange="calculateWorkHours()"></div>
+<div class="card" style="border-left:4px solid #2563eb">
+<h3 style="font-size:14px">Step 2: Booking Details</h3>
+<label style="font-size:11px;font-weight:800">Client Full Name</label>
+<input id="clientName" placeholder="John Doe">
+<label style="font-size:11px;font-weight:800">Phone (Login Phone)</label>
+<input id="clientPhone" placeholder="0544121814">
+<label style="font-size:11px;font-weight:800">Service Date</label>
+<input id="serviceDate" type="date">
+<label style="font-size:11px;font-weight:800">Service Time</label>
+<input id="serviceTime" type="time">
+<label style="font-size:11px;font-weight:800">Duration</label>
+<select id="duration"><option value="1">1 Hour</option><option value="2">2 Hours</option><option value="4">4 Hours</option><option value="8">8 Hours (Day)</option><option value="12">12 Hours</option><option value="24">24 Hours (Full Day)</option></select>
+<label style="font-size:11px;font-weight:800">Patient Condition / Notes</label>
+<textarea id="notes" placeholder="Elderly care, diabetes, needs wheelchair support..."></textarea>
+<label style="font-size:11px;font-weight:800">Your Location (Auto GPS)</label>
+<div style="display:flex;gap:6px">
+<input id="locationText" placeholder="Accra, Ghana - GPS will auto fill" readonly>
+<button class="btnSmall" style="background:#16a34a;color:white" onclick="getGPS()">📍 GPS</button>
 </div>
-
-<div style="display:flex;gap:8px;margin-top:8px">
-<div style="flex:1"><label style="font-size:11px">Care Mode</label>
-<select id="careModeSelect" onchange="toggleLiveOutOptions()">
-<option value="live-out">Live-Out (Goes home daily)</option>
-<option value="live-in">Live-In (Stays 24hrs)</option>
-<option value="hourly">Hourly Visit</option>
-</select></div>
-</div>
-
-<div id="workHoursDisplay" style="background:white;padding:8px;border-radius:8px;margin-top:8px;font-size:11px;font-weight:800;color:#0e7490">Work Hours: 08:00 - 17:00 = 9 hrs/day</div>
-
-<div style="margin-top:8px">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-<label style="font-size:10px"><input type="checkbox" id="includeWeekends" style="width:auto"> Include Weekends?</label>
-<label style="font-size:10px"><input type="checkbox" id="includeHolidays" style="width:auto"> Include Holidays?</label>
-</div>
-</div>
-
-<div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:10px;padding:10px;margin-top:10px">
-<div style="font-weight:800;font-size:12px;color:#16a34a">📍 Client Live Location (Auto GPS - No typing)</div>
-<div id="clientBookingLocationStatus" style="font-size:11px;color:#6b7280;padding:6px;background:white;border-radius:6px;margin-top:6px">📍 Nurse needs your live location to come to you - Tap to get GPS</div>
-<button type="button" id="getClientBookingLocationBtn" onclick="getClientBookingLiveLocation()" style="width:100%;background:#16a34a;color:white;padding:10px;border:none;border-radius:8px;font-weight:800;margin-top:6px">📍 Share My Live Location for This Booking</button>
-<div id="clientBookingLocationDisplay" style="display:none;margin-top:8px;background:white;border:2px solid #16a34a;border-radius:8px;padding:8px;font-size:11px"></div>
-<input type="hidden" id="clientBookingLat">
-<input type="hidden" id="clientBookingLng">
-<input type="hidden" id="clientBookingMapLink">
-</div>
-
-<div style="display:flex;gap:8px;margin-top:12px">
-<button class="btnSubmit" style="background:#6b7280;color:white;flex:1" onclick="goStep(1)">⬅️ Back</button>
-<button class="btnSubmit" style="background:#16a34a;color:white;flex:1" onclick="goStep(3)">Continue to Step 3 ➡️</button>
+<p id="gpsStatus2" style="font-size:10px;color:#16a34a;margin-top:4px">Tap GPS to auto fill</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+<button class="btnSmall" style="background:#e5e7eb" onclick="nextStep(1)">← Back</button>
+<button class="btnSmall" style="background:#2563eb;color:white" onclick="nextStep(3)">Continue →</button>
 </div>
 </div>
 </div>
 
-<!-- STEP 3: Patient Concerns + Voice Note -->
+<!-- STEP 3 -->
 <div id="step3" class="step">
-<div class="card" style="border:2px solid #ef4444;background:#fef2f2">
-<h2 style="font-size:15px">📝 Step 3/4: Patient Condition</h2>
-<label style="font-weight:800;color:#ef4444">📝 Patient Concerns / Condition</label>
-<textarea id="patientConcerns" rows="4" placeholder="Describe patient condition, symptoms, what nurse should do..."></textarea>
-<textarea id="patientMedicalHistory" rows="2" placeholder="Medical history / Medications / Allergies" style="margin-top:6px"></textarea>
-<div style="display:flex;gap:8px;margin-top:6px">
-<select id="patientAge"><option value="">Patient Age?</option><option>0-1 Infant</option><option>2-12 Child</option><option>13-17 Teen</option><option>18-40 Adult</option><option>41-60 Middle-aged</option><option>61-80 Elderly</option><option>80+ Very Elderly</option></select>
-<select id="patientGender"><option value="">Gender?</option><option>Male</option><option>Female</option><option>Other</option></select>
+<div class="card" style="border-left:4px solid #eab308">
+<h3 style="font-size:14px">Step 3: Confirm & Book</h3>
+<div id="summaryBox" style="background:#f8fafc;padding:12px;border-radius:12px;font-size:12px;line-height:1.6;margin-top:8px"></div>
+<button class="btnSmall" style="background:#16a34a;color:white;width:100%;margin-top:12px;padding:14px;font-size:14px" onclick="confirmBooking()">✅ Confirm Booking - Pay on Arrival</button>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+<button class="btnSmall" style="background:#e5e7eb" onclick="nextStep(2)">← Back</button>
+<button class="btnSmall" style="background:#ef4444;color:white" onclick="window.location.href='./index.html'">Cancel</button>
 </div>
-<div id="concernsCharCount" style="font-size:9px;color:#6b7280;text-align:right">0/500 chars</div>
-</div>
-
-<div class="card" style="border:2px solid #7c3aed;background:#f5f3ff">
-<label style="font-weight:800;color:#7c3aed">🎤 Voice Note - Describe Condition (Optional)</label>
-<div style="display:flex;gap:8px;align-items:center;margin:8px 0">
-<button id="recordBtn" class="btnSmall" style="background:#ef4444;color:white;padding:14px 20px;border-radius:50px;font-weight:800" onclick="toggleVoiceRecording()">🎤 Record</button>
-<button id="playVoiceBtn" class="btnSmall" style="display:none;background:#16a34a;color:white;padding:12px" onclick="playVoiceNote()">▶️ Play</button>
-<button id="deleteVoiceBtn" class="btnSmall" style="display:none;background:#6b7280;color:white;padding:12px" onclick="deleteVoiceNote()">🗑️ Delete</button>
-</div>
-<div id="voiceStatus" style="font-size:11px;background:white;padding:8px;border-radius:8px">Tap Record to start - Max 2 mins</div>
-<div id="voiceTimer" style="font-size:12px;font-weight:800;color:#ef4444;text-align:center"></div>
-<div id="voicePlayback" style="display:none;margin-top:8px"><audio id="voiceAudio" controls style="width:100%"></audio></div>
-</div>
-
-<div style="display:flex;gap:8px;margin:10px 12px">
-<button class="btnSubmit" style="background:#6b7280;color:white;flex:1" onclick="goStep(2)">⬅️ Back</button>
-<button class="btnSubmit" style="background:#16a34a;color:white;flex:1" onclick="goStep(4)">Continue to Step 4 ➡️</button>
-</div>
-</div>
-
-<!-- STEP 4: Phone + Offer + Paystack -->
-<div id="step4" class="step">
-<div class="card" style="border:3px solid #16a34a">
-<h2 style="font-size:15px">💰 Step 4/4: Phone & Offer & Pay</h2>
-
-<label>Phone Number</label>
-<input type="tel" id="clientPhone" placeholder="+233... Client phone">
-
-<label>Your Offer (must be >= Legal Min) - BLOCKED if below minimum</label>
-<input type="number" id="clientOffer" placeholder="Enter amount e.g. 500" oninput="validateOffer()" onblur="validateOffer()">
-<div id="offerValidationMsg" style="font-size:11px;font-weight:800;padding:6px;border-radius:8px;margin-top:4px;display:none"></div>
-<div style="font-size:10px;color:#6b7280;margin-top:4px">⚠️ Minimum required: <b id="minRequiredDisplay">GH 50/hr, 400/day</b> - If you enter below, booking will be BLOCKED to protect nurses</div>
-
-<div id="totalDisplay" style="background:#f0fdf4;border:2px solid #16a34a;border-radius:10px;padding:10px;margin-top:10px;font-size:12px;font-weight:800">Total: Calculate...</div>
-
-<button id="bookNurseBtn" class="btnSubmit" style="background:#16a34a;color:white;padding:16px;font-size:14px" onclick="bookNurse()">✅ Book Nurse - Pay with Paystack (Bottom)</button>
-<div id="bookResult" style="font-size:11px;margin-top:8px"></div>
-
-<div style="display:flex;gap:8px;margin-top:10px">
-<button class="btnSubmit" style="background:#6b7280;color:white;flex:1" onclick="goStep(3)">⬅️ Back</button>
-<a href="index.html" class="btnSubmit" style="background:#111827;color:white;flex:1;text-decoration:none">🏠 Home</a>
-</div>
-
-<p style="font-size:9px;color:#999;text-align:center;margin-top:8px">Paystack at bottom - Secure payment - Ghana, Nigeria, SA, Kenya + USD, GBP, CAD, AUD</p>
 </div>
 </div>
 
 <script>
+let selectedService=null, clientLat=5.6037, clientLng=-0.1870, selectedNurseFromMap=null;
+
+// SHOW SELECTED NURSE FROM MAP - TOP
+window.addEventListener('DOMContentLoaded',()=>{
+  selectedNurseFromMap=JSON.parse(localStorage.getItem('selectedNurseForBooking')||'null');
+  const d=document.getElementById('selectedNurseTopDisplay');
+  if(selectedNurseFromMap && d){
+    d.style.display='block';
+    d.innerHTML=`<div style="display:flex;gap:10px;align-items:center">
+      <div style="font-size:28px;background:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center">${selectedNurseFromMap.photo||'👩‍⚕️'}</div>
+      <div style="flex:1">
+        <div style="font-weight:900;font-size:13px;color:#16a34a">✅ Selected Nurse from Map - ${selectedNurseFromMap.name} ✅</div>
+        <div style="font-size:11px">${selectedNurseFromMap.specialty} • ⭐${selectedNurseFromMap.rating} • 📍 ${selectedNurseFromMap.distance.toFixed(1)}km away</div>
+        <div style="font-size:10px;color:#6b7280">License: ${selectedNurseFromMap.license} • ${selectedNurseFromMap.hourly} GHS/hr • <a href="https://www.google.com/maps?q=${selectedNurseFromMap.lat},${selectedNurseFromMap.lng}" target="_blank" style="color:#16a34a">View on Map</a></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+      <button class="btnSmall" style="background:#16a34a;color:white;padding:12px">✅ Proceed to Book ${selectedNurseFromMap.name}</button>
+      <button class="btnSmall" style="background:#ef4444;color:white;padding:12px" onclick="localStorage.removeItem('selectedNurseForBooking');document.getElementById('selectedNurseTopDisplay').style.display='none';selectedNurseFromMap=null;">❌ Reject / Choose Another</button>
+    </div>`;
+  }
+});
+
+const services=["Elderly Care","Post-Surgery Care","Baby / Nanny Care","Physiotherapy","Diabetes Care","Hypertension Care","Wound Dressing","Injection / IV","Maternity Care","Palliative Care","Companion Care","Lab Sample Collection","General Nursing"];
+function loadServices(){
+  const grid=document.getElementById('servicesGrid');
+  grid.innerHTML=services.map(s=>`<button class="serviceBtn" onclick="selectService(this,'${s}')">${s}</button>`).join('');
+}
+function selectService(el,name){
+  document.querySelectorAll('.serviceBtn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');selectedService=name;
+}
 function toggleMenu(){document.getElementById('menuOverlay').classList.toggle('open');document.getElementById('menuBg').classList.toggle('show')}
-let currentRate='hourly';
-let minRates={GH:{hourly:50,daily:400,weekly:2500,monthly:9000},NG:{hourly:2000,daily:15000,weekly:90000,monthly:320000},ZA:{hourly:120,daily:900,weekly:5500,monthly:20000},KE:{hourly:800,daily:6000,weekly:35000,monthly:120000},US:{hourly:35,daily:250,weekly:1500,monthly:5000},UK:{hourly:25,daily:180,weekly:1100,monthly:3800},CA:{hourly:35,daily:260,weekly:1600,monthly:5500},AU:{hourly:45,daily:320,weekly:1900,monthly:6500}}
-
-function goStep(n){
- document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
- document.getElementById('step'+n).classList.add('active');
- document.querySelectorAll('.stepDot').forEach((d,i)=>{d.classList.remove('active','done'); if(i+1<n) d.classList.add('done'); if(i+1==n) d.classList.add('active')});
- window.scrollTo(0,0);
+function nextStep(n){
+  if(n===2 && !selectedService){alert('Please select a service first');return;}
+  if(n===3){
+    const name=document.getElementById('clientName').value, phone=document.getElementById('clientPhone').value, date=document.getElementById('serviceDate').value;
+    if(!name||!phone||!date){alert('Fill Name, Phone, Date');return;}
+  }
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  document.getElementById('s1').style.color=n>=1?'#16a34a':'#999';
+  document.getElementById('s2').style.color=n>=2?'#16a34a':'#999';
+  document.getElementById('s3').style.color=n>=3?'#16a34a':'#999';
+  if(n===3){buildSummary();}
 }
-
-function switchRateTab(t){
- currentRate=t;
- document.getElementById('tabHourly').style.background=t=='hourly'?'#16a34a':'#e5e7eb'; document.getElementById('tabHourly').style.color=t=='hourly'?'white':'#111';
- document.getElementById('tabDaily').style.background=t=='daily'?'#16a34a':'#e5e7eb'; document.getElementById('tabDaily').style.color=t=='daily'?'white':'#111';
- document.getElementById('tabWeekly').style.background=t=='weekly'?'#16a34a':'#e5e7eb'; document.getElementById('tabWeekly').style.color=t=='weekly'?'white':'#111';
- document.getElementById('tabMonthly').style.background=t=='monthly'?'#16a34a':'#e5e7eb'; document.getElementById('tabMonthly').style.color=t=='monthly'?'white':'#111';
- document.getElementById('daysLabel').innerText=t=='hourly'?'Hours':t=='daily'?'Days':t=='weekly'?'Weeks':'Months';
- calculateTotal(); updateCountryPricing();
+function buildSummary(){
+  const nursePart=selectedNurseFromMap?`<b>Selected Nurse from Map:</b> ${selectedNurseFromMap.name} - ${selectedNurseFromMap.specialty} - ⭐${selectedNurseFromMap.rating} - ${selectedNurseFromMap.distance.toFixed(1)}km - ${selectedNurseFromMap.hourly} GHS/hr<br>`:`<b>Nurse:</b> Auto-assign nearest online nurse<br>`;
+  document.getElementById('summaryBox').innerHTML=`
+  ${nursePart}
+  <b>Service:</b> ${selectedService}<br>
+  <b>Client:</b> ${document.getElementById('clientName').value} - ${document.getElementById('clientPhone').value}<br>
+  <b>Date:</b> ${document.getElementById('serviceDate').value} ${document.getElementById('serviceTime').value}<br>
+  <b>Duration:</b> ${document.getElementById('duration').value} hours<br>
+  <b>Location:</b> ${document.getElementById('locationText').value||clientLat.toFixed(5)+','+clientLng.toFixed(5)}<br>
+  <b>Notes:</b> ${document.getElementById('notes').value||'None'}<br><br>
+  <span style="color:#16a34a;font-weight:900">Pay on arrival - Cash / MoMo</span>
+  `;
 }
-
-function updateCountryPricing(){
- const c=document.getElementById('countrySelect').value; const r=minRates[c]||minRates.GH;
- const rate=r[currentRate]||r.daily;
- document.getElementById('rateInfo').innerHTML=`Legal Rate / ${currentRate}: <b>${rate} ${c}</b> - Min protected`;
- document.getElementById('minRequiredDisplay').innerText=`${rate} ${c} / ${currentRate}`;
- calculateTotal();
+function getGPS(){
+  const st=document.getElementById('gpsStatus2');
+  st.innerText='📍 Getting GPS...';
+  if(!navigator.geolocation){st.innerText='GPS not supported';return;}
+  navigator.geolocation.getCurrentPosition(p=>{
+    clientLat=p.coords.latitude;clientLng=p.coords.longitude;
+    document.getElementById('locationText').value=`${clientLat.toFixed(5)}, ${clientLng.toFixed(5)} - Accra, Ghana`;
+    st.innerText=`✅ GPS Locked: ${clientLat.toFixed(5)}, ${clientLng.toFixed(5)}`;
+  },()=>{st.innerText='❌ GPS denied - type manually';document.getElementById('locationText').readOnly=false;},{enableHighAccuracy:true,timeout:8000});
 }
-
-function calculateTotal(){
- const days=parseInt(document.getElementById('inputDays').value)||1;
- const c=document.getElementById('countrySelect').value; const r=minRates[c]||minRates.GH;
- const rate=r[currentRate]||r.daily;
- const total=days*rate;
- document.getElementById('totalDisplay').innerText=`Total: ${total} ${c} for ${days} ${currentRate}(s) - Min: ${rate} ${c}`;
- document.getElementById('tierInfo').innerText=days>=7?`LONG TERM: ${days} ${currentRate}s - Discount may apply`:`SHORT TERM: ${days} ${currentRate}(s)`;
- validateOffer();
+function confirmBooking(){
+  const bookings=JSON.parse(localStorage.getItem('loveCareBookings')||'[]');
+  bookings.push({
+    id:'BK'+Date.now(),service:selectedService,name:document.getElementById('clientName').value,
+    phone:document.getElementById('clientPhone').value,date:document.getElementById('serviceDate').value,
+    time:document.getElementById('serviceTime').value,duration:document.getElementById('duration').value,
+    location:document.getElementById('locationText').value||clientLat+','+clientLng,
+    lat:clientLat,lng:clientLng,notes:document.getElementById('notes').value,
+    nurse:selectedNurseFromMap||null,status:'Pending',created:new Date().toISOString()
+  });
+  localStorage.setItem('loveCareBookings',JSON.stringify(bookings));
+  localStorage.removeItem('selectedNurseForBooking');
+  alert('✅ Booking Confirmed! Nurse will contact you soon. Check My Bookings');
+  window.location.href='./my-bookings.html';
 }
-
-function calculateWorkHours(){
- const s=document.getElementById('startTimeDaily').value; const e=document.getElementById('endTimeDaily').value;
- if(s&&e){const [sh,sm]=s.split(':').map(Number); const [eh,em]=e.split(':').map(Number); let diff=(eh*60+em)-(sh*60+sm); if(diff<0) diff+=24*60; const h=Math.floor(diff/60); const m=diff%60; document.getElementById('workHoursDisplay').innerText=`Work Hours: ${s} - ${e} = ${h} hrs ${m} mins/day`;}
-}
-
-function toggleLiveOutOptions(){}
-
-function getClientBookingLiveLocation(){
- const st=document.getElementById('clientBookingLocationStatus'); const disp=document.getElementById('clientBookingLocationDisplay');
- st.innerText='📍 Getting GPS... Allow location';
- if(!navigator.geolocation){st.innerText='❌ GPS not supported'; return;}
- navigator.geolocation.getCurrentPosition(p=>{
-  const lat=p.coords.latitude; const lng=p.coords.longitude;
-  document.getElementById('clientBookingLat').value=lat; document.getElementById('clientBookingLng').value=lng;
-  const link=`https://www.google.com/maps?q=${lat},${lng}`;
-  document.getElementById('clientBookingMapLink').value=link;
-  st.innerText='✅ Live location captured!';
-  disp.style.display='block'; disp.innerHTML=`✅ ${lat.toFixed(6)}, ${lng.toFixed(6)}<br><a href="${link}" target="_blank" style="color:#16a34a">Open in Google Maps</a><br><small>Accuracy: ${p.coords.accuracy.toFixed(0)}m</small>`;
- }, e=>{st.innerText='❌ GPS failed: '+e.message+' - Using Accra default'; document.getElementById('clientBookingLat').value=5.6037; document.getElementById('clientBookingLng').value=-0.1870;}, {enableHighAccuracy:true, timeout:10000});
-}
-
-function validateOffer(){
- const offer=parseFloat(document.getElementById('clientOffer').value)||0;
- const c=document.getElementById('countrySelect').value; const r=minRates[c]||minRates.GH; const rate=r[currentRate]||r.daily;
- const days=parseInt(document.getElementById('inputDays').value)||1; const minTotal=rate*days;
- const msg=document.getElementById('offerValidationMsg');
- if(offer==0){msg.style.display='none'; return false;}
- if(offer<minTotal){
-  msg.style.display='block'; msg.style.background='#fef2f2'; msg.style.color='#ef4444'; msg.style.border='2px solid #ef4444';
-  msg.innerText=`❌ BLOCKED! Your offer ${offer} ${c} is below minimum ${minTotal} ${c} (${rate} x ${days}). Increase to protect nurses!`;
-  document.getElementById('bookNurseBtn').disabled=true; document.getElementById('bookNurseBtn').style.opacity='0.5';
-  return false;
- } else {
-  msg.style.display='block'; msg.style.background='#f0fdf4'; msg.style.color='#16a34a'; msg.style.border='2px solid #16a34a';
-  msg.innerText=`✅ Offer OK! ${offer} ${c} >= minimum ${minTotal} ${c}`;
-  document.getElementById('bookNurseBtn').disabled=false; document.getElementById('bookNurseBtn').style.opacity='1';
-  return true;
- }
-}
-
-// Voice note
-let mediaRecorder, audioChunks=[], audioBlob;
-function toggleVoiceRecording(){
- const btn=document.getElementById('recordBtn'); const status=document.getElementById('voiceStatus');
- if(btn.innerText.includes('Record')){
-  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-   mediaRecorder=new MediaRecorder(stream); audioChunks=[];
-   mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
-   mediaRecorder.onstop=()=>{
-    audioBlob=new Blob(audioChunks,{type:'audio/webm'});
-    const url=URL.createObjectURL(audioBlob);
-    document.getElementById('voiceAudio').src=url;
-    document.getElementById('voicePlayback').style.display='block';
-    document.getElementById('playVoiceBtn').style.display='inline-flex';
-    document.getElementById('deleteVoiceBtn').style.display='inline-flex';
-    status.innerText='✅ Voice recorded - Ready';
-   };
-   mediaRecorder.start(); btn.innerText='⏹️ Stop'; btn.style.background='#111827'; status.innerText='🎤 Recording... Tap Stop';
-   let sec=0; const timer=setInterval(()=>{sec++; document.getElementById('voiceTimer').innerText=`${sec}s / 120s`; if(sec>=120){clearInterval(timer); toggleVoiceRecording();}},1000);
-   mediaRecorder._timer=timer;
-  }).catch(e=>{status.innerText='❌ Mic denied: '+e.message});
- } else {
-  if(mediaRecorder){mediaRecorder.stop(); clearInterval(mediaRecorder._timer); mediaRecorder.stream.getTracks().forEach(t=>t.stop());}
-  btn.innerText='🎤 Record'; btn.style.background='#ef4444'; document.getElementById('voiceTimer').innerText='';
- }
-}
-function playVoiceNote(){document.getElementById('voiceAudio').play()}
-function deleteVoiceNote(){document.getElementById('voicePlayback').style.display='none'; document.getElementById('playVoiceBtn').style.display='none'; document.getElementById('deleteVoiceBtn').style.display='none'; document.getElementById('voiceStatus').innerText='Tap Record to start';}
-
-function bookNurse(){
- if(!validateOffer()){alert('❌ Offer below minimum - Increase!'); return;}
- const phone=document.getElementById('clientPhone').value;
- if(!phone){alert('Enter phone number'); return;}
- // Paystack simulation - at bottom as you wanted
- const c=document.getElementById('countrySelect').value; const offer=document.getElementById('clientOffer').value;
- document.getElementById('bookResult').innerHTML=`✅ Validated! Opening Paystack for ${offer} ${c}...<br>Phone: ${phone}<br>Location: ${document.getElementById('clientBookingMapLink').value||'Not set'}<br>Concerns: ${document.getElementById('patientConcerns').value.substring(0,50)}...`;
- // Here Paystack popup would open - bottom placement
- if(typeof PaystackPop!=='undefined'){
-  let handler=PaystackPop.setup({key:'pk_test_xxx',email:phone+'@lovecare.com',amount:offer*100,currency:c=='GH'?'GHS':c=='NG'?'NGN':c=='ZA'?'ZAR':c=='KE'?'KES':'USD',callback:function(r){document.getElementById('bookResult').innerHTML+='<br>✅ Payment success! Ref: '+r.reference;}});
-  handler.openIframe();
- } else {
-  document.getElementById('bookResult').innerHTML+='<br>⚠️ Paystack key not set - Booking saved as pending - CEO will verify';
- }
-}
-
-updateCountryPricing(); calculateWorkHours(); calculateTotal();
+loadServices();
 </script>
 </body>
 </html>
