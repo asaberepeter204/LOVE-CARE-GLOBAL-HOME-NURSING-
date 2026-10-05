@@ -3,15 +3,12 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LOVE CARE GLOBAL HOME NURSING</title>
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./icon-192.png">
-<meta name="theme-color" content="#16a34a">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#111}
-.header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a 0%,#eab308 50%,#16a34a 100%);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111}
+.header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#eab308);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
 .card{background:#fff;border-radius:18px;padding:14px;margin:10px 12px;border:2px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,.06)}
-.btnSmall{padding:12px 14px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
-.menuOverlay{position:fixed;top:0;left:-100%;width:290px;height:100%;background:#fff;z-index:3000;transition:.35s;box-shadow:4px 0 30px rgba(0,0,0,.3);overflow:auto}
+.btnSmall{padding:12px 14px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.menuOverlay{position:fixed;top:0;left:-100%;width:290px;height:100%;background:#fff;z-index:3000;transition:.35s;overflow:auto}
 .menuOverlay.open{left:0}.menuBg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:2999;display:none}.menuBg.show{display:block}
 </style>
 </head>
@@ -19,131 +16,87 @@
 
 <div class="header">
 <div style="display:flex;align-items:center;gap:8px">
-<button class="btnSmall" style="background:#facc15;color:#111;font-size:22px;line-height:1" onclick="toggleMenu()">☰</button>
-<div style="font-weight:900;font-size:14px;line-height:1.1">LOVE CARE GLOBAL<br><span style="background:white;color:#16a34a;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:900">HOME NURSING</span></div>
+<button class="btnSmall" style="background:#facc15;color:#111;font-size:22px" onclick="toggleMenu()">☰</button>
+<div style="font-weight:900;font-size:14px;line-height:1.1">LOVE CARE GLOBAL<br><span style="background:white;color:#16a34a;padding:3px 10px;border-radius:20px;font-size:11px">HOME NURSING</span></div>
 </div>
-<div style="display:flex;gap:8px;align-items:center">
-<button class="btnSmall" style="background:#ef4444;color:white;padding:11px 20px;border-radius:22px;font-weight:900;font-size:13px" onclick="window.location.href='./sos.html'">SOS</button>
-</div>
+<button class="btnSmall" style="background:#ef4444;color:white;padding:11px 20px;border-radius:22px" onclick="window.location.href='./sos.html'">SOS</button>
 </div>
 
 <div id="menuBg" class="menuBg" onclick="toggleMenu()"></div>
 <div id="menuOverlay" class="menuOverlay">
 <div style="padding:14px">
-<h3 style="margin:0;font-size:15px">LOVE CARE GLOBAL<br><small style="font-size:11px;color:#16a34a">HOME NURSING - 8 Countries • 13 Services</small></h3>
+<h3 style="font-size:15px">LOVE CARE GLOBAL<br><small style="font-size:11px;color:#16a34a">HOME NURSING</small></h3>
 
-<div style="font-size:10px;font-weight:900;color:#16a34a;margin:14px 0 4px;letter-spacing:1px">GROUP 1: MAIN</div>
-<button class="btnSmall" style="background:#f0fdf4;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:2px solid #16a34a" onclick="window.location.href='./index.html';toggleMenu()">🏠 Home - Pure Home Only</button>
-<button class="btnSmall" style="background:#eff6ff;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:2px solid #2563eb" onclick="window.location.href='./book-nurse.html';toggleMenu()">📅 Book Nurse - 13 Services (Booking Page)</button>
-<button class="btnSmall" style="background:#fef2f2;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:2px solid #ef4444" onclick="window.location.href='./sos.html';toggleMenu()">🚨 SOS Emergency - Nearby Police + Google Maps</button>
-<button class="btnSmall" style="background:#f0fdf4;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:2px solid #16a34a" onclick="window.location.href='./my-bookings.html';toggleMenu()">📋 My Bookings</button>
-<button class="btnSmall" style="background:#16a34a;color:white;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./client-register.html';toggleMenu()">📝 Client Register - Phone & Password</button>
-<button class="btnSmall" style="background:#2563eb;color:white;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./client-login.html';toggleMenu()">🔓 Client Login</button>
-<button class="btnSmall" style="background:#f0fdf4;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:2px solid #16a34a" onclick="window.location.href='./client-dashboard.html';toggleMenu()">👤 Client Dashboard</button>
+<div style="font-size:10px;font-weight:900;color:#16a34a;margin:14px 0 4px">MAIN</div>
+<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;border:2px solid #16a34a;justify-content:flex-start" onclick="window.location.href='./index.html';toggleMenu()">🏠 Home</button>
+<button class="btnSmall" style="background:#eff6ff;width:100%;margin:4px 0;border:2px solid #2563eb;justify-content:flex-start" onclick="window.location.href='./book-nurse.html';toggleMenu()">📅 Book Nurse</button>
+<button class="btnSmall" style="background:#fef2f2;width:100%;margin:4px 0;border:2px solid #ef4444;justify-content:flex-start" onclick="window.location.href='./sos.html';toggleMenu()">🚨 SOS Emergency</button>
+<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./my-bookings.html';toggleMenu()">📋 My Bookings</button>
+<button class="btnSmall" style="background:#16a34a;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./client-register.html';toggleMenu()">📝 Client Register</button>
+<button class="btnSmall" style="background:#2563eb;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./client-login.html';toggleMenu()">🔓 Client Login</button>
+<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./client-dashboard.html';toggleMenu()">👤 Client Dashboard</button>
 
-<div style="font-size:10px;font-weight:900;color:#2563eb;margin:14px 0 4px;letter-spacing:1px">GROUP 2: NURSE</div>
-<button class="btnSmall" style="background:#f0fdf4;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:2px solid #2563eb" onclick="window.location.href='./nurse-public.html';toggleMenu()">👩‍⚕️ Join as Nurse (8 Countries - License)</button>
-<button class="btnSmall" style="background:#2563eb;color:white;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./nurse-login.html';toggleMenu()">👩‍⚕️ Nurse Login</button>
-<button class="btnSmall" style="background:#f0fdf4;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:2px solid #2563eb" onclick="window.location.href='./nurse-dashboard.html';toggleMenu()">👩‍⚕️ Nurse Dashboard</button>
-<button class="btnSmall" style="background:#7c3aed;color:white;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./group-chat.html';toggleMenu()">🔒 Nurses Group Chat (Password)</button>
+<div style="font-size:10px;font-weight:900;color:#2563eb;margin:14px 0 4px">NURSE</div>
+<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;border:2px solid #2563eb;justify-content:flex-start" onclick="window.location.href='./nurse-public.html';toggleMenu()">👩‍⚕️ Join as Nurse</button>
+<button class="btnSmall" style="background:#2563eb;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./nurse-login.html';toggleMenu()">👩‍⚕️ Nurse Login</button>
+<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./nurse-dashboard.html';toggleMenu()">👩‍⚕️ Nurse Dashboard</button>
+<button class="btnSmall" style="background:#7c3aed;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./group-chat.html';toggleMenu()">🔒 Nurses Group Chat</button>
 
-<div style="font-size:10px;font-weight:900;color:#eab308;margin:14px 0 4px;letter-spacing:1px">SUPPORT & ADMIN</div>
-<button class="btnSmall" style="background:#f9fafb;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:1px solid #e5e7eb" onclick="window.location.href='./support.html';toggleMenu()">💬 Contact Support</button>
-<button class="btnSmall" style="background:#f5f3ff;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:1px solid #7c3aed" onclick="window.location.href='./ai-support.html';toggleMenu()">🤖 AI Support</button>
-<button class="btnSmall" style="background:#fef3c7;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left;border:1px solid #eab308" onclick="window.location.href='./admin-dashboard.html';toggleMenu()">🛡️ Admin Dashboard</button>
+<div style="font-size:10px;font-weight:900;color:#eab308;margin:14px 0 4px">SUPPORT & ADMIN</div>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;border:1px solid #e5e7eb;justify-content:flex-start" onclick="window.location.href='./support.html';toggleMenu()">💬 Contact Support</button>
 
-<div style="font-size:10px;font-weight:900;color:#6b7280;margin:14px 0 4px;letter-spacing:1px">LEGALS & POLICIES</div>
-<button class="btnSmall" style="background:#f9fafb;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./privacy.html';toggleMenu()">🔒 Privacy Policy</button>
-<button class="btnSmall" style="background:#f9fafb;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./terms.html';toggleMenu()">📄 Terms of Service</button>
-<button class="btnSmall" style="background:#f9fafb;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./refund.html';toggleMenu()">💰 Refund Policy</button>
-<button class="btnSmall" style="background:#f9fafb;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./nurse-protection.html';toggleMenu()">🛡️ Nurse Protection Policy</button>
-<button class="btnSmall" style="background:#f9fafb;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./minimum-rate.html';toggleMenu()">⚖️ Minimum Wage / Legal Rate</button>
-<button class="btnSmall" style="background:#f9fafb;color:#111;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./about.html';toggleMenu()">💜 About Us</button>
-<button class="btnSmall" style="background:#111827;color:white;width:100%;padding:12px;margin:4px 0;text-align:left" onclick="window.location.href='./settings.html';toggleMenu()">⚙️ Settings</button>
+<div style="font-size:10px;font-weight:900;color:#6b7280;margin:14px 0 4px">LEGALS & POLICIES</div>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./privacy.html';toggleMenu()">🔒 Privacy Policy</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./terms.html';toggleMenu()">📄 Terms of Service</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./refund.html';toggleMenu()">💰 Refund Policy</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./nurse-protection.html';toggleMenu()">🛡️ Nurse Protection Policy</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./minimum-rate.html';toggleMenu()">⚖️ Minimum Wage / Legal Rate</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./about.html';toggleMenu()">💜 About Us</button>
+<button class="btnSmall" style="background:#111827;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./settings.html';toggleMenu()">⚙️ Settings</button>
 
 <hr style="margin:14px 0">
-<button class="btnSmall" style="background:#fef2f2;color:#ef4444;width:100%;padding:14px;margin:4px 0;text-align:left;border:2px solid #ef4444;font-size:13px" onclick="exitApp()">
-🚪 Exit App - Close & Thank You
-</button>
-
-<div style="padding:10px;text-align:center">
-<button onclick="toggleMenu()" class="btnSmall" style="width:100%;background:#6b7280;color:white">✕ Close Menu</button>
-<p style="font-size:9px;color:#999;margin-top:8px">Accra HQ • +233544121814<br>8 Countries • 13 Services</p>
-</div>
+<button class="btnSmall" style="background:#fef2f2;color:#ef4444;width:100%;margin:4px 0;border:2px solid #ef4444" onclick="exitApp()">🚪 Exit App - Close & Thank You</button>
+<button onclick="toggleMenu()" class="btnSmall" style="width:100%;background:#6b7280;color:white;margin-top:10px">✕ Close Menu</button>
+<p style="font-size:9px;color:#999;text-align:center;margin-top:8px">Accra HQ • +233544121814<br>8 Countries • 13 Services</p>
 </div>
 </div>
 
-<!-- CLIENT ACCESS -->
-<div class="card" style="border:3px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#ecfdf5)">
-<div style="display:flex;align-items:center;gap:8px">
-<div style="background:#16a34a;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center">👥</div>
-<div><h3 style="color:#16a34a;font-size:14px;margin:0">Client Access - Register / Login</h3><p style="font-size:10px;color:#6b7280;margin:0">Phone & Password BEFORE booking</p></div>
-</div>
-<p style="font-size:11px;color:#6b7280;margin:8px 0">Register with Phone & Password BEFORE booking - Location auto GPS, no typing - Booking is separate page!</p>
+<div class="card" style="border:3px solid #16a34a;background:#f0fdf4">
+<h3 style="color:#16a34a;font-size:14px">👨‍👩‍👧 Client Access - Register / Login</h3>
+<p style="font-size:11px;color:#6b7280;margin:6px 0">Register with Phone & Password BEFORE booking - Location auto GPS, no typing - Booking is separate page!</p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<button class="btnSmall" style="background:#16a34a;color:white;padding:12px;line-height:1.2" onclick="window.location.href='./client-register.html'">📝 Register<br><small style="font-size:10px;opacity:.9">Phone & Password</small></button>
-<button class="btnSmall" style="background:#2563eb;color:white;padding:12px;line-height:1.2" onclick="window.location.href='./client-login.html'">🔓 Login<br><small style="font-size:10px;opacity:.9">My Bookings</small></button>
+<button class="btnSmall" style="background:#16a34a;color:white" onclick="window.location.href='./client-register.html'">📝 Register</button>
+<button class="btnSmall" style="background:#2563eb;color:white" onclick="window.location.href='./client-login.html'">🔓 Login</button>
 </div>
 </div>
 
-<!-- FIND NURSE NEAR YOU - GOOGLE MAPS STRAIGHT -->
 <div class="card" style="border:3px solid #16a34a;text-align:center">
-<div style="font-size:28px">📍</div>
-<h3 style="font-size:15px;margin:4px 0">Find Nurse Near You</h3>
-<p style="font-size:11px;color:#6b7280;margin:4px 0">Tap to open Google Maps - Shows nearby online nurses & home nursing services</p>
-<button class="btnSmall" style="background:#16a34a;color:white;width:100%;padding:14px;font-size:13px;font-weight:900;margin-top:8px;box-shadow:0 4px 12px rgba(22,163,74,.3)" onclick="findNearbyNursesInGoogleMap()">
-📍 Find Nurse Near Me - Open in Google Maps
-</button>
-<p id="gpsStatus" style="font-size:10px;color:#16a34a;margin-top:8px;font-weight:700">📍 Allow GPS for accurate nearby nurses</p>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-<button class="btnSmall" style="background:#2563eb;color:white;width:100%;padding:12px" onclick="window.location.href='./book-nurse.html'">📅 Book Nurse Now</button>
-<button class="btnSmall" style="background:#ef4444;color:white;width:100%;padding:12px" onclick="window.location.href='./sos.html'">🚨 SOS Emergency</button>
+<h3 style="font-size:14px">📍 Find Nurse Near You</h3>
+<p style="font-size:11px;color:#6b7280">Tap to open Google Maps - Shows nearby online nurses</p>
+<button class="btnSmall" style="background:#16a34a;color:white;width:100%;padding:14px;margin-top:8px" onclick="findNearbyNursesInGoogleMap()">📍 Find Nurse Near Me - Open in Google Maps</button>
+<p id="gpsStatus" style="font-size:10px;color:#16a34a;margin-top:6px">📍 Allow GPS for accurate nearby nurses</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+<button class="btnSmall" style="background:#2563eb;color:white;width:100%" onclick="window.location.href='./book-nurse.html'">📅 Book Nurse Now</button>
+<button class="btnSmall" style="background:#ef4444;color:white;width:100%" onclick="window.location.href='./sos.html'">🚨 SOS Emergency</button>
 </div>
-</div>
-
-<div style="text-align:center;padding:16px 12px;font-size:10px;color:#9ca3af;line-height:1.4">
-LOVE CARE GLOBAL - Home Nursing<br>
-8 Countries • 13 Services • Accra HQ - Ghana<br>
-Booking separate: book-nurse.html • SOS: sos.html<br>
-<span style="color:#16a34a;font-weight:800">Pure Home - No Banner - No 3 Dots - Final</span>
 </div>
 
 <script>
 function toggleMenu(){document.getElementById('menuOverlay').classList.toggle('open');document.getElementById('menuBg').classList.toggle('show')}
 function findNearbyNursesInGoogleMap(){
-  const status=document.getElementById('gpsStatus');
-  status.innerText='📍 Getting your live location...';
-  if(!navigator.geolocation){
-    window.open('https://www.google.com/maps/search/home+nursing+services+near+me+online+nurse+verified/@5.6037,-0.1870,14z','_blank');
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const lat=pos.coords.latitude; const lng=pos.coords.longitude;
-    status.innerText=`✅ Location: ${lat.toFixed(4)}, ${lng.toFixed(4)} - Opening Google Maps...`;
-    const query='home nursing services near me online nurse verified available now';
-    const url=`https://www.google.com/maps/search/${encodeURIComponent(query)}/@${lat},${lng},14z/data=!3m1!4b1`;
-    window.open(url,'_blank');
-  }, err=>{
-    status.innerText='⚠️ GPS denied - Opening general search near Accra';
-    window.open('https://www.google.com/maps/search/home+nursing+services+near+me+online+nurse/@5.6037,-0.1870,14z','_blank');
-  }, {enableHighAccuracy:true, timeout:10000});
+ const s=document.getElementById('gpsStatus'); s.innerText='📍 Getting location...';
+ if(!navigator.geolocation){window.open('https://www.google.com/maps/search/home+nursing+services+near+me+online+nurse/@5.6037,-0.1870,14z','_blank');return;}
+ navigator.geolocation.getCurrentPosition(p=>{
+  const lat=p.coords.latitude,lng=p.coords.longitude;
+  s.innerText=`✅ ${lat.toFixed(4)},${lng.toFixed(4)} - Opening Maps...`;
+  window.open(`https://www.google.com/maps/search/home+nursing+services+near+me+online+nurse/@${lat},${lng},14z`,'_blank');
+ },()=>{window.open('https://www.google.com/maps/search/home+nursing+services+near+me+online+nurse/@5.6037,-0.1870,14z','_blank');},{enableHighAccuracy:true,timeout:8000});
 }
 function exitApp(){
-  if(confirm('🚪 Exit LOVE CARE GLOBAL?\n\nThank you for using our home nursing app!\n\nPress OK to close.')){
-    try{window.close();}catch(e){}
-    setTimeout(()=>{
-      document.body.innerHTML=`
-      <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#16a34a 0%,#eab308 100%);color:white;text-align:center;padding:24px;font-family:Inter,sans-serif">
-        <div style="font-size:70px">💜</div>
-        <h1 style="margin:12px 0;font-size:24px;font-weight:900">Thank You!</h1>
-        <p style="font-size:14px;line-height:1.5">LOVE CARE GLOBAL<br>Professional Home Nursing<br>24/7 Care - 8 Countries<br><br>App Closed Safely<br>Your data is saved</p>
-        <p style="font-size:11px;margin-top:20px;opacity:.85">You can close this tab now<br>Or tap below to reopen</p>
-        <button onclick="window.location.href='./index.html'" style="margin-top:20px;background:white;color:#16a34a;padding:14px 28px;border:none;border-radius:24px;font-weight:900;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2)">🏠 Reopen App</button>
-        <p style="font-size:9px;margin-top:20px;opacity:.7">Accra HQ • +233544121814<br>8 Countries • 13 Services</p>
-      </div>`;
-    },300);
-  }
+ if(confirm('Exit LOVE CARE GLOBAL?')){
+  try{window.close();}catch(e){}
+  setTimeout(()=>{document.body.innerHTML='<div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#16a34a,#eab308);color:white;text-align:center;padding:20px"><div style="font-size:60px">💜</div><h1>Thank You!</h1><p>App Closed Safely</p><button onclick="location.href=\'./index.html\'" style="margin-top:20px;background:white;color:#16a34a;padding:12px 24px;border:none;border-radius:20px;font-weight:900">🏠 Reopen App</button></div>';},300);
+ }
 }
 </script>
 </body>
