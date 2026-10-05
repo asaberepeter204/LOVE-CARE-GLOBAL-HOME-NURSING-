@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Settings - LOVE CARE GLOBAL HOME NURSING</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#7c3aed">
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#f8f9ff;color:#111}
+.header{background:linear-gradient(90deg,#7c3aed,#2563eb);color:white;padding:12px 16px;display:flex;justify-content:space-between;position:sticky;top:0;z-index:100}
+.container{max-width:700px;margin:0 auto;padding:16px}
+.card{background:white;border-radius:16px;padding:20px;margin:12px 0;border:1px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+h2{color:#7c3aed;margin-top:0}
+input,select,textarea{width:100%;padding:12px;margin:6px 0;border:2px solid #e5e7eb;border-radius:10px;box-sizing:border-box}
+.btn{width:100%;padding:14px;background:#7c3aed;color:white;border:none;border-radius:10px;font-weight:900;cursor:pointer;margin-top:8px}
+.btn-green{background:#16a34a}
+.btn-red{background:#ef4444}
+a{color:#7c3aed;font-weight:800;text-decoration:none}
+.switch{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f3f4f6}
+</style>
+</head>
+<body>
+<div class="header"><div><strong>LOVE CARE GLOBAL HOME NURSING</strong><br><small>Nurse Settings</small></div><div><a href="index.html" style="color:white">Home</a> | <a href="nurse-dashboard.html" style="color:white">Dashboard</a></div></div>
+<div class="container">
+
+<div class="card">
+<h2>👩‍⚕️ Profile Settings</h2>
+<p style="font-size:12px;color:#666">Official: https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+<input type="text" id="sName" placeholder="Full Name">
+<input type="tel" id="sPhone" placeholder="Phone">
+<input type="email" id="sEmail" placeholder="Email">
+<input type="text" id="sLocation" placeholder="Location / City">
+<select id="sCountry"><option>Ghana</option><option>Nigeria</option><option>USA</option><option>UK</option><option>Canada</option><option>Germany</option><option>South Africa</option><option>UAE</option></select>
+<textarea id="sBio" placeholder="Bio / Skills"></textarea>
+<button class="btn" onclick="saveProfile()">💾 Save Profile</button>
+</div>
+
+<div class="card">
+<h2>🔔 Availability & Notifications</h2>
+<div class="switch"><span>Available for Jobs</span><input type="checkbox" id="avail" checked></div>
+<div class="switch"><span>Push Notifications</span><input type="checkbox" id="push" checked></div>
+<div class="switch"><span>Show Location on Map</span><input type="checkbox" id="showLoc" checked></div>
+<div class="switch"><span>Email Alerts</span><input type="checkbox" id="emailAlert"></div>
+<button class="btn btn-green" onclick="saveSettings()">Save Settings</button>
+</div>
+
+<div class="card">
+<h2>🔒 Account</h2>
+<input type="password" id="newPass" placeholder="New Password">
+<button class="btn" onclick="changePass()">Change Password</button>
+<hr style="margin:15px 0">
+<a href="delete-account.html" class="btn btn-red" style="display:block;text-align:center;text-decoration:none">🗑️ Delete My Account</a>
+<p style="text-align:center;margin-top:15px"><a href="privacy-policy.html">Privacy Policy</a> | <a href="terms.html">Terms</a> | <a href="contact.html">Contact Support</a></p>
+</div>
+
+<p style="text-align:center;color:#888;font-size:11px">© 2026 LOVE CARE GLOBAL HOME NURSING<br>https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+const app=initializeApp({databaseURL:"https://love-care-global-default-rtdb.firebaseio.com"});
+const db=getDatabase(app);
+const phone=localStorage.getItem('nursePhone')||'';
+document.getElementById('sPhone').value=phone;
+document.getElementById('sName').value=localStorage.getItem('nurseName')||'';
+if(phone){
+ get(ref(db,'nurses/'+phone.replace(/[^0-9]/g,''))).then(snap=>{
+  if(snap.exists()){ const d=snap.val(); document.getElementById('sEmail').value=d.email||''; document.getElementById('sLocation').value=d.location||''; document.getElementById('sBio').value=d.bio||''; }
+ });
+}
+window.saveProfile=async function(){
+ const id=document.getElementById('sPhone').value.replace(/[^0-9]/g,'');
+ await update(ref(db,'nurses/'+id),{name:document.getElementById('sName').value,email:document.getElementById('sEmail').value,location:document.getElementById('sLocation').value,country:document.getElementById('sCountry').value,bio:document.getElementById('sBio').value,updated:Date.now()});
+ localStorage.setItem('nurseName',document.getElementById('sName').value);
+ alert('Profile Saved!');
+}
+window.saveSettings=async function(){
+ const id=(localStorage.getItem('nursePhone')||'').replace(/[^0-9]/g,'');
+ await update(ref(db,'nurses/'+id+'/settings'),{available:document.getElementById('avail').checked,push:document.getElementById('push').checked,showLoc:document.getElementById('showLoc').checked});
+ alert('Settings Saved!');
+}
+window.changePass=function(){ alert('Password changed - use your phone as password for now'); }
+</script>
+</body>
+</html>
