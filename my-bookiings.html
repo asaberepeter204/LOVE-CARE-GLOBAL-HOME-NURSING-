@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Bookings - LOVE CARE GLOBAL HOME NURSING</title>
+<style>body{font-family:Inter,sans-serif;margin:0;background:#f8f9ff}.header{background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;padding:14px}.container{max-width:800px;margin:0 auto;padding:16px}.booking{background:white;border:1px solid #e9d5ff;padding:16px;border-radius:12px;margin:12px 0}.status{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:800}.confirmed{background:#d1fae5;color:#065f46}.pending{background:#fef3c7;color:#92400e}a{color:#7c3aed;font-weight:800;text-decoration:none}</style>
+</head>
+<body>
+<div class="header"><h2 style="margin:0">My Bookings - LOVE CARE GLOBAL HOME NURSING</h2><small>https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</small></div>
+<div class="container">
+<p><a href="client-dashboard.html">← Dashboard</a> | <a href="index.html">Home</a> | <a href="book-nurse.html">+ New Booking</a></p>
+<div id="list">Loading bookings...</div>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+const app=initializeApp({databaseURL:"https://love-care-global-default-rtdb.firebaseio.com"}); const db=getDatabase(app);
+const phone=localStorage.getItem('clientPhone')||'';
+const list=document.getElementById('list');
+if(!phone){list.innerHTML='Please <a href="client-login.html">Login</a>';}
+else{
+ onValue(ref(db,'bookings'),snap=>{
+  list.innerHTML='';
+  snap.forEach(child=>{
+   const b=child.val();
+   if(b.clientPhone===phone || b.phone===phone){
+    list.innerHTML+=`<div class="booking"><h3>${b.service||'Nursing Service'}</h3><p>📍 ${b.location||''} | 📅 ${b.date||''}</p><p>Status: <span class="status ${b.status==='confirmed'?'confirmed':'pending'}">${b.status||'pending'}</span></p></div>`;
+   }
+  });
+  if(!list.innerHTML) list.innerHTML='No bookings yet. <a href="book-nurse.html">Book a nurse</a>';
+ });
+}
+</script>
+</body>
+</html>
