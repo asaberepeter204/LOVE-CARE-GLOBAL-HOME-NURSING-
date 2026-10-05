@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Support - LOVE CARE GLOBAL</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>body{font-family:Inter,sans-serif;margin:0;background:#f8fafc}.header{background:linear-gradient(90deg,#7c3aed,#2563eb);color:#fff;padding:14px;display:flex;justify-content:space-between}.chat{max-width:600px;margin:0 auto;padding:14px}.msg{background:#fff;padding:12px;border-radius:14px;margin:8px 0;box-shadow:0 2px 6px rgba(0,0,0,.06)}.msg.ai{border-left:4px solid #7c3aed}.msg.user{background:#16a34a;color:#fff;margin-left:40px}</style>
+</head>
+<body>
+<div class="header">
+<a href="support.html" style="color:#fff;text-decoration:none">← Back to Support</a>
+<strong>🤖 AI Support - 24/7</strong>
+<a href="index.html" style="color:#fff">🏠 Home</a>
+</div>
+<div class="chat">
+<div class="msg ai">👋 Hello! I'm LOVE CARE AI Assistant!<br>Headquartered in Accra, Ghana - Serving 8 Countries.<br>How can I help you today?<br><br>• Book a nurse<br>• Find nurse near you<br>• Emergency SOS<br>• Join as nurse</div>
+<div id="chatBox"></div>
+<div style="display:flex;gap:8px;margin-top:12px;position:sticky;bottom:0;background:#f8fafc;padding:10px">
+<input id="userInput" placeholder="Ask anything..." style="flex:1;padding:12px;border-radius:12px;border:2px solid #e5e7eb">
+<button onclick="send()" style="background:#7c3aed;color:#fff;border:none;padding:12px 18px;border-radius:12px;font-weight:800">Send</button>
+</div>
+<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<a href="find-nurse.html" style="background:#16a34a;color:#fff;padding:10px;text-align:center;border-radius:10px;text-decoration:none;font-weight:700">📍 Find Nurse Near You</a>
+<a href="book-nurse.html" style="background:#2563eb;color:#fff;padding:10px;text-align:center;border-radius:10px;text-decoration:none;font-weight:700">📅 Book Form</a>
+<a href="tel:+233544121814" style="background:#ef4444;color:#fff;padding:10px;text-align:center;border-radius:10px;text-decoration:none;font-weight:700">📞 Call (+233) 544121814</a>
+<a href="mailto:lovecareglobal@gmail.com" style="background:#f59e0b;color:#111;padding:10px;text-align:center;border-radius:10px;text-decoration:none;font-weight:700">📧 Email Us</a>
+</div>
+</div>
+<script>
+function send(){
+var input=document.getElementById('userInput'); var txt=input.value.trim(); if(!txt) return;
+var box=document.getElementById('chatBox');
+box.innerHTML+=`<div class="msg user">${txt}</div>`;
+var reply="Thanks! For '"+txt+"' - Please call our 24/7 hotline (+233) 544121814 / 0596672863 or click Find Nurse Near You. We serve Ghana, Nigeria, USA, UK, Canada, Germany, South Africa, UAE. Headquarters Accra, Ghana.";
+if(txt.toLowerCase().includes('book')) reply="To book a nurse, go to Book Nurse Form. Select service, date, location. We have verified nurses in all 8 countries!";
+if(txt.toLowerCase().includes('map')||txt.toLowerCase().includes('find')) reply="Click 'Find Nurse Near You' to view live map! Your location will be detected and nearest nurses shown.";
+if(txt.toLowerCase().includes('emergency')||txt.toLowerCase().includes('sos')) reply="🆘 EMERGENCY: Call +233544121814 or 112 Police. Or tap SOS button on homepage!";
+if(txt.toLowerCase().includes('nurse')&&txt.toLowerCase().includes('join')) reply="Want to join? Click 'Join as Nurse' - We hire verified nurses in all 8 countries!";
+setTimeout(()=>{box.innerHTML+=`<div class="msg ai">🤖 ${reply}</div>`; window.scrollTo(0,document.body.scrollHeight)},600);
+input.value="";
+}
+</script>
+</body>
+</html>
