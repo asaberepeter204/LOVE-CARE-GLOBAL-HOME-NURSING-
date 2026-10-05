@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Join as Nurse - LOVE CARE GLOBAL HOME NURSING</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#16a34a">
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#f8f9ff;color:#111}
+.header{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.container{max-width:900px;margin:0 auto;padding:16px}
+.card{background:white;border-radius:16px;padding:20px;margin:14px 0;border:2px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+h1{color:#16a34a}h2{color:#7c3aed}
+input,select,textarea{width:100%;padding:12px;margin:6px 0;border:2px solid #e5e7eb;border-radius:10px;box-sizing:border-box}
+.btn{width:100%;padding:14px;background:linear-gradient(90deg,#16a34a,#22c55e);color:white;border:none;border-radius:10px;font-weight:900;cursor:pointer;font-size:16px}
+a{color:#7c3aed;font-weight:800;text-decoration:none}
+.badge{display:inline-block;background:#f0fdf4;color:#16a34a;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:900;margin:2px;border:1px solid #16a34a}
+.progress{height:8px;background:#e5e7eb;border-radius:10px;overflow:hidden;margin:10px 0}
+.progress-bar{height:100%;background:linear-gradient(90deg,#16a34a,#7c3aed);width:0%;transition:0.3s}
+</style>
+</head>
+<body>
+<div class="header"><div><strong>LOVE CARE GLOBAL HOME NURSING</strong><br><small>Join as Nurse - 8 Countries</small></div><div><a href="index.html" style="color:white">🏠 Home</a></div></div>
+<div class="container">
+<div class="card" style="border-color:#16a34a;background:linear-gradient(135deg,#f0fdf4,#ecfdf5)">
+<h1>👩‍⚕️ Join as Verified Nurse</h1>
+<p>🌍 Working in 8 Countries: Ghana, Nigeria, USA, UK, Canada, Germany, South Africa, UAE</p>
+<p><span class="badge">✅ Verified</span> <span class="badge">💰 Paid Jobs</span> <span class="badge">📱 App Based</span></p>
+<p style="font-size:12px;color:#666">Official: https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+</div>
+
+<div class="card">
+<h2>Personal Information</h2>
+<input type="text" id="nName" placeholder="Full Name *">
+<input type="tel" id="nPhone" placeholder="Phone *">
+<input type="email" id="nEmail" placeholder="Email *">
+<select id="nCountry"><option>Ghana</option><option>Nigeria</option><option>USA</option><option>UK</option><option>Canada</option><option>Germany</option><option>South Africa</option><option>UAE</option></select>
+<input type="text" id="nLocation" placeholder="City / Region">
+<select id="nExperience"><option>Experience Level</option><option>0-1 Year</option><option>1-3 Years</option><option>3-5 Years</option><option>5+ Years</option></select>
+<textarea id="nBio" placeholder="About you / Skills"></textarea>
+</div>
+
+<div class="card">
+<h2>📄 Documents Upload (7 Required)</h2>
+<div class="progress"><div id="uploadProgressBar" class="progress-bar"></div></div>
+<p id="allUploadProgress" style="font-size:12px">0/7 files ready</p>
+
+<label>1. Passport Photo *</label>
+<input type="file" accept="image/*" onchange="previewFile(this,'photoPreview','photoStatus')">
+<div id="photoPreview"></div><div id="photoStatus" style="font-size:11px"></div>
+
+<label>2. Nursing Certificate *</label>
+<input type="file" accept="image/*,.pdf" onchange="previewFile(this,'certPreview','certStatus')">
+<div id="certPreview"></div><div id="certStatus" style="font-size:11px"></div>
+
+<label>3. ID Card *</label>
+<input type="file" accept="image/*,.pdf" onchange="previewFile(this,'idPreview','idStatus')">
+<div id="idPreview"></div><div id="idStatus" style="font-size:11px"></div>
+
+<label>4. CV / Resume</label>
+<input type="file" accept=".pdf,image/*" onchange="previewFile(this,'cvPreview','cvStatus')">
+<div id="cvPreview"></div><div id="cvStatus" style="font-size:11px"></div>
+
+<label>5. License</label>
+<input type="file" accept="image/*,.pdf" onchange="previewFile(this,'licensePreview','licenseStatus')">
+<div id="licensePreview"></div><div id="licenseStatus" style="font-size:11px"></div>
+
+<label>6. Reference Letter</label>
+<input type="file" accept="image/*,.pdf" onchange="previewFile(this,'refPreview','refStatus')">
+<div id="refPreview"></div><div id="refStatus" style="font-size:11px"></div>
+
+<label>7. Video Intro (Optional)</label>
+<input type="file" accept="video/*" onchange="previewFile(this,'videoPreview','videoStatus')">
+<div id="videoPreview"></div><div id="videoStatus" style="font-size:11px"></div>
+</div>
+
+<div class="card">
+<label><input type="checkbox" id="agreeTerms"> I agree to <a href="terms.html">Terms</a> and <a href="privacy-policy.html">Privacy Policy</a></label>
+<button class="btn" onclick="submitNurse()">Submit Application</button>
+<p style="text-align:center"><a href="nurse-login.html">Already applied? Login</a> | <a href="index.html">Home</a></p>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+const SUPABASE_URL='https://oufnquvholmpwhrtpnlm.supabase.co'; const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91Zm5xdXZob2xtcHdocnRwbmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4OTUyMDksImV4cCI6MjA1MTQ3MTIwOX0.Z_XqLDLWI3ifI1riNwleUrfxK6ZJ3Y2Ye4P1BKoZXlc';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+window.uploadedFiles=JSON.parse(localStorage.getItem('tempNurseUploads')||'{}');
+window.previewFile=async function(input,previewId,statusId){
+ const file=input.files[0]; if(!file) return;
+ document.getElementById(statusId).innerHTML='⏳ Uploading '+file.name;
+ const clean=file.name.replace(/[^a-zA-Z0-9._-]/g,'_'); const fileName=`${previewId}/${Date.now()}_${clean}`;
+ try{
+  const {error}=await supabaseClient.storage.from('nurse-files').upload(fileName,file);
+  if(error) throw error;
+  const {data}=supabaseClient.storage.from('nurse-files').getPublicUrl(fileName);
+  window.uploadedFiles[previewId]=data.publicUrl;
+  localStorage.setItem('tempNurseUploads',JSON.stringify(window.uploadedFiles));
+  document.getElementById(statusId).innerHTML='✅ Uploaded! <a href="'+data.publicUrl+'" target="_blank">View</a>';
+  const uploaded=Object.keys(window.uploadedFiles).length;
+  document.getElementById('uploadProgressBar').style.width=(uploaded/7*100)+'%';
+  document.getElementById('allUploadProgress').textContent='✅ '+uploaded+'/7 files ready';
+ }catch(e){ document.getElementById(statusId).innerHTML='❌ '+e.message; }
+}
+const firebaseConfig={databaseURL:"https://love-care-global-default-rtdb.firebaseio.com"};
+const app=initializeApp(firebaseConfig); const db=getDatabase(app);
+window.submitNurse=async function(){
+ if(!document.getElementById('agreeTerms').checked){alert('Agree to terms');return;}
+ const phone=document.getElementById('nPhone').value; const name=document.getElementById('nName').value;
+ if(!phone||!name){alert('Name and phone required');return;}
+ const id=phone.replace(/[^0-9]/g,'');
+ await set(ref(db,'nurses/'+id),{name,phone,email:document.getElementById('nEmail').value,country:document.getElementById('nCountry').value,location:document.getElementById('nLocation').value,experience:document.getElementById('nExperience').value,bio:document.getElementById('nBio').value,documents:window.uploadedFiles,status:'pending',created:Date.now()});
+ alert('Application Submitted! CEO will review.'); window.location.href='nurse-login.html';
+}
+</script>
+</body>
+</html>
