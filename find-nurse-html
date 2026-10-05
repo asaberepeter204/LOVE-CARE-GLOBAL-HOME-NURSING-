@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Find Nurse Near You - Live Map | LOVE CARE GLOBAL</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>body{margin:0;font-family:Inter,sans-serif}#map{height:70vh;width:100%}.header{background:linear-gradient(90deg,#16a34a,#2563eb);color:#fff;padding:12px;display:flex;justify-content:space-between;align-items:center}.btn{padding:10px 16px;border-radius:10px;font-weight:800;color:#fff;text-decoration:none;display:inline-flex;gap:6px}</style>
+</head>
+<body>
+<div class="header">
+<a href="index.html" style="color:#fff;text-decoration:none;font-weight:900">🏠 Home</a>
+<strong>📍 Find Nurse Near You - Live Map</strong>
+<a href="tel:+233544121814" style="color:#fff;background:#ef4444;padding:6px 12px;border-radius:8px;text-decoration:none;font-weight:800">SOS</a>
+</div>
+<div style="padding:10px;text-align:center">
+<h3>Headquarters: Accra, Ghana - Serving 8 Countries</h3>
+<p>Ghana, Nigeria, USA, UK, Canada, Germany, South Africa, UAE</p>
+</div>
+<div id="map"></div>
+<div style="padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<a href="book-nurse.html" class="btn" style="background:#16a34a;justify-content:center"><i class="fa-solid fa-calendar-check"></i> Book This Nurse</a>
+<a href="https://wa.me/233544121814" class="btn" style="background:#25D366;justify-content:center"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+</div>
+<script>
+var map = L.map('map').setView([5.6037, -0.1870], 6); // Accra
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+var nurses = [
+{lat:5.6037,lng:-0.1870,name:"Accra HQ Nurse - Available",country:"Ghana"},
+{lat:6.5244,lng:3.3792,name:"Lagos Nurse - Available",country:"Nigeria"},
+{lat:40.7128,lng:-74.0060,name:"USA Nurse - Available",country:"USA"},
+{lat:51.5072,lng:-0.1276,name:"UK Nurse - Available",country:"UK"},
+];
+nurses.forEach(n=>{
+L.marker([n.lat,n.lng]).addTo(map).bindPopup(`<b>${n.name}</b><br>${n.country}<br><a href='book-nurse.html' style='background:#16a34a;color:#fff;padding:4px 8px;border-radius:6px;text-decoration:none'>Book Now</a>`);
+});
+if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{L.marker([p.coords.latitude,p.coords.longitude]).addTo(map).bindPopup("📍 You are here").openPopup(); map.setView([p.coords.latitude,p.coords.longitude],10)})}
+</script>
+</body>
+</html>
