@@ -2,191 +2,227 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Book Nurse - LOVE CARE GLOBAL</title>
+<title>Book Nurse - 13 Services</title>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111;padding-bottom:30px}
-.header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#eab308);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-.card{background:#fff;border-radius:16px;padding:14px;margin:10px 12px;border:2px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,.06)}
-.btnSmall{padding:12px 14px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
-.step{display:none}.step.active{display:block}
-.menuOverlay{position:fixed;top:0;left:-100%;width:290px;height:100%;background:#fff;z-index:3000;transition:.35s;overflow:auto}.menuOverlay.open{left:0}.menuBg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:2999;display:none}.menuBg.show{display:block}
-.serviceBtn{padding:10px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;font-size:12px;font-weight:700;text-align:left}.serviceBtn.selected{border-color:#16a34a;background:#f0fdf4}
-input,select,textarea{width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;margin:6px 0;font-size:13px}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#f8fafc}
+.topbar{background:linear-gradient(90deg,#22c55e,#16a34a,#7c3aed);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;color:white}
+.menu{width:42px;height:42px;background:#facc15;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:900}
+.top-right{display:flex;gap:8px}
+.homeBtn{background:white;color:#16a34a;padding:8px 14px;border-radius:999px;font-weight:900;font-size:12px;text-decoration:none}
+.sosBtn{background:#ef4444;color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:12px;border:none;cursor:pointer}
+.steps{display:flex;gap:10px;padding:10px 14px;background:white;margin:8px;border-radius:12px;border:1px solid #e5e7eb;font-size:12px;font-weight:700;color:#9ca3af}
+.steps .active{color:#16a34a}
+.main{border-left:4px solid #16a34a;background:white;margin:8px;border-radius:16px;padding:14px;border-top:1px solid #e5e7eb;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb}
+.h3{font-weight:900;font-size:16px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.svc{padding:12px 10px;border:2px solid #e5e7eb;border-radius:12px;background:white;font-size:13px;font-weight:700;cursor:pointer;text-align:left}
+.svc.selected{border-color:#16a34a;background:#f0fdf4;color:#16a34a;box-shadow:0 0 0 3px #dcfce7}
+.continue{width:100%;padding:14px;background:#16a34a;color:white;border:none;border-radius:12px;font-weight:900;margin-top:14px;cursor:pointer}
+input,textarea,select{width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;margin:6px 0;font-size:13px}
+.splitBox{background:#f0fdf4;border:2px dashed #16a34a;border-radius:12px;padding:12px;margin:10px 0}
+.price{font-weight:900;color:#7c3aed}
+.pending{display:none;background:#fef3c7;border:2px solid #f59e0b;color:#92400e;padding:10px;border-radius:10px;font-weight:900;text-align:center;margin:8px 0}
+.payBtn{width:100%;padding:16px;background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer}
+.small{font-size:11px;color:#6b7280}
 </style>
 </head>
 <body>
 
-<div class="header">
-<div style="display:flex;align-items:center;gap:8px">
-<button class="btnSmall" style="background:#facc15;color:#111;font-size:20px" onclick="toggleMenu()">☰</button>
-<div style="font-weight:900;font-size:13px;line-height:1.1">BOOK NURSE<br><span style="background:white;color:#16a34a;padding:2px 8px;border-radius:20px;font-size:10px">13 SERVICES</span></div>
-</div>
-<div style="display:flex;gap:6px">
-<a href="index.html" class="btnSmall" style="background:white;color:#16a34a">🏠 Home</a>
-<a href="sos.html" class="btnSmall" style="background:#ef4444;color:white">SOS</a>
-</div>
-</div>
-
-<!-- ✅ SELECTED NURSE FROM MAP - FIXED, 1 LINE ONLY -->
-<div id="selectedNurseTopDisplay" style="display:none;background:#f0fdf4;border:3px solid #16a34a;padding:12px;border-radius:12px;margin:10px 12px;box-shadow:0 4px 12px rgba(22,163,74,.2)"></div>
-
-<div id="menuBg" class="menuBg" onclick="toggleMenu()"></div>
-<div id="menuOverlay" class="menuOverlay">
-<div style="padding:14px">
-<h3>LOVE CARE GLOBAL</h3>
-<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;border:2px solid #16a34a;justify-content:flex-start" onclick="window.location.href='./index.html'">🏠 Home</button>
-<button class="btnSmall" style="background:#eff6ff;width:100%;margin:4px 0;border:2px solid #2563eb;justify-content:flex-start" onclick="window.location.href='./book-nurse.html'">📅 Book Nurse</button>
-<button class="btnSmall" style="background:#fef2f2;width:100%;margin:4px 0;border:2px solid #ef4444;justify-content:flex-start" onclick="window.location.href='./sos.html'">🚨 SOS</button>
-<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./contact.html'">💬 Contact Support</button>
-<button onclick="toggleMenu()" class="btnSmall" style="width:100%;background:#6b7280;color:white;margin-top:10px">✕ Close</button>
-</div>
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="menu">☰</div>
+    <div style="font-weight:900;line-height:1.1">BOOK NURSE<br><span style="background:white;color:#16a34a;padding:2px 6px;border-radius:6px;font-size:10px">13 SERVICES</span></div>
+  </div>
+  <div class="top-right">
+    <a class="homeBtn" href="index.html">🏠 Home</a>
+    <button class="sosBtn" onclick="location.href='tel:112'">SOS</button>
+  </div>
 </div>
 
-<!-- STEPS -->
-<div class="card">
-<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:900">
-<span id="s1" style="color:#16a34a">● Step 1 Service</span><span id="s2" style="color:#999">○ Step 2 Details</span><span id="s3" style="color:#999">○ Step 3 Confirm</span>
-</div>
+<div class="steps">
+  <span id="st1" class="active">● Step 1 Service</span>
+  <span id="st2">○ Step 2 Details</span>
+  <span id="st3">○ Step 3 Confirm</span>
 </div>
 
-<!-- STEP 1 -->
-<div id="step1" class="step active">
-<div class="card" style="border-left:4px solid #16a34a">
-<h3 style="font-size:14px">Step 1: Choose Service (13 Services)</h3>
-<p style="font-size:11px;color:#6b7280">Select one service you need</p>
-<div id="servicesGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"></div>
-<button class="btnSmall" style="background:#16a34a;color:white;width:100%;margin-top:12px;padding:14px" onclick="nextStep(2)">Continue →</button>
-</div>
+<!-- STEP 1 - SAME AS SCREENSHOT -->
+<div id="step1" class="main">
+  <div class="h3">Step 1: Choose Service (13 Services)</div>
+  <div class="grid" id="serviceGrid">
+    <!-- 13 services - exactly like screenshot -->
+    <button class="svc" onclick="selectService(this,'Elderly Care',200)">Elderly Care</button>
+    <button class="svc" onclick="selectService(this,'Post-Surgery Care',250)">Post-Surgery Care</button>
+    <button class="svc" onclick="selectService(this,'Baby / Nanny Care',200)">Baby / Nanny Care</button>
+    <button class="svc" onclick="selectService(this,'Physiotherapy',300)">Physiotherapy</button>
+    <button class="svc" onclick="selectService(this,'Diabetes Care',200)">Diabetes Care</button>
+    <button class="svc" onclick="selectService(this,'Hypertension Care',200)">Hypertension Care</button>
+    <button class="svc" onclick="selectService(this,'Wound Dressing',150)">Wound Dressing</button>
+    <button class="svc" onclick="selectService(this,'Injection / IV',100)">Injection / IV</button>
+    <button class="svc" onclick="selectService(this,'Maternity Care',300)">Maternity Care</button>
+    <button class="svc" onclick="selectService(this,'Palliative Care',350)">Palliative Care</button>
+    <button class="svc" onclick="selectService(this,'Companion Care',180)">Companion Care</button>
+    <button class="svc" onclick="selectService(this,'Lab Sample Collection',150)">Lab Sample Collection</button>
+    <button class="svc" onclick="selectService(this,'General Nursing',200)">General Nursing</button>
+  </div>
+  <button class="continue" onclick="goStep2()">Continue →</button>
 </div>
 
 <!-- STEP 2 -->
-<div id="step2" class="step">
-<div class="card" style="border-left:4px solid #2563eb">
-<h3 style="font-size:14px">Step 2: Booking Details</h3>
-<label style="font-size:11px;font-weight:800">Client Full Name</label>
-<input id="clientName" placeholder="John Doe">
-<label style="font-size:11px;font-weight:800">Phone (Login Phone)</label>
-<input id="clientPhone" placeholder="0544121814">
-<label style="font-size:11px;font-weight:800">Service Date</label>
-<input id="serviceDate" type="date">
-<label style="font-size:11px;font-weight:800">Service Time</label>
-<input id="serviceTime" type="time">
-<label style="font-size:11px;font-weight:800">Duration</label>
-<select id="duration"><option value="1">1 Hour</option><option value="2">2 Hours</option><option value="4">4 Hours</option><option value="8">8 Hours (Day)</option><option value="12">12 Hours</option><option value="24">24 Hours (Full Day)</option></select>
-<label style="font-size:11px;font-weight:800">Patient Condition / Notes</label>
-<textarea id="notes" placeholder="Elderly care, diabetes, needs wheelchair support..."></textarea>
-<label style="font-size:11px;font-weight:800">Your Location (Auto GPS)</label>
-<div style="display:flex;gap:6px">
-<input id="locationText" placeholder="Accra, Ghana - GPS will auto fill" readonly>
-<button class="btnSmall" style="background:#16a34a;color:white" onclick="getGPS()">📍 GPS</button>
-</div>
-<p id="gpsStatus2" style="font-size:10px;color:#16a34a;margin-top:4px">Tap GPS to auto fill</p>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-<button class="btnSmall" style="background:#e5e7eb" onclick="nextStep(1)">← Back</button>
-<button class="btnSmall" style="background:#2563eb;color:white" onclick="nextStep(3)">Continue →</button>
-</div>
-</div>
+<div id="step2" class="main" style="display:none">
+  <div class="h3">Step 2: Your Details</div>
+  <input id="cName" placeholder="Full Name">
+  <input id="cPhone" placeholder="Phone Number">
+  <input id="cEmail" placeholder="Email for Paystack receipt *">
+  <input id="cLocation" placeholder="Address / GPS Location">
+  <textarea id="cNeed" placeholder="Care needed..."></textarea>
+  <button class="continue" onclick="goStep3()">Continue →</button>
+  <button class="continue" style="background:#e5e7eb;color:#333" onclick="showStep(1)">← Back</button>
 </div>
 
-<!-- STEP 3 -->
-<div id="step3" class="step">
-<div class="card" style="border-left:4px solid #eab308">
-<h3 style="font-size:14px">Step 3: Confirm & Book</h3>
-<div id="summaryBox" style="background:#f8fafc;padding:12px;border-radius:12px;font-size:12px;line-height:1.6;margin-top:8px"></div>
-<button class="btnSmall" style="background:#16a34a;color:white;width:100%;margin-top:12px;padding:14px;font-size:14px" onclick="confirmBooking()">✅ Confirm Booking - Pay on Arrival</button>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-<button class="btnSmall" style="background:#e5e7eb" onclick="nextStep(2)">← Back</button>
-<button class="btnSmall" style="background:#ef4444;color:white" onclick="window.location.href='./index.html'">Cancel</button>
-</div>
-</div>
+<!-- STEP 3 - PAYSTACK SPLIT AT BOTTOM -->
+<div id="step3" class="main" style="display:none">
+  <div class="h3">Step 3: Confirm & Pay (Split 85/15)</div>
+  
+  <div id="pendingBox" class="pending">⚠️ After 9PM - This booking will be PENDING for tomorrow 7AM (Nurse safety)</div>
+
+  <div style="background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #e5e7eb;margin:8px 0;font-size:13px">
+    <div>Service: <b id="sumService">-</b></div>
+    <div id="sumPrice" class="price">Price: -</div>
+  </div>
+
+  <div class="splitBox">
+    <div style="font-weight:900;font-size:14px;margin-bottom:6px">💰 Paystack Split Payment</div>
+    <div id="splitDisplay" style="font-size:13px;line-height:1.5;font-weight:700">
+      <!-- filled by JS -->
+    </div>
+    <div class="small" style="margin-top:6px">✅ No payment = No booking (Nurse NOT notified) | Paystack converts auto to NGN, KES, ZAR, USD etc.</div>
+  </div>
+
+  <button class="payBtn" id="payBtn" onclick="payNow()">💳 Pay with Paystack & Book Now</button>
+  <p class="small" style="text-align:center;margin-top:6px">Secured by Paystack | 15% Company | 85% Nurse | Multi-currency</p>
+
+  <button class="continue" style="background:#e5e7eb;color:#333" onclick="showStep(2)">← Back</button>
 </div>
 
 <script>
-let selectedService=null, clientLat=5.6037, clientLng=-0.1870, selectedNurseFromMap=null;
+const PAYSTACK_KEY = "pk_live_f17ae09bf855010825cbfccdda8e724553ab747b";
+let selected = {name:'General Nursing', ghs:200};
+const rates = {ngn:24, kes:14, zar:3.5, usd:11};
 
-// SHOW SELECTED NURSE FROM MAP - TOP
-window.addEventListener('DOMContentLoaded',()=>{
-  selectedNurseFromMap=JSON.parse(localStorage.getItem('selectedNurseForBooking')||'null');
-  const d=document.getElementById('selectedNurseTopDisplay');
-  if(selectedNurseFromMap && d){
-    d.style.display='block';
-    d.innerHTML=`<div style="display:flex;gap:10px;align-items:center">
-      <div style="font-size:28px;background:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center">${selectedNurseFromMap.photo||'👩‍⚕️'}</div>
-      <div style="flex:1">
-        <div style="font-weight:900;font-size:13px;color:#16a34a">✅ Selected Nurse from Map - ${selectedNurseFromMap.name} ✅</div>
-        <div style="font-size:11px">${selectedNurseFromMap.specialty} • ⭐${selectedNurseFromMap.rating} • 📍 ${selectedNurseFromMap.distance.toFixed(1)}km away</div>
-        <div style="font-size:10px;color:#6b7280">License: ${selectedNurseFromMap.license} • ${selectedNurseFromMap.hourly} GHS/hr • <a href="https://www.google.com/maps?q=${selectedNurseFromMap.lat},${selectedNurseFromMap.lng}" target="_blank" style="color:#16a34a">View on Map</a></div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-      <button class="btnSmall" style="background:#16a34a;color:white;padding:12px">✅ Proceed to Book ${selectedNurseFromMap.name}</button>
-      <button class="btnSmall" style="background:#ef4444;color:white;padding:12px" onclick="localStorage.removeItem('selectedNurseForBooking');document.getElementById('selectedNurseTopDisplay').style.display='none';selectedNurseFromMap=null;">❌ Reject / Choose Another</button>
-    </div>`;
-  }
-});
+function selectService(el,name,ghs){
+  document.querySelectorAll('.svc').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  selected = {name, ghs};
+  localStorage.setItem('selectedService', name);
+}
 
-const services=["Elderly Care","Post-Surgery Care","Baby / Nanny Care","Physiotherapy","Diabetes Care","Hypertension Care","Wound Dressing","Injection / IV","Maternity Care","Palliative Care","Companion Care","Lab Sample Collection","General Nursing"];
-function loadServices(){
-  const grid=document.getElementById('servicesGrid');
-  grid.innerHTML=services.map(s=>`<button class="serviceBtn" onclick="selectService(this,'${s}')">${s}</button>`).join('');
+function showStep(n){
+  document.getElementById('step1').style.display = n==1?'block':'none';
+  document.getElementById('step2').style.display = n==2?'block':'none';
+  document.getElementById('step3').style.display = n==3?'block':'none';
+  document.getElementById('st1').className = n==1?'active':'';
+  document.getElementById('st2').className = n==2?'active':'';
+  document.getElementById('st3').className = n==3?'active':'';
+  document.getElementById('st1').innerText = n==1?'● Step 1 Service':'○ Step 1 Service';
+  document.getElementById('st2').innerText = n==2?'● Step 2 Details':'○ Step 2 Details';
+  document.getElementById('st3').innerText = n==3?'● Step 3 Confirm':'○ Step 3 Confirm';
 }
-function selectService(el,name){
-  document.querySelectorAll('.serviceBtn').forEach(b=>b.classList.remove('selected'));
-  el.classList.add('selected');selectedService=name;
+
+function goStep2(){
+  if(!selected.name){ alert('Select a service'); return; }
+  showStep(2);
 }
-function toggleMenu(){document.getElementById('menuOverlay').classList.toggle('open');document.getElementById('menuBg').classList.toggle('show')}
-function nextStep(n){
-  if(n===2 && !selectedService){alert('Please select a service first');return;}
-  if(n===3){
-    const name=document.getElementById('clientName').value, phone=document.getElementById('clientPhone').value, date=document.getElementById('serviceDate').value;
-    if(!name||!phone||!date){alert('Fill Name, Phone, Date');return;}
-  }
-  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
-  document.getElementById('step'+n).classList.add('active');
-  document.getElementById('s1').style.color=n>=1?'#16a34a':'#999';
-  document.getElementById('s2').style.color=n>=2?'#16a34a':'#999';
-  document.getElementById('s3').style.color=n>=3?'#16a34a':'#999';
-  if(n===3){buildSummary();}
-}
-function buildSummary(){
-  const nursePart=selectedNurseFromMap?`<b>Selected Nurse from Map:</b> ${selectedNurseFromMap.name} - ${selectedNurseFromMap.specialty} - ⭐${selectedNurseFromMap.rating} - ${selectedNurseFromMap.distance.toFixed(1)}km - ${selectedNurseFromMap.hourly} GHS/hr<br>`:`<b>Nurse:</b> Auto-assign nearest online nurse<br>`;
-  document.getElementById('summaryBox').innerHTML=`
-  ${nursePart}
-  <b>Service:</b> ${selectedService}<br>
-  <b>Client:</b> ${document.getElementById('clientName').value} - ${document.getElementById('clientPhone').value}<br>
-  <b>Date:</b> ${document.getElementById('serviceDate').value} ${document.getElementById('serviceTime').value}<br>
-  <b>Duration:</b> ${document.getElementById('duration').value} hours<br>
-  <b>Location:</b> ${document.getElementById('locationText').value||clientLat.toFixed(5)+','+clientLng.toFixed(5)}<br>
-  <b>Notes:</b> ${document.getElementById('notes').value||'None'}<br><br>
-  <span style="color:#16a34a;font-weight:900">Pay on arrival - Cash / MoMo</span>
+
+function goStep3(){
+  let name = document.getElementById('cName').value.trim();
+  let phone = document.getElementById('cPhone').value.trim();
+  let email = document.getElementById('cEmail').value.trim();
+  let loc = document.getElementById('cLocation').value.trim();
+  if(!name||!phone||!email||!loc){ alert('Fill all details'); return; }
+  if(!email.includes('@')){ alert('Valid email needed for Paystack'); return; }
+
+  let ghs = selected.ghs;
+  let ngn = ghs*rates.ngn;
+  let kes = ghs*rates.kes;
+  let zar = Math.round(ghs*rates.zar);
+  let usd = (ghs/rates.usd).toFixed(2);
+
+  let nurseGHS = Math.round(ghs*0.85);
+  let compGHS = ghs - nurseGHS;
+  let nurseNGN = Math.round(nurseGHS*rates.ngn);
+  let compNGN = Math.round(compGHS*rates.ngn);
+  let nurseUSD = (nurseGHS/rates.usd).toFixed(2);
+
+  document.getElementById('sumService').innerText = selected.name;
+  document.getElementById('sumPrice').innerText = `Price: GHS ${ghs} = NGN ${ngn} = KES ${kes} = ZAR ${zar} = $${usd}`;
+
+  document.getElementById('splitDisplay').innerHTML = `
+    Total: GHS ${ghs} / NGN ${ngn} / $${usd}<br>
+    👩‍⚕️ Nurse 85%: <span style="color:#16a34a">GHS ${nurseGHS} / NGN ${nurseNGN} / $${nurseUSD}</span><br>
+    🏢 Company 15%: GHS ${compGHS} / NGN ${compNGN}<br>
+    <span style="font-size:11px;color:#6b7280">Auto multi-currency: KES ${Math.round(nurseGHS*14)}, ZAR ${Math.round(nurseGHS*3.5)}</span>
   `;
+
+  let h = new Date().getHours();
+  document.getElementById('pendingBox').style.display = h>=21?'block':'none';
+  if(h>=21) document.getElementById('payBtn').innerText = '⚠️ After 9PM - Pay for Tomorrow 7AM (PENDING)';
+
+  showStep(3);
 }
-function getGPS(){
-  const st=document.getElementById('gpsStatus2');
-  st.innerText='📍 Getting GPS...';
-  if(!navigator.geolocation){st.innerText='GPS not supported';return;}
-  navigator.geolocation.getCurrentPosition(p=>{
-    clientLat=p.coords.latitude;clientLng=p.coords.longitude;
-    document.getElementById('locationText').value=`${clientLat.toFixed(5)}, ${clientLng.toFixed(5)} - Accra, Ghana`;
-    st.innerText=`✅ GPS Locked: ${clientLat.toFixed(5)}, ${clientLng.toFixed(5)}`;
-  },()=>{st.innerText='❌ GPS denied - type manually';document.getElementById('locationText').readOnly=false;},{enableHighAccuracy:true,timeout:8000});
-}
-function confirmBooking(){
-  const bookings=JSON.parse(localStorage.getItem('loveCareBookings')||'[]');
-  bookings.push({
-    id:'BK'+Date.now(),service:selectedService,name:document.getElementById('clientName').value,
-    phone:document.getElementById('clientPhone').value,date:document.getElementById('serviceDate').value,
-    time:document.getElementById('serviceTime').value,duration:document.getElementById('duration').value,
-    location:document.getElementById('locationText').value||clientLat+','+clientLng,
-    lat:clientLat,lng:clientLng,notes:document.getElementById('notes').value,
-    nurse:selectedNurseFromMap||null,status:'Pending',created:new Date().toISOString()
+
+function payNow(){
+  let cName = document.getElementById('cName').value.trim();
+  let cPhone = document.getElementById('cPhone').value.trim();
+  let cEmail = document.getElementById('cEmail').value.trim();
+  let cLocation = document.getElementById('cLocation').value.trim();
+  let cNeed = document.getElementById('cNeed').value.trim();
+  let ghs = selected.ghs;
+  let nurseGHS = Math.round(ghs*0.85);
+  let compGHS = ghs - nurseGHS;
+  let hour = new Date().getHours();
+  let isPending = hour>=21;
+
+  var handler = PaystackPop.setup({
+    key: PAYSTACK_KEY,
+    email: cEmail,
+    amount: ghs*100,
+    currency: 'GHS',
+    ref: 'LOVECARE85_'+Date.now(),
+    metadata: {
+      custom_fields: [
+        {display_name: "Service", variable_name: "service", value: selected.name},
+        {display_name: "Nurse 85%", variable_name: "nurse_85", value: nurseGHS},
+        {display_name: "Company 15%", variable_name: "company_15", value: compGHS}
+      ]
+    },
+    callback: function(res){
+      let booking = {
+        id: 'BK_'+Date.now(),
+        service: selected.name,
+        amountGHS: ghs,
+        amountNGN: ghs*rates.ngn,
+        split: `Nurse 85%: GHS ${nurseGHS} | Company 15%: GHS ${compGHS}`,
+        nurseGHS, companyGHS: compGHS,
+        clientName: cName, clientPhone: cPhone, clientEmail: cEmail, clientLocation: cLocation, careNeed: cNeed,
+        paystackRef: res.reference,
+        status: isPending?'PENDING_TOMORROW_7AM':'PAID',
+        payment: 'PAID via Paystack '+res.reference,
+        time: new Date().toISOString()
+      };
+      let books = JSON.parse(localStorage.getItem('loveCareBookings')||'[]');
+      books.push(booking);
+      localStorage.setItem('loveCareBookings', JSON.stringify(books));
+      localStorage.setItem('currentClient', JSON.stringify({name:cName, phone:cPhone, email:cEmail, id:cPhone}));
+      alert(`✅ PAYMENT SUCCESS - SPLIT 85/15!\nRef: ${res.reference}\nService: ${selected.name}\nTotal: GHS ${ghs}\nNurse 85%: GHS ${nurseGHS}\nCompany 15%: GHS ${compGHS}\nStatus: ${booking.status}\nNurse notified!`);
+      location.href='./client-dashboard.html';
+    },
+    onClose: function(){
+      alert('❌ Payment cancelled - Booking FAILED - Nurse NOT notified');
+    }
   });
-  localStorage.setItem('loveCareBookings',JSON.stringify(bookings));
-  localStorage.removeItem('selectedNurseForBooking');
-  alert('✅ Booking Confirmed! Nurse will contact you soon. Check My Bookings');
-  window.location.href='./my-bookings.html';
+  handler.openIframe();
 }
-loadServices();
 </script>
 </body>
 </html>
