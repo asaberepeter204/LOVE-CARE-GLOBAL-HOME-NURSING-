@@ -2,163 +2,158 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Registration - LOVE CARE GLOBAL</title>
+<title>Join as Nurse - LOVE CARE GLOBAL</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111;min-height:100vh}
-.header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#7c3aed);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-.card{background:#fff;border-radius:20px;padding:18px;margin:12px;border:2px solid #e5e7eb;box-shadow:0 8px 24px rgba(0,0,0,.08)}
-input,select{width:100%;padding:14px 12px;border:2px solid #e5e7eb;border-radius:12px;margin:8px 0;font-size:14px;outline:none}
-input:focus,select:focus{border-color:#16a34a}
-.btnMain{width:100%;padding:16px;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;margin-top:10px}
-.btnSmall{padding:10px 14px;border:none;border-radius:10px;font-weight:900;cursor:pointer;font-size:12px}
-.menuOverlay{position:fixed;top:0;left:-100%;width:290px;height:100%;background:#fff;z-index:3000;transition:.35s;overflow:auto}.menuOverlay.open{left:0}.menuBg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:2999;display:none}.menuBg.show{display:block}
-.inputWrap{position:relative}.gpsBtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#16a34a;color:white;border:none;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:900;cursor:pointer}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f1f5f9;color:#111}
+.header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#2563eb,#16a34a);color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.card{max-width:420px;margin:16px auto;background:#fff;border-radius:18px;padding:18px;border:1px solid #e5e7eb;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+input,select{width:100%;padding:14px;border:2px solid #e5e7eb;border-radius:12px;margin:7px 0;font-size:14px}
+input:focus,select:focus{border-color:#2563eb}
+label{font-size:11px;font-weight:900;color:#111;margin:8px 0 2px;display:block}
+.uploadBox{border:2px dashed #2563eb;background:#eff6ff;padding:12px;border-radius:12px;margin:8px 0}
+.btnMain{width:100%;padding:16px;border:none;border-radius:14px;font-weight:900;font-size:16px;background:linear-gradient(90deg,#2563eb,#16a34a);color:white;margin-top:12px;cursor:pointer}
+.locWrap{position:relative}.gpsInside{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#16a34a;color:white;border:none;padding:7px 10px;border-radius:8px;font-weight:900;font-size:12px;cursor:pointer}
+.preview{width:70px;height:70px;border-radius:10px;object-fit:cover;border:2px solid #16a34a;display:none;margin-top:6px}
 </style>
 </head>
 <body>
 
 <div class="header">
-<div style="display:flex;align-items:center;gap:8px">
-<button class="btnSmall" style="background:#facc15;color:#111;font-size:20px" onclick="toggleMenu()">☰</button>
-<div style="font-weight:900;font-size:13px">LOVE CARE GLOBAL HOME<br>NURSING</div>
-</div>
-<a href="index.html" class="btnSmall" style="background:white;color:#16a34a">🏠 Home</a>
+<div style="font-weight:900;font-size:13px">LOVE CARE GLOBAL HOME NURSING</div>
+<a href="index.html" style="background:white;color:#2563eb;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:900;font-size:12px">🏠 Home</a>
 </div>
 
-<div id="menuBg" class="menuBg" onclick="toggleMenu()"></div>
-<div id="menuOverlay" class="menuOverlay">
-<div style="padding:14px">
-<h3>LOVE CARE GLOBAL</h3>
-<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;border:2px solid #16a34a;justify-content:flex-start" onclick="location.href='./index.html'">🏠 Home</button>
-<button class="btnSmall" style="background:#eff6ff;width:100%;margin:4px 0;border:2px solid #2563eb;justify-content:flex-start" onclick="location.href='./book-nurse.html'">📅 Book Nurse</button>
-<button class="btnSmall" style="background:#fef2f2;width:100%;margin:4px 0;border:2px solid #ef4444;justify-content:flex-start" onclick="location.href='./sos.html'">🚨 SOS</button>
-<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;justify-content:flex-start" onclick="location.href='./my-bookings.html'">📋 My Bookings</button>
-<button class="btnSmall" style="background:#16a34a;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="location.href='./client-register.html'">📝 Client Register</button>
-<button class="btnSmall" style="background:#2563eb;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="location.href='./client-login.html'">🔓 Client Login</button>
-<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;justify-content:flex-start" onclick="location.href='./client-dashboard.html'">👤 Client Dashboard</button>
-<div style="font-size:10px;font-weight:900;color:#2563eb;margin:10px 0 4px">NURSE</div>
-<button class="btnSmall" style="background:#f0fdf4;width:100%;margin:4px 0;border:1px solid #2563eb;justify-content:flex-start" onclick="location.href='./nurse-public.html'">👩‍⚕️ Join as Nurse</button>
-<button class="btnSmall" style="background:#2563eb;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="location.href='./nurse-login.html'">👩‍⚕️ Nurse Login</button>
-<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="location.href='./privacy.html'">🔒 Privacy</button>
-<button class="btnSmall" style="background:#111827;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="location.href='./settings.html'">⚙️ Settings</button>
-<button onclick="toggleMenu()" class="btnSmall" style="width:100%;background:#6b7280;color:white;margin-top:10px">✕ Close</button>
-</div>
-</div>
-
-<div class="card" style="max-width:420px;margin:20px auto">
-<h2 style="text-align:center;color:#7c3aed;font-size:24px;line-height:1.2">Client<br>Registration</h2>
-<p style="text-align:center;font-size:11px;color:#6b7280;margin:8px 0">Official:<br>https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+<div class="card">
+<h1 style="text-align:center;color:#2563eb;font-size:26px">Join as a Nurse</h1>
+<p style="text-align:center;font-size:11px;color:#6b7280;margin:6px 0">Upload ALL particulars - Clients will download & verify you</p>
 
 <input id="fullName" placeholder="Full Name *">
 <input id="phone" placeholder="Phone 0244XXXXXX *">
 <input id="email" type="email" placeholder="Email *">
-
-<select id="country">
-<option value="Ghana">Ghana</option>
-<option value="Nigeria">Nigeria</option>
-<option value="Kenya">Kenya</option>
-<option value="South Africa">South Africa</option>
-<option value="Togo">Togo</option>
-<option value="Benin">Benin</option>
-<option value="Ivory Coast">Ivory Coast</option>
-<option value="Burkina Faso">Burkina Faso</option>
-<option value="Other">Other</option>
-</select>
-
+<select id="country"><option value="Ghana" selected>Ghana</option><option value="Nigeria">Nigeria</option><option value="Kenya">Kenya</option><option value="South Africa">South Africa</option><option value="Other">Other</option></select>
 <input id="password" type="password" placeholder="Password *">
+<input id="license" placeholder="Nursing License No. NMC-XXXX *">
+<select id="specialty"><option value="">Specialty *</option><option>Elderly Care</option><option>Post-Surgery Care</option><option>Baby Care</option><option>Physiotherapy</option><option>Diabetes Care</option><option>General Nursing</option><option>Maternity Care</option></select>
+<input id="hourly" type="number" placeholder="Hourly Rate GHS e.g. 50 *">
 
-<!-- AUTO GPS LOCATION -->
-<label style="font-size:11px;font-weight:900;color:#16a34a;margin-left:4px">📍 Your Location / Address * Auto GPS</label>
-<div class="inputWrap">
-<input id="location" placeholder="📍 Getting your location automatically...">
-<button class="gpsBtn" onclick="getGPS()" type="button">📍 GPS</button>
+<label>📍 Your Location / Address * (Auto GPS)</label>
+<div class="locWrap">
+<input id="location" placeholder="📍 Auto detecting...">
+<button class="gpsInside" onclick="getGPS()" type="button">📍 GPS</button>
 </div>
-<p id="gpsStatus" style="font-size:10px;color:#16a34a;margin:2px 0 0 4px">📍 Auto detecting your location...</p>
-
+<p id="gpsStatus" style="font-size:10px;color:#16a34a">Auto detecting...</p>
 <input type="hidden" id="lat"><input type="hidden" id="lng">
 
-<button class="btnMain" onclick="register()">Create Account</button>
+<hr style="margin:14px 0">
 
-<p style="text-align:center;margin-top:12px;font-size:13px">Already have? <a href="client-login.html" style="color:#7c3aed;font-weight:900;text-decoration:none">Login</a> | <a href="index.html" style="color:#7c3aed;font-weight:900;text-decoration:none">Home</a></p>
+<h3 style="font-size:14px;color:#2563eb">📁 Upload Particulars (Client will Download & View)</h3>
 
-<div style="margin-top:14px;background:#f0fdf4;border:1px solid #16a34a;border-radius:10px;padding:10px;font-size:10px">
-<b style="color:#16a34a">✅ Auto GPS Features:</b><br>
-• Location auto-fills when you open page<br>
-• Shows your exact coordinates<br>
-• Link to Google Maps<br>
-• Used to find nearest nurse to you
+<label>1. 📸 Your Photo * (Passport size)</label>
+<div class="uploadBox"><input type="file" id="photo" accept="image/*" onchange="previewFile('photo','photoPrev')"><img id="photoPrev" class="preview"></div>
+
+<label>2. 🪪 National ID / Driving License * (Front & Back)</label>
+<div class="uploadBox"><input type="file" id="nationalId" accept="image/*,application/pdf" onchange="saveFileName('nationalId','idName')"><small id="idName" style="font-size:10px;color:#16a34a"></small></div>
+
+<label>3. 📜 Nursing License * (NMC Certificate)</label>
+<div class="uploadBox"><input type="file" id="nurseLicenseFile" accept="image/*,application/pdf" onchange="saveFileName('nurseLicenseFile','licenseName')"><small id="licenseName" style="font-size:10px;color:#16a34a"></small></div>
+
+<label>4. 📄 CV / Resume * (PDF / DOC)</label>
+<div class="uploadBox"><input type="file" id="cv" accept=".pdf,.doc,.docx,image/*" onchange="saveFileName('cv','cvName')"><small id="cvName" style="font-size:10px;color:#16a34a"></small></div>
+
+<label>5. 🎓 Certificates * (School, Training)</label>
+<div class="uploadBox"><input type="file" id="certificate" accept="image/*,application/pdf" multiple onchange="saveFileName('certificate','certName')"><small id="certName" style="font-size:10px;color:#16a34a"></small></div>
+
+<label>6. 🎥 30 Seconds Video * (Introduce yourself)</label>
+<div class="uploadBox"><input type="file" id="video" accept="video/*" onchange="saveFileName('video','videoName')"><small id="videoName" style="font-size:10px;color:#ef4444">Max 30 seconds - Say your name, specialty, experience</small><video id="videoPrev" style="width:100%;max-height:140px;border-radius:10px;display:none;margin-top:6px" controls></video></div>
+
+<button class="btnMain" onclick="registerNurse()">Register & Upload Particulars</button>
+
+<p style="text-align:center;margin-top:10px;font-size:13px">Already nurse? <a href="nurse-login.html" style="color:#2563eb;font-weight:900">Login</a></p>
+
+<div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:10px;margin-top:12px;font-size:10px">
+<b>✅ After Upload:</b><br>
+- Clients can DOWNLOAD your CV, License, Certificate, ID, Photo, Video<br>
+- Builds trust - More bookings<br>
+- Admin will verify your docs<br>
+- <span id="gpsCoords">Waiting GPS...</span>
 </div>
 </div>
 
 <script>
-let clientLat=null, clientLng=null;
-function toggleMenu(){document.getElementById('menuOverlay').classList.toggle('open');document.getElementById('menuBg').classList.toggle('show')}
-
-// AUTO GPS ON PAGE LOAD
-window.addEventListener('DOMContentLoaded',()=>{getGPS();});
+let nurseLat=null,nurseLng=null;
+let uploadedFiles={};
+window.addEventListener('DOMContentLoaded',()=>setTimeout(getGPS,600));
 
 function getGPS(){
-  const status=document.getElementById('gpsStatus');
-  const locInput=document.getElementById('location');
-  status.innerText='📍 Getting your location... Please allow location';
-  status.style.color='#2563eb';
-  locInput.placeholder='📍 Getting location... Allow permission';
-  
-  if(!navigator.geolocation){
-    status.innerText='❌ GPS not supported on this device - type manually';
-    status.style.color='#ef4444';
-    locInput.placeholder='Your Location / Address - Type manually';
-    return;
-  }
-  
-  navigator.geolocation.getCurrentPosition(async (pos)=>{
-    clientLat=pos.coords.latitude;
-    clientLng=pos.coords.longitude;
-    document.getElementById('lat').value=clientLat;
-    document.getElementById('lng').value=clientLng;
-    
-    // Try to get address name using reverse geocoding (free)
-    try{
-      const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${clientLat}&lon=${clientLng}`);
-      const data=await res.json();
-      const address=data.display_name||`${clientLat.toFixed(5)}, ${clientLng.toFixed(5)}`;
-      locInput.value=address;
-      status.innerHTML=`✅ GPS Locked: ${clientLat.toFixed(5)}, ${clientLng.toFixed(5)} - <a href="https://www.google.com/maps?q=${clientLat},${clientLng}" target="_blank" style="color:#16a34a">View on Map</a>`;
-      status.style.color='#16a34a';
-    }catch(e){
-      locInput.value=`${clientLat.toFixed(5)}, ${clientLng.toFixed(5)} - Ghana`;
-      status.innerText=`✅ GPS Locked: ${clientLat.toFixed(5)}, ${clientLng.toFixed(5)}`;
-      status.style.color='#16a34a';
-    }
-  },(err)=>{
-    status.innerText='❌ GPS denied - Please type your location manually or tap GPS again';
-    status.style.color='#ef4444';
-    locInput.placeholder='Type your location manually - e.g. Accra, Madina';
-    locInput.readOnly=false;
-  },{enableHighAccuracy:true,timeout:10000,maximumAge:0});
+  const s=document.getElementById('gpsStatus'),c=document.getElementById('gpsCoords'),loc=document.getElementById('location');
+  if(!navigator.geolocation){s.innerText='GPS not supported';return;}
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    nurseLat=pos.coords.latitude;nurseLng=pos.coords.longitude;
+    document.getElementById('lat').value=nurseLat;document.getElementById('lng').value=nurseLng;
+    try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${nurseLat}&lon=${nurseLng}`);const d=await r.json();loc.value=d.display_name||`${nurseLat.toFixed(5)}, ${nurseLng.toFixed(5)}`;}catch(e){loc.value=`${nurseLat.toFixed(5)}, ${nurseLng.toFixed(5)} - Ghana`;}
+    s.innerText=`✅ GPS Locked: ${nurseLat.toFixed(5)}, ${nurseLng.toFixed(5)}`;c.innerText=`✅ GPS Locked`;
+  },()=>{s.innerText='❌ GPS denied - Type manually';},{enableHighAccuracy:true});
 }
 
-function register(){
+function previewFile(inputId,imgId){
+  const file=document.getElementById(inputId).files[0];
+  if(!file) return;
+  uploadedFiles[inputId]=file.name;
+  const img=document.getElementById(imgId);
+  img.src=URL.createObjectURL(file);img.style.display='block';
+  // Save base64 for demo
+  const reader=new FileReader();reader.onload=e=>{localStorage.setItem(inputId+'_data',e.target.result)};reader.readAsDataURL(file);
+}
+
+function saveFileName(inputId,labelId){
+  const files=document.getElementById(inputId).files;
+  if(!files.length) return;
+  let names=[...files].map(f=>f.name).join(', ');
+  document.getElementById(labelId).innerText=`✅ Uploaded: ${names}`;
+  uploadedFiles[inputId]=names;
+  // Save first file for video preview
+  if(inputId==='video'){
+    const v=document.getElementById('videoPrev');v.src=URL.createObjectURL(files[0]);v.style.display='block';
+  }
+}
+
+function registerNurse(){
   const name=document.getElementById('fullName').value.trim();
   const phone=document.getElementById('phone').value.trim();
   const email=document.getElementById('email').value.trim();
-  const country=document.getElementById('country').value;
-  const pass=document.getElementById('password').value.trim();
+  const license=document.getElementById('license').value.trim();
+  const specialty=document.getElementById('specialty').value;
+  const hourly=document.getElementById('hourly').value;
   const loc=document.getElementById('location').value.trim();
-  
-  if(!name||!phone||!email||!pass||!loc){alert('Please fill all * fields including location');return;}
-  if(phone.length<10){alert('Enter valid phone 0244XXXXXX');return;}
-  
-  const clients=JSON.parse(localStorage.getItem('loveCareClients')||'[]');
-  if(clients.find(c=>c.phone===phone)){alert('Phone already registered - Please Login');window.location.href='./client-login.html';return;}
-  
-  const newClient={id:'CL'+Date.now(),name,phone,email,country,password:pass,location:loc,lat:clientLat||5.6037,lng:clientLng||-0.1870,created:new Date().toISOString()};
-  clients.push(newClient);
-  localStorage.setItem('loveCareClients',JSON.stringify(clients));
-  localStorage.setItem('currentClient',JSON.stringify(newClient));
-  
-  alert(`✅ Account Created Successfully!\n\nWelcome ${name}\nLocation: ${loc}\nGPS: ${clientLat?clientLat.toFixed(5)+','+clientLng.toFixed(5):'Manual'}\n\nYou can now book nurses!`);
-  window.location.href='./client-dashboard.html';
+  const photo=document.getElementById('photo').files[0];
+  const nid=document.getElementById('nationalId').files[0];
+  const licFile=document.getElementById('nurseLicenseFile').files[0];
+  const cv=document.getElementById('cv').files[0];
+
+  if(!name||!phone||!email||!license||!specialty||!hourly||!loc){alert('Fill all * fields');return;}
+  if(!photo){alert('Upload Photo *');return;}
+  if(!nid){alert('Upload National ID *');return;}
+  if(!licFile){alert('Upload Nursing License *');return;}
+  if(!cv){alert('Upload CV *');return;}
+
+  const nurses=JSON.parse(localStorage.getItem('loveCareNurses')||'[]');
+  const newNurse={
+    id:'NR'+Date.now(),name,phone,email,country:document.getElementById('country').value,license,password:document.getElementById('password').value,specialty,hourly:parseInt(hourly),location:loc,lat:nurseLat||5.6037,lng:nurseLng||-0.1870,
+    particulars:{
+      photo:uploadedFiles.photo||'photo.jpg',
+      nationalId:uploadedFiles.nationalId||'id.pdf',
+      nursingLicense:uploadedFiles.nurseLicenseFile||'license.pdf',
+      cv:uploadedFiles.cv||'cv.pdf',
+      certificate:uploadedFiles.certificate||'cert.pdf',
+      video:uploadedFiles.video||'intro.mp4'
+    },
+    rating:5.0,verified:false,online:true,created:new Date().toISOString()
+  };
+  nurses.push(newNurse);
+  localStorage.setItem('loveCareNurses',JSON.stringify(nurses));
+  localStorage.setItem('currentNurse',JSON.stringify(newNurse));
+  alert(`✅ Registration Successful ${name}!\n\nParticulars Uploaded:\n- Photo: ${newNurse.particulars.photo}\n- ID: ${newNurse.particulars.nationalId}\n- License: ${newNurse.particulars.nursingLicense}\n- CV: ${newNurse.particulars.cv}\n- Cert: ${newNurse.particulars.certificate}\n- Video: ${newNurse.particulars.video}\n\nClients can now DOWNLOAD your particulars!`);
+  location.href='./nurse-dashboard.html';
 }
 </script>
 </body>
