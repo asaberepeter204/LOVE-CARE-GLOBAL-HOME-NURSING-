@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Dashboard - LOVE CARE GLOBAL HOME NURSING</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#2563eb">
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;background:#f8f9ff;color:#111}
+.header{background:linear-gradient(90deg,#2563eb,#7c3aed);color:white;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.container{max-width:1100px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card{background:white;border-radius:16px;padding:18px;border:1px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,0.05);margin:10px 0}
+.card h3{margin:5px 0;color:#2563eb}
+.btn{background:#2563eb;color:white;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:800;display:inline-block;border:none;cursor:pointer}
+.btn-green{background:#16a34a}
+.btn-purple{background:#7c3aed}
+a{color:#7c3aed;font-weight:700;text-decoration:none}
+.job{border-left:4px solid #16a34a;background:white;padding:14px;border-radius:10px;margin:10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800}
+.pending{background:#fef3c7;color:#92400e}
+.accepted{background:#d1fae5;color:#065f46}
+.stat{font-size:28px;font-weight:900;color:#2563eb}
+</style>
+</head>
+<body>
+<div class="header">
+<div><strong>LOVE CARE GLOBAL HOME NURSING</strong><br><small>Nurse Dashboard - <span id="nName">Nurse</span></small></div>
+<div><a href="index.html" style="color:white">Home</a> | <a href="nurse-login.html" style="color:white">Logout</a></div>
+</div>
+
+<div class="container">
+<div class="grid">
+<div class="card"><div class="stat" id="totalJobs">0</div><div>Total Jobs</div></div>
+<div class="card"><div class="stat" id="pendingJobs">0</div><div>Pending Requests</div></div>
+<div class="card"><div class="stat" id="completedJobs">0</div><div>Completed</div></div>
+<div class="card"><div class="stat">⭐ 5.0</div><div>Rating</div></div>
+</div>
+
+<div class="card" style="border-color:#16a34a">
+<h3>📍 Your Status</h3>
+<p>Phone: <span id="nPhone"></span> | Location: <span id="nLocation">Ghana</span></p>
+<p>Status: <span class="badge accepted" id="nStatus">Verified</span></p>
+<div style="margin-top:10px">
+<a class="btn btn-green" href="nurse-settings.html">⚙️ Settings</a>
+<a class="btn btn-purple" href="group-chat.html">💬 Group Chat</a>
+<a class="btn" href="my-bookings.html" style="background:#eab308;color:#111">📋 My Bookings</a>
+</div>
+</div>
+
+<div class="card">
+<h3>🔔 New Job Requests Near You</h3>
+<div id="jobList">Loading jobs...</div>
+</div>
+
+<div class="card">
+<h3>📅 My Accepted Bookings</h3>
+<div id="myAccepted">No accepted jobs yet</div>
+</div>
+
+<p style="text-align:center;margin-top:20px"><a href="privacy-policy.html">Privacy</a> | <a href="terms.html">Terms</a> | <a href="contact.html">Contact</a></p>
+<p style="text-align:center;font-size:11px;color:#888">Official: https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+const app=initializeApp({databaseURL:"https://love-care-global-default-rtdb.firebaseio.com"});
+const db=getDatabase(app);
+const phone=localStorage.getItem('nursePhone')||'';
+document.getElementById('nName').innerText=localStorage.getItem('nurseName')||'Nurse';
+document.getElementById('nPhone').innerText=phone;
+
+onValue(ref(db,'bookings'),snap=>{
+ let total=0; let pending=0; let html='';
+ snap.forEach(child=>{
+  const b=child.val(); total++;
+  if(!b.nursePhone || b.status==='pending'){
+   pending++;
+   html+=`<div class="job"><strong>${b.service||'Nursing'}</strong> - ${b.location||''}<br>📅 ${b.date||''} ${b.time||''}<br>👤 Client: ${b.clientPhone||''}<br><span class="badge pending">${b.status||'pending'}</span><br><br><button class="btn btn-green" onclick="acceptJob('${child.key}')">✅ Accept Job</button></div>`;
+  }
+ });
+ document.getElementById('totalJobs').innerText=total;
+ document.getElementById('pendingJobs').innerText=pending;
+ document.getElementById('jobList').innerHTML=html||'No new jobs near you';
+});
+
+window.acceptJob=async function(key){
+ await update(ref(db,'bookings/'+key),{nursePhone:phone,status:'accepted',nurseName:localStorage.getItem('nurseName')||'Nurse',acceptedAt:Date.now()});
+ alert('Job Accepted! Check My Bookings');
+ window.location.href='my-bookings.html';
+}
+</script>
+</body>
+</html>
