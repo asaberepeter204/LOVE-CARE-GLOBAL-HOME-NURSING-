@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LOVE CARE GLOBAL HOME NURSING - Official</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,system-ui,sans-serif;background:#f8f9ff;color:#111;overflow-x:hidden}
+.header{position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#2563eb,#7c3aed);color:white;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 15px rgba(0,0,0,0.2)}
+.burger{font-size:24px;cursor:pointer;padding:8px}
+.logo{font-weight:900;font-size:16px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.logo span{border:2px solid white;padding:4px 8px;border-radius:8px}
+.header-right{display:flex;align-items:center;gap:10px}
+.sos{background:#ef4444;color:white;border:none;padding:8px 14px;border-radius:20px;font-weight:900;cursor:pointer;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.dots{font-size:22px;cursor:pointer;padding:8px;position:relative}
+.drawer{position:fixed;top:0;left:-320px;width:300px;height:100vh;background:white;z-index:2000;transition:0.3s;box-shadow:5px 0 20px rgba(0,0,0,0.3);overflow-y:auto;padding-top:60px}
+.drawer.open{left:0}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1500;display:none}
+.overlay.show{display:block}
+.drawer a{display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:#111;border-bottom:1px solid #f3f4f6;font-weight:600}
+.drawer a:hover{background:#f0f7ff;color:#2563eb}
+.drawer a i{width:22px;color:#7c3aed}
+.drawer .section{padding:8px 18px;background:#f8f9ff;font-weight:900;color:#7c3aed;font-size:12px;letter-spacing:1px}
+.dots-menu{position:fixed;top:55px;right:10px;background:white;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,0.15);z-index:3000;display:none;min-width:180px;overflow:hidden}
+.dots-menu.show{display:block}
+.dots-menu a{display:block;padding:12px 16px;text-decoration:none;color:#111;font-size:14px;border-bottom:1px solid #f3f4f6}
+.main{padding:70px 16px 20px;max-width:1200px;margin:0 auto}
+.hero{background:linear-gradient(135deg,#16a34a,#2563eb,#7c3aed);color:white;border-radius:20px;padding:28px 20px;text-align:center;margin:10px 0}
+.hero h1{font-size:26px;margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0}
+.card{background:white;border-radius:16px;padding:16px;text-align:center;border:1px solid #e5e7eb;box-shadow:0 4px 10px rgba(0,0,0,0.05);cursor:pointer;transition:0.2s;text-decoration:none;color:#111;display:block}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.1)}
+.card i{font-size:28px;color:#7c3aed;margin-bottom:8px}
+.card h3{font-size:14px;color:#111;margin:4px 0}
+.badge{background:#16a34a;color:white;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:800}
+.secret-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:5000;display:none;align-items:center;justify-content:center}
+.secret-modal.show{display:flex}
+.secret-box{background:white;padding:24px;border-radius:16px;max-width:320px;width:90%;text-align:center}
+.secret-box input{width:100%;padding:12px;margin:8px 0;border:2px solid #e5e7eb;border-radius:10px;box-sizing:border-box}
+.btn{width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:10px;font-weight:900;cursor:pointer;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div style="display:flex;align-items:center;gap:10px">
+<div class="burger" onclick="toggleDrawer()"><i class="fas fa-bars"></i></div>
+<div class="logo" onclick="logoClick()"><span><i class="fas fa-heart"></i> LOVE CARE</span><small style="font-size:10px;line-height:10px">GLOBAL<br>HOME NURSING</small></div>
+</div>
+<div class="header-right">
+<button class="sos" onclick="triggerSOS()"><i class="fas fa-bell"></i> SOS</button>
+<div class="dots" onclick="toggleDots()"><i class="fas fa-ellipsis-v"></i></div>
+</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleDrawer()"></div>
+
+<div class="drawer" id="drawer">
+<div style="padding:16px;text-align:center;border-bottom:2px solid #f3f4f6">
+<h3 style="color:#16a34a"><i class="fas fa-heart"></i> LOVE CARE GLOBAL</h3>
+<p style="font-size:11px;color:#666">https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+<p style="font-size:11px">🌍 8 Countries</p>
+</div>
+<div class="section">MAIN</div>
+<a href="index.html"><i class="fas fa-home"></i> Home</a>
+<a href="find-nurse-map.html"><i class="fas fa-map-location-dot"></i> Find Nurse + Map</a>
+<a href="group-chat.html"><i class="fas fa-comments"></i> Group Chat</a>
+<a href="contact.html"><i class="fas fa-phone"></i> Contact Us</a>
+<div class="section">CLIENT</div>
+<a href="client-public.html"><i class="fas fa-user-plus"></i> Join as Client</a>
+<a href="client-login.html"><i class="fas fa-right-to-bracket"></i> Client Login</a>
+<a href="client-dashboard.html"><i class="fas fa-table-columns"></i> Client Dashboard</a>
+<a href="client-bookings.html"><i class="fas fa-calendar-check"></i> My Bookings</a>
+<a href="client-settings.html"><i class="fas fa-gear"></i> Client Settings</a>
+<div class="section">NURSE</div>
+<a href="nurse-public.html"><i class="fas fa-user-nurse"></i> Join as Nurse</a>
+<a href="nurse-login.html"><i class="fas fa-right-to-bracket"></i> Nurse Login</a>
+<a href="nurse-dashboard.html"><i class="fas fa-stethoscope"></i> Nurse Dashboard</a>
+<a href="nurse-settings.html"><i class="fas fa-gear"></i> Nurse Settings</a>
+<div class="section">MANAGEMENT (Secret)</div>
+<a href="ceo-login.html"><i class="fas fa-crown"></i> CEO Login</a>
+<a href="staff-login.html"><i class="fas fa-user-tie"></i> Staff Login</a>
+<a href="ceo-dashboard.html"><i class="fas fa-chart-line"></i> CEO Dashboard</a>
+<a href="staff-dashboard.html"><i class="fas fa-briefcase"></i> Staff Dashboard</a>
+<div class="section">LEGAL & SUPPORT</div>
+<a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+<a href="privacy-policy.html"><i class="fas fa-shield-halved"></i> Privacy Policy</a>
+<a href="terms.html"><i class="fas fa-file-contract"></i> Terms</a>
+<a href="cookie-policy.html"><i class="fas fa-cookie"></i> Cookie Policy</a>
+<a href="disclaimer.html"><i class="fas fa-triangle-exclamation"></i> Disclaimer</a>
+<a href="refund-policy.html"><i class="fas fa-money-bill-wave"></i> Refund Policy</a>
+<a href="delete-account.html"><i class="fas fa-trash"></i> Delete Account</a>
+</div>
+
+<div class="dots-menu" id="dotsMenu">
+<a href="#" onclick="window.location.reload()"><i class="fas fa-rotate"></i> Refresh</a>
+<a href="contact.html"><i class="fas fa-circle-info"></i> About</a>
+<a href="settings.html"><i class="fas fa-gear"></i> Settings</a>
+<a href="#" onclick="if(confirm('Exit App?')) window.close()"><i class="fas fa-right-from-bracket"></i> Exit App</a>
+</div>
+
+<div class="secret-modal" id="secretModal">
+<div class="secret-box">
+<h3>🔐 Secret Access</h3>
+<p style="font-size:12px;color:#666">CEO / Staff Only</p>
+<input type="password" id="secretPass" placeholder="Enter Secret Code">
+<button class="btn" onclick="checkSecret()">Unlock</button>
+<button class="btn" style="background:#6b7280" onclick="closeSecret()">Cancel</button>
+<p style="font-size:10px;margin-top:8px;color:#888">Hint: Click logo 5 times</p>
+<div style="margin-top:10px">
+<a href="ceo-login.html" class="btn" style="display:block;text-decoration:none;background:#ef4444;text-align:center">CEO Login Page</a>
+<a href="staff-login.html" class="btn" style="display:block;text-decoration:none;background:#16a34a;text-align:center">Staff Login Page</a>
+</div>
+</div>
+</div>
+
+<div class="main">
+<div class="hero">
+<h1>🌍 LOVE CARE GLOBAL HOME NURSING</h1>
+<p>Trusted Nurses in 8 Countries - Ghana, Nigeria, USA, UK, Canada, Germany, South Africa, UAE</p>
+<p style="margin-top:10px"><span class="badge">✅ Verified Nurses</span> <span class="badge" style="background:#2563eb">📍 Live Map</span> <span class="badge" style="background:#7c3aed">💬 24/7 Chat</span></p>
+</div>
+
+<div class="grid">
+<a class="card" href="find-nurse-map.html"><i class="fas fa-map-location-dot"></i><h3>Find Nurse + Map</h3><small>Live Location</small></a>
+<a class="card" href="client-public.html"><i class="fas fa-user-plus"></i><h3>Join as Client</h3><small>Get Care Now</small></a>
+<a class="card" href="nurse-public.html"><i class="fas fa-user-nurse"></i><h3>Join as Nurse</h3><small>Start Earning</small></a>
+<a class="card" href="client-login.html"><i class="fas fa-right-to-bracket"></i><h3>Client Login</h3><small>Access Care</small></a>
+<a class="card" href="nurse-login.html"><i class="fas fa-stethoscope"></i><h3>Nurse Login</h3><small>Your Jobs</small></a>
+<a class="card" href="group-chat.html"><i class="fas fa-comments"></i><h3>Group Chat</h3><small>Talk Live</small></a>
+<a class="card" href="contact.html"><i class="fas fa-phone"></i><h3>Contact</h3><small>Need Help?</small></a>
+<a class="card" href="settings.html"><i class="fas fa-gear"></i><h3>Settings</h3><small>App Control</small></a>
+</div>
+
+<div class="card" style="text-align:left;display:block">
+<h3 style="color:#7c3aed"><i class="fas fa-link"></i> All Pages Linked - Official</h3>
+<p style="font-size:12px;color:#666">Official URL: https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+<p style="font-size:12px">✅ No external errors - All standalone, PWA ready</p>
+</div>
+
+<p style="text-align:center;color:#888;font-size:11px;margin:20px 0">© 2026 LOVE CARE GLOBAL HOME NURSING<br>Click logo 5x for secret CEO/Staff access</p>
+</div>
+
+<script>
+let logoClicks=0; let logoTimer;
+function toggleDrawer(){document.getElementById('drawer').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show');}
+function toggleDots(){document.getElementById('dotsMenu').classList.toggle('show');}
+function logoClick(){
+ logoClicks++; clearTimeout(logoTimer);
+ logoTimer=setTimeout(()=>logoClicks=0,2000);
+ if(logoClicks>=5){ document.getElementById('secretModal').classList.add('show'); logoClicks=0; }
+}
+function closeSecret(){document.getElementById('secretModal').classList.remove('show');}
+function checkSecret(){
+ const p=document.getElementById('secretPass').value;
+ if(p==='ceo2026' || p==='admin' || p==='staff123'){ window.location.href='ceo-login.html'; }
+ else { alert('Wrong code - Use ceo2026'); }
+}
+function triggerSOS(){
+ if(confirm('🚨 SOS Emergency - Call Support?')){ window.location.href='tel:+233000000000'; }
+}
+document.addEventListener('click',e=>{
+ if(!e.target.closest('.dots') && !e.target.closest('.dots-menu')) document.getElementById('dotsMenu').classList.remove('show');
+});
+</script>
+</body>
+</html>
