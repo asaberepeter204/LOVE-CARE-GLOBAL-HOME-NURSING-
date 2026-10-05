@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SOS Emergency - LOVE CARE GLOBAL</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0f172a;padding:12px}
+.card{background:#fff;border-radius:20px;padding:16px;border:3px solid #ef4444;box-shadow:0 8px 24px rgba(239,68,68,.3)}
+.btn{width:100%;padding:14px;border:none;border-radius:14px;font-weight:900;font-size:14px;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:#fff}
+.btnYellow{background:#eab308;color:#111}.btnRed{background:#ef4444}.btnDark{background:#111827}.btnBlue{background:#2563eb}.btnGreen{background:#16a34a}.btnGray{background:#6b7280}
+.policeBox{border:2px solid #16a34a;background:#f0fdf4;border-radius:12px;padding:12px;margin-top:10px}
+.small{font-size:11px;color:#666}
+</style>
+</head>
+<body>
+
+<div class="card">
+<div style="display:flex;gap:8px;align-items:center">
+<span style="font-size:28px">🚨</span>
+<div>
+<h2 style="color:#ef4444">SOS Emergency</h2>
+<p class="small">Call CEO + Police - Live location shared</p>
+</div>
+<div style="margin-left:auto"><a href="index.html" style="background:#6b7280;color:#fff;padding:6px 14px;border-radius:20px;text-decoration:none;font-weight:800;font-size:12px">✕ Close</a></div>
+</div>
+
+<!-- Call CEO -->
+<a href="tel:+233544121814" class="btn btnYellow" style="margin-top:14px;font-size:15px">
+📞 Call CEO: +233544121814 (KUSIPETER) - Straight
+</a>
+
+<!-- Call Police Ghana default -->
+<a href="tel:112" class="btn btnRed">
+🚔 Call Police: 112 - Straight
+</a>
+
+<!-- 8 Countries Police -->
+<div class="policeBox">
+<div style="font-weight:900;color:#065f46;font-size:13px">🌍 8 Countries Police - Straight Call:</div>
+<div style="margin-top:8px;font-size:13px;line-height:22px">
+🇬🇭 Ghana: <a href="tel:112" style="color:#16a34a;font-weight:900">112</a>/<a href="tel:191" style="color:#16a34a;font-weight:900">191</a><br>
+🇳🇬 Nigeria: <a href="tel:199" style="color:#16a34a;font-weight:900">199</a><br>
+🇿🇦 SA: <a href="tel:10111" style="color:#16a34a;font-weight:900">10111</a><br>
+🇰🇪 Kenya: <a href="tel:999" style="color:#16a34a;font-weight:900">999</a><br>
+🇺🇸 USA: <a href="tel:911" style="color:#16a34a;font-weight:900">911</a><br>
+🇬🇧 UK: <a href="tel:999" style="color:#16a34a;font-weight:900">999</a><br>
+🇨🇦 Canada: <a href="tel:911" style="color:#16a34a;font-weight:900">911</a><br>
+🇦🇺 Australia: <a href="tel:000" style="color:#16a34a;font-weight:900">000</a>
+</div>
+<p class="small" style="margin-top:6px">Tap number to call straight - Auto detects your country</p>
+</div>
+
+<!-- GPS Status -->
+<div style="background:#eff6ff;border:2px solid #3b82f6;border-radius:12px;padding:10px;margin-top:10px">
+<div style="font-weight:900;color:#1e40af;font-size:13px">📍 Your Live Location:</div>
+<p id="locText" style="font-size:12px;color:#1e40af;margin-top:4px">Getting GPS... Please allow location</p>
+<p id="accText" class="small"></p>
+</div>
+
+<!-- Buttons -->
+<div style="display:flex;gap:8px;margin-top:12px">
+<button class="btn btnDark" style="flex:1" onclick="findNearbyPolice()">
+🚔 Nearby Police Station
+</button>
+<button class="btn btnBlue" style="flex:1" onclick="shareLocation()">
+📍 Share Location
+</button>
+</div>
+
+<button class="btn btnGreen" onclick="openInGoogleMaps()">
+🌍 Open in Google Maps
+</button>
+
+<button class="btn btnGray" onclick="window.location.href='index.html'">
+❌ Close
+</button>
+
+<p class="small" style="text-align:center;margin-top:10px">
+SOS uses your live GPS to find nearest police station in Google Maps<br>
+Headquarters: Accra, Ghana • (+233) 544121814
+</p>
+</div>
+
+<script>
+let lat=null,lng=null,acc=null;
+
+function getLocation(){
+ let t=document.getElementById('locText');
+ let a=document.getElementById('accText');
+ if(!navigator.geolocation){t.innerText='❌ GPS not supported on this device';return}
+ navigator.geolocation.getCurrentPosition(p=>{
+   lat=p.coords.latitude; lng=p.coords.longitude; acc=p.coords.accuracy;
+   t.innerHTML=`✅ Location captured:<br><b>${lat.toFixed(6)}, ${lng.toFixed(6)}</b>`;
+   a.innerText=`Accuracy: ${acc.toFixed(0)}m • ${new Date().toLocaleString()} - Ready to open in Google Maps`;
+   localStorage.setItem('sos_lat',lat);
+   localStorage.setItem('sos_lng',lng);
+ },e=>{
+   t.innerText='❌ GPS failed: '+e.message+' - Please enable location in browser settings';
+   // Fallback to Accra
+   lat=5.6037; lng=-0.1870;
+ }, {enableHighAccuracy:true, timeout:10000});
+}
+getLocation();
+
+function findNearbyPolice(){
+ if(!lat||!lng){
+   alert('📍 Getting your location first... Allow GPS');
+   getLocation();
+   // Use fallback after 2 sec
+   setTimeout(()=>{
+     let la=lat||5.6037; let lo=lng||-0.1870;
+     let url=`https://www.google.com/maps/search/police+station+near+me/@${la},${lo},15z`;
+     window.open(url,'_blank');
+   },1500);
+   return;
+ }
+ // Opens Google Maps searching for nearby police stations around you
+ let url=`https://www.google.com/maps/search/police+station+near+me/@${lat},${lng},15z`;
+ window.open(url,'_blank');
+}
+
+function openInGoogleMaps(){
+ if(!lat||!lng){
+   alert('📍 No GPS yet, opening Accra - Allow location for your exact spot');
+   let url=`https://www.google.com/maps/search/police+station/@5.6037,-0.1870,14z`;
+   window.open(url,'_blank');
+   return;
+ }
+ // Open your location + nearby police in Google Maps
+ let url=`https://www.google.com/maps?q=${lat},${lng}&z=16`;
+ // Alternative with police search:
+ // let url=`https://www.google.com/maps/search/police/@${lat},${lng},14z`;
+ window.open(url,'_blank');
+}
+
+function shareLocation(){
+ if(!lat||!lng){alert('📍 Allow GPS first');return}
+ let msg=`🚨 SOS EMERGENCY - LOVE CARE GLOBAL\nI need help! My live location:\nhttps://www.google.com/maps?q=${lat},${lng}\nAccuracy: ${acc?acc.toFixed(0)+'m':''}\nTime: ${new Date().toLocaleString()}\nCall CEO: +233544121814\nPolice: 112`;
+ if(navigator.share){
+   navigator.share({title:'SOS - My Location',text:msg, url:`https://www.google.com/maps?q=${lat},${lng}`}).catch(()=>{copyText(msg)});
+ }else{
+   // WhatsApp share
+   let wa=`https://wa.me/?text=${encodeURIComponent(msg)}`;
+   window.open(wa,'_blank');
+ }
+}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>alert('✅ SOS location copied! Paste to WhatsApp or SMS'))}
+</script>
+</body>
+</html>
