@@ -1,139 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LOVE CARE GLOBAL HOME NURSING - 8 Countries</title>
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#16a34a">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>LOVE CARE GLOBAL - Home Nursing - 8 Countries</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html{background:#111827}
-body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#111;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
-.header{position:sticky;top:0;z-index:1500;background:linear-gradient(90deg,#16a34a,#2563eb);color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
-.burger{width:40px;height:40px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:10px;font-size:18px;cursor:pointer}
-.icon-btn{width:38px;height:38px;border:none;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;text-decoration:none}
-.main{flex:1;background:linear-gradient(180deg,#ecfdf5 0%,#f8fafc 100%)}
-#drawer{position:fixed;top:0;left:-320px;width:300px;height:100%;background:#fff;z-index:3000;transition:.32s;box-shadow:4px 0 25px rgba(0,0,0,.25);padding:16px;overflow-y:auto}
-#drawer.open{left:0}#overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2500;display:none}#overlay.open{display:block}
-.dlink{display:flex;gap:12px;padding:11px 10px;border-radius:10px;text-decoration:none;color:#111;font-weight:700;margin-bottom:3px}
-.dlink:hover{background:#f0fdf4}.dsec{font-size:11px;font-weight:900;color:#16a34a;margin:14px 0 6px 6px;letter-spacing:1px}
-.hero{padding:24px 16px;text-align:center}
-.btn{padding:12px 18px;border:none;border-radius:12px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;color:#fff;margin:4px}
-.card{background:#fff;border-radius:16px;padding:16px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.05);text-align:center}
-#sosModal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
-#sosModal.open{display:flex}
-.sosBox{background:#fff;border-radius:20px;padding:20px;max-width:360px;width:100%;text-align:center}
-#moreMenu{position:absolute;top:56px;right:8px;background:#fff;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.25);z-index:4000;display:none;overflow:hidden;min-width:200px;border:1px solid #e5e7eb}
-#moreMenu.open{display:block}
-.moreIt{display:flex;gap:10px;padding:13px 14px;text-decoration:none;color:#111;font-weight:700;font-size:13px;border-bottom:1px solid #f3f4f6;cursor:pointer;width:100%;border-left:none;border-right:none;border-top:none;background:#fff;text-align:left}
-.moreIt:hover{background:#f0fdf4}
-.footer{background:#111827;color:#9ca3af;padding:16px;text-align:center;font-size:11px;width:100%;margin-top:auto}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#111}
+.header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#eab308);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.logo{font-weight:900;line-height:1}.logo span{background:#fff;color:#16a34a;padding:1px 6px;border-radius:10px;font-size:10px}
+.btn{padding:10px 16px;border-radius:20px;text-decoration:none;font-weight:900;font-size:13px;display:inline-flex;align-items:center;gap:6px;border:none;cursor:pointer}
+.btnRed{background:#ef4444;color:#fff}.btnGreen{background:#16a34a;color:#fff}.btnDark{background:#111827;color:#fff}.btnBlue{background:#2563eb;color:#fff}
+.card{background:#fff;border-radius:16px;padding:14px;margin:10px 12px;border:2px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.hero{background:linear-gradient(135deg,#f0fdf4,#fefce8);padding:20px 12px;text-align:center}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 12px}
+.serviceBox{background:#fff;border-radius:14px;padding:12px;border:2px solid #e5e7eb;text-align:center}
+.menu{position:fixed;top:0;left:-280px;width:260px;height:100%;background:#fff;z-index:2000;transition:.3s;box-shadow:2px 0 20px rgba(0,0,0,.2);padding:16px;overflow:auto}
+.menu.open{left:0}
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1999;display:none}.overlay.show{display:block}
 </style>
 </head>
 <body>
-<div id="overlay" onclick="closeDrawer();closeMore()"></div>
 
-<!-- SOS MODAL -->
-<div id="sosModal" onclick="if(event.target===this)closeSOS()">
-<div class="sosBox">
-<h3 style="color:#ef4444">🆘 EMERGENCY SOS</h3>
-<p style="font-size:13px;color:#555;margin:8px 0">24/7 Accra HQ<br><b>(+233) 544121814 / 0596672863</b></p>
-<a href="tel:+233544121814" class="btn" style="background:#ef4444;width:100%"><i class="fa-solid fa-phone"></i> Call CEO Emergency</a>
-<a href="tel:112" class="btn" style="background:#111;width:100%"><i class="fa-solid fa-tower-broadcast"></i> Call Police 112</a>
-<a href="https://wa.me/233544121814?text=EMERGENCY%20SOS" target="_blank" class="btn" style="background:#25D366;width:100%"><i class="fa-brands fa-whatsapp"></i> WhatsApp SOS</a>
-<a href="find-nurse.html" class="btn" style="background:#2563eb;width:100%"><i class="fa-solid fa-map-location-dot"></i> Open Live Map</a>
-<button onclick="closeSOS()" class="btn" style="background:#f3f4f6;color:#111;width:100%">Close</button>
-</div>
-</div>
-
-<!-- DRAWER -->
-<div id="drawer">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-<strong style="color:#16a34a">💚 LOVE CARE MENU</strong>
-<button onclick="closeDrawer()" style="border:none;background:#f3f4f6;border-radius:8px;padding:6px 10px;font-weight:900">✕</button>
-</div>
-<div class="dsec">MAIN</div>
-<a class="dlink" href="index.html">🏠 Home</a>
-<a class="dlink" href="find-nurse.html">🗺️ Find Nurse + Live Map</a>
-<a class="dlink" href="book-nurse.html">📅 Book Nurse Form</a>
-<a class="dlink" href="contact.html">📞 Contact Us</a>
-<div class="dsec">CLIENT</div>
-<a class="dlink" href="client-public.html">👤 Join as Client</a>
-<a class="dlink" href="client-login.html">🔓 Client Login</a>
-<div class="dsec">NURSE</div>
-<a class="dlink" href="nurse-public.html">👩‍⚕️ Join as Nurse</a>
-<a class="dlink" href="nurse-login.html">🔓 Nurse Login</a>
-<div class="dsec">LEGAL</div>
-<a class="dlink" href="about.html">💜 About Us</a>
-<a class="dlink" href="privacy-policy.html">🛡️ Privacy</a>
-<div style="margin-top:18px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:10px">
-<p style="font-size:12px;font-weight:900;color:#166534">📞 24/7 Hotline</p>
-<p style="font-size:13px;font-weight:900;color:#16a34a">(+233) 544121814 / 0596672863</p>
-</div>
-</div>
-
-<!-- HEADER -->
+<!-- HEADER WITH SOS LINK -->
 <div class="header">
-<div style="display:flex;gap:10px;align-items:center">
-<button class="burger" onclick="openDrawer()"><i class="fa-solid fa-bars"></i></button>
-<div style="font-weight:900;line-height:1.1">LOVE CARE GLOBAL<br><small style="font-size:11px;opacity:.9">HOME NURSING • 8 Countries</small></div>
-</div>
-<div style="display:flex;gap:6px;position:relative">
-<button class="icon-btn" style="background:#ef4444;font-weight:900;font-size:12px;width:44px" onclick="openSOS()">SOS</button>
-<a class="icon-btn" href="find-nurse.html"><i class="fa-solid fa-map"></i></a>
-<button class="icon-btn" onclick="toggleMore()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-<div id="moreMenu">
-<button class="moreIt" onclick="location.href='index.html'"><i class="fa-solid fa-house" style="color:#16a34a"></i> Home</button>
-<button class="moreIt" onclick="location.href='book-nurse.html'"><i class="fa-solid fa-calendar-check" style="color:#2563eb"></i> Book Nurse Form</button>
-<button class="moreIt" onclick="location.href='find-nurse.html'"><i class="fa-solid fa-map-location-dot" style="color:#16a34a"></i> Find Nurse Map</button>
-<button class="moreIt" onclick="location.href='contact.html'"><i class="fa-solid fa-phone" style="color:#7c3aed"></i> Contact Us</button>
-<button class="moreIt" onclick="shareSite()"><i class="fa-solid fa-share-nodes" style="color:#111"></i> Share Site</button>
-<button class="moreIt" onclick="closeApp()" style="color:#ef4444"><i class="fa-solid fa-right-from-bracket"></i> Exit App</button>
-</div>
+<button onclick="openMenu()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:40px;height:40px;border-radius:10px;font-size:18px"><i class="fa-solid fa-bars"></i></button>
+<div class="logo">LOVE CARE GLOBAL<br><span>HOME NURSING</span></div>
+<div style="display:flex;gap:6px">
+<a href="sos.html" class="btn btnRed" style="padding:8px 14px"><i class="fa-solid fa-triangle-exclamation"></i> SOS</a>
+<button onclick="openMenu()" style="background:rgba(255,255,255,.9);border:none;width:36px;height:36px;border-radius:50%"><i class="fa-solid fa-ellipsis-vertical"></i></button>
 </div>
 </div>
 
-<!-- MAIN -->
-<div class="main">
+<!-- SIDE MENU -->
+<div id="overlay" class="overlay" onclick="closeMenu()"></div>
+<div id="sideMenu" class="menu">
+<h3 style="color:#16a34a">💚 LOVE CARE GLOBAL</h3>
+<p style="font-size:11px;color:#666">8 Countries • Accra HQ • 13 Services</p>
+<hr style="margin:10px 0">
+<a href="index.html" class="btn btnGreen" style="width:100%;justify-content:center;margin:6px 0">🏠 Home</a>
+<a href="book-nurse.html" class="btn btnBlue" style="width:100%;justify-content:center;margin:6px 0">📅 Book Nurse - 13 Services</a>
+<a href="sos.html" class="btn btnRed" style="width:100%;justify-content:center;margin:6px 0">🚨 SOS Emergency - Nearby Police + Google Maps</a>
+<a href="support.html" class="btn" style="width:100%;justify-content:center;margin:6px 0;background:#e5e7eb;color:#111">💬 Contact Support</a>
+<a href="ai-support.html" class="btn" style="width:100%;justify-content:center;margin:6px 0;background:#f5f3ff;color:#7c3aed;border:2px solid #7c3aed">🤖 AI Support</a>
+<hr style="margin:10px 0">
+<p style="font-size:11px;color:#666">📞 Hotline: (+233) 544121814 / 0596672863<br>📍 Headquarters: Accra, Ghana<br>🌍 8 Countries: GH, NG, US, UK, CA, DE, ZA, AE</p>
+<button onclick="closeMenu()" class="btn" style="width:100%;background:#6b7280;color:#fff;margin-top:10px">Close</button>
+</div>
+
+<!-- HERO -->
 <div class="hero">
-<h2 style="font-size:22px">💚 Verified Nurses in 8 Countries</h2>
-<p style="color:#555;font-size:13px;margin:10px 0">Live Map • Instant Booking • Accra Headquarters<br>Hotline (+233) 544121814 / 0596672863</p>
-<div style="margin-top:12px">
-<a class="btn" style="background:#16a34a" href="find-nurse.html"><i class="fa-solid fa-location-dot"></i> Find Nurse</a>
-<a class="btn" style="background:#2563eb" href="client-public.html"><i class="fa-solid fa-user-plus"></i> Join as Client</a>
-</div>
-<div style="margin-top:8px">
-<a class="btn" style="background:#7c3aed" href="nurse-public.html"><i class="fa-solid fa-user-nurse"></i> Join as Nurse</a>
-<a class="btn" style="background:#f59e0b;color:#111" href="book-nurse.html"><i class="fa-solid fa-calendar-check"></i> Book Form</a>
+<h1 style="color:#16a34a">LOVE CARE GLOBAL</h1>
+<p style="font-weight:800;color:#a16207">Home Nursing in 8 Countries - 13 Services</p>
+<p style="font-size:11px;color:#666;margin-top:6px">Headquarters: Accra, Ghana • Hotline (+233) 544121814 • SOS with Google Maps nearby police</p>
+<div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+<a href="book-nurse.html" class="btn btnGreen" style="padding:12px 20px;font-size:14px">📅 Book Nurse - Pay with Paystack</a>
+<a href="sos.html" class="btn btnRed" style="padding:12px 20px;font-size:14px">🚨 SOS - Open in Google Maps</a>
 </div>
 </div>
 
-<div style="max-width:900px;margin:0 auto;padding:14px">
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-<div class="card"><div style="font-size:20px">🗺️</div><b style="font-size:12px">Live Map</b><br><span style="font-size:11px;color:#666">Real-time</span></div>
-<div class="card"><div style="font-size:20px">✅</div><b style="font-size:12px">Verified</b><br><span style="font-size:11px;color:#666">Checked</span></div>
-<div class="card"><div style="font-size:20px">24/7</div><b style="font-size:12px">Support</b><br><span style="font-size:11px;color:#666">Always</span></div>
-</div>
+<!-- CLIENT ACCESS -->
+<div class="card" style="border-color:#16a34a;background:#f0fdf4">
+<h3 style="color:#16a34a"><i class="fa-solid fa-user"></i> Client Access - Register / Login</h3>
+<p style="font-size:11px;color:#666;margin-top:4px">Register with Phone & Password BEFORE booking - Your My Bookings will be identified when you login - Location auto GPS, no typing</p>
+<div style="display:flex;gap:8px;margin-top:10px">
+<a href="#" class="btn btnGreen" style="flex:1;justify-content:center">Register</a>
+<a href="#" class="btn btnDark" style="flex:1;justify-content:center">Login</a>
 </div>
 </div>
 
-<!-- FOOTER - NO WHITE SPACE BELOW -->
-<div class="footer">
-<strong>LOVE CARE GLOBAL HOME NURSING</strong><br>
-Accra, Ghana • © 2026 • <a href="privacy-policy.html" style="color:#a5b4fc;text-decoration:none">Privacy</a>
+<!-- 13 SERVICES -->
+<div style="padding:0 12px"><h3>💚 Our 13 Home Nursing Services</h3></div>
+<div class="grid">
+<div class="serviceBox">👴 Elderly Care</div><div class="serviceBox">🏥 Post-Surgery</div>
+<div class="serviceBox">👶 Child Care</div><div class="serviceBox">♿ Disability Support</div>
+<div class="serviceBox">🦾 Physiotherapy</div><div class="serviceBox">🕊️ Palliative Care</div>
+<div class="serviceBox">🤱 Maternity Care</div><div class="serviceBox">🧠 Mental Health</div>
+<div class="serviceBox">💊 Chronic Disease</div><div class="serviceBox">🩹 Wound Dressing</div>
+<div class="serviceBox">💉 Medication</div><div class="serviceBox">🏥 Hospital Companion</div>
+<div class="serviceBox" style="grid-column:span 2;background:#f0fdf4;border-color:#16a34a;font-weight:900">🏠 Live-In Full Care - 24hrs</div>
+</div>
+
+<!-- HOW BOOKING WORKS -->
+<div class="card">
+<h3>📅 How Booking Works - 4 Steps with Continue</h3>
+<div style="font-size:12px;line-height:20px;margin-top:8px">
+<b>Step 1:</b> Country (8) + Service (13) + Days → Continue<br>
+<b>Step 2:</b> Start Time (Begin) + End Time (Close) set by client + GPS Live Location + Google Maps → Continue<br>
+<b>Step 3:</b> Patient Concerns + Medical History + Age/Gender + Voice Note Record → Continue<br>
+<b>Step 4:</b> Phone + Your Offer (must >= Legal Min - BLOCKED if below) → Pay with Paystack at bottom
+</div>
+<a href="book-nurse.html" class="btn btnGreen" style="width:100%;justify-content:center;margin-top:10px">Start Booking Now →</a>
+</div>
+
+<!-- SOS FEATURE -->
+<div class="card" style="border-color:#ef4444;background:#fef2f2">
+<h3 style="color:#ef4444">🚨 SOS Emergency - Google Maps Nearby Police</h3>
+<p style="font-size:12px;margin-top:4px">Your previous SOS was able to open in Google Maps to find nearby police - Restored!</p>
+<div style="font-size:11px;margin-top:8px;line-height:18px">
+✅ Call CEO: +233544121814 (KUSIPETER) - Straight<br>
+✅ Call Police: 112 - Straight + 8 Countries Police numbers<br>
+✅ Nearby Police Station - Opens Google Maps search police near you<br>
+✅ Share Location - Shares live GPS link<br>
+✅ Open in Google Maps - Opens your live location
+</div>
+<a href="sos.html" class="btn btnRed" style="width:100%;justify-content:center;margin-top:10px">🚨 Open SOS Page - Test Google Maps</a>
+</div>
+
+<!-- SUPPORT LINKS -->
+<div class="card">
+<h3>💬 Support</h3>
+<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+<a href="support.html" class="btn" style="background:#e5e7eb;color:#111;flex:1;justify-content:center">📧 Contact Support</a>
+<a href="ai-support.html" class="btn" style="background:#7c3aed;color:#fff;flex:1;justify-content:center">🤖 AI Support</a>
+<a href="tel:+233544121814" class="btn btnGreen" style="flex:1;justify-content:center">📞 Call HQ</a>
+</div>
+</div>
+
+<div style="text-align:center;padding:20px;font-size:10px;color:#666">
+LOVE CARE GLOBAL - Home Nursing<br>
+Headquarters: Accra, Ghana • Hotline (+233) 544121814 / 0596672863<br>
+8 Countries • 13 Services • SOS with Google Maps • Paystack Payment • Min Rate Protection<br>
+Work Hours: Client sets Begin & Close Time • GPS Auto Location
 </div>
 
 <script>
-function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('open')}
-function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('open')}
-function openSOS(){document.getElementById('sosModal').classList.add('open')}
-function closeSOS(){document.getElementById('sosModal').classList.remove('open')}
-function toggleMore(){document.getElementById('moreMenu').classList.toggle('open')}
-function closeMore(){document.getElementById('moreMenu').classList.remove('open')}
-function closeApp(){if(confirm('Exit LOVE CARE app?')){try{window.close()}catch(e){}; setTimeout(()=>{location.href='about:blank'},400)}}
-function shareSite(){if(navigator.share){navigator.share({title:'LOVE CARE GLOBAL',url:location.href})}else{prompt('Copy link:',location.href)} closeMore()}
-document.addEventListener('click',e=>{if(!e.target.closest('#moreMenu') && !e.target.closest('[onclick="toggleMore()"]')) closeMore()})
+function openMenu(){document.getElementById('sideMenu').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeMenu(){document.getElementById('sideMenu').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
 </script>
 </body>
 </html>
