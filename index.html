@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LOVE CARE GLOBAL HOME NURSING</title>
-<meta name="theme-color" content="#16a34a">
+<title>Book Nurse - LOVE CARE GLOBAL</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#111;padding-bottom:20px}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111;padding-bottom:30px}
 .header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#eab308);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.2)}
-.card{background:#fff;border-radius:18px;padding:14px;margin:10px 12px;border:2px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.card{background:#fff;border-radius:16px;padding:14px;margin:10px 12px;border:2px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,.06)}
 .btnSmall{padding:12px 14px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
-.menuOverlay{position:fixed;top:0;left:-100%;width:290px;height:100%;background:#fff;z-index:3000;transition:.35s;box-shadow:4px 0 30px rgba(0,0,0,.3);overflow:auto}
-.menuOverlay.open{left:0}.menuBg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:2999;display:none}.menuBg.show{display:block}
-#nearbyNurseModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:4000;display:none;overflow:auto;padding:10px}
+.step{display:none}.step.active{display:block}
+.menuOverlay{position:fixed;top:0;left:-100%;width:290px;height:100%;background:#fff;z-index:3000;transition:.35s;box-shadow:4px 0 30px rgba(0,0,0,.3);overflow:auto}.menuOverlay.open{left:0}.menuBg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:2999;display:none}.menuBg.show{display:block}
+.serviceBtn{padding:10px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;font-size:12px;font-weight:700;text-align:left}.serviceBtn.selected{border-color:#16a34a;background:#f0fdf4}
+input,select,textarea{width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;margin:6px 0;font-size:13px}
 </style>
 </head>
 <body>
@@ -19,10 +19,16 @@
 <div class="header">
 <div style="display:flex;align-items:center;gap:8px">
 <button class="btnSmall" style="background:#facc15;color:#111;font-size:22px" onclick="toggleMenu()">☰</button>
-<div style="font-weight:900;font-size:14px;line-height:1.1">LOVE CARE GLOBAL<br><span style="background:white;color:#16a34a;padding:3px 10px;border-radius:20px;font-size:11px">HOME NURSING</span></div>
+<div style="font-weight:900;font-size:13px;line-height:1.1">BOOK NURSE<br><span style="background:white;color:#16a34a;padding:2px 8px;border-radius:20px;font-size:10px">13 SERVICES</span></div>
 </div>
-<button class="btnSmall" style="background:#ef4444;color:white;padding:11px 20px;border-radius:22px" onclick="window.location.href='./sos.html'">SOS</button>
+<div style="display:flex;gap:6px">
+<a href="index.html" class="btnSmall" style="background:white;color:#16a34a">🏠 Home</a>
+<a href="sos.html" class="btnSmall" style="background:#ef4444;color:white">SOS</a>
 </div>
+</div>
+
+<!-- ✅ SELECTED NURSE FROM MAP - SINGLE LINE, FIXED -->
+<div id="selectedNurseTopDisplay" style="display:none;background:#f0fdf4;border:3px solid #16a34a;padding:12px;border-radius:12px;margin:10px 12px"></div>
 
 <div id="menuBg" class="menuBg" onclick="toggleMenu()"></div>
 <div id="menuOverlay" class="menuOverlay">
@@ -49,12 +55,12 @@
 <button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;border:1px solid #e5e7eb;justify-content:flex-start" onclick="window.location.href='./support.html';toggleMenu()">📞 Support</button>
 
 <div style="font-size:10px;font-weight:900;color:#6b7280;margin:14px 0 4px">LEGALS</div>
-<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./privacy.html';toggleMenu()">🔒 Privacy</button>
-<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./terms.html';toggleMenu()">📄 Terms</button>
-<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./refund.html';toggleMenu()">💰 Refund</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./privacy.html';toggleMenu()">🔒 Privacy Policy</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./terms.html';toggleMenu()">📄 Terms & Conditions</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./refund.html';toggleMenu()">💰 Refund Policy</button>
 <button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./nurse-protection.html';toggleMenu()">🛡️ Nurse Protection</button>
 <button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./minimum-rate.html';toggleMenu()">⚖️ Minimum Rate</button>
-<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./about.html';toggleMenu()">💜 About</button>
+<button class="btnSmall" style="background:#f9fafb;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./about.html';toggleMenu()">💜 About Us</button>
 <button class="btnSmall" style="background:#111827;color:white;width:100%;margin:4px 0;justify-content:flex-start" onclick="window.location.href='./settings.html';toggleMenu()">⚙️ Settings</button>
 
 <hr style="margin:14px 0">
@@ -63,118 +69,66 @@
 </div>
 </div>
 
-<!-- Selected Nurse Banner - Shows after map selection -->
-<div id="selectedNurseBanner" style="display:none;background:#f0fdf4;border:3px solid #16a34a;padding:12px;border-radius:14px;margin:10px 12px">
-<div style="font-size:12px;font-weight:900;color:#16a34a">✅ Selected Nurse from Map:</div>
-<div id="selectedNurseInfo" style="font-size:12px;margin-top:6px"></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-<button class="btnSmall" style="background:#16a34a;color:white;padding:14px" onclick="proceedWithSelectedNurse()">✅ Proceed to Book</button>
-<button class="btnSmall" style="background:#ef4444;color:white;padding:14px" onclick="rejectSelectedNurse()">❌ Reject</button>
+<!-- STEPS -->
+<div class="card">
+<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:900">
+<span id="s1" style="color:#16a34a">● Step 1 Service</span><span id="s2" style="color:#999">○ Step 2 Details</span><span id="s3" style="color:#999">○ Step 3 Confirm</span>
 </div>
 </div>
 
-<!-- CLIENT ACCESS -->
-<div class="card" style="border:3px solid #16a34a;background:#f0fdf4">
-<h3 style="color:#16a34a;font-size:14px">👨‍👩‍👧 Client Access - Register / Login</h3>
-<p style="font-size:11px;color:#6b7280;margin:6px 0">Register with Phone & Password BEFORE booking - Location auto GPS, no typing!</p>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<button class="btnSmall" style="background:#16a34a;color:white" onclick="window.location.href='./client-register.html'">📝 Register</button>
-<button class="btnSmall" style="background:#2563eb;color:white" onclick="window.location.href='./client-login.html'">🔓 Login</button>
+<div id="step1" class="step active">
+<div class="card" style="border-left:4px solid #16a34a">
+<h3 style="font-size:14px">Step 1: Choose Service (13 Services)</h3>
+<div id="servicesGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"></div>
+<button class="btnSmall" style="background:#16a34a;color:white;width:100%;margin-top:12px;padding:14px" onclick="nextStep(2)">Continue →</button>
 </div>
 </div>
 
-<!-- FIND NURSE NEAR YOU - SMART -->
-<div class="card" style="border:3px solid #16a34a;text-align:center">
-<h3 style="font-size:14px">📍 Find Nurse Near You</h3>
-<p style="font-size:11px;color:#6b7280">Tap to open Google Maps - Shows nearby online nurses & auto select</p>
-<button class="btnSmall" style="background:#16a34a;color:white;width:100%;padding:14px;margin-top:8px;font-size:13px" onclick="findNearbyNursesInGoogleMap()">📍 Find Nurse Near Me - Open in Google Maps</button>
-<p id="gpsStatus" style="font-size:10px;color:#16a34a;margin-top:6px;font-weight:700">📍 Allow GPS - Then select nurse from list</p>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-<button class="btnSmall" style="background:#2563eb;color:white;width:100%" onclick="window.location.href='./book-nurse.html'">📅 Book Nurse Now</button>
-<button class="btnSmall" style="background:#ef4444;color:white;width:100%" onclick="window.location.href='./sos.html'">🚨 SOS</button>
+<div id="step2" class="step">
+<div class="card" style="border-left:4px solid #2563eb">
+<h3 style="font-size:14px">Step 2: Booking Details</h3>
+<label style="font-size:11px;font-weight:800">Full Name</label><input id="clientName" placeholder="John Doe">
+<label style="font-size:11px;font-weight:800">Phone</label><input id="clientPhone" placeholder="0544121814">
+<label style="font-size:11px;font-weight:800">Date</label><input id="serviceDate" type="date">
+<label style="font-size:11px;font-weight:800">Time</label><input id="serviceTime" type="time">
+<label style="font-size:11px;font-weight:800">Duration</label><select id="duration"><option value="1">1 Hour</option><option value="2">2 Hours</option><option value="4">4 Hours</option><option value="8">8 Hours</option><option value="12">12 Hours</option><option value="24">24 Hours</option></select>
+<label style="font-size:11px;font-weight:800">Notes</label><textarea id="notes" placeholder="Patient condition..."></textarea>
+<label style="font-size:11px;font-weight:800">Location (Auto GPS)</label>
+<div style="display:flex;gap:6px"><input id="locationText" placeholder="Accra, Ghana" readonly><button class="btnSmall" style="background:#16a34a;color:white" onclick="getGPS()">📍 GPS</button></div>
+<p id="gpsStatus2" style="font-size:10px;color:#16a34a">Tap GPS</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px"><button class="btnSmall" style="background:#e5e7eb" onclick="nextStep(1)">← Back</button><button class="btnSmall" style="background:#2563eb;color:white" onclick="nextStep(3)">Continue →</button></div>
 </div>
 </div>
 
-<!-- NEARBY NURSE MODAL - Inside App Selection -->
-<div id="nearbyNurseModal">
-<div style="background:#fff;max-width:420px;margin:10px auto;border-radius:18px;padding:14px">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<h3 style="font-size:14px">📍 Nearby Online Nurses - <span id="nearbyCount">0</span> found</h3>
-<button onclick="closeNearbyModal()" style="background:#6b7280;color:white;border:none;border-radius:50%;width:32px;height:32px;font-weight:900">✕</button>
-</div>
-<p id="nearbyGpsInfo" style="font-size:11px;color:#16a34a;margin:8px 0;background:#f0fdf4;padding:8px;border-radius:8px">📍 Getting your location...</p>
-<div id="nearbyNursesList" style="max-height:65vh;overflow:auto;margin-top:10px"></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-<button class="btnSmall" style="background:#e5e7eb;color:#111;width:100%" onclick="closeNearbyModal()">Close</button>
-<button class="btnSmall" style="background:#2563eb;color:white;width:100%" onclick="openGoogleMapsForNurses()">🗺️ Open Google Maps</button>
+<div id="step3" class="step">
+<div class="card" style="border-left:4px solid #eab308">
+<h3 style="font-size:14px">Step 3: Confirm & Book</h3>
+<div id="summaryBox" style="background:#f8fafc;padding:12px;border-radius:12px;font-size:12px;line-height:1.6;margin-top:8px"></div>
+<button class="btnSmall" style="background:#16a34a;color:white;width:100%;margin-top:12px;padding:14px" onclick="confirmBooking()">✅ Confirm Booking</button>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><button class="btnSmall" style="background:#e5e7eb" onclick="nextStep(2)">← Back</button><button class="btnSmall" style="background:#ef4444;color:white" onclick="window.location.href='./index.html'">Cancel</button></div>
 </div>
 </div>
-</div>
-
-<div style="text-align:center;padding:12px;font-size:10px;color:#999">LOVE CARE GLOBAL - 8 Countries • 13 Services • Final - No 3 dots</div>
 
 <script>
-function toggleMenu(){document.getElementById('menuOverlay').classList.toggle('open');document.getElementById('menuBg').classList.toggle('show')}
-let clientLat=5.6037,clientLng=-0.1870,selectedNurseData=null;
-
-function findNearbyNursesInGoogleMap(){
-  document.getElementById('nearbyNurseModal').style.display='block';
-  const gpsInfo=document.getElementById('nearbyGpsInfo');
-  gpsInfo.innerText='📍 Getting your live location...';
-  if(!navigator.geolocation){gpsInfo.innerText='⚠️ GPS denied - Showing Accra nurses';showNearbyNurses(5.6037,-0.1870);return;}
-  navigator.geolocation.getCurrentPosition(pos=>{
-    clientLat=pos.coords.latitude;clientLng=pos.coords.longitude;
-    gpsInfo.innerText=`✅ Your Location: ${clientLat.toFixed(5)}, ${clientLng.toFixed(5)} - Finding nurses within 10km...`;
-    showNearbyNurses(clientLat,clientLng);
-  },()=>{gpsInfo.innerText='⚠️ GPS failed - Showing Accra nurses';showNearbyNurses(5.6037,-0.1870);},{enableHighAccuracy:true,timeout:8000});
-}
-
-function showNearbyNurses(lat,lng){
-  let allNurses=JSON.parse(localStorage.getItem('loveCareNurses')||'[]');
-  if(allNurses.length===0){
-    allNurses=[
-      {id:'N001',name:'Grace Mensah',photo:'👩‍⚕️',rating:4.9,license:'RN-ACC-2024',lat:lat+0.005,lng:lng+0.004,specialty:'Elderly Care',hourly:60,verified:true,online:true},
-      {id:'N002',name:'Peter Asabere',photo:'👨‍⚕️',rating:4.8,license:'RN-KUM-2023',lat:lat-0.003,lng:lng+0.006,specialty:'General Nursing',hourly:55,verified:true,online:true},
-      {id:'N003',name:'Ama Boateng',photo:'👩‍⚕️',rating:5.0,license:'RN-TEMA-2024',lat:lat+0.007,lng:lng-0.002,specialty:'ICU/Critical',hourly:80,verified:true,online:true},
-      {id:'N004',name:'Kofi Owusu',photo:'👨‍⚕️',rating:4.7,license:'RN-CAPE-2023',lat:lat-0.006,lng:lng-0.005,specialty:'Physiotherapy',hourly:65,verified:true,online:true},
-      {id:'N005',name:'Sarah Adjei',photo:'👩‍⚕️',rating:4.9,license:'RN-ACC-2025',lat:lat+0.002,lng:lng+0.008,specialty:'Maternity',hourly:70,verified:true,online:true}
-    ];
+let selectedService=null,clientLat=5.6037,clientLng=-0.1870,selectedNurseFromMap=null;
+window.addEventListener('DOMContentLoaded',()=>{
+  selectedNurseFromMap=JSON.parse(localStorage.getItem('selectedNurseForBooking')||'null');
+  const d=document.getElementById('selectedNurseTopDisplay');
+  if(selectedNurseFromMap && d){
+    d.style.display='block';
+    d.innerHTML=`<div style="display:flex;gap:10px;align-items:center"><div style="font-size:28px;background:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center">${selectedNurseFromMap.photo||'👩‍⚕️'}</div><div style="flex:1"><div style="font-weight:900;font-size:13px;color:#16a34a">✅ Selected Nurse from Map - ${selectedNurseFromMap.name} ✅</div><div style="font-size:11px">${selectedNurseFromMap.specialty} • ⭐${selectedNurseFromMap.rating} • 📍 ${selectedNurseFromMap.distance.toFixed(1)}km • ${selectedNurseFromMap.hourly} GHS/hr</div><div style="font-size:10px">License: ${selectedNurseFromMap.license} • <a href="https://www.google.com/maps?q=${selectedNurseFromMap.lat},${selectedNurseFromMap.lng}" target="_blank" style="color:#16a34a">View on Map</a></div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><button class="btnSmall" style="background:#16a34a;color:white;padding:12px">✅ Proceed to Book ${selectedNurseFromMap.name}</button><button class="btnSmall" style="background:#ef4444;color:white;padding:12px" onclick="localStorage.removeItem('selectedNurseForBooking');document.getElementById('selectedNurseTopDisplay').style.display='none';selectedNurseFromMap=null;">❌ Reject / Choose Another</button></div>`;
   }
-  allNurses=allNurses.filter(n=>n.online!==false).map(n=>{
-    const d=getDistanceKm(lat,lng,n.lat||lat+Math.random()*0.01,n.lng||lng+Math.random()*0.01);
-    return {...n,distance:d}
-  }).sort((a,b)=>a.distance-b.distance).slice(0,10);
-
-  document.getElementById('nearbyCount').innerText=allNurses.length;
-  const list=document.getElementById('nearbyNursesList');
-  if(allNurses.length===0){list.innerHTML='<p style="text-align:center;color:#999;padding:20px">No online nurses near you</p>';return;}
-  list.innerHTML=allNurses.map(n=>{
-    const safeJson=encodeURIComponent(JSON.stringify(n));
-    return `<div style="border:2px solid #e5e7eb;border-radius:14px;padding:10px;margin:8px 0;display:flex;gap:10px;align-items:center">
-    <div style="font-size:28px;background:#f0fdf4;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center">${n.photo||'👩‍⚕️'}</div>
-    <div style="flex:1"><div style="font-weight:900;font-size:13px">${n.name} ${n.verified?'✅':''}</div>
-    <div style="font-size:11px;color:#6b7280">${n.specialty||'General'} • ⭐${n.rating||4.8} • ${n.distance.toFixed(1)}km</div>
-    <div style="font-size:10px;color:#16a34a;font-weight:700">License: ${n.license||'Verified'} • ${n.hourly||60} GHS/hr • 🟢 Online</div></div>
-    <button class="btnSmall" style="background:#16a34a;color:white;padding:10px 12px" onclick="selectNurseFromMapEncoded('${safeJson}')">Select</button></div>`;
-  }).join('');
-}
-
-function getDistanceKm(lat1,lon1,lat2,lon2){const R=6371;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
-function selectNurseFromMapEncoded(enc){try{const n=JSON.parse(decodeURIComponent(enc));selectNurseFromMap(n);}catch(e){alert('Selection error');}}
-function selectNurseFromMap(nurse){
-  selectedNurseData=nurse;localStorage.setItem('selectedNurseForBooking',JSON.stringify(nurse));closeNearbyModal();
-  document.getElementById('selectedNurseBanner').style.display='block';
-  document.getElementById('selectedNurseInfo').innerHTML=`<b>${nurse.name}</b> ${nurse.verified?'✅ Verified':''}<br>${nurse.specialty} • ⭐${nurse.rating} • 📍 ${nurse.distance.toFixed(1)}km away<br>License: ${nurse.license} • ${nurse.hourly} GHS/hr • <a href="https://www.google.com/maps?q=${nurse.lat},${nurse.lng}" target="_blank" style="color:#16a34a">View on Map</a>`;
-  document.getElementById('gpsStatus').innerText=`✅ Selected: ${nurse.name} - ${nurse.distance.toFixed(1)}km - Proceed to book`;
-  window.open(`https://www.google.com/maps/search/${encodeURIComponent(nurse.name+' nurse')}/@${nurse.lat},${nurse.lng},15z`,'_blank');
-}
-function proceedWithSelectedNurse(){window.location.href='./book-nurse.html?selectedNurse='+(selectedNurseData?.id||'N001');}
-function rejectSelectedNurse(){localStorage.removeItem('selectedNurseForBooking');selectedNurseData=null;document.getElementById('selectedNurseBanner').style.display='none';document.getElementById('gpsStatus').innerText='❌ Rejected - Choose another';findNearbyNursesInGoogleMap();}
-function closeNearbyModal(){document.getElementById('nearbyNurseModal').style.display='none';}
-function openGoogleMapsForNurses(){window.open(`https://www.google.com/maps/search/home+nursing+services+near+me+online+nurse/@${clientLat},${clientLng},14z`,'_blank');}
-function exitApp(){if(confirm('Exit LOVE CARE GLOBAL?')){try{window.close();}catch(e){}setTimeout(()=>{document.body.innerHTML='<div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#16a34a,#eab308);color:white;text-align:center;padding:20px"><div style="font-size:60px">💜</div><h1>Thank You!</h1><p>App Closed Safely</p><button onclick="location.href=\'./index.html\'" style="margin-top:20px;background:white;color:#16a34a;padding:12px 24px;border:none;border-radius:20px;font-weight:900">🏠 Reopen</button></div>';},300);}}
-// Restore if already selected
-window.addEventListener('load',()=>{const sel=JSON.parse(localStorage.getItem('selectedNurseForBooking')||'null');if(sel){selectedNurseData=sel;document.getElementById('selectedNurseBanner').style.display='block';document.getElementById('selectedNurseInfo').innerHTML=`<b>${sel.name}</b> ✅<br>${sel.specialty} • ⭐${sel.rating} • 📍 ${sel.distance.toFixed(1)}km<br><a href="https://www.google.com/maps?q=${sel.lat},${sel.lng}" target="_blank" style="color:#16a34a">View on Map</a>`;}});
+});
+const services=["Elderly Care","Post-Surgery Care","Baby / Nanny Care","Physiotherapy","Diabetes Care","Hypertension Care","Wound Dressing","Injection / IV","Maternity Care","Palliative Care","Companion Care","Lab Sample Collection","General Nursing"];
+function loadServices(){document.getElementById('servicesGrid').innerHTML=services.map(s=>`<button class="serviceBtn" onclick="selectService(this,'${s}')">${s}</button>`).join('');}
+function selectService(el,name){document.querySelectorAll('.serviceBtn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');selectedService=name;}
+function toggleMenu(){document.getElementById('menuOverlay').classList.toggle('open');document.getElementById('menuBg').classList.toggle('show')}
+function nextStep(n){if(n===2&&!selectedService){alert('Select service');return;}if(n===3){const nm=document.getElementById('clientName').value,ph=document.getElementById('clientPhone').value,dt=document.getElementById('serviceDate').value;if(!nm||!ph||!dt){alert('Fill Name, Phone, Date');return;}}document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));document.getElementById('step'+n).classList.add('active');document.getElementById('s1').style.color=n>=1?'#16a34a':'#999';document.getElementById('s2').style.color=n>=2?'#16a34a':'#999';document.getElementById('s3').style.color=n>=3?'#16a34a':'#999';if(n===3)buildSummary();}
+function buildSummary(){const nursePart=selectedNurseFromMap?`<b>Selected Nurse from Map:</b> ${selectedNurseFromMap.name} - ${selectedNurseFromMap.specialty} - ⭐${selectedNurseFromMap.rating} - ${selectedNurseFromMap.distance.toFixed(1)}km - ${selectedNurseFromMap.hourly} GHS/hr<br>`:`<b>Nurse:</b> Auto-assign nearest online nurse<br>`;document.getElementById('summaryBox').innerHTML=`${nursePart}<b>Service:</b> ${selectedService}<br><b>Client:</b> ${document.getElementById('clientName').value} - ${document.getElementById('clientPhone').value}<br><b>Date:</b> ${document.getElementById('serviceDate').value} ${document.getElementById('serviceTime').value}<br><b>Duration:</b> ${document.getElementById('duration').value} hrs<br><b>Location:</b> ${document.getElementById('locationText').value||clientLat+','+clientLng}<br><b>Notes:</b> ${document.getElementById('notes').value||'None'}<br><br><span style="color:#16a34a;font-weight:900">Pay on arrival</span>`;}
+function getGPS(){const st=document.getElementById('gpsStatus2');st.innerText='📍 Getting GPS...';if(!navigator.geolocation){st.innerText='GPS not supported';return;}navigator.geolocation.getCurrentPosition(p=>{clientLat=p.coords.latitude;clientLng=p.coords.longitude;document.getElementById('locationText').value=`${clientLat.toFixed(5)}, ${clientLng.toFixed(5)} - Accra, Ghana`;st.innerText=`✅ GPS Locked: ${clientLat.toFixed(5)}, ${clientLng.toFixed(5)}`;},()=>{st.innerText='❌ GPS denied';document.getElementById('locationText').readOnly=false;},{enableHighAccuracy:true,timeout:8000});}
+function confirmBooking(){const bookings=JSON.parse(localStorage.getItem('loveCareBookings')||'[]');bookings.push({id:'BK'+Date.now(),service:selectedService,name:document.getElementById('clientName').value,phone:document.getElementById('clientPhone').value,date:document.getElementById('serviceDate').value,time:document.getElementById('serviceTime').value,duration:document.getElementById('duration').value,location:document.getElementById('locationText').value||clientLat+','+clientLng,lat:clientLat,lng:clientLng,notes:document.getElementById('notes').value,nurse:selectedNurseFromMap||null,status:'Pending',created:new Date().toISOString()});localStorage.setItem('loveCareBookings',JSON.stringify(bookings));localStorage.removeItem('selectedNurseForBooking');alert('✅ Booking Confirmed!');window.location.href='./my-bookings.html';}
+function exitApp(){if(confirm('Exit LOVE CARE GLOBAL?')){try{window.close();}catch(e){}setTimeout(()=>{document.body.innerHTML='<div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#16a34a,#eab308);color:white;text-align:center;padding:20px"><div style="font-size:60px">💜</div><h1>Thank You!</h1><button onclick="location.href=\'./index.html\'" style="margin-top:20px;background:white;color:#16a34a;padding:12px 24px;border:none;border-radius:20px;font-weight:900">🏠 Reopen</button></div>';},300);}}
+loadServices();
 </script>
 </body>
 </html>
