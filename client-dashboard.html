@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Dashboard - LOVE CARE GLOBAL HOME NURSING</title>
+<style>body{font-family:Inter,sans-serif;margin:0;background:#f8f9ff}.header{background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;padding:14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0}.container{max-width:1000px;margin:0 auto;padding:16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{background:white;padding:20px;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,0.05)}.btn{background:#7c3aed;color:white;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:800;display:inline-block}a{color:#7c3aed}</style>
+</head>
+<body>
+<div class="header"><div><strong>LOVE CARE GLOBAL HOME NURSING</strong><br><small id="welcome">Client Dashboard</small></div><div><a href="index.html" style="color:white">Home</a> | <a href="client-login.html" style="color:white">Logout</a></div></div>
+<div class="container">
+<h2>Welcome <span id="cName"></span>!</h2>
+<div class="grid">
+<div class="card"><h3>📅 Book a Nurse</h3><p>Find verified nurses near you</p><a class="btn" href="book-nurse.html">Book Now</a></div>
+<div class="card"><h3>📋 My Bookings</h3><p>View your bookings</p><a class="btn" href="my-bookings.html">View Bookings</a></div>
+<div class="card"><h3>👩‍⚕️ Nurses</h3><p>Favorite nurses</p><a class="btn" href="index.html">Browse</a></div>
+<div class="card"><h3>⚙️ Profile</h3><p>Phone: <span id="cPhone"></span></p><a class="btn" href="contact.html">Support</a></div>
+</div>
+<p style="text-align:center;margin-top:20px"><a href="privacy-policy.html">Privacy</a> | <a href="terms.html">Terms</a> | <a href="delete-account.html">Delete Account</a></p>
+</div>
+<script>
+document.getElementById('cName').innerText=localStorage.getItem('clientName')||'Client';
+document.getElementById('cPhone').innerText=localStorage.getItem('clientPhone')||'';
+document.getElementById('welcome').innerText='Welcome '+ (localStorage.getItem('clientName')||'');
+</script>
+</body>
+</html>
