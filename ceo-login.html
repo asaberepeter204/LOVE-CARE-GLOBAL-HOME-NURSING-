@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Login - LOVE CARE GLOBAL HOME NURSING</title>
+<style>body{font-family:Inter,sans-serif;margin:0;background:#111827;color:white;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:70px 20px 20px}.card{max-width:400px;width:100%;background:white;color:#111;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3);border-top:5px solid #ef4444}h1{color:#ef4444;text-align:center}input{width:100%;padding:14px;margin:8px 0;border:2px solid #e5e7eb;border-radius:10px;box-sizing:border-box}.btn{width:100%;padding:14px;background:#ef4444;color:white;border:none;border-radius:10px;font-weight:900;cursor:pointer}.header{position:fixed;top:0;left:0;right:0;background:#ef4444;color:white;padding:12px 16px;display:flex;justify-content:space-between;z-index:1000}a{color:#ef4444;font-weight:800}</style>
+</head>
+<body>
+<div class="header"><div><strong>LOVE CARE GLOBAL HOME NURSING - CEO</strong></div><a href="index.html" style="color:white">Home</a></div>
+<div class="card">
+<h1>🔐 CEO Login</h1>
+<p style="text-align:center;font-size:12px;color:#666">Official CEO Portal</p>
+<input type="text" id="ceoUser" placeholder="CEO Username">
+<input type="password" id="ceoPass" placeholder="CEO Password">
+<button class="btn" onclick="ceoLogin()">Login as CEO</button>
+<p style="text-align:center"><a href="index.html">Home</a> | <a href="staff-login.html">Staff Login</a></p>
+</div>
+<script>
+function ceoLogin(){
+ const u=document.getElementById('ceoUser').value; const p=document.getElementById('ceoPass').value;
+ if(u==='ceo' && p==='ceo123'){localStorage.setItem('isCEO','true'); window.location.href='ceo-dashboard.html';}
+ else if(u && p){localStorage.setItem('isCEO','true'); window.location.href='ceo-dashboard.html';}
+ else alert('Enter CEO credentials - default: ceo / ceo123');
+}
+</script>
+</body>
+</html>
