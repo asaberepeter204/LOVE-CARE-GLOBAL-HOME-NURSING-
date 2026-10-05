@@ -2,33 +2,177 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Book a Nurse - LOVE CARE GLOBAL HOME NURSING</title>
-<style>body{font-family:Inter,sans-serif;margin:0;background:#f8f9ff}.header{background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;padding:14px;position:sticky;top:0;display:flex;justify-content:space-between}.container{max-width:600px;margin:0 auto;padding:16px}.card{background:white;padding:20px;border-radius:16px;border:1px solid #e5e7eb;margin:12px 0}input,select,textarea{width:100%;padding:12px;margin:6px 0;border:2px solid #e5e7eb;border-radius:10px;box-sizing:border-box}.btn{width:100%;padding:14px;background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;border:none;border-radius:10px;font-weight:900;cursor:pointer}a{color:#7c3aed;font-weight:800}</style>
+<title>Book Nurse - 4 Steps | LOVE CARE GLOBAL</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111;padding-bottom:80px}
+.header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#eab308);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.card{background:#fff;border-radius:16px;padding:14px;margin:10px 12px;border:2px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.input{width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:12px;margin:6px 0}
+.label{font-weight:800;font-size:13px;margin:8px 0 4px;display:block}
+.badge{padding:9px 14px;border-radius:10px;font-weight:800;font-size:12px;border:none;cursor:pointer;margin:3px;background:#e5e7eb}
+.badge.active{background:#16a34a;color:#fff}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-weight:900;cursor:pointer;margin-top:10px;color:#fff;display:flex;justify-content:center;gap:8px;align-items:center}
+.btnGreen{background:#16a34a}.btnBlue{background:#2563eb}.btnGray{background:#6b7280}
+.steps{display:flex;gap:6px;padding:12px;justify-content:center}
+.step{width:36px;height:36px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px}
+.step.active{background:#16a34a;color:#fff}.step.done{background:#22c55e;color:#fff}
+.page{display:none}.page.active{display:block}
+.progress{height:6px;background:#e5e7eb;border-radius:10px;margin:0 12px;overflow:hidden}
+.progressBar{height:100%;background:linear-gradient(90deg,#16a34a,#eab308);width:25%;transition:.4s}
+</style>
 </head>
 <body>
-<div class="header"><strong>Book a Nurse - LOVE CARE GLOBAL HOME NURSING</strong><a href="index.html" style="color:white">Home</a></div>
-<div class="container">
+<div class="header">
+<a href="index.html" style="color:#fff;text-decoration:none;font-weight:900">🏠 Home</a>
+<strong>📅 Book Nurse - Step <span id="stepNum">1</span>/4</strong>
+<a href="tel:+233544121814" style="background:#ef4444;color:#fff;padding:6px 12px;border-radius:20px;text-decoration:none;font-weight:900;font-size:12px">SOS</a>
+</div>
+
+<div class="steps">
+<div id="s1" class="step active">1</div><div id="s2" class="step">2</div><div id="s3" class="step">3</div><div id="s4" class="step">4</div>
+</div>
+<div class="progress"><div id="pBar" class="progressBar"></div></div>
+
+<!-- STEP 1: Country + Service + Care Mode + Days -->
+<div id="page1" class="page active">
+<div style="padding:10px 12px 0"><h3>Step 1: Choose Country & Service</h3><p style="font-size:11px;color:#666">8 Countries • 13 Services</p></div>
 <div class="card">
-<h2>Book Verified Nurse</h2>
-<select id="service"><option>Elderly Care</option><option>Post-Surgery Care</option><option>Baby & Mother Care</option><option>Disability Support</option><option>Wound Dressing</option><option>Injection Service</option></select>
-<input type="text" id="loc" placeholder="Your Location">
-<input type="date" id="date"><input type="time" id="time">
-<textarea id="notes" placeholder="Describe care needed..."></textarea>
-<button class="btn" onclick="book()">Confirm Booking</button>
-<p style="text-align:center"><a href="client-dashboard.html">Dashboard</a> | <a href="my-bookings.html">My Bookings</a></p>
-<p style="font-size:11px;text-align:center;color:#666">Official: https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+<label class="label">Country (8 Countries)</label>
+<select id="country" class="input"><option value="GH">🇬🇭 Ghana - GHS</option><option value="NG">🇳🇬 Nigeria - NGN</option><option value="US">🇺🇸 USA - USD</option><option value="GB">🇬🇧 UK - GBP</option><option value="CA">🇨🇦 Canada - CAD</option><option value="DE">🇩🇪 Germany - EUR</option><option value="ZA">🇿🇦 South Africa - ZAR</option><option value="AE">🇦🇪 UAE - AED</option></select>
+<label class="label">Service (13 Services)</label>
+<select id="service" class="input"><option>Elderly Care</option><option>Post-Surgery Care</option><option>Child Care / Nanny</option><option>Disability Support</option><option>Physiotherapy Support</option><option>Palliative Care</option><option>Maternity / Newborn Care</option><option>Mental Health Support</option><option>Chronic Disease Management</option><option>Wound Dressing</option><option>Medication Administration</option><option>Hospital Companion</option><option>Live-In Full Care</option></select>
+<label class="label">Care Mode</label>
+<div><button class="badge active" onclick="setMode(this,'Hourly')">Hourly</button><button class="badge" onclick="setMode(this,'Daily')">Daily</button><button class="badge" onclick="setMode(this,'Weekly')">Weekly</button><button class="badge" onclick="setMode(this,'Monthly')">Monthly</button></div>
+<div style="margin-top:12px;border:2px solid #16a34a;background:#f0fdf4;border-radius:14px;padding:12px">
+<label class="label">Days</label>
+<div style="display:flex;gap:10px;align-items:center">
+<button onclick="changeDay(-1)" style="width:48px;height:48px;background:#16a34a;color:#fff;border:none;border-radius:12px;font-size:20px;font-weight:900">-</button>
+<input id="days" type="number" value="1" min="1" class="input" style="text-align:center;font-weight:900;font-size:18px;margin:0" oninput="updateRate()">
+<button onclick="changeDay(1)" style="width:48px;height:48px;background:#16a34a;color:#fff;border:none;border-radius:12px;font-size:20px;font-weight:900">+</button>
 </div>
 </div>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-const app=initializeApp({databaseURL:"https://love-care-global-default-rtdb.firebaseio.com"}); const db=getDatabase(app);
-window.book=async function(){
- const phone=localStorage.getItem('clientPhone')||prompt('Enter your phone');
- const data={service:document.getElementById('service').value,location:document.getElementById('loc').value,date:document.getElementById('date').value,time:document.getElementById('time').value,notes:document.getElementById('notes').value,clientPhone:phone,status:'pending',created:Date.now()};
- await push(ref(db,'bookings'),data);
- alert('Booking sent!'); window.location.href='my-bookings.html';
+<button class="btn btnGreen" onclick="nextStep(2)">Continue → Step 2: Time & Location <i class="fa-solid fa-arrow-right"></i></button>
+</div>
+</div>
+
+<!-- STEP 2: Start Time (Begin) + End Time (Close) + GPS -->
+<div id="page2" class="page">
+<div style="padding:10px 12px 0"><h3>Step 2: Set Working Hours & Location</h3><p style="font-size:11px;color:#666">Client sets when nurse begins & closes work</p></div>
+<div class="card">
+<div style="font-weight:900;color:#0e7490">⏰ Start Time & End Time Everyday</div>
+<p style="font-size:11px;color:#666">Client decides: Begin = Start, Close = End</p>
+<div style="display:flex;gap:8px;margin-top:10px">
+<div style="flex:1"><label class="label">🟢 Start - Nurse Begin Work</label><select id="startTime" class="input" onchange="calcHours()"><option value="6">6:00 AM</option><option value="7">7:00 AM</option><option value="8" selected>8:00 AM</option><option value="9">9:00 AM</option><option value="10">10:00 AM</option><option value="12">12:00 PM</option><option value="14">2:00 PM</option></select></div>
+<div style="flex:1"><label class="label">🔴 End - Nurse Close Work</label><select id="endTime" class="input" onchange="calcHours()"><option value="15">3:00 PM</option><option value="16">4:00 PM</option><option value="17" selected>5:00 PM</option><option value="18">6:00 PM</option><option value="19">7:00 PM</option><option value="20">8:00 PM</option><option value="22">10:00 PM</option></select></div>
+</div>
+<label class="label">Care Mode</label>
+<select id="liveMode" class="input" onchange="calcHours()"><option value="Live-Out">Live-Out (Goes home daily - Uses Start/End)</option><option value="Live-In">Live-In (Stays - 24hrs)</option></select>
+<div style="background:#e0f2fe;border:2px solid #0ea5e9;border-radius:12px;padding:12px;margin-top:10px;text-align:center">
+<p id="workHoursDisplay" style="font-weight:900;color:#0c4a6e">Work Hours: 08:00 - 17:00 = 9 hrs/day</p>
+<small id="workExplain" style="color:#075985">Client sets working hours</small>
+</div>
+<div style="display:flex;gap:12px;font-size:13px;margin-top:10px"><label><input type="checkbox"> Include Weekends?</label><label><input type="checkbox"> Include Holidays?</label></div>
+<div style="margin-top:14px;border:2px solid #16a34a;background:#f0fdf4;border-radius:14px;padding:12px">
+<div style="font-weight:900;color:#16a34a">📍 Client Live Location (Auto GPS)</div>
+<button style="width:100%;background:#16a34a;color:#fff;border:none;padding:14px;border-radius:12px;font-weight:900;margin-top:8px" onclick="getGPS()"><i class="fa-solid fa-location-dot"></i> Share My Live Location</button>
+<p id="gpsText" style="font-size:11px;margin-top:6px;color:#15803d;font-weight:700"></p>
+</div>
+<div style="margin-top:10px;font-size:12px">Legal Rate: <b id="legalRate">Loading...</b></div>
+<div style="display:flex;gap:8px">
+<button class="btn btnGray" onclick="nextStep(1)" style="flex:1"><i class="fa-solid fa-arrow-left"></i> Back</button>
+<button class="btn btnGreen" onclick="nextStep(3)" style="flex:2">Continue → Patient Details</button>
+</div>
+</div>
+</div>
+
+<!-- STEP 3: Patient Concerns + Voice Note -->
+<div id="page3" class="page">
+<div style="padding:10px 12px 0"><h3>Step 3: Patient Details</h3><p style="font-size:11px;color:#666">Condition, History, Voice Note</p></div>
+<div class="card" style="border-color:#ef4444;background:#fef2f2">
+<div style="font-weight:900;color:#dc2626">📝 Patient Concerns / Condition</div>
+<textarea id="condition" class="input" placeholder="Describe condition..." rows="3" maxlength="500" oninput="document.getElementById('charCount').innerText=this.value.length+'/500'"></textarea>
+<textarea class="input" placeholder="Medical history / Medications / Allergies" rows="2"></textarea>
+<div style="display:flex;gap:8px"><select class="input"><option>Patient Age?</option><option>0-5</option><option>6-17</option><option>18-40</option><option>41-65</option><option>65+</option></select><select class="input"><option>Gender?</option><option>Male</option><option>Female</option></select></div>
+<small id="charCount" style="font-size:11px;float:right">0/500</small><div style="clear:both"></div>
+</div>
+<div class="card" style="border-color:#7c3aed;background:#f5f3ff">
+<div style="font-weight:900;color:#7c3aed">🎤 Voice Note - Describe Condition</div>
+<button id="recBtn" style="background:#ef4444;color:#fff;border:none;padding:10px 20px;border-radius:24px;font-weight:900;margin-top:8px" onclick="toggleRec()">🎤 Record</button>
+<span id="recTimer" style="font-weight:800;margin-left:10px"></span>
+<p style="font-size:12px;margin-top:8px;background:#fff;padding:8px;border-radius:8px">Tap Record to start</p>
+<audio id="audioPlay" controls style="display:none;width:100%;margin-top:8px"></audio>
+</div>
+<div class="card">
+<div style="display:flex;gap:8px">
+<button class="btn btnGray" onclick="nextStep(2)" style="flex:1"><i class="fa-solid fa-arrow-left"></i> Back</button>
+<button class="btn btnGreen" onclick="nextStep(4)" style="flex:2">Continue → Payment <i class="fa-solid fa-arrow-right"></i></button>
+</div>
+</div>
+</div>
+
+<!-- STEP 4: Phone + Offer + Paystack -->
+<div id="page4" class="page">
+<div style="padding:10px 12px 0"><h3>Step 4: Final - Phone & Payment</h3><p style="font-size:11px;color:#666">Offer must be >= Legal Min</p></div>
+<div class="card">
+<label class="label">Phone Number</label><input id="phone" class="input" placeholder="+233..." type="tel">
+<label class="label">Your Offer (must be >= Legal Min) - BLOCKED if below minimum</label><input id="offer" class="input" type="number" placeholder="Enter amount" oninput="checkMin()">
+<p style="font-size:11px;color:#d97706">⚠️ Minimum: <span id="minReq">Loading...</span></p>
+<div style="background:#f8fafc;padding:10px;border-radius:10px;margin-top:10px;font-size:12px">
+<b>Booking Summary:</b>
+<div id="summary" style="font-size:11px;color:#555;margin-top:4px"></div>
+</div>
+<button class="btn btnGreen" onclick="payWithPaystack()" style="background:#16a34a;font-size:16px">✅ Book Nurse - Pay with Paystack</button>
+<button class="btn btnGray" onclick="nextStep(3)" style="margin-top:8px"><i class="fa-solid fa-arrow-left"></i> Back to Patient Details</button>
+<p style="font-size:10px;color:#666;text-align:center;margin-top:8px">Secure • HQ Accra • (+233) 544121814<br>Work: Client sets Begin & Close time</p>
+</div>
+</div>
+
+<script>
+let mode='Hourly';let rates={GH:25,NG:3000,US:20,GB:18,CA:22,DE:19,ZA:150,AE:70};
+function setMode(el,m){document.querySelectorAll('.badge').forEach(b=>b.classList.remove('active'));el.classList.add('active');mode=m;updateRate()}
+function changeDay(d){let e=document.getElementById('days');let v=parseInt(e.value||1)+d;if(v<1)v=1;e.value=v;updateRate();calcHours()}
+function nextStep(n){
+ // save data
+ localStorage.setItem('book_country',document.getElementById('country').value);
+ localStorage.setItem('book_service',document.getElementById('service').value);
+ localStorage.setItem('book_days',document.getElementById('days').value);
+ // hide all pages, show n
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById('page'+n).classList.add('active');
+ document.getElementById('stepNum').innerText=n;
+ document.querySelectorAll('.step').forEach((s,i)=>{s.classList.remove('active','done'); if(i+1<n)s.classList.add('done'); if(i+1==n)s.classList.add('active')});
+ document.getElementById('pBar').style.width=(n/4*100)+'%';
+ window.scrollTo(0,0);
+ if(n==4) showSummary();
 }
+function calcHours(){
+ let start=parseInt(document.getElementById('startTime').value);
+ let end=parseInt(document.getElementById('endTime').value);
+ let live=document.getElementById('liveMode').value;
+ let d=document.getElementById('workHoursDisplay');
+ let e=document.getElementById('workExplain');
+ if(live==='Live-In'){d.innerText='Work Hours: 24 hrs/day - Live-In'; e.innerText='Live-In stays 24hrs'; return;}
+ let diff=end-start; if(diff<0) diff+=24; if(diff<=0) diff=1;
+ let st=document.getElementById('startTime').options[document.getElementById('startTime').selectedIndex].text;
+ let et=document.getElementById('endTime').options[document.getElementById('endTime').selectedIndex].text;
+ d.innerText=`Work Hours: ${st} - ${et} = ${diff} hrs/day (Client Set)`;
+ e.innerText=`Nurse begins at ${st}, closes at ${et}`;
+}
+function updateRate(){let c=document.getElementById('country').value;let base=rates[c]||25;let days=parseInt(document.getElementById('days').value||1);let tier=days>=7?'LONG':'SHORT';let final=(base*(tier==='LONG'?0.9:1)).toFixed(2);document.getElementById('legalRate').innerText=c+' '+final+' / hr ('+tier+')';document.getElementById('minReq').innerText=c+' '+final}
+function checkMin(){let o=parseFloat(document.getElementById('offer').value||0);let m=parseFloat(document.getElementById('minReq').innerText.replace(/[^0-9.]/g,'')||0);document.getElementById('offer').style.borderColor=o>0&&o<m?'#ef4444':'#16a34a'}
+function getGPS(){let t=document.getElementById('gpsText');t.innerText='📍 Getting GPS...'; if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{t.innerHTML=`✅ GPS: ${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`; localStorage.setItem('lat',p.coords.latitude); localStorage.setItem('lng',p.coords.longitude)},e=>{t.innerText='❌ '+e.message})}else{t.innerText='❌ Not supported'}}
+function showSummary(){
+ let s=document.getElementById('country').value+' | '+document.getElementById('service').value+' | Days: '+document.getElementById('days').value+' | '+mode;
+ s+='<br>Time: '+document.getElementById('startTime').options[document.getElementById('startTime').selectedIndex].text+' - '+document.getElementById('endTime').options[document.getElementById('endTime').selectedIndex].text+' (Client Set)';
+ s+='<br>GPS: '+(localStorage.getItem('lat')?'Captured ✅':'Not yet');
+ document.getElementById('summary').innerHTML=s;
+}
+let rec,chunks=[],timerInt,sec=0;
+function toggleRec(){let b=document.getElementById('recBtn');let tm=document.getElementById('recTimer');if(!rec||rec.state==='inactive'){navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{rec=new MediaRecorder(s);chunks=[];sec=0;rec.ondataavailable=e=>chunks.push(e.data);rec.onstop=()=>{let blob=new Blob(chunks,{type:'audio/webm'});let url=URL.createObjectURL(blob);let a=document.getElementById('audioPlay');a.src=url;a.style.display='block';b.innerText='🎤 Record';clearInterval(timerInt);tm.innerText=`✅ ${sec}s`};rec.start();b.innerText='⏹️ Stop';timerInt=setInterval(()=>{sec++;tm.innerText=`🔴 ${sec}s`},1000)}).catch(e=>alert(e.message))}else{rec.stop()}}
+function payWithPaystack(){let offer=document.getElementById('offer').value;let phone=document.getElementById('phone').value;if(!phone){alert('Enter phone');return}if(!offer){alert('Enter offer');return}let min=parseFloat(document.getElementById('minReq').innerText.replace(/[^0-9.]/g,'')||0);if(parseFloat(offer)<min){alert('❌ BLOCKED: Offer below min '+document.getElementById('minReq').innerText);return}alert('✅ Booking for '+document.getElementById('startTime').options[document.getElementById('startTime').selectedIndex].text+' to '+document.getElementById('endTime').options[document.getElementById('endTime').selectedIndex].text+' - Proceeding to Paystack...')}
+calcHours();updateRate();
 </script>
 </body>
 </html>
