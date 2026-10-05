@@ -2,44 +2,136 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Registration - LOVE CARE GLOBAL HOME NURSING</title>
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#7c3aed">
+<title>Client Registration - LOVE CARE GLOBAL</title>
 <style>
-body{font-family:Inter,system-ui,sans-serif;margin:0;background:linear-gradient(135deg,#f0fdf4,#f3f0ff);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.card{max-width:480px;width:100%;background:white;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(124,58,237,0.15);border-top:5px solid #7c3aed}
-h1{color:#7c3aed;text-align:center;margin:0}input,select{width:100%;padding:14px;margin:8px 0;border:2px solid #e5e7eb;border-radius:10px;box-sizing:border-box}
-.btn{width:100%;padding:14px;background:linear-gradient(135deg,#16a34a,#7c3aed);color:white;border:none;border-radius:10px;font-weight:900;font-size:16px;cursor:pointer;margin-top:10px}
-a{color:#7c3aed;font-weight:800;text-decoration:none}
-.header{position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;padding:12px 16px;display:flex;justify-content:space-between;z-index:10}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f1f5f9;color:#111;min-height:100vh}
+.header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#7c3aed);color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.card{max-width:380px;margin:20px auto;background:#fff;border-radius:20px;padding:22px;border:1px solid #e5e7eb;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+input,select{width:100%;padding:16px 14px;border:2px solid #e5e7eb;border-radius:14px;margin:8px 0;font-size:14px;outline:none;background:#fff}
+input:focus,select:focus{border-color:#7c3aed}
+.btnMain{width:100%;padding:16px;border:none;border-radius:14px;font-weight:900;font-size:16px;cursor:pointer;background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;margin-top:10px}
+.locWrap{position:relative}
+.gpsInside{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#16a34a;color:white;border:none;padding:8px 10px;border-radius:8px;font-weight:900;font-size:12px;cursor:pointer}
 </style>
 </head>
 <body>
-<div class="header"><div><strong>LOVE CARE GLOBAL HOME NURSING</strong></div><div><a href="index.html" style="color:white">🏠 Home</a></div></div>
-<div class="card">
-<h1>Client Registration</h1>
-<p style="text-align:center;color:#666;font-size:13px">Official: https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
-<input type="text" id="cName" placeholder="Full Name *">
-<input type="tel" id="cPhone" placeholder="Phone 0244XXXXXX *">
-<input type="email" id="cEmail" placeholder="Email *">
-<select id="cCountry"><option>Ghana</option><option>Nigeria</option><option>USA</option><option>UK</option><option>Canada</option><option>Germany</option><option>South Africa</option><option>UAE</option></select>
-<input type="password" id="cPass" placeholder="Password *">
-<input type="text" id="cLocation" placeholder="Your Location / Address">
-<button class="btn" onclick="doRegister()">Create Account</button>
-<p style="text-align:center">Already have? <a href="client-login.html">Login</a> | <a href="index.html">Home</a></p>
+
+<div class="header">
+<div style="font-weight:900;font-size:13px;line-height:1.1">LOVE CARE GLOBAL HOME<br>NURSING</div>
+<a href="index.html" style="background:white;color:#7c3aed;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:900;font-size:13px">🏠 Home</a>
 </div>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-const firebaseConfig = { databaseURL: "https://love-care-global-default-rtdb.firebaseio.com" };
-const app = initializeApp(firebaseConfig); const db = getDatabase(app);
-window.doRegister = async function(){
- const name=document.getElementById('cName').value; const phone=document.getElementById('cPhone').value; const email=document.getElementById('cEmail').value;
- if(!name||!phone){alert('Name and phone required');return;}
- const id=phone.replace(/[^0-9]/g,'');
- await set(ref(db,'clients/'+id),{name,phone,email,country:document.getElementById('cCountry').value,location:document.getElementById('cLocation').value,created:Date.now()});
- localStorage.setItem('clientPhone',phone); localStorage.setItem('clientName',name);
- alert('Registered!'); window.location.href='client-dashboard.html';
+
+<div class="card">
+<h1 style="text-align:center;color:#7c3aed;font-size:32px;line-height:1.1">Client<br>Registration</h1>
+<p style="text-align:center;font-size:12px;color:#6b7280;margin:10px 0;line-height:1.3">Official:<br>https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+
+<input id="fullName" placeholder="Full Name *">
+<input id="phone" placeholder="Phone 0244XXXXXX *">
+<input id="email" type="email" placeholder="Email *">
+
+<select id="country">
+<option value="Ghana" selected>Ghana</option>
+<option value="Nigeria">Nigeria</option>
+<option value="Kenya">Kenya</option>
+<option value="South Africa">South Africa</option>
+<option value="Togo">Togo</option>
+<option value="Benin">Benin</option>
+<option value="Ivory Coast">Ivory Coast</option>
+<option value="Burkina Faso">Burkina Faso</option>
+<option value="Other">Other</option>
+</select>
+
+<input id="password" type="password" placeholder="Password *">
+
+<!-- AUTO GPS LOCATION - WHERE YOU MARKED RED ARROW -->
+<label style="font-size:10px;font-weight:900;color:#16a34a;margin:4px">📍 Your Location / Address * (Auto GPS)</label>
+<div class="locWrap">
+<input id="location" placeholder="📍 Auto detecting your location...">
+<button class="gpsInside" onclick="getGPS()" type="button">📍 GPS</button>
+</div>
+<p id="gpsStatus" style="font-size:10px;color:#16a34a;margin:2px 4px">📍 Auto detecting location... Please allow</p>
+
+<input type="hidden" id="lat"><input type="hidden" id="lng">
+
+<button class="btnMain" onclick="register()">Create Account</button>
+
+<p style="text-align:center;margin-top:14px;font-size:14px">Already have? <a href="client-login.html" style="color:#7c3aed;font-weight:900;text-decoration:none">Login</a> | <a href="index.html" style="color:#7c3aed;font-weight:900;text-decoration:none">Home</a></p>
+
+<div style="margin-top:16px;background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:10px;font-size:11px">
+<b style="color:#16a34a">✅ Auto GPS Active:</b><br>
+• Location fills automatically on page open<br>
+• Tap 📍 GPS button to refresh<br>
+• Used to find nearest nurse to you<br>
+• <span id="gpsCoords" style="color:#2563eb">Waiting for GPS...</span>
+</div>
+</div>
+
+<script>
+let clientLat=null, clientLng=null;
+
+// AUTO START GPS WHEN PAGE LOADS
+window.addEventListener('DOMContentLoaded',()=>{setTimeout(getGPS,800);});
+
+function getGPS(){
+  const status=document.getElementById('gpsStatus');
+  const locInput=document.getElementById('location');
+  const coords=document.getElementById('gpsCoords');
+  status.innerHTML='📍 Getting your location... Allow location permission';
+  status.style.color='#2563eb';
+  coords.innerText='Getting GPS...';
+  
+  if(!navigator.geolocation){
+    status.innerText='❌ GPS not supported - type manually';
+    status.style.color='#ef4444';
+    locInput.placeholder='Type your location manually';
+    return;
+  }
+  
+  navigator.geolocation.getCurrentPosition(async (pos)=>{
+    clientLat=pos.coords.latitude;
+    clientLng=pos.coords.longitude;
+    document.getElementById('lat').value=clientLat;
+    document.getElementById('lng').value=clientLng;
+    
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${clientLat}&lon=${clientLng}`);
+      const d=await r.json();
+      locInput.value=d.display_name||`${clientLat.toFixed(5)}, ${clientLng.toFixed(5)}, Ghana`;
+    }catch(e){
+      locInput.value=`${clientLat.toFixed(5)}, ${clientLng.toFixed(5)} - Ghana`;
+    }
+    
+    status.innerHTML=`✅ GPS Locked: ${clientLat.toFixed(5)}, ${clientLng.toFixed(5)} - <a href="https://www.google.com/maps?q=${clientLat},${clientLng}" target="_blank" style="color:#16a34a">View on Map</a>`;
+    status.style.color='#16a34a';
+    coords.innerHTML=`✅ Locked: ${clientLat.toFixed(5)}, ${clientLng.toFixed(5)}`;
+  },(err)=>{
+    status.innerText='❌ GPS denied - Type location manually or tap GPS again';
+    status.style.color='#ef4444';
+    locInput.placeholder='Accra, Madina - Type your location';
+    coords.innerText='❌ GPS denied - manual typing';
+  },{enableHighAccuracy:true,timeout:10000,maximumAge:0});
+}
+
+function register(){
+  const name=document.getElementById('fullName').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const country=document.getElementById('country').value;
+  const pass=document.getElementById('password').value.trim();
+  const loc=document.getElementById('location').value.trim();
+  
+  if(!name||!phone||!email||!pass||!loc){alert('Fill all * fields including Your Location');return;}
+  if(phone.length<10){alert('Enter valid phone e.g. 0244XXXXXX');return;}
+  
+  const clients=JSON.parse(localStorage.getItem('loveCareClients')||'[]');
+  if(clients.find(c=>c.phone===phone)){alert('Phone already exists - Login');location.href='./client-login.html';return;}
+  
+  const newClient={id:'CL'+Date.now(),name,phone,email,country,password:pass,location:loc,lat:clientLat||5.6037,lng:clientLng||-0.1870,created:new Date().toISOString()};
+  clients.push(newClient);
+  localStorage.setItem('loveCareClients',JSON.stringify(clients));
+  localStorage.setItem('currentClient',JSON.stringify(newClient));
+  alert(`✅ Welcome ${name}!\nLocation: ${loc}\nGPS: ${clientLat?clientLat.toFixed(5)+','+clientLng.toFixed(5):'Manual'}\nAccount created!`);
+  location.href='./client-dashboard.html';
 }
 </script>
 </body>
