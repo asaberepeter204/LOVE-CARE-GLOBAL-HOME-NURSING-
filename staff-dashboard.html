@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Staff Login - LOVE CARE GLOBAL HOME NURSING</title>
+<style>body{font-family:Inter,sans-serif;margin:0;background:#f0fdf4;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:70px 20px 20px}.card{max-width:400px;width:100%;background:white;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);border-top:5px solid #16a34a}h1{color:#16a34a;text-align:center}input{width:100%;padding:14px;margin:8px 0;border:2px solid #e5e7eb;border-radius:10px;box-sizing:border-box}.btn{width:100%;padding:14px;background:#16a34a;color:white;border:none;border-radius:10px;font-weight:900;cursor:pointer}.header{position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;padding:12px 16px;display:flex;justify-content:space-between} a{color:#7c3aed;font-weight:800}</style>
+</head>
+<body>
+<div class="header"><div><strong>LOVE CARE GLOBAL HOME NURSING - Staff</strong></div><a href="index.html" style="color:white">Home</a></div>
+<div class="card">
+<h1>👷 Staff Login</h1>
+<input type="tel" id="staffPhone" placeholder="Staff Phone">
+<input type="password" id="staffPass" placeholder="Password">
+<button class="btn" onclick="staffLogin()">Login</button>
+<p style="text-align:center"><a href="staff-dashboard.html">Go to Dashboard</a> | <a href="index.html">Home</a></p>
+</div>
+<script>function staffLogin(){localStorage.setItem('staffPhone',document.getElementById('staffPhone').value); window.location.href='staff-dashboard.html';}</script>
+</body>
+</html>
