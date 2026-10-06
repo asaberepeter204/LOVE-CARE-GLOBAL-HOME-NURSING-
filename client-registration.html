@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Register as Client</title>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getDatabase, ref as dbRef, set, push, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getFirestore, doc, setDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyYOUR_API_KEY_REPLACE_ME",
+  authDomain: "love-care-global.firebaseapp.com",
+  databaseURL: "https://love-care-global-default-rtdb.firebaseio.com",
+  projectId: "love-care-global",
+  storageBucket: "love-care-global.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef123456"
+};
+
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+const realtimeDB = getDatabase(app);
+const firestore = getFirestore(app);
+
+async function uploadFile(file, path){
+  return new Promise((resolve,reject)=>{
+    const sRef = ref(storage, path);
+    const task = uploadBytesResumable(sRef, file);
+    task.on('state_changed', null, (err)=>reject(err), async ()=>{
+      let url=await getDownloadURL(task.snapshot.ref);
+      resolve({url,path,name:file.name});
+    });
+  });
+}
+
+window.submitClient = async function(){
+  let country=document.getElementById('country').value;
+  let fullName=document.getElementById('fullName').value.trim();
+  let email=document.getElementById('email').value.trim().toLowerCase();
+  let phone=document.getElementById('phone').value.trim();
+  let password=document.getElementById('password').value;
+  let confirmPass=document.getElementById('confirmPassword').value;
+  let city=document.getElementById('city').value.trim();
+  let address=document.getElementById('address').value.trim();
+  let emergencyContact=document.getElementById('emergencyContact').value.trim();
+  let patientInfo=document.getElementById('patientInfo').value.trim();
+
+  if(!country||!fullName||!email||!phone||!password||!city||!address){alert('Fill all required fields');return;}
+  if(password.length<6){alert('Password min 6 chars');return;}
+  if(password!==confirmPass){alert('Passwords do not match');return;}
+
+  let btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.innerText='Please wait...';
+
+  try{
+    let safe=email.replace(/[^a-zA-Z0-9]/g,'_');
+    let base=`clients/${safe}_${Date.now()}`;
+    let photoUrl=null; let idUrl=null;
+
+    let photoFile=document.getElementById('photoFile').files[0];
+    if(photoFile) photoUrl=await uploadFile(photoFile, `${base}/photo_${photoFile.name}`);
+    let idFile=document.getElementById('idFile').files[0];
+    if(idFile) idUrl=await uploadFile(idFile, `${base}/id_${idFile.name}`);
+
+    let clientData={
+      country, fullName, email, phone, password, city, address,
+      emergencyContact, patientInfo,
+      photo:photoUrl, nationalId:idUrl,
+      storageBase:base,
+      countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
+      registeredAt:new Date().toISOString(),
+      status:'ACTIVE', type:'CLIENT'
+    };
+
+    let rtMainRef=push(dbRef(realtimeDB, 'client_registrations'));
+    await set(rtMainRef, {...clientData, id:rtMainRef.key});
+    await set(push(dbRef(realtimeDB, `clients_by_country/${country}`)), {...clientData, id:rtMainRef.key});
+    await setDoc(doc(firestore, 'client_registrations', rtMainRef.key), {...clientData, id:rtMainRef.key, createdAt:serverTimestamp()});
+    await setDoc(doc(firestore, 'clients', rtMainRef.key), {...clientData, id:rtMainRef.key, createdAt:serverTimestamp()});
+
+    let all=JSON.parse(localStorage.getItem('client_registrations')||'[]');
+    all.push({...clientData, id:rtMainRef.key});
+    localStorage.setItem('client_registrations',JSON.stringify(all));
+    localStorage.setItem('currentClientId',rtMainRef.key);
+    localStorage.setItem('currentClientName',fullName);
+    localStorage.setItem('currentClientEmail',email);
+    localStorage.setItem('currentClientCountry',country);
+    localStorage.setItem('currentClientPhone',phone);
+
+    alert('Registration successful');
+    location.href='book-nurse.html';
+
+  }catch(e){
+    alert('Failed: '+e.message);
+    btn.disabled=false; btn.innerText='Register';
+  }
+}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc}
+.header{padding:16px;background:#3b82f6;color:white;text-align:center;font-weight:900;font-size:16px}
+.content{max-width:600px;margin:auto;padding:12px}
+.card{background:white;border-radius:12px;padding:14px;border:1px solid #e5e7eb;margin-bottom:10px}
+label{font-size:12px;font-weight:700;margin:8px 0 4px;display:block}
+input,select,textarea{width:100%;padding:11px;border-radius:8px;border:1px solid #d1d5db;font-size:13px}
+.btn{width:100%;padding:13px;border-radius:10px;font-weight:800;border:none;cursor:pointer;margin-top:10px}
+.btnPrimary{background:#3b82f6;color:white}
+.btnSecondary{background:#f3f4f6;border:1px solid #e5e7eb}
+.upload{border:1px dashed #bfdbfe;background:#f8faff;border-radius:8px;padding:10px;margin:6px 0}
+</style>
+</head>
+<body>
+<div class="header">Register as Client</div>
+<div class="content">
+
+<div class="card">
+<label>Country *</label>
+<select id="country">
+<option value="">Select Country</option>
+<option value="GH">Ghana</option>
+<option value="ZA">South Africa</option>
+<option value="NG">Nigeria</option>
+<option value="US">USA</option>
+<option value="GB">UK</option>
+<option value="CA">Canada</option>
+<option value="AU">Australia</option>
+<option value="KE">Kenya</option>
+<option value="OTHER">Other</option>
+</select>
+
+<label>Full Name *</label>
+<input id="fullName" placeholder="Full Name">
+
+<label>Email *</label>
+<input type="email" id="email" placeholder="Email">
+
+<label>Phone *</label>
+<input id="phone" placeholder="Phone">
+
+<label>Password *</label>
+<input type="password" id="password" placeholder="Password">
+
+<label>Confirm Password *</label>
+<input type="password" id="confirmPassword" placeholder="Confirm Password">
+
+<label>City *</label>
+<input id="city" placeholder="City">
+
+<label>Home Address *</label>
+<input id="address" placeholder="Home Address">
+
+<label>Emergency Contact</label>
+<input id="emergencyContact" placeholder="Emergency Contact">
+
+<label>Patient Information</label>
+<textarea id="patientInfo" rows="3" placeholder="Patient Information"></textarea>
+</div>
+
+<div class="card">
+<div class="upload">
+<label>Your Photo</label>
+<input type="file" id="photoFile" accept=".jpg,.png">
+</div>
+<div class="upload">
+<label>National ID</label>
+<input type="file" id="idFile" accept=".jpg,.png,.pdf">
+</div>
+</div>
+
+<button class="btn btnPrimary" id="submitBtn" onclick="submitClient()">Register</button>
+<button class="btn btnSecondary" onclick="location.href='client-login.html'">Already registered? Login</button>
+<button class="btn btnSecondary" onclick="location.href='index.html'">Home</button>
+
+</div>
+</body>
+</html>
