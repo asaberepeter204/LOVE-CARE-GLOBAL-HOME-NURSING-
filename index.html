@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Love Care Global - Home</title>
+<title>Love Care Global</title>
 <link rel="manifest" href="manifest.json">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,system-ui,sans-serif;background:#f8fafc}
+body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#111827}
 .topbar{background:linear-gradient(90deg,#22c55e,#16a34a);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
 .left{display:flex;align-items:center;gap:10px}
 .menuBtn{width:42px;height:42px;background:#facc15;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:900;border:none;cursor:pointer}
 .brand{font-weight:900;font-size:15px;line-height:1}
 .right{display:flex;gap:8px;align-items:center}
-.sosTop{background:#ef4444;color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:12px;border:none;cursor:pointer}
+.sosTop{background:#ef4444;color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:12px;border:none;cursor:pointer;text-decoration:none}
 .dotsBtn{background:rgba(255,255,255,0.25);color:white;width:34px;height:34px;border-radius:50%;border:none;font-weight:900;font-size:22px;cursor:pointer}
 #drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200}
 #drawerOverlay.show{display:block}
@@ -22,10 +22,10 @@ body{font-family:Inter,system-ui,sans-serif;background:#f8fafc}
 .drawerHeader{background:linear-gradient(90deg,#22c55e,#16a34a);padding:18px 16px;color:white}
 .drawerHeader h3{font-weight:900;font-size:18px}
 .drawerBody{flex:1;overflow-y:auto;padding:10px}
-.drawerItem{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;margin:4px 0;font-weight:800;font-size:13px;cursor:pointer;text-decoration:none;color:#111827;border:1px solid #e5e7eb;background:white}
-.drawerItem.sosItem{border-color:#fecaca;background:#fef2f2;color:#dc2626}
+.drawerItem{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;margin:4px 0;font-weight:800;font-size:13px;text-decoration:none;color:#111827;border:1px solid #e5e7eb;background:white}
 .drawerItem.client{background:#f0f9ff;border-color:#bae6fd;color:#0369a1}
 .drawerItem.nurse{background:#f5f3ff;border-color:#ddd6fe;color:#5b21b6}
+.drawerItem.sosItem{border-color:#fecaca;background:#fef2f2;color:#dc2626}
 .drawerLabel{font-size:10px;font-weight:900;color:#9ca3af;padding:10px 6px 4px;letter-spacing:.6px}
 .drawerDivider{height:1px;background:#e5e7eb;margin:8px 0}
 .closeBtn{width:100%;padding:14px;background:#111827;color:white;border:none;border-radius:12px;font-weight:900;cursor:pointer}
@@ -34,8 +34,20 @@ body{font-family:Inter,system-ui,sans-serif;background:#f8fafc}
 #dotsMenu.show{display:block}
 .dotsItem{padding:13px 14px;font-size:13px;font-weight:700;display:flex;gap:10px;color:#111827;border-bottom:1px solid #f3f4f6;cursor:pointer}
 .dotsItem.exit{color:#ef4444}
+/* HOME CONTENT */
+.hero{background:linear-gradient(135deg,#22c55e 0%,#15803d 100%);color:white;padding:24px 18px;border-radius:0 0 28px 28px;text-align:center}
+.hero h1{font-size:26px;font-weight:900;line-height:1.2}
+.hero p{font-size:14px;opacity:.95;margin:10px 0 16px;line-height:1.5}
+.heroBtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hBtn{padding:14px;border-radius:12px;font-weight:900;border:none;cursor:pointer;font-size:13px}
+.hBtn.white{background:white;color:#15803d}
+.hBtn.yellow{background:#facc15;color:#000}
 .content{padding:14px}
-.card{background:white;border-radius:16px;padding:18px;margin:10px 0;border:1px solid #e5e7eb}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:white;border-radius:16px;padding:16px;border:1px solid #e5e7eb}
+.cardTitle{font-weight:900;font-size:14px;margin-bottom:6px}
+.cardText{font-size:12px;color:#6b7280;line-height:1.4}
+.actionBtn{width:100%;padding:12px;border-radius:10px;font-weight:900;border:2px solid;font-size:13px;cursor:pointer;margin-top:10px}
 </style>
 </head>
 <body>
@@ -46,13 +58,13 @@ body{font-family:Inter,system-ui,sans-serif;background:#f8fafc}
     <div class="brand">LOVE CARE<br>GLOBAL</div>
   </div>
   <div class="right">
-    <button class="sosTop" onclick="location.href='sos.html'">SOS</button>
+    <a class="sosTop" href="sos.html">SOS</a>
     <button class="dotsBtn" onclick="toggleDots(event)">⋮</button>
   </div>
 </div>
 
 <div id="dotsMenu">
-  <div class="dotsItem" onclick="openDrawer()">📋 Open Drawer</div>
+  <div class="dotsItem" onclick="openDrawer()">📋 Menu</div>
   <div class="dotsItem" onclick="location.href='sos.html'">🚨 SOS Emergency</div>
   <div class="dotsItem" onclick="location.href='settings.html'">⚙️ Settings</div>
   <div class="dotsItem exit" onclick="doExit()">❌ Exit App</div>
@@ -61,58 +73,77 @@ body{font-family:Inter,system-ui,sans-serif;background:#f8fafc}
 <div id="drawerOverlay" onclick="closeDrawer()"></div>
 
 <div id="drawer">
-  <div class="drawerHeader">
-    <h3>LOVE CARE GLOBAL</h3>
-    <p>Main Client & Nurse Portal</p>
-  </div>
+  <div class="drawerHeader"><h3>LOVE CARE GLOBAL</h3><p>Home Nursing • 24/7 Care • Ghana</p></div>
   <div class="drawerBody">
-
     <div class="drawerLabel">MAIN</div>
     <a class="drawerItem" href="index.html" style="border-color:#16a34a;background:#f0fdf4">🏠 Home</a>
-    <a class="drawerItem" href="book-nurse.html">📅 Book Nurse - 13 Services</a>
+    <a class="drawerItem" href="book-nurse.html">📅 Book Nurse</a>
     <a class="drawerItem" href="find-nurse.html">🔍 Find Nurse</a>
 
-    <div class="drawerLabel">CLIENT - YOUR REPO FILES</div>
-    <a class="drawerItem client" href="client-register.html">👤 Client Registration / Settings</a>
-    <div style="font-size:10px;color:#0ea5e9;padding:0 14px 6px;font-weight:700">Settings • Profile • Photo • Emergency</div>
+    <div class="drawerLabel">CLIENT</div>
+    <a class="drawerItem client" href="client-register.html">👤 Client Registration</a>
     <a class="drawerItem client" href="client-login.html">🔐 Client Login</a>
-    <a class="drawerItem client" href="client-dashboard.html">📊 Client Dashboard</a>
+    <a class="drawerItem client" href="client-dashboard.html">📊 Dashboard</a>
     <a class="drawerItem client" href="client-bookings.html">📝 My Bookings</a>
     <a class="drawerItem client" href="settings.html">⚙️ Settings</a>
 
-    <div class="drawerLabel">NURSE - 6 DOCUMENTS - YOUR REPO</div>
+    <div class="drawerLabel">NURSE - 6 DOCS</div>
     <a class="drawerItem nurse" href="nurse-settings.html">🎓 Nurse Registration</a>
-    <div style="font-size:10px;color:#7c3aed;padding:0 14px 6px;font-weight:700;line-height:1.4">CV • Video • Certificate • Licence • Photo • National ID / Drivers License</div>
     <a class="drawerItem nurse" href="nurse-login.html">🔐 Nurse Login</a>
     <a class="drawerItem nurse" href="nurse-dashboard.html">👩‍⚕️ Nurse Dashboard</a>
-    <a class="drawerItem nurse" href="nurse-public.html">🌐 Nurse Public Profile</a>
-    <a class="drawerItem nurse" href="nurse-protection.html">🛡️ Nurse Protection</a>
-    <a class="drawerItem nurse" href="nurses-group-chat.html">💬 Nurses Group Chat</a>
+    <a class="drawerItem nurse" href="nurse-public.html">🌐 Public Profile</a>
+    <a class="drawerItem nurse" href="nurses-group-chat.html">💬 Group Chat</a>
 
     <div class="drawerDivider"></div>
-    <div class="drawerLabel">EMERGENCY & SUPPORT</div>
-    <a class="drawerItem sosItem" href="sos.html">🚨 Emergency SOS Page</a>
-    <a class="drawerItem" href="ai-support.html">🤖 AI Support</a>
+    <a class="drawerItem sosItem" href="sos.html">🚨 Emergency SOS</a>
     <a class="drawerItem" href="contact.html">📞 Contact Support</a>
-    <a class="drawerItem" href="about.html">ℹ️ About Us</a>
-    <a class="drawerItem" href="privacy.html">🔒 Privacy</a>
-    <a class="drawerItem" href="terms.html">📄 Terms</a>
-    <a class="drawerItem" href="consent-form.html">✅ Consent Form</a>
-
+    <a class="drawerItem" href="about.html">ℹ️ About</a>
+    <a class="drawerItem" href="privacy.html">🔒 Privacy & Terms</a>
     <div class="drawerDivider"></div>
-    <div class="drawerItem" onclick="doExit()" style="color:#ef4444;border-color:#fecaca;background:#fef2f2">❌ Exit App - 3 Dots Feature</div>
+    <div class="drawerItem" onclick="doExit()" style="color:#ef4444;border-color:#fecaca;background:#fef2f2">❌ Exit App</div>
   </div>
-  <div class="drawerFooter">
-    <button class="closeBtn" onclick="closeDrawer()">✕ Close Drawer</button>
-    <p style="font-size:10px;color:#9ca3af;text-align:center;margin-top:8px">No CEO • No Staff • Main Portal Only • v2.4</p>
+  <div class="drawerFooter"><button class="closeBtn" onclick="closeDrawer()">✕ Close</button></div>
+</div>
+
+<!-- HOME NOW FULL - NOT EMPTY -->
+<div class="hero">
+  <h1>Professional Home Nursing, Anytime ❤️</h1>
+  <p>Trusted nurses • 13 services • Verified with CV, Certificate, Licence, Photo & ID</p>
+  <div class="heroBtns">
+    <button class="hBtn white" onclick="location.href='book-nurse.html'">📅 Book a Nurse</button>
+    <button class="hBtn yellow" onclick="location.href='client-register.html'">👤 Join as Client</button>
   </div>
 </div>
 
 <div class="content">
-  <div class="card" style="text-align:center;padding:24px 18px">
-    <h2 style="font-weight:900">Love Care Global ❤️</h2>
-    <p style="font-size:13px;color:#6b7280;margin:10px 0;line-height:1.5">Main index - No CEO, No Staff - Only Client & Nurse main portal + SOS + 3 dots</p>
-    <button style="width:100%;padding:16px;background:#16a34a;color:white;border:none;border-radius:12px;font-weight:900;margin-top:10px" onclick="openDrawer()">☰ Open Drawer - All Your Repo Links</button>
+  <div class="grid2">
+    <div class="card">
+      <div class="cardTitle">👤 For Clients</div>
+      <div class="cardText">Register, set emergency contact & book verified nurses</div>
+      <button class="actionBtn" style="color:#0ea5e9;border-color:#0ea5e9;background:#f0f9ff" onclick="location.href='client-register.html'">Client Registration</button>
+    </div>
+    <div class="card">
+      <div class="cardTitle">🎓 For Nurses</div>
+      <div class="cardText">Upload CV, video, certificate, licence, photo, Ghana Card / Drivers</div>
+      <button class="actionBtn" style="color:#7c3aed;border-color:#7c3aed;background:#f5f3ff" onclick="location.href='nurse-settings.html'">Nurse Registration</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px;display:flex;align-items:center;justify-content:space-between">
+    <div><div class="cardTitle">🚨 Emergency?</div><div class="cardText">Tap SOS for immediate help & GPS sharing</div></div>
+    <button style="padding:12px 18px;background:#ef4444;color:white;border:none;border-radius:10px;font-weight:900" onclick="location.href='sos.html'">SOS</button>
+  </div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="card" onclick="location.href='find-nurse.html'" style="cursor:pointer"><div class="cardTitle">🔍 Find Nurse</div><div class="cardText">Nearby verified nurses</div></div>
+    <div class="card" onclick="location.href='ai-support.html'" style="cursor:pointer"><div class="cardTitle">🤖 AI Support</div><div class="cardText">24/7 help & questions</div></div>
+    <div class="card" onclick="location.href='client-dashboard.html'" style="cursor:pointer"><div class="cardTitle">📊 Dashboard</div><div class="cardText">Track bookings & care</div></div>
+    <div class="card" onclick="location.href='contact.html'" style="cursor:pointer"><div class="cardTitle">📞 Contact</div><div class="cardText">Call & WhatsApp support</div></div>
+  </div>
+
+  <div class="card" style="margin-top:12px;text-align:center;background:#f0fdf4;border-color:#bbf7d0">
+    <div style="font-weight:900;color:#15803d">Trusted • Verified • 85% to Nurses • Secure</div>
+    <div style="font-size:11px;color:#166534;margin-top:4px">CV • Video • Certificate • Licence • Photo • National ID / Drivers License verified</div>
   </div>
 </div>
 
@@ -120,7 +151,7 @@ body{font-family:Inter,system-ui,sans-serif;background:#f8fafc}
 function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('show');}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('show');}
 function toggleDots(e){e.stopPropagation();document.getElementById('dotsMenu').classList.toggle('show');}
-document.addEventListener('click',function(){document.getElementById('dotsMenu').classList.remove('show');});
+document.addEventListener('click',()=>{document.getElementById('dotsMenu').classList.remove('show');});
 function doExit(){if(confirm('Exit Love Care Global?')){window.close();location.href='about:blank';}}
 </script>
 </body>
