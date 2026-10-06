@@ -1,53 +1,78 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Client Register - LOVE CARE GLOBAL</title>
-<style>body{font-family:Inter,sans-serif;background:#f0fdf4;margin:0;padding:20px}.card{max-width:480px;margin:auto;background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.1)}input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1px solid #d1d5db;margin:6px 0 12px;font-family:Inter} .btn{width:100%;padding:12px;background:#16a34a;color:white;border:none;border-radius:12px;font-weight:800;cursor:pointer} .notice{background:#fef3c7;padding:10px;border-radius:10px;font-size:12px;margin-bottom:10px;border:1px solid #fde68a}label{font-size:12px;font-weight:700;color:#374151}</style>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Client Login - LOVE CARE GLOBAL</title>
+<style>
+body{font-family:Inter,sans-serif;background:#f0fdf4;margin:0}
+.card{max-width:420px;margin:30px auto;background:white;padding:22px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #d1d5db;margin:6px 0 12px;box-sizing:border-box}
+.btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;cursor:pointer}
+.btn-green{background:#059669;color:white}
+.btn-white{background:white;border:1px solid #d1d5db;margin-top:10px}
+</style>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-const firebaseConfig = { apiKey: "AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg", authDomain: "web-care-618e8.firebaseapp.com", databaseURL: "https://web-care-618e8-default-rtdb.firebaseio.com", projectId: "web-care-618e8", storageBucket: "web-care-618e8.firebasestorage.app", messagingSenderId: "1062578660694", appId: "1:1062578660694:web:f94dfe12c929df05bce2f7" };
-const app=initializeApp(firebaseConfig); const db=getDatabase(app); const auth=getAuth(app);
-window.addEventListener('DOMContentLoaded',()=>{
- let p=new URLSearchParams(location.search);
- if(p.get('google')=='1'){
-  document.getElementById('email').value=localStorage.getItem('tempGoogleEmail')||'';
-  document.getElementById('fullName').value=localStorage.getItem('tempGoogleName')||'';
-  document.getElementById('email').readOnly=true;
-  document.getElementById('email').style.background='#f3f4f6';
-  document.getElementById('notice').innerText='✅ Google detected - Complete remaining profile to unlock bookings. Email locked. One time only.';
-  document.getElementById('passGroup').style.display='none';
- }
-});
-window.registerClient=async function(){
- let fullName=document.getElementById('fullName').value.trim();
- let email=document.getElementById('email').value.trim();
- let phone=document.getElementById('phone').value.trim();
- let address=document.getElementById('address').value.trim();
- let emergency=document.getElementById('emergency').value.trim();
- let city=document.getElementById('city').value.trim();
- let pass=document.getElementById('pass').value;
- if(!fullName||!email||!phone||!address||!emergency||!city){alert('Fill ALL fields - Required for nursing care dispatch');return;}
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+ apiKey: "AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",
+ authDomain: "web-care-618e8.firebaseapp.com",
+ databaseURL: "https://web-care-618e8-default-rtdb.firebaseio.com",
+ projectId: "web-care-618e8",
+ storageBucket: "web-care-618e8.firebasestorage.app",
+ messagingSenderId: "1062578660694",
+ appId: "1:1062578660694:web:f94dfe12c929df05bce2f7"
+};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getDatabase(app);
+const provider=new GoogleAuthProvider();
+
+window.loginEmail=async()=>{
+ const e=document.getElementById('email').value.trim();
+ const p=document.getElementById('pass').value;
+ if(!e||!p){alert('Enter email & password');return;}
  try{
-  let uid=localStorage.getItem('tempGoogleUid');
-  if(!uid){
-   if(!pass){alert('Enter password');return;}
-   let cred=await createUserWithEmailAndPassword(auth,email,pass); uid=cred.user.uid;
+  let cred=await signInWithEmailAndPassword(auth,e,p);
+  let snap=await get(ref(db,'clients/'+cred.user.uid));
+  if(!snap.exists()){
+    alert('No registration found - Please complete registration first');
+    location.href='client-registration.html';
+    return;
   }
-  await set(ref(db,'clients/'+uid),{ fullName,email,phone,address,emergencyContact:emergency,city,createdAt:new Date().toISOString(), verified:false, loginMethod: localStorage.getItem('tempGoogleUid')?'google':'email' });
-  localStorage.setItem('currentClientId',uid); localStorage.setItem('currentClientEmail',email);
-  localStorage.removeItem('tempGoogleUid'); localStorage.removeItem('tempGoogleEmail'); localStorage.removeItem('tempGoogleName');
-  alert('✅ Registration complete! Redirecting to dashboard - Next time direct login');
+  localStorage.setItem('currentClientId',cred.user.uid);
   location.href='client-dashboard.html';
- }catch(err){ alert(err.message); }
-}
-</script></head><body>
-<div class="card"><h2>Create Client Account</h2><div id="notice" class="notice">Fill all details - Required for nurse dispatch in Ghana. One time only, next login direct to dashboard.</div>
-<label>Full Name</label><input id="fullName" placeholder="John Doe">
-<label>Email (locked if Google)</label><input id="email" placeholder="you@example.com">
-<label>Phone Number</label><input id="phone" placeholder="+233 24 XXX XXXX">
-<label>City</label><input id="city" placeholder="Accra, Kumasi, Tamale etc">
-<label>Full Home Address for Nurse Visit</label><textarea id="address" placeholder="House No, Street, Landmark"></textarea>
-<label>Emergency Contact Name & Phone</label><input id="emergency" placeholder="Ama - 024...">
-<div id="passGroup"><label>Password (if not Google)</label><input id="pass" type="password" placeholder="••••••••"></div>
-<button class="btn" onclick="registerClient()">✅ Complete Registration & Continue</button>
-<div style="text-align:center;margin-top:10px;font-size:12px"><a href="client-login.html">Already have account? Login</a></div>
-</div></body></html>
+ }catch(err){alert(err.message)}
+};
+
+window.loginGoogle=async()=>{
+ try{
+  let result=await signInWithPopup(auth,provider);
+  let uid=result.user.uid;
+  let snap=await get(ref(db,'clients/'+uid));
+  if(snap.exists()){
+    // OLD CLIENT - DIRECT DASHBOARD
+    localStorage.setItem('currentClientId',uid);
+    location.href='client-dashboard.html';
+  }else{
+    // FIRST TIMER - POINT TO CLIENT-REGISTRATION.HTML
+    localStorage.setItem('tempClientUid',uid);
+    localStorage.setItem('tempClientEmail',result.user.email||'');
+    localStorage.setItem('tempClientName',result.user.displayName||'');
+    alert('First time? Welcome! Please complete registration (one time only)');
+    location.href='client-registration.html?google=1';
+  }
+ }catch(err){alert('Google Failed: '+err.message)}
+};
+</script></head>
+<body>
+<div class="card">
+<h2>Client Login 🌍</h2>
+<p style="font-size:12px;color:#6b7280">Serving 8 Countries | First timers auto → registration</p>
+<input id="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
+<button class="btn btn-green" onclick="loginEmail()">🔐 Login to Dashboard</button>
+<button class="btn btn-white" onclick="loginGoogle()">G Google Login</button>
+<div style="text-align:center;margin-top:12px;font-size:12px">
+<a href="client-registration.html">New? Create Account</a> | <a href="index.html">Home</a>
+</div>
+</div>
+</body></html>
