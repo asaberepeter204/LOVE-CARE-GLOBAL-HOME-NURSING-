@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Dashboard</title>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getStorage, ref as sRef, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getDatabase, ref as dbRef, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyYOUR_API_KEY_REPLACE_ME",
+  authDomain: "love-care-global.firebaseapp.com",
+  databaseURL: "https://love-care-global-default-rtdb.firebaseio.com",
+  projectId: "love-care-global",
+  storageBucket: "love-care-global.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef123456"
+};
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+const realtimeDB = getDatabase(app);
+const firestore = getFirestore(app);
+window.db=realtimeDB; window.fs=firestore; window.st=storage;
+
+window.activeTab='pending';
+window.switchTab=function(tab){
+  activeTab=tab;
+  document.querySelectorAll('.tabBtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn_'+tab).classList.add('active');
+  document.querySelectorAll('.tabContent').forEach(c=>c.style.display='none');
+  document.getElementById('tab_'+tab).style.display='block';
+  if(tab==='pending') loadPending();
+  if(tab==='verified') loadVerified();
+  if(tab==='clients') loadClients();
+  if(tab==='bookings') loadBookings();
+  if(tab==='payouts') loadPayouts();
+  if(tab==='ai') loadAI();
+}
+
+window.loadPending=async function(){
+  let list=document.getElementById('pendingList');
+  list.innerHTML='Loading...';
+  try{
+    let snap=await get(dbRef(realtimeDB, 'pending_nurses'));
+    let data=snap.val()||{};
+    let fsSnap=await getDocs(collection(firestore, 'pending_nurses'));
+    fsSnap.forEach(d=>{ if(!data[d.id]) data[d.id]=d.data(); });
+    if(Object.keys(data).length===0){ list.innerHTML='<div class="empty">No pending nurses</div>'; return; }
+    let html='';
+    Object.values(data).forEach(n=>{
+      html+=`
+      <div class="item">
+        <div style="display:flex;justify-content:space-between">
+          <b>${n.fullName||n.name} - ${n.country} - ${n.city||''}</b>
+          <span class="badge pending">${n.status||'PENDING'}</span>
+        </div>
+        <div class="small">${n.email} | ${n.phone} | ${n.specialization||n.spec||''}</div>
+        <div class="links">
+          ${n.cv?.url?`<a href="${n.cv.url}" target="_blank">CV</a>`:''}
+          ${n.licence?.url?`<a href="${n.licence.url}" target="_blank">Licence</a>`:''}
+          ${n.video?.url?`<a href="${n.video.url}" target="_blank">Video</a>`:''}
+          ${n.nationalId?.url||n.idDoc?.url?`<a href="${n.nationalId?.url||n.idDoc?.url}" target="_blank">ID</a>`:''}
+          ${n.photos?`${n.photos.map((p,i)=>`<a href="${p.url}" target="_blank">Photo${i+1}</a>`).join(' ')}`:''}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+          <button class="btn btnGreen" onclick="approveNurse('${n.id}')">Approve</button>
+          <button class="btn btnRed" onclick="rejectNurse('${n.id}')">Reject</button>
+        </div>
+      </div>`;
+    });
+    list.innerHTML=html;
+    document.getElementById('count_pending').innerText=Object.keys(data).length;
+  }catch(e){ list.innerHTML='Error: '+e.message; }
+}
+
+window.approveNurse=async function(id){
+  if(!confirm('Approve this nurse?')) return;
+  try{
+    let snap=await get(dbRef(realtimeDB, `pending_nurses/${id}`));
+    let data=snap.val();
+    if(!data){
+      let fsDoc=await getDoc(doc(firestore, 'pending_nurses', id));
+      if(fsDoc.exists()) data=fsDoc.data();
+    }
+    if(!data){ alert('Not found'); return; }
+    data.status='APPROVED'; data.approvedAt=new Date().toISOString();
+    await set(dbRef(realtimeDB, `verified_nurses/${id}`), data);
+    await set(dbRef(realtimeDB, `nurse_registrations/${id}`), data);
+    await setDoc(doc(firestore, 'verified_nurses', id), {...data, createdAt:serverTimestamp()});
+    await setDoc(doc(firestore, 'nurse_registrations', id), {...data, createdAt:serverTimestamp()});
+    await remove(dbRef(realtimeDB, `pending_nurses/${id}`));
+    await deleteDoc(doc(firestore, 'pending_nurses', id));
+    alert('Approved');
+    loadPending();
+  }catch(e){ alert(e.message); }
+}
+
+window.rejectNurse=async function(id){
+  if(!confirm('Reject and delete?')) return;
+  try{
+    await remove(dbRef(realtimeDB, `pending_nurses/${id}`));
+    await deleteDoc(doc(firestore, 'pending_nurses', id));
+    alert('Rejected');
+    loadPending();
+  }catch(e){ alert(e.message); }
+}
+
+window.loadVerified=async function(){
+  let list=document.getElementById('verifiedList');
+  list.innerHTML='Loading...';
+  try{
+    let snap=await get(dbRef(realtimeDB, 'verified_nurses'));
+    let data=snap.val()||{};
+    let html='';
+    Object.values(data).forEach(n=>{
+      html+=`<div class="item"><b>${n.fullName||n.name} - ${n.country}</b><div class="small">${n.email} | ${n.city} | ${n.specialization||''}</div><span class="badge green">VERIFIED</span></div>`;
+    });
+    list.innerHTML=html||'<div class="empty">No verified nurses</div>';
+    document.getElementById('count_verified').innerText=Object.keys(data).length;
+  }catch(e){ list.innerHTML='Error: '+e.message; }
+}
+
+window.loadClients=async function(){
+  let list=document.getElementById('clientsList');
+  list.innerHTML='Loading...';
+  try{
+    let snap=await get(dbRef(realtimeDB, 'client_registrations'));
+    let data=snap.val()||{};
+    let html='';
+    Object.values(data).forEach(c=>{
+      html+=`<div class="item"><b>${c.fullName} - ${c.country} - ${c.city}</b><div class="small">${c.email} | ${c.phone} | ${c.address}</div>${c.photo?.url?`<a href="${c.photo.url}" target="_blank">Photo</a>`:''} ${c.nationalId?.url?`<a href="${c.nationalId.url}" target="_blank">ID</a>`:''}</div>`;
+    });
+    list.innerHTML=html||'<div class="empty">No clients</div>';
+    document.getElementById('count_clients').innerText=Object.keys(data).length;
+  }catch(e){ list.innerHTML='Error: '+e.message; }
+}
+
+window.loadBookings=async function(){
+  let list=document.getElementById('bookingsList');
+  list.innerHTML='Loading...';
+  try{
+    let snap=await get(dbRef(realtimeDB, 'bookings'));
+    let data=snap.val()||{};
+    let html='';
+    Object.values(data).reverse().slice(0,50).forEach(b=>{
+      html+=`<div class="item"><b>${b.clientName} -> ${b.nurseName} - ${b.country} - ${b.total}</b><div class="small">${b.sDate} to ${b.eDate} | ${b.serviceType} | ${b.status} | ${b.nurseStatus||''}</div><div class="small">${b.address} | ${b.lat},${b.lng}</div>${b.audioUrl?`<a href="${b.audioUrl}" target="_blank">Audio</a>`:''}</div>`;
+    });
+    list.innerHTML=html||'<div class="empty">No bookings</div>';
+    document.getElementById('count_bookings').innerText=Object.keys(data).length;
+  }catch(e){ list.innerHTML='Error: '+e.message; }
+}
+
+window.loadPayouts=async function(){
+  let list=document.getElementById('payoutsList');
+  list.innerHTML='Loading...';
+  try{
+    let snap=await get(dbRef(realtimeDB, 'withdrawal_methods'));
+    let data=snap.val()||{};
+    let html='';
+    Object.entries(data).forEach(([nurseId, m])=>{
+      html+=`<div class="item"><b>${m.nurseName||nurseId} - ${m.country}</b><div class="small">Momo: ${m.momoNumber||'-'} | Debit: ****${m.debitLast4||'-'} | Virtual: ${m.virtualProvider||'-'} ${m.virtualNumber||''} | PayPal: ${m.paypalEmail||'-'}</div></div>`;
+    });
+    list.innerHTML=html||'<div class="empty">No withdrawal methods</div>';
+  }catch(e){ list.innerHTML='Error: '+e.message; }
+}
+
+window.loadAI=async function(){
+  let list=document.getElementById('aiList');
+  list.innerHTML='Loading...';
+  try{
+    let snap=await get(dbRef(realtimeDB, 'ai_support_chats'));
+    let data=snap.val()||{};
+    let html='';
+    Object.entries(data).slice(0,20).forEach(([clientId, msgs])=>{
+      let last=Object.values(msgs).slice(-2);
+      html+=`<div class="item"><b>${clientId}</b><div class="small">${last.map(m=>`${m.role}: ${(m.text||'').substring(0,80)}`).join('<br>')}</div></div>`;
+    });
+    list.innerHTML=html||'<div class="empty">No chats</div>';
+  }catch(e){ list.innerHTML='Error: '+e.message; }
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{ switchTab('pending'); });
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc}
+.header{padding:12px;background:#111827;color:white;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:99}
+.tabs{display:flex;gap:6px;padding:10px;background:white;border-bottom:1px solid #e5e7eb;overflow-x:auto;position:sticky;top:48px;z-index:98}
+.tabBtn{padding:8px 12px;border-radius:20px;border:1px solid #e5e7eb;background:#f3f4f6;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer}
+.tabBtn.active{background:#111827;color:white}
+.content{max-width:800px;margin:auto;padding:12px}
+.tabContent{display:none}
+.card{background:white;border-radius:12px;padding:12px;border:1px solid #e5e7eb;margin-bottom:10px}
+.item{background:white;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:8px}
+.small{font-size:11px;color:#6b7280;margin-top:2px;line-height:1.4}
+.btn{padding:8px;border-radius:8px;border:none;font-weight:800;font-size:12px;cursor:pointer}
+.btnGreen{background:#16a34a;color:white}
+.btnRed{background:#ef4444;color:white}
+.btnDark{background:#111827;color:white}
+.badge{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:900}
+.pending{background:#fef3c7;color:#92400e}
+.green{background:#dcfce7;color:#166534}
+.links a{margin-right:6px;font-size:11px;color:#3b82f6;font-weight:700;text-decoration:none;border:1px solid #bfdbfe;padding:2px 6px;border-radius:6px;background:#eff6ff}
+.empty{text-align:center;padding:20px;color:#9ca3af;font-size:12px}
+.count{font-size:11px;background:#f3f4f6;padding:2px 6px;border-radius:999px;margin-left:4px}
+</style>
+</head>
+<body>
+<div class="header">
+<b>CEO Dashboard</b>
+<div style="display:flex;gap:6px">
+<button class="btn btnDark" style="background:white;color:#111827" onclick="location.href='index.html'">Home</button>
+</div>
+</div>
+
+<div class="tabs">
+<button class="tabBtn active" id="btn_pending" onclick="switchTab('pending')">Pending <span class="count" id="count_pending">0</span></button>
+<button class="tabBtn" id="btn_verified" onclick="switchTab('verified')">Verified <span class="count" id="count_verified">0</span></button>
+<button class="tabBtn" id="btn_clients" onclick="switchTab('clients')">Clients <span class="count" id="count_clients">0</span></button>
+<button class="tabBtn" id="btn_bookings" onclick="switchTab('bookings')">Bookings <span class="count" id="count_bookings">0</span></button>
+<button class="tabBtn" id="btn_payouts" onclick="switchTab('payouts')">Payouts</button>
+<button class="tabBtn" id="btn_ai" onclick="switchTab('ai')">AI Chats</button>
+</div>
+
+<div class="content">
+
+<div class="tabContent" id="tab_pending" style="display:block">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<b>Pending Nurses</b>
+<button class="btn btnDark" onclick="loadPending()">Refresh</button>
+</div>
+</div>
+<div id="pendingList"></div>
+</div>
+
+<div class="tabContent" id="tab_verified">
+<div class="card"><div style="display:flex;justify-content:space-between"><b>Verified Nurses</b><button class="btn btnDark" onclick="loadVerified()">Refresh</button></div></div>
+<div id="verifiedList"></div>
+</div>
+
+<div class="tabContent" id="tab_clients">
+<div class="card"><div style="display:flex;justify-content:space-between"><b>Clients</b><button class="btn btnDark" onclick="loadClients()">Refresh</button></div></div>
+<div id="clientsList"></div>
+</div>
+
+<div class="tabContent" id="tab_bookings">
+<div class="card"><div style="display:flex;justify-content:space-between"><b>Bookings</b><button class="btn btnDark" onclick="loadBookings()">Refresh</button></div></div>
+<div id="bookingsList"></div>
+</div>
+
+<div class="tabContent" id="tab_payouts">
+<div class="card"><div style="display:flex;justify-content:space-between"><b>Payouts - Withdrawal Methods</b><button class="btn btnDark" onclick="loadPayouts()">Refresh</button></div></div>
+<div id="payoutsList"></div>
+</div>
+
+<div class="tabContent" id="tab_ai">
+<div class="card"><div style="display:flex;justify-content:space-between"><b>AI Support Chats</b><button class="btn btnDark" onclick="loadAI()">Refresh</button></div></div>
+<div id="aiList"></div>
+</div>
+
+</div>
+</body>
+</html>
