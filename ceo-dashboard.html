@@ -2,35 +2,58 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CEO Dashboard</title>
+<title>CEO Dashboard - LOVE CARE GLOBAL</title>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getStorage, ref as sRef, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { getDatabase, ref as dbRef, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getStorage, ref as sRef, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { getDatabase, ref as dbRef, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+// FIXED: Correct project config for web-care-618e8
 const firebaseConfig = {
-  apiKey: "AIzaSyYOUR_API_KEY_REPLACE_ME",
-  authDomain: "love-care-global.firebaseapp.com",
-  databaseURL: "https://love-care-global-default-rtdb.firebaseio.com",
-  projectId: "love-care-global",
-  storageBucket: "love-care-global.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef123456"
+  apiKey: "AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",
+  authDomain: "web-care-618e8.firebaseapp.com",
+  databaseURL: "https://web-care-618e8-default-rtdb.firebaseio.com",
+  projectId: "web-care-618e8",
+  storageBucket: "web-care-618e8.firebasestorage.app",
+  messagingSenderId: "1062578660694",
+  appId: "1:1062578660694:web:f94dfe12c929df05bce2f7"
 };
+
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const storage = getStorage(app);
 const realtimeDB = getDatabase(app);
 const firestore = getFirestore(app);
 window.db=realtimeDB; window.fs=firestore; window.st=storage;
 
+// CEO ONLY protection
+onAuthStateChanged(auth, (user) => {
+  const statusEl = document.getElementById('authStatus');
+  if(!user) {
+    statusEl.innerHTML = "Not logged in - <a href='./index.html' style='color:yellow'>Go login</a>";
+    document.querySelector('.content').innerHTML = '<div class="card" style="background:#fef2f2;border-color:#fecaca;color:#991b1b"><b>CEO Access Required</b><br>Please login with joshouapee@gmail.com first.<br><br><a href="./index.html">Go to Login</a></div>';
+    return;
+  }
+  if(user.email !== "joshouapee@gmail.com") {
+    statusEl.innerHTML = "Access Denied: "+user.email;
+    document.querySelector('.content').innerHTML = '<div class="card" style="background:#fef2f2"><b>CEO Only</b><br>This dashboard is only for joshouapee@gmail.com</div>';
+    return;
+  }
+  statusEl.innerHTML = "CEO: "+user.email+" ✅";
+  switchTab('pending');
+});
+
 window.activeTab='pending';
 window.switchTab=function(tab){
   activeTab=tab;
   document.querySelectorAll('.tabBtn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('btn_'+tab).classList.add('active');
+  const btn = document.getElementById('btn_'+tab);
+  if(btn) btn.classList.add('active');
   document.querySelectorAll('.tabContent').forEach(c=>c.style.display='none');
-  document.getElementById('tab_'+tab).style.display='block';
+  const tabEl = document.getElementById('tab_'+tab);
+  if(tabEl) tabEl.style.display='block';
   if(tab==='pending') loadPending();
   if(tab==='verified') loadVerified();
   if(tab==='clients') loadClients();
@@ -45,66 +68,76 @@ window.loadPending=async function(){
   try{
     let snap=await get(dbRef(realtimeDB, 'pending_nurses'));
     let data=snap.val()||{};
-    let fsSnap=await getDocs(collection(firestore, 'pending_nurses'));
-    fsSnap.forEach(d=>{ if(!data[d.id]) data[d.id]=d.data(); });
-    if(Object.keys(data).length===0){ list.innerHTML='<div class="empty">No pending nurses</div>'; return; }
+    try {
+      let fsSnap=await getDocs(collection(firestore, 'pending_nurses'));
+      fsSnap.forEach(d=>{ if(!data[d.id]) data[d.id]={id:d.id, ...d.data()}; });
+    } catch(e) { console.log("Firestore pending skip:", e.message) }
+    
+    if(Object.keys(data).length===0){ list.innerHTML='<div class="empty">No pending nurses - database empty or check Realtime DB rules</div>'; document.getElementById('count_pending').innerText='0'; return; }
     let html='';
-    Object.values(data).forEach(n=>{
+    Object.entries(data).forEach(([id, n])=>{
+      const nurseId = n.id || id;
       html+=`
       <div class="item">
         <div style="display:flex;justify-content:space-between">
-          <b>${n.fullName||n.name} - ${n.country} - ${n.city||''}</b>
+          <b>${n.fullName||n.name||'Unnamed'} - ${n.country||''} - ${n.city||''}</b>
           <span class="badge pending">${n.status||'PENDING'}</span>
         </div>
-        <div class="small">${n.email} | ${n.phone} | ${n.specialization||n.spec||''}</div>
-        <div class="links">
+        <div class="small">${n.email||''} | ${n.phone||''} | ${n.specialization||n.spec||''}</div>
+        <div class="links" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">
           ${n.cv?.url?`<a href="${n.cv.url}" target="_blank">CV</a>`:''}
-          ${n.licence?.url?`<a href="${n.licence.url}" target="_blank">Licence</a>`:''}
+          ${n.licence?.url||n.license?.url?`<a href="${n.licence?.url||n.license?.url}" target="_blank">Licence</a>`:''}
+          ${n.certificate?.url?`<a href="${n.certificate.url}" target="_blank">Cert</a>`:''}
           ${n.video?.url?`<a href="${n.video.url}" target="_blank">Video</a>`:''}
-          ${n.nationalId?.url||n.idDoc?.url?`<a href="${n.nationalId?.url||n.idDoc?.url}" target="_blank">ID</a>`:''}
-          ${n.photos?`${n.photos.map((p,i)=>`<a href="${p.url}" target="_blank">Photo${i+1}</a>`).join(' ')}`:''}
+          ${n.nationalId?.url||n.idDoc?.url||n.ghanaCard?.url?`<a href="${n.nationalId?.url||n.idDoc?.url||n.ghanaCard?.url}" target="_blank">ID</a>`:''}
+          ${n.photo?.url?`<a href="${n.photo.url}" target="_blank">Photo</a>`:''}
+          ${n.photos?`${n.photos.map((p,i)=>`<a href="${p.url||p}" target="_blank">Photo${i+1}</a>`).join(' ')}`:''}
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
-          <button class="btn btnGreen" onclick="approveNurse('${n.id}')">Approve</button>
-          <button class="btn btnRed" onclick="rejectNurse('${n.id}')">Reject</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">
+          <button class="btn btnGreen" onclick="approveNurse('${nurseId}')">✓ Approve</button>
+          <button class="btn btnRed" onclick="rejectNurse('${nurseId}')">✕ Reject</button>
         </div>
       </div>`;
     });
     list.innerHTML=html;
     document.getElementById('count_pending').innerText=Object.keys(data).length;
-  }catch(e){ list.innerHTML='Error: '+e.message; }
+  }catch(e){ list.innerHTML='Error: '+e.message+'<br><small>Check Realtime Database Rules</small>'; console.error(e); }
 }
 
 window.approveNurse=async function(id){
-  if(!confirm('Approve this nurse?')) return;
+  if(!confirm('Approve this nurse? ID: '+id)) return;
   try{
     let snap=await get(dbRef(realtimeDB, `pending_nurses/${id}`));
     let data=snap.val();
     if(!data){
-      let fsDoc=await getDoc(doc(firestore, 'pending_nurses', id));
-      if(fsDoc.exists()) data=fsDoc.data();
+      try {
+        let fsDoc=await getDoc(doc(firestore, 'pending_nurses', id));
+        if(fsDoc.exists()) data=fsDoc.data();
+      } catch(e){}
     }
-    if(!data){ alert('Not found'); return; }
+    if(!data){ alert('Not found: '+id); return; }
     data.status='APPROVED'; data.approvedAt=new Date().toISOString();
     await set(dbRef(realtimeDB, `verified_nurses/${id}`), data);
     await set(dbRef(realtimeDB, `nurse_registrations/${id}`), data);
-    await setDoc(doc(firestore, 'verified_nurses', id), {...data, createdAt:serverTimestamp()});
-    await setDoc(doc(firestore, 'nurse_registrations', id), {...data, createdAt:serverTimestamp()});
+    try {
+      await setDoc(doc(firestore, 'verified_nurses', id), {...data, createdAt:serverTimestamp()});
+      await setDoc(doc(firestore, 'nurse_registrations', id), {...data, createdAt:serverTimestamp()});
+    } catch(e){ console.log("Firestore write skip", e.message) }
     await remove(dbRef(realtimeDB, `pending_nurses/${id}`));
-    await deleteDoc(doc(firestore, 'pending_nurses', id));
-    alert('Approved');
+    try { await deleteDoc(doc(firestore, 'pending_nurses', id)); } catch(e){}
+    alert('Approved: '+(data.fullName||id));
     loadPending();
-  }catch(e){ alert(e.message); }
+  }catch(e){ alert("Approve error: "+e.message); }
 }
 
 window.rejectNurse=async function(id){
-  if(!confirm('Reject and delete?')) return;
+  if(!confirm('Reject and delete this nurse? ID: '+id)) return;
   try{
     await remove(dbRef(realtimeDB, `pending_nurses/${id}`));
-    await deleteDoc(doc(firestore, 'pending_nurses', id));
-    alert('Rejected');
+    try { await deleteDoc(doc(firestore, 'pending_nurses', id)); } catch(e){}
+    alert('Rejected & deleted');
     loadPending();
-  }catch(e){ alert(e.message); }
+  }catch(e){ alert("Reject error: "+e.message); }
 }
 
 window.loadVerified=async function(){
@@ -115,9 +148,9 @@ window.loadVerified=async function(){
     let data=snap.val()||{};
     let html='';
     Object.values(data).forEach(n=>{
-      html+=`<div class="item"><b>${n.fullName||n.name} - ${n.country}</b><div class="small">${n.email} | ${n.city} | ${n.specialization||''}</div><span class="badge green">VERIFIED</span></div>`;
+      html+=`<div class="item"><b>${n.fullName||n.name} - ${n.country||''}</b><div class="small">${n.email||''} | ${n.city||''} | ${n.specialization||''}</div><span class="badge green">VERIFIED</span><div class="small">Approved: ${n.approvedAt||''}</div></div>`;
     });
-    list.innerHTML=html||'<div class="empty">No verified nurses</div>';
+    list.innerHTML=html||'<div class="empty">No verified nurses yet</div>';
     document.getElementById('count_verified').innerText=Object.keys(data).length;
   }catch(e){ list.innerHTML='Error: '+e.message; }
 }
@@ -130,9 +163,9 @@ window.loadClients=async function(){
     let data=snap.val()||{};
     let html='';
     Object.values(data).forEach(c=>{
-      html+=`<div class="item"><b>${c.fullName} - ${c.country} - ${c.city}</b><div class="small">${c.email} | ${c.phone} | ${c.address}</div>${c.photo?.url?`<a href="${c.photo.url}" target="_blank">Photo</a>`:''} ${c.nationalId?.url?`<a href="${c.nationalId.url}" target="_blank">ID</a>`:''}</div>`;
+      html+=`<div class="item"><b>${c.fullName||'Client'} - ${c.country||''} - ${c.city||''}</b><div class="small">${c.email||''} | ${c.phone||''} | ${c.address||''}</div>${c.photo?.url?`<a href="${c.photo.url}" target="_blank">Photo</a>`:''} ${c.nationalId?.url?`<a href="${c.nationalId.url}" target="_blank">ID</a>`:''}</div>`;
     });
-    list.innerHTML=html||'<div class="empty">No clients</div>';
+    list.innerHTML=html||'<div class="empty">No clients yet</div>';
     document.getElementById('count_clients').innerText=Object.keys(data).length;
   }catch(e){ list.innerHTML='Error: '+e.message; }
 }
@@ -145,9 +178,9 @@ window.loadBookings=async function(){
     let data=snap.val()||{};
     let html='';
     Object.values(data).reverse().slice(0,50).forEach(b=>{
-      html+=`<div class="item"><b>${b.clientName} -> ${b.nurseName} - ${b.country} - ${b.total}</b><div class="small">${b.sDate} to ${b.eDate} | ${b.serviceType} | ${b.status} | ${b.nurseStatus||''}</div><div class="small">${b.address} | ${b.lat},${b.lng}</div>${b.audioUrl?`<a href="${b.audioUrl}" target="_blank">Audio</a>`:''}</div>`;
+      html+=`<div class="item"><b>${b.clientName||'Client'} -> ${b.nurseName||'Nurse'} - ${b.country||''} - ${b.total||''}</b><div class="small">${b.sDate||''} to ${b.eDate||''} | ${b.serviceType||''} | ${b.status||''} | ${b.nurseStatus||''}</div><div class="small">${b.address||''} | ${b.lat||''},${b.lng||''}</div>${b.audioUrl?`<a href="${b.audioUrl}" target="_blank">Audio</a>`:''}</div>`;
     });
-    list.innerHTML=html||'<div class="empty">No bookings</div>';
+    list.innerHTML=html||'<div class="empty">No bookings yet</div>';
     document.getElementById('count_bookings').innerText=Object.keys(data).length;
   }catch(e){ list.innerHTML='Error: '+e.message; }
 }
@@ -160,9 +193,9 @@ window.loadPayouts=async function(){
     let data=snap.val()||{};
     let html='';
     Object.entries(data).forEach(([nurseId, m])=>{
-      html+=`<div class="item"><b>${m.nurseName||nurseId} - ${m.country}</b><div class="small">Momo: ${m.momoNumber||'-'} | Debit: ****${m.debitLast4||'-'} | Virtual: ${m.virtualProvider||'-'} ${m.virtualNumber||''} | PayPal: ${m.paypalEmail||'-'}</div></div>`;
+      html+=`<div class="item"><b>${m.nurseName||nurseId} - ${m.country||''}</b><div class="small">Momo: ${m.momoNumber||'-'} | Debit: ****${m.debitLast4||'-'} | Virtual: ${m.virtualProvider||'-'} ${m.virtualNumber||''} | PayPal: ${m.paypalEmail||'-'}</div></div>`;
     });
-    list.innerHTML=html||'<div class="empty">No withdrawal methods</div>';
+    list.innerHTML=html||'<div class="empty">No withdrawal methods yet</div>';
   }catch(e){ list.innerHTML='Error: '+e.message; }
 }
 
@@ -174,14 +207,12 @@ window.loadAI=async function(){
     let data=snap.val()||{};
     let html='';
     Object.entries(data).slice(0,20).forEach(([clientId, msgs])=>{
-      let last=Object.values(msgs).slice(-2);
-      html+=`<div class="item"><b>${clientId}</b><div class="small">${last.map(m=>`${m.role}: ${(m.text||'').substring(0,80)}`).join('<br>')}</div></div>`;
+      let last=Object.values(msgs||{}).slice(-2);
+      html+=`<div class="item"><b>${clientId}</b><div class="small">${last.map(m=>`${m.role||''}: ${(m.text||'').substring(0,80)}`).join('<br>')}</div></div>`;
     });
-    list.innerHTML=html||'<div class="empty">No chats</div>';
+    list.innerHTML=html||'<div class="empty">No chats yet</div>';
   }catch(e){ list.innerHTML='Error: '+e.message; }
 }
-
-window.addEventListener('DOMContentLoaded', ()=>{ switchTab('pending'); });
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc}
@@ -189,7 +220,7 @@ window.addEventListener('DOMContentLoaded', ()=>{ switchTab('pending'); });
 .tabs{display:flex;gap:6px;padding:10px;background:white;border-bottom:1px solid #e5e7eb;overflow-x:auto;position:sticky;top:48px;z-index:98}
 .tabBtn{padding:8px 12px;border-radius:20px;border:1px solid #e5e7eb;background:#f3f4f6;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer}
 .tabBtn.active{background:#111827;color:white}
-.content{max-width:800px;margin:auto;padding:12px}
+.content{max-width:900px;margin:auto;padding:12px}
 .tabContent{display:none}
 .card{background:white;border-radius:12px;padding:12px;border:1px solid #e5e7eb;margin-bottom:10px}
 .item{background:white;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:8px}
@@ -201,15 +232,16 @@ window.addEventListener('DOMContentLoaded', ()=>{ switchTab('pending'); });
 .badge{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:900}
 .pending{background:#fef3c7;color:#92400e}
 .green{background:#dcfce7;color:#166534}
-.links a{margin-right:6px;font-size:11px;color:#3b82f6;font-weight:700;text-decoration:none;border:1px solid #bfdbfe;padding:2px 6px;border-radius:6px;background:#eff6ff}
-.empty{text-align:center;padding:20px;color:#9ca3af;font-size:12px}
+.links a{margin-right:6px;font-size:11px;color:#3b82f6;font-weight:700;text-decoration:none;border:1px solid #bfdbfe;padding:2px 6px;border-radius:6px;background:#eff6ff;display:inline-block}
+.empty{text-align:center;padding:20px;color:#9ca3af;font-size:12px;border:1px dashed #e5e7eb;border-radius:10px;background:white}
 .count{font-size:11px;background:#f3f4f6;padding:2px 6px;border-radius:999px;margin-left:4px}
 </style>
 </head>
 <body>
 <div class="header">
-<b>CEO Dashboard</b>
-<div style="display:flex;gap:6px">
+<b>CEO Dashboard - LOVE CARE</b>
+<div style="display:flex;gap:6px;align-items:center">
+<span id="authStatus" style="font-size:10px;opacity:0.8">Checking auth...</span>
 <button class="btn btnDark" style="background:white;color:#111827" onclick="location.href='index.html'">Home</button>
 </div>
 </div>
@@ -228,11 +260,12 @@ window.addEventListener('DOMContentLoaded', ()=>{ switchTab('pending'); });
 <div class="tabContent" id="tab_pending" style="display:block">
 <div class="card">
 <div style="display:flex;justify-content:space-between;align-items:center">
-<b>Pending Nurses</b>
+<b>Pending Nurses (need approval)</b>
 <button class="btn btnDark" onclick="loadPending()">Refresh</button>
 </div>
+<div class="small">Shows from Realtime DB: pending_nurses + Firestore: pending_nurses</div>
 </div>
-<div id="pendingList"></div>
+<div id="pendingList">Loading...</div>
 </div>
 
 <div class="tabContent" id="tab_verified">
