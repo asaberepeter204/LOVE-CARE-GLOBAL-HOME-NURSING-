@@ -1,22 +1,27 @@
-// firebase-config.js - LOVE CARE GLOBAL
-// 1. Replace with your Firebase Console > Project Settings > Config
-export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// PASTE THE FRESH CONFIG FROM Firebase Console > Project Settings HERE
+// Don't reuse the old exposed one
+const firebaseConfig = {
+  apiKey: "PASTE_NEW_KEY_HERE",
+  authDomain: "web-care-618e8.firebaseapp.com",
+  databaseURL: "https://web-care-618e8-default-rtdb.firebaseio.com",
+  projectId: "web-care-618e8",
+  storageBucket: "web-care-618e8.firebasestorage.app",
+  messagingSenderId: "1062578660694",
+  appId: "1:1062578660694:web:f94dfe12c929df05bce2f7"
 };
 
-// Helper to initialize once
-import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
-
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export default app;
+export const db = getDatabase(app);
+export const googleProvider = new GoogleAuthProvider();
+
+// Auto-check if key is valid
+onAuthStateChanged(auth, () => {
+  console.log("Firebase connected OK - API key is valid");
+}, (error) => {
+  console.error("Firebase auth failed:", error.code);
+});
