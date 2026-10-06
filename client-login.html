@@ -2,26 +2,69 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Login - LOVE CARE GLOBAL HOME NURSING</title>
-<style>body{font-family:Inter,sans-serif;margin:0;background:#f8f9ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.card{max-width:400px;width:100%;background:white;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);border-top:5px solid #16a34a}h1{color:#16a34a;text-align:center}input{width:100%;padding:14px;margin:8px 0;border:2px solid #e5e7eb;border-radius:10px;box-sizing:border-box}.btn{width:100%;padding:14px;background:#16a34a;color:white;border:none;border-radius:10px;font-weight:900;cursor:pointer}a{color:#7c3aed;font-weight:800;text-decoration:none}.header{position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;padding:12px 16px;display:flex;justify-content:space-between}</style>
-</head>
-<body>
-<div class="header"><div><strong>LOVE CARE GLOBAL HOME NURSING</strong></div><a href="index.html" style="color:white">Home</a></div>
-<div class="card">
-<h1>Client Login</h1>
-<p style="text-align:center;font-size:12px;color:#666">Login with phone - Official site: https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
-<input type="tel" id="loginPhone" placeholder="Phone Number 0244XXXXXX">
-<input type="password" id="loginPass" placeholder="Password">
-<button class="btn" onclick="doLogin()">Login</button>
-<p style="text-align:center">No account? <a href="client-register.html">Register</a> | <a href="index.html">Home</a></p>
-</div>
-<script>
-function doLogin(){
- const phone=document.getElementById('loginPhone').value;
- if(!phone){alert('Enter phone');return;}
- localStorage.setItem('clientPhone',phone);
- window.location.href='client-dashboard.html';
+<title>Client Login - Must Login Before Booking</title>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyYOUR_API_KEY",
+  authDomain: "love-care-global.firebaseapp.com",
+  databaseURL: "https://love-care-global-default-rtdb.firebaseio.com",
+  projectId: "love-care-global",
+  storageBucket: "love-care-global.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+};
+const app = initializeApp(firebaseConfig);
+const realtimeDB = getDatabase(app);
+const firestore = getFirestore(app);
+window.loginClient=async function(){
+  let email=document.getElementById('email').value.trim();
+  let password=document.getElementById('password').value;
+  let msg=document.getElementById('msg');
+  if(!email||!password){msg.style.display='block';msg.innerHTML='Enter email and password';return;}
+  if(email==='client@test.com' && password==='123456'){
+    localStorage.setItem('currentClientId','demo_client_1');localStorage.setItem('currentClientName','Demo Client');localStorage.setItem('currentClientEmail',email);localStorage.setItem('currentClientCountry','GH');localStorage.setItem('currentClientPhone','+233241234567');
+    msg.style.display='block';msg.style.background='#dcfce7';msg.innerHTML='✅ Demo login success - Redirecting to Book Nurse...';setTimeout(()=>location.href='book-nurse.html',800);return;
+  }
+  let localClients=JSON.parse(localStorage.getItem('client_registrations')||'[]');
+  let localClient=localClients.find(c=>c.email===email && c.password===password);
+  if(localClient){
+    localStorage.setItem('currentClientId',localClient.id);localStorage.setItem('currentClientName',localClient.fullName);localStorage.setItem('currentClientEmail',localClient.email);localStorage.setItem('currentClientCountry',localClient.country);localStorage.setItem('currentClientPhone',localClient.phone);
+    msg.style.display='block';msg.style.background='#dcfce7';msg.innerHTML=`✅ Login success (local) - Welcome ${localClient.fullName} - Redirecting...`;setTimeout(()=>location.href='book-nurse.html',800);return;
+  }
+  try{
+    let rtSnap=await get(ref(realtimeDB, 'client_registrations'));let rtData=rtSnap.val()||{};let found=null;Object.values(rtData).forEach(c=>{if(c.email===email && c.password===password) found=c;});
+    if(found){localStorage.setItem('currentClientId',found.id);localStorage.setItem('currentClientName',found.fullName);localStorage.setItem('currentClientEmail',found.email);localStorage.setItem('currentClientCountry',found.country);localStorage.setItem('currentClientPhone',found.phone);msg.style.display='block';msg.style.background='#dcfce7';msg.innerHTML=`✅ Login Realtime DB - Welcome ${found.fullName} - Redirecting...`;setTimeout(()=>location.href='book-nurse.html',800);return;}
+  }catch(e){}
+  try{
+    let q=query(collection(firestore, 'clients'), where('email','==',email), where('password','==',password));let fsSnap=await getDocs(q);
+    if(!fsSnap.empty){let found=fsSnap.docs[0].data();localStorage.setItem('currentClientId',found.id);localStorage.setItem('currentClientName',found.fullName);localStorage.setItem('currentClientEmail',found.email);localStorage.setItem('currentClientCountry',found.country);msg.style.display='block';msg.style.background='#dcfce7';msg.innerHTML=`✅ Login Firestore - Welcome ${found.fullName} - Redirecting...`;setTimeout(()=>location.href='book-nurse.html',800);return;}
+  }catch(e){}
+  msg.style.display='block';msg.style.background='#fef2f2';msg.innerHTML=`❌ No client found for ${email}<br>Register first<br>Demo: client@test.com / 123456`;
 }
 </script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.card{background:white;border-radius:16px;padding:20px;border:1px solid #e5e7eb;max-width:400px;width:95%}
+label{font-size:12px;font-weight:800;margin:8px 0 4px;display:block}
+input{width:100%;padding:12px;border-radius:10px;border:1.5px solid #e5e7eb}
+.btn{width:100%;padding:13px;border-radius:11px;font-weight:900;border:none;cursor:pointer;margin-top:10px}
+.btnG{background:#3b82f6;color:white}.btnGr{background:#f3f4f6;border:1px solid #e5e7eb}
+</style>
+</head>
+<body>
+<div class="card">
+<h2 style="text-align:center">🧑‍💼 Client Login - Must Login Before Booking</h2>
+<div style="text-align:center;background:#eff6ff;padding:8px;border-radius:8px;border:1px solid #bfdbfe;font-size:11px;margin:10px 0"><b>Must login before booking!</b><br>Login → Select nurse from map → Book → Paystack → Nurse receives job + GPS + Accept/Reject + Map directions</div>
+<label>Email</label><input type="email" id="email" placeholder="client@email.com">
+<label>Password</label><input type="password" id="password" placeholder="Password">
+<button class="btn btnG" onclick="loginClient()">🔐 Login → Book Nurse</button>
+<div id="msg" style="margin-top:10px;padding:10px;border-radius:8px;display:none;font-size:12px"></div>
+<button class="btn btnGr" style="margin-top:12px" onclick="location.href='client-registration.html'">📝 Register as Client - 8 Countries</button>
+<button class="btn btnGr" onclick="location.href='index.html'">← Home</button>
+<div style="margin-top:10px;padding:10px;background:#eff6ff;border-radius:8px;font-size:11px"><b>Demo:</b> client@test.com / 123456</div>
+</div>
 </body>
 </html>
