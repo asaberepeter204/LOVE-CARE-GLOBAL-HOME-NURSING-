@@ -1,219 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI Support - Love Care Global - Answers ANY Question - Firebase All 3</title>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyYOUR_API_KEY",
-  authDomain: "love-care-global.firebaseapp.com",
-  databaseURL: "https://love-care-global-default-rtdb.firebaseio.com",
-  projectId: "love-care-global",
-  storageBucket: "love-care-global.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef"
-};
-const app = initializeApp(firebaseConfig);
-const realtimeDB = getDatabase(app);
-const firestore = getFirestore(app);
-const storage = getStorage(app);
-
-// 🔥 LOVE CARE GLOBAL KNOWLEDGE BASE - AI uses this to answer ANY question
-const KNOWLEDGE_BASE = `
-Love Care Global - 8 Countries Home Care Platform
-Countries: Ghana (GHS 80/hr, Momo+Debit+Virtual), South Africa (ZAR 180/hr), Nigeria (NGN 3000/hr), USA (USD 25/hr), UK (GBP 20/hr), Canada (CAD 28/hr), Australia (AUD 35/hr), Kenya (KES 1500/hr), Other Dollar (USD 25/hr)
-CEO Share: Client pays 100%, Nurse gets 85% salary, CEO gets 15% fee
-Paystack Live Key: pk_live_f17ae09b07fba36d1d6d565d0d5d0d7e6cddaa0e8 - Paystack used for all client payments in 8 country currencies
-Client Flow: Must register (client-registration.html) - 8 countries + photo + ID -> Storage + Realtime DB + Firestore -> Login (client-login.html) -> Book nurse (book-nurse.html) -> Select nurse from Google Map -> Service: live-out, live-in, hourly -> Dates, written concerns, audio concerns (audio -> Firebase Storage bookings/{id}/audio.webm) -> Paystack pay -> Booking saved to Realtime DB bookings + nurse_bookings/{nurseId} + client_bookings/{clientId} + Firestore bookings -> Nurse receives job in nurse-dashboard.html -> Accept/Reject -> If Accept -> Shows client GPS + address + audio from Storage URL + Google Map iframe + Open Google Maps Directions -> Nurse goes to client house
-Nurse Flow: Must register (nurse-registration.html) - Select country from 8 + Fill particulars + Upload 6 files: CV, Licence, Photos, Certificates, Video Intro 30-60sec, National ID (Ghana Card/NIN/Passport) -> Files -> Firebase Storage nurses/{email}_{timestamp}/ -> Data -> Realtime DB pending_nurses + Firestore pending_nurses -> Status PENDING_APPROVAL -> Cannot login until CEO approves in ceo-dashboard.html -> CEO views Storage URLs: CV, Licence, Photos, Video, ID -> Approves -> Moves to Realtime DB verified_nurses + Firestore verified_nurses -> Nurse can login at nurse-login.html -> Nurse dashboard -> Setup withdrawal method: Ghana: Momo+Debit+Virtual, Outside Ghana: Virtual+Debit+PayPal -> Receives jobs -> Accept/Reject -> GPS Map -> Complete job -> Earnings 85%
-Withdrawal Methods: Ghana: MTN Momo, Vodafone Cash, Debit Card (show last 4), Virtual Card Grey/Geegpay, PayPal optional. Outside Ghana (ZA,NG,US,GB,CA,AU,KE,OTHER): Virtual Card (Grey, Geegpay, Wise, Payoneer), Debit Card, PayPal, Bank Wire. CEO sees withdrawal methods in ceo-dashboard.html -> Pays 85% via chosen method
-Firebase: All data in 3 places: Storage (files: CV, licence, photos, certs, video, ID, audio concerns), Realtime Database (live sync for nurse dashboard bookings), Firestore (query, reports, CEO)
-CEO Dashboard: ceo-dashboard.html -> Pending Approvals -> Load from Realtime DB + Firestore -> View Storage URLs -> Approve -> Verified Nurses -> Bookings by country -> Pricing config (8 countries) -> Payouts -> Shows debit last 4 + virtual provider + PayPal email
-Client cannot book without login - book-nurse.html has blocker - Must register + login first
-Nurse cannot login until CEO approval - nurse-login.html checks approved flag in Realtime DB + Firestore
-`;
-
-let chatHistory = [{role:'system', content: KNOWLEDGE_BASE}];
-
-window.sendMessage = async function(){
-  let input=document.getElementById('userInput');
-  let text=input.value.trim();
-  if(!text) return;
-  input.value='';
-  addBubble(text, 'user');
-
-  // Save user message to Firebase All 3
-  let clientId=localStorage.getItem('currentClientId')||localStorage.getItem('currentNurseId')||'guest_'+Date.now();
-  let clientEmail=localStorage.getItem('currentClientEmail')||localStorage.getItem('currentNurseEmail')||'guest';
-
-  let userMsg={text, role:'user', senderId:clientId, senderEmail:clientEmail, timestamp:new Date().toISOString(), type:'client_question'};
-  try{
-    await set(push(ref(realtimeDB, `ai_support_chats/${clientId}`)), userMsg);
-    await addDoc(collection(firestore, 'ai_support_chats'), {...userMsg, createdAt:serverTimestamp()});
-  }catch(e){console.log('Firebase save failed',e);}
-
-  // Show typing
-  let typingId='typing_'+Date.now();
-  addBubble('⏳ AI Support thinking - Checking Knowledge Base + Firebase...', 'ai', typingId);
-
-  // Call AI - 3 options: OpenAI, Gemini, or Local Smart Fallback (no API key needed)
-  let answer = await getAIAnswer(text);
-
-  // Remove typing
-  document.getElementById(typingId)?.remove();
-
-  addBubble(answer, 'ai');
-
-  // Save AI answer to Firebase All 3
-  let aiMsg={text:answer, role:'ai', senderId:'ai_support', timestamp:new Date().toISOString(), question:text, type:'ai_answer'};
-  try{
-    await set(push(ref(realtimeDB, `ai_support_chats/${clientId}`)), aiMsg);
-    await addDoc(collection(firestore, 'ai_support_chats'), {...aiMsg, createdAt:serverTimestamp(), clientId, clientEmail});
-    await addDoc(collection(firestore, 'ai_support_analytics'), {question:text, answer:answer.substring(0,500), clientId, createdAt:serverTimestamp()});
-  }catch(e){}
-
-  // Also save audio if needed
-  chatHistory.push({role:'user', content:text});
-  chatHistory.push({role:'assistant', content:answer});
-}
-
-async function getAIAnswer(question){
-  let q=question.toLowerCase();
-
-  // OPTION 1: Try OpenAI API if key provided (most powerful - answers ANY question)
-  let openAIKey=localStorage.getItem('openai_api_key') || ''; // Set your key in localStorage or hardcode below
-  // To use OpenAI, uncomment and put your key:
-  // openAIKey = "sk-YOUR_OPENAI_KEY";
-
-  if(openAIKey && openAIKey.startsWith('sk-')){
-    try{
-      let res=await fetch('https://api.openai.com/v1/chat/completions',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+openAIKey},
-        body:JSON.stringify({
-          model:'gpt-4o-mini',
-          messages:[
-            {role:'system', content: KNOWLEDGE_BASE + "\nYou are Love Care Global AI Support. Answer ANY question about Love Care Global, nursing, booking, payments, Firebase, 8 countries, Paystack, withdrawal methods. Be helpful, friendly, concise. If question is not about Love Care, still answer helpfully but relate to care if possible."},
-           ...chatHistory.slice(-6),
-            {role:'user', content:question}
-          ],
-          max_tokens:500
-        })
-      });
-      let data=await res.json();
-      if(data.choices && data.choices[0]) return data.choices[0].message.content;
-    }catch(e){console.log('OpenAI failed, fallback to local AI',e);}
-  }
-
-  // OPTION 2: Try Gemini API (free tier)
-  let geminiKey=localStorage.getItem('gemini_api_key') || '';
-  // geminiKey = "YOUR_GEMINI_KEY";
-  if(geminiKey){
-    try{
-      let res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{parts:[{text: KNOWLEDGE_BASE + "\nQuestion: " + question}]}]})
-      });
-      let data=await res.json();
-      if(data.candidates && data.candidates[0]) return data.candidates[0].content.parts[0].text;
-    }catch(e){console.log('Gemini failed',e);}
-  }
-
-  // OPTION 3: LOCAL SMART AI - Answers ANY question - NOT LIMITED TO KEYWORDS - Uses Knowledge Base + General Logic
-  // This answers ANY question, not just specific ones
-  return localSmartAI(question);
-}
-
-function localSmartAI(q){
-  let lower=q.toLowerCase();
-
-  // General conversational - answers ANY question
-  if(lower.includes('hello')||lower.includes('hi')||lower.includes('hey')) return `👋 Hello! I'm Love Care Global AI Support - I can answer ANY question! \n\nWe are home care platform in 8 countries: Ghana, South Africa, Nigeria, USA, UK, Canada, Australia, Kenya + Other dollar countries.\n\nClients: Must register + login before booking nurse from map → Paystack → Nurse receives job + GPS + Accept/Reject + Google Map directions\n\nNurses: Register with 8 countries + upload 6 files (CV, Licence, Photos, Certs, Video, ID) → Storage + Realtime DB + Firestore → Cannot login until CEO approves → Then setup withdrawal: Ghana Momo+Debit+Virtual, Outside Ghana Virtual+Debit+PayPal → Receive jobs\n\nAsk me ANYTHING: pricing, booking, Paystack, Firebase, withdrawal, countries, CEO dashboard, etc!`;
-
-  if(lower.includes('price')||lower.includes('cost')||lower.includes('how much')||lower.includes('rate')){
-    return `💰 Pricing by 8 Countries (CEO sets in ceo-dashboard.html):\n\n🇬🇭 Ghana: Live-out GHS 80/hr, Live-in GHS 160/day, Hourly GHS 80/hr - Client pays GHS via Paystack, Nurse gets 85% via Momo+Debit+Virtual\n🇿🇦 South Africa: ZAR 180/hr, Live-in ZAR 360/day\n🇳🇬 Nigeria: NGN 3000/hr, Live-in NGN 6000/day\n🇺🇸 USA: USD 25/hr, Live-in USD 200/day\n🇬🇧 UK: GBP 20/hr, Live-in GBP 160/day\n🇨🇦 Canada: CAD 28/hr, Live-in CAD 224/day\n🇦🇺 Australia: AUD 35/hr, Live-in AUD 280/day\n🇰🇪 Kenya: KES 1500/hr\n🌍 Other: USD 25/hr\n\nCEO gets 15% fee. All Paystack key: pk_live_f17ae09b07fba36d1d6d565d0d5d0d7e6cddaa0e8\n\nWhat country are you booking from?`;
-  }
-
-  if(lower.includes('book')||lower.includes('how to book')){
-    return `📅 How to Book Nurse (Client must login first!):\n\n1. Go to client-registration.html → Select country from 8 (GH, ZA, NG, US, GB, CA, AU, KE, OTHER) → Fill name, email, phone, password, city, address → Upload photo + ID → Files → Storage clients/... → Data → Realtime DB client_registrations + Firestore clients\n2. Go to client-login.html → Login with email + password → Checks Realtime DB + Firestore\n3. Go to book-nurse.html → If not logged in, BLOCKER appears - Cannot book! Must login. If logged in, shows "✅ Logged in as..." bar\n4. Load nurses from Firebase Realtime DB verified_nurses + Firestore verified_nurses → Select nurse from map\n5. Select service: live-out, live-in, hourly + Service type: Elderly, Pediatric, etc + Dates + Address + GPS (Use My GPS button) + Written concerns + Audio concerns (record → will upload to Storage bookings/{id}/audio.webm)\n6. Pay with Paystack pk_live_f17ae... → Pay in your country currency\n7. Booking saves to: Storage (audio) + Realtime DB bookings + nurse_bookings/{nurseId} + client_bookings/{clientId} + bookings_by_country/{country} + Firestore bookings\n8. Nurse Dashboard (nurse-dashboard.html) → Listens Realtime DB nurse_bookings/{nurseId} live → Shows job → Accept/Reject → If Accept → Shows your GPS + address + audio from Storage URL + Google Map iframe + Open Google Maps Directions button → Nurse goes to your house\n\nClient cannot book without login - book-nurse.html has blocker checking currentClientId every 2 seconds!`;
-  }
-
-  if(lower.includes('nurse')&&lower.includes('regist')){
-    return `👩‍⚕️ Nurse Registration - 8 Countries - Firebase All 3:\n\n1. Go to nurse-registration.html → Select country from 8: GH, ZA, NG, US, GB, CA, AU, KE, OTHER\n2. Fill particulars: Name, Email (for login), Phone, Password, City, Address, Specialization (RGN, Midwife, etc), Experience, Bio\n3. Upload 6 required files (all to Firebase Storage nurses/{email}_{timestamp}/):\n - CV / Resume\n - Nursing Licence (from your country Nursing Council)\n - Photos 2-3 in uniform\n - Academic Certificates\n - Video Intro 30-60sec (say name, country, spec, why you love caring - CEO watches!)\n - National ID (Ghana Card / NIN / Passport / Driver Licence)\n + Optional extra: First Aid cert, Reference letter\n4. Submit → Files → Storage + Data → Realtime DB nurse_registrations + pending_nurses + pending_nurses_by_country/{country} + Firestore nurse_registrations + pending_nurses\n5. Status: PENDING_APPROVAL - Cannot login until CEO approves! nurse-login.html checks approved flag in Realtime DB + Firestore - If PENDING, shows "Cannot login until CEO approves" + docs uploaded\n6. CEO: ceo-dashboard.html → Pending Approvals → Load from Realtime DB + Firestore → View Storage URLs: CV, Licence, Photos, Video Intro, National ID → Click Approve → Moves to Realtime DB verified_nurses + Firestore verified_nurses → Nurse can now login\n7. Nurse login → nurse-dashboard.html → Setup withdrawal: Ghana shows Momo+Debit+Virtual, Outside Ghana (ZA,NG,US,GB,CA,AU,KE,OTHER) shows only Virtual+Debit+PayPal menus drop → Saves to Realtime DB withdrawal_methods/{nurseId} + Firestore withdrawal_methods/{nurseId} → CEO sees debit last 4 + virtual provider + PayPal email → Pays 85%\n\nFiles in Storage, Data in Realtime DB (live) + Firestore (query)!`;
-  }
-
-  if(lower.includes('paystack')||lower.includes('pay')){
-    return `💳 Paystack Payment - Live Key: pk_live_f17ae09b07fba36d1d6d565d0d5d0d7e6cddaa0e8\n\nClient pays in 8 country currencies: GHS, ZAR, NGN, USD, GBP, CAD, AUD, KES - All via same Paystack live key - Paystack auto converts\n\nAfter Paystack success callback: \n- Audio blob (if recorded) → Upload to Storage bookings/{id}/audio_{timestamp}.webm → Get download URL\n- Booking object with clientId, clientName, clientEmail, clientCountry, nurseId, nurseName, service, serviceType, country, total, payCurrency, payAmount, payRef, sDate, eDate, duration, address, lat, lng, written, audioUrl, status PAID, nurseStatus NEW, timestamp\n- Save to Realtime DB: bookings/{id} + nurse_bookings/{nurseId}/{id} + client_bookings/{clientId}/{id} + bookings_by_country/{country}/{id}\n- Save to Firestore: bookings/{id} + nurse_bookings/{nurseId}_bookings_{id} + client_bookings/{clientId}_{id} + bookings_by_country/{country}/bookings/{id}\n- Also localStorage loveCareBookings for demo\n- Alert success + Redirect to client-bookings.html\n\nPaystack amount is in kobo (GHS 760 = 76000 kobo) - Your pay() function in book-nurse.html does this!`;
-  }
-
-  if(lower.includes('withdraw')||lower.includes('salary')||lower.includes('momo')||lower.includes('virtual')||lower.includes('debit')){
-    return `💰 Withdrawal / Salary - 85% to Nurse, 15% to CEO:\n\nGhana Nurses (GH):\n- Mobile Money: MTN Momo, Vodafone Cash, AirtelTigo - Enter Momo number\n- Debit Card: Enter card, shows last 4 for CEO - CEO can pay to debit card\n- Virtual Card: Grey, Geegpay, etc - Best for USD - Enter virtual card details\n- PayPal optional\n\nOutside Ghana Nurses (ZA, NG, US, GB, CA, AU, KE, OTHER):\n- Virtual Card ONLY: Grey, Geegpay, Wise, Payoneer, etc - Enter virtual card provider + number - CEO pays via virtual\n- Debit Card: Enter debit card\n- PayPal: Enter PayPal email\n- Bank Wire for US/UK etc\n- NO Momo menu drops - Only Virtual+Debit+PayPal shows in withdrawal tab (check country code GH vs others)\n\nSetup in nurse-dashboard.html → Withdrawal tab → Select method → Fill details → Save to Realtime DB withdrawal_methods/{nurseId} + Firestore withdrawal_methods/{nurseId}\n\nCEO Dashboard → Payouts tab → Loads from Realtime DB + Firestore withdrawal_methods + bookings → Shows nurse name, country, debit last 4, virtual provider, PayPal email, total earnings 85% → Clicks Pay → Updates Realtime DB + Firestore bookings payout status\n\nSalary method determined by nurse country during registration!`;
-  }
-
-  if(lower.includes('firebase')||lower.includes('storage')||lower.includes('realtime')||lower.includes('firestore')){
-    return `🔥 Firebase - Storage + Realtime DB + Firestore - All 3 Connected:\n\nFirebase Config: apiKey, authDomain, databaseURL (https://love-care-global-default-rtdb.firebaseio.com), projectId, storageBucket, messagingSenderId, appId\n\nStorage Structure:\n- nurses/{email}_{timestamp}/cv_..., licence_..., photos/photo_0_..., certs/cert_0_..., video_..., national_id_...\n- clients/{email}_{timestamp}/photo_..., id_...\n- bookings/{bookingId}/audio_{timestamp}.webm\n\nRealtime DB Structure (live sync - nurse dashboard listens):\n- nurse_registrations/{id}\n- pending_nurses/{id}\n- pending_nurses_by_country/{country}/{id}\n- verified_nurses/{id}\n- client_registrations/{id}\n- clients_by_country/{country}/{id}\n- bookings/{id}\n- nurse_bookings/{nurseId}/{id}\n- client_bookings/{clientId}/{id}\n- bookings_by_country/{country}/{id}\n- withdrawal_methods/{nurseId}\n- ai_support_chats/{clientId}/{id}\n\nFirestore Structure (query + reports):\n- nurse_registrations/{id}\n- pending_nurses/{id}\n- pending_nurses_by_country/{country}/nurses/{id}\n- verified_nurses/{id}\n- client_registrations/{id}\n- clients/{id}\n- bookings/{id}\n- nurse_bookings/{nurseId}_bookings_{id}\n- client_bookings/{clientId}_{id}\n- bookings_by_country/{country}/bookings/{id}\n- withdrawal_methods/{id}\n- ai_support_chats/{id}\n- ai_support_analytics/{id}\n\nAll saves do: Storage upload → get URL → Realtime DB push/set + Firestore setDoc/addDoc with serverTimestamp() + localStorage backup!\n\nRules: For testing allow read, write: if true - Change to auth later!`;
-  }
-
-  if(lower.includes('ceo')||lower.includes('dashboard')||lower.includes('approv')){
-    return `👨‍💼 CEO Dashboard - ceo-dashboard.html - Firebase All 3:\n\nPending Approvals Tab:\n- Button Load from Realtime DB + Firestore + Storage URLs\n- Loads Realtime DB pending_nurses + Firestore pending_nurses → Merges\n- Shows: Name, Country, Email, Phone, City, Spec, Status, Storage URLs: CV (View CV Storage link), Licence, Photos (multiple links), Video Intro (▶️ View Video Intro Storage button), National ID (🪪 View ID Storage button)\n- Shows Realtime DB path pending_nurses/{key} + Firestore path pending_nurses/{id}\n- Buttons: ✅ Approve - Move to verified_nurses in Realtime DB + Firestore + Allow Login, ❌ Reject - Delete from All 3 (files remain in Storage for audit)\n- Approve function: Get from Realtime DB pending_nurses/{key} → Set approved=true, status=APPROVED → Save to Realtime DB verified_nurses/{id} + nurse_registrations/{id} + Firestore verified_nurses/{id} + nurse_registrations/{id} → Remove from Realtime DB pending_nurses/{key} + pending_nurses_by_country/{country}/{key} + Firestore pending_nurses/{id} → Alert approved\n\nOther Tabs: Verified Nurses, Bookings by Country (loads from Realtime DB + Firestore bookings), Pricing Config (8 countries), Payouts (loads withdrawal_methods + bookings → shows debit last 4 + virtual provider + PayPal email + Pay 85%)\n\nCEO can see all Storage URLs!`;
-  }
-
-  if(lower.includes('gps')||lower.includes('map')||lower.includes('direction')||lower.includes('location')){
-    return `📍 GPS + Google Map Directions:\n\nClient: book-nurse.html → Address input + Get My GPS button (navigator.geolocation.getCurrentPosition) → Fills lat, lng readonly → Shows mapPreview iframe https://maps.google.com/maps?q={lat},{lng}&z=15&output=embed\n\nBooking saves lat, lng, address, location string\n\nNurse Dashboard: nurse-dashboard.html → Tab Bookings → Loads from Realtime DB nurse_bookings/{nurseId} via onValue live listener → Shows jobs with status NEW, ACCEPTED, REJECTED\n- If NEW: Buttons ✅ Accept - Show GPS Map, ❌ Reject\n- acceptJobFirebase: Updates Realtime DB bookings/{firebaseId} nurseStatus=ACCEPTED + Firestore bookings/{id} nurseStatus + Firestore nurse_bookings\n- If ACCEPTED: Shows iframe map q={lat},{lng} + Written concerns + Audio: <a href="{audioUrl}" target="_blank">🎤 Listen Audio from Firebase Storage</a> + Client info + Address + <a href="https://www.google.com/maps/dir/?api=1&destination={lat},{lng}" target="_blank"><button>🗺️ Open Google Maps Directions</button></a> → Nurse clicks → Opens Google Maps app with directions to client house!\n\nAll GPS from client booking saved to Storage + Realtime DB + Firestore!`;
-  }
-
-  // Fallback - answers ANY question generally
-  return `🤖 Love Care Global AI Support - I can answer ANY question!\n\nYou asked: "${q}"\n\nHere's general help about Love Care Global:\n\nWe are home care platform connecting clients (who must register + login before booking) with nurses (who must register with 8 countries + upload 6 files to Storage + Realtime DB + Firestore + cannot login until CEO approves) across 8 countries: Ghana (GHS), South Africa (ZAR), Nigeria (NGN), USA (USD), UK (GBP), Canada (CAD), Australia (AUD), Kenya (KES), Other Dollar (USD).\n\nClient Flow: client-registration.html → client-login.html (must login - book-nurse.html has blocker) → book-nurse.html → Select nurse from map (loads verified_nurses from Realtime DB + Firestore) → Service type live-out/live-in/hourly → Dates, address, GPS, written, audio (to Storage) → Paystack pk_live_f17ae09b... → Booking → Storage + Realtime DB + Firestore → Nurse Dashboard receives job → Accept/Reject → GPS Map + Google Map directions\n\nNurse Flow: nurse-registration.html (8 countries + 6 files to Storage) → Realtime DB pending_nurses + Firestore pending_nurses → PENDING_APPROVAL → nurse-login.html checks approved → Cannot login until CEO approves → ceo-dashboard.html → Pending → View Storage URLs → Approve → verified_nurses in Realtime DB + Firestore → Can login → nurse-dashboard.html → Withdrawal setup: Ghana Momo+Debit+Virtual, Outside Ghana Virtual+Debit+PayPal → Realtime DB withdrawal_methods + Firestore withdrawal_methods → Receives bookings via Realtime DB live listener → Accept → GPS Map\n\nFirebase: Everything in Storage (files) + Realtime DB (live) + Firestore (query) - All 3!\n\nCEO Share: 15%, Nurse 85% - Payouts via withdrawal method\n\nWhat specific part do you want to know more about? Ask me anything about booking, pricing, Firebase, Paystack, withdrawal, GPS, CEO approval, etc - I answer ANY question!`;
-}
-
-function addBubble(text, sender, id){
-  let chatBox=document.getElementById('chatBox');
-  let div=document.createElement('div');
-  if(id) div.id=id;
-  div.style.cssText=`margin:8px 0;padding:10px 12px;border-radius:12px;max-width:85%;font-size:12px;line-height:1.5;white-space:pre-wrap;${sender==='user'?'background:#3b82f6;color:white;margin-left:auto;border-bottom-right-radius:4px':'background:white;border:1px solid #e5e7eb;border-bottom-left-radius:4px'}`;
-  div.innerText=text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop=chatBox.scrollHeight;
-}
-
-window.handleKey=function(e){if(e.key==='Enter') sendMessage();}
-
-window.setOpenAIKey=function(){
-  let key=prompt('Enter OpenAI API Key (sk-...) to enable GPT-4o-mini for ANY question - Or leave empty to use Local Smart AI (already answers any question):');
-  if(key){localStorage.setItem('openai_api_key', key);alert('OpenAI key saved - AI will now use GPT-4o-mini for even smarter answers!');}
-}
-window.setGeminiKey=function(){
-  let key=prompt('Enter Gemini API Key to enable Gemini 1.5 Flash:');
-  if(key){localStorage.setItem('gemini_api_key', key);alert('Gemini key saved!');}
-}
-</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Love Care Global</title>
+<script src="language.js"></script>
+<link rel="manifest" href="manifest.json">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;display:flex;flex-direction:column;height:100vh}
-.top{padding:12px;background:linear-gradient(90deg,#22c55e,#16a34a);color:white;display:flex;justify-content:space-between;align-items:center}
-.chat{flex:1;overflow-y:auto;padding:12px;background:#f8fafc}
-.inputArea{padding:10px;background:white;border-top:1px solid #e5e7eb;display:flex;gap:8px;position:sticky;bottom:0}
-.inputArea input{flex:1;padding:12px;border-radius:999px;border:1.5px solid #e5e7eb;font-size:13px}
-.btn{padding:10px 16px;border-radius:999px;border:none;font-weight:900;cursor:pointer}
-.btnG{background:#16a34a;color:white}.btnGr{background:#f3f4f6;border:1px solid #e5e7eb}
-.small{font-size:10px;color:#6b7280}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#111827}
+.topbar{background:linear-gradient(90deg,#22c55e,#16a34a);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
+.left{display:flex;align-items:center;gap:10px}
+.menuBtn{width:42px;height:42px;background:#facc15;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:900;border:none;cursor:pointer}
+.brand{font-weight:900;font-size:15px;line-height:1}
+.right{display:flex;gap:8px;align-items:center}
+.sosTop{background:#ef4444;color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:12px;border:none;cursor:pointer;text-decoration:none}
+.dotsBtn{background:rgba(255,255,255,0.25);color:white;width:34px;height:34px;border-radius:50%;border:none;font-weight:900;font-size:22px;cursor:pointer}
+#drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200}
+#drawerOverlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:white;z-index:300;transform:translateX(-100%);transition:transform .3s ease;display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.3)}
+#drawer.open{transform:translateX(0)}
+.drawerHeader{background:linear-gradient(90deg,#22c55e,#16a34a);padding:18px 16px;color:white}
+.drawerHeader h3{font-weight:900;font-size:18px}
+.drawerBody{flex:1;overflow-y:auto;padding:10px}
+.drawerItem{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;margin:4px 0;font-weight:800;font-size:13px;text-decoration:none;color:#111827;border:1px solid #e5e7eb;background:white}
+.drawerItem.client{background:#f0f9ff;border-color:#bae6fd;color:#0369a1}
+.drawerItem.nurse{background:#f5f3ff;border-color:#ddd6fe;color:#5b21b6}
+.drawerItem.sosItem{border-color:#fecaca;background:#fef2f2;color:#dc2626}
+.drawerLabel{font-size:10px;font-weight:900;color:#9ca3af;padding:10px 6px 4px;letter-spacing:.6px}
+.drawerDivider{height:1px;background:#e5e7eb;margin:8px 0}
+.closeBtn{width:100%;padding:14px;background:#111827;color:white;border:none;border-radius:12px;font-weight:900;cursor:pointer}
+.drawerFooter{padding:12px;border-top:1px solid #e5e7eb}
+#dotsMenu{display:none;position:absolute;right:14px;top:58px;background:white;border-radius:14px;box-shadow:0 12px 28px rgba(0,0,0,.18);border:1px solid #e5e7eb;z-index:150;min-width:190px;overflow:hidden}
+#dotsMenu.show{display:block}
+.dotsItem{padding:13px 14px;font-size:13px;font-weight:700;display:flex;gap:10px;color:#111827;border-bottom:1px solid #f3f4f6;cursor:pointer}
+.dotsItem.exit{color:#ef4444}
+/* HOME CONTENT */
+.hero{background:linear-gradient(135deg,#22c55e 0%,#15803d 100%);color:white;padding:24px 18px;border-radius:0 0 28px 28px;text-align:center}
+.hero h1{font-size:26px;font-weight:900;line-height:1.2}
+.hero p{font-size:14px;opacity:.95;margin:10px 0 16px;line-height:1.5}
+.heroBtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hBtn{padding:14px;border-radius:12px;font-weight:900;border:none;cursor:pointer;font-size:13px}
+.hBtn.white{background:white;color:#15803d}
+.hBtn.yellow{background:#facc15;color:#000}
+.content{padding:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:white;border-radius:16px;padding:16px;border:1px solid #e5e7eb}
+.cardTitle{font-weight:900;font-size:14px;margin-bottom:6px}
+.cardText{font-size:12px;color:#6b7280;line-height:1.4}
+.actionBtn{width:100%;padding:12px;border-radius:10px;font-weight:900;border:2px solid;font-size:13px;cursor:pointer;margin-top:10px}
 </style>
 </head>
 <body>
-<div class="top"><b>🤖 AI Support - Answers ANY Question - Storage + Realtime DB + Firestore</b><div style="display:flex;gap:6px"><button class="btn btnGr" style="background:white;color:#16a34a;padding:6px 10px" onclick="setOpenAIKey()">🔑 Set OpenAI Key (Optional)</button><button class="btn btnGr" style="background:white;color:#16a34a;padding:6px 10px" onclick="location.href='index.html'">🏠 Home</button></div></div>
-<div style="padding:8px;background:#fffbeb;border-bottom:1px solid #facc15;font-size:10px;text-align:center"><b>NEW AI - Not limited to specific questions - Answers ANY question about Love Care Global, Firebase, Paystack, 8 countries, booking, nurse, withdrawal, GPS, CEO, etc + General care questions</b><br><span class="small">Powered by Knowledge Base + OpenAI/Gemini optional + Local Smart AI fallback - All chats saved to Realtime DB ai_support_chats + Firestore ai_support_chats + ai_support_analytics - All 3 Firebase!</span></div>
-<div class="chat" id="chatBox">
-<div style="margin:8px 0;padding:10px 12px;border-radius:12px;background:white;border:1px solid #e5e7eb;font-size:12px;max-width:85%">👋 Hi! I'm Love Care Global AI Support - NEW version - I answer ANY question, not just specific ones!<br><br>Ask me anything:<br>- How to book nurse? (Client must register + login before booking - book-nurse.html has blocker)<br>- Nurse registration 8 countries + 6 files to Storage + Realtime DB + Firestore + CEO approval?<br>- Pricing in 8 countries? Paystack pk_live_f17ae...?<br>- Firebase Storage + Realtime DB + Firestore structure?<br>- Withdrawal methods Momo+Debit+Virtual vs Virtual+Debit+PayPal?<br>- GPS Map + Google Map directions?<br>- CEO Dashboard approval viewing Storage URLs?<br>- Client cannot book without login fix?<br>- Nurse cannot login until CEO approves?<br><br>Try: "How does booking work?" or "What is withdrawal?" or "Explain Firebase" or ANY question!</div>
+
+<div class="topbar">
+  <div class="left">
+    <button class="menuBtn" onclick="openDrawer()">☰</button>
+    <div class="brand">LOVE CARE<br>GLOBAL</div>
+  </div>
+  <div class="right">
+    <a class="sosTop" href="sos.html">SOS</a>
+    <button class="dotsBtn" onclick="toggleDots(event)">⋮</button>
+  </div>
 </div>
-<div class="inputArea">
-<input type="text" id="userInput" placeholder="Ask ANY question - Not limited - e.g., How to book? Pricing? Firebase? Withdrawal? GPS? CEO?" onkeypress="handleKey(event)">
-<button class="btn btnG" onclick="sendMessage()">Send</button>
+
+<div id="dotsMenu">
+  <div class="dotsItem" onclick="openDrawer()">📋 Menu</div>
+  <div class="dotsItem" onclick="location.href='sos.html'">🚨 SOS Emergency</div>
+  <div class="dotsItem" onclick="location.href='settings.html'">⚙️ Settings</div>
+  <div class="dotsItem exit" onclick="doExit()">❌ Exit App</div>
 </div>
-<div style="padding:6px;background:#f0fdf4;text-align:center;font-size:9px;border-top:1px solid #bbf7d0">AI Support saves to: Storage (if voice) + Realtime DB ai_support_chats/{clientId} + Firestore ai_support_chats + ai_support_analytics - All 3 Firebase - CEO can view chats in ceo-dashboard.html - OpenAI key optional - Local Smart AI answers ANY question without API key!</div>
+
+<div id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<div id="drawer">
+  <div class="drawerHeader"><h3>LOVE CARE GLOBAL</h3><p>Home Nursing • 24/7 Care • Ghana</p></div>
+  <div class="drawerBody">
+    <div class="drawerLabel">MAIN</div>
+    <a class="drawerItem" href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEiPgo8dGl0bGU+TG92ZSBDYXJlIEdsb2JhbDwvdGl0bGU+CjxsaW5rIHJlbD0ibWFuaWZlc3QiIGhyZWY9Im1hbmlmZXN0Lmpzb24iPgo8c3R5bGU+Cip7Ym94LXNpemluZzpib3JkZXItYm94O21hcmdpbjowO3BhZGRpbmc6MH0KYm9keXtmb250LWZhbWlseTpJbnRlcixzeXN0ZW0tdWksc2Fucy1zZXJpZjtiYWNrZ3JvdW5kOiNmOGZhZmM7Y29sb3I6IzExMTgyN30KLnRvcGJhcntiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCg5MGRlZywjMjJjNTVlLCMxNmEzNGEpO3BhZGRpbmc6MTJweCAxNHB4O2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47Y29sb3I6d2hpdGU7cG9zaXRpb246c3RpY2t5O3RvcDowO3otaW5kZXg6MTAwfQoubGVmdHtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDoxMHB4fQoubWVudUJ0bnt3aWR0aDo0MnB4O2hlaWdodDo0MnB4O2JhY2tncm91bmQ6I2ZhY2MxNTtib3JkZXItcmFkaXVzOjEycHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2ZvbnQtc2l6ZToyMnB4O2NvbG9yOiMwMDA7Zm9udC13ZWlnaHQ6OTAwO2JvcmRlcjpub25lO2N1cnNvcjpwb2ludGVyfQouYnJhbmR7Zm9udC13ZWlnaHQ6OTAwO2ZvbnQtc2l6ZToxNXB4O2xpbmUtaGVpZ2h0OjF9Ci5yaWdodHtkaXNwbGF5OmZsZXg7Z2FwOjhweDthbGlnbi1pdGVtczpjZW50ZXJ9Ci5zb3NUb3B7YmFja2dyb3VuZDojZWY0NDQ0O2NvbG9yOndoaXRlO3BhZGRpbmc6OHB4IDE0cHg7Ym9yZGVyLXJhZGl1czo5OTlweDtmb250LXdlaWdodDo5MDA7Zm9udC1zaXplOjEycHg7Ym9yZGVyOm5vbmU7Y3Vyc29yOnBvaW50ZXI7dGV4dC1kZWNvcmF0aW9uOm5vbmV9Ci5kb3RzQnRue2JhY2tncm91bmQ6cmdiYSgyNTUsMjU1LDI1NSwwLjI1KTtjb2xvcjp3aGl0ZTt3aWR0aDozNHB4O2hlaWdodDozNHB4O2JvcmRlci1yYWRpdXM6NTAlO2JvcmRlcjpub25lO2ZvbnQtd2VpZ2h0OjkwMDtmb250LXNpemU6MjJweDtjdXJzb3I6cG9pbnRlcn0KI2RyYXdlck92ZXJsYXl7ZGlzcGxheTpub25lO3Bvc2l0aW9uOmZpeGVkO2luc2V0OjA7YmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuNSk7ei1pbmRleDoyMDB9CiNkcmF3ZXJPdmVybGF5LnNob3d7ZGlzcGxheTpibG9ja30KI2RyYXdlcntwb3NpdGlvbjpmaXhlZDtsZWZ0OjA7dG9wOjA7Ym90dG9tOjA7d2lkdGg6MzEwcHg7YmFja2dyb3VuZDp3aGl0ZTt6LWluZGV4OjMwMDt0cmFuc2Zvcm06dHJhbnNsYXRlWCgtMTAwJSk7dHJhbnNpdGlvbjp0cmFuc2Zvcm0gLjNzIGVhc2U7ZGlzcGxheTpmbGV4O2ZsZXgtZGlyZWN0aW9uOmNvbHVtbjtib3gtc2hhZG93OjRweCAwIDI0cHggcmdiYSgwLDAsMCwwLjMpfQojZHJhd2VyLm9wZW57dHJhbnNmb3JtOnRyYW5zbGF0ZVgoMCl9Ci5kcmF3ZXJIZWFkZXJ7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsIzIyYzU1ZSwjMTZhMzRhKTtwYWRkaW5nOjE4cHggMTZweDtjb2xvcjp3aGl0ZX0KLmRyYXdlckhlYWRlciBoM3tmb250LXdlaWdodDo5MDA7Zm9udC1zaXplOjE4cHh9Ci5kcmF3ZXJCb2R5e2ZsZXg6MTtvdmVyZmxvdy15OmF1dG87cGFkZGluZzoxMHB4fQouZHJhd2VySXRlbXtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDoxMnB4O3BhZGRpbmc6MTJweCAxNHB4O2JvcmRlci1yYWRpdXM6MTFweDttYXJnaW46NHB4IDA7Zm9udC13ZWlnaHQ6ODAwO2ZvbnQtc2l6ZToxM3B4O3RleHQtZGVjb3JhdGlvbjpub25lO2NvbG9yOiMxMTE4Mjc7Ym9yZGVyOjFweCBzb2xpZCAjZTVlN2ViO2JhY2tncm91bmQ6d2hpdGV9Ci5kcmF3ZXJJdGVtLmNsaWVudHtiYWNrZ3JvdW5kOiNmMGY5ZmY7Ym9yZGVyLWNvbG9yOiNiYWU2ZmQ7Y29sb3I6IzAzNjlhMX0KLmRyYXdlckl0ZW0ubnVyc2V7YmFja2dyb3VuZDojZjVmM2ZmO2JvcmRlci1jb2xvcjojZGRkNmZlO2NvbG9yOiM1YjIxYjZ9Ci5kcmF3ZXJJdGVtLnNvc0l0ZW17Ym9yZGVyLWNvbG9yOiNmZWNhY2E7YmFja2dyb3VuZDojZmVmMmYyO2NvbG9yOiNkYzI2MjZ9Ci5kcmF3ZXJMYWJlbHtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo5MDA7Y29sb3I6IzljYTNhZjtwYWRkaW5nOjEwcHggNnB4IDRweDtsZXR0ZXItc3BhY2luZzouNnB4fQouZHJhd2VyRGl2aWRlcntoZWlnaHQ6MXB4O2JhY2tncm91bmQ6I2U1ZTdlYjttYXJnaW46OHB4IDB9Ci5jbG9zZUJ0bnt3aWR0aDoxMDAlO3BhZGRpbmc6MTRweDtiYWNrZ3JvdW5kOiMxMTE4Mjc7Y29sb3I6d2hpdGU7Ym9yZGVyOm5vbmU7Ym9yZGVyLXJhZGl1czoxMnB4O2ZvbnQtd2VpZ2h0OjkwMDtjdXJzb3I6cG9pbnRlcn0KLmRyYXdlckZvb3RlcntwYWRkaW5nOjEycHg7Ym9yZGVyLXRvcDoxcHggc29saWQgI2U1ZTdlYn0KI2RvdHNNZW51e2Rpc3BsYXk6bm9uZTtwb3NpdGlvbjphYnNvbHV0ZTtyaWdodDoxNHB4O3RvcDo1OHB4O2JhY2tncm91bmQ6d2hpdGU7Ym9yZGVyLXJhZGl1czoxNHB4O2JveC1zaGFkb3c6MCAxMnB4IDI4cHggcmdiYSgwLDAsMCwuMTgpO2JvcmRlcjoxcHggc29saWQgI2U1ZTdlYjt6LWluZGV4OjE1MDttaW4td2lkdGg6MTkwcHg7b3ZlcmZsb3c6aGlkZGVufQojZG90c01lbnUuc2hvd3tkaXNwbGF5OmJsb2NrfQouZG90c0l0ZW17cGFkZGluZzoxM3B4IDE0cHg7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwO2Rpc3BsYXk6ZmxleDtnYXA6MTBweDtjb2xvcjojMTExODI3O2JvcmRlci1ib3R0b206MXB4IHNvbGlkICNmM2Y0ZjY7Y3Vyc29yOnBvaW50ZXJ9Ci5kb3RzSXRlbS5leGl0e2NvbG9yOiNlZjQ0NDR9Ci8qIEhPTUUgQ09OVEVOVCAqLwouaGVyb3tiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsIzIyYzU1ZSAwJSwjMTU4MDNkIDEwMCUpO2NvbG9yOndoaXRlO3BhZGRpbmc6MjRweCAxOHB4O2JvcmRlci1yYWRpdXM6MCAwIDI4cHggMjhweDt0ZXh0LWFsaWduOmNlbnRlcn0KLmhlcm8gaDF7Zm9udC1zaXplOjI2cHg7Zm9udC13ZWlnaHQ6OTAwO2xpbmUtaGVpZ2h0OjEuMn0KLmhlcm8gcHtmb250LXNpemU6MTRweDtvcGFjaXR5Oi45NTttYXJnaW46MTBweCAwIDE2cHg7bGluZS1oZWlnaHQ6MS41fQouaGVyb0J0bnN7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDoxMHB4fQouaEJ0bntwYWRkaW5nOjE0cHg7Ym9yZGVyLXJhZGl1czoxMnB4O2ZvbnQtd2VpZ2h0OjkwMDtib3JkZXI6bm9uZTtjdXJzb3I6cG9pbnRlcjtmb250LXNpemU6MTNweH0KLmhCdG4ud2hpdGV7YmFja2dyb3VuZDp3aGl0ZTtjb2xvcjojMTU4MDNkfQouaEJ0bi55ZWxsb3d7YmFja2dyb3VuZDojZmFjYzE1O2NvbG9yOiMwMDB9Ci5jb250ZW50e3BhZGRpbmc6MTRweH0KLmdyaWQye2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmcjtnYXA6MTBweH0KLmNhcmR7YmFja2dyb3VuZDp3aGl0ZTtib3JkZXItcmFkaXVzOjE2cHg7cGFkZGluZzoxNnB4O2JvcmRlcjoxcHggc29saWQgI2U1ZTdlYn0KLmNhcmRUaXRsZXtmb250LXdlaWdodDo5MDA7Zm9udC1zaXplOjE0cHg7bWFyZ2luLWJvdHRvbTo2cHh9Ci5jYXJkVGV4dHtmb250LXNpemU6MTJweDtjb2xvcjojNmI3MjgwO2xpbmUtaGVpZ2h0OjEuNH0KLmFjdGlvbkJ0bnt3aWR0aDoxMDAlO3BhZGRpbmc6MTJweDtib3JkZXItcmFkaXVzOjEwcHg7Zm9udC13ZWlnaHQ6OTAwO2JvcmRlcjoycHggc29saWQ7Zm9udC1zaXplOjEzcHg7Y3Vyc29yOnBvaW50ZXI7bWFyZ2luLXRvcDoxMHB4fQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5PgoKPGRpdiBjbGFzcz0idG9wYmFyIj4KICA8ZGl2IGNsYXNzPSJsZWZ0Ij4KICAgIDxidXR0b24gY2xhc3M9Im1lbnVCdG4iIG9uY2xpY2s9Im9wZW5EcmF3ZXIoKSI+4piwPC9idXR0b24+CiAgICA8ZGl2IGNsYXNzPSJicmFuZCI+TE9WRSBDQVJFPGJyPkdMT0JBTDwvZGl2PgogIDwvZGl2PgogIDxkaXYgY2xhc3M9InJpZ2h0Ij4KICAgIDxhIGNsYXNzPSJzb3NUb3AiIGhyZWY9InNvcy5odG1sIj5TT1M8L2E+CiAgICA8YnV0dG9uIGNsYXNzPSJkb3RzQnRuIiBvbmNsaWNrPSJ0b2dnbGVEb3RzKGV2ZW50KSI+4ouuPC9idXR0b24+CiAgPC9kaXY+CjwvZGl2PgoKPGRpdiBpZD0iZG90c01lbnUiPgogIDxkaXYgY2xhc3M9ImRvdHNJdGVtIiBvbmNsaWNrPSJvcGVuRHJhd2VyKCkiPvCfk4sgTWVudTwvZGl2PgogIDxkaXYgY2xhc3M9ImRvdHNJdGVtIiBvbmNsaWNrPSJsb2NhdGlvbi5ocmVmPSdzb3MuaHRtbCciPvCfmqggU09TIEVtZXJnZW5jeTwvZGl2PgogIDxkaXYgY2xhc3M9ImRvdHNJdGVtIiBvbmNsaWNrPSJsb2NhdGlvbi5ocmVmPSdzZXR0aW5ncy5odG1sJyI+4pqZ77iPIFNldHRpbmdzPC9kaXY+CiAgPGRpdiBjbGFzcz0iZG90c0l0ZW0gZXhpdCIgb25jbGljaz0iZG9FeGl0KCkiPuKdjCBFeGl0IEFwcDwvZGl2Pgo8L2Rpdj4KCjxkaXYgaWQ9ImRyYXdlck92ZXJsYXkiIG9uY2xpY2s9ImNsb3NlRHJhd2VyKCkiPjwvZGl2PgoKPGRpdiBpZD0iZHJhd2VyIj4KICA8ZGl2IGNsYXNzPSJkcmF3ZXJIZWFkZXIiPjxoMz5MT1ZFIENBUkUgR0xPQkFMPC9oMz48cD5Ib21lIE51cnNpbmcg4oCiIDI0LzcgQ2FyZSDigKIgR2hhbmE8L3A+PC9kaXY+CiAgPGRpdiBjbGFzcz0iZHJhd2VyQm9keSI+CiAgICA8ZGl2IGNsYXNzPSJkcmF3ZXJMYWJlbCI+TUFJTjwvZGl2PgogICAgPGEgY2xhc3M9ImRyYXdlckl0ZW0iIGhyZWY9ImluZGV4Lmh0bWwiIHN0eWxlPSJib3JkZXItY29sb3I6IzE2YTM0YTtiYWNrZ3JvdW5kOiNmMGZkZjQiPvCfj6AgSG9tZTwvYT4KICAgIDxhIGNsYXNzPSJkcmF3ZXJJdGVtIiBocmVmPSJib29rLW51cnNlLmh0bWwiPvCfk4UgQm9vayBOdXJzZTwvYT4KICAgIDxhIGNsYXNzPSJkcmF3ZXJJdGVtIiBocmVmPSJmaW5kLW51cnNlLmh0bWwiPvCflI0gRmluZCBOdXJzZTwvYT4KCiAgICA8ZGl2IGNsYXNzPSJkcmF3ZXJMYWJlbCI+Q0xJRU5UPC9kaXY+CiAgICA8YSBjbGFzcz0iZHJhd2VySXRlbSBjbGllbnQiIGhyZWY9ImNsaWVudC1yZWdpc3Rlci5odG1sIj7wn5GkIENsaWVudCBSZWdpc3RyYXRpb248L2E+CiAgICA8YSBjbGFzcz0iZHJhd2VySXRlbSBjbGllbnQiIGhyZWY9ImNsaWVudC1sb2dpbi5odG1sIj7wn5SQIENsaWVudCBMb2dpbjwvYT4KICAgIDxhIGNsYXNzPSJkcmF3ZXJJdGVtIGNsaWVudCIgaHJlZj0iY2xpZW50LWRhc2hib2FyZC5odG1sIj7wn5OKIERhc2hib2FyZDwvYT4KICAgIDxhIGNsYXNzPSJkcmF3ZXJJdGVtIGNsaWVudCIgaHJlZj0iY2xpZW50LWJvb2tpbmdzLmh0bWwiPvCfk50gTXkgQm9va2luZ3M8L2E+CiAgICA8YSBjbGFzcz0iZHJhd2VySXRlbSBjbGllbnQiIGhyZWY9InNldHRpbmdzLmh0bWwiPuKame+4jyBTZXR0aW5nczwvYT4KCiAgICA8ZGl2IGNsYXNzPSJkcmF3ZXJMYWJlbCI+TlVSU0UgLSA2IERPQ1M8L2Rpdj4KICAgIDxhIGNsYXNzPSJkcmF3ZXJJdGVtIG51cnNlIiBocmVmPSJudXJzZS1sb2dpbi5odG1sIj7wn5SQIE51cnNlIExvZ2luPC9hPgogICAgPGEgY2xhc3M9ImRyYXdlckl0ZW0gbnVyc2UiIGhyZWY9Im51cnNlLWRhc2hib2FyZC5odG1sIj7wn5Gp4oCN4pqV77iPIE51cnNlIERhc2hib2FyZDwvYT4KICAgIDxhIGNsYXNzPSJkcmF3ZXJJdGVtIG51cnNlIiBocmVmPSJudXJzZS1yZWdpc3RyYXRpb24uaHRtbCI+TnVyc2UgUHVibGljPC9hPgogICAgPGEgY2xhc3M9ImRyYXdlckl0ZW0gbnVyc2UiIGhyZWY9Im51cnNlcy1ncm91cC1jaGF0Lmh0bWwiPvCfkqwgR3JvdXAgQ2hhdDwvYT4KCiAgICA8ZGl2IGNsYXNzPSJkcmF3ZXJEaXZpZGVyIj48L2Rpdj4KICAgIDxhIGNsYXNzPSJkcmF3ZXJJdGVtIHNvc0l0ZW0iIGhyZWY9InNvcy5odG1sIj7wn5qoIEVtZXJnZW5jeSBTT1M8L2E+CiAgICA8YSBjbGFzcz0iZHJhd2VySXRlbSIgaHJlZj0iY29udGFjdC5odG1sIj7wn5OeIENvbnRhY3QgU3VwcG9ydDwvYT4KICAgIDxhIGNsYXNzPSJkcmF3ZXJJdGVtIiBocmVmPSJhYm91dC5odG1sIj7ihLnvuI8gQWJvdXQ8L2E+CiAgICA8YSBjbGFzcz0iZHJhd2VySXRlbSIgaHJlZj0icHJpdmFjeS5odG1sIj7wn5SSIFByaXZhY3kgJiBUZXJtczwvYT4KICAgIDxkaXYgY2xhc3M9ImRyYXdlckRpdmlkZXIiPjwvZGl2PgogICAgPGRpdiBjbGFzcz0iZHJhd2VySXRlbSIgb25jbGljaz0iZG9FeGl0KCkiIHN0eWxlPSJjb2xvcjojZWY0NDQ0O2JvcmRlci1jb2xvcjojZmVjYWNhO2JhY2tncm91bmQ6I2ZlZjJmMiI+4p2MIEV4aXQgQXBwPC9kaXY+CiAgPC9kaXY+CiAgPGRpdiBjbGFzcz0iZHJhd2VyRm9vdGVyIj48YnV0dG9uIGNsYXNzPSJjbG9zZUJ0biIgb25jbGljaz0iY2xvc2VEcmF3ZXIoKSI+4pyVIENsb3NlPC9idXR0b24+PC9kaXY+CjwvZGl2PgoKPCEtLSBIT01FIE5PVyBGVUxMIC0gTk9UIEVNUFRZIC0tPgo8ZGl2IGNsYXNzPSJoZXJvIj4KICA8aDE+UHJvZmVzc2lvbmFsIEhvbWUgTnVyc2luZywgQW55dGltZSDinaTvuI88L2gxPgogIDxwPlRydXN0ZWQgbnVyc2VzIOKAoiAxMyBzZXJ2aWNlcyDigKIgVmVyaWZpZWQgd2l0aCBDViwgQ2VydGlmaWNhdGUsIExpY2VuY2UsIFBob3RvICYgSUQ8L3A+CiAgPGRpdiBjbGFzcz0iaGVyb0J0bnMiPgogICAgPGJ1dHRvbiBjbGFzcz0iaEJ0biB3aGl0ZSIgb25jbGljaz0ibG9jYXRpb24uaHJlZj0nYm9vay1udXJzZS5odG1sJyI+8J+ThSBCb29rIGEgTnVyc2U8L2J1dHRvbj4KICAgIDxidXR0b24gY2xhc3M9ImhCdG4geWVsbG93IiBvbmNsaWNrPSJsb2NhdGlvbi5ocmVmPSdjbGllbnQtcmVnaXN0ZXIuaHRtbCciPvCfkaQgSm9pbiBhcyBDbGllbnQ8L2J1dHRvbj4KICA8L2Rpdj4KPC9kaXY+Cgo8ZGl2IGNsYXNzPSJjb250ZW50Ij4KICA8ZGl2IGNsYXNzPSJncmlkMiI+CiAgICA8ZGl2IGNsYXNzPSJjYXJkIj4KICAgICAgPGRpdiBjbGFzcz0iY2FyZFRpdGxlIj7wn5GkIEZvciBDbGllbnRzPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImNhcmRUZXh0Ij5SZWdpc3Rlciwgc2V0IGVtZXJnZW5jeSBjb250YWN0ICYgYm9vayB2ZXJpZmllZCBudXJzZXM8L2Rpdj4KICAgICAgPGJ1dHRvbiBjbGFzcz0iYWN0aW9uQnRuIiBzdHlsZT0iY29sb3I6IzBlYTVlOTtib3JkZXItY29sb3I6IzBlYTVlOTtiYWNrZ3JvdW5kOiNmMGY5ZmYiIG9uY2xpY2s9ImxvY2F0aW9uLmhyZWY9J2NsaWVudC1yZWdpc3Rlci5odG1sJyI+Q2xpZW50IFJlZ2lzdHJhdGlvbjwvYnV0dG9uPgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJjYXJkIj4KICAgICAgPGRpdiBjbGFzcz0iY2FyZFRpdGxlIj7wn46TIEZvciBOdXJzZXM8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iY2FyZFRleHQiPlVwbG9hZCBDViwgdmlkZW8sIGNlcnRpZmljYXRlLCBsaWNlbmNlLCBwaG90bywgR2hhbmEgQ2FyZCAvIERyaXZlcnM8L2Rpdj4KICAgICAgPGJ1dHRvbiBjbGFzcz0iYWN0aW9uQnRuIiBzdHlsZT0iY29sb3I6IzdjM2FlZDtib3JkZXItY29sb3I6IzdjM2FlZDtiYWNrZ3JvdW5kOiNmNWYzZmYiIG9uY2xpY2s9ImxvY2F0aW9uLmhyZWY9J251cnNlLXJlZ2lzdHJhdGlvbi5odG1sJyI+TnVyc2UgUmVnaXN0cmF0aW9uPC9idXR0b24+CiAgICA8L2Rpdj4KICA8L2Rpdj4KCiAgPGRpdiBjbGFzcz0iY2FyZCIgc3R5bGU9Im1hcmdpbi10b3A6MTJweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuIj4KICAgIDxkaXY+PGRpdiBjbGFzcz0iY2FyZFRpdGxlIj7wn5qoIEVtZXJnZW5jeT88L2Rpdj48ZGl2IGNsYXNzPSJjYXJkVGV4dCI+VGFwIFNPUyBmb3IgaW1tZWRpYXRlIGhlbHAgJiBHUFMgc2hhcmluZzwvZGl2PjwvZGl2PgogICAgPGJ1dHRvbiBzdHlsZT0icGFkZGluZzoxMnB4IDE4cHg7YmFja2dyb3VuZDojZWY0NDQ0O2NvbG9yOndoaXRlO2JvcmRlcjpub25lO2JvcmRlci1yYWRpdXM6MTBweDtmb250LXdlaWdodDo5MDAiIG9uY2xpY2s9ImxvY2F0aW9uLmhyZWY9J3Nvcy5odG1sJyI+U09TPC9idXR0b24+CiAgPC9kaXY+CgogIDxkaXYgY2xhc3M9ImdyaWQyIiBzdHlsZT0ibWFyZ2luLXRvcDoxMnB4Ij4KICAgIDxkaXYgY2xhc3M9ImNhcmQiIG9uY2xpY2s9ImxvY2F0aW9uLmhyZWY9J2ZpbmQtbnVyc2UuaHRtbCciIHN0eWxlPSJjdXJzb3I6cG9pbnRlciI+PGRpdiBjbGFzcz0iY2FyZFRpdGxlIj7wn5SNIEZpbmQgTnVyc2U8L2Rpdj48ZGl2IGNsYXNzPSJjYXJkVGV4dCI+TmVhcmJ5IHZlcmlmaWVkIG51cnNlczwvZGl2PjwvZGl2PgogICAgPGRpdiBjbGFzcz0iY2FyZCIgb25jbGljaz0ibG9jYXRpb24uaHJlZj0nYWktc3VwcG9ydC5odG1sJyIgc3R5bGU9ImN1cnNvcjpwb2ludGVyIj48ZGl2IGNsYXNzPSJjYXJkVGl0bGUiPvCfpJYgQUkgU3VwcG9ydDwvZGl2PjxkaXYgY2xhc3M9ImNhcmRUZXh0Ij4yNC83IGhlbHAgJiBxdWVzdGlvbnM8L2Rpdj48L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImNhcmQiIG9uY2xpY2s9ImxvY2F0aW9uLmhyZWY9J2NsaWVudC1kYXNoYm9hcmQuaHRtbCciIHN0eWxlPSJjdXJzb3I6cG9pbnRlciI+PGRpdiBjbGFzcz0iY2FyZFRpdGxlIj7wn5OKIERhc2hib2FyZDwvZGl2PjxkaXYgY2xhc3M9ImNhcmRUZXh0Ij5UcmFjayBib29raW5ncyAmIGNhcmU8L2Rpdj48L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImNhcmQiIG9uY2xpY2s9ImxvY2F0aW9uLmhyZWY9J2NvbnRhY3QuaHRtbCciIHN0eWxlPSJjdXJzb3I6cG9pbnRlciI+PGRpdiBjbGFzcz0iY2FyZFRpdGxlIj7wn5OeIENvbnRhY3Q8L2Rpdj48ZGl2IGNsYXNzPSJjYXJkVGV4dCI+Q2FsbCAmIFdoYXRzQXBwIHN1cHBvcnQ8L2Rpdj48L2Rpdj4KICA8L2Rpdj4KCiAgPGRpdiBjbGFzcz0iY2FyZCIgc3R5bGU9Im1hcmdpbi10b3A6MTJweDt0ZXh0LWFsaWduOmNlbnRlcjtiYWNrZ3JvdW5kOiNmMGZkZjQ7Ym9yZGVyLWNvbG9yOiNiYmY3ZDAiPgogICAgPGRpdiBzdHlsZT0iZm9udC13ZWlnaHQ6OTAwO2NvbG9yOiMxNTgwM2QiPlRydXN0ZWQg4oCiIFZlcmlmaWVkIOKAoiA4NSUgdG8gTnVyc2VzIOKAoiBTZWN1cmU8L2Rpdj4KICAgIDxkaXYgc3R5bGU9ImZvbnQtc2l6ZToxMXB4O2NvbG9yOiMxNjY1MzQ7bWFyZ2luLXRvcDo0cHgiPkNWIOKAoiBWaWRlbyDigKIgQ2VydGlmaWNhdGUg4oCiIExpY2VuY2Ug4oCiIFBob3RvIOKAoiBOYXRpb25hbCBJRCAvIERyaXZlcnMgTGljZW5zZSB2ZXJpZmllZDwvZGl2PgogIDwvZGl2Pgo8L2Rpdj4KCjxzY3JpcHQ+CmZ1bmN0aW9uIG9wZW5EcmF3ZXIoKXtkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZHJhd2VyJykuY2xhc3NMaXN0LmFkZCgnb3BlbicpO2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdkcmF3ZXJPdmVybGF5JykuY2xhc3NMaXN0LmFkZCgnc2hvdycpO30KZnVuY3Rpb24gY2xvc2VEcmF3ZXIoKXtkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZHJhd2VyJykuY2xhc3NMaXN0LnJlbW92ZSgnb3BlbicpO2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdkcmF3ZXJPdmVybGF5JykuY2xhc3NMaXN0LnJlbW92ZSgnc2hvdycpO30KZnVuY3Rpb24gdG9nZ2xlRG90cyhlKXtlLnN0b3BQcm9wYWdhdGlvbigpO2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdkb3RzTWVudScpLmNsYXNzTGlzdC50b2dnbGUoJ3Nob3cnKTt9CmRvY3VtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywoKT0+e2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdkb3RzTWVudScpLmNsYXNzTGlzdC5yZW1vdmUoJ3Nob3cnKTt9KTsKZnVuY3Rpb24gZG9FeGl0KCl7aWYoY29uZmlybSgnRXhpdCBMb3ZlIENhcmUgR2xvYmFsPycpKXt3aW5kb3cuY2xvc2UoKTtsb2NhdGlvbi5ocmVmPSdhYm91dDpibGFuayc7fX0KPC9zY3JpcHQ+CjwvYm9keT4KPC9odG1sPgo=" style="border-color:#16a34a;background:#f0fdf4">🏠 Home</a>
+    <a class="drawerItem" href="book-nurse.html">📅 Book Nurse</a>
+    <a class="drawerItem" href="find-nurse.html">🔍 Find Nurse</a>
+
+    <div class="drawerLabel">CLIENT</div>
+    <a class="drawerItem client" href="./client-register.html">👤 Client Registration</a>
+    <a class="drawerItem client" href="./client-login.html">🔐 Client Login</a>
+    <a class="drawerItem client" href="./client-dashboard.html">📊 Dashboard</a>
+    <a class="drawerItem client" href="client-bookings.html">📝 My Bookings</a>
+    <a class="drawerItem client" href="settings.html">⚙️ Settings</a>
+
+    <div class="drawerLabel">NURSE - 6 DOCS</div>
+    <a class="drawerItem nurse" href="./nurse-login.html">🔐 Nurse Login</a>
+    <a class="drawerItem nurse" href="nurse-dashboard.html">👩‍⚕️ Nurse Dashboard</a>
+    <a class="drawerItem nurse" href="./nurse-registration.html">Nurse Registration</a>
+    <a class="drawerItem nurse" href="nurses-group-chat.html">💬 Group Chat</a>
+
+    <div class="drawerDivider"></div>
+    <a class="drawerItem sosItem" href="sos.html">🚨 Emergency SOS</a>
+    <a class="drawerItem" href="contact.html">📞 Contact Support</a>
+    <a class="drawerItem" href="about.html">ℹ️ About</a>
+    <a class="drawerItem" href="privacy.html">🔒 Privacy & Terms</a>
+    <div class="drawerDivider"></div>
+    <div class="drawerItem" onclick="doExit()" style="color:#ef4444;border-color:#fecaca;background:#fef2f2">❌ Exit App</div>
+  </div>
+  <div class="drawerFooter"><button class="closeBtn" onclick="closeDrawer()">✕ Close</button></div>
+</div>
+
+<!-- HOME NOW FULL - NOT EMPTY -->
+<div class="hero">
+  <h1>Professional Home Nursing, Anytime ❤️</h1>
+  <p>Trusted nurses • 13 services • Verified with CV, Certificate, Licence, Photo & ID</p>
+  <div class="heroBtns">
+    <button class="hBtn white" onclick="location.href='book-nurse.html'">📅 Book a Nurse</button>
+    <button class="hBtn yellow" onclick="location.href='client-register.html'">👤 Join as Client</button>
+  </div>
+</div>
+
+<div class="content">
+  <div class="grid2">
+    <div class="card">
+      <div class="cardTitle">👤 For Clients</div>
+      <div class="cardText">Register, set emergency contact & book verified nurses</div>
+      <button class="actionBtn" style="color:#0ea5e9;border-color:#0ea5e9;background:#f0f9ff" onclick="location.href='client-register.html'">Client Registration</button>
+    </div>
+    <div class="card">
+      <div class="cardTitle">🎓 For Nurses</div>
+      <div class="cardText">Upload CV, video, certificate, licence, photo, Ghana Card / Drivers</div>
+      <button class="actionBtn" style="color:#7c3aed;border-color:#7c3aed;background:#f5f3ff" onclick="location.href='nurse-registration.html'">Nurse Registration</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px;display:flex;align-items:center;justify-content:space-between">
+    <div><div class="cardTitle">🚨 Emergency?</div><div class="cardText">Tap SOS for immediate help & GPS sharing</div></div>
+    <button style="padding:12px 18px;background:#ef4444;color:white;border:none;border-radius:10px;font-weight:900" onclick="location.href='sos.html'">SOS</button>
+  </div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="card" onclick="location.href='find-nurse.html'" style="cursor:pointer"><div class="cardTitle">🔍 Find Nurse</div><div class="cardText">Nearby verified nurses</div></div>
+    <div class="card" onclick="location.href='ai-support.html'" style="cursor:pointer"><div class="cardTitle">🤖 AI Support</div><div class="cardText">24/7 help & questions</div></div>
+    <div class="card" onclick="location.href='client-dashboard.html'" style="cursor:pointer"><div class="cardTitle">📊 Dashboard</div><div class="cardText">Track bookings & care</div></div>
+    <div class="card" onclick="location.href='contact.html'" style="cursor:pointer"><div class="cardTitle">📞 Contact</div><div class="cardText">Call & WhatsApp support</div></div>
+  </div>
+
+  <div class="card" style="margin-top:12px;text-align:center;background:#f0fdf4;border-color:#bbf7d0">
+    <div style="font-weight:900;color:#15803d">Trusted • Verified • 85% to Nurses • Secure</div>
+    <div style="font-size:11px;color:#166534;margin-top:4px">CV • Video • Certificate • Licence • Photo • National ID / Drivers License verified</div>
+  </div>
+</div>
+
+<script>
+function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('show');}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('show');}
+function toggleDots(e){e.stopPropagation();document.getElementById('dotsMenu').classList.toggle('show');}
+document.addEventListener('click',()=>{document.getElementById('dotsMenu').classList.remove('show');});
+function doExit(){if(confirm('Exit Love Care Global?')){window.close();location.href='about:blank';}}
+</script>
 </body>
 </html>
