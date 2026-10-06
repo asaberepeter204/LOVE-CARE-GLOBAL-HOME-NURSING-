@@ -2,277 +2,134 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Dashboard - Bookings + GPS Map - Love Care Global</title>
+<title>Nurse Dashboard</title>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getDatabase, ref as dbRef, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyYOUR_API_KEY",authDomain:"love-care-global.firebaseapp.com",databaseURL:"https://love-care-global-default-rtdb.firebaseio.com",projectId:"love-care-global",storageBucket:"love-care-global.appspot.com",messagingSenderId:"123",appId:"1:123:web:abc"};
+const app=initializeApp(cfg); const storage=getStorage(app); const db=getDatabase(app); const fs=getFirestore(app);
+const nurseId=localStorage.getItem('currentNurseId');
+if(!nurseId) location.href='nurse-login.html';
+window.tab=function(t){
+ document.querySelectorAll('.sec').forEach(s=>s.style.display='none');
+ document.getElementById('sec_'+t).style.display='block';
+ document.querySelectorAll('.tabBtn').forEach(b=>b.classList.remove('active'));
+ document.getElementById('tab_'+t).classList.add('active');
+}
+window.loadProfile=async function(){
+ let snap=await get(dbRef(db,`verified_nurses/${nurseId}`)); let d=snap.val()||{};
+ if(!Object.keys(d).length){ let fsDoc=await getDoc(doc(fs,'verified_nurses',nurseId)); if(fsDoc.exists()) d=fsDoc.data(); }
+ if(!d) return;
+ document.getElementById('p_name').value=d.fullName||''; document.getElementById('p_city').value=d.city||''; document.getElementById('p_bio').value=d.publicBio||'';
+ document.getElementById('p_avail').value=d.availability||'Available';
+ document.getElementById('s_email').value=d.email||''; document.getElementById('s_phone').value=d.phone||''; document.getElementById('s_id').innerText=nurseId;
+ document.getElementById('w_momo').value=d.momoNumber||''; document.getElementById('w_debit').value=d.debitLast4||''; document.getElementById('w_paypal').value=d.paypalEmail||'';
+ // Rating - Read only from clients
+ let ratingSnap=await get(dbRef(db,`nurse_ratings/${nurseId}`)); let ratings=ratingSnap.val()||{};
+ let vals=Object.values(ratings); let avg=0; if(vals.length){ avg=vals.reduce((a,b)=>a+(b.stars||b.rating||0),0)/vals.length; }
+ document.getElementById('ratingDisplay').innerHTML=`⭐ ${avg.toFixed(1)} / 5.0 from ${vals.length} clients`;
+ document.getElementById('starsView').innerText='★'.repeat(Math.round(avg)) + '☆'.repeat(5-Math.round(avg));
+ document.getElementById('publicRatingView').innerText=`Public shows: ${avg.toFixed(1)} stars (${vals.length} reviews) - Cannot be edited - Exact from clients`;
+}
+window.upload=function(file,path){return new Promise((res,rej)=>{const r=sRef(storage,path);const t=uploadBytesResumable(r,file);t.on('state_changed',null,e=>rej(e),async()=>{res({url:await getDownloadURL(t.snapshot.ref),path,name:file.name});});});}
+window.savePublic=async function(){
+ let b=document.getElementById('btnPublic'); b.disabled=true; b.innerText='Saving...';
+ let snap=await get(dbRef(db,`verified_nurses/${nurseId}`)); let data=snap.val()||{};
+ let base=`nurses/${nurseId}/public`; let photoF=document.getElementById('p_photo').files[0]; let publicPhoto=data.publicPhoto||null; if(photoF) publicPhoto=await upload(photoF,`${base}/photo_${Date.now()}`);
+ let updated={...data,id:nurseId,fullName:document.getElementById('p_name').value,city:document.getElementById('p_city').value,publicBio:document.getElementById('p_bio').value,availability:document.getElementById('p_avail').value,publicPhoto,publicUpdatedAt:new Date().toISOString(),status:'APPROVED'};
+ await set(dbRef(db,`verified_nurses/${nurseId}`),updated); await setDoc(doc(fs,'verified_nurses',nurseId),{...updated,updatedAt:serverTimestamp()},{merge:true}); alert('Public saved'); b.disabled=false; b.innerText='Save Public Info';
+}
+window.savePayout=async function(){
+ let b=document.getElementById('btnPayout'); b.disabled=true; b.innerText='Saving...';
+ let snap=await get(dbRef(db,`verified_nurses/${nurseId}`)); let data=snap.val()||{};
+ let upd={...data,momoNumber:document.getElementById('w_momo').value,debitLast4:document.getElementById('w_debit').value,paypalEmail:document.getElementById('w_paypal').value};
+ await set(dbRef(db,`verified_nurses/${nurseId}`),upd); await setDoc(doc(fs,'verified_nurses',nurseId),upd,{merge:true}); await set(dbRef(db,`withdrawal_methods/${nurseId}`),upd); alert('Payout saved'); b.disabled=false; b.innerText='Save Payouts';
+}
+window.saveEmail=async function(){
+ let newEmail=document.getElementById('s_email').value.trim().toLowerCase(); if(!newEmail){alert('Enter email');return;}
+ let b=document.getElementById('btnEmail'); b.disabled=true; b.innerText='Saving...';
+ let snap=await get(dbRef(db,`verified_nurses/${nurseId}`)); let data=snap.val()||{}; data.email=newEmail;
+ await set(dbRef(db,`verified_nurses/${nurseId}`),data); await setDoc(doc(fs,'verified_nurses',nurseId),{email:newEmail},{merge:true}); localStorage.setItem('currentNurseEmail',newEmail); alert('Email changed'); b.disabled=false; b.innerText='Change Email';
+}
+window.savePassword=async function(){
+ let oldP=document.getElementById('s_old').value; let newP=document.getElementById('s_new').value; let conf=document.getElementById('s_conf').value;
+ if(!oldP||!newP){alert('Fill');return;} if(newP!==conf){alert('No match');return;} if(newP.length<6){alert('Min 6');return;}
+ let b=document.getElementById('btnPass'); b.disabled=true; b.innerText='Saving...';
+ let snap=await get(dbRef(db,`verified_nurses/${nurseId}`)); let data=snap.val()||{}; if(data.password && data.password!==oldP){alert('Old wrong'); b.disabled=false; b.innerText='Change Password'; return;}
+ data.password=newP; await set(dbRef(db,`verified_nurses/${nurseId}`),data); await setDoc(doc(fs,'verified_nurses',nurseId),{password:newP},{merge:true}); alert('Password changed'); document.getElementById('s_old').value=''; document.getElementById('s_new').value=''; document.getElementById('s_conf').value=''; b.disabled=false; b.innerText='Change Password';
+}
+window.addEventListener('DOMContentLoaded',()=>{loadProfile(); tab('public');});
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc}
-.top{padding:12px;background:linear-gradient(90deg,#22c55e,#16a34a);color:white;display:flex;justify-content:space-between;position:sticky;top:0;z-index:99}
-.tabBar{display:flex;gap:5px;padding:10px;background:white;border-bottom:1px solid #e5e7eb;overflow:auto;position:sticky;top:48px;z-index:98}
-.tab{padding:10px 14px;border-radius:10px;font-weight:900;font-size:11px;white-space:nowrap;border:1px solid #e5e7eb;background:white;cursor:pointer}
-.tab.active{background:#16a34a;color:white}
-.content{max-width:650px;margin:auto;padding:12px}
-.card{background:white;border-radius:14px;padding:14px;border:1px solid #e5e7eb;margin-bottom:10px}
-label{font-size:12px;font-weight:800;margin:8px 0 4px;display:block}
-input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1.5px solid #e5e7eb;font-size:13px}
-.btn{width:100%;padding:12px;border-radius:11px;font-weight:900;border:none;cursor:pointer;margin-top:8px;font-size:13px}
-.btnG{background:#16a34a;color:white}.btnY{background:#facc15;color:#000}.btnR{background:#ef4444;color:white}.btnGr{background:#f3f4f6;border:1px solid #e5e7eb}.btnB{background:#3b82f6;color:white}
-.methodCard{border:2px solid #e5e7eb;border-radius:12px;padding:12px;margin:8px 0;cursor:pointer}
-.methodCard.sel{border-color:#16a34a;background:#f0fdf4}
-.methodCard.hiddenMethod{display:none}
-.hide{display:none}.small{font-size:11px;color:#6b7280;line-height:1.4;margin-top:4px}
-.badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900;margin:2px}
-.jobCard{border:2px solid #e5e7eb;border-radius:12px;padding:12px;margin:8px 0;background:white}
-.jobCard.new{border-color:#facc15;background:#fffbeb}
-.jobCard.accepted{border-color:#16a34a;background:#f0fdf4}
-.jobCard.rejected{border-color:#ef4444;background:#fef2f2;opacity:0.7}
-.mapFrame{width:100%;height:200px;border:none;border-radius:10px;margin-top:8px;border:2px solid #bae6fd}
+.h{padding:12px;background:#16a34a;color:white;display:flex;justify-content:space-between;position:sticky;top:0;z-index:10}
+.c{max-width:600px;margin:auto;padding:10px;padding-bottom:80px}
+.card{background:white;border-radius:10px;padding:12px;border:1px solid #e5e7eb;margin-bottom:10px}
+label{font-size:11px;font-weight:700;margin:6px 0 3px;display:block}
+input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:12px}
+.btn{width:100%;padding:11px;border-radius:10px;font-weight:800;border:none;cursor:pointer;margin-top:8px}
+.green{background:#16a34a;color:white}.orange{background:#f97316;color:white}.light{background:#f3f4f6;border:1px solid #e5e7eb}
+.tabs{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #e5e7eb;display:flex;padding:6px;gap:6px}
+.tabBtn{flex:1;padding:10px;border-radius:10px;border:1px solid #e5e7eb;background:#f9fafb;font-weight:800;font-size:11px}
+.tabBtn.active{background:#16a34a;color:white;border-color:#16a34a}
+.sec{display:none}
+.ro{background:#fefce8;border:1px solid #fde047;padding:10px;border-radius:8px;font-size:11px}
+.stars{font-size:18px;color:#f59e0b}
 </style>
 </head>
 <body>
-<div class="top"><b>👩‍⚕️ Nurse Dashboard - Jobs + GPS Map</b><button onclick="location.href='index.html'" style="background:white;color:#16a34a;border:none;padding:6px 12px;border-radius:8px;font-weight:900">🏠 Home</button></div>
-<div class="tabBar">
-<div class="tab active" id="tabOverview" onclick="showTab('overview')">Overview</div>
-<div class="tab" id="tabBookings" onclick="showTab('bookings')">📅 Bookings (Jobs)</div>
-<div class="tab" id="tabWithdrawal" onclick="showTab('withdrawal')">💳 Withdrawal</div>
-<div class="tab" id="tabEarnings" onclick="showTab('earnings')">Earnings</div>
-<div class="tab" id="tabProfile" onclick="showTab('profile')">Profile</div>
-</div>
-<div class="content">
+<div class="h"><b>Nurse Dashboard</b><button style="background:white;color:#16a34a;border:none;padding:6px 12px;border-radius:8px;font-weight:800" onclick="localStorage.clear();location.href='nurse-login.html'">Logout</button></div>
+<div class="c">
 
-<div id="overview">
-<div class="card" style="background:linear-gradient(90deg,#22c55e,#16a34a);color:white">
-<b>Welcome <span id="nurseName">Nurse</span>! ✅</b><br><span style="font-size:11px">When client books you from map + pays Paystack, job appears in Bookings tab → Accept/Reject → If Accept, Client GPS + Google Map directions auto opens</span>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
-<div style="background:rgba(255,255,255,0.2);padding:10px;border-radius:10px;text-align:center"><b id="bookCount">0</b><br><span style="font-size:10px">Jobs</span></div>
-<div style="background:rgba(255,255,255,0.2);padding:10px;border-radius:10px;text-align:center"><b id="earnCount">$0</b><br><span style="font-size:10px">Earnings 85%</span></div>
-<div style="background:rgba(255,255,255,0.2);padding:10px;border-radius:10px;text-align:center"><b id="newJobs">0</b><br><span style="font-size:10px">New Jobs</span></div>
-</div>
-</div>
-<div class="card" style="border:2px solid #facc15"><b>⚠️ New Job? Go to Bookings Tab → Accept → GPS Map Shows → Go to Client</b><button class="btn btnG" onclick="showTab('bookings')">📅 View My Jobs (Bookings) → Accept/Reject + GPS Map</button></div>
-<div class="card"><b>Recent Jobs</b><div id="recentBookings" style="font-size:12px">No jobs yet - Client books from book-nurse.html</div></div>
-</div>
-
-<!-- BOOKINGS - JOB RECEIVING + ACCEPT/REJECT + GPS MAP DIRECTIONS -->
-<div id="bookings" class="hide">
-<div class="card" style="background:linear-gradient(90deg,#fef3c7,#fffbeb);border:2px solid #facc15">
-<b>📅 My Jobs - When Client Books You (Auto from book-nurse)</b>
-<div class="small">Client selects you from Google Map → Selects Live-out/Live-in/Hourly → Pays Paystack pk_live_f17ae09... → Booking auto appears here → You Accept or Reject → If Accept, client GPS shown + Google Map opens for directions to go</div>
-<div style="margin-top:8px;display:flex;gap:6px">
-<button class="btnGr btn" style="padding:8px 12px;font-size:11px;width:auto" onclick="loadBookings()">🔄 Refresh Jobs</button>
-<button class="btnGr btn" style="padding:8px 12px;font-size:11px;width:auto" onclick="clearTestBookings()">🗑️ Clear Test</button>
-<span class="badge" style="background:#facc15">NEW = Accept/Reject</span>
-<span class="badge" style="background:#16a34a;color:white">ACCEPTED = GPS Map + Directions</span>
-</div>
-</div>
-
-<div id="bookingList"></div>
-
-<div class="card" style="border:2px dashed #3b82f6">
-<b>🧪 Test Booking - For Testing Accept + GPS Map</b>
-<div class="small">Click to create test job with GPS to test Accept → Google Map directions</div>
-<button class="btn btnB" onclick="createTestBooking()">➕ Create Test Job with GPS (Accra)</button>
-</div>
-</div>
-
-<!-- WITHDRAWAL -->
-<div id="withdrawal" class="hide">
-<div class="card" style="background:linear-gradient(90deg,#dcfce7,#f0fdf4);border:2px solid #16a34a">
-<b>💳 Salary Withdrawal - Select Country First</b>
-<div id="logicInfo" style="margin-top:8px;padding:8px;background:#fffbeb;border-radius:8px;border:1px solid #facc15;font-size:11px;font-weight:800"></div>
-<div class="small" style="margin-top:6px"><b>Ghana</b> = Momo + Debit + Virtual drops | <b>Outside Ghana</b> = Only Virtual + Debit + PayPal drops</div>
-</div>
+<div id="sec_public" class="sec">
+<div class="card" style="border:2px solid #16a34a"><b>Public Info - Client sees when booking</b><div style="font-size:11px;color:#6b7280">Edit anytime to win bookings - Rating not editable</div></div>
 <div class="card">
-<label>🌍 Select Your Country - Controls withdrawal menu!</label>
-<select id="nCountry" onchange="updateWithdrawalLogic()">
-<option value="GH">🇬🇭 Ghana - Shows: Momo + Debit Card + Virtual Card</option>
-<option value="NG">🇳🇬 Nigeria - Outside - Shows: Virtual + Debit + PayPal</option>
-<option value="ZA">🇿🇦 South Africa - Outside - Shows: Virtual + Debit + PayPal</option>
-<option value="KE">🇰🇪 Kenya - Outside - Shows: Virtual + Debit + PayPal</option>
-<option value="US">🇺🇸 USA - Outside - Shows: Virtual + Debit + PayPal</option>
-<option value="GB">🇬🇧 UK - Outside - Shows: Virtual + Debit + PayPal</option>
-<option value="CA">🇨🇦 Canada - Outside - Shows: Virtual + Debit + PayPal</option>
-<option value="AU">🇦🇺 Australia - Outside - Shows: Virtual + Debit + PayPal</option>
-<option value="OTHER">🌍 Other - Outside - Shows: Virtual + Debit + PayPal</option>
-</select>
-<label>Full Name (As on Bank/Card)</label><input id="fullName" placeholder="Grace Mensah">
-<label>Phone / WhatsApp</label><input id="phone" placeholder="+233...">
+<label>Full Name</label><input id="p_name">
+<label>City</label><input id="p_city">
+<label>Bio - Why book you</label><textarea id="p_bio" rows="3"></textarea>
+<label>Availability</label><select id="p_avail"><option>Available</option><option>Busy</option><option>Morning Only</option><option>Night Only</option></select>
+<label>Public Photo</label><input type="file" id="p_photo" accept=".jpg,.png">
 </div>
-<div class="card" id="methodsCard">
-<h3 id="methodsTitle">Withdrawal Methods</h3>
-<div class="methodCard" id="mMomo" onclick="selMethod('momo')"><b>📱 Mobile Money - MTN, Vodafone (GHANA ONLY)</b><div class="small">For Ghana - CEO sends via Momo</div><div id="momoForm" style="display:none;margin-top:10px"><select id="momoNetwork"><option>MTN Momo Ghana</option><option>Vodafone Cash Ghana</option><option>AirtelTigo Money</option></select><input id="momoNumber" placeholder="Momo Number +233..." style="margin-top:6px"><input id="momoName" placeholder="Momo Name" style="margin-top:6px"></div></div>
-<div class="methodCard" id="mDebit" onclick="selMethod('debit')"><b>💳 Debit Card - Direct to Card</b><div class="small">For Ghana + Outside Ghana - CEO transfers 85% to card</div><div id="debitForm" style="display:none;margin-top:10px"><input id="debitBankName" placeholder="Bank Name"><input id="debitCardNumber" placeholder="Card Number 16 digits" style="margin-top:6px"><input id="debitExpiry" placeholder="Expiry MM/YY" style="margin-top:6px"><input id="debitHolder" placeholder="Holder Name" style="margin-top:6px"></div></div>
-<div class="methodCard" id="mVirtual" onclick="selMethod('virtual')"><b>🌐 Virtual Card - Wise, Payoneer, Grey, Geegpay</b><div class="small">Best for all - FREE USD virtual - CEO sends USD</div><div id="virtualForm" style="display:none;margin-top:10px"><select id="virtualProvider"><option value="Wise">Wise - USD account</option><option value="Payoneer">Payoneer</option><option value="Grey">Grey - Africa</option><option value="Geegpay">Geegpay</option></select><input id="virtualCardNumber" placeholder="Virtual Card Number" style="margin-top:6px"><input id="virtualEmail" placeholder="Email linked" style="margin-top:6px"><input id="virtualUSDAccount" placeholder="USD Account + Routing" style="margin-top:6px"></div></div>
-<div class="methodCard" id="mPaypal" onclick="selMethod('paypal')"><b>💙 PayPal Account - Outside Ghana Only</b><div class="small">CEO sends USD to PayPal - Only outside Ghana</div><div id="paypalForm" style="display:none;margin-top:10px"><input id="paypalEmail" placeholder="PayPal Email"><input id="paypalName" placeholder="PayPal Name" style="margin-top:6px"></div></div>
-<input type="hidden" id="selectedMethod">
+<div class="card ro">
+<b>Rating - Cannot be edited - Shows exact stars from clients</b>
+<div class="stars" id="starsView">☆☆☆☆☆</div>
+<div id="ratingDisplay">Loading ratings...</div>
+<div id="publicRatingView" style="margin-top:4px;font-size:10px;color:#854d0e"></div>
+<div style="font-size:10px;color:#6b7280;margin-top:4px">From Realtime DB nurse_ratings/{nurseId} + Firestore nurse_ratings - Clients rate after booking</div>
 </div>
-<div class="card"><label>Notes for CEO</label><textarea id="notes" rows="3" style="width:100%;padding:11px;border-radius:10px;border:1.5px solid #e5e7eb" placeholder="Ghana: Momo 024... / Outside: Wise USD..."></textarea></div>
-<button class="btn btnG" onclick="saveMethod()">💾 Save Withdrawal - Reflect on CEO Dashboard</button>
-<div id="savedBox" style="margin-top:10px;padding:12px;background:#dcfce7;border-radius:10px;display:none"></div>
-<div class="card"><h3>✅ Current Method (CEO Sees)</h3><div id="currentMethod" style="font-size:12px;padding:10px;background:#f9fafb;border-radius:8px;border:1px dashed #e5e7eb">No method yet</div></div>
+<button class="btn green" id="btnPublic" onclick="savePublic()">Save Public Info</button>
 </div>
 
-<div id="earnings" class="hide"><div class="card"><h3>💰 Earnings 85%</h3><div id="earnList"></div></div></div>
-<div id="profile" class="hide"><div class="card"><h3>Profile & Docs</h3><label>Full Name</label><input placeholder="Grace"><button class="btn btnG">Save Profile</button></div></div>
+<div id="sec_payout" class="sec">
+<div class="card" style="border:2px solid #16a34a"><b>Payouts - 85% Salary</b></div>
+<div class="card">
+<label>Momo / Vodafone Number (GH)</label><input id="w_momo" placeholder="0244...">
+<label>Debit Last 4</label><input id="w_debit" placeholder="1234" maxlength="4">
+<label>PayPal Email</label><input id="w_paypal" placeholder="paypal@email.com">
+</div>
+<button class="btn green" id="btnPayout" onclick="savePayout()">Save Payouts</button>
 </div>
 
-<script>
-function showTab(t){
- ['overview','bookings','withdrawal','earnings','profile'].forEach(id=>{document.getElementById(id).classList.add('hide');document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1)).classList.remove('active');});
- document.getElementById(t).classList.remove('hide');document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
- if(t==='bookings')loadBookings();if(t==='earnings')loadEarnings();if(t==='withdrawal'){loadCurrentMethod();updateWithdrawalLogic();}
-}
-function updateWithdrawalLogic(){
- let country=document.getElementById('nCountry').value;
- let isGhana=country==='GH';
- let logicInfo=document.getElementById('logicInfo');
- let momoCard=document.getElementById('mMomo');
- let paypalCard=document.getElementById('mPaypal');
- if(isGhana){
-  logicInfo.innerHTML='🇬🇭 <b>GHANA:</b> Showing Momo + Debit + Virtual (No PayPal)';
-  logicInfo.style.background='#f0fdf4';
-  momoCard.classList.remove('hiddenMethod');paypalCard.classList.add('hiddenMethod');
-  document.getElementById('methodsTitle').innerHTML='🇬🇭 Ghana: Momo + Debit + Virtual';
- }else{
-  logicInfo.innerHTML=`🌍 <b>OUTSIDE GHANA (${country}):</b> Showing Virtual + Debit + PayPal (No Momo)`;
-  logicInfo.style.background='#f5f3ff';
-  momoCard.classList.add('hiddenMethod');paypalCard.classList.remove('hiddenMethod');
-  document.getElementById('methodsTitle').innerHTML=`🌍 Outside Ghana ${country}: Virtual + Debit + PayPal`;
- }
-}
-let selectedMethod='';
-function selMethod(m){
- let country=document.getElementById('nCountry').value;
- let isGhana=country==='GH';
- if(isGhana && m==='paypal'){alert('PayPal not for Ghana');return;}
- if(!isGhana && m==='momo'){alert('Momo not for outside Ghana');return;}
- selectedMethod=m;document.getElementById('selectedMethod').value=m;
- document.querySelectorAll('.methodCard').forEach(c=>c.classList.remove('sel'));
- document.getElementById('m'+m.charAt(0).toUpperCase()+m.slice(1)).classList.add('sel');
- document.getElementById('debitForm').style.display=m==='debit'?'block':'none';
- document.getElementById('virtualForm').style.display=m==='virtual'?'block':'none';
- document.getElementById('momoForm').style.display=m==='momo'?'block':'none';
- document.getElementById('paypalForm').style.display=m==='paypal'?'block':'none';
-}
-function saveMethod(){
- if(!selectedMethod){alert('Select method');return;}
- let fullName=document.getElementById('fullName').value;if(!fullName){alert('Enter name');return;}
- let country=document.getElementById('nCountry').value;
- let data={id:'W'+Date.now(),nurseId:localStorage.getItem('currentNurseId')||'NURSE_'+Math.random().toString(36).substr(2,6).toUpperCase(),nurseName:fullName,country:country,isGhana:country==='GH',phone:document.getElementById('phone').value,method:selectedMethod,debit:{bank:document.getElementById('debitBankName')?.value,cardNumber:document.getElementById('debitCardNumber')?.value,expiry:document.getElementById('debitExpiry')?.value,holder:document.getElementById('debitHolder')?.value},virtual:{provider:document.getElementById('virtualProvider')?.value,cardNumber:document.getElementById('virtualCardNumber')?.value,email:document.getElementById('virtualEmail')?.value,usdAccount:document.getElementById('virtualUSDAccount')?.value},momo:{network:document.getElementById('momoNetwork')?.value,number:document.getElementById('momoNumber')?.value,name:document.getElementById('momoName')?.value},paypal:{email:document.getElementById('paypalEmail')?.value,name:document.getElementById('paypalName')?.value},notes:document.getElementById('notes').value,timestamp:new Date().toISOString()};
- let all=JSON.parse(localStorage.getItem('nurse_withdrawal_methods')||'[]');all=all.filter(x=>x.nurseName!==fullName);all.push(data);
- localStorage.setItem('nurse_withdrawal_methods',JSON.stringify(all));localStorage.setItem('current_nurse_withdrawal',JSON.stringify(data));localStorage.setItem('currentNurseId',data.nurseId);localStorage.setItem('currentNurseName',fullName);
- document.getElementById('savedBox').style.display='block';document.getElementById('savedBox').innerHTML=`✅ Saved! ${data.isGhana?'Ghana':'Outside Ghana '+country} Method: ${selectedMethod.toUpperCase()} - Reflects on CEO Dashboard`;
- loadCurrentMethod();alert('Saved! CEO sees it now!');
-}
-function loadCurrentMethod(){
- let data=JSON.parse(localStorage.getItem('current_nurse_withdrawal')||'null')||JSON.parse(localStorage.getItem('nurse_withdrawal_methods')||'[]').slice(-1)[0];
- if(!data){document.getElementById('currentMethod').innerHTML='No method yet - Select country first';return;}
- let html=`<b>${data.nurseName} - ${data.isGhana?'Ghana':'Outside '+data.country} - ${data.method.toUpperCase()}</b><br>`;
- if(data.method==='momo') html+=`Momo: ${data.momo.network} ${data.momo.number}<br>`;
- if(data.method==='debit') html+=`Debit: ${data.debit.bank} ****${data.debit.cardNumber?data.debit.cardNumber.slice(-4):''}<br>`;
- if(data.method==='virtual') html+=`Virtual: ${data.virtual.provider} ${data.virtual.email} ${data.virtual.cardNumber}<br>`;
- if(data.method==='paypal') html+=`PayPal: ${data.paypal.email}<br>`;
- html+=`Phone: ${data.phone}<br><span style="color:#16a34a;font-weight:800">✅ CEO Dashboard sees this</span>`;
- document.getElementById('currentMethod').innerHTML=html;document.getElementById('nurseName').innerText=data.nurseName;
-}
+<div id="sec_settings" class="sec">
+<div class="card"><b>Settings - Change login by yourself</b><div style="font-size:11px;background:#f0fdf4;border:1px solid #bbf7d0;padding:6px;border-radius:6px;margin-top:4px">ID: <span id="s_id"></span> - Cannot change ID</div></div>
+<div class="card"><label>Email - For login</label><input id="s_email" type="email"><button class="btn green" id="btnEmail" onclick="saveEmail()">Change Email</button></div>
+<div class="card"><label>Phone</label><input id="s_phone"></div>
+<div class="card" style="border:2px solid #f97316"><b>Change Password</b><label>Old Password</label><input type="password" id="s_old"><label>New Password</label><input type="password" id="s_new"><label>Confirm</label><input type="password" id="s_conf"><button class="btn orange" id="btnPass" onclick="savePassword()">Change Password</button></div>
+</div>
 
-// BOOKING LOGIC WITH ACCEPT/REJECT + GPS MAP
-function loadBookings(){
- let books=JSON.parse(localStorage.getItem('loveCareBookings')||'[]');
- let nurseId=localStorage.getItem('currentNurseId');
- let nurseName=localStorage.getItem('currentNurseName');
- // Show bookings for this nurse OR all if no filter
- let myBooks=books.filter(b=>!nurseName || b.nurseName===nurseName || b.nurseId===nurseId);
- if(myBooks.length===0) myBooks=books; // Show all for now if no name match - for demo
+<div id="sec_bookings" class="sec">
+<div class="card"><b>My Bookings</b></div>
+<div class="card" style="text-align:center;color:#9ca3af;font-size:12px"><button class="btn light" onclick="location.href='nurse-bookings-clean.html'">Open Bookings</button></div>
+</div>
 
- let h='';
- let newCount=0;
- if(myBooks.length===0){
-  h='<div style="padding:20px;text-align:center;color:#9ca3af">No jobs yet<br><small>When client books you from book-nurse.html + pays Paystack, job auto appears here with Accept/Reject + GPS Map</small></div>';
- }else{
-  myBooks.slice().reverse().forEach((b,i)=>{
-   let status=b.nurseStatus||'NEW';
-   if(status==='NEW') newCount++;
-   let cardClass=status==='NEW'?'new':status==='ACCEPTED'?'accepted':status==='REJECTED'?'rejected':'';
-   h+=`<div class="jobCard ${cardClass}">
-   <div style="display:flex;justify-content:space-between;align-items:center">
-   <b>📅 Job #${b.id} - ${b.service||b.serviceType||''}</b>
-   <span class="badge" style="background:${status==='NEW'?'#facc15':status==='ACCEPTED'?'#16a34a;color:white':status==='REJECTED'?'#ef4444;color:white':'#e5e7eb'}">${status}</span>
-   </div>
-   <div style="font-size:11px;line-height:1.6;margin-top:6px">
-   <b>Client:</b> ${b.clientEmail||''} ${b.cPhone||''}<br>
-   <b>Service Type:</b> ${b.serviceType?b.serviceType.toUpperCase():''} - ${b.service||''}<br>
-   <b>Country/Pay:</b> ${b.country||''} - ${b.total||''} - ${b.payCurrency||''} ${b.payAmount||''} - ${b.tier||''}<br>
-   <b>Duration:</b> ${b.sDate||''} ${b.sTime||''} to ${b.eDate||''} ${b.eTime||''} - ${b.duration||''}<br>
-   <b>Address:</b> ${b.address||''}<br>
-   <b>GPS:</b> ${b.lat?b.lat.toFixed(5):''}, ${b.lng?b.lng.toFixed(5):''} - ${b.location||''}<br>
-   <b>Written Concerns:</b> ${b.written||b.wConcern||''}<br>
-   <b>Audio:</b> ${b.audio?'🎤 Yes - Listen in CEO dashboard':''}<br>
-   <b>Pay Ref:</b> ${b.payRef||''}
-   </div>
-
-   ${status==='NEW'?`
-   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-   <button class="btn btnG" onclick="acceptJob('${b.id}')">✅ Accept Job - Show GPS Map</button>
-   <button class="btn btnR" onclick="rejectJob('${b.id}')">❌ Reject Job</button>
-   </div>
-   <div class="small">If Accept, client GPS + Google Map directions auto open for you to go to client</div>
-   `:''}
-
-   ${status==='ACCEPTED'?`
-   <div style="margin-top:10px;padding:10px;background:white;border-radius:10px;border:2px solid #16a34a">
-   <b>✅ YOU ACCEPTED - Client GPS + Directions - Go to Client Now!</b><br>
-   <div style="font-size:11px;margin:6px 0"><b>Client Location:</b> ${b.address||''}<br><b>GPS:</b> ${b.lat}, ${b.lng}<br><b>Emergency Contact:</b> ${b.eContact||''}</div>
-   <iframe class="mapFrame" src="https://maps.google.com/maps?q=${b.lat},${b.lng}&z=15&output=embed"></iframe>
-   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
-   <a href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}" target="_blank" style="text-decoration:none"><button class="btn btnB">🗺️ Open Google Maps Directions - Go to Client</button></a>
-   <a href="https://www.google.com/maps/search/?api=1&query=${b.lat},${b.lng}" target="_blank" style="text-decoration:none"><button class="btn btnY">📍 View Client Location on Map</button></a>
-   </div>
-   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
-   <a href="tel:${b.cPhone||''}" style="text-decoration:none"><button class="btn btnG">📞 Call Client ${b.cPhone||''}</button></a>
-   <button class="btn btnGr" onclick="markCompleted('${b.id}')">✅ Mark Job Completed</button>
-   </div>
-   <div class="small" style="margin-top:6px;color:#16a34a;font-weight:800">GPS auto opens Google Map for directions - Follow map to client house - Show this screen to client on arrival</div>
-   </div>
-   `:''}
-
-   ${status==='REJECTED'?`<div style="margin-top:8px;padding:8px;background:#fef2f2;border-radius:8px;font-size:11px">❌ You rejected this job - CEO will assign to another nurse</div>`:''}
-   ${status==='COMPLETED'?`<div style="margin-top:8px;padding:8px;background:#f0fdf4;border-radius:8px;font-size:11px;border:1px solid #16a34a">✅ Completed - Waiting CEO payout 85% via your withdrawal method (${JSON.parse(localStorage.getItem('current_nurse_withdrawal')||'{}').method||'Not set'})</div>`:''}
-   </div>`;
-  });
- }
- document.getElementById('bookingList').innerHTML=h;
- document.getElementById('recentBookings').innerHTML=myBooks.length>0?myBooks.slice(-2).reverse().map(b=>`<div style="padding:8px;border:1px solid #e5e7eb;border-radius:8px;margin:4px 0"><b>#${b.id} ${b.service}</b> - ${b.nurseStatus||'NEW'} - ${b.total}</div>`).join(''):'No jobs yet';
- document.getElementById('bookCount').innerText=myBooks.length;
- document.getElementById('newJobs').innerText=newCount;
-}
-
-function acceptJob(id){
- let books=JSON.parse(localStorage.getItem('loveCareBookings')||'[]');
- let idx=books.findIndex(b=>b.id===id);
- if(idx>=0){books[idx].nurseStatus='ACCEPTED';books[idx].acceptedAt=new Date().toISOString();localStorage.setItem('loveCareBookings',JSON.stringify(books));alert('✅ You ACCEPTED Job #'+id+'\n📍 Client GPS: '+books[idx].lat+','+books[idx].lng+'\n🗺️ Google Map directions now shown - Go to client!');loadBookings();}
-}
-function rejectJob(id){
- if(!confirm('Reject this job? CEO will assign to another nurse'))return;
- let books=JSON.parse(localStorage.getItem('loveCareBookings')||'[]');
- let idx=books.findIndex(b=>b.id===id);
- if(idx>=0){books[idx].nurseStatus='REJECTED';books[idx].rejectedAt=new Date().toISOString();localStorage.setItem('loveCareBookings',JSON.stringify(books));alert('❌ Rejected Job #'+id+' - CEO will assign to another nurse');loadBookings();}
-}
-function markCompleted(id){
- let books=JSON.parse(localStorage.getItem('loveCareBookings')||'[]');
- let idx=books.findIndex(b=>b.id===id);
- if(idx>=0){books[idx].nurseStatus='COMPLETED';books[idx].completedAt=new Date().toISOString();localStorage.setItem('loveCareBookings',JSON.stringify(books));alert('✅ Job #'+id+' Marked Completed - CEO will now pay your 85% salary via your withdrawal method (Debit Card / Virtual Card / PayPal / Momo)');loadBookings();loadEarnings();}
-}
-function createTestBooking(){
- let test={id:'BK'+Date.now(),nurseName:localStorage.getItem('currentNurseName')||'Grace Mensah',nurseId:localStorage.getItem('currentNurseId')||'1',service:'Elderly Care',serviceType:'live-out',country:'GH',currency:'GHS',total:'GHS 760.00',payCurrency:'GHS',payAmount:760,location:'5.6037, -0.1870 Accra',lat:5.6037,lng:-0.1870,address:'House 12, East Legon, Accra - Near Mensah Guinea',sDate:new Date().toISOString().split('T')[0],eDate:new Date(Date.now()+86400000*3).toISOString().split('T')[0],sTime:'08:00',eTime:'18:00',duration:'3 days (8-12hrs/day live-out)',tier:'SHORT (1-6d) - 3 days',written:'Elderly woman 75 years, needs help with bathing, medication, BP check - Kind and respectful',audio:false,payRef:'TEST'+Date.now(),status:'PAID',nurseStatus:'NEW',clientEmail:'client@test.com',cPhone:'+233241234567',timestamp:new Date().toISOString()};
- let books=JSON.parse(localStorage.getItem('loveCareBookings')||'[]');books.push(test);localStorage.setItem('loveCareBookings',JSON.stringify(books));loadBookings();alert('Test job created - Now Accept to see GPS Map + Google Directions!');
-}
-function clearTestBookings(){if(confirm('Clear all test bookings?')){localStorage.setItem('loveCareBookings','[]');loadBookings();}}
-function loadEarnings(){
- let books=JSON.parse(localStorage.getItem('loveCareBookings')||'[]');
- let total=0;let h='';books.filter(b=>b.nurseStatus==='COMPLETED' || b.nurseStatus==='ACCEPTED').forEach(b=>{let amt=parseFloat(b.payAmount||0);let earn=amt*0.85;total+=earn;h+=`<div style="padding:8px;border:1px solid #e5e7eb;border-radius:8px;margin:4px 0">#${b.id} - 85%: ${b.payCurrency||''} ${earn.toFixed(2)} - ${b.nurseStatus} - Pay via ${JSON.parse(localStorage.getItem('current_nurse_withdrawal')||'{}').method||'Not set'}</div>`;});
- document.getElementById('earnList').innerHTML=h||'No earnings - Complete jobs to earn 85% - Paid via your withdrawal method';document.getElementById('earnCount').innerText='$'+total.toFixed(2);
-}
-
-loadBookings();loadCurrentMethod();updateWithdrawalLogic();
-</script>
+</div>
+<div class="tabs">
+<button class="tabBtn active" id="tab_public" onclick="tab('public')">Public</button>
+<button class="tabBtn" id="tab_payout" onclick="tab('payout')">Payouts</button>
+<button class="tabBtn" id="tab_settings" onclick="tab('settings')">Settings</button>
+<button class="tabBtn" id="tab_bookings" onclick="tab('bookings')">Bookings</button>
+</div>
 </body>
 </html>
