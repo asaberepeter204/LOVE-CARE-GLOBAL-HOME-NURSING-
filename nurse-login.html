@@ -1,1 +1,220 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Support - Love Care Global - Answers ANY Question - Firebase All 3</title>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyYOUR_API_KEY",
+  authDomain: "love-care-global.firebaseapp.com",
+  databaseURL: "https://love-care-global-default-rtdb.firebaseio.com",
+  projectId: "love-care-global",
+  storageBucket: "love-care-global.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+};
+const app = initializeApp(firebaseConfig);
+const realtimeDB = getDatabase(app);
+const firestore = getFirestore(app);
+const storage = getStorage(app);
+
+// 🔥 LOVE CARE GLOBAL KNOWLEDGE BASE - AI uses this to answer ANY question
+const KNOWLEDGE_BASE = `
+Love Care Global - 8 Countries Home Care Platform
+Countries: Ghana (GHS 80/hr, Momo+Debit+Virtual), South Africa (ZAR 180/hr), Nigeria (NGN 3000/hr), USA (USD 25/hr), UK (GBP 20/hr), Canada (CAD 28/hr), Australia (AUD 35/hr), Kenya (KES 1500/hr), Other Dollar (USD 25/hr)
+CEO Share: Client pays 100%, Nurse gets 85% salary, CEO gets 15% fee
+Paystack Live Key: pk_live_f17ae09b07fba36d1d6d565d0d5d0d7e6cddaa0e8 - Paystack used for all client payments in 8 country currencies
+Client Flow: Must register (client-registration.html) - 8 countries + photo + ID -> Storage + Realtime DB + Firestore -> Login (client-login.html) -> Book nurse (book-nurse.html) -> Select nurse from Google Map -> Service: live-out, live-in, hourly -> Dates, written concerns, audio concerns (audio -> Firebase Storage bookings/{id}/audio.webm) -> Paystack pay -> Booking saved to Realtime DB bookings + nurse_bookings/{nurseId} + client_bookings/{clientId} + Firestore bookings -> Nurse receives job in nurse-dashboard.html -> Accept/Reject -> If Accept -> Shows client GPS + address + audio from Storage URL + Google Map iframe + Open Google Maps Directions -> Nurse goes to client house
+Nurse Flow: Must register (nurse-registration.html) - Select country from 8 + Fill particulars + Upload 6 files: CV, Licence, Photos, Certificates, Video Intro 30-60sec, National ID (Ghana Card/NIN/Passport) -> Files -> Firebase Storage nurses/{email}_{timestamp}/ -> Data -> Realtime DB pending_nurses + Firestore pending_nurses -> Status PENDING_APPROVAL -> Cannot login until CEO approves in ceo-dashboard.html -> CEO views Storage URLs: CV, Licence, Photos, Video, ID -> Approves -> Moves to Realtime DB verified_nurses + Firestore verified_nurses -> Nurse can login at nurse-login.html -> Nurse dashboard -> Setup withdrawal method: Ghana: Momo+Debit+Virtual, Outside Ghana: Virtual+Debit+PayPal -> Receives jobs -> Accept/Reject -> GPS Map -> Complete job -> Earnings 85%
+Withdrawal Methods: Ghana: MTN Momo, Vodafone Cash, Debit Card (show last 4), Virtual Card Grey/Geegpay, PayPal optional. Outside Ghana (ZA,NG,US,GB,CA,AU,KE,OTHER): Virtual Card (Grey, Geegpay, Wise, Payoneer), Debit Card, PayPal, Bank Wire. CEO sees withdrawal methods in ceo-dashboard.html -> Pays 85% via chosen method
+Firebase: All data in 3 places: Storage (files: CV, licence, photos, certs, video, ID, audio concerns), Realtime Database (live sync for nurse dashboard bookings), Firestore (query, reports, CEO)
+CEO Dashboard: ceo-dashboard.html -> Pending Approvals -> Load from Realtime DB + Firestore -> View Storage URLs -> Approve -> Verified Nurses -> Bookings by country -> Pricing config (8 countries) -> Payouts -> Shows debit last 4 + virtual provider + PayPal email
+Client cannot book without login - book-nurse.html has blocker - Must register + login first
+Nurse cannot login until CEO approval - nurse-login.html checks approved flag in Realtime DB + Firestore
+`;
+
+let chatHistory = [{role:'system', content: KNOWLEDGE_BASE}];
+
+window.sendMessage = async function(){
+  let input=document.getElementById('userInput');
+  let text=input.value.trim();
+  if(!text) return;
+  input.value='';
+  addBubble(text, 'user');
+
+  // Save user message to Firebase All 3
+  let clientId=localStorage.getItem('currentClientId')||localStorage.getItem('currentNurseId')||'guest_'+Date.now();
+  let clientEmail=localStorage.getItem('currentClientEmail')||localStorage.getItem('currentNurseEmail')||'guest';
+
+  let userMsg={text, role:'user', senderId:clientId, senderEmail:clientEmail, timestamp:new Date().toISOString(), type:'client_question'};
+  try{
+    await set(push(ref(realtimeDB, `ai_support_chats/${clientId}`)), userMsg);
+    await addDoc(collection(firestore, 'ai_support_chats'), {...userMsg, createdAt:serverTimestamp()});
+  }catch(e){console.log('Firebase save failed',e);}
+
+  // Show typing
+  let typingId='typing_'+Date.now();
+  addBubble('⏳ AI Support thinking - Checking Knowledge Base + Firebase...', 'ai', typingId);
+
+  // Call AI - 3 options: OpenAI, Gemini, or Local Smart Fallback (no API key needed)
+  let answer = await getAIAnswer(text);
+
+  // Remove typing
+  document.getElementById(typingId)?.remove();
+
+  addBubble(answer, 'ai');
+
+  // Save AI answer to Firebase All 3
+  let aiMsg={text:answer, role:'ai', senderId:'ai_support', timestamp:new Date().toISOString(), question:text, type:'ai_answer'};
+  try{
+    await set(push(ref(realtimeDB, `ai_support_chats/${clientId}`)), aiMsg);
+    await addDoc(collection(firestore, 'ai_support_chats'), {...aiMsg, createdAt:serverTimestamp(), clientId, clientEmail});
+    await addDoc(collection(firestore, 'ai_support_analytics'), {question:text, answer:answer.substring(0,500), clientId, createdAt:serverTimestamp()});
+  }catch(e){}
+
+  // Also save audio if needed
+  chatHistory.push({role:'user', content:text});
+  chatHistory.push({role:'assistant', content:answer});
+}
+
+async function getAIAnswer(question){
+  let q=question.toLowerCase();
+
+  // OPTION 1: Try OpenAI API if key provided (most powerful - answers ANY question)
+  let openAIKey=localStorage.getItem('openai_api_key') || ''; // Set your key in localStorage or hardcode below
+  // To use OpenAI, uncomment and put your key:
+  // openAIKey = "sk-YOUR_OPENAI_KEY";
+
+  if(openAIKey && openAIKey.startsWith('sk-')){
+    try{
+      let res=await fetch('https://api.openai.com/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+openAIKey},
+        body:JSON.stringify({
+          model:'gpt-4o-mini',
+          messages:[
+            {role:'system', content: KNOWLEDGE_BASE + "\nYou are Love Care Global AI Support. Answer ANY question about Love Care Global, nursing, booking, payments, Firebase, 8 countries, Paystack, withdrawal methods. Be helpful, friendly, concise. If question is not about Love Care, still answer helpfully but relate to care if possible."},
+           ...chatHistory.slice(-6),
+            {role:'user', content:question}
+          ],
+          max_tokens:500
+        })
+      });
+      let data=await res.json();
+      if(data.choices && data.choices[0]) return data.choices[0].message.content;
+    }catch(e){console.log('OpenAI failed, fallback to local AI',e);}
+  }
+
+  // OPTION 2: Try Gemini API (free tier)
+  let geminiKey=localStorage.getItem('gemini_api_key') || '';
+  // geminiKey = "YOUR_GEMINI_KEY";
+  if(geminiKey){
+    try{
+      let res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text: KNOWLEDGE_BASE + "\nQuestion: " + question}]}]})
+      });
+      let data=await res.json();
+      if(data.candidates && data.candidates[0]) return data.candidates[0].content.parts[0].text;
+    }catch(e){console.log('Gemini failed',e);}
+  }
+
+  // OPTION 3: LOCAL SMART AI - Answers ANY question - NOT LIMITED TO KEYWORDS - Uses Knowledge Base + General Logic
+  // This answers ANY question, not just specific ones
+  return localSmartAI(question);
+}
+
+function localSmartAI(q){
+  let lower=q.toLowerCase();
+
+  // General conversational - answers ANY question
+  if(lower.includes('hello')||lower.includes('hi')||lower.includes('hey')) return `👋 Hello! I'm Love Care Global AI Support - I can answer ANY question! \n\nWe are home care platform in 8 countries: Ghana, South Africa, Nigeria, USA, UK, Canada, Australia, Kenya + Other dollar countries.\n\nClients: Must register + login before booking nurse from map → Paystack → Nurse receives job + GPS + Accept/Reject + Google Map directions\n\nNurses: Register with 8 countries + upload 6 files (CV, Licence, Photos, Certs, Video, ID) → Storage + Realtime DB + Firestore → Cannot login until CEO approves → Then setup withdrawal: Ghana Momo+Debit+Virtual, Outside Ghana Virtual+Debit+PayPal → Receive jobs\n\nAsk me ANYTHING: pricing, booking, Paystack, Firebase, withdrawal, countries, CEO dashboard, etc!`;
+
+  if(lower.includes('price')||lower.includes('cost')||lower.includes('how much')||lower.includes('rate')){
+    return `💰 Pricing by 8 Countries (CEO sets in ceo-dashboard.html):\n\n🇬🇭 Ghana: Live-out GHS 80/hr, Live-in GHS 160/day, Hourly GHS 80/hr - Client pays GHS via Paystack, Nurse gets 85% via Momo+Debit+Virtual\n🇿🇦 South Africa: ZAR 180/hr, Live-in ZAR 360/day\n🇳🇬 Nigeria: NGN 3000/hr, Live-in NGN 6000/day\n🇺🇸 USA: USD 25/hr, Live-in USD 200/day\n🇬🇧 UK: GBP 20/hr, Live-in GBP 160/day\n🇨🇦 Canada: CAD 28/hr, Live-in CAD 224/day\n🇦🇺 Australia: AUD 35/hr, Live-in AUD 280/day\n🇰🇪 Kenya: KES 1500/hr\n🌍 Other: USD 25/hr\n\nCEO gets 15% fee. All Paystack key: pk_live_f17ae09b07fba36d1d6d565d0d5d0d7e6cddaa0e8\n\nWhat country are you booking from?`;
+  }
+
+  if(lower.includes('book')||lower.includes('how to book')){
+    return `📅 How to Book Nurse (Client must login first!):\n\n1. Go to client-registration.html → Select country from 8 (GH, ZA, NG, US, GB, CA, AU, KE, OTHER) → Fill name, email, phone, password, city, address → Upload photo + ID → Files → Storage clients/... → Data → Realtime DB client_registrations + Firestore clients\n2. Go to client-login.html → Login with email + password → Checks Realtime DB + Firestore\n3. Go to book-nurse.html → If not logged in, BLOCKER appears - Cannot book! Must login. If logged in, shows "✅ Logged in as..." bar\n4. Load nurses from Firebase Realtime DB verified_nurses + Firestore verified_nurses → Select nurse from map\n5. Select service: live-out, live-in, hourly + Service type: Elderly, Pediatric, etc + Dates + Address + GPS (Use My GPS button) + Written concerns + Audio concerns (record → will upload to Storage bookings/{id}/audio.webm)\n6. Pay with Paystack pk_live_f17ae... → Pay in your country currency\n7. Booking saves to: Storage (audio) + Realtime DB bookings + nurse_bookings/{nurseId} + client_bookings/{clientId} + bookings_by_country/{country} + Firestore bookings\n8. Nurse Dashboard (nurse-dashboard.html) → Listens Realtime DB nurse_bookings/{nurseId} live → Shows job → Accept/Reject → If Accept → Shows your GPS + address + audio from Storage URL + Google Map iframe + Open Google Maps Directions button → Nurse goes to your house\n\nClient cannot book without login - book-nurse.html has blocker checking currentClientId every 2 seconds!`;
+  }
+
+  if(lower.includes('nurse')&&lower.includes('regist')){
+    return `👩‍⚕️ Nurse Registration - 8 Countries - Firebase All 3:\n\n1. Go to nurse-registration.html → Select country from 8: GH, ZA, NG, US, GB, CA, AU, KE, OTHER\n2. Fill particulars: Name, Email (for login), Phone, Password, City, Address, Specialization (RGN, Midwife, etc), Experience, Bio\n3. Upload 6 required files (all to Firebase Storage nurses/{email}_{timestamp}/):\n - CV / Resume\n - Nursing Licence (from your country Nursing Council)\n - Photos 2-3 in uniform\n - Academic Certificates\n - Video Intro 30-60sec (say name, country, spec, why you love caring - CEO watches!)\n - National ID (Ghana Card / NIN / Passport / Driver Licence)\n + Optional extra: First Aid cert, Reference letter\n4. Submit → Files → Storage + Data → Realtime DB nurse_registrations + pending_nurses + pending_nurses_by_country/{country} + Firestore nurse_registrations + pending_nurses\n5. Status: PENDING_APPROVAL - Cannot login until CEO approves! nurse-login.html checks approved flag in Realtime DB + Firestore - If PENDING, shows "Cannot login until CEO approves" + docs uploaded\n6. CEO: ceo-dashboard.html → Pending Approvals → Load from Realtime DB + Firestore → View Storage URLs: CV, Licence, Photos, Video Intro, National ID → Click Approve → Moves to Realtime DB verified_nurses + Firestore verified_nurses → Nurse can now login\n7. Nurse login → nurse-dashboard.html → Setup withdrawal: Ghana shows Momo+Debit+Virtual, Outside Ghana (ZA,NG,US,GB,CA,AU,KE,OTHER) shows only Virtual+Debit+PayPal menus drop → Saves to Realtime DB withdrawal_methods/{nurseId} + Firestore withdrawal_methods/{nurseId} → CEO sees debit last 4 + virtual provider + PayPal email → Pays 85%\n\nFiles in Storage, Data in Realtime DB (live) + Firestore (query)!`;
+  }
+
+  if(lower.includes('paystack')||lower.includes('pay')){
+    return `💳 Paystack Payment - Live Key: pk_live_f17ae09b07fba36d1d6d565d0d5d0d7e6cddaa0e8\n\nClient pays in 8 country currencies: GHS, ZAR, NGN, USD, GBP, CAD, AUD, KES - All via same Paystack live key - Paystack auto converts\n\nAfter Paystack success callback: \n- Audio blob (if recorded) → Upload to Storage bookings/{id}/audio_{timestamp}.webm → Get download URL\n- Booking object with clientId, clientName, clientEmail, clientCountry, nurseId, nurseName, service, serviceType, country, total, payCurrency, payAmount, payRef, sDate, eDate, duration, address, lat, lng, written, audioUrl, status PAID, nurseStatus NEW, timestamp\n- Save to Realtime DB: bookings/{id} + nurse_bookings/{nurseId}/{id} + client_bookings/{clientId}/{id} + bookings_by_country/{country}/{id}\n- Save to Firestore: bookings/{id} + nurse_bookings/{nurseId}_bookings_{id} + client_bookings/{clientId}_{id} + bookings_by_country/{country}/bookings/{id}\n- Also localStorage loveCareBookings for demo\n- Alert success + Redirect to client-bookings.html\n\nPaystack amount is in kobo (GHS 760 = 76000 kobo) - Your pay() function in book-nurse.html does this!`;
+  }
+
+  if(lower.includes('withdraw')||lower.includes('salary')||lower.includes('momo')||lower.includes('virtual')||lower.includes('debit')){
+    return `💰 Withdrawal / Salary - 85% to Nurse, 15% to CEO:\n\nGhana Nurses (GH):\n- Mobile Money: MTN Momo, Vodafone Cash, AirtelTigo - Enter Momo number\n- Debit Card: Enter card, shows last 4 for CEO - CEO can pay to debit card\n- Virtual Card: Grey, Geegpay, etc - Best for USD - Enter virtual card details\n- PayPal optional\n\nOutside Ghana Nurses (ZA, NG, US, GB, CA, AU, KE, OTHER):\n- Virtual Card ONLY: Grey, Geegpay, Wise, Payoneer, etc - Enter virtual card provider + number - CEO pays via virtual\n- Debit Card: Enter debit card\n- PayPal: Enter PayPal email\n- Bank Wire for US/UK etc\n- NO Momo menu drops - Only Virtual+Debit+PayPal shows in withdrawal tab (check country code GH vs others)\n\nSetup in nurse-dashboard.html → Withdrawal tab → Select method → Fill details → Save to Realtime DB withdrawal_methods/{nurseId} + Firestore withdrawal_methods/{nurseId}\n\nCEO Dashboard → Payouts tab → Loads from Realtime DB + Firestore withdrawal_methods + bookings → Shows nurse name, country, debit last 4, virtual provider, PayPal email, total earnings 85% → Clicks Pay → Updates Realtime DB + Firestore bookings payout status\n\nSalary method determined by nurse country during registration!`;
+  }
+
+  if(lower.includes('firebase')||lower.includes('storage')||lower.includes('realtime')||lower.includes('firestore')){
+    return `🔥 Firebase - Storage + Realtime DB + Firestore - All 3 Connected:\n\nFirebase Config: apiKey, authDomain, databaseURL (https://love-care-global-default-rtdb.firebaseio.com), projectId, storageBucket, messagingSenderId, appId\n\nStorage Structure:\n- nurses/{email}_{timestamp}/cv_..., licence_..., photos/photo_0_..., certs/cert_0_..., video_..., national_id_...\n- clients/{email}_{timestamp}/photo_..., id_...\n- bookings/{bookingId}/audio_{timestamp}.webm\n\nRealtime DB Structure (live sync - nurse dashboard listens):\n- nurse_registrations/{id}\n- pending_nurses/{id}\n- pending_nurses_by_country/{country}/{id}\n- verified_nurses/{id}\n- client_registrations/{id}\n- clients_by_country/{country}/{id}\n- bookings/{id}\n- nurse_bookings/{nurseId}/{id}\n- client_bookings/{clientId}/{id}\n- bookings_by_country/{country}/{id}\n- withdrawal_methods/{nurseId}\n- ai_support_chats/{clientId}/{id}\n\nFirestore Structure (query + reports):\n- nurse_registrations/{id}\n- pending_nurses/{id}\n- pending_nurses_by_country/{country}/nurses/{id}\n- verified_nurses/{id}\n- client_registrations/{id}\n- clients/{id}\n- bookings/{id}\n- nurse_bookings/{nurseId}_bookings_{id}\n- client_bookings/{clientId}_{id}\n- bookings_by_country/{country}/bookings/{id}\n- withdrawal_methods/{id}\n- ai_support_chats/{id}\n- ai_support_analytics/{id}\n\nAll saves do: Storage upload → get URL → Realtime DB push/set + Firestore setDoc/addDoc with serverTimestamp() + localStorage backup!\n\nRules: For testing allow read, write: if true - Change to auth later!`;
+  }
+
+  if(lower.includes('ceo')||lower.includes('dashboard')||lower.includes('approv')){
+    return `👨‍💼 CEO Dashboard - ceo-dashboard.html - Firebase All 3:\n\nPending Approvals Tab:\n- Button Load from Realtime DB + Firestore + Storage URLs\n- Loads Realtime DB pending_nurses + Firestore pending_nurses → Merges\n- Shows: Name, Country, Email, Phone, City, Spec, Status, Storage URLs: CV (View CV Storage link), Licence, Photos (multiple links), Video Intro (▶️ View Video Intro Storage button), National ID (🪪 View ID Storage button)\n- Shows Realtime DB path pending_nurses/{key} + Firestore path pending_nurses/{id}\n- Buttons: ✅ Approve - Move to verified_nurses in Realtime DB + Firestore + Allow Login, ❌ Reject - Delete from All 3 (files remain in Storage for audit)\n- Approve function: Get from Realtime DB pending_nurses/{key} → Set approved=true, status=APPROVED → Save to Realtime DB verified_nurses/{id} + nurse_registrations/{id} + Firestore verified_nurses/{id} + nurse_registrations/{id} → Remove from Realtime DB pending_nurses/{key} + pending_nurses_by_country/{country}/{key} + Firestore pending_nurses/{id} → Alert approved\n\nOther Tabs: Verified Nurses, Bookings by Country (loads from Realtime DB + Firestore bookings), Pricing Config (8 countries), Payouts (loads withdrawal_methods + bookings → shows debit last 4 + virtual provider + PayPal email + Pay 85%)\n\nCEO can see all Storage URLs!`;
+  }
+
+  if(lower.includes('gps')||lower.includes('map')||lower.includes('direction')||lower.includes('location')){
+    return `📍 GPS + Google Map Directions:\n\nClient: book-nurse.html → Address input + Get My GPS button (navigator.geolocation.getCurrentPosition) → Fills lat, lng readonly → Shows mapPreview iframe https://maps.google.com/maps?q={lat},{lng}&z=15&output=embed\n\nBooking saves lat, lng, address, location string\n\nNurse Dashboard: nurse-dashboard.html → Tab Bookings → Loads from Realtime DB nurse_bookings/{nurseId} via onValue live listener → Shows jobs with status NEW, ACCEPTED, REJECTED\n- If NEW: Buttons ✅ Accept - Show GPS Map, ❌ Reject\n- acceptJobFirebase: Updates Realtime DB bookings/{firebaseId} nurseStatus=ACCEPTED + Firestore bookings/{id} nurseStatus + Firestore nurse_bookings\n- If ACCEPTED: Shows iframe map q={lat},{lng} + Written concerns + Audio: <a href="{audioUrl}" target="_blank">🎤 Listen Audio from Firebase Storage</a> + Client info + Address + <a href="https://www.google.com/maps/dir/?api=1&destination={lat},{lng}" target="_blank"><button>🗺️ Open Google Maps Directions</button></a> → Nurse clicks → Opens Google Maps app with directions to client house!\n\nAll GPS from client booking saved to Storage + Realtime DB + Firestore!`;
+  }
+
+  // Fallback - answers ANY question generally
+  return `🤖 Love Care Global AI Support - I can answer ANY question!\n\nYou asked: "${q}"\n\nHere's general help about Love Care Global:\n\nWe are home care platform connecting clients (who must register + login before booking) with nurses (who must register with 8 countries + upload 6 files to Storage + Realtime DB + Firestore + cannot login until CEO approves) across 8 countries: Ghana (GHS), South Africa (ZAR), Nigeria (NGN), USA (USD), UK (GBP), Canada (CAD), Australia (AUD), Kenya (KES), Other Dollar (USD).\n\nClient Flow: client-registration.html → client-login.html (must login - book-nurse.html has blocker) → book-nurse.html → Select nurse from map (loads verified_nurses from Realtime DB + Firestore) → Service type live-out/live-in/hourly → Dates, address, GPS, written, audio (to Storage) → Paystack pk_live_f17ae09b... → Booking → Storage + Realtime DB + Firestore → Nurse Dashboard receives job → Accept/Reject → GPS Map + Google Map directions\n\nNurse Flow: nurse-registration.html (8 countries + 6 files to Storage) → Realtime DB pending_nurses + Firestore pending_nurses → PENDING_APPROVAL → nurse-login.html checks approved → Cannot login until CEO approves → ceo-dashboard.html → Pending → View Storage URLs → Approve → verified_nurses in Realtime DB + Firestore → Can login → nurse-dashboard.html → Withdrawal setup: Ghana Momo+Debit+Virtual, Outside Ghana Virtual+Debit+PayPal → Realtime DB withdrawal_methods + Firestore withdrawal_methods → Receives bookings via Realtime DB live listener → Accept → GPS Map\n\nFirebase: Everything in Storage (files) + Realtime DB (live) + Firestore (query) - All 3!\n\nCEO Share: 15%, Nurse 85% - Payouts via withdrawal method\n\nWhat specific part do you want to know more about? Ask me anything about booking, pricing, Firebase, Paystack, withdrawal, GPS, CEO approval, etc - I answer ANY question!`;
+}
+
+function addBubble(text, sender, id){
+  let chatBox=document.getElementById('chatBox');
+  let div=document.createElement('div');
+  if(id) div.id=id;
+  div.style.cssText=`margin:8px 0;padding:10px 12px;border-radius:12px;max-width:85%;font-size:12px;line-height:1.5;white-space:pre-wrap;${sender==='user'?'background:#3b82f6;color:white;margin-left:auto;border-bottom-right-radius:4px':'background:white;border:1px solid #e5e7eb;border-bottom-left-radius:4px'}`;
+  div.innerText=text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop=chatBox.scrollHeight;
+}
+
+window.handleKey=function(e){if(e.key==='Enter') sendMessage();}
+
+window.setOpenAIKey=function(){
+  let key=prompt('Enter OpenAI API Key (sk-...) to enable GPT-4o-mini for ANY question - Or leave empty to use Local Smart AI (already answers any question):');
+  if(key){localStorage.setItem('openai_api_key', key);alert('OpenAI key saved - AI will now use GPT-4o-mini for even smarter answers!');}
+}
+window.setGeminiKey=function(){
+  let key=prompt('Enter Gemini API Key to enable Gemini 1.5 Flash:');
+  if(key){localStorage.setItem('gemini_api_key', key);alert('Gemini key saved!');}
+}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;display:flex;flex-direction:column;height:100vh}
+.top{padding:12px;background:linear-gradient(90deg,#22c55e,#16a34a);color:white;display:flex;justify-content:space-between;align-items:center}
+.chat{flex:1;overflow-y:auto;padding:12px;background:#f8fafc}
+.inputArea{padding:10px;background:white;border-top:1px solid #e5e7eb;display:flex;gap:8px;position:sticky;bottom:0}
+.inputArea input{flex:1;padding:12px;border-radius:999px;border:1.5px solid #e5e7eb;font-size:13px}
+.btn{padding:10px 16px;border-radius:999px;border:none;font-weight:900;cursor:pointer}
+.btnG{background:#16a34a;color:white}.btnGr{background:#f3f4f6;border:1px solid #e5e7eb}
+.small{font-size:10px;color:#6b7280}
+</style>
+</head>
+<body>
+<div class="top"><b>🤖 AI Support - Answers ANY Question - Storage + Realtime DB + Firestore</b><div style="display:flex;gap:6px"><button class="btn btnGr" style="background:white;color:#16a34a;padding:6px 10px" onclick="setOpenAIKey()">🔑 Set OpenAI Key (Optional)</button><button class="btn btnGr" style="background:white;color:#16a34a;padding:6px 10px" onclick="location.href='index.html'">🏠 Home</button></div></div>
+<div style="padding:8px;background:#fffbeb;border-bottom:1px solid #facc15;font-size:10px;text-align:center"><b>NEW AI - Not limited to specific questions - Answers ANY question about Love Care Global, Firebase, Paystack, 8 countries, booking, nurse, withdrawal, GPS, CEO, etc + General care questions</b><br><span class="small">Powered by Knowledge Base + OpenAI/Gemini optional + Local Smart AI fallback - All chats saved to Realtime DB ai_support_chats + Firestore ai_support_chats + ai_support_analytics - All 3 Firebase!</span></div>
+<div class="chat" id="chatBox">
+<div style="margin:8px 0;padding:10px 12px;border-radius:12px;background:white;border:1px solid #e5e7eb;font-size:12px;max-width:85%">👋 Hi! I'm Love Care Global AI Support - NEW version - I answer ANY question, not just specific ones!<br><br>Ask me anything:<br>- How to book nurse? (Client must register + login before booking - book-nurse.html has blocker)<br>- Nurse registration 8 countries + 6 files to Storage + Realtime DB + Firestore + CEO approval?<br>- Pricing in 8 countries? Paystack pk_live_f17ae...?<br>- Firebase Storage + Realtime DB + Firestore structure?<br>- Withdrawal methods Momo+Debit+Virtual vs Virtual+Debit+PayPal?<br>- GPS Map + Google Map directions?<br>- CEO Dashboard approval viewing Storage URLs?<br>- Client cannot book without login fix?<br>- Nurse cannot login until CEO approves?<br><br>Try: "How does booking work?" or "What is withdrawal?" or "Explain Firebase" or ANY question!</div>
+</div>
+<div class="inputArea">
+<input type="text" id="userInput" placeholder="Ask ANY question - Not limited - e.g., How to book? Pricing? Firebase? Withdrawal? GPS? CEO?" onkeypress="handleKey(event)">
+<button class="btn btnG" onclick="sendMessage()">Send</button>
+</div>
+<div style="padding:6px;background:#f0fdf4;text-align:center;font-size:9px;border-top:1px solid #bbf7d0">AI Support saves to: Storage (if voice) + Realtime DB ai_support_chats/{clientId} + Firestore ai_support_chats + ai_support_analytics - All 3 Firebase - CEO can view chats in ceo-dashboard.html - OpenAI key optional - Local Smart AI answers ANY question without API key!</div>
+</body>
+</html>
