@@ -1,1 +1,229 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book Nurse - 13 Services</title>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#f8fafc}
+.topbar{background:linear-gradient(90deg,#22c55e,#16a34a,#7c3aed);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;color:white}
+.menu{width:42px;height:42px;background:#facc15;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:900}
+.top-right{display:flex;gap:8px}
+.homeBtn{background:white;color:#16a34a;padding:8px 14px;border-radius:999px;font-weight:900;font-size:12px;text-decoration:none}
+.sosBtn{background:#ef4444;color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:12px;border:none;cursor:pointer}
+.steps{display:flex;gap:10px;padding:10px 14px;background:white;margin:8px;border-radius:12px;border:1px solid #e5e7eb;font-size:12px;font-weight:700;color:#9ca3af}
+.steps .active{color:#16a34a}
+.main{border-left:4px solid #16a34a;background:white;margin:8px;border-radius:16px;padding:14px;border-top:1px solid #e5e7eb;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb}
+.h3{font-weight:900;font-size:16px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.svc{padding:12px 10px;border:2px solid #e5e7eb;border-radius:12px;background:white;font-size:13px;font-weight:700;cursor:pointer;text-align:left}
+.svc.selected{border-color:#16a34a;background:#f0fdf4;color:#16a34a;box-shadow:0 0 0 3px #dcfce7}
+.continue{width:100%;padding:14px;background:#16a34a;color:white;border:none;border-radius:12px;font-weight:900;margin-top:14px;cursor:pointer}
+input,textarea,select{width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;margin:6px 0;font-size:13px}
+.splitBox{background:#f0fdf4;border:2px dashed #16a34a;border-radius:12px;padding:12px;margin:10px 0}
+.price{font-weight:900;color:#7c3aed}
+.pending{display:none;background:#fef3c7;border:2px solid #f59e0b;color:#92400e;padding:10px;border-radius:10px;font-weight:900;text-align:center;margin:8px 0}
+.payBtn{width:100%;padding:16px;background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer}
+.small{font-size:11px;color:#6b7280}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="menu">☰</div>
+    <div style="font-weight:900;line-height:1.1">BOOK NURSE<br><span style="background:white;color:#16a34a;padding:2px 6px;border-radius:6px;font-size:10px">13 SERVICES</span></div>
+  </div>
+  <div class="top-right">
+    <a class="homeBtn" href="index.html">🏠 Home</a>
+    <button class="sosBtn" onclick="location.href='tel:112'">SOS</button>
+  </div>
+</div>
+
+<div class="steps">
+  <span id="st1" class="active">● Step 1 Service</span>
+  <span id="st2">○ Step 2 Details</span>
+  <span id="st3">○ Step 3 Confirm</span>
+</div>
+
+<!-- STEP 1 - SAME AS SCREENSHOT -->
+<div id="step1" class="main">
+  <div class="h3">Step 1: Choose Service (13 Services)</div>
+  <div class="grid" id="serviceGrid">
+    <!-- 13 services - exactly like screenshot -->
+    <button class="svc" onclick="selectService(this,'Elderly Care',200)">Elderly Care</button>
+    <button class="svc" onclick="selectService(this,'Post-Surgery Care',250)">Post-Surgery Care</button>
+    <button class="svc" onclick="selectService(this,'Baby / Nanny Care',200)">Baby / Nanny Care</button>
+    <button class="svc" onclick="selectService(this,'Physiotherapy',300)">Physiotherapy</button>
+    <button class="svc" onclick="selectService(this,'Diabetes Care',200)">Diabetes Care</button>
+    <button class="svc" onclick="selectService(this,'Hypertension Care',200)">Hypertension Care</button>
+    <button class="svc" onclick="selectService(this,'Wound Dressing',150)">Wound Dressing</button>
+    <button class="svc" onclick="selectService(this,'Injection / IV',100)">Injection / IV</button>
+    <button class="svc" onclick="selectService(this,'Maternity Care',300)">Maternity Care</button>
+    <button class="svc" onclick="selectService(this,'Palliative Care',350)">Palliative Care</button>
+    <button class="svc" onclick="selectService(this,'Companion Care',180)">Companion Care</button>
+    <button class="svc" onclick="selectService(this,'Lab Sample Collection',150)">Lab Sample Collection</button>
+    <button class="svc" onclick="selectService(this,'General Nursing',200)">General Nursing</button>
+  </div>
+  <button class="continue" onclick="goStep2()">Continue →</button>
+</div>
+
+<!-- STEP 2 -->
+<div id="step2" class="main" style="display:none">
+  <div class="h3">Step 2: Your Details</div>
+  <input id="cName" placeholder="Full Name">
+  <input id="cPhone" placeholder="Phone Number">
+  <input id="cEmail" placeholder="Email for Paystack receipt *">
+  <input id="cLocation" placeholder="Address / GPS Location">
+  <textarea id="cNeed" placeholder="Care needed..."></textarea>
+  <button class="continue" onclick="goStep3()">Continue →</button>
+  <button class="continue" style="background:#e5e7eb;color:#333" onclick="showStep(1)">← Back</button>
+</div>
+
+<!-- STEP 3 - PAYSTACK SPLIT AT BOTTOM -->
+<div id="step3" class="main" style="display:none">
+  <div class="h3">Step 3: Confirm & Pay (Split 85/15)</div>
+  
+  <div id="pendingBox" class="pending">⚠️ After 9PM - This booking will be PENDING for tomorrow 7AM (Nurse safety)</div>
+
+  <div style="background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #e5e7eb;margin:8px 0;font-size:13px">
+    <div>Service: <b id="sumService">-</b></div>
+    <div id="sumPrice" class="price">Price: -</div>
+  </div>
+
+  <div class="splitBox">
+    <div style="font-weight:900;font-size:14px;margin-bottom:6px">💰 Paystack Split Payment</div>
+    <div id="splitDisplay" style="font-size:13px;line-height:1.5;font-weight:700">
+      <!-- filled by JS -->
+    </div>
+    <div class="small" style="margin-top:6px">✅ No payment = No booking (Nurse NOT notified) | Paystack converts auto to NGN, KES, ZAR, USD etc.</div>
+  </div>
+
+  <button class="payBtn" id="payBtn" onclick="payNow()">💳 Pay with Paystack & Book Now</button>
+  <p class="small" style="text-align:center;margin-top:6px">Secured by Paystack | 15% Company | 85% Nurse | Multi-currency</p>
+
+  <button class="continue" style="background:#e5e7eb;color:#333" onclick="showStep(2)">← Back</button>
+</div>
+
+<script>
+const PAYSTACK_KEY = "pk_live_f17ae09bf855010825cbfccdda8e724553ab747b";
+let selected = {name:'General Nursing', ghs:200};
+const rates = {ngn:24, kes:14, zar:3.5, usd:11};
+
+function selectService(el,name,ghs){
+  document.querySelectorAll('.svc').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  selected = {name, ghs};
+  localStorage.setItem('selectedService', name);
+}
+
+function showStep(n){
+  document.getElementById('step1').style.display = n==1?'block':'none';
+  document.getElementById('step2').style.display = n==2?'block':'none';
+  document.getElementById('step3').style.display = n==3?'block':'none';
+  document.getElementById('st1').className = n==1?'active':'';
+  document.getElementById('st2').className = n==2?'active':'';
+  document.getElementById('st3').className = n==3?'active':'';
+  document.getElementById('st1').innerText = n==1?'● Step 1 Service':'○ Step 1 Service';
+  document.getElementById('st2').innerText = n==2?'● Step 2 Details':'○ Step 2 Details';
+  document.getElementById('st3').innerText = n==3?'● Step 3 Confirm':'○ Step 3 Confirm';
+}
+
+function goStep2(){
+  if(!selected.name){ alert('Select a service'); return; }
+  showStep(2);
+}
+
+function goStep3(){
+  let name = document.getElementById('cName').value.trim();
+  let phone = document.getElementById('cPhone').value.trim();
+  let email = document.getElementById('cEmail').value.trim();
+  let loc = document.getElementById('cLocation').value.trim();
+  if(!name||!phone||!email||!loc){ alert('Fill all details'); return; }
+  if(!email.includes('@')){ alert('Valid email needed for Paystack'); return; }
+
+  let ghs = selected.ghs;
+  let ngn = ghs*rates.ngn;
+  let kes = ghs*rates.kes;
+  let zar = Math.round(ghs*rates.zar);
+  let usd = (ghs/rates.usd).toFixed(2);
+
+  let nurseGHS = Math.round(ghs*0.85);
+  let compGHS = ghs - nurseGHS;
+  let nurseNGN = Math.round(nurseGHS*rates.ngn);
+  let compNGN = Math.round(compGHS*rates.ngn);
+  let nurseUSD = (nurseGHS/rates.usd).toFixed(2);
+
+  document.getElementById('sumService').innerText = selected.name;
+  document.getElementById('sumPrice').innerText = `Price: GHS ${ghs} = NGN ${ngn} = KES ${kes} = ZAR ${zar} = $${usd}`;
+
+  document.getElementById('splitDisplay').innerHTML = `
+    Total: GHS ${ghs} / NGN ${ngn} / $${usd}<br>
+    👩‍⚕️ Nurse 85%: <span style="color:#16a34a">GHS ${nurseGHS} / NGN ${nurseNGN} / $${nurseUSD}</span><br>
+    🏢 Company 15%: GHS ${compGHS} / NGN ${compNGN}<br>
+    <span style="font-size:11px;color:#6b7280">Auto multi-currency: KES ${Math.round(nurseGHS*14)}, ZAR ${Math.round(nurseGHS*3.5)}</span>
+  `;
+
+  let h = new Date().getHours();
+  document.getElementById('pendingBox').style.display = h>=21?'block':'none';
+  if(h>=21) document.getElementById('payBtn').innerText = '⚠️ After 9PM - Pay for Tomorrow 7AM (PENDING)';
+
+  showStep(3);
+}
+
+function payNow(){
+  let cName = document.getElementById('cName').value.trim();
+  let cPhone = document.getElementById('cPhone').value.trim();
+  let cEmail = document.getElementById('cEmail').value.trim();
+  let cLocation = document.getElementById('cLocation').value.trim();
+  let cNeed = document.getElementById('cNeed').value.trim();
+  let ghs = selected.ghs;
+  let nurseGHS = Math.round(ghs*0.85);
+  let compGHS = ghs - nurseGHS;
+  let hour = new Date().getHours();
+  let isPending = hour>=21;
+
+  var handler = PaystackPop.setup({
+    key: PAYSTACK_KEY,
+    email: cEmail,
+    amount: ghs*100,
+    currency: 'GHS',
+    ref: 'LOVECARE85_'+Date.now(),
+    metadata: {
+      custom_fields: [
+        {display_name: "Service", variable_name: "service", value: selected.name},
+        {display_name: "Nurse 85%", variable_name: "nurse_85", value: nurseGHS},
+        {display_name: "Company 15%", variable_name: "company_15", value: compGHS}
+      ]
+    },
+    callback: function(res){
+      let booking = {
+        id: 'BK_'+Date.now(),
+        service: selected.name,
+        amountGHS: ghs,
+        amountNGN: ghs*rates.ngn,
+        split: `Nurse 85%: GHS ${nurseGHS} | Company 15%: GHS ${compGHS}`,
+        nurseGHS, companyGHS: compGHS,
+        clientName: cName, clientPhone: cPhone, clientEmail: cEmail, clientLocation: cLocation, careNeed: cNeed,
+        paystackRef: res.reference,
+        status: isPending?'PENDING_TOMORROW_7AM':'PAID',
+        payment: 'PAID via Paystack '+res.reference,
+        time: new Date().toISOString()
+      };
+      let books = JSON.parse(localStorage.getItem('loveCareBookings')||'[]');
+      books.push(booking);
+      localStorage.setItem('loveCareBookings', JSON.stringify(books));
+      localStorage.setItem('currentClient', JSON.stringify({name:cName, phone:cPhone, email:cEmail, id:cPhone}));
+      alert(`✅ PAYMENT SUCCESS - SPLIT 85/15!\nRef: ${res.reference}\nService: ${selected.name}\nTotal: GHS ${ghs}\nNurse 85%: GHS ${nurseGHS}\nCompany 15%: GHS ${compGHS}\nStatus: ${booking.status}\nNurse notified!`);
+      location.href='./client-dashboard.html';
+    },
+    onClose: function(){
+      alert('❌ Payment cancelled - Booking FAILED - Nurse NOT notified');
+    }
+  });
+  handler.openIframe();
+}
+</script>
+</body>
+</html>
