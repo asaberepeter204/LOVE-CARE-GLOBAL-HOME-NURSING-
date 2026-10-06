@@ -1,63 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CEO Dashboard - LOVE CARE GLOBAL - ALL BUTTONS</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Dashboard - SPLIT PAGES - LOVE CARE GLOBAL</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-*{box-sizing:border-box}body{font-family:Inter,Arial,sans-serif;margin:0;background:#f8fafc;color:#111827;padding:0}
+*{box-sizing:border-box}body{font-family:Inter,Arial,sans-serif;margin:0;background:#f8fafc}
 .header{position:sticky;top:0;z-index:99;background:#111827;color:white;padding:12px;display:flex;justify-content:space-between;align-items:center}
-.card{background:white;border-radius:16px;padding:14px;margin:10px;border:2px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.card{background:white;border-radius:16px;padding:14px;margin:10px;border:2px solid #e5e7eb}
 .btn{border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;margin:3px;font-size:12px}
 .btnGreen{background:#16a34a;color:white}.btnBlue{background:#2563eb;color:white}.btnRed{background:#ef4444;color:white}.btnDark{background:#111827;color:white}.btnYellow{background:#eab308;color:#111}.btnPurple{background:#7c3aed;color:white}.btnOrange{background:#ff6a00;color:white}.btnGray{background:#6b7280;color:white}
-.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.page{display:none}.page.active{display:block}
+.nav{display:flex;justify-content:space-between;align-items:center;margin:10px;padding:10px;background:#111827;color:white;border-radius:12px}
+.progress{display:flex;gap:4px;justify-content:center;margin:10px}
+.dot{width:10px;height:10px;border-radius:50%;background:#e5e7eb}.dot.active{background:#16a34a}
 .badge{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:900;color:white}
 .links a{display:inline-block;margin:2px;padding:4px 8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#2563eb;font-size:11px;text-decoration:none;font-weight:700}
-#map{height:300px;border-radius:12px;border:3px solid #16a34a}
 </style>
 </head>
 <body>
 <div class="header">
-<div><b>👑 CEO Dashboard - LOVE CARE GLOBAL</b><div style="font-size:10px;opacity:0.8">CEO: joshouapee@gmail.com | FULL ALL BUTTONS</div></div>
-<div style="display:flex;gap:4px"><button class="btn" style="background:white;color:#111" onclick="location.href='index.html'">Home</button><button class="btn" style="background:white;color:#111" onclick="location.href='nurses-group-chat.html'">💬 Group Chat</button><button class="btn" style="background:#facc15;color:#111" onclick="logout()">Logout</button></div>
+<div><b>👑 CEO Dashboard - SPLIT VERSION</b><div style="font-size:10px">CEO: joshouapee@gmail.com | Page <span id="pageNum">1</span>/4</div></div>
+<div style="display:flex;gap:4px"><button class="btn" style="background:white;color:#111" onclick="location.href='index.html'">Home</button><button class="btn" style="background:white;color:#111" onclick="location.href='nurses-group-chat.html'">💬 Chat</button></div>
 </div>
 
-<div style="max-width:1100px;margin:0 auto;padding:10px">
+<div style="max-width:1100px;margin:0 auto">
+<div class="progress"><div class="dot active" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div><div class="dot" id="d4"></div></div>
 
-<!-- STATS -->
+<!-- PAGE 1 -->
+<div id="page1" class="page active">
 <div class="grid4">
 <div class="card" style="border-color:#16a34a;text-align:center"><b>Bookings</b><div id="ceoTotalBookings" style="font-weight:900;font-size:20px">0</div></div>
 <div class="card" style="border-color:#2563eb;text-align:center"><b>Nurses</b><div id="ceoTotalNurses" style="font-weight:900;font-size:20px">0</div></div>
 <div class="card" style="border-color:#eab308;text-align:center"><b>Earnings</b><div id="ceoPlatformEarnings" style="font-weight:900;font-size:20px">0</div></div>
 <div class="card" style="border-color:#ef4444;text-align:center"><b>SOS</b><div id="ceoSOSCount" style="font-weight:900;font-size:20px">0</div></div>
 </div>
-
-<!-- CONTROL CENTER -->
-<div class="card" style="background:linear-gradient(90deg,#16a34a,#7c3aed);color:white">
-<div style="display:flex;justify-content:space-between;align-items:center"><div><b>👑 CEO CONTROL CENTER - KUSIPETER</b><div style="font-size:10px;opacity:0.9">CEO ↔ Nurse ↔ Client ↔ Staff Live Connection</div></div><button class="btn" style="background:white;color:#16a34a" onclick="loadAll()">🔄 Refresh All</button></div>
-</div>
-
-<!-- ALL BUTTONS ROW 1 -->
+<div class="card" style="background:linear-gradient(90deg,#16a34a,#7c3aed);color:white"><b>👑 CEO CONTROL CENTER - KUSIPETER</b><div style="font-size:10px">CEO ↔ Nurse ↔ Client ↔ Staff Live Connection</div></div>
 <div class="card">
-<b>🔗 Quick Actions - ALL BUTTONS FROM YOUR FILE</b><br><br>
-<button class="btn btnGreen" onclick="document.getElementById('pendingSection').scrollIntoView({behavior:'smooth'})">👩‍⚕️ Review Nurses</button>
+<b>PAGE 1: Quick Actions & Filters - ALL BUTTONS</b><br><br>
+<button class="btn btnGreen" onclick="goTo(2)">👩‍⚕️ Review Nurses → Continue</button>
 <button class="btn btnBlue" onclick="loadNursesForCall()">📞 Nurse Directory</button>
 <button class="btn" style="background:#0e7490;color:white" onclick="loadStaffForCall()">👔 Staff</button>
 <button class="btn btnOrange" onclick="loadClientsForCall()">👨‍👩‍👧 Clients</button>
 <button class="btn btnPurple" onclick="viewLiveMap()">🗺️ Live Map All</button>
-<button class="btn btnYellow" onclick="broadcastToNurses()">📢 To Nurses</button>
-<button class="btn btnYellow" onclick="broadcastToClients()">📢 To Clients</button>
-</div>
-
-<!-- FILTERS -->
-<div class="card">
-<b>Filters</b><br><br>
+<button class="btn btnYellow" onclick="broadcastToNurses()">📢 To Nurses - Entire App</button>
+<button class="btn btnYellow" onclick="broadcastToClients()">📢 To Clients - Entire App</button>
+<br><br>
+<b>Filters:</b><br>
 <button class="btn btnYellow" onclick="filterNurses('pending')">⏳ Pending Only</button>
 <button class="btn btnBlue" onclick="filterNurses('all')">📋 All</button>
 <button class="btn btnGreen" onclick="filterNurses('approved')">✅ Approved</button>
@@ -66,118 +60,114 @@
 <button class="btn btnDark" onclick="removeDemo()">🧹 Remove Demo</button>
 <button class="btn btnGreen" onclick="loadPending()">🔄 Load Pending</button>
 </div>
-
-<!-- PENDING -->
 <div id="pendingSection" class="card" style="border:3px solid #ef4444;background:#fef2f2">
 <h3 style="margin:0;color:#991b1b">🚨 PENDING NURSE REGISTRATIONS - Accept / Reject</h3>
-<p style="font-size:11px;color:#6b7280">New nurses upload CV, Licence, Photos, Certificate, Video, National ID - CEO must view and Accept/Reject</p>
-<div id="ceoNurseApplicationsList" style="max-height:700px;overflow-y:auto;background:white;border-radius:10px;padding:8px;border:2px solid #ef4444;margin-top:8px">Loading...</div>
+<p style="font-size:11px;color:#6b7280">CV, Licence, Photos, Certificate, Video, National ID</p>
+<div id="ceoNurseApplicationsList" style="max-height:600px;overflow-y:auto;background:white;border-radius:10px;padding:8px;border:2px solid #ef4444;margin-top:8px">Loading pending...</div>
+</div>
+<div class="nav"><button class="btn btnGray" disabled>⬅️ Backwards</button><span>Page 1 of 4 - Pending Nurses</span><button class="btn btnGreen" onclick="goTo(2)">Continue →</button></div>
 </div>
 
-<!-- VERIFIED -->
+<!-- PAGE 2 -->
+<div id="page2" class="page">
 <div class="card" style="border:3px solid #16a34a;background:#f0fdf4">
-<h3 style="margin:0;color:#16a34a">✅ VERIFIED NURSES - View Uploads</h3>
+<h3 style="margin:0;color:#16a34a">✅ VERIFIED NURSES - View Uploads - PAGE 2</h3>
 <div style="margin:8px 0">
 <button class="btn btnGreen" onclick="loadVerified()">👩‍⚕️ Load Verified Nurses</button>
-<button class="btn btnBlue" onclick="viewAllDocs()">📁 View All Docs Gallery</button>
+<button class="btn btnBlue" onclick="viewAllDocs()">📁 View All Docs Gallery - Entire App</button>
 </div>
-<div id="ceoVerifiedNursesList" style="max-height:500px;overflow-y:auto;background:white;border-radius:10px;padding:8px;border:2px solid #16a34a">No verified nurses yet</div>
+<div id="ceoVerifiedNursesList" style="max-height:400px;overflow-y:auto;background:white;border-radius:10px;padding:8px;border:2px solid #16a34a">No verified yet</div>
 </div>
-
-<!-- CALL LISTS -->
-<div class="card">
-<h3>📞 Call Lists - Live tracking</h3>
-<div id="ceoCallLists" style="max-height:200px;overflow-y:auto;background:#f9fafb;border-radius:8px;padding:8px;border:1px solid #e5e7eb">Click Nurse Directory / Staff / Clients above</div>
-<div id="ceoStaffList" style="max-height:150px;overflow-y:auto;margin-top:6px"></div>
-</div>
-
-<!-- CONNECTION HUB - ALL 8 BUTTONS -->
+<div class="card"><h3>📞 Call Lists - Live tracking - Entire App</h3><div id="ceoCallLists" style="max-height:200px;overflow-y:auto;background:#f9fafb;border-radius:8px;padding:8px;border:1px solid #e5e7eb">Click Nurse Directory / Staff / Clients</div><div id="ceoStaffList" style="margin-top:6px"></div></div>
 <div class="card" style="border:2px solid #7c3aed;background:#f5f3ff">
-<h3 style="color:#7c3aed;margin:0">🔗 CEO ↔ Nurse ↔ Client ↔ Staff Connection Hub</h3><br>
+<h3 style="color:#7c3aed;margin:0">🔗 CEO ↔ Nurse ↔ Client ↔ Staff Connection Hub - ALL 8 BUTTONS</h3><br>
 <div class="grid2">
-<button class="btn btnGreen" style="padding:12px" onclick="assignNurse()">🔄 Assign Nurse to Client Booking</button>
-<button class="btn btnBlue" style="padding:12px" onclick="location.href='nurses-group-chat.html'">💬 Open Group Chat (All) → nurses-group-chat.html</button>
-<button class="btn" style="background:#0e7490;color:white;padding:12px" onclick="location.href='nurses-group-chat.html'">💬 Direct Chat: CEO → Nurse → nurses-group-chat.html</button>
-<button class="btn btnOrange" style="padding:12px" onclick="location.href='nurses-group-chat.html'">💬 Direct Chat: CEO → Client → nurses-group-chat.html</button>
-<button class="btn btnPurple" style="padding:12px" onclick="broadcastToNurses()">📢 Broadcast to All Nurses</button>
-<button class="btn btnYellow" style="padding:12px" onclick="broadcastToClients()">📢 Broadcast to All Clients</button>
-<button class="btn btnRed" style="padding:12px" onclick="viewSOS()">🚨 View SOS Alerts (All Users)</button>
-<button class="btn btnDark" style="padding:12px" onclick="viewLiveMap()">🗺️ Live Tracking Map</button>
+<button class="btn btnGreen" style="padding:12px" onclick="assignNurse()">🔄 Assign Nurse to Client Booking - Entire App</button>
+<button class="btn btnBlue" style="padding:12px" onclick="location.href='nurses-group-chat.html'">💬 Open Group Chat → nurses-group-chat.html</button>
+<button class="btn" style="background:#0e7490;color:white;padding:12px" onclick="location.href='nurses-group-chat.html'">💬 Direct Chat CEO→Nurse → nurses-group-chat.html</button>
+<button class="btn btnOrange" style="padding:12px" onclick="location.href='nurses-group-chat.html'">💬 Direct Chat CEO→Client → nurses-group-chat.html</button>
+<button class="btn btnPurple" style="padding:12px" onclick="broadcastToNurses()">📢 Broadcast to All Nurses - Entire App</button>
+<button class="btn btnYellow" style="padding:12px" onclick="broadcastToClients()">📢 Broadcast to All Clients - Entire App</button>
+<button class="btn btnRed" style="padding:12px" onclick="viewSOS()">🚨 View SOS Alerts (All Users) - Entire App</button>
+<button class="btn btnDark" style="padding:12px" onclick="viewLiveMap()">🗺️ Live Tracking Map - Entire App</button>
 </div>
+</div>
+<div class="nav"><button class="btn btnBlue" onclick="goTo(1)">⬅️ Backwards</button><span>Page 2 of 4 - Verified & Connection Hub</span><button class="btn btnGreen" onclick="goTo(3)">Continue →</button></div>
 </div>
 
-<!-- STAFF MANAGEMENT -->
-<div class="card">
-<h3>👔 Staff Management</h3>
+<!-- PAGE 3 -->
+<div id="page3" class="page">
+<div class="card"><h3>👔 Staff Management - PAGE 3 - ALL BUTTONS</h3>
 <div class="grid4">
 <input id="newStaffId" placeholder="Staff ID" style="padding:10px;border-radius:8px;border:2px solid #e5e7eb">
 <input id="newStaffPass" placeholder="Password" style="padding:10px;border-radius:8px;border:2px solid #e5e7eb">
 <input id="newStaffPhone" placeholder="Phone" style="padding:10px;border-radius:8px;border:2px solid #e5e7eb">
-<button class="btn btnGreen" onclick="createStaff()">✅ Create Staff</button>
+<button class="btn btnGreen" onclick="createStaff()">✅ Create Staff - Entire App</button>
 </div>
-<button class="btn btnBlue" style="width:100%;margin-top:6px" onclick="loadStaffList()">👥 Staff - Deactivate/Activate/Call</button>
+<button class="btn btnBlue" style="width:100%;margin-top:6px" onclick="loadStaffList()">👥 Staff - Deactivate/Activate/Call - Entire App</button>
 <div id="staffListDisplay" style="max-height:150px;overflow-y:auto;margin-top:6px;border:1px solid #e5e7eb;border-radius:8px;padding:6px">Staff list</div>
 <div style="margin-top:10px">
 <input id="newCeoId" placeholder="New CEO ID" style="width:100%;padding:10px;border-radius:8px;border:2px solid #e5e7eb;margin-bottom:4px">
 <input id="newCeoPass" type="password" placeholder="New Pass" style="width:100%;padding:10px;border-radius:8px;border:2px solid #e5e7eb;margin-bottom:4px">
-<button class="btn btnRed" style="width:100%" onclick="changeCEO()">🔐 Change CEO ID/Pass</button>
+<button class="btn btnRed" style="width:100%" onclick="changeCEO()">🔐 Change CEO ID/Pass - Entire App</button>
 </div>
 </div>
-
-<!-- PAYSTACK + FINANCE -->
 <div class="card">
 <h3>💳 Finance & Payouts - ALL BUTTONS</h3>
 <div style="background:#f0fdf4;border:1px solid #16a34a;border-radius:8px;padding:8px;margin-bottom:8px">
 <input id="paystackSecretKey" type="password" placeholder="sk_live_..." style="width:100%;padding:10px;border-radius:6px;border:2px solid #16a34a">
 <div style="display:flex;gap:4px;margin-top:6px">
-<button class="btn btnGreen" style="flex:1" onclick="savePaystack()">💾 Save Paystack Key</button>
+<button class="btn btnGreen" style="flex:1" onclick="savePaystack()">💾 Save Paystack Key - Entire App</button>
 <button class="btn btnBlue" style="flex:1" onclick="testPaystack()">🔌 Test Connection</button>
 </div>
 <div id="paystackKeyStatus" style="font-size:11px;margin-top:4px"></div>
 </div>
-
 <div style="display:flex;gap:4px;flex-wrap:wrap">
-<button class="btn" style="background:#ff6a00;color:white" onclick="loadPayouts()">💸 Payouts 85%</button>
-<button class="btn btnGreen" onclick="bonusNurse()">⭐ Bonus Nurse</button>
-<button class="btn btnYellow" onclick="loadRefunds()">💸 Refunds</button>
+<button class="btn" style="background:#ff6a00;color:white" onclick="loadPayouts()">💸 Payouts 85% - Entire App</button>
+<button class="btn btnGreen" onclick="bonusNurse()">⭐ Bonus Nurse - Entire App</button>
+<button class="btn btnYellow" onclick="loadRefunds()">💸 Refunds - Entire App</button>
 <button class="btn btnPurple" onclick="viewLiveMap()">🗺️ Live Map All</button>
 <button class="btn btnYellow" onclick="refreshCount()">🔄 Refresh Rating & Count</button>
-<button class="btn" style="background:#ff9800;color:white" onclick="setShortPrice()">💰 Short (1-6d)</button>
-<button class="btn" style="background:#4caf50;color:white" onclick="setLongPrice()">💰 Long (7+ days)</button>
+<button class="btn" style="background:#ff9800;color:white" onclick="setShortPrice()">💰 Short (1-6d) - Entire App</button>
+<button class="btn" style="background:#4caf50;color:white" onclick="setLongPrice()">💰 Long (7+ days) - Entire App</button>
 <button class="btn" style="background:#2196f3;color:white" onclick="refreshPrice()">🔄 Refresh Price</button>
 </div>
-
-<div id="ceoPayoutsList" style="max-height:200px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px;background:white;margin-top:8px">Payouts - WHERE CEO RECEIVES PAYMENT REQUEST</div>
-<div id="ceoClientConfirmationsList" style="max-height:200px;overflow-y:auto;border:1px solid #16a34a;border-radius:8px;padding:8px;background:#f0fdf4;margin-top:8px">Confirmations + Ratings - WHERE CEO RECEIVES CONFIRMATION</div>
-<div id="ceoRefundsList" style="max-height:200px;overflow-y:auto;border:1px solid #ef4444;border-radius:8px;padding:8px;background:#fef2f2;margin-top:8px">Refunds + Disputes</div>
-
-<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">
-<button class="btn btnBlue" style="flex:1" onclick="assignNurse()">🔄 Assign Nurse Manually</button>
-<button class="btn btnRed" style="flex:1" onclick="resolveDispute()">⚠️ Resolve Dispute</button>
-<button class="btn btnGreen" style="flex:1" onclick="approveRefund()">✅ Approve Refund</button>
-<button class="btn btnGray" style="flex:1" onclick="denyRefund()">❌ Deny Refund</button>
 </div>
+<div class="nav"><button class="btn btnBlue" onclick="goTo(2)">⬅️ Backwards</button><span>Page 3 of 4 - Staff & Finance</span><button class="btn btnGreen" onclick="goTo(4)">Continue →</button></div>
 </div>
 
-<!-- INCIDENT REPORTS -->
-<div class="card" style="border:3px solid #7c3aed;background:#f5f3ff">
-<h3 style="color:#7c3aed;margin:0">🚨 Incident Reports & Misconduct</h3>
-<div id="ceoIncidentReports" style="max-height:300px;overflow-y:auto;background:white;border-radius:8px;padding:8px;margin-top:8px;border:1px solid #ddd6fe">No reports - click Load</div>
-<button class="btn btnPurple" style="width:100%;margin-top:6px" onclick="loadIncidents()">🔄 Load Reports</button>
-</div>
-
-<!-- MAP -->
+<!-- PAGE 4 -->
+<div id="page4" class="page">
 <div class="card">
-<h3>🗺️ Live Map - All Nurses & Clients</h3>
+<h3>📅 Bookings, Payouts, Refunds - PAGE 4 - ALL BUTTONS</h3>
+<div id="ceoBookingsList" style="max-height:150px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px;background:white;margin-bottom:8px">Bookings loading...</div>
+<div id="ceoPayoutsList" style="max-height:200px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px;background:white;margin-bottom:8px">Payouts - WHERE CEO RECEIVES PAYMENT REQUEST - Entire App</div>
+<div id="ceoClientConfirmationsList" style="max-height:200px;overflow-y:auto;border:1px solid #16a34a;border-radius:8px;padding:8px;background:#f0fdf4;margin-bottom:8px">Confirmations + Ratings - WHERE CEO RECEIVES CONFIRMATION</div>
+<div id="ceoRefundsList" style="max-height:200px;overflow-y:auto;border:1px solid #ef4444;border-radius:8px;padding:8px;background:#fef2f2;margin-bottom:8px">Refunds + Disputes - Entire App</div>
+<div style="display:flex;gap:4px;flex-wrap:wrap">
+<button class="btn btnBlue" style="flex:1" onclick="assignNurse()">🔄 Assign Nurse Manually - Entire App</button>
+<button class="btn btnRed" style="flex:1" onclick="resolveDispute()">⚠️ Resolve Dispute - Entire App</button>
+<button class="btn btnGreen" style="flex:1" onclick="approveRefund()">✅ Approve Refund - Entire App</button>
+<button class="btn btnGray" style="flex:1" onclick="denyRefund()">❌ Deny Refund - Entire App</button>
+</div>
+</div>
+<div class="card" style="border:3px solid #7c3aed;background:#f5f3ff">
+<h3 style="color:#7c3aed;margin:0">🚨 Incident Reports & Misconduct - Entire App</h3>
+<div id="ceoIncidentReports" style="max-height:300px;overflow-y:auto;background:white;border-radius:8px;padding:8px;margin-top:8px;border:1px solid #ddd6fe">No reports</div>
+<button class="btn btnPurple" style="width:100%;margin-top:6px" onclick="loadIncidents()">🔄 Load Reports - Entire App</button>
+</div>
+<div class="card">
+<h3>🗺️ Live Map - All Nurses & Clients - Entire App</h3>
 <div id="ceoMap" style="height:350px;border-radius:12px;border:3px solid #16a34a;margin-top:8px"></div>
-<button class="btn btnPurple" style="margin-top:6px" onclick="viewLiveMap()">🔄 Reload Map</button>
+<button class="btn btnPurple" style="margin-top:6px" onclick="viewLiveMap()">🔄 Reload Map - Entire App</button>
+</div>
+<div class="nav"><button class="btn btnBlue" onclick="goTo(3)">⬅️ Backwards</button><span>Page 4 of 4 - Bookings, Map, Incidents</span><button class="btn btnDark" onclick="goTo(1)">⬅️ Back to Start</button></div>
 </div>
 
 </div>
 
-<!-- DOC VIEWER -->
 <div id="nurseDocViewerModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;padding:12px">
-<div style="background:white;border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto"><div style="padding:12px;background:#111827;color:white;display:flex;justify-content:space-between"><b>📄 Nurse Documents</b><button class="btn btnRed" onclick="closeViewer()">X</button></div><div id="nurseDocViewerBody" style="padding:12px"></div></div>
+<div style="background:white;border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto"><div style="padding:12px;background:#111827;color:white;display:flex;justify-content:space-between"><b>📄 Docs</b><button class="btn btnRed" onclick="closeViewer()">X</button></div><div id="nurseDocViewerBody" style="padding:12px"></div></div>
 </div>
 
 <script>
@@ -190,50 +180,39 @@ const firebaseConfig = {
   messagingSenderId: "1062578660694",
   appId: "1:1062578660694:web:f94dfe12c929df05bce2f7"
 };
-try{
-  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  window.db=firebase.database(); window.auth=firebase.auth();
-  console.log("✅ Firebase OK");
-}catch(e){console.error(e); alert("Firebase Error: "+e.message);}
+try{ if(!firebase.apps.length) firebase.initializeApp(firebaseConfig); window.db=firebase.database(); window.auth=firebase.auth(); }catch(e){ console.error(e); }
 
-function logout(){ auth.signOut().then(()=>location.href='ceo-login.html'); }
+function goTo(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page'+n).classList.add('active');
+  document.getElementById('pageNum').innerText=n;
+  document.querySelectorAll('.dot').forEach(d=>d.classList.remove('active'));
+  document.getElementById('d'+n).classList.add('active');
+  window.scrollTo(0,0);
+  if(n===2) loadVerified(); if(n===4){ loadBookings(); loadPayouts(); loadRefunds(); viewLiveMap(); }
+}
 function getApps(){ try{ return JSON.parse(localStorage.getItem('nurseApplications')||'[]'); }catch(e){ return []; } }
 function saveApps(a){ localStorage.setItem('nurseApplications', JSON.stringify(a)); }
 window._filter='pending';
 function filterNurses(f){ window._filter=f; loadPending(); }
 function removeDemo(){ var apps=getApps(); var filt=apps.filter(a=>{ var n=(a.name||'').toLowerCase(); return !n.includes('demo')&&!n.includes('test'); }); saveApps(filt); alert('Removed '+(apps.length-filt.length)); loadPending(); }
-
 function syncAll(app){
   try{
     if(db){
       db.ref('nurseApplications/'+app.id).set(app);
       db.ref('pending_nurses/'+app.id).set(app);
       var rec={id:app.id, username:app.username||app.id, name:app.name, phone:app.phone, email:app.email||'', specialty:app.specialty||'', licenseNumber:app.licenseNumber||'', docs:app.docs||{}, photo:app.photo||'', country:app.country||'', city:app.city||'', status:app.status, blocked:app.blocked||false, deactivated:app.deactivated||false, approvedAt:app.approvedAt||Date.now(), createdAt:app.createdAt||Date.now()};
-      db.ref('nurses/'+app.id).set(rec);
-      if(app.username) db.ref('nurses/'+app.username).set(rec);
-      if(app.status==='approved'&&!app.blocked&&!app.deactivated){
-        db.ref('verifiedNurses/'+app.id).set(rec);
-        db.ref('verified_nurses/'+app.id).set(rec);
-        db.ref('pending_nurses/'+app.id).remove();
-      }else{
-        db.ref('verifiedNurses/'+app.id).remove();
-        db.ref('verified_nurses/'+app.id).remove();
-      }
+      db.ref('nurses/'+app.id).set(rec); if(app.username) db.ref('nurses/'+app.username).set(rec);
+      if(app.status==='approved'&&!app.blocked&&!app.deactivated){ db.ref('verifiedNurses/'+app.id).set(rec); db.ref('verified_nurses/'+app.id).set(rec); db.ref('pending_nurses/'+app.id).remove(); }else{ db.ref('verifiedNurses/'+app.id).remove(); db.ref('verified_nurses/'+app.id).remove(); }
       if(app.status==='blocked') db.ref('blockedNurses/'+app.id).set({id:app.id, name:app.name, reason:app.blockReason||''});
-      if(app.status==='rejected') db.ref('pending_nurses/'+app.id).remove();
       db.ref('lastCEOAction').set({action:app.status, nurseId:app.id, time:Date.now()});
     }
   }catch(e){console.error(e);}
   var apps=getApps(); var idx=apps.findIndex(a=>a.id===app.id); if(idx>=0) apps[idx]=app; else apps.push(app); saveApps(apps);
-  try{ localStorage.setItem('nurseApprovedUpdate', Date.now().toString()); }catch(e){}
 }
-
-function loadAll(){ loadPending(); loadVerified(); loadBookings(); loadPayouts(); loadRefunds(); loadStaffList(); loadIncidents(); loadStats(); }
-function loadStats(){ var apps=getApps(); var appr=apps.filter(a=>a.status==='approved').length; document.getElementById('ceoTotalNurses').innerText=appr+' / '+apps.length; if(db) db.ref('bookings').once('value').then(s=>{ document.getElementById('ceoTotalBookings').innerText=s.numChildren(); }); }
 function loadPending(){
   var container=document.getElementById('ceoNurseApplicationsList');
   var apps=getApps();
-  container.innerHTML='Loading '+apps.length+'...';
   function render(all){
     var f=window._filter; var filtered=f==='all'?all:(f?all.filter(a=>(a.status||'pending')===f):all.filter(a=>(a.status||'pending')==='pending'));
     filtered.sort((a,b)=>{ if(a.status==='pending'&&b.status!=='pending') return -1; if(a.status!=='pending'&&b.status==='pending') return 1; return (b.createdAt||0)-(a.createdAt||0); });
@@ -248,13 +227,13 @@ function loadPending(){
       html+='<div class="links" style="margin-top:6px">'+Object.keys(d).map(k=>d[k]?'<a href="'+d[k]+'" target="_blank">'+k.toUpperCase()+'</a>':'').join('')+(app.photo?'<a href="'+app.photo+'" target="_blank">PHOTO</a>':'')+'</div>';
       html+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">';
       if(app.status==='pending'){
-        html+='<button class="btn btnGreen" style="flex:1" onclick="approve(\''+safeId+'\')">✅ Approve - Affects Entire App</button>';
-        html+='<button class="btn btnRed" style="flex:1" onclick="reject(\''+safeId+'\')">❌ Reject</button>';
-        html+='<button class="btn btnGray" onclick="del(\''+safeId+'\')">🗑️ Delete</button>';
+        html+='<button class="btn btnGreen" style="flex:1" onclick="approve(\''+safeId+'\')">✅ Approve - Entire App</button>';
+        html+='<button class="btn btnRed" style="flex:1" onclick="reject(\''+safeId+'\')">❌ Reject - Entire App</button>';
+        html+='<button class="btn btnGray" onclick="del(\''+safeId+'\')">🗑️ Delete - Entire App</button>';
       }else if(app.status==='approved'){
         html+='<button class="btn btnBlue" onclick="callNurse(\''+(app.phone||'')+'\')">📞 Call</button>';
         html+='<button class="btn btnYellow" onclick="block(\''+safeId+'\')">🚫 Block - Entire App</button>';
-        html+='<button class="btn btnGray" onclick="deact(\''+safeId+'\')">⏸️ Deact</button>';
+        html+='<button class="btn btnGray" onclick="deact(\''+safeId+'\')">⏸️ Deact - Entire App</button>';
       }else{
         html+='<button class="btn btnGreen" onclick="react(\''+safeId+'\')">✅ Reactivate - Entire App</button>';
         html+='<button class="btn btnGray" onclick="del(\''+safeId+'\')">🗑️ Delete</button>';
@@ -263,50 +242,47 @@ function loadPending(){
     });
     container.innerHTML=html;
   }
-  if(db){
-    db.ref('nurseApplications').once('value').then(function(snap){
-      var val=snap.val(); if(val){ var fb=Object.values(val); fb.forEach(function(fa){ if(!apps.find(a=>a.id===fa.id)) apps.push(fa); }); saveApps(apps); }
-      render(apps);
-    }).catch(e=>{ render(apps); });
-  }else render(apps);
+  if(db){ db.ref('nurseApplications').once('value').then(function(snap){ var val=snap.val(); if(val){ var fb=Object.values(val); fb.forEach(function(fa){ if(!apps.find(a=>a.id===fa.id)) apps.push(fa); }); saveApps(apps); } render(apps); }).catch(e=>{ render(apps); }); }else render(apps);
 }
-function approve(id){ if(!confirm('✅ Approve '+id+'? Nurse will be LIVE in entire app repo')) return; var apps=getApps(); var i=apps.findIndex(a=>a.id===id); if(i>=0){ apps[i].status='approved'; apps[i].approvedAt=Date.now(); apps[i].blocked=false; apps[i].deactivated=false; saveApps(apps); syncAll(apps[i]); } loadPending(); loadVerified(); loadStats(); alert('✅ Approved - Now live in entire app'); }
-function reject(id){ var r=prompt('Reject '+id+'? Reason:'); if(r===null) return; var apps=getApps(); var i=apps.findIndex(a=>a.id===id); if(i>=0){ apps[i].status='rejected'; apps[i].rejectReason=r; saveApps(apps); syncAll(apps[i]); if(db) db.ref('nurseApplications/'+id).update({status:'rejected'}); } loadPending(); }
-function del(id){ if(!confirm('Delete '+id+' permanently from entire app repo?')) return; var apps=getApps().filter(a=>a.id!==id); saveApps(apps); if(db){ db.ref('nurseApplications/'+id).remove(); db.ref('nurses/'+id).remove(); db.ref('verifiedNurses/'+id).remove(); db.ref('verified_nurses/'+id).remove(); db.ref('pending_nurses/'+id).remove(); } loadPending(); loadVerified(); }
-function block(id){ var r=prompt('Block '+id+'? Reason:'); if(!r) return; var apps=getApps(); var i=apps.findIndex(a=>a.id===id); if(i>=0){ apps[i].blocked=true; apps[i].blockReason=r; apps[i].status='blocked'; saveApps(apps); syncAll(apps[i]); } loadPending(); loadVerified(); }
-function deact(id){ if(!confirm('Deactivate '+id+'? Hidden from entire app')) return; var apps=getApps(); var i=apps.findIndex(a=>a.id===id); if(i>=0){ apps[i].deactivated=true; apps[i].status='deactivated'; saveApps(apps); syncAll(apps[i]); if(db){ db.ref('verifiedNurses/'+id).remove(); db.ref('verified_nurses/'+id).remove(); } } loadVerified(); loadPending(); }
+function approve(id){ if(!confirm('✅ Approve '+id+'? LIVE in entire app')) return; var apps=getApps(); var i=apps.findIndex(a=>a.id===id); if(i>=0){ apps[i].status='approved'; apps[i].approvedAt=Date.now(); apps[i].blocked=false; apps[i].deactivated=false; saveApps(apps); syncAll(apps[i]); } loadPending(); loadVerified(); loadStats(); }
+function reject(id){ var r=prompt('Reject reason:'); if(r===null) return; var apps=getApps(); var i=apps.findIndex(a=>a.id===id); if(i>=0){ apps[i].status='rejected'; apps[i].rejectReason=r; saveApps(apps); syncAll(apps[i]); } loadPending(); }
+function del(id){ if(!confirm('Delete '+id+' from entire app?')) return; var apps=getApps().filter(a=>a.id!==id); saveApps(apps); if(db){ db.ref('nurseApplications/'+id).remove(); db.ref('nurses/'+id).remove(); db.ref('verifiedNurses/'+id).remove(); db.ref('verified_nurses/'+id).remove(); db.ref('pending_nurses/'+id).remove(); } loadPending(); loadVerified(); }
+function block(id){ var r=prompt('Block reason:'); if(!r) return; var apps=getApps(); var i=apps.findIndex(a=>a.id===id); if(i>=0){ apps[i].blocked=true; apps[i].blockReason=r; apps[i].status='blocked'; saveApps(apps); syncAll(apps[i]); } loadPending(); loadVerified(); }
+function deact(id){ if(!confirm('Deactivate?')) return; var apps=getApps(); var i=apps.findIndex(a=>a.id===id); if(i>=0){ apps[i].deactivated=true; apps[i].status='deactivated'; saveApps(apps); syncAll(apps[i]); if(db){ db.ref('verifiedNurses/'+id).remove(); db.ref('verified_nurses/'+id).remove(); } } loadVerified(); loadPending(); }
 function react(id){ var apps=getApps(); var i=apps.findIndex(a=>a.id===id); if(i>=0){ apps[i].deactivated=false; apps[i].status='approved'; saveApps(apps); syncAll(apps[i]); } loadVerified(); loadPending(); }
 function callNurse(p){ window.open('tel:'+p); }
-function loadVerified(){ var apps=getApps().filter(a=>a.status==='approved'&&!a.blocked&&!a.deactivated); var el=document.getElementById('ceoVerifiedNursesList'); el.innerHTML=apps.map(a=>'<div style="padding:8px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><span>✅ '+a.name+' - '+a.phone+'</span><span><a href="tel:'+a.phone+'" style="background:#16a34a;color:white;padding:4px 8px;border-radius:4px;text-decoration:none">📞</a> <button class="btn btnGray" style="padding:4px 8px" onclick="deact(\''+a.id+'\')">⏸️</button></span></div>').join('')||'No verified'; }
+function loadVerified(){ var apps=getApps().filter(a=>a.status==='approved'&&!a.blocked&&!a.deactivated); var el=document.getElementById('ceoVerifiedNursesList'); el.innerHTML=apps.map(a=>'<div style="padding:8px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><span>✅ '+a.name+' - '+a.phone+'</span><span><a href="tel:'+a.phone+'" style="background:#16a34a;color:white;padding:4px 8px;border-radius:4px;text-decoration:none">📞</a></span></div>').join('')||'No verified'; }
 function viewAllDocs(){ var apps=getApps().filter(a=>a.status==='approved'); var h=apps.map(a=>'<div style="border:1px solid #ddd;padding:8px;margin:4px"><b>'+a.name+'</b><br>'+Object.keys(a.docs||{}).map(k=>'<a href="'+a.docs[k]+'" target="_blank">'+k+'</a>').join(' ')+'</div>').join(''); document.getElementById('nurseDocViewerBody').innerHTML=h; document.getElementById('nurseDocViewerModal').style.display='flex'; }
 function closeViewer(){ document.getElementById('nurseDocViewerModal').style.display='none'; }
-function loadNursesForCall(){ var apps=getApps(); document.getElementById('ceoCallLists').innerHTML=apps.map(a=>'<div style="padding:8px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><span>👩‍⚕️ '+a.name+' - '+a.phone+'</span><a href="tel:'+a.phone+'" style="background:#16a34a;color:white;padding:6px 10px;border-radius:6px;text-decoration:none">📞 Call - Entire App</a></div>').join(''); }
-function loadStaffForCall(){ document.getElementById('ceoCallLists').innerHTML='Loading staff...'; if(db) db.ref('staffUsers').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:6px;border-bottom:1px solid #eee">'+v.id+' - '+v.phone+' <a href="tel:'+v.phone+'" style="background:#0e7490;color:white;padding:4px 8px;border-radius:4px;text-decoration:none">Call</a></div>'; }); document.getElementById('ceoCallLists').innerHTML=h||'No staff'; }); }
-function loadClientsForCall(){ document.getElementById('ceoCallLists').innerHTML='Loading clients...'; if(db) db.ref('clientUsers').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:8px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><span>👤 '+(v.name||c.key)+' - '+v.phone+'</span><a href="tel:'+v.phone+'" style="background:#ff6a00;color:white;padding:6px 10px;border-radius:6px;text-decoration:none">📞</a></div>'; }); document.getElementById('ceoCallLists').innerHTML=h||'No clients'; }); }
-function broadcastToNurses(){ var m=prompt('Broadcast to ALL NURSES (entire repo):'); if(!m) return; if(db) db.ref('broadcasts/nurses').push({message:m,time:Date.now(),from:'CEO'}); alert('Sent to entire app'); }
-function broadcastToClients(){ var m=prompt('Broadcast to ALL CLIENTS (entire repo):'); if(!m) return; if(db) db.ref('broadcasts/clients').push({message:m,time:Date.now()}); alert('Sent to entire app'); }
-function viewLiveMap(){ var el=document.getElementById('ceoMap'); if(!el) return; if(window.ceoMap) window.ceoMap.remove(); window.ceoMap=L.map('ceoMap').setView([5.6037,-0.1870],6); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(window.ceoMap); var apps=getApps().filter(a=>a.status==='approved'); apps.forEach(a=>{ if(a.lat&&a.lng) L.marker([a.lat,a.lng]).addTo(window.ceoMap).bindPopup(a.name+'<br>'+a.phone); }); }
-function loadBookings(){ if(!db) return; db.ref('bookings').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var b=c.val(); h+='<div style="border:1px solid #e5e7eb;padding:8px;border-radius:8px;margin:4px 0;font-size:11px"><b>#'+c.key+'</b> '+b.service+' | '+b.status+'<br><small>'+b.clientPhone+' -> '+(b.nurseName||'')+'</small></div>'; }); document.getElementById('ceoBookingsList').innerHTML=h||'No bookings'; }); }
-function loadPayouts(){ if(!db) return; db.ref('payoutRequests').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var p=c.val(); h+='<div style="border:1px solid #e5e7eb;padding:6px;border-radius:6px;margin:4px 0;font-size:11px"><b>'+p.nurseName+'</b> - '+p.amount+'<br><small>'+p.method+'</small></div>'; }); document.getElementById('ceoPayoutsList').innerHTML=h||'No payouts'; }); }
+function loadNursesForCall(){ var apps=getApps(); document.getElementById('ceoCallLists').innerHTML=apps.map(a=>'<div style="padding:8px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><span>👩‍⚕️ '+a.name+' - '+a.phone+'</span><a href="tel:'+a.phone+'" style="background:#16a34a;color:white;padding:6px 10px;border-radius:6px;text-decoration:none">📞 Call</a></div>').join(''); goTo(2); }
+function loadStaffForCall(){ document.getElementById('ceoCallLists').innerHTML='Loading...'; goTo(2); if(db) db.ref('staffUsers').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:6px;border-bottom:1px solid #eee">'+v.id+' - '+v.phone+'</div>'; }); document.getElementById('ceoCallLists').innerHTML=h||'No staff'; }); }
+function loadClientsForCall(){ document.getElementById('ceoCallLists').innerHTML='Loading clients...'; goTo(2); if(db) db.ref('clientUsers').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:8px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><span>👤 '+(v.name||c.key)+' - '+v.phone+'</span><a href="tel:'+v.phone+'" style="background:#ff6a00;color:white;padding:6px 10px;border-radius:6px;text-decoration:none">📞</a></div>'; }); document.getElementById('ceoCallLists').innerHTML=h||'No clients'; }); }
+function broadcastToNurses(){ var m=prompt('Broadcast to ALL NURSES:'); if(!m) return; if(db) db.ref('broadcasts/nurses').push({message:m,time:Date.now()}); alert('Sent - Entire App'); }
+function broadcastToClients(){ var m=prompt('Broadcast to ALL CLIENTS:'); if(!m) return; if(db) db.ref('broadcasts/clients').push({message:m,time:Date.now()}); alert('Sent - Entire App'); }
+function viewLiveMap(){ var el=document.getElementById('ceoMap'); if(!el) return; if(window.ceoMap) window.ceoMap.remove(); window.ceoMap=L.map('ceoMap').setView([5.6037,-0.1870],6); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(window.ceoMap); var apps=getApps().filter(a=>a.status==='approved'); apps.forEach(a=>{ if(a.lat&&a.lng) L.marker([a.lat,a.lng]).addTo(window.ceoMap).bindPopup(a.name); }); goTo(4); }
+function loadBookings(){ if(!db) return; db.ref('bookings').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var b=c.val(); h+='<div style="border:1px solid #e5e7eb;padding:8px;border-radius:8px;margin:4px 0;font-size:11px"><b>#'+c.key+'</b> '+b.service+' | '+b.status+'</div>'; }); document.getElementById('ceoBookingsList').innerHTML=h||'No bookings'; }); }
+function loadPayouts(){ if(!db) return; db.ref('payoutRequests').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var p=c.val(); h+='<div style="border:1px solid #e5e7eb;padding:6px;border-radius:6px;margin:4px 0;font-size:11px"><b>'+p.nurseName+'</b> - '+p.amount+'</div>'; }); document.getElementById('ceoPayoutsList').innerHTML=h||'No payouts'; }); }
 function loadRefunds(){ if(!db) return; db.ref('refunds').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var r=c.val(); h+='<div style="border:1px solid #e5e7eb;padding:6px;border-radius:6px;margin:4px 0;font-size:11px">'+r.reason+' - '+r.status+'</div>'; }); document.getElementById('ceoRefundsList').innerHTML=h||'No refunds'; }); }
-function loadStaffList(){ if(!db) return; db.ref('staffUsers').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:6px;border-bottom:1px solid #eee">'+v.id+' - '+v.phone+' <button class="btn btnRed" style="padding:2px 6px" onclick="db.ref(\'staffUsers/'+c.key+'\').remove();loadStaffList()">Delete</button></div>'; }); document.getElementById('staffListDisplay').innerHTML=h||'No staff'; document.getElementById('ceoStaffList').innerHTML=h||'No staff'; }); }
-function createStaff(){ var id=document.getElementById('newStaffId').value; var pass=document.getElementById('newStaffPass').value; var phone=document.getElementById('newStaffPhone').value; if(!id||!pass){ alert('Enter ID and Pass'); return; } if(db) db.ref('staffUsers/'+id).set({id:id,password:pass,phone:phone,createdAt:Date.now()}); alert('Staff '+id+' created - Affects entire app'); loadStaffList(); }
-function changeCEO(){ var id=document.getElementById('newCeoId').value; var pass=document.getElementById('newCeoPass').value; if(!id||!pass){ alert('Enter ID and Pass'); return; } localStorage.setItem('ceoID',id); localStorage.setItem('ceoPass',pass); alert('Changed to '+id); }
-function savePaystack(){ var k=document.getElementById('paystackSecretKey').value; if(!k){ alert('Enter key'); return; } localStorage.setItem('paystackSecretKey',k); document.getElementById('paystackKeyStatus').innerText='✅ Saved - Affects entire app repo'; }
-function testPaystack(){ alert('Testing Paystack...'); }
-function assignNurse(){ var b=prompt('Booking ID:'); var n=prompt('Nurse ID:'); if(b&&n) alert('Assign '+n+' to '+b+' - Implement: db.ref(bookings/'+b+').update({nurseId:n})'); }
-function resolveDispute(){ alert('Resolve dispute - Check refunds and bookings'); }
-function approveRefund(){ var id=prompt('Refund ID to approve:'); if(id&&db) db.ref('refunds/'+id).update({status:'approved'}); }
-function denyRefund(){ var id=prompt('Refund ID to deny:'); if(id&&db) db.ref('refunds/'+id).update({status:'denied'}); }
-function viewSOS(){ if(db) db.ref('sosAlerts').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:6px;border-bottom:1px solid #eee">'+v.phone+' - '+v.location+'</div>'; }); document.getElementById('ceoCallLists').innerHTML=h||'No SOS'; }); }
-function setShortPrice(){ var p=prompt('Short price 1-6d:'); if(p) localStorage.setItem('shortBookingPrice',p); }
-function setLongPrice(){ var p=prompt('Long price 7+ days:'); if(p) localStorage.setItem('longBookingPrice',p); }
-function refreshPrice(){ alert('Price refreshed - Affects entire app'); }
-function bonusNurse(){ var id=prompt('Nurse ID:'); var amt=prompt('Amount:'); if(id&&amt) alert('Bonus '+amt+' to '+id+' - Entire app'); }
-function loadIncidents(){ var el=document.getElementById('ceoIncidentReports'); el.innerHTML='Loading...'; if(db) db.ref('incidentReports').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var r=c.val(); h+='<div style="border:1px solid #e5e7eb;padding:8px;border-radius:8px;margin:4px 0;font-size:11px"><b>'+(r.type||'Incident')+'</b> - '+r.text+'<br><small>'+r.reporterId+'</small></div>'; }); el.innerHTML=h||'No reports'; }); }
-function refreshCount(){ var apps=getApps().filter(a=>a.status==='approved'&&!a.blocked&&!a.deactivated); alert('Verified count: '+apps.length+' - Home page will show '+apps.length); loadStats(); }
+function loadStaffList(){ if(!db) return; db.ref('staffUsers').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:6px;border-bottom:1px solid #eee">'+v.id+' - '+v.phone+' <button class="btn btnRed" style="padding:2px 6px" onclick="db.ref(\'staffUsers/'+c.key+'\').remove();loadStaffList()">Delete</button></div>'; }); document.getElementById('staffListDisplay').innerHTML=h||'No staff'; }); }
+function createStaff(){ var id=document.getElementById('newStaffId').value; var pass=document.getElementById('newStaffPass').value; var phone=document.getElementById('newStaffPhone').value; if(!id||!pass){ alert('Enter ID and Pass'); return; } if(db) db.ref('staffUsers/'+id).set({id:id,password:pass,phone:phone,createdAt:Date.now()}); alert('Staff '+id+' created - Entire App'); loadStaffList(); }
+function changeCEO(){ var id=document.getElementById('newCeoId').value; var pass=document.getElementById('newCeoPass').value; if(!id||!pass){ alert('Enter ID and Pass'); return; } localStorage.setItem('ceoID',id); localStorage.setItem('ceoPass',pass); alert('Changed'); }
+function savePaystack(){ var k=document.getElementById('paystackSecretKey').value; if(!k){ alert('Enter key'); return; } localStorage.setItem('paystackSecretKey',k); document.getElementById('paystackKeyStatus').innerText='✅ Saved - Entire App'; }
+function testPaystack(){ alert('Testing Paystack'); }
+function assignNurse(){ var b=prompt('Booking ID:'); var n=prompt('Nurse ID:'); if(b&&n) alert('Assign '+n+' to '+b); }
+function resolveDispute(){ alert('Resolve dispute'); }
+function approveRefund(){ var id=prompt('Refund ID:'); if(id&&db) db.ref('refunds/'+id).update({status:'approved'}); }
+function denyRefund(){ var id=prompt('Refund ID:'); if(id&&db) db.ref('refunds/'+id).update({status:'denied'}); }
+function viewSOS(){ if(db) db.ref('sosAlerts').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:6px;border-bottom:1px solid #eee">'+v.phone+' - '+v.location+'</div>'; }); document.getElementById('ceoCallLists').innerHTML=h||'No SOS'; goTo(2); }); }
+function setShortPrice(){ var p=prompt('Short price:'); if(p) localStorage.setItem('shortBookingPrice',p); }
+function setLongPrice(){ var p=prompt('Long price:'); if(p) localStorage.setItem('longBookingPrice',p); }
+function refreshPrice(){ alert('Refreshed - Entire App'); }
+function bonusNurse(){ var id=prompt('Nurse ID:'); var amt=prompt('Amount:'); if(id&&amt) alert('Bonus '+amt+' to '+id); }
+function loadIncidents(){ var el=document.getElementById('ceoIncidentReports'); el.innerHTML='Loading...'; if(db) db.ref('incidentReports').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var r=c.val(); h+='<div style="border:1px solid #e5e7eb;padding:8px;border-radius:8px;margin:4px 0;font-size:11px"><b>'+(r.type||'Incident')+'</b> - '+r.text+'</div>'; }); el.innerHTML=h||'No reports'; }); }
+function refreshCount(){ var apps=getApps().filter(a=>a.status==='approved'&&!a.blocked&&!a.deactivated); alert('Count: '+apps.length); }
+function loadVerified(){ var apps=getApps().filter(a=>a.status==='approved'&&!a.blocked&&!a.deactivated); var el=document.getElementById('ceoVerifiedNursesList'); el.innerHTML=apps.map(a=>'<div style="padding:8px;border-bottom:1px solid #eee;display:flex;justify-content:space-between"><span>✅ '+a.name+' - '+a.phone+'</span><a href="tel:'+a.phone+'" style="background:#16a34a;color:white;padding:4px 8px;border-radius:4px;text-decoration:none">📞</a></div>').join('')||'No verified'; }
+function loadStats(){ var apps=getApps(); var appr=apps.filter(a=>a.status==='approved').length; document.getElementById('ceoTotalNurses').innerText=appr+' / '+apps.length; if(db) db.ref('bookings').once('value').then(s=>{ document.getElementById('ceoTotalBookings').innerText=s.numChildren(); }); }
 
-document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ loadAll(); viewLiveMap(); }, 800); });
+document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ loadPending(); loadStats(); }, 800); });
 </script>
 </body>
 </html>
