@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Dashboard - 8 Countries - Love Care Global</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111827}
+.topbar{background:linear-gradient(90deg,#22c55e,#16a34a);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
+.menuBtn{width:42px;height:42px;background:#facc15;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:900;border:none;cursor:pointer}
+#drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200}
+#drawerOverlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:white;z-index:300;transform:translateX(-100%);transition:transform.3s ease;display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.3)}
+#drawer.open{transform:translateX(0)}
+.drawerHeader{background:linear-gradient(90deg,#22c55e,#16a34a);padding:18px 16px;color:white}
+.drawerBody{flex:1;overflow-y:auto;padding:10px}
+.drawerItem{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;margin:4px 0;font-weight:800;font-size:13px;text-decoration:none;color:#111827;border:1px solid #e5e7eb;background:white}
+.drawerItem.client{background:#f0f9ff;border-color:#bae6fd;color:#0369a1}
+.drawerItem.legal{background:#f9fafb}
+.drawerItem.danger{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+.drawerSection{font-size:10px;font-weight:900;color:#9ca3af;margin:14px 0 4px;padding-left:6px}
+.closeBtn{width:100%;padding:14px;background:#111827;color:white;border:none;border-radius:12px;font-weight:900;cursor:pointer}
+.wrap{max-width:900px;margin:0 auto;padding:12px}
+.card{background:white;border-radius:16px;padding:14px;border:1px solid #e5e7eb;margin-bottom:12px}
+.btn{padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;width:100%}
+.btnGreen{background:linear-gradient(90deg,#22c55e,#16a34a);color:white}
+.btnBlue{background:#3b82f6;color:white}
+.btnRed{background:#ef4444;color:white}
+.btnYellow{background:#facc15;color:#000}
+.btnLight{background:#f3f4f6;border:1px solid #e5e7eb}
+.btnSmall{padding:8px 12px;font-size:11px;width:auto}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-flex}
+.badgeGreen{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.badgeYellow{background:#fefce8;color:#a16207;border:1px solid #fde68a}
+.badgeRed{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.badgeBlue{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.tab{padding:10px 14px;border-radius:999px;font-weight:900;font-size:12px;border:1px solid #e5e7eb;background:white;cursor:pointer;white-space:nowrap}
+.tab.active{background:#16a34a;color:white;border-color:#16a34a}
+.tabContent{display:none}.tabContent.active{display:block}
+.mapWrap{width:100%;height:280px;border-radius:14px;border:1px solid #e5e7eb;overflow:hidden}
+#map{width:100%;height:100%}
+.blocker{position:fixed;inset:0;background:rgba(255,255,255,0.97);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+label{font-size:11px;font-weight:800;margin:8px 0 4px;display:block}
+input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;font-size:12px}
+.stars{font-size:22px;color:#facc15;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="drawerOverlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+<div class="drawerHeader"><h3>👤 CLIENT PORTAL - 8 Countries</h3><p>Love Care Global</p></div>
+<div class="drawerBody">
+<div class="drawerSection">CLIENT</div>
+<a class="drawerItem client" href="index.html">🏠 Home</a>
+<a class="drawerItem client" href="client-dashboard.html" style="border-color:#22c55e;background:#f0fdf4">📊 Dashboard</a>
+<a class="drawerItem client" href="book-nurse.html">🗺️ Book Nurse - Google Map (8 Countries)</a>
+<a class="drawerItem client" href="client-bookings.html">📋 My Bookings</a>
+<div class="drawerSection">LEGAL & SUPPORT</div>
+<a class="drawerItem legal" href="about.html">ℹ️ About Us</a>
+<a class="drawerItem legal" href="contact.html">📞 Contact Us</a>
+<a class="drawerItem legal" href="privacy.html">🔒 Privacy Policy</a>
+<a class="drawerItem legal" href="terms.html">📜 Terms</a>
+<a class="drawerItem legal" href="refund.html">💰 Refund Policy - Request Refund</a>
+<a class="drawerItem legal" href="delete-account.html">🗑️ Delete Account</a>
+<a class="drawerItem danger" href="sos.html">🚨 SOS Emergency</a>
+</div>
+<div style="padding:12px;border-top:1px solid #e5e7eb"><button class="closeBtn" onclick="closeDrawer()">✕ Close</button></div>
+</div>
+
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:10px"><button class="menuBtn" onclick="openDrawer()">☰</button><div style="font-weight:900;line-height:1">CLIENT<br>DASHBOARD</div></div>
+<div style="display:flex;gap:6px"><span id="clientNameTop" style="font-size:11px;font-weight:800;background:rgba(255,255,255,0.2);padding:6px 10px;border-radius:999px">Client</span><button onclick="logout()" style="background:#111827;color:white;border:none;padding:6px 12px;border-radius:999px;font-weight:800;font-size:11px">Logout</button></div>
+</div>
+
+<div id="loginBlocker" class="blocker">
+<div style="background:white;border-radius:16px;padding:20px;max-width:360px;width:100%;text-align:center;border:2px solid #22c55e">
+<div style="font-size:40px">👤</div><h2 style="font-size:18px;margin:8px 0">Client Login Required - One Login</h2><p style="font-size:11px;color:#6b7280">Login once to access Book Nurse + Dashboard + Bookings - 8 Countries</p>
+<button class="btn btnGreen" style="margin-top:12px" onclick="location.href='client-login.html'">Go to Client Login</button>
+</div>
+</div>
+
+<div class="wrap" id="mainContent" style="display:none">
+
+<div class="card" style="background:linear-gradient(90deg,#f0fdf4,#dcfce7);border-color:#bbf7d0">
+<div style="display:flex;gap:12px;align-items:center">
+<img src="https://i.pravatar.cc/100?img=12" style="width:54px;height:54px;border-radius:12px">
+<div style="flex:1"><div style="font-weight:900;font-size:15px" id="clientName">Client</div><div style="font-size:11px;color:#6b7280" id="clientEmail"></div><div style="margin-top:4px"><span class="badge badgeGreen" id="clientCountryBadge">🌍 Country</span><span class="badge badgeBlue" style="margin-left:4px">One Login Active</span></div></div>
+<div style="text-align:right"><button class="btn btnGreen btnSmall" onclick="location.href='book-nurse.html'">🗺️ Book Nurse - 8 Countries</button></div>
+</div>
+</div>
+
+<div class="tabs">
+<button class="tab active" onclick="switchTab('bookings')">📋 My Bookings</button>
+<button class="tab" onclick="switchTab('map')">🗺️ Nurses Near Me - 8 Countries</button>
+<button class="tab" onclick="switchTab('ratings')">⭐ My Ratings</button>
+<button class="tab" onclick="switchTab('refunds')">💰 Refunds</button>
+</div>
+
+<div id="tab-bookings" class="tabContent active">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3>📋 My Bookings - All Countries</h3><button class="btn btnLight btnSmall" onclick="loadBookings()">🔄 Refresh</button></div>
+<div style="display:flex;gap:6px;margin-top:8px"><button class="btn btnLight btnSmall" onclick="filterBookings('ALL')">All</button><button class="btn btnYellow btnSmall" onclick="filterBookings('PENDING')">🟡 Pending (10min)</button><button class="btn btnGreen btnSmall" onclick="filterBookings('ACCEPTED')">🟢 Accepted</button><button class="btn btnRed btnSmall" onclick="filterBookings('REJECTED')">🔴 Rejected</button></div>
+<div id="bookingsList" style="margin-top:10px">Loading...</div>
+</div>
+</div>
+
+<div id="tab-map" class="tabContent">
+<div class="card">
+<h3>🗺️ Nurses Near Me - 8 Countries - GPS</h3>
+<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+<select id="filterCountry" onchange="loadNurses()" style="flex:1;padding:8px;border-radius:10px;border:1px solid #e5e7eb;font-size:11px"><option value="">All Countries (8+Other)</option><option value="GH">🇬🇭 Ghana</option><option value="NG">🇳🇬 Nigeria</option><option value="ZA">🇿🇦 SA</option><option value="GB">🇬🇧 UK</option><option value="US">🇺🇸 USA</option><option value="AU">🇦🇺 Australia</option><option value="AE">🇦🇪 UAE</option><option value="CA">🇨🇦 Canada</option><option value="OTHER">🌍 Other</option></select>
+<button class="btn btnBlue btnSmall" onclick="getGPS()">📍 Update My GPS</button>
+</div>
+<div class="mapWrap" style="margin-top:10px"><div id="map"></div></div>
+<div id="nursesNearList" style="margin-top:10px"></div>
+</div>
+</div>
+
+<div id="tab-ratings" class="tabContent">
+<div class="card"><h3>⭐ My Ratings - Nurses I Rated</h3><p style="font-size:11px;color:#6b7280">You rated these nurses after service. Ratings reflect for each client who want to book her (read-only for nurse).</p><div id="myRatingsList" style="margin-top:10px">Loading...</div></div>
+</div>
+
+<div id="tab-refunds" class="tabContent">
+<div class="card">
+<h3>💰 Refund Requests - 8 Countries</h3><p style="font-size:11px;color:#6b7280">If nurse rejects or 10min pending with no acceptance, you can request refund. Goes to CEO dashboard for approval.</p>
+<div id="refundsList" style="margin-top:10px">Loading...</div>
+<button class="btn btnYellow" style="margin-top:10px" onclick="location.href='refund.html'">💰 Go to Refund Page - Request Refund</button>
+</div>
+</div>
+
+</div>
+
+<div id="detailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px">
+<div style="background:white;border-radius:20px;max-width:460px;width:100%;max-height:90vh;overflow-y:auto">
+<div style="padding:16px">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3 id="modalTitle" style="font-weight:900">Details</h3><button onclick="closeModal()" style="width:32px;height:32px;border-radius:8px;border:1px solid #e5e7eb;background:white;cursor:pointer">✕</button></div>
+<div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.6"></div>
+<div id="modalActions" style="margin-top:14px;display:grid;gap:8px"></div>
+</div>
+</div>
+</div>
+
+<!-- Rating Modal -->
+<div id="ratingModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:6000;display:none;align-items:center;justify-content:center;padding:16px">
+<div style="background:white;border-radius:20px;max-width:360px;width:100%;padding:16px">
+<h3 style="font-weight:900">⭐ Rate Nurse - Read Only for Nurse</h3><p style="font-size:11px;color:#6b7280;margin:6px 0">Your rating will reflect for each client who want to book her. Nurse cannot change rating.</p>
+<div id="ratingNurseName" style="font-weight:900;margin:10px 0"></div>
+<div id="starContainer" class="stars" style="text-align:center;margin:10px 0">☆☆☆☆☆</div>
+<label>Review (optional)</label><textarea id="reviewText" rows="3" placeholder="How was the service?"></textarea>
+<button class="btn btnGreen" style="margin-top:10px" onclick="submitRating()">⭐ Submit Rating</button>
+<button class="btn btnLight" style="margin-top:6px" onclick="closeRatingModal()">Cancel</button>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const auth=getAuth(app);
+
+let currentClientId=null, currentClientData=null, bookings=[], allNurses=[], map=null, markers=[];
+let filterStatus='ALL';
+let currentRatingBooking=null, selectedStars=0;
+
+function getClientSession(){return localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');}
+function checkLogin(){
+  const id=getClientSession();
+  const blocker=document.getElementById('loginBlocker');
+  const main=document.getElementById('mainContent');
+  if(!id){blocker.style.display='flex';main.style.display='none';return null;}
+  blocker.style.display='none';main.style.display='block';return id;
+}
+window.logout=async()=>{try{await signOut(auth);}catch(e){}localStorage.clear();location.href='client-login.html';}
+window.openDrawer=()=>{document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('show');}
+window.closeDrawer=()=>{document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('show');}
+window.switchTab=(tab)=>{
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tabContent').forEach(c=>c.classList.remove('active'));
+  document.querySelector(`.tab[onclick="switchTab('${tab}')"]`)?.classList.add('active');
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  if(tab==='map' &&!map){setTimeout(initMap,300);}
+}
+
+function initMap(){
+  if(map)return;
+  const lat=currentClientData?.lat||5.6037;
+  const lng=currentClientData?.lng||-0.1870;
+  map=L.map('map').setView([lat,lng],12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  L.marker([lat,lng],{icon:L.divIcon({html:'👤',className:'',iconSize:[20,20]})}).addTo(map).bindPopup('You - Client');
+  loadNurses();
+}
+
+window.getGPS=()=>{
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=pos.coords.latitude.toFixed(6);
+    const lng=pos.coords.longitude.toFixed(6);
+    if(currentClientId){
+      updateDoc(doc(db,'clients',currentClientId),{lat:parseFloat(lat),lng:parseFloat(lng), lastGPSUpdate:serverTimestamp()});
+      localStorage.setItem('currentClientLat',lat);
+      localStorage.setItem('currentClientLng',lng);
+      if(map){map.setView([lat,lng],12);}
+      alert(`GPS updated: ${lat},${lng}`);
+      loadNurses();
+    }
+  });
+}
+
+async function loadClientProfile(){
+  const id=checkLogin(); if(!id)return;
+  currentClientId=id;
+  try{
+    const snap=await getDoc(doc(db,'clients',id));
+    if(snap.exists()){
+      currentClientData=snap.data();
+      document.getElementById('clientName').textContent=currentClientData.fullName||'Client';
+      document.getElementById('clientNameTop').textContent=currentClientData.fullName||'Client';
+      document.getElementById('clientEmail').textContent=currentClientData.email||'';
+      document.getElementById('clientCountryBadge').textContent=`${currentClientData.countryName||currentClientData.country||'GH'} - One Login Active`;
+    }
+  }catch(e){}
+}
+
+window.loadBookings=async()=>{
+  const id=checkLogin(); if(!id)return;
+  try{
+    const q=query(collection(db,'bookings'), where('clientId','==',id));
+    const snap=await getDocs(q);
+    let list=[];
+    snap.forEach(d=>{list.push({id:d.id,...d.data()});});
+    list.sort((a,b)=> new Date(b.timestamp||0)-new Date(a.timestamp||0));
+    bookings=list;
+    renderBookings();
+    loadMyRatings();
+    loadRefunds();
+  }catch(e){document.getElementById('bookingsList').innerHTML=`Error: ${e.message}`;}
+}
+
+function renderBookings(){
+  let filtered=bookings;
+  if(filterStatus!=='ALL'){filtered=bookings.filter(b=>b.nurseStatus===filterStatus);}
+  const el=document.getElementById('bookingsList');
+  if(filtered.length===0){el.innerHTML=`<div style="text-align:center;padding:20px;background:#f9fafb;border-radius:12px;color:#9ca3af">No ${filterStatus} bookings - <a href="book-nurse.html" style="color:#16a34a;font-weight:900">Book Nurse on Google Map - 8 Countries</a></div>`;return;}
+  let html='';
+  filtered.forEach(b=>{
+    const isPending=b.nurseStatus==='PENDING';
+    const pendingTime=isPending && b.timestamp? (Date.now() - new Date(b.timestamp).getTime())/1000/60 : 0;
+    const showRefund=isPending && pendingTime>10;
+    const badge=isPending?`<span class="badge badgeYellow">🟡 PENDING - ${pendingTime.toFixed(0)}min ago - 10min to refund</span>`: b.nurseStatus==='ACCEPTED'?`<span class="badge badgeGreen">🟢 ACCEPTED - Nurse coming</span>`:`<span class="badge badgeRed">🔴 ${b.nurseStatus}</span>`;
+    html+=`<div style="border:1.5px solid ${isPending?'#facc15': b.nurseStatus==='ACCEPTED'?'#22c55e':'#ef4444'};border-radius:14px;padding:12px;margin:8px 0;background:${isPending?'#fefce8': b.nurseStatus==='ACCEPTED'?'#f0fdf4':'#fef2f2'}">
+      <div style="display:flex;justify-content:space-between"><b>${b.nurseName||'Nurse'} - ${b.service||''}</b>${badge}</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:4px">📅 ${b.sDate||''} to ${b.eDate||''} • 💰 ₵${b.amount||0} • ${b.clientCountry||''} • ${b.nurseId? (allNurses.find(n=>n.id===b.nurseId)?.country||'') : ''}</div>
+      <div style="font-size:11px;color:#6b7280">📍 ${b.address||''} • GPS: ${b.lat?.toFixed(4)||''},${b.lng?.toFixed(4)||''}</div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        ${b.nurseStatus==='ACCEPTED'?`<button class="btn btnGreen btnSmall" onclick="openNavigation(${b.lat},${b.lng},${b.nurseId? allNurses.find(n=>n.id===b.nurseId)?.lat||0 : 0},${b.nurseId? allNurses.find(n=>n.id===b.nurseId)?.lng||0 : 0})">🗺️ Google Maps Navigation to Nurse</button><button class="btn btnBlue btnSmall" onclick="openRating('${b.id}')">⭐ Rate Nurse - Reflect for other clients</button>`:''}
+        ${b.nurseStatus==='REJECTED'?`<button class="btn btnYellow btnSmall" onclick="requestRefund('${b.id}')">💰 Request Refund - Nurse Rejected</button><button class="btn btnLight btnSmall" onclick="location.href='book-nurse.html'">🔍 Look for Different Nurse or Increase Amount</button>`:''}
+        ${showRefund?`<button class="btn btnYellow btnSmall" onclick="requestRefund('${b.id}')">💰 Request Refund - 10min Pending No Acceptance</button>`:''}
+        <button class="btn btnLight btnSmall" onclick="viewBooking('${b.id}')">👁️ View Details</button>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+window.filterBookings=(s)=>{filterStatus=s; renderBookings();}
+
+window.openNavigation=(clientLat,clientLng,nurseLat,nurseLng)=>{
+  const url=`https://www.google.com/maps/dir/?api=1&origin=${clientLat},${clientLng}&destination=${nurseLat||clientLat},${nurseLng||clientLng}&travelmode=driving`;
+  window.open(url,'_blank');
+}
+
+window.viewBooking=(id)=>{
+  const b=bookings.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent=`Booking - ${b.nurseName} - ${b.nurseStatus}`;
+  document.getElementById('modalBody').innerHTML=`
+    <b>Nurse:</b> ${b.nurseName} - ${allNurses.find(n=>n.id===b.nurseId)?.country||''}<br>
+    <b>Service:</b> ${b.service} (${b.serviceType})<br>
+    <b>Amount:</b> ₵${b.amount}<br><b>Status:</b> ${b.nurseStatus}<br>
+    <b>Address:</b> ${b.address}<br><b>GPS:</b> ${b.lat},${b.lng} - <a href="https://www.google.com/maps?q=${b.lat},${b.lng}" target="_blank">View on Google Maps</a><br>
+    <b>Dates:</b> ${b.sDate} to ${b.eDate}<br>
+    <b>Written Concerns:</b> ${b.written||''}<br>
+    ${b.audioUrl?`<audio controls src="${b.audioUrl}" style="width:100%;margin-top:6px"></audio>`:''}
+    ${b.nurseStatus==='REJECTED'?`<div style="background:#fefce8;padding:8px;border-radius:8px;margin-top:8px;border:1px solid #fde68a;font-size:11px">Nurse rejected. Please look for different nurse or increase amount for quick successful booking.</div>`:''}
+  `;
+  let actions='';
+  if(b.nurseStatus==='ACCEPTED'){
+    actions=`<button class="btn btnGreen" onclick="openNavigation(${b.lat},${b.lng},${allNurses.find(n=>n.id===b.nurseId)?.lat||0},${allNurses.find(n=>n.id===b.nurseId)?.lng||0})">🗺️ Google Maps Navigation</button><button class="btn btnBlue" onclick="openRating('${b.id}');closeModal()">⭐ Rate Nurse - Reflect for Other Clients</button>`;
+  }else if(b.nurseStatus==='REJECTED' || (b.nurseStatus==='PENDING' && (Date.now() - new Date(b.timestamp).getTime())/1000/60>10)){
+    actions=`<button class="btn btnYellow" onclick="requestRefund('${b.id}');closeModal()">💰 Request Refund</button><button class="btn btnGreen" onclick="location.href='book-nurse.html'">🔍 Look for Different Nurse or Increase Amount</button>`;
+  }
+  actions+=`<button class="btn btnLight" onclick="closeModal()">Close</button>`;
+  document.getElementById('modalActions').innerHTML=actions;
+  document.getElementById('detailModal').style.display='flex';
+}
+
+window.openRating=(bookingId)=>{
+  const b=bookings.find(x=>x.id===bookingId);
+  if(!b)return;
+  if(b.rating){alert('You already rated this booking - ⭐ '+b.rating);return;}
+  currentRatingBooking=b;
+  selectedStars=0;
+  document.getElementById('ratingNurseName').textContent=`Rate ${b.nurseName} - ${b.service}`;
+  document.getElementById('starContainer').innerHTML='☆☆☆☆☆';
+  document.getElementById('reviewText').value='';
+  document.getElementById('ratingModal').style.display='flex';
+  setupStars();
+}
+function setupStars(){
+  const container=document.getElementById('starContainer');
+  container.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const span=document.createElement('span');
+    span.textContent='☆';
+    span.style.cursor='pointer';
+    span.onclick=()=>{selectedStars=i; renderStars();};
+    span.onmouseenter=()=>{renderStars(i);};
+    container.appendChild(span);
+  }
+  container.onmouseleave=()=>{renderStars();};
+}
+function renderStars(hover=0){
+  const stars=document.getElementById('starContainer').children;
+  const val=hover||selectedStars;
+  for(let i=0;i<5;i++){
+    stars[i].textContent= i<val? '★' : '☆';
+    stars[i].style.color= i<val? '#facc15' : '#d1d5db';
+  }
+}
+window.closeRatingModal=()=>{document.getElementById('ratingModal').style.display='none'; currentRatingBooking=null;}
+window.submitRating=async()=>{
+  if(!selectedStars){alert('Select stars - 1 to 5');return;}
+  if(!currentRatingBooking){return;}
+  try{
+    const bookingId=currentRatingBooking.id;
+    const nurseId=currentRatingBooking.nurseId;
+    await updateDoc(doc(db,'bookings',bookingId),{
+      rating: selectedStars,
+      review: document.getElementById('reviewText').value,
+      ratedAt: serverTimestamp(),
+      ratedByClient: true
+    });
+    // Add to nurse ratings subcollection
+    await setDoc(doc(db,`nurses/${nurseId}/ratings/${bookingId}`),{
+      bookingId, clientId: currentClientId, clientName: currentClientData?.fullName||'Client',
+      rating: selectedStars, review: document.getElementById('reviewText').value,
+      createdAt: serverTimestamp(), timestamp: new Date().toISOString()
+    });
+    // Update nurse average rating
+    const ratingsSnap=await getDocs(collection(db,`nurses/${nurseId}/ratings`));
+    let total=0, count=0;
+    ratingsSnap.forEach(d=>{total+=d.data().rating||0; count++;});
+    const avg=count? total/count : selectedStars;
+    await updateDoc(doc(db,'nurses',nurseId),{rating: avg, reviewCount: count, totalRatings: count, lastRatingAt: serverTimestamp()});
+
+    alert(`✅ Rated ${currentRatingBooking.nurseName} - ⭐ ${selectedStars} - Your rating will reflect for each client who want to book her. Nurse cannot change rating (read-only).`);
+    closeRatingModal();
+    loadBookings();
+  }catch(e){alert('Rating failed: '+e.message);}
+}
+
+window.requestRefund=async(bookingId)=>{
+  const b=bookings.find(x=>x.id===bookingId);
+  if(!b)return;
+  if(!confirm(`Request refund ₵${b.amount} for booking with ${b.nurseName}? Reason: ${b.nurseStatus==='REJECTED'?'Nurse rejected':'10min pending no acceptance'}. Will go to CEO dashboard for approval.`))return;
+  try{
+    await setDoc(doc(db,'refunds',bookingId),{
+      id: bookingId, bookingId: bookingId,
+      clientId: currentClientId, clientName: currentClientData?.fullName||b.clientName, clientEmail: currentClientData?.email||b.clientEmail,
+      nurseId: b.nurseId, nurseName: b.nurseName,
+      amount: b.amount, refundAmount: b.amount,
+      reason: b.nurseStatus==='REJECTED'?'Nurse rejected - Look for different nurse or increase amount' : '10min pending - No nurse acceptance',
+      clientCountry: currentClientData?.country||b.clientCountry||'GH',
+      country: currentClientData?.country||'GH',
+      status: 'PENDING',
+      createdAt: serverTimestamp(), timestamp: new Date().toISOString()
+    });
+    await updateDoc(doc(db,'bookings',bookingId),{refundRequested:true, refundRequestedAt:serverTimestamp()});
+    alert('✅ Refund requested - Goes to CEO dashboard. CEO will approve refund via Paystack/MoMo. For quick booking, look for different nurse or increase amount.');
+    loadBookings();
+  }catch(e){alert('Refund request failed: '+e.message);}
+}
+
+window.loadNurses=async()=>{
+  const countryFilter=document.getElementById('filterCountry')?.value||'';
+  try{
+    const q=query(collection(db,'nurses'), where('isApproved','==',true));
+    const snap=await getDocs(q);
+    let list=[];
+    snap.forEach(d=>{list.push({id:d.id,...d.data()});});
+    if(countryFilter){list=list.filter(n=>n.country===countryFilter);}
+    allNurses=list;
+    if(map){
+      markers.forEach(m=>map.removeLayer(m)); markers=[];
+      list.forEach(n=>{
+        if(n.lat && n.lng){
+          const icon=L.divIcon({html:`<div style="background:${n.country==='GH'?'#22c55e':'#7c3aed'};color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;border:2px solid white">👩‍⚕️</div>`,className:'',iconSize:[30,30]});
+          const marker=L.marker([n.lat,n.lng],{icon}).addTo(map).bindPopup(`<b>${n.fullName||''}</b><br>${n.country||''} - ⭐ ${n.rating||0} (${n.reviewCount||0})<br>${(n.services||[]).join(', ')}<br><button onclick="location.href='book-nurse.html'" style="margin-top:4px;padding:4px 8px;background:#22c55e;color:white;border:none;border-radius:6px">Book</button>`);
+          markers.push(marker);
+        }
+      });
+    }
+    const el=document.getElementById('nursesNearList');
+    if(list.length===0){el.innerHTML=`<div style="text-align:center;padding:10px;color:#9ca3af">No approved nurses in ${countryFilter||'all countries'} near you. Try all countries.</div>`;return;}
+    let html='';
+    list.slice(0,10).forEach(n=>{
+      html+=`<div style="border:1px solid #e5e7eb;border-radius:12px;padding:10px;margin:6px 0;display:flex;gap:10px;align-items:center"><img src="${n.photoURL||'https://i.pravatar.cc/40'}" style="width:40px;height:40px;border-radius:10px;object-fit:cover"><div style="flex:1"><b>${n.fullName||''}</b> - ${n.country||''} ${n.countryName||''}<br><small>⭐ ${n.rating||0} (${n.reviewCount||0} ratings) - ${ (n.services||[]).join(', ')} - ${n.phone||''}</small><br><small>GPS: ${n.lat?.toFixed(3)},${n.lng?.toFixed(3)}</small></div><button class="btn btnGreen btnSmall" onclick="location.href='book-nurse.html'">Book</button></div>`;
+    });
+    el.innerHTML=html;
+  }catch(e){document.getElementById('nursesNearList').innerHTML=`Error: ${e.message}`;}
+}
+
+async function loadMyRatings(){
+  const myRatings=bookings.filter(b=>b.rating);
+  const el=document.getElementById('myRatingsList');
+  if(myRatings.length===0){el.innerHTML=`<div style="text-align:center;padding:20px;color:#9ca3af">You haven't rated any nurse yet. After service, rate nurse - Your rating will reflect for other clients booking her.</div>`;return;}
+  let html='';
+  myRatings.forEach(b=>{
+    html+=`<div style="border:1px solid #e5e7eb;border-radius:12px;padding:10px;margin:6px 0"><div style="display:flex;justify-content:space-between"><b>${b.nurseName}</b><span>⭐ ${b.rating}</span></div><div style="font-size:11px;color:#6b7280">${b.review||''}</div><div style="font-size:10px;color:#9ca3af">${b.ratedAt? 'Rated' : ''} - ${b.service||''}</div></div>`;
+  });
+  el.innerHTML=html;
+}
+
+async function loadRefunds(){
+  try{
+    const q=query(collection(db,'refunds'), where('clientId','==',currentClientId));
+    const snap=await getDocs(q);
+    let list=[];
+    snap.forEach(d=>{list.push(d.data());});
+    const el=document.getElementById('refundsList');
+    if(list.length===0){el.innerHTML=`<div style="text-align:center;padding:10px;background:#f9fafb;border-radius:10px;color:#6b7280;font-size:11px">No refund requests yet. If nurse rejects or 10min pending, you can request refund - Goes to CEO dashboard.</div>`;return;}
+    let html='';
+    list.forEach(r=>{
+      html+=`<div style="border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin:6px 0"><div style="display:flex;justify-content:space-between"><b>₵${r.amount||0} - ${r.nurseName||''}</b><span class="badge ${r.status==='PENDING'?'badgeYellow':r.status==='APPROVED'?'badgeGreen':'badgeRed'}">${r.status}</span></div><div style="font-size:11px;color:#6b7280">${r.reason||''} - ${r.country||''} - ${r.timestamp? new Date(r.timestamp).toLocaleDateString():''}</div></div>`;
+    });
+    el.innerHTML=html;
+  }catch(e){document.getElementById('refundsList').innerHTML=`Error: ${e.message}`;}
+}
+
+window.closeModal=()=>{document.getElementById('detailModal').style.display='none';}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  if(checkLogin()){
+    loadClientProfile();
+    loadBookings();
+    setTimeout(initMap,500);
+  }
+});
+onAuthStateChanged(auth, async(user)=>{
+  if(!user)return;
+  if(localStorage.getItem('lcg_logged_in')==='true' && localStorage.getItem('lcg_role')==='client'){
+    checkLogin();
+    loadClientProfile();
+    loadBookings();
+  }
+});
+</script>
+</body>
+</html>
