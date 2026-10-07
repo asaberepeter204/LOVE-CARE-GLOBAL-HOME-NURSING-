@@ -2,145 +2,125 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Login - Eye Toggle + Auto GPS - Love Care Global</title>
+<title>Nurse Login - Professional - LOVE CARE GLOBAL HOME NURSING</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111827}
-.topbar{background:linear-gradient(90deg,#7c3aed,#5b21b6);padding:12px 14px;display:flex;justify-content:space-between;color:white;position:sticky;top:0}
-.wrap{max-width:400px;margin:0 auto;padding:20px}
-.card{background:white;border-radius:20px;padding:20px;border:1px solid #e5e7eb;box-shadow:0 8px 24px rgba(0,0,0,.06)}
-label{font-size:11px;font-weight:800;margin:10px 0 4px;display:block}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f6f7fb;color:#111827;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.wrap{width:100%;max-width:420px;padding:16px}
+.card{background:white;border-radius:20px;padding:24px;border:1px solid #e5e7eb;box-shadow:0 20px 40px rgba(0,0,0,.08)}
+.logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#5b21b6);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;margin:0 auto 12px;font-size:20px}
+h1{font-size:20px;font-weight:900;text-align:center} .sub{font-size:12px;color:#6b7280;text-align:center;margin:6px 0 16px}
+label{font-size:11px;font-weight:800;margin:12px 0 6px;display:block;color:#374151}
 .inputWrap{position:relative}
-input,select{width:100%;padding:12px 40px 12px 12px;border-radius:12px;border:1.5px solid #d1d5db;font-size:13px;outline:none}
-input:focus,select:focus{border-color:#7c3aed}
-.eyeBtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#f3f4f6;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px}
-.btn{padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;width:100%;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px}
-.btnPurple{background:linear-gradient(90deg,#7c3aed,#5b21b6);color:white}
-.btnLight{background:#f3f4f6;border:1px solid #e5e7eb}
-.badge{padding:6px 12px;border-radius:999px;font-size:10px;font-weight:900;background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe}
+input,select{width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1.5px solid #e5e7eb;font-size:13px;outline:none;background:#f9fafb;transition:.2s}
+input:focus,select:focus{border-color:#7c3aed;background:white;box-shadow:0 0 0 4px rgba(124,58,237,.12)}
+.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:white;border:1px solid #e5e7eb;width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.7;transition:.2s}
+.eyeBtn:hover{opacity:1}
+.btn{width:100%;padding:13px;border-radius:12px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;margin-top:14px}
+.btnPurple{background:#111827;color:white}
+.btnGoogle{background:white;border:1.5px solid #e5e7eb;color:#111827}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#9ca3af;font-size:11px;font-weight:700}
+.divider:before,.divider:after{content:"";flex:1;height:1px;background:#e5e7eb}
+.gpsBox{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;padding:10px;margin-top:10px}
+.gpsName{font-size:11px;font-weight:700;color:#5b21b6;line-height:1.3}
 </style>
 </head>
 <body>
-<div class="topbar"><b>👩‍⚕️ NURSE LOGIN - One Login</b><a href="index.html" style="color:white;text-decoration:none;font-weight:800">Home</a></div>
-<div class="wrap">
-<div class="card">
-<div style="text-align:center;margin-bottom:12px"><div style="font-size:36px">👩‍⚕️</div><h2 style="font-weight:900">Nurse Login</h2><p style="font-size:11px;color:#6b7280">Eye toggle + Auto GPS + 8 Countries withdrawal</p><span class="badge">✅ One Login - Dashboard Unlocked</span></div>
+<div class="wrap"><div class="card">
+<div class="logo">N</div>
+<h1>Nurse Login</h1>
+<p class="sub">LOVE CARE GLOBAL HOME NURSING • 8 Countries • Withdrawal</p>
 
-<label>Country (8 Countries + Other)</label>
-<select id="country">
-<option value="">-- Select Country --</option>
-<option value="GH">🇬🇭 Ghana - MoMo + Card</option>
-<option value="NG">🇳🇬 Nigeria - Debit + Virtual Card</option>
-<option value="ZA">🇿🇦 South Africa - Debit + Virtual Card</option>
-<option value="GB">🇬🇧 UK - Debit + Virtual Card</option>
-<option value="US">🇺🇸 USA - Debit + Virtual Card</option>
-<option value="AU">🇦🇺 Australia - Debit + Virtual Card</option>
-<option value="AE">🇦🇪 UAE - Debit + Virtual Card</option>
-<option value="CA">🇨🇦 Canada - Debit + Virtual Card</option>
-<option value="OTHER">🌍 Other - Debit + Virtual Card</option>
-</select>
+<button class="btn btnGoogle" onclick="loginWithGoogle()">
+<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+Continue with Google
+</button>
 
-<label>Email *</label>
-<div class="inputWrap"><input id="email" type="email" placeholder="nurse@email.com"></div>
+<div class="divider">OR CONTINUE WITH EMAIL</div>
 
+<label>Country *</label>
+<select id="country"><option value="">Select country</option><option value="GH">🇬🇭 Ghana - MoMo + Card</option><option value="NG">🇳🇬 Nigeria - Debit + Virtual</option><option value="ZA">🇿🇦 South Africa - Debit + Virtual</option><option value="GB">🇬🇧 UK - Debit + Virtual</option><option value="US">🇺🇸 USA - Debit + Virtual</option><option value="AU">🇦🇺 Australia - Debit + Virtual</option><option value="AE">🇦🇪 UAE - Debit + Virtual</option><option value="CA">🇨🇦 Canada - Debit + Virtual</option><option value="OTHER">🌍 Other - Debit + Virtual</option></select>
+
+<label>Email *</label><input id="email" type="email" placeholder="you@example.com">
 <label>Password *</label>
 <div class="inputWrap">
-<input id="password" type="password" placeholder="Password">
-<button class="eyeBtn" type="button" onclick="toggleEye('password',this)">👁️</button>
+<input id="password" type="password" placeholder="••••••••">
+<button class="eyeBtn" type="button" onclick="toggleEye('password',this)">
+<svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+<svg class="eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+</button>
 </div>
 
-<label>GPS Location (Auto GPS on load - Required for Map & Withdrawal) *</label>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div class="inputWrap"><input id="lat" readonly placeholder="Auto GPS Lat"></div>
-<div class="inputWrap"><input id="lng" readonly placeholder="Auto GPS Lng"></div>
-</div>
-<div style="display:flex;gap:6px;margin-top:6px">
-<button class="btn btnLight" style="flex:1;padding:8px;font-size:11px" type="button" onclick="getGPS()">📍 Refresh GPS</button>
-<span id="gpsStatus" style="font-size:10px;color:#6b7280;padding:8px">Auto GPS locating...</span>
-</div>
-<div id="mapPreview" style="display:none;margin-top:8px"><iframe id="mapFrame" style="width:100%;height:120px;border:none;border-radius:10px"></iframe></div>
-
-<button class="btn btnPurple" onclick="loginNurse()">🔐 Login - Eye Toggle + Auto GPS</button>
-
-<div style="text-align:center;margin-top:14px;font-size:12px">
-<a href="nurse-registration.html" style="color:#7c3aed;font-weight:900;text-decoration:none">Register as Nurse - 8 Countries + GPS + Withdrawal Setup</a><br>
-<div style="margin-top:8px"><a href="client-login.html" style="color:#16a34a;font-weight:800;text-decoration:none;font-size:11px">👤 Client Login</a> • <a href="index.html" style="font-size:11px;color:#6b7280;text-decoration:none">Home</a></div>
+<div class="gpsBox">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;font-weight:900;color:#5b21b6">📍 GPS ACTUAL NAME - MAP & WITHDRAWAL</span><button type="button" onclick="getGPS()" style="font-size:10px;font-weight:800;background:white;border:1px solid #ddd6fe;border-radius:999px;padding:4px 8px;cursor:pointer">Refresh</button></div>
+<div id="gpsName" class="gpsName" style="margin-top:6px">Locating your actual place name...</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px"><input id="lat" readonly style="padding:8px;font-size:11px" placeholder="Lat"><input id="lng" readonly style="padding:8px;font-size:11px" placeholder="Lng"></div>
+<div id="mapPreview" style="display:none;margin-top:8px;border-radius:10px;overflow:hidden"><iframe id="mapFrame" style="width:100%;height:120px;border:0"></iframe></div>
 </div>
 
-<div style="background:#f5f3ff;padding:10px;border-radius:12px;margin-top:12px;border:1px solid #ddd6fe">
-<div style="font-size:11px;font-weight:900;color:#5b21b6">💸 Withdrawal - 8 Countries Rule</div>
-<div style="font-size:10px;color:#6b7280;margin-top:4px">Ghana = MoMo (MTN/Vodafone/AirtelTigo) + Debit + Virtual Card<br>Outside Ghana (NG, ZA, GB, US, AU, AE, CA, OTHER) = Debit Card + Virtual Card only with dropdown details + GPS required during withdrawal</div>
-<div style="font-size:10px;color:#dc2626;margin-top:4px">Refund is NOT for nurses - Only withdrawals. Refund is for clients in client dashboard.</div>
-</div>
-</div>
-</div>
+<button class="btn btnPurple" onclick="loginEmail()">Continue →</button>
+
+<div style="text-align:center;margin-top:14px;font-size:12px;color:#6b7280">No account? <a href="nurse-registration.html" style="color:#7c3aed;font-weight:800;text-decoration:none">Create account</a> • <a href="index.html" style="color:#6b7280;text-decoration:none">Home</a></div>
+<div style="text-align:center;margin-top:6px"><a href="client-login.html" style="font-size:11px;color:#16a34a;font-weight:700;text-decoration:none">Are you a Client? Client Login →</a></div>
+<div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:8px;margin-top:10px;font-size:10px;color:#6b7280">Ghana = MoMo + Card • Outside = Debit + Virtual Card only (dropdown) • GPS actual name required for map & withdrawal</div>
+</div></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
+const provider=new GoogleAuthProvider();
 
-window.toggleEye=(inputId,btn)=>{
-  const input=document.getElementById(inputId);
-  if(input.type==='password'){input.type='text'; btn.textContent='🙈';}
-  else{input.type='password'; btn.textContent='👁️';}
+window.toggleEye=(id,btn)=>{
+  const input=document.getElementById(id);
+  const open=btn.querySelector('.eye-open');
+  const closed=btn.querySelector('.eye-closed');
+  if(input.type==='password'){input.type='text'; open.style.display='none'; closed.style.display='block'; btn.style.opacity='1';}
+  else{input.type='password'; open.style.display='block'; closed.style.display='none'; btn.style.opacity='.7';}
 }
 window.getGPS=()=>{
-  const status=document.getElementById('gpsStatus');
-  status.textContent='📍 Locating GPS...';
-  if(!navigator.geolocation){status.textContent='GPS not supported'; return;}
-  navigator.geolocation.getCurrentPosition(pos=>{
-    document.getElementById('lat').value=pos.coords.latitude.toFixed(6);
-    document.getElementById('lng').value=pos.coords.longitude.toFixed(6);
-    status.textContent='✅ GPS Auto Located - Ready for Map & Withdrawal';
+  const nameEl=document.getElementById('gpsName');
+  nameEl.textContent='📍 Locating... getting actual place name...';
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude; const lng=pos.coords.longitude;
+    document.getElementById('lat').value=lat.toFixed(6); document.getElementById('lng').value=lng.toFixed(6);
     document.getElementById('mapPreview').style.display='block';
-    document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}&z=15&output=embed`;
-  },()=>{
-    status.textContent='❌ Enable GPS - Required for Map & Withdrawal';
-  },{enableHighAccuracy:true, timeout:10000});
+    document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+    try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`); const d=await r.json(); nameEl.textContent=d.display_name||`${lat},${lng}`;}catch{ nameEl.textContent=`${lat.toFixed(6)}, ${lng.toFixed(6)} - GPS located`; }
+  },()=>{nameEl.textContent='❌ Enable GPS - Required for map & withdrawal';},{enableHighAccuracy:true, timeout:15000});
 }
-window.loginNurse=async()=>{
+window.loginWithGoogle=async()=>{
   const country=document.getElementById('country').value;
-  const email=document.getElementById('email').value.trim();
-  const password=document.getElementById('password').value;
-  const lat=document.getElementById('lat').value;
-  const lng=document.getElementById('lng').value;
-  if(!country){alert('Select country - 8 Countries: Ghana, Nigeria, SA, UK, USA, Australia, UAE, Canada, Other');return;}
-  if(!email||!password){alert('Email and password required');return;}
-  if(!lat||!lng){alert('Auto GPS locating... Please wait for GPS or click Refresh GPS. GPS required for Google Map search & withdrawal verification.'); getGPS(); return;}
+  if(!country){alert('Select country first'); return;}
   try{
-    const cred=await signInWithEmailAndPassword(auth,email,password);
-    const uid=cred.user.uid;
-    const snap=await getDoc(doc(db,'nurses',uid));
-    if(!snap.exists()){alert('Not a nurse account. Use Nurse Registration - 8 Countries');return;}
-    const data=snap.data();
-    try{
-      await updateDoc(doc(db,'nurses',uid),{country, countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text, lat:parseFloat(lat), lng:parseFloat(lng), lastLoginGPS:`${lat},${lng}`, lastLoginAt:serverTimestamp()});
-    }catch(e){}
-    localStorage.setItem('lcg_nurse_uid',uid);
-    localStorage.setItem('lcg_nurse_email',email);
-    localStorage.setItem('lcg_nurse_name',data.fullName||email.split('@')[0]);
-    localStorage.setItem('lcg_role','nurse');
-    localStorage.setItem('lcg_logged_in','true');
-    localStorage.setItem('lcg_nurse_country',country);
-    localStorage.setItem('currentNurseId',uid);
-    localStorage.setItem('currentNurseCountry',country);
-    localStorage.setItem('currentNurseLat',lat);
-    localStorage.setItem('currentNurseLng',lng);
-    alert(`✅ Nurse Logged in! Country: ${country} | Auto GPS: ${lat},${lng} | Withdrawal: ${country==='GH'?'MoMo+Card':'Debit+Virtual Card'}`);
+    const result=await signInWithPopup(auth,provider);
+    const user=result.user;
+    const lat=document.getElementById('lat').value; const lng=document.getElementById('lng').value; const gpsName=document.getElementById('gpsName').textContent;
+    const snap=await getDoc(doc(db,'nurses',user.uid));
+    if(!snap.exists()){
+      await setDoc(doc(db,'nurses',user.uid),{uid:user.uid, fullName:user.displayName||'Nurse', email:user.email, phone:user.phoneNumber||'', country, countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text, lat:lat?parseFloat(lat):null, lng:lng?parseFloat(lng):null, gpsActualName:gpsName, role:'nurse', isApproved:false, rating:0, reviewCount:0, createdAt:serverTimestamp(), provider:'google'});
+    }else{
+      await updateDoc(doc(db,'nurses',user.uid),{country, lat:lat?parseFloat(lat):null, lng:lng?parseFloat(lng):null, gpsActualName:gpsName, lastLoginAt:serverTimestamp()});
+    }
+    localStorage.setItem('lcg_nurse_uid',user.uid); localStorage.setItem('lcg_role','nurse'); localStorage.setItem('lcg_logged_in','true'); localStorage.setItem('currentNurseId',user.uid); localStorage.setItem('currentNurseCountry',country);
     location.href='nurse-dashboard.html';
-  }catch(e){alert('Login failed: '+e.message);}
+  }catch(e){alert('Google login failed: '+e.message);}
 }
-window.addEventListener('DOMContentLoaded', ()=>{
-  getGPS();
-  if(localStorage.getItem('lcg_logged_in')==='true' && localStorage.getItem('lcg_role')==='nurse'){
-    const uid=localStorage.getItem('lcg_nurse_uid');
-    if(uid) location.href='nurse-dashboard.html';
-  }
-});
+window.loginEmail=async()=>{
+  const country=document.getElementById('country').value; const email=document.getElementById('email').value.trim(); const pass=document.getElementById('password').value;
+  const lat=document.getElementById('lat').value; const lng=document.getElementById('lng').value; const gpsName=document.getElementById('gpsName').textContent;
+  if(!country){alert('Select country'); return;} if(!email||!pass){alert('Email & password required'); return;} if(!lat){getGPS(); alert('Wait for GPS actual name'); return;}
+  try{
+    const cred=await signInWithEmailAndPassword(auth,email,pass);
+    await updateDoc(doc(db,'nurses',cred.user.uid),{country, lat:parseFloat(lat), lng:parseFloat(lng), gpsActualName:gpsName, lastLoginAt:serverTimestamp()});
+    localStorage.setItem('lcg_nurse_uid',cred.user.uid); localStorage.setItem('lcg_role','nurse'); localStorage.setItem('lcg_logged_in','true'); localStorage.setItem('currentNurseId',cred.user.uid); localStorage.setItem('currentNurseCountry',country);
+    location.href='nurse-dashboard.html';
+  }catch(e){alert(e.message);}
+}
+window.addEventListener('DOMContentLoaded',()=>{getGPS();});
 </script>
 </body>
 </html>
