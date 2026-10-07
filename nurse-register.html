@@ -2,73 +2,86 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Registration - 8 Countries - Love Care Global</title>
+<title>Nurse Registration - 8 Countries + GPS Actual Name - LOVE CARE GLOBAL HOME NURSING</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111827}
-.topbar{background:linear-gradient(90deg,#7c3aed,#5b21b6);padding:12px 14px;display:flex;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
-.wrap{max-width:600px;margin:0 auto;padding:14px}
-.card{background:white;border-radius:16px;padding:16px;border:1px solid #e5e7eb;margin-bottom:12px}
-label{font-size:11px;font-weight:800;margin:10px 0 4px;display:block}
-input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1.5px solid #d1d5db;font-size:12px}
+.topbar{background:#7c3aed;padding:12px 14px;display:flex;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
+.wrap{max-width:520px;margin:0 auto;padding:16px}
+.card{background:white;border-radius:20px;padding:18px;border:1px solid #e5e7eb;box-shadow:0 8px 24px rgba(0,0,0,.06);margin-bottom:12px}
+label{font-size:11px;font-weight:800;margin:10px 0 4px;display:block;color:#374151}
+.inputWrap{position:relative}
+input,select,textarea{width:100%;padding:12px 40px 12px 12px;border-radius:12px;border:1.5px solid #d1d5db;font-size:13px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#7c3aed}
+.eyeBtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#f3f4f6;border:none;width:32px;height:32px;border-radius:8px;cursor:pointer}
 .btn{padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;width:100%;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px}
 .btnPurple{background:linear-gradient(90deg,#7c3aed,#5b21b6);color:white}
-.btnGreen{background:#22c55e;color:white}
 .btnLight{background:#f3f4f6;border:1px solid #e5e7eb}
+.badge{padding:5px 10px;border-radius:999px;font-size:10px;font-weight:900;background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe}
+.sectionTitle{font-weight:900;font-size:13px;margin:14px 0 6px;background:#f5f3ff;padding:8px 12px;border-radius:10px;color:#5b21b6;border:1px solid #ddd6fe}
 </style>
 </head>
 <body>
-<div class="topbar"><b>👩‍⚕️ Nurse Registration - 8 Countries</b><a href="index.html" style="color:white;text-decoration:none;font-weight:800">Home</a></div>
+<div class="topbar"><b>👩‍⚕️ NURSE REGISTRATION</b><a href="index.html" style="color:white;text-decoration:none;font-weight:900">Home</a></div>
 <div class="wrap">
+
 <div class="card">
-<h3>🌍 Select Your Country + GPS (Required)</h3>
-<p style="font-size:11px;color:#6b7280;margin:4px 0">Serves: Ghana, Nigeria, South Africa, UK, USA, Australia, UAE, Canada, Other. GPS required for Google Map search + withdrawal verification.</p>
-<label>Country * (8 Countries + Other)</label>
-<select id="country" required onchange="updateWithdrawalInfo()">
-<option value="">-- Select Country --</option>
-<option value="GH">🇬🇭 Ghana - GHS - Momo + Debit + Virtual Card</option>
-<option value="NG">🇳🇬 Nigeria - NGN - Debit + Virtual Card</option>
-<option value="ZA">🇿🇦 South Africa - ZAR - Debit + Virtual Card</option>
-<option value="GB">🇬🇧 United Kingdom (UK) - GBP - Debit + Virtual Card</option>
-<option value="US">🇺🇸 United States (USA) - USD - Debit + Virtual Card</option>
-<option value="AU">🇦🇺 Australia - AUD - Debit + Virtual Card</option>
-<option value="AE">🇦🇪 UAE Dubai - AED - Debit + Virtual Card</option>
-<option value="CA">🇨🇦 Canada - CAD - Debit + Virtual Card</option>
-<option value="OTHER">🌍 Other Country - USD - Debit + Virtual Card</option>
-</select>
-<div id="countryInfo" style="margin-top:8px;padding:10px;background:#f5f3ff;border-radius:10px;font-size:11px;display:none;border:1px solid #ddd6fe"></div>
+<div style="text-align:center"><div style="font-size:36px">👩‍⚕️</div><h2 style="font-weight:900">Nurse Registration</h2><p style="font-size:11px;color:#6b7280">Eye Toggle • GPS Actual Name • 8 Countries • Withdrawal Setup</p><span class="badge">One Login System</span></div>
 
-<label>Full Name *</label><input id="fullName" required placeholder="As on ID">
-<label>Phone *</label><input id="phone" required placeholder="024... / +234... / +44...">
-<label>Email *</label><input id="email" type="email" required placeholder="nurse@email.com">
-<label>Password *</label><input id="password" type="password" required placeholder="Min 6 chars">
+<div class="sectionTitle">🌍 Country & Personal Info</div>
+<label>Country (8 Countries + Other) *</label><select id="country" onchange="updateWithdrawal()"><option value="">-- Select Country --</option><option value="GH">🇬🇭 Ghana - MoMo + Debit + Virtual Card</option><option value="NG">🇳🇬 Nigeria - Debit + Virtual Card</option><option value="ZA">🇿🇦 South Africa - Debit + Virtual Card</option><option value="GB">🇬🇧 UK - Debit + Virtual Card</option><option value="US">🇺🇸 USA - Debit + Virtual Card</option><option value="AU">🇦🇺 Australia - Debit + Virtual Card</option><option value="AE">🇦🇪 UAE - Debit + Virtual Card</option><option value="CA">🇨🇦 Canada - Debit + Virtual Card</option><option value="OTHER">🌍 Other - Debit + Virtual Card</option></select>
 
-<label>Your GPS Location (Required for Google Map search + withdrawal) *</label>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div><input id="lat" placeholder="Lat" readonly required><div style="font-size:9px;color:#6b7280">Latitude</div></div>
-<div><input id="lng" placeholder="Lng" readonly required><div style="font-size:9px;color:#6b7280">Longitude</div></div>
-</div>
-<button class="btn btnGreen" type="button" onclick="getGPS()">📍 Use My GPS - Required for Map & Withdrawal</button>
-<div id="mapPreview" style="display:none;margin-top:8px"><iframe id="mapFrame" style="width:100%;height:160px;border:none;border-radius:10px"></iframe></div>
+<label>Full Name *</label><input id="fullName" placeholder="Sarah Mensah" required>
+<label>Email *</label><input id="email" type="email" placeholder="nurse@email.com" required>
+<label>Phone (with country code) *</label><input id="phone" placeholder="+233..." required>
 
-<label>Bio / About (Clients see this on Map)</label><textarea id="bio" rows="3" placeholder="5 years elderly care..."></textarea>
-<label>Services (comma separated)</label><input id="services" placeholder="Elderly Care, Pediatric Care, General Nursing">
+<label>Password *</label><div class="inputWrap"><input id="password" type="password" placeholder="Password"><button class="eyeBtn" type="button" onclick="toggleEye('password',this)">👁️</button></div>
+<label>Confirm Password *</label><div class="inputWrap"><input id="confirmPassword" type="password" placeholder="Confirm Password"><button class="eyeBtn" type="button" onclick="toggleEye('confirmPassword',this)">👁️</button></div>
 
-<label>Profile Photo *</label><input type="file" id="photoFile" accept="image/*">
-<label>Introduction Video (Clients see when selecting you)</label><input type="file" id="videoFile" accept="video/*">
-<label>CV</label><input type="file" id="cvFile" accept=".pdf,.doc,.docx">
-<label>Nursing Licence *</label><input type="file" id="licenceFile" accept=".pdf,image/*">
-<label>Certificate</label><input type="file" id="certFile" accept=".pdf,image/*">
+<label>Years Experience *</label><select id="experience"><option value="">Select</option><option>1-2 years</option><option>3-5 years</option><option>5+ years</option><option>10+ years</option></select>
+<label>Services You Offer (comma) *</label><input id="services" placeholder="Elderly Care, Baby Care, Post Surgery..." required>
 
-<div style="background:#f9fafb;padding:12px;border-radius:12px;margin-top:14px;border:1px solid #e5e7eb">
-<h4 style="font-size:12px;font-weight:900">💸 Withdrawal Setup - Required (8 Countries Rule)</h4>
-<div id="withdrawalSetupInfo" style="font-size:11px;color:#6b7280;margin:6px 0">Select country first</div>
-<label>Withdrawal Method *</label>
-<select id="withdrawalMethod" onchange="updateWithdrawalFields()"><option value="">-- Select Method --</option></select>
-<div id="withdrawalFields" style="margin-top:8px"></div>
+<div class="sectionTitle">📍 GPS Location - Actual Name (Required for Map & Withdrawal)</div>
+<label>GPS Actual Place Name *</label><input id="gpsName" readonly placeholder="Auto GPS locating... Actual name will show here" style="background:#f9fafb">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px"><input id="lat" readonly placeholder="Lat - Auto"><input id="lng" readonly placeholder="Lng - Auto"></div>
+<button class="btn btnLight" type="button" onclick="getGPS()">📍 Use My GPS - Get Actual Name + Map</button>
+<div id="mapPreview" style="display:none;margin-top:8px"><iframe id="mapFrame" style="width:100%;height:140px;border:none;border-radius:12px"></iframe></div>
+<label>Home Address (Actual Name) *</label><input id="address" placeholder="Will auto fill from GPS actual name">
+
+<div class="sectionTitle">📸 Profile & Verification</div>
+<label>Profile Photo *</label><input id="photo" type="file" accept="image/*" required>
+<label>Short Video Intro (30 sec) *</label><input id="video" type="file" accept="video/*">
+<label>CV Upload *</label><input id="cv" type="file" accept=".pdf,.doc,.docx">
+<label>Nursing Licence *</label><input id="licence" type="file" accept="image/*,.pdf" required>
+<label>Certificate *</label><input id="certificate" type="file" accept="image/*,.pdf">
+
+<div class="sectionTitle">💸 Withdrawal Setup - 8 Countries Rule</div>
+<div id="withdrawalInfo" style="background:#f5f3ff;padding:10px;border-radius:10px;border:1px solid #ddd6fe;font-size:11px;color:#6b7280">Select country first - Ghana = MoMo + Debit + Virtual Card | Outside Ghana = Debit + Virtual Card only (dropdown)</div>
+
+<div id="momoFields" style="display:none">
+<label>MoMo Network (Ghana Only)</label><select id="momoNetwork"><option value="">Select Network</option><option value="MTN">MTN MoMo</option><option value="VODAFONE">Vodafone Cash</option><option value="AIRTELTIGO">AirtelTigo Money</option></select>
+<label>MoMo Number (Ghana Only)</label><input id="momoNumber" placeholder="0XX XXX XXXX">
 </div>
 
-<button class="btn btnPurple" onclick="registerNurse()">📝 Register as Nurse - 8 Countries</button>
-<div style="text-align:center;margin-top:10px;font-size:12px">Already have account? <a href="nurse-login.html" style="color:#7c3aed;font-weight:900">Nurse Login</a></div>
+<label>Debit Card - Select Type</label><select id="debitCardType" onchange="updateCardFields()"><option value="">Select Debit Card</option><option value="VISA">VISA Debit</option><option value="MASTERCARD">MASTERCARD Debit</option><option value="VISA_ELECTRON">VISA Electron</option></select>
+<div id="debitFields" style="display:none">
+<label>Debit Card Number</label><div class="inputWrap"><input id="debitNumber" type="password" placeholder="Card Number"><button class="eyeBtn" type="button" onclick="toggleEye('debitNumber',this)">👁️</button></div>
+<label>Expiry MM/YY</label><input id="debitExpiry" placeholder="MM/YY">
+<label>CVV</label><div class="inputWrap"><input id="debitCVV" type="password" placeholder="CVV"><button class="eyeBtn" type="button" onclick="toggleEye('debitCVV',this)">👁️</button></div>
+<label>Name on Card</label><input id="debitName" placeholder="Name on Debit Card">
+</div>
+
+<label>Virtual Card - Select Type</label><select id="virtualCardType" onchange="updateVirtualFields()"><option value="">Select Virtual Card</option><option value="VISA_VIRTUAL">VISA Virtual</option><option value="MASTERCARD_VIRTUAL">MASTERCARD Virtual</option></select>
+<div id="virtualFields" style="display:none">
+<label>Virtual Card Number</label><div class="inputWrap"><input id="virtualNumber" type="password" placeholder="Virtual Card Number"><button class="eyeBtn" type="button" onclick="toggleEye('virtualNumber',this)">👁️</button></div>
+<label>Expiry</label><input id="virtualExpiry" placeholder="MM/YY">
+<label>CVV</label><div class="inputWrap"><input id="virtualCVV" type="password" placeholder="CVV"><button class="eyeBtn" type="button" onclick="toggleEye('virtualCVV',this)">👁️</button></div>
+</div>
+
+<div style="background:#fef2f2;padding:8px;border-radius:8px;border:1px solid #fecaca;font-size:10px;color:#dc2626;margin-top:10px">⚠️ GPS Actual Name required during registration AND withdrawal. CEO verifies GPS during withdrawal approval.</div>
+
+<button class="btn btnPurple" onclick="register()">✅ Register - Eye Toggle + GPS Actual Name + 8 Countries</button>
+
+<div style="text-align:center;margin-top:12px;font-size:12px"><a href="nurse-login.html" style="color:#7c3aed;font-weight:900;text-decoration:none">Already have account? Nurse Login - Eye Toggle + GPS Actual Name</a><br><a href="index.html" style="font-size:11px;color:#6b7280;text-decoration:none">Home - LOVE CARE GLOBAL HOME NURSING</a></div>
 </div>
 </div>
 
@@ -76,103 +89,123 @@ input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1.5px so
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
+
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
 const storage=getStorage(app);
 
+window.toggleEye=(id,btn)=>{const i=document.getElementById(id); if(i.type==='password'){i.type='text';btn.textContent='🙈';}else{i.type='password';btn.textContent='👁️';}}
+
+window.updateWithdrawal=()=>{
+  const c=document.getElementById('country').value;
+  const momo=document.getElementById('momoFields');
+  const info=document.getElementById('withdrawalInfo');
+  if(c==='GH'){momo.style.display='block'; info.innerHTML='🇬🇭 Ghana: MoMo (MTN/Vodafone/AirtelTigo) + Debit Card (dropdown) + Virtual Card (dropdown) + GPS Actual Name required';}
+  else if(c){momo.style.display='none'; info.innerHTML=`${c}: Outside Ghana - Debit Card + Virtual Card only (select type from dropdown) + GPS Actual Name required during registration & withdrawal. MoMo NOT allowed.`;}
+  else{momo.style.display='none';}
+}
+window.updateCardFields=()=>{document.getElementById('debitFields').style.display=document.getElementById('debitCardType').value? 'block':'none';}
+window.updateVirtualFields=()=>{document.getElementById('virtualFields').style.display=document.getElementById('virtualCardType').value? 'block':'none';}
+
 window.getGPS=()=>{
-  navigator.geolocation.getCurrentPosition(pos=>{
-    document.getElementById('lat').value=pos.coords.latitude.toFixed(6);
-    document.getElementById('lng').value=pos.coords.longitude.toFixed(6);
+  if(!navigator.geolocation){alert('GPS not supported');return;}
+  document.getElementById('gpsName').value='📍 Locating... Getting actual place name...';
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude; const lng=pos.coords.longitude;
+    document.getElementById('lat').value=lat.toFixed(6);
+    document.getElementById('lng').value=lng.toFixed(6);
     document.getElementById('mapPreview').style.display='block';
-    document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}&z=15&output=embed`;
-  },()=>alert('Enable GPS - Required'));
+    document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+    try{
+      const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const data=await res.json();
+      const actualName=data.display_name||`${lat},${lng}`;
+      document.getElementById('gpsName').value=actualName;
+      document.getElementById('address').value=actualName;
+    }catch(e){
+      document.getElementById('gpsName').value=`${lat.toFixed(6)}, ${lng.toFixed(6)} - GPS Located`;
+      document.getElementById('address').value=`${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    }
+  },()=>{document.getElementById('gpsName').value='❌ Enable GPS - Required'; alert('Enable GPS - Required for Google Map & Withdrawal');},{enableHighAccuracy:true});
 }
-window.updateWithdrawalInfo=()=>{
+
+window.register=async()=>{
   const country=document.getElementById('country').value;
-  const info=document.getElementById('countryInfo');
-  const setupInfo=document.getElementById('withdrawalSetupInfo');
-  const methodSelect=document.getElementById('withdrawalMethod');
-  if(!country){info.style.display='none';return;}
-  info.style.display='block';
-  if(country==='GH'){
-    info.innerHTML=`🇬🇭 <b>Ghana:</b> You can use <b>Momo + Debit Card + Virtual Card</b> for withdrawal. MoMo: MTN, Vodafone, AirtelTigo`;
-    setupInfo.innerHTML=`Ghana nurses: MoMo + Debit Card + Virtual Card`;
-    methodSelect.innerHTML=`<option value="">-- Select Method --</option><option value="MOMO">📱 Mobile Money (MoMo) - Ghana only</option><option value="DEBIT_CARD">💳 Debit Card</option><option value="VIRTUAL_CARD">💻 Virtual Card - Wise/【entity-Payoneer¦canonical_name=Payoneer】</option>`;
-  }else{
-    const countryName=document.getElementById('country').options[document.getElementById('country').selectedIndex].text;
-    info.innerHTML=`${countryName}: <b>Outside Ghana</b> uses <b>Debit Card + Virtual Card only</b> with dropdown to fill details for withdrawal. MoMo not allowed.`;
-    setupInfo.innerHTML=`International nurses: Debit Card + Virtual Card only - Fill dropdown details`;
-    methodSelect.innerHTML=`<option value="">-- Select Method --</option><option value="DEBIT_CARD">💳 Debit Card (International - dropdown details)</option><option value="VIRTUAL_CARD">💻 Virtual Card - Wise/【entity-Payoneer¦canonical_name=Payoneer】/【entity-PayPal¦canonical_name=PayPal】 (dropdown details)</option>`;
-  }
-  updateWithdrawalFields();
-}
-window.updateWithdrawalFields=()=>{
-  const method=document.getElementById('withdrawalMethod').value;
-  const country=document.getElementById('country').value;
-  const fields=document.getElementById('withdrawalFields');
-  if(!method){fields.innerHTML='';return;}
-  if(method==='MOMO'){
-    fields.innerHTML=`<label>MoMo Network *</label><select id="momoNetwork"><option>MTN</option><option>Vodafone</option><option>AirtelTigo</option></select><label>MoMo Number *</label><input id="momoNumber" placeholder="024..."><label>MoMo Name *</label><input id="momoName" placeholder="Name on MoMo">`;
-  }else if(method==='DEBIT_CARD'){
-    fields.innerHTML=`<label>Bank Name *</label><input id="bankName" placeholder="Bank Name"><label>Account Holder Name *</label><input id="accountName" placeholder="As on card"><label>Account Number / IBAN *</label><input id="accountNumber" placeholder="Account Number or IBAN"><label>Card Last 4 *</label><input id="cardNumber" placeholder="For verification"><label>Bank Country *</label><input id="bankCountry" value="${country}" readonly>`;
-  }else if(method==='VIRTUAL_CARD'){
-    fields.innerHTML=`<label>Virtual Card Provider * (Dropdown)</label><select id="virtualProvider"><option>Wise</option><option>【entity-Payoneer¦canonical_name=Payoneer】</option><option>【entity-PayPal¦canonical_name=PayPal】</option><option>【entity-Revolut¦canonical_name=Revolut】</option><option>Other Virtual Card</option></select><label>Virtual Card Email / ID *</label><input id="virtualEmail" placeholder="Email linked to virtual card"><label>Account Holder Name *</label><input id="virtualName" placeholder="Name"><label>Country *</label><input id="virtualCountry" value="${country}" readonly>`;
-  }
-}
-window.registerNurse=async()=>{
-  const country=document.getElementById('country').value;
+  const fullName=document.getElementById('fullName').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('password').value;
+  const confirmPassword=document.getElementById('confirmPassword').value;
   const lat=document.getElementById('lat').value;
   const lng=document.getElementById('lng').value;
-  if(!country){alert('Select country - 8 Countries: Ghana, Nigeria, SA, UK, USA, Australia, UAE, Canada, Other');return;}
-  if(!lat||!lng){alert('Use GPS - Required for Google Map search + withdrawal verification');return;}
-  const withdrawalMethod=document.getElementById('withdrawalMethod').value;
-  if(!withdrawalMethod){alert('Select withdrawal method - Ghana=MoMo+Card, Outside Ghana=Debit+Virtual Card dropdown');return;}
-  const email=document.getElementById('email').value.trim();
-  const password=document.getElementById('password').value;
-  if(!email||!password){alert('Email & password required');return;}
+  const gpsName=document.getElementById('gpsName').value;
+  const address=document.getElementById('address').value;
+  const services=document.getElementById('services').value;
+  const photo=document.getElementById('photo').files[0];
+
+  if(!country){alert('Select country - 8 Countries');return;}
+  if(!fullName||!email||!phone){alert('Fill personal info');return;}
+  if(password.length<6){alert('Password min 6 chars');return;}
+  if(password!==confirmPassword){alert('Passwords do not match - eye toggle to verify');return;}
+  if(!lat||!lng||!gpsName){alert('Use GPS - Get Actual Name - Required for Map & Withdrawal'); getGPS(); return;}
+  if(!photo){alert('Profile photo required');return;}
+  if(!services){alert('Services required');return;}
+
   try{
     const cred=await createUserWithEmailAndPassword(auth,email,password);
     const uid=cred.user.uid;
-    async function uploadIfExists(inputId, folder){
-      const file=document.getElementById(inputId).files[0];
-      if(!file)return null;
-      const path=`nurses/${uid}/${folder}_${Date.now()}_${file.name}`;
-      const ref=sRef(storage, path);
-      await uploadBytes(ref, file);
-      return await getDownloadURL(ref);
-    }
-    const photoURL=await uploadIfExists('photoFile','photo');
-    const introVideoUrl=await uploadIfExists('videoFile','video');
-    const cvUrl=await uploadIfExists('cvFile','cv');
-    const licenceUrl=await uploadIfExists('licenceFile','licence');
-    const certificateUrl=await uploadIfExists('certFile','certificate');
-    let withdrawalDetails={};
-    if(withdrawalMethod==='MOMO'){withdrawalDetails={method:'MOMO', momoNetwork:document.getElementById('momoNetwork').value, momoNumber:document.getElementById('momoNumber').value, momoName:document.getElementById('momoName').value};}
-    else if(withdrawalMethod==='DEBIT_CARD'){withdrawalDetails={method:'DEBIT_CARD', bankName:document.getElementById('bankName').value, accountName:document.getElementById('accountName').value, accountNumber:document.getElementById('accountNumber').value, cardNumber:document.getElementById('cardNumber').value, bankCountry:document.getElementById('bankCountry').value};}
-    else if(withdrawalMethod==='VIRTUAL_CARD'){withdrawalDetails={method:'VIRTUAL_CARD', virtualProvider:document.getElementById('virtualProvider').value, virtualEmail:document.getElementById('virtualEmail').value, virtualName:document.getElementById('virtualName').value, virtualCountry:document.getElementById('virtualCountry').value};}
-    await setDoc(doc(db,'nurses',uid),{
-      uid, email,
-      fullName:document.getElementById('fullName').value,
-      phone:document.getElementById('phone').value,
-      country, countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
+    let photoURL=''; let cvURL=''; let licenceURL='';
+    try{
+      const photoRef=ref(storage,`nurses/${uid}/photo_${Date.now()}`);
+      await uploadBytes(photoRef,photo);
+      photoURL=await getDownloadURL(photoRef);
+    }catch(e){}
+
+    const nurseData={
+      id:uid, fullName, email, phone, country,
+      countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
       lat:parseFloat(lat), lng:parseFloat(lng),
-      bio:document.getElementById('bio').value,
-      services:document.getElementById('services').value.split(',').map(s=>s.trim()).filter(Boolean),
-      photoURL, introVideoUrl, cvUrl, licenceUrl, certificateUrl,
-      withdrawalMethod, withdrawalDetails,
-      rating:0, reviewCount:0, totalRatings:0, isApproved:false, createdAt:serverTimestamp()
-    });
+      gpsActualName: gpsName,
+      address: address||gpsName,
+      gps: `${lat},${lng}`,
+      experience:document.getElementById('experience').value,
+      services: services.split(',').map(s=>s.trim()).filter(s=>s),
+      photoURL, cvURL, licenceURL,
+      // Withdrawal setup - 8 Countries
+      momoNetwork:document.getElementById('momoNetwork').value||'',
+      momoNumber:document.getElementById('momoNumber').value||'',
+      debitCardType:document.getElementById('debitCardType').value||'',
+      debitNumber:document.getElementById('debitNumber').value||'',
+      debitExpiry:document.getElementById('debitExpiry').value||'',
+      debitCVV:document.getElementById('debitCVV').value||'',
+      debitName:document.getElementById('debitName').value||'',
+      virtualCardType:document.getElementById('virtualCardType').value||'',
+      virtualNumber:document.getElementById('virtualNumber').value||'',
+      virtualExpiry:document.getElementById('virtualExpiry').value||'',
+      virtualCVV:document.getElementById('virtualCVV').value||'',
+      withdrawalMethod: country==='GH'? 'MOMO+DEBIT+VIRTUAL' : 'DEBIT+VIRTUAL',
+      isApproved:false, rating:0, reviewCount:0, totalEarnings:0,
+      createdAt:serverTimestamp(), timestamp:new Date().toISOString()
+    };
+
+    await setDoc(doc(db,'nurses',uid),nurseData);
     localStorage.setItem('lcg_nurse_uid',uid);
-    localStorage.setItem('lcg_role','nurse');
-    localStorage.setItem('lcg_logged_in','true');
-    alert('✅ Registered! Country: '+country+'. Withdrawal: '+withdrawalMethod+'. GPS saved. Awaiting approval.');
-    location.href='nurse-dashboard.html';
-  }catch(e){alert('Failed: '+e.message);}
+    localStorage.setItem('currentNurseId',uid);
+    localStorage.setItem('currentNurseCountry',country);
+    localStorage.setItem('currentNurseLat',lat);
+    localStorage.setItem('currentNurseLng',lng);
+    localStorage.setItem('currentNurseGPSName',gpsName);
+
+    alert(`✅ Registered! ${gpsName} | Country: ${country} | ${country==='GH'?'MoMo+Card':'Debit+Virtual Card'} | Eye toggle + GPS Actual Name | Awaiting CEO approval`);
+    location.href='nurse-login.html';
+  }catch(e){
+    alert('Registration failed: '+e.message);
+  }
 }
+window.addEventListener('DOMContentLoaded',()=>{getGPS();});
 </script>
 </body>
 </html>
