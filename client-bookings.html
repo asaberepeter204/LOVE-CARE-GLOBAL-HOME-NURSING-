@@ -2,34 +2,227 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Bookings - LOVE CARE GLOBAL HOME NURSING</title>
-<style>body{font-family:Inter,sans-serif;margin:0;background:#f8f9ff}.header{background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;padding:14px}.container{max-width:800px;margin:0 auto;padding:16px}.booking{background:white;border:1px solid #e9d5ff;padding:16px;border-radius:12px;margin:12px 0}.status{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:800}.confirmed{background:#d1fae5;color:#065f46}.pending{background:#fef3c7;color:#92400e}a{color:#7c3aed;font-weight:800;text-decoration:none}</style>
+<title>My Bookings - Pay with Paystack - LOVE CARE GLOBAL HOME NURSING</title>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f6f7fb;color:#111827}
+.topbar{background:#111827;padding:12px 14px;display:flex;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
+.wrap{max-width:800px;margin:0 auto;padding:14px}
+.card{background:white;border-radius:16px;padding:14px;border:1px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:12px}
+.btn{padding:11px;border-radius:10px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;margin-top:8px;text-decoration:none}
+.btnGreen{background:#16a34a;color:white}.btnDark{background:#111827;color:white}.btnLight{background:#f3f4f6;border:1px solid #e5e7eb;color:#111827}.btnRed{background:#ef4444;color:white}.btnBlue{background:#2563eb;color:white}
+.badge{padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900}
+.badgePending{background:#fef3c7;color:#92400e}.badgePaid{background:#dcfce7;color:#166534}.badgeCompleted{background:#dbeafe;color:#1e40af}
+.condBox{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px;margin:8px 0}
+.audioBox{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px;margin:8px 0}
+</style>
 </head>
 <body>
-<div class="header"><h2 style="margin:0">My Bookings - LOVE CARE GLOBAL HOME NURSING</h2><small>https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</small></div>
-<div class="container">
-<p><a href="client-dashboard.html">← Dashboard</a> | <a href="index.html">Home</a> | <a href="book-nurse.html">+ New Booking</a></p>
-<div id="list">Loading bookings...</div>
+<div class="topbar"><b>📋 MY BOOKINGS - HEART - Pay with Paystack Live</b><a href="client-dashboard.html" style="background:white;color:#111827;padding:6px 12px;border-radius:999px;text-decoration:none;font-weight:900;font-size:12px">Heart Dashboard</a></div>
+<div class="wrap">
+
+<div class="card" style="background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:11px;opacity:.9">Paystack Live Public Key - LOVE CARE GLOBAL HOME NURSING</div><div style="font-weight:900;font-size:14px;margin-top:2px">pk_live_f17ae...ab747b • Cedis/Dollar + Start/End Time + Conditions Text + Audio</div><div style="font-size:10px;opacity:.8;margin-top:4px">Amount entered by client in Cedis OR Dollar - client selects one - as you requested • GPS Actual Name Required</div></div>
+<div style="text-align:right"><div style="font-size:22px;font-weight:900" id="totalBookings">0</div><div style="font-size:10px;opacity:.9">BOOKINGS</div></div>
 </div>
+</div>
+
+<div id="bookingsContainer"><div class="card" style="text-align:center;padding:30px;font-size:13px;color:#6b7280">Loading your bookings from heart... ClientId == your uid... GPS actual name...</div></div>
+
+<div class="card" style="text-align:center;font-size:10px;color:#9ca3af">❤️ Heart Bookings • Pay through Paystack live key pk_live_f17ae09bf855010825cbfccdda8e724553ab747b • Amount Cedis OR Dollar - client selects • Start & End Time per day - client sets • Conditions Text + Audio Voice - accommodation, feeding etc • GPS Actual Name • 8 Countries • One Login • LOVE CARE GLOBAL HOME NURSING</div>
+
+</div>
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-const app=initializeApp({databaseURL:"https://love-care-global-default-rtdb.firebaseio.com"}); const db=getDatabase(app);
-const phone=localStorage.getItem('clientPhone')||'';
-const list=document.getElementById('list');
-if(!phone){list.innerHTML='Please <a href="client-login.html">Login</a>';}
-else{
- onValue(ref(db,'bookings'),snap=>{
-  list.innerHTML='';
-  snap.forEach(child=>{
-   const b=child.val();
-   if(b.clientPhone===phone || b.phone===phone){
-    list.innerHTML+=`<div class="booking"><h3>${b.service||'Nursing Service'}</h3><p>📍 ${b.location||''} | 📅 ${b.date||''}</p><p>Status: <span class="status ${b.status==='confirmed'?'confirmed':'pending'}">${b.status||'pending'}</span></p></div>`;
-   }
-  });
-  if(!list.innerHTML) list.innerHTML='No bookings yet. <a href="book-nurse.html">Book a nurse</a>';
- });
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+// YOUR PAYSTACK LIVE PUBLIC KEY - AS YOU PROVIDED
+const PAYSTACK_PUBLIC_KEY = "pk_live_f17ae09bf855010825cbfccdda8e724553ab747b";
+
+async function loadBookings(){
+  const clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
+  if(!clientUid){location.href='client-login.html'; return;}
+  const container=document.getElementById('bookingsContainer');
+  try{
+    const q=query(collection(db,'bookings'), where('clientId','==',clientUid));
+    const snap=await getDocs(q);
+    document.getElementById('totalBookings').textContent=snap.size;
+    if(snap.empty){
+      container.innerHTML=`<div class="card" style="text-align:center;padding:20px"><div style="font-size:14px;font-weight:800">No bookings yet - Heart is empty</div><div style="font-size:11px;color:#6b7280;margin:6px 0">Go to Book Nurse - Heart - Cedis/Dollar + Start/End Time + Conditions Text + Audio Voice + GPS Actual Name</div><a class="btn btnGreen" href="book-nurse.html">📍 Book Nurse Now - Heart Operation - 8 Countries</a></div>`;
+      return;
+    }
+    let html='';
+    snap.forEach(docSnap=>{
+      const d=docSnap.data();
+      const id=docSnap.id;
+      const isPaid=d.paymentStatus==='paid';
+      const isCompleted=d.status==='completed';
+      const currency=d.currency||'GHS';
+      const symbol=d.currencySymbol||(currency==='GHS'?'GH₵':'$');
+      const totalAmount=d.totalAmount||0;
+      const amountPerDay=d.amountPerDay||0;
+      const days=d.days||1;
+      const startTime=d.startTime||'--:--';
+      const endTime=d.endTime||'--:--';
+      const hoursPerDay=d.hoursPerDay||0;
+      const totalHours=d.totalHours||0;
+      
+      html+=`
+      <div class="card" style="${isPaid?'border-color:#bbf7d0':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><div style="font-weight:900;font-size:14px">👩‍⚕️ ${d.nurseName||'Nurse'} - ${d.service||''}</div><div style="font-size:10px;color:#6b7280;margin-top:2px">Booking ID: ${id.slice(0,8)}... • ${d.startDate||''} • ${days} day(s) • ${d.country||''}</div></div>
+          <div style="text-align:right"><span class="badge ${isPaid?'badgePaid':isCompleted?'badgeCompleted':'badgePending'}">${isPaid?'PAID':d.status||'pending'}</span><div style="font-size:10px;color:#6b7280;margin-top:4px">${d.paymentStatus||'unpaid'}</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px">
+            <div style="font-size:10px;color:#15803d;font-weight:800">⏰ START & END TIME PER DAY - CLIENT SETS</div>
+            <div style="font-size:12px;font-weight:900;margin-top:4px">Start: ${startTime} - Begin work per day</div>
+            <div style="font-size:12px;font-weight:900">End: ${endTime} - End work per day</div>
+            <div style="font-size:10px;color:#6b7280;margin-top:4px">${hoursPerDay.toFixed(1)}h/day • ${totalHours.toFixed(1)}h total • ${days} day(s)</div>
+          </div>
+          <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:8px">
+            <div style="font-size:10px;color:#6b7280;font-weight:800">💰 AMOUNT - CEDIS OR DOLLAR - CLIENT SELECTS ONE</div>
+            <div style="font-size:12px;font-weight:900;margin-top:4px">${symbol} ${amountPerDay} ${currency} / day</div>
+            <div style="font-size:14px;font-weight:900;color:#16a34a">${symbol} ${totalAmount.toFixed(2)} ${currency} Total</div>
+            <div style="font-size:10px;color:#6b7280">${d.bookingDetails||''}</div>
+          </div>
+        </div>
+
+        <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:8px;margin-top:8px;font-size:11px">
+          <div><b>📍 GPS Actual Name:</b> <span style="color:#15803d;font-weight:700">${d.gpsActualName||d.clientGPSActualName||d.address||''}</span></div>
+          <div style="margin-top:4px"><b>Patient:</b> ${d.patientDetails||''}</div>
+          <div style="margin-top:4px"><b>Address:</b> ${d.address||''}</div>
+        </div>
+
+        <div class="condBox">
+          <div style="font-weight:900;color:#92400e;font-size:11px">🏠 Conditions Attached To Work - Accommodation, Feeding etc - Text + Audio Voice</div>
+          ${d.conditionsSelected&&d.conditionsSelected.length? `<div style="margin-top:6px;font-size:11px"><b>Quick Conditions:</b> ${d.conditionsSelected.join(' • ')}</div>`:''}
+          ${d.conditionsText? `<div style="margin-top:6px;font-size:11px;background:white;border:1px solid #fde68a;border-radius:8px;padding:8px"><b>📝 Text Conditions:</b><br>${d.conditionsText}</div>`:''}
+          ${!d.conditionsText&&!d.conditionsSelected? `<div style="font-size:10px;color:#9ca3af;margin-top:4px">No text conditions written</div>`:''}
+        </div>
+
+        ${d.conditionsAudioURL? `
+        <div class="audioBox">
+          <div style="font-weight:900;color:#1d4ed8;font-size:11px">🎙️ Audio Voice About Conditions - Accommodation, Feeding etc - Nurse Can Listen</div>
+          <audio controls style="width:100%;margin-top:8px" src="${d.conditionsAudioURL}"></audio>
+          <div style="font-size:10px;color:#3b82f6;margin-top:4px">Client recorded audio voice about conditions attached to work - accommodation, feeding etc - Nurse listens in heart dashboard before accepting.</div>
+          <a href="${d.conditionsAudioURL}" target="_blank" style="font-size:10px;color:#2563eb;text-decoration:underline">🔗 Open Audio Link</a>
+        </div>
+        `: `<div class="audioBox" style="background:#f9fafb;border-color:#e5e7eb"><div style="font-size:11px;color:#6b7280">🎙️ No audio voice - client did not record audio about conditions</div></div>`}
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+          ${!isPaid? `<button class="btn btnGreen" onclick="payWithPaystack('${id}', ${totalAmount}, '${currency}', '${d.nurseName||'Nurse'}', '${d.service||''}')">💳 Pay ${symbol} ${totalAmount.toFixed(2)} ${currency} - Paystack Live - ${PAYSTACK_PUBLIC_KEY.slice(0,8)}...</button>` : `<button class="btn btnLight" disabled>✅ Paid - ${symbol} ${totalAmount.toFixed(2)} ${currency} - Paystack</button>`}
+          <button class="btn btnLight" onclick="location.href='client-chat.html?booking=${id}'">💬 Chat Nurse - Heart</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px">
+          <button class="btn btnLight" onclick="location.href='rate-nurse.html?booking=${id}'">⭐ Rate</button>
+          <button class="btn btnLight" onclick="cancelBooking('${id}')">❌ Cancel</button>
+          <button class="btn btnLight" onclick="requestRefund('${id}')">💰 Refund</button>
+        </div>
+      </div>
+      `;
+    });
+    container.innerHTML=html;
+  }catch(e){
+    container.innerHTML=`<div class="card" style="color:#ef4444">Error loading bookings: ${e.message}</div>`;
+  }
 }
+
+window.payWithPaystack=async(bookingId, totalAmount, currency, nurseName, service)=>{
+  const clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
+  if(!clientUid){alert('Not logged in'); return;}
+  try{
+    const clientSnap=await getDoc(doc(db,'clients',clientUid));
+    const clientData=clientSnap.exists()? clientSnap.data():{};
+    const clientEmail=clientData.email||auth.currentUser?.email||prompt('Enter your email for Paystack receipt:');
+    if(!clientEmail){alert('Email required for Paystack'); return;}
+
+    // Paystack amount must be in kobo/pesewas (smallest unit) *100
+    // GHS: pesewas, USD: cents - both *100
+    // If currency is GHS, Paystack Ghana account will process as GHS
+    // If currency is USD, Paystack will process as USD if account enabled, otherwise convert
+    const amountInSmallestUnit = Math.round(totalAmount * 100);
+
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: clientEmail,
+      amount: amountInSmallestUnit,
+      currency: currency, // GHS or USD - as client selected - as you requested - Cedis or Dollar
+      ref: `LCGBOOK_${bookingId.slice(0,8)}_${Date.now()}`,
+      metadata: {
+        custom_fields: [
+          {display_name: "Booking ID", variable_name: "booking_id", value: bookingId},
+          {display_name: "Nurse Name", variable_name: "nurse_name", value: nurseName},
+          {display_name: "Service", variable_name: "service", value: service},
+          {display_name: "Client ID", variable_name: "client_id", value: clientUid},
+          {display_name: "Currency Selected", variable_name: "currency", value: currency},
+          {display_name: "Amount Cedis/Dollar", variable_name: "amount", value: totalAmount},
+          {display_name: "GPS Actual Name", variable_name: "gps_actual_name", value: clientData.gpsActualName||''}
+        ]
+      },
+      callback: async function(response){
+        // Payment successful
+        try{
+          await updateDoc(doc(db,'bookings',bookingId),{
+            paymentStatus:'paid',
+            status:'confirmed',
+            paystackReference:response.reference,
+            paystackCurrency:currency,
+            paystackAmount:totalAmount,
+            paystackAmountFormatted:`${currency==='GHS'?'GH₵':'$'} ${totalAmount.toFixed(2)} ${currency}`,
+            paystackPublicKey:PAYSTACK_PUBLIC_KEY,
+            paidAt:serverTimestamp(),
+            paidTimestamp:new Date().toISOString(),
+            paystackResponse:response
+          });
+          // Save payment record for CEO dashboard
+          await addDoc(collection(db,'payments'),{
+            bookingId,
+            clientId:clientUid,
+            clientEmail,
+            nurseName,
+            service,
+            amount:totalAmount,
+            currency,
+            currencySymbol:currency==='GHS'?'GH₵':'$',
+            amountInSmallestUnit,
+            reference:response.reference,
+            paystackPublicKey:PAYSTACK_PUBLIC_KEY,
+            status:'paid',
+            createdAt:serverTimestamp(),
+            timestamp:new Date().toISOString()
+          });
+          alert(`✅ Payment successful via Paystack Live!\n\nAmount: ${currency==='GHS'?'GH₵':'$'} ${totalAmount.toFixed(2)} ${currency} - Client selected ${currency} - Cedis or Dollar\nReference: ${response.reference}\nCurrency: ${currency}\nBooking: ${bookingId}\n\nNurse will be notified in heart dashboard. GPS actual name logged.`);
+          loadBookings();
+        }catch(e){alert('Payment recorded at Paystack but failed to update booking: '+e.message+' - Reference: '+response.reference);}
+      },
+      onClose: function(){
+        alert('Paystack payment window closed - Payment not completed - You can pay again - Cedis or Dollar as you selected - GPS actual name remains');
+      }
+    });
+    handler.openIframe();
+  }catch(e){alert('Paystack error: '+e.message);}
+}
+
+window.cancelBooking=async(id)=>{
+  if(!confirm('Cancel this booking? Heart operation - GPS actual name logged')) return;
+  try{await updateDoc(doc(db,'bookings',id),{status:'cancelled', cancelledAt:serverTimestamp()}); alert('Booking cancelled - Heart'); loadBookings();}catch(e){alert(e.message);}
+}
+window.requestRefund=async(id)=>{
+  const reason=prompt('Reason for refund? CEO reviews - with GPS actual name:');
+  if(!reason) return;
+  try{await addDoc(collection(db,'refund_requests'),{bookingId:id, clientId:localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId'), reason, createdAt:serverTimestamp()}); alert('Refund requested - CEO will review in heart dashboard - Paystack reference will be checked');}catch(e){alert(e.message);}
+}
+
+window.addEventListener('DOMContentLoaded', loadBookings);
 </script>
 </body>
 </html>
