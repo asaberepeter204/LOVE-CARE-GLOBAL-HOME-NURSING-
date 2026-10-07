@@ -1,0 +1,29 @@
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
+window.emailLogin=async()=>{
+  const email=document.getElementById('email').value.trim();const pwd=document.getElementById('password').value;
+  await setPersistence(auth,browserLocalPersistence);
+  const cred=await signInWithEmailAndPassword(auth,email,pwd);
+  const user=cred.user;const ref=doc(db,'clients',user.uid);const snap=await getDoc(ref);
+  if(!snap.exists()){
+    await setDoc(ref,{uid:user.uid,email:user.email,role:'client',profileCompleted:true,createdAt:serverTimestamp(),lastLogin:serverTimestamp()},{merge:true});
+  }else{
+    if(snap.data().profileCompleted===false && (snap.data().fullName||snap.data().phone)){
+      await setDoc(ref,{profileCompleted:true,lastLogin:serverTimestamp()},{merge:true});
+    }else{ await setDoc(ref,{lastLogin:serverTimestamp()},{merge:true}); }
+  }
+  localStorage.setItem('lcg_client_uid',user.uid);
+  localStorage.setItem('lcg_client_email',user.email);
+  localStorage.setItem('lcg_client_name',snap.exists()? snap.data().fullName||user.email : user.email);
+  localStorage.setItem('lcg_role','client');
+  localStorage.setItem('lcg_logged_in','true');
+  localStorage.setItem('lcg_login_time',Date.now().toString());
+  localStorage.setItem('currentClientId',user.uid);
+  localStorage.setItem('currentClientEmail',user.email);
+  location.href='client-dashboard.html';
+}
+</script>
