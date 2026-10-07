@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurses Group Chat - Love Care Global</title>
+<link rel="manifest" href="manifest.json">
+<script src="data:application/javascript;base64,Ly8gTG92ZSBDYXJlIEdsb2JhbCAtIEdsb2JhbCBMYW5ndWFnZSAmIFBheW1lbnQgU3lzdGVtCi8vIENFTzogbG92ZWNhcmVnbG9iYWxAZ21haWwuY29tCmNvbnN0IENFT19FTUFJTCA9ICdsb3ZlY2FyZWdsb2JhbEBnbWFpbC5jb20nOwpjb25zdCBDRU9fRU1BSUxTID0gWydsb3ZlY2FyZWdsb2JhbEBnbWFpbC5jb20nLCAnY2VvQGxvdmVjYXJlZ2xvYmFsLmNvbScsICdhc2FiZXJlcGV0ZXIyMDRAZ21haWwuY29tJ107Cgpjb25zdCBMQ0dfTEFOR1VBR0VTID0gewogICJlbi1HSCI6IHsgCiAgICBuYW1lOiAiRW5nbGlzaCDigKIgR2hhbmEgKEdIUykiLCBjb2RlOiAiZW4iLCBjdXJyZW5jeTogIkdIUyIsIGZsYWc6ICLwn4es8J+HrSIsIGxhbmc6ICJlbiIsCiAgICBjb3VudHJ5OiAiR0giLCBpc0doYW5hOiB0cnVlLAogICAgcGF5bWVudHM6IFsiTW9iaWxlIE1vbmV5IiwgIlBheXN0YWNrIiwgIkRlYml0IENhcmQiLCAiQmFuayBUcmFuc2ZlciJdLAogICAgcGF5bWVudE5vdGU6ICJHaGFuYTogTW9iaWxlIE1vbmV5IChNVE4sIFZvZGFmb25lLCBBaXJ0ZWxUaWdvKSArIFBheXN0YWNrICsgQ2FyZHMiLAogICAgcGF5c3RhY2s6IHRydWUsIG1vbW86IHRydWUsIHBheXBhbDogZmFsc2UKICB9LAogICJlbi1ORyI6IHsgCiAgICBuYW1lOiAiRW5nbGlzaCDigKIgTmlnZXJpYSAoTkdOKSIsIGNvZGU6ICJlbiIsIGN1cnJlbmN5OiAiTkdOIiwgZmxhZzogIvCfh7Pwn4esIiwgbGFuZzogImVuIiwKICAgIGNvdW50cnk6ICJORyIsIGlzR2hhbmE6IGZhbHNlLAogICAgcGF5bWVudHM6IFsiRGViaXQgQ2FyZCIsICJWaXJ0dWFsIENhcmQiLCAiUGF5UGFsIl0sCiAgICBwYXltZW50Tm90ZTogIkludGVybmF0aW9uYWw6IERlYml0IENhcmQgKyBWaXJ0dWFsIENhcmQgKyBQYXlQYWwgb25seSIsCiAgICBwYXlzdGFjazogZmFsc2UsIG1vbW86IGZhbHNlLCBwYXlwYWw6IHRydWUKICB9LAogICJlbi1LRSI6IHsgCiAgICBuYW1lOiAiRW5nbGlzaCDigKIgS2VueWEgKEtFUykiLCBjb2RlOiAiZW4iLCBjdXJyZW5jeTogIktFUyIsIGZsYWc6ICLwn4ew8J+HqiIsIGxhbmc6ICJlbiIsCiAgICBjb3VudHJ5OiAiS0UiLCBpc0doYW5hOiBmYWxzZSwKICAgIHBheW1lbnRzOiBbIkRlYml0IENhcmQiLCAiVmlydHVhbCBDYXJkIiwgIlBheVBhbCJdLAogICAgcGF5bWVudE5vdGU6ICJJbnRlcm5hdGlvbmFsOiBEZWJpdCBDYXJkICsgVmlydHVhbCBDYXJkICsgUGF5UGFsIG9ubHkiLAogICAgcGF5c3RhY2s6IGZhbHNlLCBtb21vOiBmYWxzZSwgcGF5cGFsOiB0cnVlCiAgfSwKICAiZnItQ0kiOiB7IAogICAgbmFtZTogIkZyYW7Dp2FpcyDigKIgQ8O0dGUgZCdJdm9pcmUgKFhPRikiLCBjb2RlOiAiZnIiLCBjdXJyZW5jeTogIlhPRiIsIGZsYWc6ICLwn4eo8J+HriIsIGxhbmc6ICJmciIsCiAgICBjb3VudHJ5OiAiQ0kiLCBpc0doYW5hOiBmYWxzZSwKICAgIHBheW1lbnRzOiBbIkNhcnRlIETDqWJpdCIsICJDYXJ0ZSBWaXJ0dWVsbGUiLCAiUGF5UGFsIl0sCiAgICBwYXltZW50Tm90ZTogIkludGVybmF0aW9uYWw6IENhcnRlIETDqWJpdCArIFZpcnR1ZWxsZSArIFBheVBhbCB1bmlxdWVtZW50IiwKICAgIHBheXN0YWNrOiBmYWxzZSwgbW9tbzogZmFsc2UsIHBheXBhbDogdHJ1ZQogIH0sCiAgImVuLVpBIjogeyAKICAgIG5hbWU6ICJFbmdsaXNoIOKAoiBTb3V0aCBBZnJpY2EgKFpBUikiLCBjb2RlOiAiZW4iLCBjdXJyZW5jeTogIlpBUiIsIGZsYWc6ICLwn4e/8J+HpiIsIGxhbmc6ICJlbiIsCiAgICBjb3VudHJ5OiAiWkEiLCBpc0doYW5hOiBmYWxzZSwKICAgIHBheW1lbnRzOiBbIkRlYml0IENhcmQiLCAiVmlydHVhbCBDYXJkIiwgIlBheVBhbCJdLAogICAgcGF5bWVudE5vdGU6ICJJbnRlcm5hdGlvbmFsOiBEZWJpdCBDYXJkICsgVmlydHVhbCBDYXJkICsgUGF5UGFsIG9ubHkiLAogICAgcGF5c3RhY2s6IGZhbHNlLCBtb21vOiBmYWxzZSwgcGF5cGFsOiB0cnVlCiAgfSwKICAiZW4tVVMiOiB7IAogICAgbmFtZTogIkVuZ2xpc2gg4oCiIFVTQSAoVVNEKSIsIGNvZGU6ICJlbiIsIGN1cnJlbmN5OiAiVVNEIiwgZmxhZzogIvCfh7rwn4e4IiwgbGFuZzogImVuIiwKICAgIGNvdW50cnk6ICJVUyIsIGlzR2hhbmE6IGZhbHNlLAogICAgcGF5bWVudHM6IFsiRGViaXQgQ2FyZCIsICJWaXJ0dWFsIENhcmQiLCAiUGF5UGFsIl0sCiAgICBwYXltZW50Tm90ZTogIkludGVybmF0aW9uYWw6IERlYml0IENhcmQgKyBWaXJ0dWFsIENhcmQgKyBQYXlQYWwgb25seSIsCiAgICBwYXlzdGFjazogZmFsc2UsIG1vbW86IGZhbHNlLCBwYXlwYWw6IHRydWUKICB9Cn07Cgpjb25zdCBMQ0dfVFJBTlNMQVRJT05TID0gewogIGVuOiB7CiAgICBob21lOiAiSG9tZSIsIGJvb2tOdXJzZTogIkJvb2sgTnVyc2UiLCBmaW5kTnVyc2U6ICJGaW5kIE51cnNlIiwKICAgIGNsaWVudFJlZzogIkNsaWVudCBSZWdpc3RyYXRpb24iLCBjbGllbnRMb2dpbjogIkNsaWVudCBMb2dpbiIsIGRhc2hib2FyZDogIkRhc2hib2FyZCIsCiAgICBteUJvb2tpbmdzOiAiTXkgQm9va2luZ3MiLCBzZXR0aW5nczogIlNldHRpbmdzIiwgbnVyc2VSZWc6ICJOdXJzZSBSZWdpc3RyYXRpb24iLAogICAgbnVyc2VMb2dpbjogIk51cnNlIExvZ2luIiwgbnVyc2VEYXNoYm9hcmQ6ICJOdXJzZSBEYXNoYm9hcmQiLCBncm91cENoYXQ6ICJHcm91cCBDaGF0IiwKICAgIHNvczogIkVtZXJnZW5jeSBTT1MiLCBjb250YWN0OiAiQ29udGFjdCBTdXBwb3J0IiwgYWJvdXQ6ICJBYm91dCIsIHByaXZhY3k6ICJQcml2YWN5ICYgVGVybXMiLAogICAgaGVyb1RpdGxlOiAiUHJvZmVzc2lvbmFsIEhvbWUgTnVyc2luZywgQW55dGltZSDinaTvuI8iLAogICAgaGVyb1N1YjogIlRydXN0ZWQgbnVyc2VzIOKAoiAxMyBzZXJ2aWNlcyDigKIgVmVyaWZpZWQgd2l0aCBDViwgQ2VydGlmaWNhdGUsIExpY2VuY2UsIFBob3RvICYgSUQiLAogICAgYm9va0J0bjogIvCfk4UgQm9vayBhIE51cnNlIiwgam9pbkNsaWVudDogIvCfkaQgSm9pbiBhcyBDbGllbnQiLAogICAgZm9yQ2xpZW50czogIkZvciBDbGllbnRzIiwgZm9yQ2xpZW50c0Rlc2M6ICJSZWdpc3Rlciwgc2V0IGVtZXJnZW5jeSBjb250YWN0ICYgYm9vayB2ZXJpZmllZCBudXJzZXMiLAogICAgZm9yTnVyc2VzOiAiRm9yIE51cnNlcyIsIGZvck51cnNlc0Rlc2M6ICJVcGxvYWQgQ1YsIHZpZGVvLCBjZXJ0aWZpY2F0ZSwgbGljZW5jZSwgcGhvdG8sIEdoYW5hIENhcmQgLyBEcml2ZXJzIiwKICAgIGVtZXJnZW5jeTogIkVtZXJnZW5jeT8iLCBlbWVyZ2VuY3lEZXNjOiAiVGFwIFNPUyBmb3IgaW1tZWRpYXRlIGhlbHAgJiBHUFMgc2hhcmluZyIsCiAgICB0cnVzdGVkOiAiVHJ1c3RlZCDigKIgVmVyaWZpZWQg4oCiIDg1JSB0byBOdXJzZXMg4oCiIFNlY3VyZSIKICB9LAogIGZyOiB7CiAgICBob21lOiAiQWNjdWVpbCIsIGJvb2tOdXJzZTogIlLDqXNlcnZlciBJbmZpcm1pw6hyZSIsIGZpbmROdXJzZTogIlRyb3V2ZXIgSW5maXJtacOocmUiLAogICAgY2xpZW50UmVnOiAiSW5zY3JpcHRpb24gQ2xpZW50IiwgY2xpZW50TG9naW46ICJDb25uZXhpb24gQ2xpZW50IiwgZGFzaGJvYXJkOiAiVGFibGVhdSBkZSBCb3JkIiwKICAgIG15Qm9va2luZ3M6ICJNZXMgUsOpc2VydmF0aW9ucyIsIHNldHRpbmdzOiAiUGFyYW3DqHRyZXMiLCBudXJzZVJlZzogIkluc2NyaXB0aW9uIEluZmlybWnDqHJlIiwKICAgIG51cnNlTG9naW46ICJDb25uZXhpb24gSW5maXJtacOocmUiLCBudXJzZURhc2hib2FyZDogIlRhYmxlYXUgSW5maXJtacOocmUiLCBncm91cENoYXQ6ICJDaGF0IGRlIEdyb3VwZSIsCiAgICBzb3M6ICJTT1MgZCdVcmdlbmNlIiwgY29udGFjdDogIlN1cHBvcnQgQ29udGFjdCIsIGFib3V0OiAiw4AgUHJvcG9zIiwgcHJpdmFjeTogIkNvbmZpZGVudGlhbGl0w6kgJiBDb25kaXRpb25zIiwKICAgIGhlcm9UaXRsZTogIlNvaW5zIEluZmlybWllcnMgUHJvZmVzc2lvbm5lbHMgw6AgRG9taWNpbGUg4p2k77iPIiwKICAgIGhlcm9TdWI6ICJJbmZpcm1pw6hyZXMgZGUgY29uZmlhbmNlIOKAoiAxMyBzZXJ2aWNlcyDigKIgVsOpcmlmacOpZXMgYXZlYyBDViwgQ2VydGlmaWNhdCwgTGljZW5jZSwgUGhvdG8gJiBJRCIsCiAgICBib29rQnRuOiAi8J+ThSBSw6lzZXJ2ZXIgdW5lIEluZmlybWnDqHJlIiwgam9pbkNsaWVudDogIvCfkaQgUmVqb2luZHJlIGNvbW1lIENsaWVudCIsCiAgICBmb3JDbGllbnRzOiAiUG91ciBDbGllbnRzIiwgZm9yQ2xpZW50c0Rlc2M6ICJJbnNjcml2ZXotdm91cywgZMOpZmluaXNzZXogY29udGFjdCBkJ3VyZ2VuY2UgZXQgcsOpc2VydmV6IGRlcyBpbmZpcm1pw6hyZXMgdsOpcmlmacOpZXMiLAogICAgZm9yTnVyc2VzOiAiUG91ciBJbmZpcm1pw6hyZXMiLCBmb3JOdXJzZXNEZXNjOiAiVMOpbMOpY2hhcmdleiBDViwgdmlkw6lvLCBjZXJ0aWZpY2F0LCBsaWNlbmNlLCBwaG90bywgQ2FydGUgR2hhbmEgLyBQZXJtaXMiLAogICAgZW1lcmdlbmN5OiAiVXJnZW5jZT8iLCBlbWVyZ2VuY3lEZXNjOiAiQXBwdXlleiBzdXIgU09TIHBvdXIgYWlkZSBpbW3DqWRpYXRlIGV0IHBhcnRhZ2UgR1BTIiwKICAgIHRydXN0ZWQ6ICJGaWFibGUg4oCiIFbDqXJpZmnDqSDigKIgODUlIGF1eCBJbmZpcm1pw6hyZXMg4oCiIFPDqWN1cmlzw6kiCiAgfQp9OwoKZnVuY3Rpb24gZ2V0Q3VycmVudExhbmdDb25maWcoKXsKICBsZXQgc2F2ZWQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnYXBwX2xhbmd1YWdlX2tleScpIHx8ICdlbi1HSCc7CiAgcmV0dXJuIExDR19MQU5HVUFHRVNbc2F2ZWRdIHx8IExDR19MQU5HVUFHRVNbJ2VuLUdIJ107Cn0KZnVuY3Rpb24gZ2V0UGF5bWVudE1ldGhvZHMoKXsgcmV0dXJuIGdldEN1cnJlbnRMYW5nQ29uZmlnKCkucGF5bWVudHM7IH0KZnVuY3Rpb24gaXNHaGFuYVBheW1lbnQoKXsgcmV0dXJuIGdldEN1cnJlbnRMYW5nQ29uZmlnKCkuaXNHaGFuYTsgfQpmdW5jdGlvbiBnZXRQYXltZW50Tm90ZSgpeyByZXR1cm4gZ2V0Q3VycmVudExhbmdDb25maWcoKS5wYXltZW50Tm90ZTsgfQoKZnVuY3Rpb24gYXBwbHlHbG9iYWxMYW5ndWFnZSgpewogIGxldCBjb25maWcgPSBnZXRDdXJyZW50TGFuZ0NvbmZpZygpOwogIGxldCB0ID0gTENHX1RSQU5TTEFUSU9OU1tjb25maWcubGFuZ10gfHwgTENHX1RSQU5TTEFUSU9OU1snZW4nXTsKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCdbZGF0YS1pMThuXScpLmZvckVhY2goZWw9PnsKICAgIGxldCBrZXkgPSBlbC5nZXRBdHRyaWJ1dGUoJ2RhdGEtaTE4bicpOwogICAgaWYodFtrZXldKSBlbC50ZXh0Q29udGVudCA9IHRba2V5XTsKICB9KTsKICBkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQubGFuZyA9IGNvbmZpZy5jb2RlOwogIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJ1tkYXRhLWN1cnJlbmN5XScpLmZvckVhY2goZWw9PnsgZWwudGV4dENvbnRlbnQgPSBjb25maWcuY3VycmVuY3k7IH0pOwogIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJ1tkYXRhLXBheW1lbnQtbm90ZV0nKS5mb3JFYWNoKGVsPT57IGVsLnRleHRDb250ZW50ID0gY29uZmlnLnBheW1lbnROb3RlOyB9KTsKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCdbZGF0YS1wYXltZW50LW1ldGhvZHNdJykuZm9yRWFjaChlbD0+eyBlbC50ZXh0Q29udGVudCA9IGNvbmZpZy5wYXltZW50cy5qb2luKCcg4oCiICcpOyB9KTsKICBsZXQgaXNHSCA9IGNvbmZpZy5pc0doYW5hOwogIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJy5naGFuYS1vbmx5JykuZm9yRWFjaChlbD0+eyBlbC5zdHlsZS5kaXNwbGF5ID0gaXNHSCA/ICcnIDogJ25vbmUnOyB9KTsKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcuaW50bC1vbmx5JykuZm9yRWFjaChlbD0+eyBlbC5zdHlsZS5kaXNwbGF5ID0gaXNHSCA/ICdub25lJyA6ICcnOyB9KTsKICB3aW5kb3cuZGlzcGF0Y2hFdmVudChuZXcgQ3VzdG9tRXZlbnQoJ2xjZ0xhbmd1YWdlQ2hhbmdlZCcsIHtkZXRhaWw6IGNvbmZpZ30pKTsKfQpkb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCdET01Db250ZW50TG9hZGVkJywgYXBwbHlHbG9iYWxMYW5ndWFnZSk7Cg=="></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f0fdf4;color:#111827;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{background:linear-gradient(90deg,#16a34a,#7c3aed);color:white;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.left{display:flex;align-items:center;gap:10px}
+.menuBtn{width:38px;height:38px;background:#facc15;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#000;font-weight:900;border:none;cursor:pointer}
+.brand{font-weight:900;font-size:13px;line-height:1.1}
+.right{display:flex;gap:6px;align-items:center}
+.iconBtn{background:rgba(255,255,255,0.2);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-weight:900;display:flex;align-items:center;justify-content:center}
+.iconBtn.red{background:#ef4444}
+.iconBtn.yellow{background:#facc15;color:#000}
+#chatContainer{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#f8fafc}
+.message{max-width:80%;padding:10px 12px;border-radius:16px;position:relative;word-break:break-word;box-shadow:0 1px 2px rgba(0,0,0,0.05);border:1px solid #e5e7eb}
+.message.me{align-self:flex-end;background:linear-gradient(135deg,#dcfce7,#bbf7d0);border-color:#86efac}
+.message.other{align-self:flex-start;background:white}
+.message.ceo{border-left:4px solid #facc15;background:#fefce8}
+.message.staff{border-left:4px solid #22c55e}
+.msgHeader{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap}
+.avatar{width:28px;height:28px;border-radius:50%;background:#16a34a;color:white;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0}
+.avatar.ceo{background:#facc15;color:#000}
+.avatar.staff{background:#7c3aed}
+.msgName{font-weight:900;font-size:12px}
+.msgRole{font-size:9px;font-weight:900;padding:2px 6px;border-radius:999px}
+.role-nurse{background:#f5f3ff;color:#6d28d9}
+.role-ceo{background:#fef3c7;color:#92400e}
+.role-staff{background:#dcfce7;color:#166534}
+.msgTime{font-size:10px;color:#9ca3af;margin-left:6px}
+.msgText{font-size:13px;line-height:1.4;margin-top:2px;white-space:pre-wrap}
+.msgActions{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.actBtn{font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;border:1px solid #e5e7eb;background:#f9fafb;cursor:pointer}
+.actBtn.edit{color:#2563eb}
+.actBtn.del{color:#dc2626}
+.actBtn.block{color:#fff;background:#ef4444;border-color:#ef4444}
+.audioPlayer{margin-top:6px;width:100%;max-width:220px}
+.photoMsg{max-width:220px;border-radius:12px;margin-top:6px;cursor:pointer;border:1px solid #e5e7eb}
+.videoMsg{max-width:240px;border-radius:12px;margin-top:6px;border:1px solid #e5e7eb}
+.inputBar{background:white;border-top:1px solid #e5e7eb;padding:8px 10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.inputBar input[type=text]{flex:1;min-width:120px;padding:12px 14px;border-radius:999px;border:1.5px solid #e5e7eb;outline:none;font-size:14px}
+.inputBar input:focus{border-color:#7c3aed;background:#f5f3ff}
+.sendBtn{width:42px;height:42px;border-radius:50%;border:none;background:linear-gradient(135deg,#16a34a,#7c3aed);color:white;font-weight:900;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.micBtn{width:42px;height:42px;border-radius:50%;border:1px solid #e5e7eb;background:#f9fafb;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.micBtn.recording{background:#fee2e2;border-color:#fecaca;animation:pulse 1s infinite}
+.mediaBtn{width:42px;height:42px;border-radius:50%;border:1px solid #e5e7eb;background:#eff6ff;color:#2563eb;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+.ceoPanel{background:#fefce8;border:1px solid #fde68a;padding:8px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ceoPanel .title{font-weight:900;font-size:12px;color:#92400e}
+.ceoBtn{padding:8px 12px;border-radius:10px;font-weight:900;font-size:11px;border:none;cursor:pointer}
+.ceoWipe{background:#dc2626;color:white}
+.ceoUnblock{background:#f3f4f6;border:1px solid #e5e7eb}
+.loginWall{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}
+.loginCard{background:white;border-radius:20px;padding:24px;border:1px solid #e5e7eb;max-width:360px;width:100%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.08)}
+.loginCard h2{font-weight:900;font-size:20px;margin-bottom:8px}
+.loginCard p{font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.5}
+.loginBtn{width:100%;padding:13px;border-radius:12px;font-weight:900;border:none;cursor:pointer;margin-top:8px}
+.loginBtn.nurse{background:#7c3aed;color:white}
+.loginBtn.home{background:#f9fafb;border:1px solid #e5e7eb}
+.editBox{width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid #7c3aed;font-size:13px;margin-top:6px}
+.saveEdit{margin-top:6px;padding:6px 10px;border-radius:8px;background:#16a34a;color:white;border:none;font-weight:800;font-size:11px;cursor:pointer}
+.previewBar{display:none;background:#eff6ff;border:1px solid #bfdbfe;padding:8px 12px;align-items:center;gap:10px}
+.previewBar img, .previewBar video{max-width:80px;max-height:80px;border-radius:8px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="left">
+    <button class="menuBtn" onclick="goHome()">☰</button>
+    <div class="brand">NURSES GROUP CHAT<br><small style="font-weight:600;opacity:0.9">Nurses • CEO • Staff Only</small></div>
+  </div>
+  <div class="right">
+    <button class="iconBtn" onclick="goHome()" title="Home">🏠</button>
+    <button class="iconBtn yellow" id="ceoWipeBtn" onclick="ceoWipeAll()" title="CEO: Wipe All" style="display:none">🗑️</button>
+    <button class="iconBtn" onclick="location.reload()" title="Refresh">↻</button>
+  </div>
+</div>
+
+<div id="ceoPanel" class="ceoPanel" style="display:none">
+  <span class="title">👑 CEO Control:</span>
+  <button class="ceoBtn ceoWipe" onclick="ceoWipeAll()">🗑️ Wipe All</button>
+  <button class="ceoBtn ceoUnblock" onclick="ceoShowBlocked()">🚫 Blocked</button>
+  <span id="onlineCount" style="font-size:11px;color:#6b7280;margin-left:auto"></span>
+</div>
+
+<div id="previewBar" class="previewBar">
+  <img id="previewImg" style="display:none">
+  <video id="previewVideo" style="display:none" controls></video>
+  <div style="flex:1"><div id="previewName" style="font-size:12px;font-weight:800"></div><div style="font-size:11px;color:#6b7280">Ready to send</div></div>
+  <button onclick="clearPreview()" style="padding:6px 10px;border-radius:8px;border:1px solid #e5e7eb;background:white;cursor:pointer;font-weight:800">✕</button>
+  <button onclick="sendMediaMessage()" style="padding:8px 14px;border-radius:10px;background:#16a34a;color:white;border:none;font-weight:900;cursor:pointer">Send</button>
+</div>
+
+<div id="chatContainer"></div>
+
+<div id="loginWall" class="loginWall" style="display:none">
+  <div class="loginCard">
+    <div style="font-size:40px;margin-bottom:10px">🔐</div>
+    <h2>Login Required</h2>
+    <p>This group is for <b>Nurses, CEO & Staff only</b>.<br>Login so your name appears when chatting.</p>
+    <button class="loginBtn nurse" onclick="location.href='nurse-login.html'">👩‍⚕️ Nurse Login</button>
+    <button class="loginBtn nurse" onclick="ceoLogin()" style="background:#facc15;color:#000">👑 CEO / Staff Login</button>
+    <button class="loginBtn home" onclick="goHome()">🏠 Back to Home</button>
+  </div>
+</div>
+
+<div class="inputBar" id="inputBar" style="display:none">
+  <button class="mediaBtn" onclick="document.getElementById('photoInput').click()" title="Add Photo">📷</button>
+  <button class="mediaBtn" onclick="document.getElementById('videoInput').click()" title="Add Video">🎥</button>
+  <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this)">
+  <input type="file" id="videoInput" accept="video/*" style="display:none" onchange="handleVideoSelect(this)">
+  <button class="micBtn" id="micBtn" onclick="toggleRecording()" title="Voice message">🎤</button>
+  <input type="text" id="msgInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
+  <button class="sendBtn" onclick="sendMessage()">➤</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded, onChildChanged, onChildRemoved, get, remove, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+const firebaseConfig = { databaseURL: "https://love-care-global-default-rtdb.firebaseio.com" };
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const CEO_EMAILS = ['lovecareglobal@gmail.com', 'ceo@lovecareglobal.com', 'asaberepeter204@gmail.com'];
+const STAFF_EMAILS = ['lovecareglobal@gmail.com', 'staff@lovecareglobal.com'];
+
+let currentUser = null;
+let currentRole = null;
+let blockedUsers = [];
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let audioBlob = null;
+let pendingPhotoData = null;
+let pendingVideoData = null;
+let pendingMediaType = null;
+let pendingMediaName = null;
+
+function goHome(){ window.location.href = './index.html'; }
+window.goHome = goHome;
+
+// LOGIN CHECK
+(function checkLogin(){
+  let nurseName = localStorage.getItem('currentNurseName') || localStorage.getItem('nurseName');
+  let nurseEmail = localStorage.getItem('currentNurseEmail') || localStorage.getItem('nurseEmail') || '';
+  let nursePhone = localStorage.getItem('currentNursePhone') || localStorage.getItem('nursePhone') || '';
+  let isCEO = CEO_EMAILS.includes(nurseEmail.toLowerCase()) || CEO_EMAILS.includes(localStorage.getItem('currentClientEmail')?.toLowerCase() || '');
+  let isStaff = STAFF_EMAILS.includes(nurseEmail.toLowerCase()) || isCEO;
+
+  if(nurseName || isCEO){
+    let name = nurseName || (isCEO ? 'CEO' : 'Staff');
+    let id = nursePhone || nurseEmail || 'user_' + Date.now();
+    currentUser = {
+      id: id.replace(/[^a-z0-9]/gi,'_').toLowerCase(),
+      name: name,
+      email: nurseEmail || 'ceo',
+      phone: nursePhone || id,
+      avatar: name.charAt(0).toUpperCase()
+    };
+    currentRole = isCEO ? 'ceo' : (isStaff ? 'staff' : 'nurse');
+    document.getElementById('loginWall').style.display='none';
+    document.getElementById('inputBar').style.display='flex';
+    document.getElementById('chatContainer').style.display='flex';
+    if(currentRole==='ceo'){
+      document.getElementById('ceoPanel').style.display='flex';
+      document.getElementById('ceoWipeBtn').style.display='flex';
+    }
+    loadBlockedUsers();
+    initChat();
+  } else {
+    document.getElementById('loginWall').style.display='flex';
+    document.getElementById('inputBar').style.display='none';
+  }
+})();
+
+window.ceoLogin = function(){
+  let email = prompt('Enter CEO / Staff Email:');
+  if(!email) return;
+  let pass = prompt('Enter Password:');
+  if(!pass) return;
+  if(CEO_EMAILS.includes(email.toLowerCase())){
+    localStorage.setItem('currentNurseName', 'CEO');
+    localStorage.setItem('currentNurseEmail', email.toLowerCase());
+    localStorage.setItem('currentNursePhone', 'CEO_'+Date.now());
+    alert('✅ CEO Verified - Welcome!');
+    location.reload();
+  } else if(email.toLowerCase().includes('staff')){
+    localStorage.setItem('currentNurseName', 'Staff - ' + email.split('@')[0]);
+    localStorage.setItem('currentNurseEmail', email.toLowerCase());
+    localStorage.setItem('currentNursePhone', 'STAFF_'+Date.now());
+    alert('✅ Staff Verified - Welcome!');
+    location.reload();
+  } else {
+    alert('❌ Not authorized. Contact CEO: lovecareglobal@gmail.com');
+  }
+}
+
+function loadBlockedUsers(){
+  get(ref(db, 'nurses_group_chat/blocked_users')).then(snap=>{
+    if(snap.exists()){
+      blockedUsers = Object.values(snap.val()).map(b=>b.userId);
+    }
+  });
+}
+
+function initChat(){
+  const chatRef = ref(db, 'nurses_group_chat/messages');
+  document.getElementById('chatContainer').innerHTML = '<div style="text-align:center;color:#9ca3af;font-size:12px;padding:20px">Loading messages...</div>';
+  let firstLoad = true;
+  onChildAdded(chatRef, (snap)=>{
+    let data = snap.val(); let id = snap.key;
+    if(firstLoad && document.getElementById('chatContainer').innerText.includes('Loading')){
+      document.getElementById('chatContainer').innerHTML=''; firstLoad=false;
+    }
+    renderMessage(id, data);
+  });
+  onChildChanged(chatRef, (snap)=>{
+    let data = snap.val(); let id = snap.key;
+    let el = document.getElementById('msg_'+id); if(el) el.remove();
+    renderMessage(id, data);
+  });
+  onChildRemoved(chatRef, (snap)=>{
+    let id = snap.key; let el = document.getElementById('msg_'+id); if(el) el.remove();
+  });
+  get(chatRef).then(snap=>{
+    if(!snap.exists()){
+      document.getElementById('chatContainer').innerHTML='<div style="text-align:center;color:#9ca3af;font-size:12px;padding:30px">No messages yet. Be first to chat! 💬<br><br>📷 Photo • 🎥 Video • 🎤 Voice supported</div>';
+    }
+  });
+}
+
+function renderMessage(id, data){
+  if(blockedUsers.includes(data.userId) && currentRole!=='ceo') return;
+  let container = document.getElementById('chatContainer');
+  let isMe = data.userId === currentUser.id;
+  let div = document.createElement('div');
+  div.id = 'msg_' + id;
+  div.className = 'message ' + (isMe ? 'me' : 'other') + ' ' + (data.role || '');
+  let roleBadge = data.role==='ceo' ? '<span class="msgRole role-ceo">👑 CEO</span>' : data.role==='staff' ? '<span class="msgRole role-staff">STAFF</span>' : '<span class="msgRole role-nurse">NURSE</span>';
+  let blockedBadge = blockedUsers.includes(data.userId) ? '<span class="msgRole" style="background:#fee2e2;color:#dc2626">BLOCKED</span>' : '';
+  let editedBadge = data.edited ? '<span style="font-size:9px;color:#9ca3af">(edited)</span>' : '';
+  
+  let contentHtml = '';
+  if(data.type==='photo' && data.mediaData){
+    contentHtml = `<img src="${data.mediaData}" class="photoMsg" onclick="window.open(this.src,'_blank')" alt="photo"><div class="msgText">${escapeHtml(data.text||'')}</div>`;
+  } else if(data.type==='video' && data.mediaData){
+    contentHtml = `<video src="${data.mediaData}" class="videoMsg" controls></video><div class="msgText">${escapeHtml(data.text||'')}</div>`;
+  } else if(data.type==='audio' && data.mediaData){
+    contentHtml = `<audio controls class="audioPlayer"><source src="${data.mediaData}" type="audio/webm">Voice</audio><div style="font-size:10px;color:#6b7280;margin-top:4px">🎤 Voice • ${data.duration||'0s'}</div><div class="msgText">${escapeHtml(data.text||'')}</div>`;
+  } else {
+    contentHtml = `<div class="msgText">${escapeHtml(data.text)}</div>`;
+  }
+  
+  let actions = '';
+  if(isMe){
+    actions = `<div class="msgActions">
+      ${data.type==='text' ? `<button class="actBtn edit" onclick="editMessage('${id}')">✏️ Edit</button>` : ''}
+      <button class="actBtn del" onclick="deleteMessage('${id}')">🗑️ Delete</button>
+    </div>`;
+  } else if(currentRole==='ceo'){
+    actions = `<div class="msgActions">
+      <button class="actBtn del" onclick="deleteMessage('${id}')">🗑️ Delete</button>
+      <button class="actBtn block" onclick="blockUser('${data.userId}','${escapeHtml(data.userName)}')">${blockedUsers.includes(data.userId) ? 'Unblock' : '🚫 Block'}</button>
+    </div>`;
+  }
+  
+  div.innerHTML = `
+    <div class="msgHeader">
+      <div class="avatar ${data.role||''}">${escapeHtml((data.userName||'?').charAt(0).toUpperCase())}</div>
+      <span class="msgName">${escapeHtml(data.userName)}</span>
+      ${roleBadge} ${blockedBadge} ${editedBadge}
+      <span class="msgTime">${formatTime(data.timestamp)}</span>
+    </div>
+    ${contentHtml}
+    ${actions}
+    <div id="editArea_${id}" style="display:none"></div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function escapeHtml(str){ if(!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatTime(ts){ if(!ts) return ''; let d = new Date(ts); return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+
+// PHOTO
+window.handlePhotoSelect = function(input){
+  let file = input.files[0];
+  if(!file) return;
+  if(file.size > 5*1024*1024){ alert('Photo too large (max 5MB)'); return; }
+  let reader = new FileReader();
+  reader.onload = e=>{
+    pendingPhotoData = e.target.result;
+    pendingMediaType = 'photo';
+    pendingMediaName = file.name;
+    showPreview('photo', pendingPhotoData, file.name);
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+}
+window.handleVideoSelect = function(input){
+  let file = input.files[0];
+  if(!file) return;
+  if(file.size > 15*1024*1024){ alert('Video too large (max 15MB)'); return; }
+  let reader = new FileReader();
+  reader.onload = e=>{
+    pendingVideoData = e.target.result;
+    pendingMediaType = 'video';
+    pendingMediaName = file.name;
+    showPreview('video', pendingVideoData, file.name);
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+}
+function showPreview(type, data, name){
+  let bar = document.getElementById('previewBar');
+  let img = document.getElementById('previewImg');
+  let vid = document.getElementById('previewVideo');
+  let nameEl = document.getElementById('previewName');
+  bar.style.display='flex';
+  nameEl.textContent = name + ' (' + type + ')';
+  if(type==='photo'){ img.style.display='block'; img.src=data; vid.style.display='none'; }
+  else { vid.style.display='block'; vid.src=data; img.style.display='none'; }
+}
+window.clearPreview = function(){
+  document.getElementById('previewBar').style.display='none';
+  pendingPhotoData=null; pendingVideoData=null; pendingMediaType=null; pendingMediaName=null;
+  document.getElementById('previewImg').src=''; document.getElementById('previewVideo').src='';
+}
+window.sendMediaMessage = function(){
+  if(blockedUsers.includes(currentUser.id)){ alert('🚫 Blocked by CEO'); return; }
+  let text = document.getElementById('msgInput').value.trim();
+  let mediaData = pendingMediaType==='photo' ? pendingPhotoData : pendingVideoData;
+  if(!mediaData) return;
+  let msg = {
+    userId: currentUser.id,
+    userName: currentUser.name,
+    userEmail: currentUser.email,
+    role: currentRole,
+    timestamp: Date.now(),
+    type: pendingMediaType,
+    mediaData: mediaData,
+    text: text,
+    fileName: pendingMediaName
+  };
+  push(ref(db, 'nurses_group_chat/messages'), msg);
+  clearPreview();
+  document.getElementById('msgInput').value='';
+}
+
+window.sendMessage = function(){
+  let input = document.getElementById('msgInput');
+  let text = input.value.trim();
+  if(!text && !audioBlob) return;
+  if(blockedUsers.includes(currentUser.id)){ alert('🚫 Blocked by CEO. Contact lovecareglobal@gmail.com'); return; }
+  let messageData = { userId: currentUser.id, userName: currentUser.name, userEmail: currentUser.email, role: currentRole, timestamp: Date.now(), type: 'text', text: text };
+  if(audioBlob){
+    let reader = new FileReader();
+    reader.onloadend = function(){
+      messageData.type='audio'; messageData.mediaData = reader.result; messageData.duration = document.getElementById('micBtn').dataset.duration || 'voice';
+      messageData.text = text ? text + ' (voice)' : '🎤 Voice';
+      push(ref(db, 'nurses_group_chat/messages'), messageData);
+      audioBlob=null; document.getElementById('micBtn').textContent='🎤'; document.getElementById('micBtn').classList.remove('recording');
+    };
+    reader.readAsDataURL(audioBlob);
+  } else {
+    push(ref(db, 'nurses_group_chat/messages'), messageData);
+  }
+  input.value='';
+}
+
+window.editMessage = function(id){
+  let el = document.getElementById('msg_'+id); if(!el) return;
+  let currentText = el.querySelector('.msgText')?.innerText || '';
+  let editArea = document.getElementById('editArea_'+id);
+  editArea.style.display='block';
+  editArea.innerHTML = `<textarea class="editBox" id="editInput_${id}">${currentText}</textarea><button class="saveEdit" onclick="saveEdit('${id}')">Save</button><button class="saveEdit" style="background:#6b7280;margin-left:6px" onclick="cancelEdit('${id}')">Cancel</button>`;
+}
+window.cancelEdit = function(id){ document.getElementById('editArea_'+id).style.display='none'; }
+window.saveEdit = function(id){
+  let newText = document.getElementById('editInput_'+id).value.trim(); if(!newText) return alert('Enter text');
+  update(ref(db, 'nurses_group_chat/messages/'+id), {text: newText, edited: true, editedAt: Date.now()});
+  document.getElementById('editArea_'+id).style.display='none';
+}
+window.deleteMessage = function(id){ if(!confirm('Delete this message?')) return; remove(ref(db, 'nurses_group_chat/messages/'+id)); }
+
+window.toggleRecording = async function(){
+  let btn = document.getElementById('micBtn');
+  if(!isRecording){
+    try{
+      let stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaRecorder = new MediaRecorder(stream); audioChunks = [];
+      mediaRecorder.ondataavailable = e=> audioChunks.push(e.data);
+      mediaRecorder.onstop = ()=>{
+        audioBlob = new Blob(audioChunks, {type:'audio/webm'});
+        btn.textContent='✅'; btn.dataset.duration = Math.round(audioChunks.length/2) + 's';
+        if(confirm('Send voice message?')) sendMessage();
+      };
+      mediaRecorder.start(); isRecording=true; btn.classList.add('recording'); btn.textContent='⏹️';
+      setTimeout(()=>{ if(isRecording) toggleRecording(); }, 60000);
+    }catch(e){ alert('🎤 Microphone access denied'); }
+  } else { mediaRecorder.stop(); isRecording=false; btn.classList.remove('recording'); }
+}
+
+window.ceoWipeAll = function(){
+  if(currentRole!=='ceo'){ alert('Only CEO can wipe'); return; }
+  let email = prompt('CEO email to confirm WIPE ALL (lovecareglobal@gmail.com):');
+  if(!email || !CEO_EMAILS.includes(email.toLowerCase())){ alert('❌ Unauthorized'); return; }
+  let reason = prompt('Reason for wiping?'); if(!reason || reason.length<5){ alert('Reason required'); return; }
+  if(!confirm('⚠️ FINAL: DELETE ALL messages?\nReason: '+reason)) return;
+  remove(ref(db, 'nurses_group_chat/messages')).then(()=>{
+    alert('✅ Wiped. Reason: '+reason);
+    push(ref(db, 'nurses_group_chat/logs'), {action:'WIPE_ALL', by:currentUser.name, email:email, reason:reason, timestamp:Date.now()});
+  });
+}
+window.blockUser = function(userId, userName){
+  if(currentRole!=='ceo') return;
+  let isBlocked = blockedUsers.includes(userId);
+  if(isBlocked){
+    if(!confirm('Unblock '+userName+'?')) return;
+    get(ref(db, 'nurses_group_chat/blocked_users')).then(snap=>{
+      if(snap.exists()){
+        let data = snap.val();
+        for(let key in data){ if(data[key].userId===userId) remove(ref(db, 'nurses_group_chat/blocked_users/'+key)); }
+        blockedUsers = blockedUsers.filter(u=>u!==userId);
+        alert('✅ Unblocked '+userName); location.reload();
+      }
+    });
+  } else {
+    let reason = prompt('Block '+userName+'? Reason:'); if(!reason) return;
+    push(ref(db, 'nurses_group_chat/blocked_users'), {userId:userId, userName:userName, reason:reason, blockedBy:currentUser.name, timestamp:Date.now()});
+    blockedUsers.push(userId); alert('🚫 Blocked '+userName);
+  }
+}
+window.ceoShowBlocked = function(){
+  get(ref(db, 'nurses_group_chat/blocked_users')).then(snap=>{
+    if(!snap.exists()){ alert('No blocked users'); return; }
+    let list = Object.values(snap.val()).map(b=> `• ${b.userName} (${b.userId}) - ${b.reason}`).join('\n');
+    alert('🚫 Blocked Users:\n\n'+list);
+  });
+}
+</script>
+</body>
+</html>
