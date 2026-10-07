@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book Nurse - Love Care Global</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#111827}
+.topbar{background:linear-gradient(90deg,#22c55e,#16a34a);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
+.left{display:flex;align-items:center;gap:10px}
+.menuBtn{width:42px;height:42px;background:#facc15;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:900;border:none;cursor:pointer}
+.brand{font-weight:900;font-size:15px;line-height:1;cursor:pointer}
+#drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200}
+#drawerOverlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:white;z-index:300;transform:translateX(-100%);transition:transform.3s ease;display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.3)}
+#drawer.open{transform:translateX(0)}
+.drawerHeader{background:linear-gradient(90deg,#22c55e,#16a34a);padding:18px 16px;color:white}
+.drawerBody{flex:1;overflow-y:auto;padding:10px}
+.drawerItem{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;margin:4px 0;font-weight:800;font-size:13px;text-decoration:none;color:#111827;border:1px solid #e5e7eb;background:white}
+.drawerItem.client{background:#f0f9ff;border-color:#bae6fd;color:#0369a1}
+.drawerItem.legal{background:#f9fafb}
+.drawerItem.danger{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+.drawerSection{font-size:10px;font-weight:900;color:#9ca3af;margin:14px 0 4px;padding-left:6px}
+.closeBtn{width:100%;padding:14px;background:#111827;color:white;border:none;border-radius:12px;font-weight:900;cursor:pointer}
+.content{max-width:900px;margin:auto;padding:10px}
+.card{background:white;border-radius:16px;padding:14px;border:1px solid #e5e7eb;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+label{font-size:11px;font-weight:700;margin:8px 0 3px;display:block}
+input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1.5px solid #d1d5db;font-size:12px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#22c55e}
+.btn{width:100%;padding:13px;border-radius:12px;font-weight:900;border:none;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;transition:0.2s}
+.btnGreen{background:linear-gradient(90deg,#22c55e,#16a34a);color:white}
+.btnBlue{background:#3b82f6;color:white}
+.btnLight{background:#f3f4f6;border:1px solid #e5e7eb;color:#111827}
+.btnYellow{background:#facc15;color:#000}
+.nurseCard{border:1.5px solid #e5e7eb;border-radius:14px;padding:12px;margin:8px 0;cursor:pointer;display:flex;gap:12px;transition:0.2s;background:white}
+.nurseCard:hover{border-color:#22c55e;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+.nurseCard.sel{border-color:#16a34a;background:#f0fdf4;box-shadow:0 0 0 3px #dcfce7}
+.nurseAvatar{width:56px;height:56px;border-radius:12px;object-fit:cover;background:#e5e7eb;flex-shrink:0}
+.nurseInfo{flex:1}
+.nurseName{font-weight:900;font-size:14px}
+.nurseMeta{font-size:11px;color:#6b7280;margin:2px 0}
+.badge{display:inline-flex;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:900;margin-right:4px}
+.badgeGreen{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.badgeBlue{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd}
+.mapWrap{width:100%;height:320px;border-radius:14px;border:1.5px solid #bae6fd;overflow:hidden;position:relative}
+#map{width:100%;height:100%}
+.blocker{position:fixed;inset:0;background:rgba(255,255,255,0.98);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.modalOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
+.modalOverlay.show{display:flex}
+.modal{background:white;border-radius:20px;padding:0;max-width:420px;width:100%;max-height:90vh;overflow-y:auto}
+.waitingCard{background:linear-gradient(180deg,#f0f9ff,#ffffff);border:2px solid #bae6fd}
+.timer{font-size:32px;font-weight:900;color:#dc2626;text-align:center;margin:10px 0}
+</style>
+</head>
+<body>
+
+<!-- Drawer -->
+<div id="drawerOverlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="drawerHeader"><h3>💚 LOVE CARE GLOBAL</h3><p>Home Nursing • 24/7 Care • Ghana</p></div>
+  <div class="drawerBody">
+    <div class="drawerSection">CLIENT</div>
+    <a class="drawerItem client" href="index.html">🏠 Home</a>
+    <a class="drawerItem client" href="client-dashboard.html">📊 Dashboard</a>
+    <a class="drawerItem client" href="book-nurse.html" style="border-color:#22c55e;background:#f0fdf4">📅 Book Nurse</a>
+    <a class="drawerItem client" href="client-bookings.html">📋 My Bookings</a>
+    <a class="drawerItem client" href="refund.html">💰 Refund Policy</a>
+    <div class="drawerSection">LEGAL & SUPPORT</div>
+    <a class="drawerItem legal" href="about.html">ℹ️ About Us</a>
+    <a class="drawerItem legal" href="contact.html">📞 Contact Us</a>
+    <a class="drawerItem legal" href="privacy.html">🔒 Privacy Policy</a>
+    <a class="drawerItem legal" href="terms.html">📜 Terms & Conditions</a>
+    <a class="drawerItem legal" href="refund.html">💰 Refund Policy</a>
+    <a class="drawerItem legal" href="delete-account.html">🗑️ Delete Account</a>
+    <a class="drawerItem danger" href="sos.html">🚨 SOS Emergency</a>
+  </div>
+  <div style="padding:12px;border-top:1px solid #e5e7eb"><button class="closeBtn" onclick="closeDrawer()">✕ Close</button></div>
+</div>
+
+<div class="topbar">
+  <div class="left"><button class="menuBtn" onclick="openDrawer()">☰</button><div class="brand" onclick="location.href='index.html'">LOVE CARE<br>GLOBAL</div></div>
+  <div class="right"><a href="client-dashboard.html" style="color:white;text-decoration:none;font-weight:800;padding:6px 12px;background:rgba(255,255,255,0.2);border-radius:999px;font-size:12px">📊 Dashboard</a><button onclick="logout()" style="background:#111827;color:white;border:none;padding:6px 12px;border-radius:999px;font-weight:800;font-size:12px">Logout</button></div>
+</div>
+
+<!-- Login Blocker -->
+<div id="loginBlocker" class="blocker">
+  <div style="background:white;border-radius:16px;padding:20px;max-width:360px;width:100%;text-align:center;border:2px solid #3b82f6">
+    <div style="font-size:40px">🔐</div><h2 style="color:#1d4ed8;font-size:18px;margin:8px 0">Must Login as Client</h2>
+    <p style="font-size:12px;color:#6b7280">One login unlocks booking & dashboard</p>
+    <div style="margin-top:16px;display:grid;gap:8px">
+      <button class="btn btnBlue" onclick="location.href='client-registration.html'">Register as Client</button>
+      <button class="btn btnGreen" onclick="location.href='client-login.html'">Login as Client → Book</button>
+      <button class="btn btnLight" onclick="location.href='index.html'">Home</button>
+    </div>
+  </div>
+</div>
+
+<!-- Waiting for Acceptance Modal -->
+<div id="waitingModal" class="modalOverlay">
+  <div class="modal">
+    <div class="card waitingCard" style="margin:0;border:none;border-radius:20px">
+      <h3 style="text-align:center">⏳ Waiting for Nurse Acceptance</h3>
+      <div class="timer" id="countdown">10:00</div>
+      <div style="text-align:center;font-size:12px;color:#6b7280">
+        <div id="waitingNurseName">Nurse will accept or reject</div>
+        <div style="margin-top:8px;padding:8px;background:white;border-radius:10px;border:1px solid #e5e7eb">
+          <div style="font-weight:900" id="waitingStatus">Status: PENDING</div>
+          <div style="font-size:11px;margin-top:4px" id="waitingMsg">Please wait, nurse is reviewing your request...</div>
+        </div>
+      </div>
+      <div id="pendingActions" style="margin-top:14px;display:grid;gap:8px">
+        <button class="btn btnYellow" onclick="increaseAmount()">💰 Increase Amount for Quick Booking (+₵20)</button>
+        <button class="btn btnLight" onclick="chooseDifferentNurse()">👩‍⚕️ Look for Different Nurse</button>
+        <button class="btn btnLight" onclick="cancelBooking()">✕ Cancel Booking</button>
+      </div>
+      <div id="acceptedActions" style="display:none;margin-top:14px">
+        <div style="text-align:center;padding:12px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;margin-bottom:10px">
+          <div style="font-size:24px">✅</div><div style="font-weight:900;color:#15803d">Nurse Accepted!</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:4px">Opening Google Maps Navigation...</div>
+        </div>
+        <button class="btn btnGreen" onclick="openGoogleMapsNav()">🗺️ Open Google Maps Navigation</button>
+        <button class="btn btnBlue" style="margin-top:8px" onclick="location.href='client-dashboard.html'">Go to Dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Nurse Detail Modal -->
+<div id="nurseDetailModal" class="modalOverlay">
+  <div class="modal">
+    <div style="padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h3 id="detailName" style="font-weight:900">Nurse Name</h3><button onclick="closeDetail()" style="width:32px;height:32px;border-radius:8px;border:1px solid #e5e7eb;background:white;cursor:pointer">✕</button></div>
+
+      <img id="detailPhoto" src="" style="width:100%;height:200px;object-fit:cover;border-radius:14px;margin:10px 0;background:#f3f4f6">
+
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0">
+        <span class="badge badgeGreen" id="detailRating">⭐ 4.8 (120 reviews)</span>
+        <span class="badge badgeBlue" id="detailDistance">📍 1.2km away</span>
+        <span class="badge badgeBlue" id="detailPhone">📞 024...</span>
+      </div>
+
+      <div style="margin:10px 0">
+        <div style="font-size:11px;font-weight:800">Introduction Video</div>
+        <video id="detailVideo" controls style="width:100%;border-radius:12px;margin-top:6px;background:#000;max-height:200px;display:none"></video>
+        <div id="noVideo" style="padding:20px;text-align:center;background:#f9fafb;border-radius:12px;font-size:11px;color:#9ca3af">No video uploaded</div>
+      </div>
+
+      <div style="background:#f9fafb;padding:10px;border-radius:12px;margin:8px 0">
+        <div style="font-size:11px;font-weight:800">About</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:4px" id="detailAbout">Experienced nurse...</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+        <button class="btn btnLight" onclick="closeDetail()">Close</button>
+        <button class="btn btnGreen" onclick="confirmNurseSelection()">💚 Continue Booking This Nurse</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content" id="mainContent" style="display:none">
+
+  <div class="card" id="welcomeCard" style="background:#f0fdf4;border:1px solid #bbf7d0;display:none">
+    <div id="welcomeText" style="font-size:12px;font-weight:700;color:#15803d"></div>
+  </div>
+
+  <!-- Step 1: Location -->
+  <div class="card">
+    <h3>📍 Your Location (Auto-detect nurses on Google Map)</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <div><label>Your Address</label><input id="address" placeholder="Enter home address"></div>
+      <div><label>City</label><input id="city" placeholder="Accra" value="Accra"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <div><label>Lat</label><input id="lat" readonly placeholder="Click Use GPS"></div>
+      <div><label>Lng</label><input id="lng" readonly></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btnBlue" onclick="getGPS()" style="flex:1">📍 Use My GPS</button>
+      <button class="btn btnGreen" onclick="searchNurses()" style="flex:1">🔍 Search Nurses on Map</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Map + Nurses -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>🗺️ Nurses Near You (Google Map)</h3>
+      <span style="font-size:11px;color:#6b7280" id="nurseCount">0 nurses found</span>
+    </div>
+    <div class="mapWrap" style="margin-top:10px"><div id="map"></div></div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <select id="filterService" onchange="searchNurses()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #e5e7eb;font-size:12px"><option value="">All Services</option><option>Elderly Care</option><option>Pediatric Care</option><option>Disability Care</option><option>General Nursing</option></select>
+      <select id="filterRadius" onchange="searchNurses()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #e5e7eb;font-size:12px"><option value="5">5km radius</option><option value="10" selected>10km radius</option><option value="20">20km radius</option><option value="50">50km radius</option></select>
+    </div>
+    <div id="nurseList" style="margin-top:10px"><div style="text-align:center;padding:20px;color:#9ca3af;font-size:12px">Click "Search Nurses on Map" to find nurses near you</div></div>
+    <div id="selectedInfo" style="display:none;padding:10px;background:#f0fdf4;border-radius:10px;margin-top:10px;font-size:12px;border:1px solid #bbf7d0"></div>
+  </div>
+
+  <!-- Step 3: Booking Details -->
+  <div class="card" id="bookingCard" style="display:none">
+    <h3>📅 Booking Details for <span id="selectedNurseName" style="color:#16a34a"></span></h3>
+    <label>Service Type</label><select id="serviceType"><option value="live-out">Live-out</option><option value="live-in">Live-in</option><option value="hourly">Hourly</option></select>
+    <label>Service Needed</label><select id="service"><option>Elderly Care</option><option>Pediatric Care</option><option>Disability Care</option><option>General Nursing</option></select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label>Start Date</label><input type="date" id="sDate"></div>
+      <div><label>End Date</label><input type="date" id="eDate"></div>
+    </div>
+    <label>Booking Amount (GHS) - Increase for quick acceptance</label>
+    <div style="display:flex;gap:8px"><input id="amount" type="number" value="76" style="flex:1"><button class="btn btnYellow" style="width:auto" onclick="increaseAmountInput()">+₵20</button></div>
+    <div style="font-size:10px;color:#6b7280;margin-top:4px">Tip: Higher amount = faster acceptance. Nurses see higher-paying jobs first.</div>
+
+    <label style="margin-top:10px">Written Concerns</label><textarea id="written" rows="3" placeholder="Describe care needed..."></textarea>
+    <label>Audio Concerns</label>
+    <div style="display:flex;gap:6px"><button class="btn btnLight" style="width:auto" id="recordBtn" onclick="toggleRecord()">🎙️ Start Recording</button><span id="recordStatus" style="font-size:11px;padding:8px;color:#6b7280"></span></div>
+    <audio id="audioPlayer" controls style="width:100%;margin-top:6px;display:none"></audio>
+
+    <button class="btn btnGreen" style="margin-top:14px" id="payBtn" onclick="pay()">💳 Pay with Paystack & Book</button>
+    <div style="font-size:10px;color:#6b7280;text-align:center;margin-top:6px">After payment, nurse has 10 minutes to accept. You'll be notified.</div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getDatabase, ref as dbRef, set, push } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
+
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const rtdb=getDatabase(app);
+const storage=getStorage(app);
+const auth=getAuth(app);
+window.db=db; window.rtdb=rtdb; window.storage=storage; window.auth=auth;
+
+// Global state
+let selNurse=null, audioBlob=null, mediaRecorder=null, isRecording=false;
+let map=null, markers=[], clientMarker=null;
+let currentBookingId=null, countdownInterval=null;
+let allNurses=[];
+
+// Check login
+function getClientSession(){
+  const oldId=localStorage.getItem('currentClientId');
+  const newUid=localStorage.getItem('lcg_client_uid');
+  const logged=localStorage.getItem('lcg_logged_in');
+  const role=localStorage.getItem('lcg_role');
+  const email=localStorage.getItem('currentClientEmail')||localStorage.getItem('lcg_client_email')||'';
+  const name=localStorage.getItem('currentClientName')||email.split('@')[0]||'Client';
+  if(logged==='true' && role==='client' && newUid){return {id:newUid,email,name};}
+  if(oldId){return {id:oldId,email,name};}
+  return null;
+}
+function checkLogin(){
+  const s=getClientSession();
+  const blocker=document.getElementById('loginBlocker');
+  const main=document.getElementById('mainContent');
+  if(!s){blocker.style.display='flex';main.style.display='none';return null;}
+  blocker.style.display='none';main.style.display='block';
+  document.getElementById('welcomeCard').style.display='block';
+  document.getElementById('welcomeText').textContent=`✅ Logged in as ${s.name} (${s.email}) - Search nurses on Google Map`;
+  localStorage.setItem('currentClientId',s.id);
+  return s;
+}
+window.logout=()=>{localStorage.clear();location.href='client-login.html';}
+window.openDrawer=()=>{document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('show');}
+window.closeDrawer=()=>{document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('show');}
+
+// GPS
+window.getGPS=()=>{
+  if(!navigator.geolocation){alert('GPS not supported');return;}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById('lat').value=pos.coords.latitude.toFixed(6);
+    document.getElementById('lng').value=pos.coords.longitude.toFixed(6);
+    initMap(pos.coords.latitude, pos.coords.longitude);
+    searchNurses();
+  },()=>alert('GPS failed - enter address manually'));
+}
+
+function initMap(lat=5.6037, lng=-0.1870){
+  if(map){map.setView([lat,lng],13);return;}
+  map=L.map('map').setView([lat,lng],13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+}
+
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c;
+}
+
+// Search nurses from Firestore + fallback demo data
+window.searchNurses=async()=>{
+  const lat=parseFloat(document.getElementById('lat').value);
+  const lng=parseFloat(document.getElementById('lng').value);
+  const radius=parseFloat(document.getElementById('filterRadius').value)||10;
+  const serviceFilter=document.getElementById('filterService').value;
+
+  if(!lat||!lng){alert('Please use GPS or enter lat/lng first');return;}
+  if(!map)initMap(lat,lng); else map.setView([lat,lng],13);
+
+  // Clear markers
+  markers.forEach(m=>map.removeLayer(m)); markers=[];
+  if(clientMarker)map.removeLayer(clientMarker);
+  clientMarker=L.marker([lat,lng],{icon:L.divIcon({html:'📍',className:'',iconSize:[30,30]})}).addTo(map).bindPopup('Your Location');
+
+  document.getElementById('nurseList').innerHTML=`<div style="text-align:center;padding:20px">🔍 Searching nurses on Google Map within ${radius}km...</div>`;
+
+  let nurses=[];
+  try{
+    // Try Firestore nurses collection
+    const q=query(collection(db,'nurses'), where('isApproved','==',true));
+    const snap=await getDocs(q);
+    snap.forEach(d=>{
+      const data=d.data();
+      if(data.lat && data.lng){
+        data.id=d.id;
+        nurses.push(data);
+      }
+    });
+  }catch(e){console.log('Firestore fetch failed, using demo',e);}
+
+  // Fallback demo nurses if no real data (for testing)
+  if(nurses.length===0){
+    nurses=[
+      {id:'demo1',fullName:'Grace Mensah',phone:'0241234567',lat:5.6037,lng:-0.1870,city:'Accra',rating:4.9,reviewCount:124,services:['Elderly Care','General Nursing'],photoURL:'https://i.pravatar.cc/150?img=5',introVideoUrl:'',about:'5 years experience in elderly care, certified by Ghana NMC'},
+      {id:'demo2',fullName:'Abena Osei',phone:'0249876543',lat:5.615,lng:-0.195,city:'Accra',rating:4.7,reviewCount:89,services:['Pediatric Care','General Nursing'],photoURL:'https://i.pravatar.cc/150?img=9',introVideoUrl:'',about:'Pediatric specialist, 3 years at Korle Bu'},
+      {id:'demo3',fullName:'Ngozi Okafor',phone:'+2348012345678',lat:5.59,lng:-0.17,city:'Accra',rating:4.8,reviewCount:156,services:['Elderly Care','Disability Care'],photoURL:'https://i.pravatar.cc/150?img=10',introVideoUrl:'',about:'Nigerian nurse based in Ghana, disability care expert'},
+      {id:'demo4',fullName:'Sarah Johnson',phone:'0551234567',lat:5.65,lng:-0.20,city:'Accra',rating:4.6,reviewCount:67,services:['General Nursing'],photoURL:'https://i.pravatar.cc/150?img=16',introVideoUrl:'',about:'US-trained, general nursing'},
+    ];
+  }
+
+  // Filter by service and distance
+  let filtered=nurses.filter(n=>{
+    const dist=haversine(lat,lng,n.lat,n.lng);
+    n.distance=dist;
+    if(dist>radius)return false;
+    if(serviceFilter && n.services &&!n.services.includes(serviceFilter))return false;
+    return true;
+  }).sort((a,b)=>a.distance-b.distance);
+
+  allNurses=filtered;
+  document.getElementById('nurseCount').textContent=`${filtered.length} nurses found within ${radius}km`;
+
+  if(filtered.length===0){
+    document.getElementById('nurseList').innerHTML=`<div style="text-align:center;padding:20px;background:#fef2f2;border-radius:12px;border:1px solid #fecaca;color:#dc2626">No nurses found within ${radius}km.<br>Try increasing radius or different service.<br><br><button class="btn btnLight" onclick="document.getElementById('filterRadius').value='50';searchNurses()">Search 50km radius</button></div>`;
+    return;
+  }
+
+  // Add markers to map
+  filtered.forEach(n=>{
+    const marker=L.marker([n.lat,n.lng]).addTo(map).bindPopup(`<b>${n.fullName||n.name}</b><br>⭐ ${n.rating||4.5} (${n.reviewCount||0})<br>📍 ${n.distance.toFixed(1)}km<br><button onclick="selectNurse('${n.id}')" style="margin-top:6px;padding:6px 10px;background:#22c55e;color:white;border:none;border-radius:8px;font-weight:800">View Profile</button>`);
+    markers.push(marker);
+  });
+
+  // List view
+  let html='';
+  filtered.forEach(n=>{
+    html+=`<div class="nurseCard" id="nurse_${n.id}" onclick="selectNurse('${n.id}')">
+      <img class="nurseAvatar" src="${n.photoURL||'https://i.pravatar.cc/150?u='+n.id}" onerror="this.src='https://i.pravatar.cc/150'">
+      <div class="nurseInfo">
+        <div class="nurseName">${n.fullName||n.name} <span style="font-weight:400;font-size:11px;color:#16a34a">● Online</span></div>
+        <div class="nurseMeta">⭐ ${n.rating||4.5} (${n.reviewCount||0} reviews) • 📍 ${n.distance.toFixed(1)}km • ${n.city||''}</div>
+        <div class="nurseMeta">📞 ${n.phone? n.phone.substring(0,4)+'****' : 'Hidden until selection'} • ${n.services? n.services.slice(0,2).join(', ') : 'General'}</div>
+        <div style="margin-top:4px"><span class="badge badgeGreen">Verified</span><span class="badge badgeBlue">${n.services? n.services[0] : 'General Nursing'}</span></div>
+      </div>
+      <div style="display:flex;align-items:center"><span style="font-size:18px">›</span></div>
+    </div>`;
+  });
+  document.getElementById('nurseList').innerHTML=html;
+}
+
+window.selectNurse=(id)=>{
+  document.querySelectorAll('.nurseCard').forEach(c=>c.classList.remove('sel'));
+  const el=document.getElementById('nurse_'+id);
+  if(el)el.classList.add('sel');
+  selNurse=allNurses.find(n=>n.id===id);
+  if(!selNurse)return;
+
+  // Show detail modal
+  document.getElementById('detailName').textContent=selNurse.fullName||selNurse.name;
+  document.getElementById('detailPhoto').src=selNurse.photoURL||`https://i.pravatar.cc/300?u=${selNurse.id}`;
+  document.getElementById('detailRating').textContent=`⭐ ${selNurse.rating||4.5} (${selNurse.reviewCount||0} reviews)`;
+  document.getElementById('detailDistance').textContent=`📍 ${selNurse.distance? selNurse.distance.toFixed(1)+'km away' : selNurse.city||''}`;
+  document.getElementById('detailPhone').textContent=`📞 ${selNurse.phone||'Will show after booking'}`;
+  document.getElementById('detailAbout').textContent=selNurse.about||selNurse.bio||'Experienced nurse verified by Love Care Global';
+
+  const video=document.getElementById('detailVideo');
+  const noVideo=document.getElementById('noVideo');
+  if(selNurse.introVideoUrl){
+    video.src=selNurse.introVideoUrl; video.style.display='block'; noVideo.style.display='none';
+  }else{video.style.display='none'; noVideo.style.display='block';}
+
+  document.getElementById('nurseDetailModal').classList.add('show');
+}
+
+window.closeDetail=()=>{document.getElementById('nurseDetailModal').classList.remove('show');}
+window.confirmNurseSelection=()=>{
+  closeDetail();
+  if(!selNurse)return;
+  document.getElementById('selectedInfo').style.display='block';
+  document.getElementById('selectedInfo').innerHTML=`✅ Selected: <b>${selNurse.fullName||selNurse.name}</b> • ⭐ ${selNurse.rating} • 📍 ${selNurse.distance.toFixed(1)}km • 📞 ${selNurse.phone}`;
+  document.getElementById('bookingCard').style.display='block';
+  document.getElementById('selectedNurseName').textContent=selNurse.fullName||selNurse.name;
+  document.getElementById('bookingCard').scrollIntoView({behavior:'smooth'});
+}
+
+window.increaseAmountInput=()=>{
+  const el=document.getElementById('amount');
+  el.value=parseInt(el.value||76)+20;
+}
+
+// Audio
+window.toggleRecord=()=>{
+  if(!isRecording){
+    navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+      mediaRecorder=new MediaRecorder(stream); let chunks=[];
+      mediaRecorder.ondataavailable=e=>chunks.push(e.data);
+      mediaRecorder.onstop=()=>{audioBlob=new Blob(chunks,{type:'audio/webm'}); let url=URL.createObjectURL(audioBlob); let p=document.getElementById('audioPlayer'); p.src=url; p.style.display='block'; document.getElementById('recordStatus').innerText='✅ Recorded';};
+      mediaRecorder.start(); isRecording=true; document.getElementById('recordBtn').innerText='⏹️ Stop'; document.getElementById('recordStatus').innerText='🔴 Recording...';
+    });
+  }else{mediaRecorder.stop(); isRecording=false; document.getElementById('recordBtn').innerText='🎙️ Start Recording';}
+}
+
+// Pay & Book
+window.pay=async()=>{
+  const session=getClientSession();
+  if(!session){location.href='client-login.html';return;}
+  if(!selNurse){alert('Select a nurse from map first');return;}
+  const sDate=document.getElementById('sDate').value, eDate=document.getElementById('eDate').value;
+  const address=document.getElementById('address').value, lat=document.getElementById('lat').value, lng=document.getElementById('lng').value;
+  const amount=document.getElementById('amount').value;
+  if(!sDate||!eDate){alert('Select start and end dates');return;}
+  if(!address||!lat||!lng){alert('Address + GPS required - use GPS button');return;}
+
+  const booking={
+    id:'BK'+Date.now(),
+    clientId:session.id,
+    clientName:session.name,
+    clientEmail:session.email,
+    nurseId:selNurse.id,
+    nurseName:selNurse.fullName||selNurse.name,
+    nursePhone:selNurse.phone,
+    nurseLat:selNurse.lat,
+    nurseLng:selNurse.lng,
+    service:document.getElementById('service').value,
+    serviceType:document.getElementById('serviceType').value,
+    sDate,eDate,address,lat:parseFloat(lat),lng:parseFloat(lng),
+    written:document.getElementById('written').value,
+    amount:parseFloat(amount),
+    status:'PAID',
+    nurseStatus:'PENDING',
+    payStatus:'PAID',
+    timestamp:new Date().toISOString(),
+    createdAt:serverTimestamp(),
+    expiresAt: new Date(Date.now()+10*60*1000).toISOString()
+  };
+
+  const handler=PaystackPop.setup({
+    key:'pk_live_f17ae09b07fba36d1d6d565d0d5d0d7e6cddaa0e8',
+    email:booking.clientEmail,
+    amount:booking.amount*100,
+    currency:'GHS',
+    ref:booking.id,
+    callback: async function(res){
+      booking.payRef=res.reference;
+      try{
+        // Save to Firestore
+        const bookingRef=doc(db,'bookings',booking.id);
+        await setDoc(bookingRef, {...booking, firebaseId:booking.id});
+        // Save to Realtime DB for nurse dashboard
+        await set(push(dbRef(rtdb, `nurse_bookings/${booking.nurseId}`)), {...booking, firebaseId:booking.id});
+        await set(push(dbRef(rtdb, `client_bookings/${booking.clientId}`)), {...booking, firebaseId:booking.id});
+        // Also main bookings list
+        await set(push(dbRef(rtdb, 'bookings')), {...booking, firebaseId:booking.id});
+
+        currentBookingId=booking.id;
+        startWaitingFlow(booking);
+      }catch(e){alert('Save failed: '+e.message);}
+    },
+    onClose:()=>alert('Payment closed')
+  });
+  handler.openIframe();
+}
+
+function startWaitingFlow(booking){
+  document.getElementById('waitingModal').classList.add('show');
+  document.getElementById('waitingNurseName').textContent=`Waiting for ${booking.nurseName} to accept`;
+  document.getElementById('waitingStatus').textContent=`Status: ${booking.nurseStatus}`;
+  document.getElementById('pendingActions').style.display='grid';
+  document.getElementById('acceptedActions').style.display='none';
+
+  let timeLeft=10*60; // 10 minutes
+  countdownInterval=setInterval(()=>{
+    timeLeft--;
+    const m=Math.floor(timeLeft/60); const s=timeLeft%60;
+    document.getElementById('countdown').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+    if(timeLeft<=0){
+      clearInterval(countdownInterval);
+      document.getElementById('waitingStatus').textContent='Status: EXPIRED - No response';
+      document.getElementById('waitingMsg').textContent='Booking pending for 10 minutes. Nurse did not respond. Try increasing amount or choose different nurse for quick booking.';
+      document.getElementById('countdown').textContent='00:00';
+    }
+  },1000);
+
+  // Listen for nurse acceptance in Firestore
+  const bookingRef=doc(db,'bookings',booking.id);
+  const unsub=onSnapshot(bookingRef, (snap)=>{
+    if(!snap.exists())return;
+    const data=snap.data();
+    document.getElementById('waitingStatus').textContent=`Status: ${data.nurseStatus}`;
+    if(data.nurseStatus==='ACCEPTED'){
+      clearInterval(countdownInterval);
+      document.getElementById('pendingActions').style.display='none';
+      document.getElementById('acceptedActions').style.display='block';
+      document.getElementById('waitingStatus').textContent='Status: ACCEPTED ✅';
+      document.getElementById('waitingMsg').textContent=`${data.nurseName} accepted! Phone: ${data.nursePhone||selNurse.phone}. Opening navigation...`;
+      setTimeout(()=>openGoogleMapsNav(),1500);
+    }else if(data.nurseStatus==='REJECTED'){
+      clearInterval(countdownInterval);
+      document.getElementById('waitingStatus').textContent='Status: REJECTED ❌';
+      document.getElementById('waitingMsg').textContent=`${data.nurseName} rejected. Please look for different nurse or increase amount for quick successful booking.`;
+    }
+  });
+}
+
+window.openGoogleMapsNav=()=>{
+  if(!selNurse)return;
+  const dest=`${selNurse.lat},${selNurse.lng}`;
+  const clientLat=document.getElementById('lat').value;
+  const clientLng=document.getElementById('lng').value;
+  // Google Maps navigation URL
+  const url=`https://www.google.com/maps/dir/?api=1&origin=${clientLat},${clientLng}&destination=${dest}&travelmode=driving`;
+  window.open(url,'_blank');
+}
+
+window.increaseAmount=()=>{
+  const el=document.getElementById('amount');
+  if(el)el.value=parseInt(el.value||76)+20;
+  alert('Amount increased to ₵'+el.value+'. This will notify nurses for faster acceptance.');
+  // Update booking amount in Firestore if already booked
+  if(currentBookingId){
+    setDoc(doc(db,'bookings',currentBookingId),{amount:parseInt(el.value), increased:true},{merge:true});
+  }
+}
+window.chooseDifferentNurse=()=>{
+  document.getElementById('waitingModal').classList.remove('show');
+  if(countdownInterval)clearInterval(countdownInterval);
+  document.getElementById('nurseList').scrollIntoView({behavior:'smooth'});
+  alert('Please select a different nurse from the map. Higher amount = quicker acceptance.');
+}
+window.cancelBooking=()=>{
+  if(confirm('Cancel booking? You can request refund in refund.html')){
+    document.getElementById('waitingModal').classList.remove('show');
+    if(countdownInterval)clearInterval(countdownInterval);
+    location.href='client-dashboard.html';
+  }
+}
+
+// Init
+window.addEventListener('DOMContentLoaded', ()=>{
+  checkLogin();
+  initMap();
+  // Auto search if GPS available
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      document.getElementById('lat').value=pos.coords.latitude.toFixed(6);
+      document.getElementById('lng').value=pos.coords.longitude.toFixed(6);
+      initMap(pos.coords.latitude, pos.coords.longitude);
+    });
+  }
+});
+
+// Auth state for one login
+onAuthStateChanged(auth, async(user)=>{
+  if(!user)return;
+  if(localStorage.getItem('lcg_logged_in')==='true')return;
+  try{
+    const snap=await getDoc(doc(db,'clients',user.uid));
+    if(snap.exists()){
+      localStorage.setItem('lcg_client_uid',user.uid);
+      localStorage.setItem('lcg_client_email',user.email);
+      localStorage.setItem('lcg_client_name',snap.data().fullName||user.email);
+      localStorage.setItem('lcg_role','client');
+      localStorage.setItem('lcg_logged_in','true');
+      localStorage.setItem('currentClientId',user.uid);
+      localStorage.setItem('currentClientEmail',user.email);
+      checkLogin();
+    }
+  }catch(e){}
+});
+</script>
+</body>
+</html>
