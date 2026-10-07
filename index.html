@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LOVE CARE GLOBAL</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui;background:#f8fafc}
+.topbar{background:linear-gradient(90deg,#22c55e,#16a34a);padding:12px 14px;display:flex;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
+.hero{max-width:1100px;margin:0 auto;padding:28px 14px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+.heroCard{background:white;border-radius:20px;padding:22px 18px;border:1px solid #e5e7eb}
+.btn{padding:14px 18px;border-radius:12px;font-weight:900;border:none;cursor:pointer;font-size:14px;display:inline-flex;gap:8px;text-decoration:none}
+.btnPrimary{background:linear-gradient(90deg,#22c55e,#16a34a);color:white}
+.popupOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.popupOverlay.show{display:flex}
+.popup{background:white;border-radius:24px;padding:28px 20px;max-width:380px;width:100%;text-align:center;animation:popIn 0.3s ease}
+@keyframes popIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+.choiceBtn{width:100%;padding:16px;border-radius:14px;border:1.5px solid #e5e7eb;background:white;font-weight:900;cursor:pointer;display:flex;gap:12px;margin:8px 0;text-align:left}
+.choiceBtn:hover{border-color:#22c55e;background:#f0fdf4}
+</style>
+</head>
+<body>
+<div class="topbar">
+<div style="font-weight:900">LOVE CARE GLOBAL</div>
+<div style="display:flex;gap:8px">
+<a href="client-login.html" style="color:white;text-decoration:none;font-weight:800;padding:6px 12px;background:rgba(255,255,255,0.2);border-radius:999px;font-size:12px">Client Login</a>
+<a href="nurse-login.html" style="color:#000;text-decoration:none;font-weight:800;padding:6px 12px;background:#facc15;border-radius:999px;font-size:12px">Nurse Login</a>
+</div>
+</div>
+
+<div class="hero">
+<div class="heroCard">
+<h1>Professional Home <span style="color:#16a34a">Nursing Care</span> in Ghana</h1>
+<p style="font-size:14px;color:#6b7280;margin:10px 0">24/7 trusted nurses, elderly care, SOS emergency. Book a nurse in minutes.</p>
+<div style="display:flex;gap:10px;margin-top:14px">
+<button class="btn btnPrimary" onclick="showFirstTimerPopup()">📅 Book a Nurse Now</button>
+<a class="btn" style="background:white;border:1.5px solid #e5e7eb" href="nurse-registration.html">👩‍⚕️ Join as Nurse</a>
+</div>
+</div>
+<div style="background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:20px;padding:20px;color:white">
+<h3>Why Love Care?</h3>
+<ul style="margin:12px 0;padding-left:18px;font-size:13px;line-height:1.6"><li>Verified Nurses</li><li>24/7 Support</li><li>Pay with Paystack</li></ul>
+<button class="btn" style="background:white;color:#15803d;width:100%" onclick="showFirstTimerPopup()">Get Started</button>
+</div>
+</div>
+
+<!-- FIRST TIMER POPUP -->
+<div id="firstTimerPopup" class="popupOverlay">
+<div class="popup">
+<div style="font-size:48px">👋</div>
+<h2>Welcome!</h2>
+<p style="font-size:13px;color:#6b7280;margin:6px 0 18px">Do you want to book a nurse or join as a nurse?</p>
+<button class="choiceBtn" onclick="chooseClient()"><div>👤</div><div><div>Book a Nurse</div><div style="font-size:11px;color:#6b7280">I need a nurse</div></div></button>
+<button class="choiceBtn" onclick="chooseNurse()"><div>👩‍⚕️</div><div><div>Join as a Nurse</div><div style="font-size:11px;color:#6b7280">I want to provide care</div></div></button>
+<div style="margin-top:14px;font-size:12px;color:#6b7280">Already registered?<br><a href="client-login.html" style="color:#0369a1;font-weight:900;text-decoration:none">Client Login</a> • <a href="nurse-login.html" style="color:#5b21b6;font-weight:900;text-decoration:none">Nurse Login</a></div>
+<button onclick="closePopup()" style="margin-top:12px;background:none;border:none;color:#9ca3af;font-size:11px;cursor:pointer">Skip</button>
+</div>
+</div>
+
+<script>
+function showFirstTimerPopup(){
+  const logged = localStorage.getItem('lcg_logged_in');
+  const role = localStorage.getItem('lcg_role');
+  if(logged==='true' && role==='client'){ location.href='client-dashboard.html'; return; }
+  if(logged==='true' && (role==='nurse'||role==='staff')){ location.href='nurse-dashboard.html'; return; }
+  document.getElementById('firstTimerPopup').classList.add('show');
+}
+function closePopup(){ document.getElementById('firstTimerPopup').classList.remove('show'); localStorage.setItem('hasSeenWelcomePopup','true'); }
+function chooseClient(){
+  localStorage.setItem('hasSeenWelcomePopup','true'); localStorage.setItem('userIntent','client');
+  closePopup();
+  const uid = localStorage.getItem('lcg_client_uid') || localStorage.getItem('currentClientId');
+  if(uid){ location.href='client-login.html'; } else { location.href='client-registration.html'; }
+}
+function chooseNurse(){ localStorage.setItem('hasSeenWelcomePopup','true'); closePopup(); location.href='nurse-registration.html'; }
+window.addEventListener('DOMContentLoaded', ()=>{
+  const hasSeen = localStorage.getItem('hasSeenWelcomePopup');
+  const logged = localStorage.getItem('lcg_logged_in');
+  if(!hasSeen && logged!=='true'){ setTimeout(()=>{ showFirstTimerPopup(); }, 1000); }
+});
+</script>
+</body>
+</html>
