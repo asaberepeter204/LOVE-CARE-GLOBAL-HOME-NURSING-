@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LOVE CARE GLOBAL HOME NURSING</title>
-<meta name="description" content="LOVE CARE GLOBAL HOME NURSING - Professional Home Nursing Care - 8 Countries - Ghana, Nigeria, South Africa, UK, USA, Australia, UAE, Canada">
+<title>LOVE CARE GLOBAL - Home Nursing - 8 Countries</title>
+<meta name="description" content="Professional Home Nursing Care - Ghana, Nigeria, South Africa, UK, USA, Australia, UAE, Canada, Other - 24/7 Care">
 <link rel="manifest" href="manifest.json">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -12,10 +12,9 @@ body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#111827}
 .topbar{background:linear-gradient(90deg,#22c55e,#16a34a);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
 .left{display:flex;align-items:center;gap:10px}
 .menuBtn{width:42px;height:42px;background:#facc15;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;font-weight:900;border:none;cursor:pointer}
-.brand{font-weight:900;font-size:15px;line-height:1;cursor:pointer;letter-spacing:0.5px}
+.brand{font-weight:900;font-size:15px;line-height:1}
 .right{display:flex;gap:8px;align-items:center}
 .sosTop{background:#ef4444;color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:12px;border:none;cursor:pointer;text-decoration:none}
-.dotsBtn{background:rgba(255,255,255,0.25);color:white;width:34px;height:34px;border-radius:50%;border:none;font-weight:900;font-size:22px;cursor:pointer}
 #drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200}
 #drawerOverlay.show{display:block}
 #drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:white;z-index:300;transform:translateX(-100%);transition:transform .3s ease;display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.3)}
@@ -25,124 +24,120 @@ body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#111827}
 .drawerItem{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;margin:4px 0;font-weight:800;font-size:13px;text-decoration:none;color:#111827;border:1px solid #e5e7eb;background:white}
 .drawerItem.client{background:#f0f9ff;border-color:#bae6fd;color:#0369a1}
 .drawerItem.nurse{background:#f5f3ff;border-color:#ddd6fe;color:#5b21b6}
-.drawerItem.ceo{background:#111827;color:white;border-color:#000}
-.drawerItem.active{border-color:#22c55e;background:#f0fdf4;color:#15803d}
+.drawerSection{font-size:10px;font-weight:900;color:#9ca3af;margin:14px 0 4px;padding-left:6px;letter-spacing:0.5px}
 .closeBtn{width:100%;padding:14px;background:#111827;color:white;border:none;border-radius:12px;font-weight:900;cursor:pointer}
-.drawerFooter{padding:12px;border-top:1px solid #e5e7eb}
-#dotsMenu{display:none;position:absolute;right:14px;top:58px;background:white;border-radius:14px;box-shadow:0 12px 28px rgba(0,0,0,.18);border:1px solid #e5e7eb;z-index:150;min-width:190px;overflow:hidden}
-#dotsMenu.show{display:block}
-.dotsItem{padding:13px 14px;font-size:13px;font-weight:700;display:flex;gap:10px;color:#111827;border-bottom:1px solid #f3f4f6;cursor:pointer}
+.hero{max-width:1100px;margin:0 auto;padding:28px 14px 18px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+.heroCard{background:white;border-radius:20px;padding:22px 18px;border:1px solid #e5e7eb;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.heroCard h1{font-size:28px;font-weight:900;line-height:1.1}
+.heroCard h1 span{color:#16a34a}
+.heroCard p{font-size:14px;color:#6b7280;margin:10px 0 16px;line-height:1.5}
+.btn{padding:14px 18px;border-radius:12px;font-weight:900;border:none;cursor:pointer;font-size:14px;transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btnPrimary{background:linear-gradient(90deg,#22c55e,#16a34a);color:white;box-shadow:0 6px 16px rgba(34,197,94,.35)}
+.btnSecondary{background:white;border:1.5px solid #e5e7eb;color:#111827}
+.ctaRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.sideCard{background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:20px;padding:20px 18px;color:white}
+.sideCard h3{font-size:18px;font-weight:900}
+.sideCard ul{margin:12px 0 16px;padding-left:18px;font-size:13px;line-height:1.6;font-weight:600}
 .section{max-width:1100px;margin:0 auto;padding:14px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 @media(max-width:800px){.grid3{grid-template-columns:1fr}}
 .card{background:white;border-radius:16px;padding:16px;border:1px solid #e5e7eb}
 .card h4{font-size:14px;font-weight:900;margin-bottom:6px}
 .card p{font-size:12px;color:#6b7280;line-height:1.4}
-.btn{padding:14px 18px;border-radius:12px;font-weight:900;border:none;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
-.btnPrimary{background:linear-gradient(90deg,#22c55e,#16a34a);color:white}
-.btnSecondary{background:white;border:1.5px solid #e5e7eb;color:#111827}
+.badge{padding:6px 12px;border-radius:999px;font-weight:900;font-size:11px;border:1px solid #e5e7eb;background:#f0fdf4;color:#15803d}
 </style>
 </head>
 <body>
 
-<div id="drawerOverlay" onclick="closeDrawer()"></div>
-<div id="drawer">
-  <div class="drawerHeader">
-    <h3 style="font-weight:900">LOVE CARE GLOBAL HOME NURSING</h3>
-    <p style="font-size:11px;margin-top:4px;opacity:0.9">8 Countries - Ghana, Nigeria, SA, UK, USA, Australia, UAE, Canada</p>
-  </div>
-  <div class="drawerBody">
-    <a class="drawerItem active" href="index.html">🏠 Home - LOVE CARE GLOBAL HOME NURSING</a>
-    <a class="drawerItem client" href="client-login.html">👤 Client Login - 8 Countries</a>
-    <a class="drawerItem client" href="client-registration.html">📝 Client Registration - 8 Countries + GPS</a>
-    <a class="drawerItem client" href="client-dashboard.html">📊 Client Dashboard</a>
-    <a class="drawerItem client" href="book-nurse.html">🗺️ Book Nurse on Google Map - 8 Countries</a>
-    <a class="drawerItem nurse" href="nurse-login.html">👩‍⚕️ Nurse Login - 8 Countries</a>
-    <a class="drawerItem nurse" href="nurse-registration.html">📝 Nurse Registration - 8 Countries + GPS + Withdrawal</a>
-    <a class="drawerItem nurse" href="nurse-dashboard.html">📊 Nurse Dashboard - Withdrawal (MoMo + Card)</a>
-    <a class="drawerItem ceo" href="ceo-dashboard.html">👑 CEO Dashboard - Manage Entire App - Refunds & Withdrawals</a>
-    <div style="margin-top:12px;border-top:1px solid #e5e7eb;padding-top:10px">
-      <a class="drawerItem" href="about.html">ℹ️ About Us</a>
-      <a class="drawerItem" href="contact.html">📞 Contact Us</a>
-      <a class="drawerItem" href="privacy.html">🔒 Privacy Policy</a>
-      <a class="drawerItem" href="terms.html">📜 Terms</a>
-      <a class="drawerItem" href="refund.html">💰 Refund Policy</a>
-      <a class="drawerItem" href="delete-account.html">🗑️ Delete Account</a>
-      <a class="drawerItem" style="background:#fef2f2;border-color:#fecaca;color:#dc2626" href="sos.html">🚨 SOS Emergency</a>
-    </div>
-  </div>
-  <div class="drawerFooter"><button class="closeBtn" onclick="closeDrawer()">✕ Close</button></div>
-</div>
-
 <div class="topbar">
   <div class="left">
     <button class="menuBtn" onclick="openDrawer()">☰</button>
-    <div class="brand" onclick="location.href='index.html'">LOVE CARE GLOBAL HOME NURSING</div>
+    <div class="brand">LOVE CARE<br>GLOBAL</div>
   </div>
   <div class="right">
     <a class="sosTop" href="sos.html">🚨 SOS</a>
-    <button class="dotsBtn" onclick="toggleDots(event)">⋮</button>
-  </div>
-  <div id="dotsMenu">
-    <div class="dotsItem" onclick="location.href='client-login.html'">👤 Client Login</div>
-    <div class="dotsItem" onclick="location.href='nurse-login.html'">👩‍⚕️ Nurse Login</div>
-    <div class="dotsItem" onclick="location.href='ceo-dashboard.html'">👑 CEO Dashboard</div>
-    <div class="dotsItem" onclick="location.href='contact.html'">📞 Contact</div>
   </div>
 </div>
 
-<!-- BANNER REMOVED - Now direct to services -->
+<div id="drawerOverlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="drawerHeader">
+    <h3 style="font-weight:900">LOVE CARE GLOBAL</h3>
+    <p style="font-size:12px;opacity:0.9;margin-top:4px">8 Countries • Home Nursing</p>
+  </div>
+  <div class="drawerBody">
+    <div class="drawerSection">CLIENT</div>
+    <a class="drawerItem client" href="index.html">🏠 Home</a>
+    <a class="drawerItem client" href="book-nurse.html">📍 Book Nurse on Map</a>
+    <a class="drawerItem client" href="client-login.html">👤 Client Login</a>
+    <a class="drawerItem client" href="client-registration.html">📝 Client Registration - 8 Countries</a>
+    <a class="drawerItem client" href="client-dashboard.html">📊 Client Dashboard</a>
+
+    <div class="drawerSection">NURSE - 8 COUNTRIES</div>
+    <a class="drawerItem nurse" href="nurse-login.html">👩‍⚕️ Nurse Login</a>
+    <a class="drawerItem nurse" href="nurse-registration.html">📝 Nurse Registration - 8 Countries + GPS</a>
+    <a class="drawerItem nurse" href="nurse-dashboard.html">📊 Nurse Dashboard - Withdrawal</a>
+
+    <div class="drawerSection">LEGAL & SUPPORT</div>
+    <a class="drawerItem" href="about.html">ℹ️ About Us</a>
+    <a class="drawerItem" href="contact.html">📞 Contact Us</a>
+    <a class="drawerItem" href="privacy.html">🔒 Privacy Policy</a>
+    <a class="drawerItem" href="terms.html">📜 Terms</a>
+    <a class="drawerItem" href="refund.html">💰 Refund Policy</a>
+    <a class="drawerItem" href="delete-account.html">🗑️ Delete Account</a>
+    <a class="drawerItem" href="sos.html" style="border-color:#fecaca;background:#fef2f2;color:#dc2626">🚨 SOS Emergency</a>
+  </div>
+  <div style="padding:12px;border-top:1px solid #e5e7eb">
+    <button class="closeBtn" onclick="closeDrawer()">✕ Close</button>
+    <div style="text-align:center;font-size:9px;color:#9ca3af;margin-top:8px">8 Countries: GH, NG, ZA, GB, US, AU, AE, CA, OTHER</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="heroCard">
+    <h1>Professional Home Nursing Care <span>Across 8 Countries</span></h1>
+    <p>Book verified nurses near you on Google Map. Ghana, Nigeria, South Africa, UK, USA, Australia, UAE, Canada, Other. GPS verified. 24/7 care.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+      <span class="badge">🇬🇭 GH MoMo + Card</span>
+      <span class="badge">🌍 8 Countries</span>
+      <span class="badge">📍 GPS Verified</span>
+      <span class="badge">⭐ Rated by Clients</span>
+    </div>
+    <div class="ctaRow">
+      <a class="btn btnPrimary" href="book-nurse.html">📍 Book Nurse on Map</a>
+      <a class="btn btnSecondary" href="nurse-registration.html">👩‍⚕️ Join as Nurse - 8 Countries</a>
+    </div>
+  </div>
+  <div class="sideCard">
+    <h3>Why Love Care Global?</h3>
+    <ul>
+      <li>Verified Nurses with Licence & CV</li>
+      <li>GPS Location + Video Profile</li>
+      <li>8 Countries: GH, NG, ZA, GB, US, AU, AE, CA, OTHER</li>
+      <li>Ghana: MoMo + Card, Others: Debit + Virtual Card</li>
+      <li>Client Ratings Only - Read Only for Nurse</li>
+      <li>Secure Paystack Payment</li>
+    </ul>
+    <a class="btn" style="background:white;color:#15803d;width:100%" href="client-registration.html">Get Started - Client</a>
+  </div>
+</div>
 
 <div class="section">
   <div class="grid3">
-    <div class="card">
-      <h4>👤 For Clients - 8 Countries</h4>
-      <p>Book verified nurses in Ghana, Nigeria, South Africa, UK, USA, Australia, UAE, Canada, Other. GPS + Google Map search.</p>
-      <div style="margin-top:10px;display:grid;gap:8px">
-        <a class="btn btnPrimary" href="client-registration.html">📝 Register as Client - 8 Countries + GPS</a>
-        <a class="btn btnSecondary" href="client-login.html">🔐 Client Login - One Login</a>
-        <a class="btn btnSecondary" href="book-nurse.html">🗺️ Book Nurse on Map</a>
-      </div>
-    </div>
-    <div class="card">
-      <h4>👩‍⚕️ For Nurses - 8 Countries + Withdrawal</h4>
-      <p>Ghana = MoMo + Debit + Virtual Card | Outside Ghana = Debit + Virtual Card only (dropdown) + GPS verification during registration & withdrawal.</p>
-      <div style="margin-top:10px;display:grid;gap:8px">
-        <a class="btn btnPrimary" style="background:linear-gradient(90deg,#7c3aed,#5b21b6)" href="nurse-registration.html">📝 Nurse Registration - 8 Countries + GPS</a>
-        <a class="btn btnSecondary" href="nurse-login.html">🔐 Nurse Login</a>
-        <a class="btn btnSecondary" href="nurse-dashboard.html">💸 Withdrawal - 8 Countries</a>
-      </div>
-    </div>
-    <div class="card" style="background:#111827;color:white;border-color:#000">
-      <h4 style="color:white">👑 CEO - Manage Entire App</h4>
-      <p style="color:#9ca3af">Approve nurses, manage clients, refunds from clients, withdrawals from nurses (Debit/Virtual Card + GPS), bookings, earnings, SOS.</p>
-      <div style="margin-top:10px;display:grid;gap:8px">
-        <a class="btn" style="background:#facc15;color:#000" href="ceo-dashboard.html">👑 CEO Dashboard - All Buttons</a>
-        <a class="btn btnSecondary" style="background:white" href="group_chat.html">💬 Nurses Group Chat</a>
-      </div>
-    </div>
+    <div class="card"><h4>📍 Book on Google Map</h4><p>Select nurse near you on map. See photo, video, rating, distance. 8 countries filter.</p></div>
+    <div class="card"><h4>👩‍⚕️ Verified Nurses</h4><p>CV, Licence, Certificate, Video verified. Rating by clients only, not editable by nurse.</p></div>
+    <div class="card"><h4>💸 Withdrawal - 8 Countries</h4><p>Ghana nurses: MoMo + Debit + Virtual Card. Outside Ghana: Debit + Virtual Card with GPS verification.</p></div>
   </div>
 </div>
 
-<div class="section">
-  <div class="grid3">
-    <div class="card"><h4>🌍 8 Countries Served</h4><p>🇬🇭 Ghana (MoMo + Card)<br>🇳🇬 Nigeria<br>🇿🇦 South Africa<br>🇬🇧 UK<br>🇺🇸 USA<br>🇦🇺 Australia<br>🇦🇪 UAE<br>🇨🇦 Canada<br>🌍 Other can join</p></div>
-    <div class="card"><h4>💸 Withdrawal - 8 Countries</h4><p><b>Ghana:</b> MoMo (MTN, Vodafone, AirtelTigo) + Debit + Virtual Card<br><b>Outside Ghana:</b> Debit Card + Virtual Card only with dropdown to fill details + GPS required during registration & withdrawal</p></div>
-    <div class="card"><h4>⭐ Ratings - Read Only</h4><p>Ratings cannot be changed by nurse. Only clients rate after service. Total ratings reflect for each client who want to book her. GPS verified.</p></div>
-  </div>
-</div>
-
-<div class="section" style="text-align:center;padding:20px;color:#6b7280;font-size:11px">
-  <b>LOVE CARE GLOBAL HOME NURSING</b> - Professional Home Nursing - 8 Countries<br>
-  Ghana | Nigeria | South Africa | UK | USA | Australia | UAE | Canada | Other<br>
-  <div style="margin-top:8px"><a href="privacy.html" style="color:#6b7280">Privacy</a> • <a href="terms.html" style="color:#6b7280">Terms</a> • <a href="refund.html" style="color:#6b7280">Refund</a> • <a href="contact.html" style="color:#6b7280">Contact</a></div>
+<div class="section" style="text-align:center;padding:24px 14px">
+  <p style="font-size:11px;color:#9ca3af">© 2026 Love Care Global • 8 Countries • Home Nursing • <a href="privacy.html" style="color:#6b7280">Privacy</a> • <a href="terms.html" style="color:#6b7280">Terms</a> • <a href="refund.html" style="color:#6b7280">Refund</a></p>
 </div>
 
 <script>
 function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('show');}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('show');}
-function toggleDots(e){e.stopPropagation();document.getElementById('dotsMenu').classList.toggle('show');}
-document.addEventListener('click',()=>{const m=document.getElementById('dotsMenu'); if(m) m.classList.remove('show');});
 </script>
 </body>
 </html>
