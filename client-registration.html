@@ -2,298 +2,180 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Registration</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<title>Client Register - Save Any Name - LOVE CARE GLOBAL HOME NURSING</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.wrap{max-width:520px;margin:0 auto;padding:24px 14px 60px}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:22px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5)}
-.card h2{font-family:Plus Jakarta Sans,sans-serif;font-size:18px;font-weight:800;color:#f3e8ff;text-align:center;margin-bottom:18px}
-label{font-size:11px;font-weight:800;margin:14px 0 6px;display:block;color:#c4b5fd;letter-spacing:.05em}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f6f7fb;color:#111827;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
+.wrap{width:100%;max-width:460px}
+.card{background:white;border-radius:20px;padding:22px;border:1px solid #e5e7eb;box-shadow:0 20px 40px rgba(0,0,0,.08)}
+.logo{width:48px;height:48px;border-radius:14px;background:#16a34a;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;margin:0 auto 10px;font-size:22px}
+h1{text-align:center;font-weight:900;font-size:22px}.sub{text-align:center;font-size:11px;color:#6b7280;margin:6px 0 14px}
+label{font-size:11px;font-weight:800;margin:10px 0 5px;display:block;color:#374151}
 .inputWrap{position:relative}
-input,select{width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.7);color:#ede9fe;font-size:14px;font-weight:600;outline:none}
-select{padding-right:14px}
-input::placeholder{color:#6b5b8a}
-input:focus,select:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
-.eyeBtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.14);width:36px;height:36px;border-radius:10px;cursor:pointer;display:grid;place-items:center}
-.eyeBtn svg{stroke:#d8b4fe}
-.btn{padding:14px;border-radius:12px;font-weight:900;border:none;cursor:pointer;width:100%;margin-top:14px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.3)}
-.btnLight{background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
-.gpsInput{background:rgba(76,29,149,.12)!important;color:#d8b4fe!important}
-</style>
-
-<style>
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.left{display:flex;align-items:center;gap:12px}
-.hamburger{width:42px;height:42px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
-.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
-.hamburger span+span{margin-top:4px}
-.logoBox{display:flex;align-items:center;gap:10px}
-.logoImg{width:42px;height:42px;border-radius:12px;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
-.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
-.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
-#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
-#overlay.show{display:block}
-#drawer{position:fixed;left:0;top:0;bottom:0;width:300px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
-#drawer.open{transform:translateX(0)}
-.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
-.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
-.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+input,select{width:100%;padding:12px 42px 12px 12px;border-radius:12px;border:1.5px solid #e5e7eb;background:#f9fafb;font-size:13px;outline:none}
+input:focus,select:focus{border-color:#16a34a;background:white;box-shadow:0 0 0 3px rgba(34,197,94,.12)}
+.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:white;border:1px solid #e5e7eb;width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.7}
+.btn{width:100%;padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:10px;text-decoration:none}
+.btnGreen{background:#16a34a;color:white}.btnLight{background:#f3f4f6;border:1px solid #e5e7eb;color:#111827}.btnGoogle{background:#111827;color:white}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 </style>
 </head>
 <body>
-<div class="bg"></div>
+<div class="wrap"><div class="card">
+<div class="logo">👤</div>
+<h1>Create Client Account - Any Name</h1>
+<p class="sub">Anyone who registers and logs in, his name will appear with welcome - Cedis/Dollar + Start/End Time + Conditions</p>
 
-<div class="topbar">
-<div class="left">
-<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
-<div class="logoBox">
-<img src="icon-transparent-512.png" alt="Logo" class="logoImg">
-<div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div>
-</div>
-</div>
-<a href="sos.html" class="sosBtn">SOS</a>
-</div>
+<button class="btn btnGoogle" onclick="googleRegister()">
+<svg width="20" height="20" viewBox="0 0 48 48"><path fill="white" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="white" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="white" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="white" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+Continue with Google - Any Name Auto Saved
+</button>
 
-<div id="overlay" onclick="closeD()"></div>
-<div id="drawer">
-<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
-<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:12px;background:#3b0f6e">
-<div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
-</div>
-<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
-<a class="item" href="index.html">Home</a>
-<a class="item" href="about.html">About</a>
-<a class="item" href="services.html">Services</a>
-<a class="item" href="how-it-works.html">How It Works</a>
-<a class="item" href="contact.html">Contact</a>
-<a class="item" href="client-registration.html">Client Registration</a>
-<a class="item" href="nurses-registration.html">Nurse Registration</a>
-<a class="item consent" href="consent-form.html">Consent Form</a>
-<a class="item" href="privacy.html">Privacy</a>
-<a class="item" href="terms.html">Terms</a>
-<a class="item" href="refund.html">Refund</a>
-<a class="item sos" href="sos.html">SOS</a>
-</div>
-<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+<div style="text-align:center;margin:12px 0;color:#9ca3af;font-size:12px;font-weight:800">OR REGISTER WITH EMAIL</div>
+
+<label>Full Name - Anyone's Name Will Appear With Welcome *</label>
+<input id="fullName" type="text" placeholder="e.g., Kwame Mensah, Ama Doe - Anyone's name">
+
+<div class="grid2">
+<div><label>Email *</label><input id="email" type="email" placeholder="client@email.com"></div>
+<div><label>Phone *</label><input id="phone" type="tel" placeholder="055..."></div>
 </div>
 
-<div class="wrap">
-
-<div class="card">
-<h2>Client Registration</h2>
-
-<label>Full Name</label>
-<input id="fullName" placeholder="Full name">
-
-<label>Email</label>
-<input id="email" type="email" placeholder="Email">
-
-<label>Phone</label>
-<div style="display:grid;grid-template-columns:130px 1fr;gap:8px">
-<select id="phoneCode" onchange="handlePhoneCode()">
-<option value="+233">🇬🇭 +233</option>
-<option value="+234">🇳🇬 +234</option>
-<option value="+27">🇿🇦 +27</option>
-<option value="+44">🇬🇧 +44</option>
-<option value="+1">🇺🇸 +1</option>
-<option value="+61">🇦🇺 +61</option>
-<option value="+971">🇦🇪 +971</option>
-<option value="+1-CA">🇨🇦 +1</option>
-<option value="OTHER">🌍 Other</option>
-</select>
-<input id="phone" placeholder="Phone number" inputmode="numeric">
-</div>
-<div id="customCodeWrap" style="display:none;margin-top:8px">
-<input id="customCode" placeholder="Country code e.g. +33">
-</div>
-
-<label>Country</label>
-<select id="country">
-<option value="">Select Country</option>
-<option value="GH">🇬🇭 Ghana</option>
-<option value="NG">🇳🇬 Nigeria</option>
-<option value="ZA">🇿🇦 South Africa</option>
-<option value="GB">🇬🇧 UK</option>
-<option value="US">🇺🇸 USA</option>
-<option value="AU">🇦🇺 Australia</option>
-<option value="AE">🇦🇪 UAE</option>
-<option value="CA">🇨🇦 Canada</option>
-<option value="OTHER">🌍 Other</option>
-</select>
-
-<label>Password</label>
+<label>Password - Eye Toggle Fading With Slash Line *</label>
 <div class="inputWrap">
-<input id="password" type="password" placeholder="Password">
-<button class="eyeBtn" type="button" onclick="toggleEye('password',this)">
-<svg id="eye-password-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-<svg id="eye-password-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53a3 3 0 1 0 4.24 4.24"/><path d="M1 1l22 22"/></svg>
+<input id="password" type="password" placeholder="Password - eye toggle fading with slash line">
+<button class="eyeBtn" type="button" onclick="toggleEye('password',this)[STRIPPED 15 bytes]eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3[STRIPPED 22 bytes]eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
 </button>
 </div>
 
-<label>Confirm Password</label>
-<div class="inputWrap">
-<input id="confirmPassword" type="password" placeholder="Confirm password">
-<button class="eyeBtn" type="button" onclick="toggleEye('confirmPassword',this)">
-<svg id="eye-confirmPassword-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-<svg id="eye-confirmPassword-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53a3 3 0 1 0 4.24 4.24"/><path d="M1 1l22 22"/></svg>
-</button>
+<label>Country - 8 Countries *</label>
+<select id="country"><option value="">Select country</option><option value="GH">🇬🇭 Ghana</option><option value="NG">🇳🇬 Nigeria</option><option value="ZA">🇿🇦 South Africa</option><option value="GB">🇬🇧 UK</option><option value="US">🇺🇸 USA</option><option value="AU">🇦🇺 Australia</option><option value="AE">🇦🇪 UAE</option><option value="CA">🇨🇦 Canada</option><option value="OTHER">🌍 Other</option></select>
+
+<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px;margin-top:10px;font-size:11px">
+<div><b>GPS Actual Name:</b> <span id="gpsName" style="color:#15803d;font-weight:700">Loading actual name...</span></div>
+<div><span id="latlng" style="font-size:10px;color:#6b7280"></span></div>
+<button class="btn btnLight" onclick="getGPS()" type="button">📍 Enable GPS - Actual Name Required</button>
 </div>
 
-<label>Actual Location</label>
-<input id="gpsName" readonly class="gpsInput" placeholder="Locating...">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><input id="lat" readonly class="gpsInput" placeholder="Lat"><input id="lng" readonly class="gpsInput" placeholder="Lng"></div>
-<button class="btn btnLight" type="button" onclick="getGPS()">Refresh Location</button>
-<div id="mapPreview" style="display:none;margin-top:10px"><iframe id="mapFrame" style="width:100%;height:160px;border:none;border-radius:12px;border:1px solid rgba(168,85,247,.12)"></iframe></div>
-
-<button class="btn btnPrimary" onclick="register()">Register</button>
-<div style="text-align:center;margin-top:16px;font-size:13px"><a href="client-login.html" style="color:#d8b4fe;font-weight:800;text-decoration:none">Already have account? Login</a><br><a href="index.html" style="font-size:12px;color:#a78bfa;text-decoration:none;margin-top:8px;display:inline-block">Home</a></div>
+<button class="btn btnGreen" onclick="emailRegister()">✅ Create Client Account - Save Any Name - Welcome Will Show His Name</button>
+<div style="display:flex;gap:8px;margin-top:8px">
+<a href="client-login.html" class="btn btnLight" style="flex:1">🔐 Login - Client</a>
+<a href="index.html" class="btn btnLight" style="flex:1">🏠 Home</a>
 </div>
-</div>
+<div id="msg" style="font-size:11px;margin-top:10px;text-align:center;color:#dc2626"></div>
+</div></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-import { getFirestore, doc, setDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
-
-const firebaseConfig={
-  apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",
-  authDomain:"web-care-618e8.firebaseapp.com",
-  databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",
-  projectId:"web-care-618e8",
-  storageBucket:"web-care-618e8.firebasestorage.app",
-  messagingSenderId:"1062578660694",
-  appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"
-};
-
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
-const rtdb=getDatabase(app);
+let currentLat=null, currentLng=null, currentGPSName='';
+
+window.setSession = function(user){
+  localStorage.setItem('lcg_client_uid', user.uid);
+  localStorage.setItem('currentClientId', user.uid);
+  localStorage.setItem('lcg_client_email', user.email||'');
+  localStorage.setItem('lcg_user_type', 'client');
+}
 
 window.toggleEye=(id,btn)=>{
   const input=document.getElementById(id);
-  const openIcon=document.getElementById(`eye-${id}-open`);
-  const closedIcon=document.getElementById(`eye-${id}-closed`);
-  if(input.type==='password'){
-    input.type='text';
-    if(openIcon)openIcon.style.display='none';
-    if(closedIcon)closedIcon.style.display='block';
-  }else{
-    input.type='password';
-    if(openIcon)openIcon.style.display='block';
-    if(closedIcon)closedIcon.style.display='none';
-  }
+  const open=btn.querySelector('.eye-open');
+  const closed=btn.querySelector('.eye-closed');
+  if(input.type==='password'){input.type='text'; open.style.display='none'; closed.style.display='block';}
+  else{input.type='password'; open.style.display='block'; closed.style.display='none';}
 }
-
 window.getGPS=()=>{
-  const nameField=document.getElementById('gpsName');
-  nameField.value='Locating...';
-  if(!navigator.geolocation){nameField.value='GPS not supported';return;}
   navigator.geolocation.getCurrentPosition(async pos=>{
-    const lat=pos.coords.latitude; const lng=pos.coords.longitude;
-    document.getElementById('lat').value=lat.toFixed(6);
-    document.getElementById('lng').value=lng.toFixed(6);
-    document.getElementById('mapPreview').style.display='block';
-    document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+    currentLat=pos.coords.latitude; currentLng=pos.coords.longitude;
+    document.getElementById('latlng').textContent=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`;
     try{
-      const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`);
-      const data=await res.json();
-      nameField.value=data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-    }catch(e){
-      nameField.value=`${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-    }
-  },()=>{nameField.value='Enable GPS'; alert('Enable GPS');},{enableHighAccuracy:true, timeout:15000});
+      const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}`);
+      const d=await r.json();
+      currentGPSName=d.display_name||`${currentLat},${currentLng}`;
+      document.getElementById('gpsName').textContent=currentGPSName;
+    }catch{ currentGPSName=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`; document.getElementById('gpsName').textContent=currentGPSName;}
+  },()=>{document.getElementById('msg').textContent='Enable GPS - Required';},{enableHighAccuracy:true});
 }
 
-window.handlePhoneCode=()=>{
-  const sel=document.getElementById('phoneCode').value;
-  const wrap=document.getElementById('customCodeWrap');
-  wrap.style.display = sel==='OTHER' ? 'block' : 'none';
-};
-
-window.syncPhoneCodeWithCountry=()=>{
-  const country=document.getElementById('country').value;
-  const phoneCode=document.getElementById('phoneCode');
-  const map={GH:'+233',NG:'+234',ZA:'+27',GB:'+44',US:'+1',AU:'+61',AE:'+971',CA:'+1-CA'};
-  if(map[country]){ phoneCode.value=map[country]; handlePhoneCode(); }
-  if(country==='OTHER'){ phoneCode.value='OTHER'; handlePhoneCode(); }
-};
-document.getElementById('country')?.addEventListener('change', syncPhoneCodeWithCountry);
-
-
-window.register=async()=>{
+window.emailRegister=async()=>{
   const fullName=document.getElementById('fullName').value.trim();
-  const email=document.getElementById('email').value.trim().toLowerCase();
-  const phoneRaw=document.getElementById('phone').value.trim();
-  const phoneCodeVal=document.getElementById('phoneCode').value;
-  const customCode=document.getElementById('customCode')?.value.trim();
-  let finalCode=phoneCodeVal;
-  if(phoneCodeVal==='OTHER'){
-    if(!customCode){ alert('Enter country code'); return; }
-    finalCode=customCode;
-  }
-  if(finalCode==='+1-CA') finalCode='+1';
-  const phone=finalCode+' '+phoneRaw;
-  if(!phoneRaw){ alert('Enter phone'); return; }
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('password').value;
   const country=document.getElementById('country').value;
-  const pass=document.getElementById('password').value;
-  const cpass=document.getElementById('confirmPassword').value;
-  const lat=document.getElementById('lat').value;
-  const lng=document.getElementById('lng').value;
-  const gpsName=document.getElementById('gpsName').value;
-  if(!fullName||!email||!country||!pass){alert('Fill all fields');return;}
-  if(pass!==cpass){alert('Passwords do not match');return;}
-  if(!lat||!lng||!gpsName||gpsName.includes('Locating')){alert('Wait for location'); getGPS(); return;}
+  const msg=document.getElementById('msg');
+  if(!fullName||!email||!phone||!password||!country){msg.textContent='Fill all fields - Full name required - Anyone\'s name'; return;}
+  if(!currentGPSName){msg.textContent='Enable GPS - Actual name required'; getGPS(); return;}
   try{
-    const nurseQ = query(collection(db,'nurses'), where('email','==', email));
-    const nurseSnap = await getDocs(nurseQ);
-    if(!nurseSnap.empty){
-      alert('Email already registered as Nurse. Use different email.');
-      return;
-    }
-    const clientQ = query(collection(db,'clients'), where('email','==', email));
-    const clientSnap = await getDocs(clientQ);
-    if(!clientSnap.empty){
-      alert('Email already registered. Please login.');
-      return;
-    }
-  }catch(e){ console.log(e); }
-  try{
-    const cred=await createUserWithEmailAndPassword(auth,email,pass);
-    const uid=cred.user.uid;
-    await setDoc(doc(db,'clients',uid),{
-      uid, fullName, email, phone, country,
-      countryName: document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
-      phoneCode: finalCode, phoneRaw, phoneFull: phone,
-      lat:parseFloat(lat), lng:parseFloat(lng), gpsActualName:gpsName, actualLocationName:gpsName,
-      role:'client', isApproved:true,
-      createdAt:serverTimestamp(), timestamp:new Date().toISOString()
+    msg.textContent='Creating account for '+fullName+'...';
+    const cred=await createUserWithEmailAndPassword(auth, email, password);
+    const user=cred.user;
+    await updateProfile(user,{displayName:fullName});
+    await setDoc(doc(db,'clients',user.uid),{
+      uid:user.uid,
+      email:user.email,
+      fullName:fullName,
+      displayName:fullName,
+      name:fullName,
+      firstName:fullName.split(' ')[0],
+      lastName:fullName.split(' ').slice(1).join(' '),
+      phone:phone,
+      country:country,
+      countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
+      gpsActualName:currentGPSName,
+      actualLocationName:currentGPSName,
+      lat:currentLat,
+      lng:currentLng,
+      createdAt:serverTimestamp(),
+      loginMethod:'email',
+      welcomeMessage:`Welcome back, ${fullName.split(' ')[0]} 👋`
     });
-    await set(ref(rtdb,'clients/'+uid),{
-      uid, name:fullName, fullName, email, phone, phoneCode:finalCode, phoneRaw, phoneFull:phone, country,
-      lat:parseFloat(lat), lng:parseFloat(lng), gpsName:gpsName,
-      role:'client', createdAt:Date.now()
-    });
-    localStorage.setItem('lcg_client_uid',uid);
-    localStorage.setItem('lcg_role','client');
-    localStorage.setItem('lcg_logged_in','true');
-    localStorage.setItem('lcg_session_expiry',(Date.now()+30*60*1000).toString());
-    localStorage.setItem('clientProfile', JSON.stringify({uid, name:fullName, email, phone, lat, lng, gpsName}));
-    localStorage.setItem('currentClientEmail',email);
-    alert('Registered');
-    location.href='client-dashboard.html';
-  }catch(e){alert('Failed: '+e.message);}
+    setSession(user);
+    msg.textContent=`✅ Account created for ${fullName} - Welcome will show his name`;
+    setTimeout(()=>{location.href='client-dashboard.html';}, 1000);
+  }catch(e){
+    if(e.code==='auth/email-already-in-use'){msg.textContent='Email already registered - Go to Login - Client';}
+    else{msg.textContent='Register failed: '+e.message;}
+  }
 }
 
-window.addEventListener('DOMContentLoaded',()=>{getGPS();});
-function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
-function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+window.googleRegister=async()=>{
+  const msg=document.getElementById('msg');
+  const fullNameInput=document.getElementById('fullName').value.trim();
+  try{
+    msg.textContent='Opening Google...';
+    const provider=new GoogleAuthProvider();
+    const cred=await signInWithPopup(auth, provider);
+    const user=cred.user;
+    const finalFullName=fullNameInput||user.displayName||'Client';
+    await setDoc(doc(db,'clients',user.uid),{
+      uid:user.uid,
+      email:user.email,
+      fullName:finalFullName,
+      displayName:finalFullName,
+      name:finalFullName,
+      firstName:finalFullName.split(' ')[0],
+      lastName:finalFullName.split(' ').slice(1).join(' '),
+      photoURL:user.photoURL||'',
+      country:document.getElementById('country').value||'GH',
+      gpsActualName:currentGPSName||'',
+      actualLocationName:currentGPSName||'',
+      lat:currentLat||null,
+      lng:currentLng||null,
+      createdAt:serverTimestamp(),
+      loginMethod:'google',
+      welcomeMessage:`Welcome back, ${finalFullName.split(' ')[0]} 👋`
+    },{merge:true});
+    setSession(user);
+    msg.textContent=`✅ Google account for ${finalFullName}`;
+    setTimeout(()=>{location.href='client-dashboard.html';}, 1000);
+  }catch(e){msg.textContent='Google register failed: '+e.message;}
+}
+window.addEventListener('DOMContentLoaded', getGPS);
 </script>
-<script>function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')} function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}</script></body>
+</body>
 </html>
