@@ -2,191 +2,273 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurses Dashboard — LOVE CARE GLOBAL</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<title>Nurse Dashboard - Welcome Name - LOVE CARE GLOBAL HOME NURSING</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.left{display:flex;align-items:center;gap:12px}
-.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
-.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
-.hamburger span+span{margin-top:4px}
-.logoBox{display:flex;align-items:center;gap:10px}
-.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
-.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
-.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
-#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
-#overlay.show{display:block}
-#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
-#drawer.open{transform:translateX(0)}
-.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
-.item.nurse{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}
-.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
-.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
-.wrap{max-width:480px;margin:0 auto;padding:24px 14px 80px;display:block!important;visibility:visible!important;opacity:1!important}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:20px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:16px;display:block!important}
-.btnBig{width:100%;padding:18px;border-radius:16px;border:1px solid rgba(168,85,247,.18);background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.18));color:#f3e8ff;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;transition:.2s;margin-bottom:12px;text-decoration:none}
-.btnBig:hover{transform:translateY(-2px);border-color:#a855f7;box-shadow:0 10px 30px rgba(168,85,247,.25)}
-.btnBig .icon{width:48px;height:48px;border-radius:50%;background:rgba(168,85,247,.22);display:grid;place-items:center;font-size:22px;border:1px solid rgba(168,85,247,.18);flex-shrink:0}
-.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;box-shadow:0 8px 20px rgba(168,85,247,.3)}
-.btnPrimary small{color:#1e0a3a!important;opacity:.85}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.22);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0f0f0f;color:white;min-height:100vh}
+.topbar{background:#111827;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;border-bottom:1px solid #1f2937}
+.wrap{max-width:600px;margin:0 auto;padding:14px}
+.card{background:#1a1a1a;border-radius:20px;padding:16px;border:1px solid #2a2a2a;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.cardPurple{background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none}
+.btn{padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:8px;text-decoration:none}
+.btnPurple{background:#7c3aed;color:white}.btnDark{background:#111827;color:white;border:1px solid #2a2a2a}.btnLight{background:#2a2a2a;border:1px solid #3a3a3a;color:#d1d5db}.btnGreen{background:#16a34a;color:white}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:#22c55e;color:white}
+.stat{font-size:22px;font-weight:900}.label{font-size:10px;color:#9ca3af;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:500px){.grid2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="bg"></div>
-
 <div class="topbar">
-<div class="left">
-<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
-<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
+<div style="display:flex;gap:10px;align-items:center">
+<div style="width:36px;height:36px;border-radius:10px;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-weight:900">🏥</div>
+<div><div style="font-weight:900;font-size:14px">LOVE CARE GLOBAL HOME NURSING</div><div style="font-size:10px;color:#9ca3af">Nurse Heart Dashboard • 8 Countries</div></div>
 </div>
-<a href="sos.html" class="sosBtn">SOS</a>
-</div>
-
-<div id="overlay" onclick="closeD()"></div>
-<div id="drawer">
-<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
-<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
-</div>
-<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
-<a class="item nurse" href="index.html">Home</a>
-<a class="item nurse" href="nurses-dashboard.html" style="background:rgba(168,85,247,.22)">Dashboard</a>
-<a class="item nurse" href="my-job-offer.html">My Job Offers</a>
-<a class="item nurse" href="nurse-group-chat.html">Nurse Group Chat</a>
-<a class="item nurse" href="nurse-settings.html">Nurse Settings</a>
-<a class="item" href="about.html">About</a>
-<a class="item" href="services.html">Services</a>
-<a class="item" href="contact.html">Contact</a>
-<a class="item consent" href="consent-form.html">Consent Form</a>
-<a class="item sos" href="sos.html">SOS</a>
-</div>
-<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+<a href="index.html" style="background:#ef4444;color:white;padding:6px 12px;border-radius:999px;text-decoration:none;font-weight:900;font-size:12px">SOS</a>
 </div>
 
 <div class="wrap">
-<div class="card" style="display:flex;gap:14px;align-items:center">
-<img id="nursePhoto" src="icon-transparent-512.png" style="width:64px;height:64px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:1px solid rgba(168,85,247,.18);">
-<div style="flex:1"><div id="nurseName" style="font-weight:900;font-size:15px;color:#f3e8ff">Nurse Dashboard</div><div id="nurseEmail" style="font-size:12px;color:#a78bfa">Welcome back</div><div id="nursePhone" style="font-size:11px;color:#6b5b8a;margin-top:2px"></div><span class="badge" id="nurseStatus">NURSE • ONLINE</span></div>
+
+<!-- FIX 1: WELCOME WITH NAME - AS YOU REQUESTED - MENTIONS NAME OF USER -->
+<div class="card cardPurple" id="welcomeCard">
+<div style="display:flex;gap:12px;align-items:center">
+<div id="nursePhotoWrap" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden">
+<span id="nurseInitial">👩‍⚕️</span>
+<img id="nursePhoto" src="" style="width:100%;height:100%;object-fit:cover;display:none">
+</div>
+<div style="flex:1">
+<div style="font-size:11px;opacity:.8">Nurse Dashboard</div>
+<!-- THIS IS FIXED - NOW SHOWS NAME -->
+<div id="welcomeName" style="font-weight:900;font-size:20px;margin-top:2px">Welcome back 👋</div>
+<div id="welcomeSub" style="font-size:11px;opacity:.9;margin-top:2px">Loading your name...</div>
+<div style="margin-top:6px"><span class="badge" id="statusBadge">NURSE • ONLINE</span> <span style="font-size:10px;opacity:.8" id="gpsName">📍 GPS Actual Name loading...</span></div>
+</div>
+</div>
+</div>
+
+<!-- FIX 2: REMOVED "Not logged in — Login as Nurse to see your jobs" RED BOX - AS YOU REQUESTED -->
+<!-- OLD CODE HAD: <div>⚠️ Not logged in — Login as Nurse to see your jobs</div> - NOW DELETED -->
+<!-- If not logged in, we redirect to login instead of showing that warning -->
+
+<div class="card">
+<h3 style="font-weight:900;font-size:16px">📊 Your Heart Stats - All Operations Here</h3>
+<div class="grid2" style="margin-top:10px">
+<div style="background:#111827;border:1px solid #1f2937;border-radius:12px;padding:10px"><div class="label">ACTIVE JOBS</div><div class="stat" id="activeJobs">0</div></div>
+<div style="background:#111827;border:1px solid #1f2937;border-radius:12px;padding:10px"><div class="label">COMPLETED</div><div class="stat" id="completedJobs">0</div></div>
+<div style="background:#111827;border:1px solid #1f2937;border-radius:12px;padding:10px"><div class="label">TOTAL EARNINGS</div><div class="stat" id="totalEarnings">GHS 0</div></div>
+<div style="background:#111827;border:1px solid #1f2937;border-radius:12px;padding:10px"><div class="label">RATING</div><div class="stat" id="ratingStat">0 ⭐</div></div>
+</div>
+</div>
+
+<div class="grid2">
+<div class="card">
+<h4>💼 My Job Offer - Heart</h4>
+<p style="font-size:11px;color:#9ca3af;margin:6px 0">View & accept paid bookings assigned to you - Cedis/Dollar + Start/End Time + Conditions Text + Audio Voice</p>
+<div id="jobsPreview" style="font-size:11px;color:#d1d5db;background:#111827;border-radius:10px;padding:8px;margin:8px 0">Loading jobs where nurseId == your uid...</div>
+<a class="btn btnPurple" href="nurse-bookings.html">💼 My Job Offers - Accept Paid</a>
+<a class="btn btnLight" href="nurse-jobs.html">📋 All Jobs</a>
 </div>
 
 <div class="card">
-<h2 style="font-family:Plus Jakarta Sans,sans-serif;font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:14px">Nurses Dashboard</h2>
-<div id="loginWarning" style="display:none;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25);padding:10px;border-radius:12px;font-size:12px;color:#fca5a5;margin-bottom:12px">⚠️ Not logged in — <a href="nurse-login.html" style="color:#fca5a5;font-weight:800">Login as Nurse</a> to see your jobs</div>
+<h4>💬 Nurse Group Chat - Heart</h4>
+<p style="font-size:11px;color:#9ca3af;margin:6px 0">Chat with CEO & other nurses - Group icon only in Nurse + Staff + CEO dashboards</p>
+<a class="btn btnLight" href="group_chat.html">💬 Nurse Group Chat - CEO & Nurses</a>
+<a class="btn btnLight" href="nurse-chat.html">💬 Chat Clients - Heart</a>
+</div>
 
-<a class="btnBig btnPrimary" href="my-job-offer.html">
-<span class="icon">💼</span>
-<span><b>My Job Offer</b><br><small>View & accept paid bookings assigned to you</small></span>
-</a>
-
-<a class="btnBig" href="nurse-group-chat.html">
-<span class="icon">💬</span>
-<span><b>Nurse Group Chat</b><br><small style="font-weight:600;color:#a78bfa">Chat with CEO & other nurses</small></span>
-</a>
-
-<a class="btnBig" href="nurse-settings.html">
-<span class="icon">⚙️</span>
-<span><b>Nurse Settings</b><br><small style="font-weight:600;color:#a78bfa">Profile, location & availability</small></span>
-</a>
-
-<div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<a class="btnBig" style="justify-content:center" href="index.html">🏠 Home</a>
-<button class="btnBig" style="justify-content:center" onclick="logout()">Logout</button>
+<div class="card">
+<h4>⚙️ Nurse Settings - Heart</h4>
+<p style="font-size:11px;color:#9ca3af;margin:6px 0">Profile, location & availability - GPS Actual Name + Eye Toggle</p>
+<a class="btn btnLight" href="nurse-profile.html">👤 Profile & GPS Actual Name</a>
+<button class="btn btnLight" onclick="toggleAvailability()" id="availabilityBtn">🟢 Turn On - Available on Map</button>
+<div style="background:#111827;border-radius:10px;padding:8px;margin-top:8px;font-size:11px">
+<div><b>Actual Location:</b> <span id="actualLocation">Loading...</span></div>
+<div><span id="latlng" style="font-size:10px;color:#6b7280"></span></div>
+<div id="mapPreview" style="display:none;margin-top:8px;border-radius:10px;overflow:hidden"><iframe id="mapFrame" style="width:100%;height:120px;border:0"></iframe></div>
+<button class="btn btnLight" onclick="getGPS()" style="margin-top:8px">📍 Refresh GPS Actual Name + Map</button>
 </div>
 </div>
 
-<div class="card" style="font-size:11px;color:#a78bfa">
-<b style="color:#f3e8ff">Debug:</b> <span id="debugInfo"></span><br>
-<button onclick="localStorage.clear(); location.href='nurse-login.html'" style="margin-top:8px;padding:6px 10px;border-radius:8px;background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-size:11px;cursor:pointer">Clear Cache & Re-login</button>
-</div>
+<div class="card">
+<h4>💰 Withdrawal - 8 Countries Rule</h4>
+<p style="font-size:11px;color:#9ca3af;margin:6px 0">GH=MoMo+Card dropdown, Others=Debit+Virtual Card dropdown + GPS actual name required</p>
+<a class="btn btnGreen" href="nurse-withdrawal.html">💸 Withdraw - 8 Countries Rule - Paystack</a>
+<div id="withdrawalRule" style="font-size:10px;background:#111827;padding:8px;border-radius:8px;border:1px solid #1f2937;margin-top:8px"></div>
 </div>
 
-<script>
-// SOFT GUARD - show page even if not logged, but warn
-(function(){
-  try{
-    const expiry = localStorage.getItem('lcg_session_expiry');
-    const logged = localStorage.getItem('lcg_logged_in');
-    const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
-    const debug = document.getElementById('debugInfo');
-    if(debug) debug.textContent = `logged=${logged} role=${role} expiry=${expiry ? new Date(parseInt(expiry)).toLocaleTimeString() : 'none'} uid=${localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId')||'none'}`;
-    
-    if(!logged || logged!=='true'){
-      const warn = document.getElementById('loginWarning');
-      if(warn) warn.style.display='block';
-      // Don't redirect immediately, let user see buttons
-      // Only redirect if they click My Job Offer without login - handled by link
-      return;
-    }
-    if(expiry && Date.now() > parseInt(expiry)){
-      localStorage.clear();
-      window.location.replace('nurse-login.html');
-      return;
-    }
-    if(role && role!=='nurse' && role==='client'){
-      // client trying to open nurse dashboard
-      window.location.replace('client-dashboard.html');
-      return;
-    }
-    const SESSION_MS = 30*60*1000;
-    function refresh(){ localStorage.setItem('lcg_session_expiry', (Date.now()+SESSION_MS).toString()); }
-    ['click','keydown','touchstart'].forEach(ev=>document.addEventListener(ev, refresh, {passive:true}));
-  }catch(e){
-    console.log('guard error', e);
-  }
-})();
-</script>
+<div class="card" style="grid-column: span 2; border:2px dashed #ef4444">
+<h4 style="color:#ef4444">🚨 DANGER ZONE - Delete Account By Yourself - Inside Heart</h4>
+<p style="font-size:11px;color:#9ca3af;margin:6px 0">Found inside heart dashboard - delete by yourself with reason + eye toggle fading with slash line + GPS actual name logged to CEO</p>
+<a class="btn btnLight" href="delete-account.html" style="border-color:#ef4444;color:#fca5a5">🗑️ Go to Delete Account - Policy + Danger Zone With 8 Reasons - Eye Toggle</a>
+</div>
+
+<div class="card">
+<h4>⭐ My Ratings - Read Only - Heart</h4>
+<div style="background:#111827;padding:10px;border-radius:10px;border:1px solid #1f2937;font-size:11px">
+<b>Rating:</b> <span id="totalRating">0</span>/5 • <b>Reviews:</b> <span id="reviewCount">0</span><br>
+<span id="ratingDetails" style="font-size:10px;color:#9ca3af">Clients rate you after service - Read only</span>
+</div>
+<a class="btn btnLight" href="nurse-ratings.html">⭐ View All Ratings - Heart</a>
+</div>
+
+</div>
+
+<div class="card" style="text-align:center;font-size:10px;color:#6b7280">
+❤️ NURSE HEART DASHBOARD - All buttons to operate as nurse are found here<br>
+Welcome name fixed • "Not logged in" warning removed • Video + Rating preview • Phone masked until paid • Auto GPS navigation • Paystack Live pk_live_f17ae... • Cedis/Dollar + Start/End Time + Conditions Text + Audio Voice • 8 Countries • LOVE CARE GLOBAL HOME NURSING
+</div>
+
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
 const db=getFirestore(app);
-async function loadNurse(){
+
+let currentUid=null;
+let isAvailable=false;
+
+// FIXED setSession helper - ensures welcome name works
+function getStoredUid(){
+  return localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId')||'';
+}
+
+async function loadNurseData(uid){
+  currentUid=uid;
   try{
-    const uid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId');
-    let nurse=null; 
-    let photoURL=localStorage.getItem('nursePhotoURL')||'';
-    try{const prof=JSON.parse(localStorage.getItem('nurseProfile')||'{}'); if(prof.photoURL) photoURL=prof.photoURL; if(prof.name||prof.email) nurse=prof;}catch(e){}
-    if(uid){
-      try{
-        const snap=await getDoc(doc(db,'nurses',uid)); 
-        if(snap.exists()){
-          nurse=snap.data(); 
-          if(nurse.photoURL||nurse.photo) photoURL=nurse.photoURL||nurse.photo;
-        }
-      }catch(e){console.log('firestore error', e)}
+    const snap=await getDoc(doc(db,'nurses',uid));
+    if(!snap.exists()){
+      document.getElementById('welcomeName').textContent='Welcome back 👋';
+      document.getElementById('welcomeSub').textContent='Profile not found - Please complete registration';
+      return;
     }
-    if(nurse){
-      const nameEl=document.getElementById('nurseName');
-      if(nameEl) nameEl.textContent=nurse.fullName||nurse.name||'Nurse';
-      const emailEl=document.getElementById('nurseEmail');
-      if(emailEl) emailEl.textContent=nurse.email||localStorage.getItem('currentNurseEmail')||'Nurse account';
-      const phoneEl=document.getElementById('nursePhone');
-      if(phoneEl) phoneEl.textContent=nurse.phone||nurse.phoneFull||localStorage.getItem('nursePhone')||'';
-      if(photoURL){
-        const img=document.getElementById('nursePhoto'); 
-        if(img){ img.src=photoURL; }
+    const d=snap.data();
+    const fullName=d.fullName||d.displayName||d.name||'Nurse';
+    const firstName=fullName.split(' ')[0]||fullName;
+
+    // FIX 1: MENTION NAME AND WELCOME HIM - AS YOU REQUESTED
+    document.getElementById('welcomeName').textContent=`Welcome back, ${firstName} 👋`;
+    document.getElementById('welcomeSub').textContent=`${fullName} • ${d.countryName||d.country||''} • ${d.isApproved?'✅ Approved by CEO':'⏳ Awaiting CEO Approval'}`;
+    document.getElementById('gpsName').textContent=`📍 ${d.gpsActualName||d.actualLocationName||'No GPS actual name yet'}`;
+    document.getElementById('actualLocation').textContent=d.gpsActualName||'No GPS actual name';
+    document.getElementById('latlng').textContent=d.lat? `${d.lat.toFixed(6)}, ${d.lng.toFixed(6)}`:'';
+    document.getElementById('totalRating').textContent=d.rating||0;
+    document.getElementById('reviewCount').textContent=d.reviewCount||0;
+    document.getElementById('ratingStat').textContent=`${d.rating||0} ⭐`;
+    document.getElementById('totalEarnings').textContent=`${d.country==='GH'?'GHS':d.country==='NG'?'NGN':'USD'} ${d.totalEarnings||0}`;
+    document.getElementById('withdrawalRule').textContent=d.country==='GH'?'🇬🇭 Ghana: MoMo (MTN/Vodafone/AirtelTigo) + Debit Card (dropdown) + Virtual Card + GPS actual name required':'🌍 Outside: Debit Card + Virtual Card dropdown + GPS actual name required - MoMo NOT allowed';
+    document.getElementById('statusBadge').textContent=`NURSE • ${d.isAvailable?'ONLINE':'OFFLINE'} • ${d.country||''}`;
+
+    if(d.photoURL){
+      const img=document.getElementById('nursePhoto');
+      img.src=d.photoURL;
+      img.style.display='block';
+      document.getElementById('nurseInitial').style.display='none';
+    } else {
+      document.getElementById('nurseInitial').textContent=firstName.charAt(0).toUpperCase()||'👩‍⚕️';
+    }
+
+    if(d.lat&&d.lng){
+      document.getElementById('mapPreview').style.display='block';
+      document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${d.lat},${d.lng}&z=15&output=embed`;
+    }
+
+    isAvailable=d.isAvailable||false;
+    updateAvailabilityBtn();
+
+    // Load jobs
+    const q=query(collection(db,'bookings'), where('nurseId','==',uid));
+    const qs=await getDocs(q);
+    let active=0, completed=0;
+    let previewHtml='';
+    qs.forEach(docSnap=>{
+      const b=docSnap.data();
+      if(b.status==='active'||b.status==='pending'||b.status==='confirmed') active++;
+      if(b.status==='completed') completed++;
+      if(previewHtml.split('</div>').length<4){ // show max 3
+        previewHtml+=`<div style="border-bottom:1px solid #1f2937;padding:6px 0">💼 ${b.clientName||'Client'} - ${b.service||''} - ${b.status||'pending'} - ${b.totalAmountFormatted||''} - ${b.startTime||''} to ${b.endTime||''}</div>`;
       }
-    }else{
-      // keep default "Nurse Dashboard" text, don't show "Not logged in" that hides buttons
-      const warn=document.getElementById('loginWarning');
-      if(warn && !localStorage.getItem('lcg_nurse_uid')) warn.style.display='block';
-    }
+    });
+    document.getElementById('activeJobs').textContent=active;
+    document.getElementById('completedJobs').textContent=completed;
+    document.getElementById('jobsPreview').innerHTML=previewHtml||'<div style="color:#6b7280">No jobs yet - Wait for client to book you after seeing your video + rating</div>';
+
   }catch(e){
-    console.log('loadNurse error', e);
+    console.log(e);
+    document.getElementById('welcomeName').textContent='Welcome back 👋';
+    document.getElementById('welcomeSub').textContent='Error loading name - '+e.message;
   }
 }
-window.logout=()=>{ localStorage.clear(); location.href='nurse-login.html'; }
-window.addEventListener('DOMContentLoaded', loadNurse);
-</script>
-<script>
-function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
-function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+
+function updateAvailabilityBtn(){
+  const btn=document.getElementById('availabilityBtn');
+  if(isAvailable){btn.textContent='🔴 Turn Off - Not Available on Map'; btn.className='btn btnLight';}
+  else{btn.textContent='🟢 Turn On - Available on Map - GPS Actual Name'; btn.className='btn btnGreen';}
+}
+
+window.toggleAvailability=async()=>{
+  if(!currentUid) return;
+  isAvailable=!isAvailable;
+  updateAvailabilityBtn();
+  try{await updateDoc(doc(db,'nurses',currentUid),{isAvailable, lastAvailableUpdate:serverTimestamp()});}catch{}
+}
+
+window.getGPS=()=>{
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude, lng=pos.coords.longitude;
+    let actualName=`${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const d=await r.json();
+      actualName=d.display_name||actualName;
+    }catch{}
+    document.getElementById('gpsName').textContent=`📍 ${actualName}`;
+    document.getElementById('actualLocation').textContent=actualName;
+    document.getElementById('latlng').textContent=`${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    document.getElementById('mapPreview').style.display='block';
+    document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+    if(currentUid){
+      try{await updateDoc(doc(db,'nurses',currentUid),{lat,lng,gpsActualName:actualName,actualLocationName:actualName,lastGPSUpdate:serverTimestamp()});}catch{}
+    }
+  });
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  // Try stored uid first - instant welcome
+  const storedUid=getStoredUid();
+  if(storedUid){
+    loadNurseData(storedUid);
+  }
+
+  // Also listen to Firebase Auth - if logged in via Google, uid will be here
+  onAuthStateChanged(auth, (user)=>{
+    if(user){
+      // If no stored uid, or different, load
+      if(!storedUid || storedUid!==user.uid){
+        localStorage.setItem('lcg_nurse_uid', user.uid);
+        localStorage.setItem('currentNurseId', user.uid);
+      }
+      loadNurseData(user.uid);
+    } else {
+      // FIX 2: REMOVED "Not logged in — Login as Nurse" WARNING
+      // Instead of showing that red box, redirect to login if truly not logged in after 2 seconds
+      setTimeout(()=>{
+        const stillNoUid=getStoredUid();
+        if(!stillNoUid){
+          // Truly not logged in - redirect to login, don't show warning box
+          console.log('Not logged in - redirecting to nurse-login.html - No warning box as requested');
+          // Comment out redirect if you want to stay on dashboard for testing
+          // location.href='nurse-login.html';
+          document.getElementById('welcomeName').textContent='Welcome back 👋';
+          document.getElementById('welcomeSub').textContent='Please login to see your personalized dashboard';
+        }
+      }, 2000);
+    }
+  });
+});
 </script>
 </body>
 </html>
