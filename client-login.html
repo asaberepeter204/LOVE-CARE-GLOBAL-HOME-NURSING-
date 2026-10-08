@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:12px;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:300px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+.wrap{max-width:440px;margin:0 auto;padding:24px 14px 60px}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:22px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5)}
+.card h2{font-family:Plus Jakarta Sans,sans-serif;font-size:18px;font-weight:800;color:#f3e8ff;text-align:center;margin-bottom:18px}
+label{font-size:11px;font-weight:800;margin:14px 0 6px;display:block;color:#c4b5fd;letter-spacing:.05em}
+.inputWrap{position:relative}
+input,select{width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.7);color:#ede9fe;font-size:14px;font-weight:600;outline:none}
+select{padding-right:14px}
+input::placeholder{color:#6b5b8a}
+input:focus,select:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
+.eyeBtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.14);width:36px;height:36px;border-radius:10px;cursor:pointer;display:grid;place-items:center}
+.eyeBtn svg{stroke:#d8b4fe}
+.btn{padding:14px;border-radius:12px;font-weight:900;border:none;cursor:pointer;width:100%;margin-top:14px;display:flex;align-items:center;justify-content:center;font-size:14px;gap:8px}
+.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.3)}
+.btnGhost{background:rgba(255,255,255,.04);border:1px solid rgba(168,85,247,.18);color:#ede9fe}
+.gpsInput{background:rgba(76,29,149,.12)!important;color:#d8b4fe!important;font-size:12px}
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:#6b5b8a;font-size:11px;font-weight:700}
+.divider:before,.divider:after{content:"";flex:1;height:1px;background:rgba(168,85,247,.14)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox">
+<img src="icon-transparent-512.png" alt="Logo" class="logoImg">
+<div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div>
+</div>
+</div>
+<a href="sos.html" class="sosBtn">SOS</a>
+</div>
+
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:12px;background:#3b0f6e">
+<div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">Home</a>
+<a class="item" href="about.html">About</a>
+<a class="item" href="services.html">Services</a>
+<a class="item" href="how-it-works.html">How It Works</a>
+<a class="item" href="contact.html">Contact</a>
+<a class="item" href="client-registration.html">Client Registration</a>
+<a class="item" href="nurses-registration.html">Nurse Registration</a>
+<a class="item consent" href="consent-form.html">Consent Form</a>
+<a class="item" href="privacy.html">Privacy</a>
+<a class="item" href="terms.html">Terms</a>
+<a class="item" href="refund.html">Refund</a>
+<a class="item sos" href="sos.html">SOS</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+</div>
+
+<div class="wrap">
+<div class="card">
+<h2>Client Login</h2>
+
+<button class="btn btnGhost" onclick="loginWithGoogle()">
+<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+Continue with Google
+</button>
+
+<div class="divider">OR</div>
+
+<label>Country</label>
+<select id="country">
+<option value="">Select Country</option>
+<option value="GH">🇬🇭 Ghana</option>
+<option value="NG">🇳🇬 Nigeria</option>
+<option value="ZA">🇿🇦 South Africa</option>
+<option value="GB">🇬🇧 UK</option>
+<option value="US">🇺🇸 USA</option>
+<option value="AU">🇦🇺 Australia</option>
+<option value="AE">🇦🇪 UAE</option>
+<option value="CA">🇨🇦 Canada</option>
+<option value="OTHER">🌍 Other</option>
+</select>
+
+<label>Email</label>
+<input id="email" type="email" placeholder="Email">
+
+<label>Password</label>
+<div class="inputWrap">
+<input id="password" type="password" placeholder="Password">
+<button class="eyeBtn" type="button" onclick="toggleEye('password',this)">
+<svg id="eye-password-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+<svg id="eye-password-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53a3 3 0 1 0 4.24 4.24"/><path d="M1 1l22 22"/></svg>
+</button>
+</div>
+
+<input id="gpsName" readonly class="gpsInput" placeholder="Locating..." style="margin-top:12px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><input id="lat" readonly class="gpsInput" placeholder="Lat"><input id="lng" readonly class="gpsInput" placeholder="Lng"></div>
+<button class="btn btnGhost" type="button" onclick="getGPS()" style="margin-top:8px;padding:10px;font-size:12px">Refresh Location</button>
+<div id="mapPreview" style="display:none;margin-top:8px;border-radius:12px;overflow:hidden;border:1px solid rgba(168,85,247,.12)"><iframe id="mapFrame" style="width:100%;height:120px;border:0"></iframe></div>
+
+<button class="btn btnPrimary" onclick="loginEmail()">Continue</button>
+
+<div style="text-align:center;margin-top:16px;font-size:13px"><a href="client-registration.html" style="color:#d8b4fe;font-weight:800;text-decoration:none">Create account</a> • <a href="index.html" style="color:#a78bfa;text-decoration:none">Home</a></div>
+<div style="text-align:center;margin-top:8px"><a href="nurse-login.html" style="font-size:12px;color:#a78bfa;font-weight:700;text-decoration:none">Nurse Login</a></div>
+</div>
+</div>
+
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const provider=new GoogleAuthProvider();
+
+window.toggleEye=(id,btn)=>{
+  const input=document.getElementById(id);
+  const openIcon=document.getElementById(`eye-${id}-open`);
+  const closedIcon=document.getElementById(`eye-${id}-closed`);
+  if(input.type==='password'){
+    input.type='text';
+    if(openIcon)openIcon.style.display='none';
+    if(closedIcon)closedIcon.style.display='block';
+  }else{
+    input.type='password';
+    if(openIcon)openIcon.style.display='block';
+    if(closedIcon)closedIcon.style.display='none';
+  }
+}
+window.getGPS=()=>{
+  const nameEl=document.getElementById('gpsName');
+  nameEl.value='Locating...';
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude; const lng=pos.coords.longitude;
+    document.getElementById('lat').value=lat.toFixed(6); document.getElementById('lng').value=lng.toFixed(6);
+    document.getElementById('mapPreview').style.display='block';
+    document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+    try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`); const d=await r.json(); nameEl.value=d.display_name||`${lat},${lng}`;}catch{ nameEl.value=`${lat.toFixed(6)}, ${lng.toFixed(6)}`; }
+  },()=>{nameEl.value='Enable GPS';},{enableHighAccuracy:true, timeout:15000});
+}
+window.loginWithGoogle=async()=>{
+  const country=document.getElementById('country').value;
+  if(!country){alert('Select country'); return;}
+  try{
+    const result=await signInWithPopup(auth,provider);
+    const user=result.user;
+    const lat=document.getElementById('lat').value; const lng=document.getElementById('lng').value; const gpsName=document.getElementById('gpsName').value;
+    const expectedSnap=await getDoc(doc(db,'clients',user.uid));
+    const oppositeSnap=await getDoc(doc(db,'nurses',user.uid));
+    if(oppositeSnap.exists() && !expectedSnap.exists()){
+      await auth.signOut();
+      alert("⛔ This email is registered as NURSE. You cannot login as CLIENT. Please use Nurse Login or different email.");
+      return;
+    }
+    if(!expectedSnap.exists()){
+      await auth.signOut();
+      alert("❌ No CLIENT account found. Please register as Client first.");
+      window.location.href='client-registration.html';
+      return;
+    }
+    await updateDoc(doc(db,'clients',user.uid),{country, lat:lat?parseFloat(lat):null, lng:lng?parseFloat(lng):null, gpsActualName:gpsName, lastLoginAt:serverTimestamp()}).catch(()=>{});
+    localStorage.setItem('lcg_client_uid',user.uid);
+    setSession('client');
+    localStorage.setItem('currentClientId',user.uid);
+    localStorage.setItem('currentClientCountry',country);
+    localStorage.setItem('currentClientEmail',user.email||'');
+    location.href='client-dashboard.html';
+  }catch(e){alert('Google login failed: '+e.message);}
+}
+window.loginEmail=async()=>{
+  const country=document.getElementById('country').value;
+  const email=document.getElementById('email').value.trim();
+  const pass=document.getElementById('password').value;
+  const lat=document.getElementById('lat').value;
+  const lng=document.getElementById('lng').value;
+  const gpsName=document.getElementById('gpsName').value;
+  if(!country){alert('Select country'); return;}
+  if(!email||!pass){alert('Email & password required'); return;}
+  if(!lat){getGPS(); alert('Wait for location'); return;}
+  try{
+    const cred=await signInWithEmailAndPassword(auth,email,pass);
+    const uid=cred.user.uid;
+    const expectedSnap=await getDoc(doc(db,'clients',uid));
+    const oppositeSnap=await getDoc(doc(db,'nurses',uid));
+    if(!expectedSnap.exists() && oppositeSnap.exists()){
+      await auth.signOut();
+      alert("⛔ SECURITY BLOCK: This email is registered as NURSE, not CLIENT. Use Nurse Login.");
+      return;
+    }
+    if(!expectedSnap.exists() && !oppositeSnap.exists()){
+      await auth.signOut();
+      alert("❌ No CLIENT account found. Please register first.");
+      window.location.href='client-registration.html';
+      return;
+    }
+    const expectedData=expectedSnap.data();
+    if(expectedData.role && expectedData.role !== 'client'){
+      await auth.signOut();
+      alert("⛔ Role mismatch: Account is "+expectedData.role);
+      return;
+    }
+    await updateDoc(doc(db,'clients',uid),{country, lat:parseFloat(lat), lng:parseFloat(lng), gpsActualName:gpsName, lastLoginAt:serverTimestamp()}).catch(()=>{});
+    localStorage.setItem('lcg_client_uid',uid);
+    setSession('client');
+    localStorage.setItem('currentClientId',uid);
+    localStorage.setItem('currentClientCountry',country);
+    localStorage.setItem('currentClientEmail',email);
+    localStorage.setItem('clientProfile', JSON.stringify({uid, email, name: expectedData.fullName||expectedData.name||email, phone: expectedData.phone||'', country}));
+    location.href='client-dashboard.html';
+  }catch(e){
+    console.error(e);
+    if(e.code==='auth/wrong-password' || e.code==='auth/invalid-credential' || e.code==='auth/user-not-found'){
+      alert('Invalid email or password');
+    }else{
+      alert('Login failed: '+e.message);
+    }
+  }
+}
+window.addEventListener('DOMContentLoaded',()=>{getGPS();});
+</script>
+
+<script>function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}</script>
+</body>
+</html>
