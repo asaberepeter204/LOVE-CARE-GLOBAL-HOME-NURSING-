@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LOVE CARE GLOBAL HOME NURSING</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:12px;object-fit:contain;background:#3b0f6e;box-shadow:0 4px 18px rgba(76,29,149,.45);border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.brand small{display:block;font-size:9px;color:#a78bfa;letter-spacing:.12em;margin-top:2px;opacity:.85}
+.pill{font-size:10px;padding:5px 9px;border-radius:999px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.18);color:#d8b4fe;font-weight:800}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:1px solid rgba(239,68,68,.3);cursor:pointer;box-shadow:0 4px 14px rgba(239,68,68,.35);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 14px 50px}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;padding:28px 0 16px}
+@media(max-width:880px){.hero{grid-template-columns:1fr}}
+.h1{font-family:Plus Jakarta Sans,sans-serif;font-size:36px;line-height:.95;font-weight:800;color:#f5f0ff}
+.h1 span{background:linear-gradient(90deg,#d8b4fe,#a78bfa,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:#b4a0d0;font-size:13px;line-height:1.6;margin:10px 0 18px;max-width:460px}
+.btnGhost{background:rgba(76,29,149,.14);border:1px solid rgba(168,85,247,.14);color:#d8b4fe;padding:9px 12px;font-size:11px;border-radius:12px;cursor:pointer}
+.card{background:rgba(28,18,56,.72);border:1px solid rgba(168,85,247,.10);border-radius:16px;padding:14px;backdrop-filter:blur(12px)}
+.list{max-height:420px;overflow:auto;border:1px solid rgba(168,85,247,.10);border-radius:14px;background:rgba(14,10,28,.7)}
+.row{padding:10px 12px;border-bottom:1px solid rgba(168,85,247,.07);display:flex;gap:10px;align-items:center;justify-content:space-between}
+.avatar{width:38px;height:38px;border-radius:10px;background:#2e1065;border:1px solid rgba(168,85,247,.15);display:grid;place-items:center;font-weight:900;overflow:hidden;color:white}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+@media(max-width:880px){.grid3{grid-template-columns:1fr}}
+.feat{background:rgba(28,18,56,.6);border:1px solid rgba(168,85,247,.08);border-radius:14px;padding:12px}
+.feat b{font-size:12px;display:block;margin:6px 0 3px;color:#ede9fe}
+.feat p{font-size:11px;color:#a78bfa;line-height:1.5;opacity:.85}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:300px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.drawerHead{padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item:hover{background:rgba(76,29,149,.16)}
+.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+#roleModal{position:fixed;inset:0;z-index:100;display:flex;place-items:center;padding:14px;background:rgba(14,10,28,.78);backdrop-filter:blur(14px)}
+.modalBox{width:100%;max-width:440px;background:rgba(24,14,48,.98);border:1px solid rgba(168,85,247,.18);border-radius:20px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox">
+<img src="icon-transparent-512.png" alt="Logo" class="logoImg">
+<div class="brand">LOVE CARE GLOBAL<br>HOME NURSING<small>8 COUNTRIES • 24/7 CARE</small></div>
+</div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<span class="pill" id="fbStatus">● Live</span>
+<a href="sos.html" class="sosBtn">🚨 SOS</a>
+</div>
+</div>
+
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div class="drawerHead">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:12px;background:#3b0f6e;border:1px solid rgba(168,85,247,.2)">
+<div><b style="font-size:12px;letter-spacing:.06em;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b><div style="font-size:9px;color:#a78bfa;margin-top:3px">MENU LIST</div></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">🏠 Home</a>
+<a class="item" href="about.html">ℹ️ About Us</a>
+<a class="item" href="services.html">🩺 Our Services</a>
+<a class="item" href="how-it-works.html">⚙️ How It Works</a>
+<a class="item" href="contact.html">📞 Contact</a>
+<a class="item consent" href="consent-form.html">📝 Consent Form — Required</a>
+<div style="height:1px;background:rgba(168,85,247,.10);margin:4px 0"></div>
+<a class="item" href="privacy.html">🔒 Privacy Policy</a>
+<a class="item" href="terms.html">📜 Terms & Conditions</a>
+<a class="item" href="refund.html">💳 Refund Policy</a>
+<div style="height:1px;background:rgba(168,85,247,.10);margin:4px 0"></div>
+<a class="item sos" href="sos.html">🚨 SOS Emergency — sos.html</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close Menu</button></div>
+</div>
+
+<div class="wrap">
+<div class="hero">
+<div>
+<h1 class="h1">LOVE CARE GLOBAL<br><span>HOME NURSING</span></h1>
+<p class="sub">Licensed, verified nurses at your doorstep. Professional care, live tracking, secure payment.</p>
+<div style="display:flex;gap:8px;margin-top:12px"><button class="btnGhost" onclick="location.href='consent-form.html'">📝 Consent Form</button><button class="btnGhost" onclick="location.href='nurses-group-chat.html'">💬 Live Chat</button></div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:10px;color:#a78bfa;letter-spacing:.1em">VERIFIED NURSES — REAL</b><span class="pill" id="countPill">0</span></div>
+<div id="realList" class="list">Loading verified nurses from Firebase...</div>
+<div style="margin-top:10px"><button class="btnGhost" style="width:100%" onclick="loadReal()">🔄 Refresh List</button></div>
+</div>
+</div>
+
+<div class="grid3">
+<div class="feat"><div style="font-size:18px">🛡️</div><b>Verified Nurses</b><p>Every nurse is checked and approved before activation.</p></div>
+<div class="feat"><div style="font-size:18px">📍</div><b>Live Tracking</b><p>Track your assigned nurse in real time.</p></div>
+<div class="feat"><div style="font-size:18px">⚡</div><b>Fast Booking</b><p>Popup only — choose role, Register or Login.</p></div>
+</div>
+</div>
+
+<div id="roleModal">
+<div class="modalBox">
+<div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+<img src="icon-transparent-512.png" style="width:42px;height:42px;border-radius:10px;background:#3b0f6e;border:1px solid rgba(168,85,247,.2)">
+<div><h2 style="font-size:14px;color:#f3e8ff">Do you want to join as nurse or want to book a nurse?</h2><p style="font-size:10px;color:#a78bfa;margin-top:3px">Choose your role to continue</p></div>
+</div>
+<div id="s1" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+<div style="padding:14px;border-radius:12px;background:rgba(76,29,149,.12);border:1px solid rgba(168,85,247,.14);cursor:pointer" onclick="chooseRole('nurse')"><b style="font-size:13px;color:#ede9fe">👩‍⚕️ Join as Nurse</b><br><small style="color:#a78bfa">Earn with jobs</small></div>
+<div style="padding:14px;border-radius:12px;background:rgba(76,29,149,.12);border:1px solid rgba(168,85,247,.14);cursor:pointer" onclick="chooseRole('client')"><b style="font-size:13px;color:#ede9fe">📍 Book a Nurse</b><br><small style="color:#a78bfa">Need care at home</small></div>
+</div>
+<div id="s2" style="display:none;margin-top:14px">
+<div style="display:grid;gap:8px">
+<button style="padding:12px;border-radius:12px;background:#f5f0ff;color:#1e0a3a;font-weight:800;border:none;cursor:pointer" onclick="goFirst()">Register</button>
+<button style="padding:12px;border-radius:12px;background:rgba(76,29,149,.22);border:1px solid rgba(168,85,247,.18);color:#ede9fe;font-weight:800;cursor:pointer" onclick="goLogin()">Login</button>
+<button style="background:transparent;color:#7c3aed;border:none;font-size:12px;cursor:pointer" onclick="back()">⬅ Back</button>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",
+  authDomain: "web-care-618e8.firebaseapp.com",
+  databaseURL: "https://web-care-618e8-default-rtdb.firebaseio.com",
+  projectId: "web-care-618e8",
+  storageBucket: "web-care-618e8.firebasestorage.app",
+  messagingSenderId: "1062578660694",
+  appId: "1:1062578660694:web:f94dfe12c929df05bce2f7"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+let sel=null;
+function chooseRole(r){ sel=r; document.getElementById('s1').style.display='none'; document.getElementById('s2').style.display='block'; }
+function goFirst(){ location.href= sel==='nurse'?'nurses-registration.html':'client-registration.html'; }
+function goLogin(){ location.href= sel==='nurse'?'nurses-dashboard.html':'client-dashboard.html'; }
+function back(){ document.getElementById('s1').style.display='grid'; document.getElementById('s2').style.display='none'; }
+async function fetchPath(p){ try{ const s=await db.ref(p).once('value'); const a=[]; s.forEach(c=>{ const v=c.val(); if((v.status||'').toLowerCase()==='approved'&&!v.blocked) a.push({id:c.key,name:v.name||v.fullName||c.key,phone:v.phone||'',photo:v.photo||v.photoURL||'',spec:v.specialty||'General Nursing'}); }); return a; }catch{return []} }
+async function loadReal(){
+ const el=document.getElementById('realList'); el.innerHTML='<div style="padding:14px;color:#a78bfa">Loading verified nurses...</div>';
+ const src=await Promise.all([fetchPath('nurseApplications'),fetchPath('nurses'),fetchPath('verifiedNurses')]);
+ let real=[...new Map(src.flat().map(n=>[n.id,n])).values()];
+ document.getElementById('countPill').textContent=real.length;
+ document.getElementById('fbStatus').textContent='● '+real.length+' verified';
+ if(real.length===0){ el.innerHTML='<div style="padding:16px;text-align:center;color:#a78bfa">No verified nurses yet</div>'; return; }
+ el.innerHTML=real.map(n=>`<div class="row"><div style="display:flex;gap:10px;align-items:center"><div class="avatar">${n.photo?`<img src="${n.photo}">`:n.name.charAt(0)}</div><div><b style="font-size:13px;color:#f3e8ff">${n.name}</b><br><small style="color:#a78bfa">${n.phone} • ${n.spec}</small></div></div><span class="pill" style="background:rgba(168,85,247,.18);color:#d8b4fe">Verified</span></div>`).join('');
+}
+document.addEventListener('DOMContentLoaded', ()=>{ loadReal(); db.ref('nurseApplications').on('value', loadReal); });
+</script>
+</body>
+</html>
