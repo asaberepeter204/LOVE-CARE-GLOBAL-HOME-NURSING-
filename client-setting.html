@@ -15,11 +15,11 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 .bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
 .left{display:flex;align-items:center;gap:12px}
-.hamburger{width:42px;height:42px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
 .hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
 .hamburger span+span{margin-top:4px}
 .logoBox{display:flex;align-items:center;gap:10px}
-.logoImg{width:42px;height:42px;border-radius:12px;object-fit:contain;background:#3b0f6e;box-shadow:0 4px 18px rgba(76,29,149,.45);border:1px solid rgba(168,85,247,.18)}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;box-shadow:0 4px 18px rgba(76,29,149,.45);border:1px solid rgba(168,85,247,.18)}
 .brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
 .brand small{display:block;font-size:9px;color:#a78bfa;letter-spacing:.12em;margin-top:2px}
 .pill{font-size:10px;padding:5px 9px;border-radius:999px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.18);color:#d8b4fe;font-weight:800}
@@ -47,7 +47,7 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:700px){.grid2{grid-template-columns:1fr}}
 .photoBox{display:flex;gap:16px;align-items:center}
-.photoPreview{width:84px;height:84px;border-radius:18px;background:#2e1065;border:2px solid rgba(168,85,247,.18);overflow:hidden;display:grid;place-items:center;font-weight:900;font-size:28px;color:white;flex-shrink:0}
+.photoPreview{width:84px;height:84px;border-radius:50%;background:#2e1065;border:2px solid rgba(168,85,247,.18);overflow:hidden;display:grid;place-items:center;font-weight:900;font-size:28px;color:white;flex-shrink:0}
 .photoPreview img{width:100%;height:100%;object-fit:cover}
 .danger{border:1px solid rgba(239,68,68,.28);background:linear-gradient(180deg,rgba(239,68,68,.10),rgba(14,10,28,.7));border-radius:18px;padding:18px}
 .checkRow{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:12px;color:#c4b5fd}
@@ -71,7 +71,7 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 <div id="overlay" onclick="closeD()"></div>
 <div id="drawer">
 <div class="drawerHead">
-<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:12px;background:#3b0f6e;border:1px solid rgba(168,85,247,.2)">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e;border:1px solid rgba(168,85,247,.2)">
 <div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b><div style="font-size:9px;color:#a78bfa;margin-top:3px">MENU LIST</div></div>
 </div>
 <div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
@@ -92,7 +92,7 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 <div class="wrap">
 
 <div class="card">
-<h2>👤 Profile Photo</h2>
+<h2>Profile Photo</h2>
 <div class="photoBox">
 <div class="photoPreview" id="photoPreview">C</div>
 <div style="flex:1">
@@ -189,6 +189,27 @@ const storage = firebase.storage();
 
 function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
 function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+
+// INSTANT fill from localStorage to avoid loading...
+(function instantFill(){
+  try{
+    const local = JSON.parse(localStorage.getItem('clientProfile')||'{}');
+    const emailLS = localStorage.getItem('currentClientEmail')||local.email||'';
+    const phoneLS = localStorage.getItem('currentClientPhone')||local.phone||'';
+    const nameLS = localStorage.getItem('currentClientName')||local.name||local.fullName||'';
+    if(emailLS) document.getElementById('currentEmail').value=emailLS;
+    if(phoneLS) document.getElementById('currentPhone').value=phoneLS;
+    if(nameLS) document.getElementById('displayName').value=nameLS;
+    if(local.photo){
+      document.getElementById('photoPreview').innerHTML=`<img src="${local.photo}">`;
+    }
+    if(emailLS || phoneLS){
+      document.getElementById('userStatus').textContent='● '+ (emailLS||'Local session');
+    }
+  }catch(e){}
+})();
+
+
 function toast(m, ms=3500){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none', ms); }
 
 let currentUser=null;
@@ -198,8 +219,11 @@ auth.onAuthStateChanged(async (user)=>{
   if(!user){
     document.getElementById('userStatus').textContent='● Not logged in';
     document.getElementById('currentEmail').value='';
-    // try local fallback
-    const local = JSON.parse(localStorage.getItem('clientProfile')||'null');
+    // try local fallback (enhanced)
+    const local = JSON.parse(localStorage.getItem('clientProfile')||localStorage.getItem('clientProfile')||'{}');
+    const emailLS2 = localStorage.getItem('currentClientEmail')||localStorage.getItem('clientEmail')||'';
+    const phoneLS2 = localStorage.getItem('currentClientPhone')||'';
+
     if(local){
       document.getElementById('currentEmail').value=local.email||'';
       document.getElementById('currentPhone').value=local.phone||'';
