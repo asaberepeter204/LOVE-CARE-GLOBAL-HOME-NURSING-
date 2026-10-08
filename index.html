@@ -2,36 +2,47 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LOVE CARE GLOBAL HOME NURSING - Home - 8 Countries - Heart Dashboards</title>
+<title>LOVE CARE GLOBAL HOME NURSING - 8 Countries - Heart</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#f6f7fb;color:#111827;line-height:1.5}
-.topbar{background:#111827;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
-.logo{width:44px;height:44px;border-radius:12px;background:#16a34a;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:20px}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:#0f0f0f;color:white;line-height:1.5;overflow-x:hidden}
+.topbar{background:#111827;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:200;border-bottom:1px solid #1f2937}
+.logoWrap{display:flex;gap:10px;align-items:center}
+.logoBox{width:42px;height:42px;border-radius:12px;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;overflow:hidden}
+.logoBox img{width:100%;height:100%;object-fit:cover}
+.menuBtn{width:40px;height:40px;border-radius:10px;background:#1f2937;border:1px solid #2a2a2a;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer}
+.menuBtn span{width:20px;height:2px;background:white;border-radius:2px;display:block;transition:.2s}
+.drawer{position:fixed;top:0;left:-100%;width:82%;max-width:320px;height:100vh;background:#111827;border-right:1px solid #2a2a2a;z-index:300;padding:16px;transition:left .3s ease;overflow-y:auto}
+.drawer.open{left:0}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:250;display:none}
+.overlay.show{display:block}
+.drawerItem{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:#1a1a1a;border:1px solid #2a2a2a;margin:6px 0;text-decoration:none;color:#d1d5db;font-weight:700;font-size:13px}
+.drawerItem:hover{background:#1f2937;border-color:#7c3aed}
 .btn{padding:10px 16px;border-radius:999px;font-weight:800;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:13px;text-decoration:none}
-.btnGreen{background:#16a34a;color:white}.btnDark{background:#111827;color:white}.btnLight{background:white;border:1px solid #e5e7eb;color:#111827}.btnPurple{background:#7c3aed;color:white}
-.hero{max-width:1100px;margin:0 auto;padding:32px 16px;display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:center}
-@media(max-width:800px){.hero{grid-template-columns:1fr}}
-.card{background:white;border-radius:20px;padding:18px;border:1px solid #e5e7eb;box-shadow:0 8px 24px rgba(0,0,0,.04);margin-bottom:14px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-@media(max-width:700px){.grid3,.grid2{grid-template-columns:1fr}}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
+.btnGreen{background:#16a34a;color:white}.btnPurple{background:#7c3aed;color:white}.btnLight{background:#1f2937;border:1px solid #2a2a2a;color:#d1d5db}
+.hero{max-width:1100px;margin:0 auto;padding:24px 16px}
+.card{background:#1a1a1a;border-radius:18px;padding:16px;border:1px solid #2a2a2a;margin-bottom:12px}
 </style>
 </head>
 <body>
+
 <div class="topbar">
-<div style="display:flex;gap:12px;align-items:center;color:white">
-<div class="logo">❤️</div>
-<div><div style="font-weight:900;font-size:16px">LOVE CARE GLOBAL HOME NURSING</div><div style="font-size:10px;color:#9ca3af">8 Countries • Heart Dashboards • GPS Actual Name • Cedis/Dollar</div></div>
+<div class="logoWrap">
+<!-- MENU BUTTON - DRAWER LIST - AS YOU REQUESTED -->
+<button class="menuBtn" onclick="toggleDrawer()" id="menuBtn">
+<span></span><span></span><span></span>
+</button>
+
+<!-- MY LOGO - AS YOU REQUESTED - LOVE CARE GLOBAL HOME NURSING LOGO -->
+<div class="logoBox">
+<!-- Replace src with your real logo file e.g., logo.png -->
+<img src="logo.png" alt="LOGO" onerror="this.style.display='none'; this.parentElement.textContent='❤️'; this.parentElement.style.fontSize='20px'">
 </div>
-<div style="display:flex;gap:8px">
-<a class="btn btnLight" href="client-login.html" style="padding:8px 14px">Client Login</a>
-<a class="btn btnPurple" href="nurse-login.html" style="padding:8px 14px">Nurse Login</a>
+
+<div>
+<div style="font-weight:900;font-size:14px;letter-spacing:.3px">LOVE CARE GLOBAL</div>
+<div style="font-weight:800;font-size:12px;color:#9ca3af;margin-top:-2px">HOME NURSING</div>
 </div>
 </div>
 
-<div class="hero">
-<div>
-<div class="badge" style="background:#dcfce7;color:#166534">✅ FIXED - No Chinese - Pure English - Professional</div>
-<h1 style="font-weight:900;font-size:36px;line-height:1.1;margin:12px 0">Professional Home Nursing Care Across 8 Countries — Heart Dashboards Where All Operations Are Found</h1>
-<p style="font-size:14px;color:#4b5563;margin:8px 0 16px">Book verified nurses near your GPS actual name. Client selects amount in Cedis OR Dollar, sets starting time and ending time per day, writes or
+<a href="client-login.html" style="background:#ef4444;color:white;padding:8px 14px;border-radius:999px;text-decoration:none;font-weight:900;font-size:12px">SOS</a>
+</
