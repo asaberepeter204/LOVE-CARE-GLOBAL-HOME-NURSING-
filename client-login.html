@@ -47,6 +47,45 @@ input:focus,select:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,2
 <body>
 <div class="bg"></div>
 
+<script>
+// --- 30 MIN SESSION AUTO-LOGIN ---
+(function(){
+  const SESSION_MS = 30*60*1000;
+  const expiry = localStorage.getItem('lcg_session_expiry');
+  const role = localStorage.getItem('lcg_role');
+  const logged = localStorage.getItem('lcg_logged_in');
+  if(logged==='true' && expiry && Date.now() < parseInt(expiry)){
+    const r = (role||'').toLowerCase();
+    if(r==='client'){ window.location.replace('client-dashboard.html'); return; }
+    if(r==='nurse'){ 
+      // support both filenames
+      window.location.replace('nurse-dashboard.html'); return; 
+    }
+  } else if(expiry && Date.now() >= parseInt(expiry)){
+    // expired - clear
+    localStorage.removeItem('lcg_logged_in');
+    localStorage.removeItem('lcg_session_expiry');
+  }
+})();
+function setSession(role){
+  const now = Date.now();
+  localStorage.setItem('lcg_login_time', now.toString());
+  localStorage.setItem('lcg_session_expiry', (now + 30*60*1000).toString());
+  localStorage.setItem('lcg_role', role);
+  localStorage.setItem('lcg_logged_in','true');
+  // clear opposite role data to avoid cross-dashboard
+  if(role==='nurse'){
+    localStorage.removeItem('lcg_client_uid');
+    localStorage.removeItem('currentClientId');
+    localStorage.removeItem('currentClientEmail');
+  } else {
+    localStorage.removeItem('lcg_nurse_uid');
+    localStorage.removeItem('currentNurseId');
+  }
+}
+</script>
+
+
 <div class="topbar">
 <div class="left">
 <button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
@@ -71,7 +110,6 @@ input:focus,select:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,2
 <a class="item" href="how-it-works.html">How It Works</a>
 <a class="item" href="contact.html">Contact</a>
 <a class="item" href="client-registration.html">Client Registration</a>
-<a class="item" href="nurses-registration.html">Nurse Registration</a>
 <a class="item consent" href="consent-form.html">Consent Form</a>
 <a class="item" href="privacy.html">Privacy</a>
 <a class="item" href="terms.html">Terms</a>
@@ -178,7 +216,7 @@ window.loginWithGoogle=async()=>{
     }else{
       await updateDoc(doc(db,'clients',user.uid),{country, lat:lat?parseFloat(lat):null, lng:lng?parseFloat(lng):null, gpsActualName:gpsName, lastLoginAt:serverTimestamp()});
     }
-    localStorage.setItem('lcg_client_uid',user.uid); localStorage.setItem('lcg_role','client'); localStorage.setItem('lcg_logged_in','true'); localStorage.setItem('currentClientId',user.uid); localStorage.setItem('currentClientCountry',country);
+    localStorage.setItem('lcg_client_uid',user.uid); setSession('client'); localStorage.setItem('currentClientId',user.uid); localStorage.setItem('currentClientCountry',country);
     location.href='client-dashboard.html';
   }catch(e){alert('Google login failed: '+e.message);}
 }
@@ -189,7 +227,7 @@ window.loginEmail=async()=>{
   try{
     const cred=await signInWithEmailAndPassword(auth,email,pass);
     await updateDoc(doc(db,'clients',cred.user.uid),{country, lat:parseFloat(lat), lng:parseFloat(lng), gpsActualName:gpsName, lastLoginAt:serverTimestamp()});
-    localStorage.setItem('lcg_client_uid',cred.user.uid); localStorage.setItem('lcg_role','client'); localStorage.setItem('lcg_logged_in','true'); localStorage.setItem('currentClientId',cred.user.uid); localStorage.setItem('currentClientCountry',country);
+    localStorage.setItem('lcg_client_uid',cred.user.uid); setSession('client'); localStorage.setItem('currentClientId',cred.user.uid); localStorage.setItem('currentClientCountry',country);
     location.href='client-dashboard.html';
   }catch(e){alert(e.message);}
 }
