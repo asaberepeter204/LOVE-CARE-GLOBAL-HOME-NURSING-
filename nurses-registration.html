@@ -204,7 +204,7 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 4p
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getFirestore, doc, setDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
 
 const firebaseConfig={
@@ -282,10 +282,11 @@ window.getGPS=()=>{
   },()=>{document.getElementById('gpsName').value='Enable GPS'; alert('Enable GPS');},{enableHighAccuracy:true});
 }
 
+
 window.register=async()=>{
   const country=document.getElementById('country').value;
   const fullName=document.getElementById('fullName').value.trim();
-  const email=document.getElementById('email').value.trim();
+  const email=document.getElementById('email').value.trim().toLowerCase();
   const phoneRaw=document.getElementById('phone').value.trim();
   const phoneCodeVal=document.getElementById('phoneCode').value;
   const customCode=document.getElementById('customCode')?.value.trim();
@@ -313,6 +314,25 @@ window.register=async()=>{
   if(!lat||!lng||!gpsName){alert('Use GPS'); getGPS(); return;}
   if(!photo){alert('Photo required');return;}
 
+  // === STRICT EMAIL ROLE CHECK - PREVENT CLIENT EMAIL REUSE ===
+  try{
+    const clientQuery = query(collection(db,'clients'), where('email','==', email));
+    const clientSnap = await getDocs(clientQuery);
+    if(!clientSnap.empty){
+      alert('⛔ SECURITY: This email is already registered as CLIENT.
+You cannot register as NURSE with same email.
+
+Use different email or login as Client.');
+      return;
+    }
+    const nurseQuery = query(collection(db,'nurses'), where('email','==', email));
+    const nurseSnap = await getDocs(nurseQuery);
+    if(!nurseSnap.empty){
+      alert('❌ Email already registered as NURSE. Please login at nurse-login.html');
+      return;
+    }
+  }catch(e){ console.log('role check error',e); }
+
   try{
     const cred=await createUserWithEmailAndPassword(auth,email,password);
     const uid=cred.user.uid;
@@ -324,7 +344,7 @@ window.register=async()=>{
     }catch(e){}
 
     const nurseData={
-      id:uid, fullName, email, phone, phoneCode:finalCode, phoneRaw, phoneFull:phone, country,
+      id:uid, uid:uid, fullName, email, phone, phoneCode:finalCode, phoneRaw, phoneFull:phone, country,
       countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
       lat:parseFloat(lat), lng:parseFloat(lng),
       gpsActualName: gpsName,
@@ -332,7 +352,7 @@ window.register=async()=>{
       gps: `${lat},${lng}`,
       experience:document.getElementById('experience').value,
       services: services.split(',').map(s=>s.trim()).filter(s=>s),
-      photoURL,
+      photoURL, photo:photoURL,
       momoNetwork:document.getElementById('momoNetwork').value||'',
       momoNumber:document.getElementById('momoNumber').value||'',
       debitCardType:document.getElementById('debitCardType').value||'',
@@ -345,18 +365,23 @@ window.register=async()=>{
       virtualExpiry:document.getElementById('virtualExpiry').value||'',
       virtualCVV:document.getElementById('virtualCVV').value||'',
       withdrawalMethod: country==='GH'? 'MOMO+DEBIT+VIRTUAL' : 'DEBIT+VIRTUAL',
+      role:'nurse',
       isApproved:false, rating:0, reviewCount:0, totalEarnings:0,
       createdAt:serverTimestamp(), timestamp:new Date().toISOString()
     };
 
     await setDoc(doc(db,'nurses',uid),nurseData);
     localStorage.setItem('lcg_nurse_uid',uid);
-    alert(`Registered!`);
+    localStorage.setItem('lcg_role','nurse');
+    localStorage.setItem('currentNurseEmail',email);
+    localStorage.setItem('nurseProfile', JSON.stringify({uid, name:fullName, email, phone, photo:photoURL, country}));
+    alert(`✅ Registered as Nurse! Awaiting CEO approval.`);
     location.href='nurse-login.html';
   }catch(e){
     alert('Failed: '+e.message);
   }
 }
+
 window.addEventListener('DOMContentLoaded',()=>{getGPS();});
 </script>
 <script>function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}</script>
