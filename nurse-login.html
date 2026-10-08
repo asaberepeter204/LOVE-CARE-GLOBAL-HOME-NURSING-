@@ -59,7 +59,7 @@ input:focus,select:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,2
     if(r==='client'){ window.location.replace('client-dashboard.html'); return; }
     if(r==='nurse'){ 
       // support both filenames
-      window.location.replace('nurse-dashboard.html'); return; 
+      window.location.replace('nurses-dashboard.html'); return; 
     }
   } else if(expiry && Date.now() >= parseInt(expiry)){
     // expired - clear
@@ -217,7 +217,7 @@ window.loginWithGoogle=async()=>{
       await updateDoc(doc(db,'nurses',user.uid),{country, lat:lat?parseFloat(lat):null, lng:lng?parseFloat(lng):null, gpsActualName:gpsName, lastLoginAt:serverTimestamp()});
     }
     localStorage.setItem('lcg_nurse_uid',user.uid); setSession('nurse'); localStorage.setItem('currentNurseId',user.uid); localStorage.setItem('currentNurseCountry',country);
-    location.href='nurse-dashboard.html';
+    location.href='nurses-dashboard.html';
   }catch(e){alert('Google login failed: '+e.message);}
 }
 window.loginEmail=async()=>{
@@ -228,7 +228,7 @@ window.loginEmail=async()=>{
     const cred=await signInWithEmailAndPassword(auth,email,pass);
     await updateDoc(doc(db,'nurses',cred.user.uid),{country, lat:parseFloat(lat), lng:parseFloat(lng), gpsActualName:gpsName, lastLoginAt:serverTimestamp()});
     localStorage.setItem('lcg_nurse_uid',cred.user.uid); setSession('nurse'); localStorage.setItem('currentNurseId',cred.user.uid); localStorage.setItem('currentNurseCountry',country);
-    location.href='nurse-dashboard.html';
+    location.href='nurses-dashboard.html';
   }catch(e){alert(e.message);}
 }
 window.addEventListener('DOMContentLoaded',()=>{getGPS();});
