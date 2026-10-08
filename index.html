@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LOVE CARE GLOBAL HOME NURSING</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(800px 500px at 10% 5%, rgba(76,29,149,.26) 0%, transparent 65%),radial-gradient(600px 400px at 90% 15%, rgba(168,85,247,.16) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #130f2a 50%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:12px;object-fit:contain;background:#3b0f6e;box-shadow:0 4px 18px rgba(76,29,149,.45);border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 14px rgba(239,68,68,.35)}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 14px 60px}
+.welcomeCard{position:relative;background:linear-gradient(135deg,rgba(28,18,56,.88),rgba(38,22,72,.82));border:1px solid rgba(168,85,247,.16);border-radius:28px;padding:28px 24px;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.hWelcome{font-family:Plus Jakarta Sans,sans-serif;font-size:32px;line-height:.95;font-weight:800;color:#f5f0ff;margin-bottom:10px}
+.hWelcome span{background:linear-gradient(90deg,#d8b4fe,#a78bfa,#f5f3ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pWelcome{color:#c4b5fd;font-size:13.5px;line-height:1.7;margin-bottom:16px}
+.pWelcome b{color:#ede9fe}
+.inlineRoles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+@media(max-width:600px){.inlineRoles{grid-template-columns:1fr}}
+.roleCard{border-radius:18px;padding:16px;background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.14);backdrop-filter:blur(8px)}
+.roleCard h3{font-size:14px;color:#f3e8ff;margin-bottom:4px}
+.roleCard p{font-size:11px;color:#a78bfa;margin-bottom:12px}
+.roleBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btnRole{padding:11px;border-radius:11px;font-weight:900;font-size:12px;border:none;cursor:pointer;display:grid;place-items:center;text-decoration:none}
+.btnReg{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}
+.btnLog{background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.16);color:#d8b4fe}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}
+@media(max-width:880px){.grid3{grid-template-columns:1fr}}
+.feat{background:rgba(28,18,56,.6);border:1px solid rgba(168,85,247,.08);border-radius:14px;padding:12px}
+.feat b{font-size:12px;display:block;margin:6px 0 3px;color:#ede9fe}
+.feat p{font-size:11px;color:#a78bfa;line-height:1.5;opacity:.85}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:300px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox">
+<img src="icon-transparent-512.png" alt="Logo" class="logoImg">
+<div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div>
+</div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<a href="sos.html" class="sosBtn">SOS</a>
+</div>
+</div>
+
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:12px;background:#3b0f6e;border:1px solid rgba(168,85,247,.2)">
+<div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">Home</a>
+<a class="item" href="about.html">About</a>
+<a class="item" href="services.html">Services</a>
+<a class="item" href="how-it-works.html">How It Works</a>
+<a class="item" href="contact.html">Contact</a>
+<a class="item consent" href="consent-form.html">Consent Form</a>
+<a class="item" href="privacy.html">Privacy</a>
+<a class="item" href="terms.html">Terms</a>
+<a class="item" href="refund.html">Refund</a>
+<a class="item sos" href="sos.html">SOS</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+</div>
+
+<div class="wrap">
+
+<div class="welcomeCard">
+<h1 class="hWelcome">Welcome to<br><span>LOVE CARE GLOBAL<br>HOME NURSING</span></h1>
+<p class="pWelcome">
+<b>Your health, our heart.</b><br>
+We bring licensed nurses right to your doorstep — compassionate, professional care in 8 countries, 24/7.
+</p>
+
+<div class="inlineRoles">
+<div class="roleCard">
+<h3>Join as Nurse</h3>
+<p>Earn with jobs</p>
+<div class="roleBtns">
+<a class="btnRole btnReg" href="nurses-registration.html">Register</a>
+<a class="btnRole btnLog" href="nurse-login.html">Login</a>
+</div>
+</div>
+<div class="roleCard">
+<h3>Book a Nurse</h3>
+<p>Need care at home</p>
+<div class="roleBtns">
+<a class="btnRole btnReg" href="client-registration.html">Register</a>
+<a class="btnRole btnLog" href="client-login.html">Login</a>
+</div>
+</div>
+</div>
+
+</div>
+
+<div class="grid3">
+<div class="feat"><div style="font-size:18px">📍</div><b>Live Tracking</b><p>Track your nurse in real time.</p></div>
+<div class="feat"><div style="font-size:18px">⚡</div><b>Fast Booking</b><p>Register or Login inline — no popup.</p></div>
+<div class="feat"><div style="font-size:18px">💜</div><b>Trusted Care</b><p>Compassionate care in 8 countries, 24/7.</p></div>
+</div>
+
+</div>
+
+<script>
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
+</body>
+</html>
