@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Registration</title>
+<title>Nurses Dashboard — LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
@@ -11,37 +11,29 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 .bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
 .left{display:flex;align-items:center;gap:12px}
-.hamburger{width:42px;height:42px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
 .hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
 .hamburger span+span{margin-top:4px}
 .logoBox{display:flex;align-items:center;gap:10px}
-.logoImg{width:42px;height:42px;border-radius:12px;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
 .brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
 .sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
 #overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
 #overlay.show{display:block}
-#drawer{position:fixed;left:0;top:0;bottom:0;width:300px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
 #drawer.open{transform:translateX(0)}
 .item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.nurse{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}
 .item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
 .item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
-.wrap{max-width:560px;margin:0 auto;padding:20px 14px 60px}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:22px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5)}
-.card h2{font-family:Plus Jakarta Sans,sans-serif;font-size:18px;font-weight:800;color:#f3e8ff;text-align:center;margin-bottom:18px}
-label{font-size:11px;font-weight:800;margin:14px 0 6px;display:block;color:#c4b5fd;letter-spacing:.05em}
-.inputWrap{position:relative}
-input,select,textarea{width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.7);color:#ede9fe;font-size:14px;font-weight:600;outline:none}
-textarea{padding-right:14px;resize:none;min-height:70px}
-select{padding-right:14px}
-input::placeholder,textarea::placeholder{color:#6b5b8a}
-input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
-.eyeBtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.14);width:36px;height:36px;border-radius:10px;cursor:pointer;display:grid;place-items:center}
-.eyeBtn svg{stroke:#d8b4fe}
-.btn{padding:14px;border-radius:12px;font-weight:900;border:none;cursor:pointer;width:100%;margin-top:14px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.3)}
-.btnLight{background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
-.gpsInput{background:rgba(76,29,149,.12)!important;color:#d8b4fe!important}
-.fileInput{padding:10px 14px}
+.wrap{max-width:480px;margin:0 auto;padding:24px 14px 80px;display:block!important;visibility:visible!important;opacity:1!important}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:20px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:16px;display:block!important}
+.btnBig{width:100%;padding:18px;border-radius:16px;border:1px solid rgba(168,85,247,.18);background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.18));color:#f3e8ff;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;transition:.2s;margin-bottom:12px;text-decoration:none}
+.btnBig:hover{transform:translateY(-2px);border-color:#a855f7;box-shadow:0 10px 30px rgba(168,85,247,.25)}
+.btnBig .icon{width:48px;height:48px;border-radius:50%;background:rgba(168,85,247,.22);display:grid;place-items:center;font-size:22px;border:1px solid rgba(168,85,247,.18);flex-shrink:0}
+.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;box-shadow:0 8px 20px rgba(168,85,247,.3)}
+.btnPrimary small{color:#1e0a3a!important;opacity:.85}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.22);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
 </style>
 </head>
 <body>
@@ -50,10 +42,7 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 4p
 <div class="topbar">
 <div class="left">
 <button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
-<div class="logoBox">
-<img src="icon-transparent-512.png" alt="Logo" class="logoImg">
-<div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div>
-</div>
+<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
 </div>
 <a href="sos.html" class="sosBtn">SOS</a>
 </div>
@@ -61,329 +50,143 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 4p
 <div id="overlay" onclick="closeD()"></div>
 <div id="drawer">
 <div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
-<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:12px;background:#3b0f6e">
-<div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
 </div>
 <div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
-<a class="item" href="index.html">Home</a>
+<a class="item nurse" href="index.html">Home</a>
+<a class="item nurse" href="nurses-dashboard.html" style="background:rgba(168,85,247,.22)">Dashboard</a>
+<a class="item nurse" href="my-job-offer.html">My Job Offers</a>
+<a class="item nurse" href="nurse-group-chat.html">Nurse Group Chat</a>
+<a class="item nurse" href="nurse-settings.html">Nurse Settings</a>
 <a class="item" href="about.html">About</a>
 <a class="item" href="services.html">Services</a>
-<a class="item" href="how-it-works.html">How It Works</a>
 <a class="item" href="contact.html">Contact</a>
-<a class="item" href="client-registration.html">Client Registration</a>
-<a class="item" href="nurses-registration.html">Nurse Registration</a>
 <a class="item consent" href="consent-form.html">Consent Form</a>
-<a class="item" href="privacy.html">Privacy</a>
-<a class="item" href="terms.html">Terms</a>
-<a class="item" href="refund.html">Refund</a>
 <a class="item sos" href="sos.html">SOS</a>
 </div>
 <div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
 </div>
 
 <div class="wrap">
+<div class="card" style="display:flex;gap:14px;align-items:center">
+<img id="nursePhoto" src="icon-transparent-512.png" style="width:64px;height:64px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:1px solid rgba(168,85,247,.18);">
+<div style="flex:1"><div id="nurseName" style="font-weight:900;font-size:15px;color:#f3e8ff">Nurse Dashboard</div><div id="nurseEmail" style="font-size:12px;color:#a78bfa">Welcome back</div><div id="nursePhone" style="font-size:11px;color:#6b5b8a;margin-top:2px"></div><span class="badge" id="nurseStatus">NURSE • ONLINE</span></div>
+</div>
+
 <div class="card">
-<h2>Nurse Registration</h2>
+<h2 style="font-family:Plus Jakarta Sans,sans-serif;font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:14px">Nurses Dashboard</h2>
+<div id="loginWarning" style="display:none;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25);padding:10px;border-radius:12px;font-size:12px;color:#fca5a5;margin-bottom:12px">⚠️ Not logged in — <a href="nurse-login.html" style="color:#fca5a5;font-weight:800">Login as Nurse</a> to see your jobs</div>
 
-<label>Country</label>
-<select id="country" onchange="updateWithdrawal()">
-<option value="">Select Country</option>
-<option value="GH">🇬🇭 Ghana</option>
-<option value="NG">🇳🇬 Nigeria</option>
-<option value="ZA">🇿🇦 South Africa</option>
-<option value="GB">🇬🇧 UK</option>
-<option value="US">🇺🇸 USA</option>
-<option value="AU">🇦🇺 Australia</option>
-<option value="AE">🇦🇪 UAE</option>
-<option value="CA">🇨🇦 Canada</option>
-<option value="OTHER">🌍 Other</option>
-</select>
+<a class="btnBig btnPrimary" href="my-job-offer.html">
+<span class="icon">💼</span>
+<span><b>My Job Offer</b><br><small>View & accept paid bookings assigned to you</small></span>
+</a>
 
-<label>Full Name</label>
-<input id="fullName" placeholder="Full name">
+<a class="btnBig" href="nurse-group-chat.html">
+<span class="icon">💬</span>
+<span><b>Nurse Group Chat</b><br><small style="font-weight:600;color:#a78bfa">Chat with CEO & other nurses</small></span>
+</a>
 
-<label>Email</label>
-<input id="email" type="email" placeholder="Email">
+<a class="btnBig" href="nurse-settings.html">
+<span class="icon">⚙️</span>
+<span><b>Nurse Settings</b><br><small style="font-weight:600;color:#a78bfa">Profile, location & availability</small></span>
+</a>
 
-<label>Phone</label>
-<div style="display:grid;grid-template-columns:130px 1fr;gap:8px">
-<select id="phoneCode" onchange="handlePhoneCode()">
-<option value="+233">🇬🇭 +233</option>
-<option value="+234">🇳🇬 +234</option>
-<option value="+27">🇿🇦 +27</option>
-<option value="+44">🇬🇧 +44</option>
-<option value="+1">🇺🇸 +1</option>
-<option value="+61">🇦🇺 +61</option>
-<option value="+971">🇦🇪 +971</option>
-<option value="+1-CA">🇨🇦 +1</option>
-<option value="OTHER">🌍 Other</option>
-</select>
-<input id="phone" placeholder="Phone number" inputmode="numeric">
-</div>
-<div id="customCodeWrap" style="display:none;margin-top:8px">
-<input id="customCode" placeholder="Country code e.g. +33">
-</div>
-
-<label>Password</label>
-<div class="inputWrap">
-<input id="password" type="password" placeholder="Password">
-<button class="eyeBtn" type="button" onclick="toggleEye('password',this)">
-<svg id="eye-password-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-<svg id="eye-password-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53a3 3 0 1 0 4.24 4.24"/><path d="M1 1l22 22"/></svg>
-</button>
-</div>
-
-<label>Confirm Password</label>
-<div class="inputWrap">
-<input id="confirmPassword" type="password" placeholder="Confirm password">
-<button class="eyeBtn" type="button" onclick="toggleEye('confirmPassword',this)">
-<svg id="eye-confirmPassword-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-<svg id="eye-confirmPassword-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53a3 3 0 1 0 4.24 4.24"/><path d="M1 1l22 22"/></svg>
-</button>
-</div>
-
-<label>Experience</label>
-<select id="experience"><option value="">Select</option><option>1-2 years</option><option>3-5 years</option><option>5+ years</option><option>10+ years</option></select>
-
-<label>Services</label>
-<input id="services" placeholder="Elderly Care, Baby Care...">
-
-<label>Actual Location</label>
-<input id="gpsName" readonly class="gpsInput" placeholder="Locating...">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><input id="lat" readonly class="gpsInput" placeholder="Lat"><input id="lng" readonly class="gpsInput" placeholder="Lng"></div>
-<button class="btn btnLight" type="button" onclick="getGPS()">Refresh Location</button>
-<div id="mapPreview" style="display:none;margin-top:10px"><iframe id="mapFrame" style="width:100%;height:160px;border:none;border-radius:12px;border:1px solid rgba(168,85,247,.12)"></iframe></div>
-
-<label>Home Address</label>
-<input id="address" placeholder="Address">
-
-<label>Profile Photo</label>
-<input id="photo" type="file" accept="image/*" class="fileInput">
-
-<label>Video Intro</label>
-<input id="video" type="file" accept="video/*" class="fileInput">
-
-<label>CV</label>
-<input id="cv" type="file" accept=".pdf,.doc,.docx" class="fileInput">
-
-<label>Licence</label>
-<input id="licence" type="file" accept="image/*,.pdf" class="fileInput">
-
-<label>Certificate</label>
-<input id="certificate" type="file" accept="image/*,.pdf" class="fileInput">
-
-<div id="withdrawalBox" style="margin-top:16px;border:1px solid rgba(168,85,247,.14);border-radius:16px;padding:12px;background:rgba(14,10,28,.4)">
-<label style="margin-top:0">Withdrawal</label>
-
-<div id="momoFields" style="display:none">
-<label>MoMo Network</label><select id="momoNetwork"><option value="">Select Network</option><option value="MTN">MTN MoMo</option><option value="VODAFONE">Vodafone Cash</option><option value="AIRTELTIGO">AirtelTigo Money</option></select>
-<label>MoMo Number</label><input id="momoNumber" placeholder="MoMo number">
-</div>
-
-<label>Debit Card Type</label><select id="debitCardType" onchange="updateCardFields()"><option value="">Select Debit Card</option><option value="VISA">VISA</option><option value="MASTERCARD">MASTERCARD</option><option value="VISA_ELECTRON">VISA Electron</option></select>
-<div id="debitFields" style="display:none">
-<label>Card Number</label><div class="inputWrap"><input id="debitNumber" type="password" placeholder="Card number"><button class="eyeBtn" type="button" onclick="toggleEye('debitNumber',this)"><svg id="eye-debitNumber-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg id="eye-debitNumber-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53a3 3 0 1 0 4.24 4.24"/><path d="M1 1l22 22"/></svg></button></div>
-<label>Expiry</label><input id="debitExpiry" placeholder="MM/YY">
-<label>CVV</label><div class="inputWrap"><input id="debitCVV" type="password" placeholder="CVV"><button class="eyeBtn" type="button" onclick="toggleEye('debitCVV',this)"><svg id="eye-debitCVV-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg id="eye-debitCVV-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53a3 3 0 1 0 4.24 4.24"/><path d="M1 1l22 22"/></svg></button></div>
-<label>Name on Card</label><input id="debitName" placeholder="Name on card">
-</div>
-
-<label>Virtual Card Type</label><select id="virtualCardType" onchange="updateVirtualFields()"><option value="">Select Virtual Card</option><option value="VISA">VISA Virtual</option><option value="MASTERCARD">MASTERCARD Virtual</option></select>
-<div id="virtualFields" style="display:none">
-<label>Virtual Number</label><div class="inputWrap"><input id="virtualNumber" type="password" placeholder="Virtual number"><button class="eyeBtn" type="button" onclick="toggleEye('virtualNumber',this)"><svg id="eye-virtualNumber-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg id="eye-virtualNumber-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53a3 3 0 1 0 4.24 4.24"/><path d="M1 1l22 22"/></svg></button></div>
-<label>Expiry</label><input id="virtualExpiry" placeholder="MM/YY">
-<label>CVV</label><div class="inputWrap"><input id="virtualCVV" type="password" placeholder="CVV"><button class="eyeBtn" type="button" onclick="toggleEye('virtualCVV',this)"><svg id="eye-virtualCVV-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg id="eye-virtualCVV-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53a3 3 0 1 0 4.24 4.24"/><path d="M1 1l22 22"/></svg></button></div>
+<div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<a class="btnBig" style="justify-content:center" href="index.html">🏠 Home</a>
+<button class="btnBig" style="justify-content:center" onclick="logout()">Logout</button>
 </div>
 </div>
 
-<button class="btn btnPrimary" onclick="register()">Register</button>
-<div style="text-align:center;margin-top:16px;font-size:13px"><a href="nurse-login.html" style="color:#d8b4fe;font-weight:800;text-decoration:none">Already have account? Login</a><br><a href="index.html" style="font-size:12px;color:#a78bfa;text-decoration:none;margin-top:8px;display:inline-block">Home</a></div>
+<div class="card" style="font-size:11px;color:#a78bfa">
+<b style="color:#f3e8ff">Debug:</b> <span id="debugInfo"></span><br>
+<button onclick="localStorage.clear(); location.href='nurse-login.html'" style="margin-top:8px;padding:6px 10px;border-radius:8px;background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-size:11px;cursor:pointer">Clear Cache & Re-login</button>
 </div>
 </div>
+
+<script>
+// SOFT GUARD - show page even if not logged, but warn
+(function(){
+  try{
+    const expiry = localStorage.getItem('lcg_session_expiry');
+    const logged = localStorage.getItem('lcg_logged_in');
+    const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
+    const debug = document.getElementById('debugInfo');
+    if(debug) debug.textContent = `logged=${logged} role=${role} expiry=${expiry ? new Date(parseInt(expiry)).toLocaleTimeString() : 'none'} uid=${localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId')||'none'}`;
+    
+    if(!logged || logged!=='true'){
+      const warn = document.getElementById('loginWarning');
+      if(warn) warn.style.display='block';
+      // Don't redirect immediately, let user see buttons
+      // Only redirect if they click My Job Offer without login - handled by link
+      return;
+    }
+    if(expiry && Date.now() > parseInt(expiry)){
+      localStorage.clear();
+      window.location.replace('nurse-login.html');
+      return;
+    }
+    if(role && role!=='nurse' && role==='client'){
+      // client trying to open nurse dashboard
+      window.location.replace('client-dashboard.html');
+      return;
+    }
+    const SESSION_MS = 30*60*1000;
+    function refresh(){ localStorage.setItem('lcg_session_expiry', (Date.now()+SESSION_MS).toString()); }
+    ['click','keydown','touchstart'].forEach(ev=>document.addEventListener(ev, refresh, {passive:true}));
+  }catch(e){
+    console.log('guard error', e);
+  }
+})();
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-import { getFirestore, doc, setDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
-
-const firebaseConfig={
-  apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",
-  authDomain:"web-care-618e8.firebaseapp.com",
-  databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",
-  projectId:"web-care-618e8",
-  storageBucket:"web-care-618e8.firebasestorage.app",
-  messagingSenderId:"1062578660694",
-  appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"
-};
-
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
 const db=getFirestore(app);
-const storage=getStorage(app);
-
-window.toggleEye=(id,btn)=>{
-  const input=document.getElementById(id);
-  const openIcon=document.getElementById(`eye-${id}-open`);
-  const closedIcon=document.getElementById(`eye-${id}-closed`);
-  if(input.type==='password'){
-    input.type='text';
-    if(openIcon)openIcon.style.display='none';
-    if(closedIcon)closedIcon.style.display='block';
-  }else{
-    input.type='password';
-    if(openIcon)openIcon.style.display='block';
-    if(closedIcon)closedIcon.style.display='none';
-  }
-}
-
-window.updateWithdrawal=()=>{
-  const c=document.getElementById('country').value;
-  const momo=document.getElementById('momoFields');
-  if(c==='GH'){momo.style.display='block';}
-  else{ momo.style.display='none';}
-}
-window.updateCardFields=()=>{document.getElementById('debitFields').style.display=document.getElementById('debitCardType').value? 'block':'none';}
-window.updateVirtualFields=()=>{document.getElementById('virtualFields').style.display=document.getElementById('virtualCardType').value? 'block':'none';}
-
-window.handlePhoneCode=()=>{
-  const sel=document.getElementById('phoneCode').value;
-  document.getElementById('customCodeWrap').style.display = sel==='OTHER' ? 'block' : 'none';
-};
-window.syncPhoneCodeWithCountry=()=>{
-  const country=document.getElementById('country').value;
-  const phoneCode=document.getElementById('phoneCode');
-  const map={GH:'+233',NG:'+234',ZA:'+27',GB:'+44',US:'+1',AU:'+61',AE:'+971',CA:'+1-CA'};
-  if(map[country]){ phoneCode.value=map[country]; handlePhoneCode(); }
-  if(country==='OTHER'){ phoneCode.value='OTHER'; handlePhoneCode(); }
-};
-document.getElementById('country')?.addEventListener('change', syncPhoneCodeWithCountry);
-
-window.getGPS=()=>{
-  const nameField=document.getElementById('gpsName');
-  nameField.value='Locating...';
-  if(!navigator.geolocation){nameField.value='GPS not supported';return;}
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const lat=pos.coords.latitude; const lng=pos.coords.longitude;
-    document.getElementById('lat').value=lat.toFixed(6);
-    document.getElementById('lng').value=lng.toFixed(6);
-    document.getElementById('mapPreview').style.display='block';
-    document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-    try{
-      const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-      const data=await res.json();
-      const actualName=data.display_name||`${lat},${lng}`;
-      document.getElementById('gpsName').value=actualName;
-      document.getElementById('address').value=actualName;
-    }catch(e){
-      document.getElementById('gpsName').value=`${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-      document.getElementById('address').value=`${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-    }
-  },()=>{document.getElementById('gpsName').value='Enable GPS'; alert('Enable GPS');},{enableHighAccuracy:true});
-}
-
-
-window.register=async()=>{
-  const country=document.getElementById('country').value;
-  const fullName=document.getElementById('fullName').value.trim();
-  const email=document.getElementById('email').value.trim().toLowerCase();
-  const phoneRaw=document.getElementById('phone').value.trim();
-  const phoneCodeVal=document.getElementById('phoneCode').value;
-  const customCode=document.getElementById('customCode')?.value.trim();
-  let finalCode=phoneCodeVal;
-  if(phoneCodeVal==='OTHER'){
-    if(!customCode){ alert('Enter country code'); return; }
-    finalCode=customCode;
-  }
-  if(finalCode==='+1-CA') finalCode='+1';
-  const phone=finalCode+' '+phoneRaw;
-  if(!phoneRaw){ alert('Enter phone'); return; }
-  const password=document.getElementById('password').value;
-  const confirmPassword=document.getElementById('confirmPassword').value;
-  const lat=document.getElementById('lat').value;
-  const lng=document.getElementById('lng').value;
-  const gpsName=document.getElementById('gpsName').value;
-  const address=document.getElementById('address').value;
-  const services=document.getElementById('services').value;
-  const photo=document.getElementById('photo').files[0];
-
-  if(!country){alert('Select country');return;}
-  if(!fullName||!email){alert('Fill info');return;}
-  if(password.length<6){alert('Password min 6');return;}
-  if(password!==confirmPassword){alert('Passwords do not match');return;}
-  if(!lat||!lng||!gpsName){alert('Use GPS'); getGPS(); return;}
-  if(!photo){alert('Photo required');return;}
-
-  // === STRICT EMAIL ROLE CHECK - PREVENT CLIENT EMAIL REUSE ===
+async function loadNurse(){
   try{
-    const clientQuery = query(collection(db,'clients'), where('email','==', email));
-    const clientSnap = await getDocs(clientQuery);
-    if(!clientSnap.empty){
-      alert('⛔ SECURITY: This email is already registered as CLIENT.
-You cannot register as NURSE with same email.
-
-Use different email or login as Client.');
-      return;
+    const uid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId');
+    let nurse=null; 
+    let photoURL=localStorage.getItem('nursePhotoURL')||'';
+    try{const prof=JSON.parse(localStorage.getItem('nurseProfile')||'{}'); if(prof.photoURL) photoURL=prof.photoURL; if(prof.name||prof.email) nurse=prof;}catch(e){}
+    if(uid){
+      try{
+        const snap=await getDoc(doc(db,'nurses',uid)); 
+        if(snap.exists()){
+          nurse=snap.data(); 
+          if(nurse.photoURL||nurse.photo) photoURL=nurse.photoURL||nurse.photo;
+        }
+      }catch(e){console.log('firestore error', e)}
     }
-    const nurseQuery = query(collection(db,'nurses'), where('email','==', email));
-    const nurseSnap = await getDocs(nurseQuery);
-    if(!nurseSnap.empty){
-      alert('❌ Email already registered as NURSE. Please login at nurse-login.html');
-      return;
+    if(nurse){
+      const nameEl=document.getElementById('nurseName');
+      if(nameEl) nameEl.textContent=nurse.fullName||nurse.name||'Nurse';
+      const emailEl=document.getElementById('nurseEmail');
+      if(emailEl) emailEl.textContent=nurse.email||localStorage.getItem('currentNurseEmail')||'Nurse account';
+      const phoneEl=document.getElementById('nursePhone');
+      if(phoneEl) phoneEl.textContent=nurse.phone||nurse.phoneFull||localStorage.getItem('nursePhone')||'';
+      if(photoURL){
+        const img=document.getElementById('nursePhoto'); 
+        if(img){ img.src=photoURL; }
+      }
+    }else{
+      // keep default "Nurse Dashboard" text, don't show "Not logged in" that hides buttons
+      const warn=document.getElementById('loginWarning');
+      if(warn && !localStorage.getItem('lcg_nurse_uid')) warn.style.display='block';
     }
-  }catch(e){ console.log('role check error',e); }
-
-  try{
-    const cred=await createUserWithEmailAndPassword(auth,email,password);
-    const uid=cred.user.uid;
-    let photoURL='';
-    try{
-      const photoRef=ref(storage,`nurses/${uid}/photo_${Date.now()}`);
-      await uploadBytes(photoRef,photo);
-      photoURL=await getDownloadURL(photoRef);
-    }catch(e){}
-
-    const nurseData={
-      id:uid, uid:uid, fullName, email, phone, phoneCode:finalCode, phoneRaw, phoneFull:phone, country,
-      countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
-      lat:parseFloat(lat), lng:parseFloat(lng),
-      gpsActualName: gpsName,
-      address: address||gpsName,
-      gps: `${lat},${lng}`,
-      experience:document.getElementById('experience').value,
-      services: services.split(',').map(s=>s.trim()).filter(s=>s),
-      photoURL, photo:photoURL,
-      momoNetwork:document.getElementById('momoNetwork').value||'',
-      momoNumber:document.getElementById('momoNumber').value||'',
-      debitCardType:document.getElementById('debitCardType').value||'',
-      debitNumber:document.getElementById('debitNumber').value||'',
-      debitExpiry:document.getElementById('debitExpiry').value||'',
-      debitCVV:document.getElementById('debitCVV').value||'',
-      debitName:document.getElementById('debitName').value||'',
-      virtualCardType:document.getElementById('virtualCardType').value||'',
-      virtualNumber:document.getElementById('virtualNumber').value||'',
-      virtualExpiry:document.getElementById('virtualExpiry').value||'',
-      virtualCVV:document.getElementById('virtualCVV').value||'',
-      withdrawalMethod: country==='GH'? 'MOMO+DEBIT+VIRTUAL' : 'DEBIT+VIRTUAL',
-      role:'nurse',
-      isApproved:false, rating:0, reviewCount:0, totalEarnings:0,
-      createdAt:serverTimestamp(), timestamp:new Date().toISOString()
-    };
-
-    await setDoc(doc(db,'nurses',uid),nurseData);
-    localStorage.setItem('lcg_nurse_uid',uid);
-    localStorage.setItem('lcg_role','nurse');
-    localStorage.setItem('currentNurseEmail',email);
-    localStorage.setItem('nurseProfile', JSON.stringify({uid, name:fullName, email, phone, photo:photoURL, country}));
-    alert(`✅ Registered as Nurse! Awaiting CEO approval.`);
-    location.href='nurse-login.html';
   }catch(e){
-    alert('Failed: '+e.message);
+    console.log('loadNurse error', e);
   }
 }
-
-window.addEventListener('DOMContentLoaded',()=>{getGPS();});
+window.logout=()=>{ localStorage.clear(); location.href='nurse-login.html'; }
+window.addEventListener('DOMContentLoaded', loadNurse);
 </script>
-<script>function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}</script>
+<script>
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
 </body>
 </html>
