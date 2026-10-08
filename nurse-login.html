@@ -47,6 +47,36 @@ input:focus,select:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,2
 <body>
 <div class="bg"></div>
 
+<script>
+// --- 30 MIN SESSION AUTO-LOGIN ---
+(function(){
+  const SESSION_MS = 30*60*1000;
+  const expiry = localStorage.getItem('lcg_session_expiry');
+  const role = localStorage.getItem('lcg_role');
+  const logged = localStorage.getItem('lcg_logged_in');
+  if(logged==='true' && expiry && Date.now() < parseInt(expiry)){
+    const r = (role||'').toLowerCase();
+    if(r==='client'){ window.location.replace('client-dashboard.html'); return; }
+    if(r==='nurse'){ 
+      // support both filenames
+      window.location.replace('nurse-dashboard.html'); return; 
+    }
+  } else if(expiry && Date.now() >= parseInt(expiry)){
+    // expired - clear
+    localStorage.removeItem('lcg_logged_in');
+    localStorage.removeItem('lcg_session_expiry');
+  }
+})();
+function setSession(role){
+  const now = Date.now();
+  localStorage.setItem('lcg_login_time', now.toString());
+  localStorage.setItem('lcg_session_expiry', (now + 30*60*1000).toString());
+  localStorage.setItem('lcg_role', role);
+  localStorage.setItem('lcg_logged_in','true');
+}
+</script>
+
+
 <div class="topbar">
 <div class="left">
 <button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
@@ -177,7 +207,7 @@ window.loginWithGoogle=async()=>{
     }else{
       await updateDoc(doc(db,'nurses',user.uid),{country, lat:lat?parseFloat(lat):null, lng:lng?parseFloat(lng):null, gpsActualName:gpsName, lastLoginAt:serverTimestamp()});
     }
-    localStorage.setItem('lcg_nurse_uid',user.uid); localStorage.setItem('lcg_role','nurse'); localStorage.setItem('lcg_logged_in','true'); localStorage.setItem('currentNurseId',user.uid); localStorage.setItem('currentNurseCountry',country);
+    localStorage.setItem('lcg_nurse_uid',user.uid); setSession('nurse'); localStorage.setItem('currentNurseId',user.uid); localStorage.setItem('currentNurseCountry',country);
     location.href='nurse-dashboard.html';
   }catch(e){alert('Google login failed: '+e.message);}
 }
@@ -188,7 +218,7 @@ window.loginEmail=async()=>{
   try{
     const cred=await signInWithEmailAndPassword(auth,email,pass);
     await updateDoc(doc(db,'nurses',cred.user.uid),{country, lat:parseFloat(lat), lng:parseFloat(lng), gpsActualName:gpsName, lastLoginAt:serverTimestamp()});
-    localStorage.setItem('lcg_nurse_uid',cred.user.uid); localStorage.setItem('lcg_role','nurse'); localStorage.setItem('lcg_logged_in','true'); localStorage.setItem('currentNurseId',cred.user.uid); localStorage.setItem('currentNurseCountry',country);
+    localStorage.setItem('lcg_nurse_uid',cred.user.uid); setSession('nurse'); localStorage.setItem('currentNurseId',cred.user.uid); localStorage.setItem('currentNurseCountry',country);
     location.href='nurse-dashboard.html';
   }catch(e){alert(e.message);}
 }
