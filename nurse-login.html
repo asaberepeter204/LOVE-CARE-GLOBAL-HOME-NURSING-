@@ -73,6 +73,15 @@ function setSession(role){
   localStorage.setItem('lcg_session_expiry', (now + 30*60*1000).toString());
   localStorage.setItem('lcg_role', role);
   localStorage.setItem('lcg_logged_in','true');
+  // clear opposite role data to avoid cross-dashboard
+  if(role==='nurse'){
+    localStorage.removeItem('lcg_client_uid');
+    localStorage.removeItem('currentClientId');
+    localStorage.removeItem('currentClientEmail');
+  } else {
+    localStorage.removeItem('lcg_nurse_uid');
+    localStorage.removeItem('currentNurseId');
+  }
 }
 </script>
 
