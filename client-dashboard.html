@@ -2,149 +2,118 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<title>Client Dashboard - Welcome Any Name - LOVE CARE GLOBAL HOME NURSING</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.left{display:flex;align-items:center;gap:12px}
-.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
-.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
-.hamburger span+span{margin-top:4px}
-.logoBox{display:flex;align-items:center;gap:10px}
-.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
-.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
-.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
-#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
-#overlay.show{display:block}
-#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
-#drawer.open{transform:translateX(0)}
-.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
-.item.client{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}
-.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
-.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
-.wrap{max-width:480px;margin:0 auto;padding:24px 14px 60px}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:20px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:16px}
-.btnBig{width:100%;padding:18px;border-radius:16px;border:1px solid rgba(168,85,247,.18);background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.18));color:#f3e8ff;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;transition:.2s;margin-bottom:12px;text-decoration:none}
-.btnBig:hover{transform:translateY(-2px);border-color:#a855f7;box-shadow:0 10px 30px rgba(168,85,247,.25)}
-.btnBig .icon{width:48px;height:48px;border-radius:50%;background:rgba(168,85,247,.22);display:grid;place-items:center;font-size:22px;border:1px solid rgba(168,85,247,.18);flex-shrink:0}
-.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;box-shadow:0 8px 20px rgba(168,85,247,.3)}
-.btnPrimary small{color:#1e0a3a!important;opacity:.85}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f6f7fb;color:#111827;min-height:100vh}
+.topbar{background:#111827;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.wrap{max-width:600px;margin:0 auto;padding:14px}
+.card{background:white;border-radius:20px;padding:16px;border:1px solid #e5e7eb;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.04)}
+.cardGreen{background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none}
+.btn{padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:8px;text-decoration:none}
+.btnGreen{background:#16a34a;color:white}.btnDark{background:#111827;color:white}.btnLight{background:#f3f4f6;border:1px solid #e5e7eb;color:#111827}
 </style>
 </head>
 <body>
-<div class="bg"></div>
-
-<script>
-// --- 30 MIN SESSION GUARD FOR CLIENT ---
-(function(){
-  const expiry = localStorage.getItem('lcg_session_expiry');
-  const logged = localStorage.getItem('lcg_logged_in');
-  const role = localStorage.getItem('lcg_role');
-  if(!logged || logged!=='true' || !expiry || Date.now() > parseInt(expiry)){
-    localStorage.clear();
-    window.location.replace('client-login.html');
-    return;
-  }
-  // optional sliding expiry on activity - refresh expiry
-  const SESSION_MS = 30*60*1000;
-  function refresh(){ localStorage.setItem('lcg_session_expiry', (Date.now()+SESSION_MS).toString()); }
-  ['click','keydown','touchstart'].forEach(ev=>document.addEventListener(ev, refresh, {passive:true}));
-})();
-</script>
-
 <div class="topbar">
-<div class="left">
-<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
-<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
-</div>
-<a href="sos.html" class="sosBtn">SOS</a>
-</div>
-<div id="overlay" onclick="closeD()"></div>
-<div id="drawer">
-<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
-<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
-</div>
-<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
-<a class="item client" href="index.html">Home</a>
-<a class="item client" href="client-dashboard.html" style="background:rgba(168,85,247,.22)">Dashboard</a>
-<a class="item client" href="book-nurse.html">Book Nurse</a>
-<a class="item client" href="my-bookings.html">Client Bookings</a>
-<a class="item" href="about.html">About</a>
-<a class="item" href="services.html">Services</a>
-<a class="item" href="how-it-works.html">How It Works</a>
-<a class="item" href="contact.html">Contact</a>
-<a class="item" href="client-registration.html">Client Registration</a>
-<a class="item consent" href="consent-form.html">Consent Form</a>
-<a class="item" href="privacy.html">Privacy</a>
-<a class="item" href="terms.html">Terms</a>
-<a class="item" href="refund.html">Refund</a>
-<a class="item sos" href="sos.html">SOS</a>
-</div>
-<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+<div style="display:flex;gap:10px;align-items:center;color:white"><div style="width:36px;height:36px;border-radius:10px;background:#16a34a;display:flex;align-items:center;justify-content:center;font-weight:900">🏥</div><div><div style="font-weight:900;font-size:14px">LOVE CARE GLOBAL HOME NURSING</div><div style="font-size:10px;color:#9ca3af">Client Heart Dashboard • 8 Countries</div></div></div>
+<a href="index.html" style="background:white;color:#111827;padding:6px 12px;border-radius:999px;text-decoration:none;font-weight:900;font-size:12px">Home</a>
 </div>
 
 <div class="wrap">
-<div class="card" style="display:flex;gap:14px;align-items:center">
-<img id="clientPhoto" src="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:1px solid rgba(168,85,247,.18);display:none">
-<div style="flex:1"><div id="clientName" style="font-weight:900;font-size:15px;color:#f3e8ff">Loading...</div><div id="clientEmail" style="font-size:12px;color:#a78bfa"></div><div id="clientPhone" style="font-size:11px;color:#6b5b8a;margin-top:2px"></div></div>
+
+<!-- ANY CLIENT NAME WELCOME - NOT ONLY YOUR NAME -->
+<div class="card cardGreen" id="welcomeCard">
+<div style="display:flex;gap:12px;align-items:center">
+<div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden"><span id="clientInitial">👤</span><img id="clientPhoto" src="" style="width:100%;height:100%;object-fit:cover;display:none"></div>
+<div style="flex:1">
+<div style="font-size:11px;opacity:.8">Client Dashboard</div>
+<!-- DYNAMIC NAME FOR ANYONE -->
+<div id="welcomeName" style="font-weight:900;font-size:20px;margin-top:2px">Welcome back 👋</div>
+<div id="welcomeSub" style="font-size:11px;opacity:.9;margin-top:2px">Loading your name...</div>
+<div style="margin-top:6px;font-size:10px;opacity:.8" id="gpsName">📍 GPS Actual Name loading...</div>
+</div>
+</div>
+</div>
+
+<!-- NO "Not logged in" WARNING - REMOVED AS YOU REQUESTED FOR NURSE - SAME FOR CLIENT -->
+<div class="card">
+<h3 style="font-weight:900">📊 Your Heart Stats - All Operations Found Here</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:10px"><div style="font-size:10px;color:#6b7280;font-weight:700">BOOKINGS</div><div style="font-size:20px;font-weight:900" id="bookingCount">0</div></div>
+<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:10px"><div style="font-size:10px;color:#6b7280;font-weight:700">SPENT</div><div style="font-size:20px;font-weight:900" id="totalSpent">GHS 0</div></div>
+</div>
 </div>
 
 <div class="card">
-<h2 style="font-family:Plus Jakarta Sans,sans-serif;font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:14px">Client Dashboard</h2>
-
-<a class="btnBig btnPrimary" href="book-nurse.html">
-<span class="icon">📅</span>
-<span><b>Book Nurse</b><br><small>Choose nurse on Google Map — Photo, Video, Rating</small></span>
-</a>
-
-<a class="btnBig" href="my-bookings.html">
-<span class="icon">📋</span>
-<span><b>Client Bookings</b><br><small style="font-weight:600;color:#a78bfa">View all bookings</small></span>
-</a>
-
-<a class="btnBig" href="client-setting.html">
-<span class="icon">⚙️</span>
-<span><b>Client Settings</b><br><small style="font-weight:600;color:#a78bfa">Profile & settings</small></span>
-</a>
-
-<div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<a class="btnBig" style="justify-content:center" href="index.html">🏠 Home</a>
-<button class="btnBig" style="justify-content:center" onclick="logout()">Logout</button>
+<h4>📍 Heart Operation - Book Nurse</h4>
+<p style="font-size:11px;color:#6b7280">Book nurse near you - Video + Rating preview - Phone masked until paid - Cedis/Dollar + Start/End Time + Conditions Text + Audio Voice</p>
+<a class="btn btnGreen" href="book-nurse.html">📍 Book Nurse - Heart - 8 Countries + GPS Actual Name</a>
+<a class="btn btnLight" href="client-bookings.html">📋 My Bookings - Pay with Paystack Live pk_live_f17ae...</a>
 </div>
-</div>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
 const db=getFirestore(app);
-async function loadClient(){
-  const uid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
-  let client=null; let photoURL=localStorage.getItem('clientPhotoURL')||'';
-  try{const prof=JSON.parse(localStorage.getItem('clientProfile')||'{}'); if(prof.photoURL) photoURL=prof.photoURL; if(prof.name||prof.email) client=prof;}catch(e){}
-  if(uid){try{const snap=await getDoc(doc(db,'clients',uid)); if(snap.exists()){client=snap.data(); if(client.photoURL) photoURL=client.photoURL;}}catch(e){}}
-  if(client){
-    document.getElementById('clientName').textContent=client.fullName||client.name||'Client';
-    document.getElementById('clientEmail').textContent=client.email||localStorage.getItem('currentClientEmail')||'';
-    document.getElementById('clientPhone').textContent=client.phone||client.phoneFull||localStorage.getItem('clientPhone')||'';
-    if(photoURL){const img=document.getElementById('clientPhoto'); img.src=photoURL; img.style.display='block';}
-  }else{
-    document.getElementById('clientName').textContent='Not logged in';
-    document.getElementById('clientEmail').textContent='Please login';
+
+function getStoredUid(){return localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId')||'';}
+
+async function loadClientData(uid){
+  try{
+    const snap=await getDoc(doc(db,'clients',uid));
+    if(!snap.exists()){
+      document.getElementById('welcomeName').textContent='Welcome back 👋';
+      document.getElementById('welcomeSub').textContent='Profile not found - Please complete registration';
+      return;
+    }
+    const d=snap.data();
+    const fullName=d.fullName||d.displayName||d.name||'Client';
+    const firstName=fullName.split(' ')[0]||fullName;
+
+    // ANYONE'S NAME WILL APPEAR - NOT ONLY YOUR NAME
+    document.getElementById('welcomeName').textContent=`Welcome back, ${firstName} 👋`;
+    document.getElementById('welcomeSub').textContent=`${fullName} • ${d.countryName||d.country||''} • ${d.email||''}`;
+    document.getElementById('gpsName').textContent=`📍 ${d.gpsActualName||d.actualLocationName||'No GPS actual name yet'}`;
+    document.getElementById('clientInitial').textContent=firstName.charAt(0).toUpperCase()||'👤';
+
+    if(d.photoURL){
+      const img=document.getElementById('clientPhoto');
+      img.src=d.photoURL;
+      img.style.display='block';
+      document.getElementById('clientInitial').style.display='none';
+    }
+
+    const q=query(collection(db,'bookings'), where('clientId','==',uid));
+    const qs=await getDocs(q);
+    document.getElementById('bookingCount').textContent=qs.size;
+    let spent=0;
+    qs.forEach(docSnap=>{const b=docSnap.data(); if(b.paymentStatus==='paid'){spent+=b.totalAmount||0;}});
+    document.getElementById('totalSpent').textContent=`GHS ${spent}`;
+  }catch(e){
+    document.getElementById('welcomeName').textContent='Welcome back 👋';
+    document.getElementById('welcomeSub').textContent='Error loading name - '+e.message;
   }
 }
-window.logout=()=>{ localStorage.clear(); location.href='client-login.html'; }
-window.addEventListener('DOMContentLoaded', loadClient);
-</script>
-<script>
-function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
-function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  const storedUid=getStoredUid();
+  if(storedUid){loadClientData(storedUid);}
+  onAuthStateChanged(auth, (user)=>{
+    if(user){
+      if(!storedUid||storedUid!==user.uid){
+        localStorage.setItem('lcg_client_uid', user.uid);
+        localStorage.setItem('currentClientId', user.uid);
+      }
+      loadClientData(user.uid);
+    }
+  });
+});
 </script>
 </body>
 </html>
