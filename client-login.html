@@ -2,80 +2,140 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Login - Fixed setSession - LOVE CARE GLOBAL HOME NURSING</title>
+<title>Client Login — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f6f7fb;color:#111827;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.wrap{width:100%;max-width:420px;padding:16px}
-.card{background:white;border-radius:20px;padding:22px;border:1px solid #e5e7eb;box-shadow:0 20px 40px rgba(0,0,0,.08)}
-.logo{width:48px;height:48px;border-radius:14px;background:#16a34a;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;margin:0 auto 10px;font-size:22px}
-h1{text-align:center;font-weight:900;font-size:22px} .sub{text-align:center;font-size:11px;color:#6b7280;margin:6px 0 14px}
-label{font-size:11px;font-weight:800;margin:10px 0 5px;display:block;color:#374151}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.wrap{width:100%;max-width:440px;padding:16px;position:relative;z-index:1}
+.card{background:rgba(28,18,56,.88);border:1px solid rgba(168,85,247,.18);border-radius:24px;padding:26px;backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.logoWrap{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;margin:0 auto 12px;font-size:30px;box-shadow:0 8px 24px rgba(168,85,247,.35);border:1px solid rgba(255,255,255,.15)}
+h1{text-align:center;font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:22px;color:#f3e8ff}
+.sub{text-align:center;font-size:11px;color:#a78bfa;margin:6px 0 18px;font-weight:600;letter-spacing:.04em}
+label{font-size:11px;font-weight:800;margin:12px 0 6px;display:block;color:#d8b4fe;letter-spacing:.04em;text-transform:uppercase}
 .inputWrap{position:relative}
-input{width:100%;padding:12px 42px 12px 12px;border-radius:12px;border:1.5px solid #e5e7eb;background:#f9fafb;font-size:13px;outline:none}
-input:focus{border-color:#16a34a;background:white;box-shadow:0 0 0 3px rgba(34,197,94,.12)}
-.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:white;border:1px solid #e5e7eb;width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.7}
-.btn{width:100%;padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:10px}
-.btnGreen{background:#16a34a;color:white}.btnLight{background:#f3f4f6;border:1px solid #e5e7eb;color:#111827}.btnGoogle{background:#111827;color:white}
+input{width:100%;padding:13px 44px 13px 14px;border-radius:14px;border:1.5px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);font-size:13px;outline:none;color:#f3e8ff;transition:.2s}
+input::placeholder{color:#6b5b8a}
+input:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-shadow:0 0 0 3px rgba(168,85,247,.18)}
+.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.18);width:36px;height:36px;border-radius:12px;cursor:pointer;display:grid;place-items:center;transition:.2s}
+.eyeBtn:hover{background:rgba(168,85,247,.25)}
+.btn{width:100%;padding:13px;border-radius:14px;font-weight:800;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:12px;transition:.2s;text-decoration:none}
+.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35);font-weight:900}
+.btnPrimary:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(168,85,247,.45)}
+.btnDark{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);color:#e9d5ff}
+.btnDark:hover{background:rgba(76,29,149,.18);border-color:#a855f7}
+.btnGoogle{background:#ffffff;color:#111827;border:1px solid rgba(0,0,0,.08)}
+.btnGoogle:hover{background:#f3f4f6}
+.divider{display:flex;align-items:center;gap:12px;margin:14px 0;color:#6b5b8a;font-size:11px;font-weight:800;letter-spacing:.08em}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(168,85,247,.15)}
+.gpsCard{background:rgba(76,29,149,.12);border:1px solid rgba(168,85,247,.18);border-radius:14px;padding:12px;margin-top:12px}
+#msg{font-size:11px;margin-top:12px;text-align:center;min-height:16px;font-weight:700}
+.success{color:#a7f3d0!important}
+.error{color:#fca5a5!important}
 </style>
 </head>
 <body>
+<div class="bg"></div>
 <div class="wrap"><div class="card">
-<div class="logo">👤</div>
+<div class="logoWrap">👤</div>
 <h1>Client Login</h1>
-<p class="sub">LOVE CARE GLOBAL HOME NURSING • Fixed setSession • Cedis/Dollar + Start/End Time</p>
+<p class="sub">LOVE CARE GLOBAL HOME NURSING</p>
 
 <button class="btn btnGoogle" onclick="googleLogin()">
-<svg width="20" height="20" viewBox="0 0 48 48"><path fill="white" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="white" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="white" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="white" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+<svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.3-5.7 7.5-11.3 7.5-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l6-6C34.7 5.1 29.7 3 24 3 12.3 3 2.7 12.6 2.7 24S12.3 45 24 45c10.5 0 21-7.2 21-21 0-1.4-.2-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16.1 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l6-6C34.7 5.1 29.7 3 24 3 16.3 3 9.6 7.1 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.8 0 10.7-1.9 14.3-5.2l-6.6-5.1c-1.9 1.3-4.3 2.1-7.7 2.1-5.6 0-10.3-3.8-12-8.8l-6.6 5.1C9.6 40.9 16.3 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.7 2-2.1 3.7-4 4.9l6.6 5.1C41.3 34.9 44 28.5 44 24c0-1.4-.2-2.7-.4-3.5z"/></svg>
 Continue with Google
 </button>
 
-<div style="text-align:center;margin:12px 0;color:#9ca3af;font-size:12px;font-weight:800">OR</div>
+<div class="divider">OR</div>
 
-<label>Email *</label><input id="email" type="email" placeholder="client@email.com">
-<label>Password - Eye Toggle Fading With Slash *</label>
+<label>Email Address</label>
+<input id="email" type="email" placeholder="client@email.com">
+
+<label>Password</label>
 <div class="inputWrap">
-<input id="password" type="password" placeholder="Password - eye toggle">
+<input id="password" type="password" placeholder="Enter your password">
 <button class="eyeBtn" type="button" onclick="toggleEye('password',this)">
-<svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-<svg class="eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+<svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+<svg class="eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53A3 3 0 0 0 12 15a3 3 0 0 0 2.47-4.47"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
 </button>
 </div>
 
-<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px;margin-top:10px;font-size:11px">
-<div><b>GPS Actual Name:</b> <span id="gpsName" style="color:#15803d;font-weight:700">Loading...</span></div>
-<div><span id="latlng" style="font-size:10px;color:#6b7280"></span></div>
-<button class="btn btnLight" onclick="getGPS()" type="button">📍 Enable GPS - Actual Name Required</button>
+<div class="gpsCard">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<b style="font-size:11px;color:#d8b4fe">📍 Your Location</b>
+<span id="gpsName" style="color:#a78bfa;font-weight:700;font-size:10px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Detecting...</span>
+</div>
+<div id="latlng" style="font-size:10px;color:#6b5b8a;margin-top:4px"></div>
+<button class="btn btnDark" onclick="getGPS()" type="button" style="margin-top:8px;padding:9px;font-size:11px">Enable GPS</button>
 </div>
 
-<button class="btn btnGreen" onclick="emailLogin()">🔐 Login - Heart Dashboard</button>
-<a href="client-register.html" class="btn btnLight">📝 Create Account - Client - 8 Countries + GPS</a>
+<button class="btn btnPrimary" onclick="emailLogin()">🔐 Login to Dashboard</button>
+<a href="client-register.html" class="btn btnDark">📝 Create Client Account</a>
 <div style="display:flex;gap:8px;margin-top:8px">
-<a href="index.html" class="btn btnLight" style="flex:1">🏠 Home</a>
-<a href="nurse-login.html" class="btn btnLight" style="flex:1">👩‍⚕️ Nurse Login</a>
+<a href="index.html" class="btn btnDark" style="flex:1">🏠 Home</a>
+<a href="nurse-login.html" class="btn btnDark" style="flex:1">👩‍⚕️ Nurse</a>
 </div>
-<div id="msg" style="font-size:11px;margin-top:10px;text-align:center;color:#dc2626"></div>
+<div id="msg"></div>
 </div></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getFirestore(app);
+
 let currentLat=null, currentLng=null, currentGPSName='';
 
-// FIX - setSession DEFINED - THIS FIXES YOUR ERROR
-window.setSession = function(user){
+// UPDATED setSession - saves name + photo so dashboard shows welcome + photo
+window.setSession = function(user, extraData={}){
   const uid=user.uid;
   const email=user.email||'';
+  const displayName = extraData.fullName || user.displayName || email.split('@')[0] || 'Client';
+  const photo = extraData.photoURL || user.photoURL || '';
+
+  // Core session
   localStorage.setItem('lcg_client_uid', uid);
   localStorage.setItem('currentClientId', uid);
+  localStorage.setItem('lcg_uid', uid);
   localStorage.setItem('lcg_client_email', email);
   localStorage.setItem('currentClientEmail', email);
+  localStorage.setItem('lcg_email', email);
   localStorage.setItem('lcg_user_type', 'client');
   localStorage.setItem('currentUserType', 'client');
+  localStorage.setItem('lcg_role', 'client');
+  localStorage.setItem('lcg_logged_in', 'true');
+  localStorage.setItem('lcg_session_expiry', (Date.now()+ 30*60*1000).toString());
+
+  // Name for welcome message
+  localStorage.setItem('clientName', displayName);
+  localStorage.setItem('currentClientName', displayName);
+  localStorage.setItem('lcg_client_name', displayName);
+  localStorage.setItem('lcg_name', displayName);
+  localStorage.setItem('userName', displayName);
+
+  // Photo for dashboard
+  if(photo){
+    localStorage.setItem('clientPhotoURL', photo);
+    localStorage.setItem('clientPhoto', photo);
+    localStorage.setItem('photoURL', photo);
+  }
+
+  // Profile object for dashboard fallback
+  localStorage.setItem('clientProfile', JSON.stringify({
+    uid,
+    email,
+    name: displayName,
+    fullName: displayName,
+    photoURL: photo,
+    ...extraData
+  }));
+
   if(currentGPSName){localStorage.setItem('lcg_client_gps_actual_name', currentGPSName);}
   if(currentLat){localStorage.setItem('lcg_client_lat', currentLat); localStorage.setItem('lcg_client_lng', currentLng);}
 }
@@ -87,34 +147,45 @@ window.toggleEye=(id,btn)=>{
   if(input.type==='password'){input.type='text'; open.style.display='none'; closed.style.display='block';}
   else{input.type='password'; open.style.display='block'; closed.style.display='none';}
 }
+
 window.getGPS=()=>{
+  const gpsNameEl = document.getElementById('gpsName');
+  const latlngEl = document.getElementById('latlng');
+  const msgEl = document.getElementById('msg');
   navigator.geolocation.getCurrentPosition(async pos=>{
     currentLat=pos.coords.latitude; currentLng=pos.coords.longitude;
-    document.getElementById('latlng').textContent=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`;
+    if(latlngEl) latlngEl.textContent=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`;
     try{
       const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}`);
       const d=await r.json();
       currentGPSName=d.display_name||`${currentLat},${currentLng}`;
-      document.getElementById('gpsName').textContent=currentGPSName;
-    }catch{ currentGPSName=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`; document.getElementById('gpsName').textContent=currentGPSName;}
-  },()=>{document.getElementById('msg').textContent='Enable GPS - Required';},{enableHighAccuracy:true});
+      if(gpsNameEl) gpsNameEl.textContent=currentGPSName.slice(0,60);
+    }catch{ 
+      currentGPSName=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`; 
+      if(gpsNameEl) gpsNameEl.textContent=currentGPSName;
+    }
+  },()=>{
+    if(msgEl){msgEl.textContent='Please enable GPS - Required for booking'; msgEl.className='error';}
+  },{enableHighAccuracy:true});
 }
+
 window.emailLogin=async()=>{
   const email=document.getElementById('email').value.trim();
   const password=document.getElementById('password').value;
   const msg=document.getElementById('msg');
-  if(!email||!password){msg.textContent='Enter email and password'; return;}
+  if(!email||!password){msg.textContent='Enter email and password'; msg.className='error'; return;}
   try{
-    msg.textContent='Logging in...';
+    msg.textContent='Logging in...'; msg.className='';
     const cred=await signInWithEmailAndPassword(auth, email, password);
     const user=cred.user;
     const snap=await getDoc(doc(db,'clients',user.uid));
+    let data = snap.exists() ? snap.data() : null;
+
     if(!snap.exists()){
-      // Your case: Auth exists but Firestore doc missing because setSession crashed before
-      await setDoc(doc(db,'clients',user.uid),{
+      data = {
         uid:user.uid,
         email:user.email,
-        fullName:user.displayName||'Client',
+        fullName:user.displayName|| email.split('@')[0] || 'Client',
         gpsActualName:currentGPSName||'',
         actualLocationName:currentGPSName||'',
         lat:currentLat||null,
@@ -122,26 +193,34 @@ window.emailLogin=async()=>{
         createdAt:serverTimestamp(),
         country:'GH',
         loginMethod:'email'
-      },{merge:true});
+      };
+      await setDoc(doc(db,'clients',user.uid), data, {merge:true});
     }
-    setSession(user);
-    msg.textContent='✅ Login success - Heart Dashboard';
-    setTimeout(()=>{location.href='client-dashboard.html';}, 800);
+
+    // Save session with name + photo -> dashboard will show welcome + photo
+    setSession(user, data);
+    msg.textContent='✅ Login success! Redirecting...'; msg.className='success';
+    setTimeout(()=>{ location.href='client-dashboard.html'; }, 600);
+
   }catch(e){
-    if(e.code==='auth/invalid-credential'){msg.textContent='Invalid - If you registered with Google, click Continue with Google';}
+    if(e.code==='auth/invalid-credential'){msg.textContent='Invalid credentials - If you used Google, click Continue with Google';}
     else{msg.textContent='Login failed: '+e.message;}
+    msg.className='error';
   }
 }
+
 window.googleLogin=async()=>{
   const msg=document.getElementById('msg');
   try{
-    msg.textContent='Opening Google...';
+    msg.textContent='Opening Google...'; msg.className='';
     const provider=new GoogleAuthProvider();
     const cred=await signInWithPopup(auth, provider);
     const user=cred.user;
     const snap=await getDoc(doc(db,'clients',user.uid));
+    let data = snap.exists() ? snap.data() : null;
+
     if(!snap.exists()){
-      await setDoc(doc(db,'clients',user.uid),{
+      data = {
         uid:user.uid,
         email:user.email,
         fullName:user.displayName||'Client',
@@ -153,13 +232,17 @@ window.googleLogin=async()=>{
         createdAt:serverTimestamp(),
         country:'GH',
         loginMethod:'google'
-      },{merge:true});
+      };
+      await setDoc(doc(db,'clients',user.uid), data, {merge:true});
     }
-    setSession(user);
-    msg.textContent='✅ Google login success - Heart';
-    setTimeout(()=>{location.href='client-dashboard.html';}, 800);
-  }catch(e){msg.textContent='Google login failed: '+e.message; alert('Google login failed: '+e.message+' - setSession is not defined FIXED now');}
+
+    setSession(user, data);
+    msg.textContent='✅ Google login success! Redirecting...'; msg.className='success';
+    setTimeout(()=>{ location.href='client-dashboard.html'; }, 600);
+
+  }catch(e){msg.textContent='Google login failed: '+e.message; msg.className='error';}
 }
+
 window.addEventListener('DOMContentLoaded', getGPS);
 </script>
 </body>
