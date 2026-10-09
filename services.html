@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Services Policy - LOVE CARE GLOBAL HOME NURSING</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.wrap{max-width:900px;margin:0 auto;padding:20px 14px 80px}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:14px}
+h1{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:24px;color:#f3e8ff;margin-bottom:6px}
+h2{font-size:16px;color:#f3e8ff;margin:18px 0 8px}
+h3{font-size:13px;color:#d8b4fe;margin:12px 0 6px}
+p,li{font-size:13px;color:#c4b5fd;line-height:1.7}
+ul{margin:8px 0 12px 18px}
+.badge{display:inline-flex;background:rgba(168,85,247,.18);color:#d8b4fe;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid rgba(168,85,247,.18)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
+</div>
+<a href="sos.html" class="sosBtn">SOS</a>
+</div>
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">Home</a>
+<a class="item" href="about.html">About</a>
+<a class="item active" href="services.html">Services</a>
+<a class="item" href="how-it-works.html">How It Works</a>
+<a class="item" href="contact.html">Contact</a>
+<a class="item" href="consent-form.html">Consent Form</a>
+<a class="item" href="privacy.html">Privacy</a>
+<a class="item" href="terms.html">Terms</a>
+<a class="item" href="refund.html">Refund</a>
+<a class="item" href="sos.html" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;justify-content:center">SOS</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+</div>
+
+<div class="wrap">
+<span class="badge">Services Policy - Updated 2026</span>
+<h1>Services Policy - LOVE CARE GLOBAL HOME NURSING</h1>
+<p style="color:#a78bfa;font-size:12px;margin-bottom:14px">Professional home nursing care across Ghana and beyond. Verified nurses, hourly pricing, 24/7 support.</p>
+
+<div class="card">
+<h2>1. What We Offer</h2>
+<p>LOVE CARE GLOBAL provides trained, verified nurses for home-based care. Our services include:</p>
+<ul>
+<li><b>General Home Nursing:</b> Daily care, medication administration, vital signs monitoring, wound dressing.</li>
+<li><b>Elderly Care:</b> Companionship, mobility support, personal hygiene, chronic disease management.</li>
+<li><b>Post-Surgery Care:</b> Recovery monitoring, wound care, physiotherapy assistance, medication compliance.</li>
+<li><b>Child & Baby Care:</b> Newborn care, pediatric nursing, immunization support.</li>
+<li><b>24-Hour Live-In Care:</b> Continuous care at client's home - daily, weekly, monthly packages.</li>
+<li><b>Hospital Companion:</b> Nurses to stay with patients in hospital.</li>
+<li><b>Specialized Care:</b> Diabetes, hypertension, stroke recovery, palliative care.</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>2. Nurse Verification</h2>
+<p>All nurses are verified by CEO (lovecareglobal@gmail.com) before they can receive job offers:</p>
+<ul>
+<li>Photo ID, National ID, Nursing Licence, Certificate, CV, Intro Video</li>
+<li>GPS location and actual address verified</li>
+<li>Phone and email verified</li>
+<li>Status: Pending → CEO Approves → Approved → Can login and receive jobs</li>
+<li>Blocked nurses cannot receive jobs or chat (CEO can block/unblock at CEO Dashboard)</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>3. Pricing Policy - Hourly Based</h2>
+<p>Pricing is calculated as: <b>Hourly Rate × Hours Per Day × Quantity (days/weeks) + Transport</b></p>
+<ul>
+<li><b>Ghana (GHS):</b> Example 50 GHS/hour (CEO sets hourly in CEO Dashboard → Pricing). Daily 8h = 400 GHS, Weekly 40h = 2000 GHS, Monthly 160h = 8000 GHS. 24h live-in: Daily 24h = 1200 GHS.</li>
+<li><b>Outside Ghana (USD):</b> Example 5 USD/hour. Daily 8h = 40 USD, etc.</li>
+<li><b>Hours From Start/End Time:</b> Client selects Start Time and End Time (e.g., 08:00-17:00 = 9 hrs). System calculates total hours automatically.</li>
+<li><b>Client Offer:</b> Client can offer above minimum. Nurse sees offer in My Job Offers.</li>
+<li><b>Payment:</b> Paystack (GHS, NGN, ZAR, USD, GBP) - payment before booking is sent to nurse.</li>
+</ul>
+<p style="font-size:11px;color:#facc15;background:rgba(245,158,11,.12);padding:8px;border-radius:8px;margin-top:8px">CEO sets hourly rate at ceo-dashboard.html → Pricing. All clients see updated rates automatically.</p>
+</div>
+
+<div class="card">
+<h2>4. Booking & Job Offer Flow</h2>
+<ul>
+<li>Client searches nearby nurses (2km, 5km, 10km, 20km, All Ghana) on map</li>
+<li>Client selects nurse, fills patient name, phone with country code (+233), service type, Start/End time, quantity</li>
+<li>System calculates total hours and amount, client pays via Paystack</li>
+<li>Booking saved to: bookings/{id}, nurseBookings/{nurseId}/{id}, myJobOffers/{nurseId}/{id}, jobOffers/{id}, clientBookings/{phone}/{id}</li>
+<li>Nurse receives job in My Job Offers page (my-job-offer.html) with Booking ID, client phone (+country code), amount, patient details</li>
+<li>Nurse accepts job, contacts client, service begins</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>5. Client Responsibilities</h2>
+<ul>
+<li>Provide accurate patient information, address, GPS, phone with country code</li>
+<li>Ensure safe working environment for nurse</li>
+<li>Pay agreed amount before service starts (Paystack)</li>
+<li>Sign Consent Form (consent-form.html) before care begins</li>
+<li>For 24h live-in: Provide accommodation, meals, resting area for nurse</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>6. Nurse Responsibilities</h2>
+<ul>
+<li>Provide professional, compassionate care as per service booked</li>
+<li>Keep patient information confidential</li>
+<li>Arrive on time as per Start Time, work until End Time</li>
+<li>Update CEO or client in case of emergency, use SOS page</li>
+<li>No extra charges beyond agreed offer unless approved by CEO</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>7. Safety & Quality</h2>
+<ul>
+<li>All nurses approved by CEO only - no unverified nurse can receive jobs</li>
+<li>CEO can wipe group chat and block misbehaving nurses at CEO Dashboard → Group Chat Master Controls</li>
+<li>Nurses group chat (nurse-group-chat.html) - clean chat, no spam, CEO monitored</li>
+<li>Ratings system: Clients can rate nurses after service (ratings collection)</li>
+<li>SOS Alerts: For emergencies, use sos.html - CEO and nurses notified</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>8. Cancellation & Refund</h2>
+<p>See Refund Policy (refund.html) - cancellations allowed before nurse acceptance. After acceptance, 50% refund if within 24h, no refund after service starts unless nurse fails to appear.</p>
+</div>
+
+<div class="card" style="background:linear-gradient(90deg,rgba(76,29,149,.3),rgba(168,85,247,.15));border:1px solid rgba(168,85,247,.2)">
+<b style="color:#f3e8ff">Contact CEO</b><br>
+<p style="font-size:12px;margin-top:6px">Email: lovecareglobal@gmail.com<br>Phone: Check contact.html<br>CEO Dashboard: ceo-dashboard.html (pending nurses, block manager, master delete, pricing)</p>
+</div>
+
+</div>
+<script>
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
+</body>
+</html>
