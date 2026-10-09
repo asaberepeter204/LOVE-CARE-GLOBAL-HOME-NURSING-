@@ -3,126 +3,91 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Refund Policy - LOVE CARE GLOBAL HOME NURSING</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f8fafc;color:#111;line-height:1.6}
-.header{position:sticky;top:0;z-index:1000;background:linear-gradient(90deg,#16a34a,#7c3aed);color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
-.container{max-width:800px;margin:0 auto;padding:20px 16px}
-.card{background:#fff;border-radius:16px;padding:20px;margin:16px 0;border:1px solid #e5e7eb;box-shadow:0 4px 12px rgba(0,0,0,.05)}
-h1{font-size:28px;color:#16a34a;text-align:center;margin:10px 0}h2{font-size:18px;color:#7c3aed;margin:18px 0 8px;border-left:4px solid #16a34a;padding-left:10px}
-p,li{font-size:13px;color:#334155;margin:6px 0}ul{margin-left:18px}
-.table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}.table th,.table td{border:1px solid #e5e7eb;padding:10px;text-align:left}.table th{background:#f0fdf4;color:#16a34a}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:900}.green{background:#dcfce7;color:#166534}.red{background:#fee2e2;color:#991b1b}.yellow{background:#fef3c7;color:#92400e}
-.btn{padding:12px 18px;border:none;border-radius:10px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-block;font-size:13px;margin:4px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.delete{border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.08);color:#fca5a5}
+.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+.wrap{max-width:900px;margin:0 auto;padding:20px 14px 80px}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:14px}
+h1{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:22px;color:#f3e8ff;margin-bottom:6px;border-bottom:2px solid rgba(168,85,247,.3);padding-bottom:10px}
+h2{font-size:16px;color:#f3e8ff;margin:24px 0 10px;background:rgba(76,29,149,.2);padding:8px 12px;border-radius:10px;border-left:3px solid #a855f7}
+p,li{font-size:13px;color:#c4b5fd;line-height:1.8}
+ul,ol{margin:8px 0 12px 18px}
+.badge{display:inline-flex;background:rgba(168,85,247,.18);color:#d8b4fe;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid rgba(168,85,247,.18)}
 </style>
 </head>
 <body>
-
-<div class="header">
-<div style="font-weight:900;font-size:13px;line-height:1.1">LOVE CARE GLOBAL HOME<br>NURSING</div>
-<a href="index.html" style="background:white;color:#16a34a;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:900;font-size:12px">🏠 Home</a>
+<div class="bg"></div>
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
+</div>
+<a href="sos.html" class="sosBtn">SOS</a>
+</div>
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">Home</a>
+<a class="item " href="about.html">About</a>
+<a class="item " href="services.html">Services</a>
+<a class="item " href="how-it-works.html">How It Works</a>
+<a class="item " href="contact.html">Contact</a>
+<a class="item consent" href="consent-form.html">Consent Form</a>
+<a class="item " href="privacy.html">Privacy</a>
+<a class="item " href="terms.html">Terms</a>
+<a class="item active" href="refund.html">Refund</a>
+<a class="item delete " href="delete-account.html">🗑️ Delete Account</a>
+<a class="item sos" href="sos.html">SOS</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
 </div>
 
-<div class="container">
-<h1>💰 Refund Policy</h1>
-<p style="text-align:center;font-size:12px;color:#6b7280">Last Updated: October 5, 2026 | LOVE CARE GLOBAL HOME NURSING - 8 Countries</p>
-<p style="text-align:center;font-size:11px">Official: https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+<div class="wrap">
+<span class="badge">Refund Policy - Updated Oct 2026</span>
+<div class="card" style="margin-top:12px">
 
-<div class="card" style="border:2px solid #16a34a;background:#f0fdf4">
-<h2 style="margin-top:0">✅ Our Promise</h2>
-<p>We want you happy! If our nurse does not show up or service is bad, we will refund you. But please read rules below - refund depends on WHEN you cancel and WHY.</p>
-<p><b>Contact for Refund:</b> +233 544121814 | lovecareglobal@gmail.com | WhatsApp 24/7</p>
+<h1>Refund Policy - LOVE CARE GLOBAL HOME NURSING</h1>
+<p><b>Effective:</b> October 5, 2026 | Paystack payments only</p>
+<h2>1. Before Nurse Acceptance</h2><p>100% refund if you cancel before nurse accepts job in my-job-offer.html. Contact CEO or use contact.html, provide Booking ID.</p>
+<h2>2. After Acceptance, Within 24h</h2><p>50% refund if nurse accepted but service not started, and you cancel within 24 hours of booking time.</p>
+<h2>3. After Service Starts</h2><p>No refund after nurse arrives and starts care, unless nurse fails to appear or provides no service - then 100% refund after CEO verification.</p>
+<h2>4. Nurse No-Show</h2><p>If nurse does not show, report via SOS or contact.html with Booking ID, CEO will verify via bookings/{id} and refund 100%.</p>
+<h2>5. How to Request Refund</h2><p>Email lovecareglobal@gmail.com with Booking ID, reason, phone with country code. Refund processed via Paystack to original payment method within 3-5 business days. Deletion? Request refund BEFORE deleting at delete-account.html.</p>
+<h2>6. 8 Countries</h2><p>Ghana MoMo refunds to MoMo, outside Ghana to card. Transaction fees may not be refunded.</p>
+
+<div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(168,85,247,.12);display:flex;gap:10px;flex-wrap:wrap">
+<a href="index.html" style="padding:10px 16px;border-radius:12px;background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none">← Back to Home</a>
+<a href="delete-account.html" style="padding:10px 16px;border-radius:12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5;text-decoration:none">Delete Account Policy</a>
 </div>
-
-<div class="card">
-<h2>1. When You Get FULL Refund (100%) <span class="badge green">100% REFUND</span></h2>
-<ul>
-<li><b>Nurse No-Show:</b> Nurse did not come at booked time and no replacement within 2 hours</li>
-<li><b>Emergency Cancellation by Us:</b> We cancel due to our fault</li>
-<li><b>Fake Nurse Profile:</b> Nurse license / ID was fake (verified after booking)</li>
-<li><b>Double Payment:</b> You were charged twice by mistake</li>
-<li><b>Service Not Started:</b> Cancelled 24 hours BEFORE booking time</li>
-</ul>
 </div>
-
-<div class="card">
-<h2>2. Partial Refund Table <span class="badge yellow">50% - 80%</span></h2>
-<table class="table">
-<tr><th>When You Cancel</th><th>Refund You Get</th><th>Reason</th></tr>
-<tr><td>24+ hours before service</td><td><b>100% Refund</b></td><td>Full - No charge</td></tr>
-<tr><td>12-24 hours before</td><td><b>80% Refund</b></td><td>20% kept - Nurse reserved</td></tr>
-<tr><td>6-12 hours before</td><td><b>50% Refund</b></td><td>50% kept - Nurse prepared</td></tr>
-<tr><td>Less than 6 hours before</td><td><b>0% Refund</b></td><td>No refund - Nurse on way</td></tr>
-<tr><td>After nurse arrived (1 hour service done)</td><td><b>0% Refund</b></td><td>Service started</td></tr>
-</table>
 </div>
-
-<div class="card">
-<h2>3. No Refund Cases <span class="badge red">NO REFUND</span></h2>
-<ul>
-<li>❌ You cancel after nurse already arrived at your home</li>
-<li>❌ You provided wrong address / GPS and nurse could not find you</li>
-<li>❌ You refuse nurse because of tribe, gender, religion (discrimination)</li>
-<li>❌ You booked but family says no need after nurse comes</li>
-<li>❌ You did not allow nurse to do work after arrival</li>
-<li>❌ Change of mind after service started</li>
-<li>❌ Client misconduct / harassment to nurse (we will investigate)</li>
-</ul>
-</div>
-
-<div class="card">
-<h2>4. Nurse Fault - You Get Refund + Free Replacement</h2>
-<ul>
-<li>If nurse is rude, late more than 1 hour, unprofessional, or sleeps on duty - Report within 24 hours with photo/video proof</li>
-<li>We will give <b>FREE replacement nurse</b> next day + <b>50% refund</b> of that day</li>
-<li>If serious (theft, abuse) - <b>100% refund + police report</b> - Nurse license blocked forever</li>
-</ul>
-</div>
-
-<div class="card">
-<h2>5. How to Ask for Refund</h2>
-<p><b>Step 1:</b> WhatsApp +233 544121814 within 24 hours of issue</p>
-<p><b>Step 2:</b> Send: Booking ID + Phone + Reason + Photo/Video proof (if any)</p>
-<p><b>Step 3:</b> We review within 6 hours</p>
-<p><b>Step 4:</b> If approved, refund via Mobile Money / Bank within 24-48 hours</p>
-<p style="background:#fffbeb;border:1px solid #f59e0b;padding:10px;border-radius:8px;margin-top:8px"><b>⚠️ Important:</b> Keep your Booking ID and Payment receipt - Needed for refund</p>
-</div>
-
-<div class="card">
-<h2>6. Payment Methods & Refund Time</h2>
-<table class="table">
-<tr><th>Payment Method</th><th>Refund Time</th><th>Refund To</th></tr>
-<tr><td>MTN Mobile Money</td><td>24 hours</td><td>Same MTN number</td></tr>
-<tr><td>Vodafone Cash</td><td>24 hours</td><td>Same Vodafone number</td></tr>
-<tr><td>AirtelTigo Money</td><td>24 hours</td><td>Same number</td></tr>
-<tr><td>Bank Transfer</td><td>48 hours</td><td>Same bank account</td></tr>
-<tr><td>Cash to Nurse</td><td>Not refundable</td><td>Must report same day</td></tr>
-</table>
-</div>
-
-<div class="card">
-<h2>7. Monthly Packages Refund</h2>
-<ul>
-<li><b>Weekly Package (7 days):</b> Cancel after 2 days used = Refund for 5 days remaining (minus 10% fee)</li>
-<li><b>Monthly Package (30 days):</b> Cancel after 10 days = Refund for 20 days (minus 15% admin fee)</li>
-<li>Monthly packages cannot be refunded after 20 days used</li>
-</ul>
-</div>
-
-<div class="card" style="border-left:4px solid #16a34a">
-<h2>8. CEO Guarantee</h2>
-<p><b>👑 From CEO Peter Asabere:</b> "If we fail you, we will refund you. Your health and trust is more important than money. If nurse no-show, I personally ensure 100% refund + free nurse next time. WhatsApp me directly +233 544121814"</p>
-<p style="font-size:11px;color:#6b7280;margin-top:8px">This refund policy applies to Ghana, Nigeria, Kenya, South Africa, Togo, Benin, Ivory Coast, Burkina Faso - All 8 countries same policy</p>
-</div>
-
-<div style="text-align:center;margin:20px 0">
-<a href="index.html" class="btn" style="background:#16a34a;color:white">🏠 Home</a>
-<a href="book-nurse.html" class="btn" style="background:#7c3aed;color:white">📅 Book Nurse</a>
-<a href="https://wa.me/233544121814?text=Hello%20I%20need%20refund%20help" class="btn" style="background:#25d366;color:white">💬 WhatsApp Refund</a>
-</div>
-
-<p style="text-align:center;font-size:10px;color:#94a3b8;margin-bottom:30px">© 2026 LOVE CARE GLOBAL HOME NURSING - All Rights Reserved | 8 Countries | Refund Policy v2.0</p>
-
-</div>
-
+<script>
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
 </body>
 </html>
