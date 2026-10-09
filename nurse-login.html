@@ -60,13 +60,13 @@ input:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-shadow:0 0 0 3
 <div class="wrap"><div class="card">
 <div class="logoWrap">👩‍⚕️</div>
 <h1>Nurse Login</h1>
-<p class="sub">LOVE CARE GLOBAL HOME NURSING — CEO Approval Required</p>
+<p class="sub">LOVE CARE GLOBAL HOME NURSING</p>
 
-<div class="alert alert-warn">⚠️ <b>CEO Approval Required:</b> You can login only after CEO (lovecareglobal@gmail.com) approves your registration with all particulars (Photo, ID, Licence, Video, etc.) in CEO Dashboard.</div>
+
 
 <button class="btn btnGoogle" onclick="googleLogin()">
 <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.3-5.7 7.5-11.3 7.5-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l6-6C34.7 5.1 29.7 3 24 3 12.3 3 2.7 12.6 2.7 24S12.3 45 24 45c10.5 0 21-7.2 21-21 0-1.4-.2-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16.1 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l6-6C34.7 5.1 29.7 3 24 3 16.3 3 9.6 7.1 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.8 0 10.7-1.9 14.3-5.2l-6.6-5.1c-1.9 1.3-4.3 2.1-7.7 2.1-5.6 0-10.3-3.8-12-8.8l-6.6 5.1C9.6 40.9 16.3 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.7 2-2.1 3.7-4 4.9l6.6 5.1C41.3 34.9 44 28.5 44 24c0-1.4-.2-2.7-.4-3.5z"/></svg>
-Continue with Google — Must Be Approved
+Continue with Google
 </button>
 
 <div class="divider">OR</div>
@@ -186,7 +186,7 @@ window.emailLogin=async()=>{
   const msg=document.getElementById('msg');
   if(!email||!password){msg.innerHTML='<div class="alert alert-error">Enter email and password</div>'; return;}
   try{
-    msg.innerHTML='<div class="alert alert-info">Logging in... Checking CEO approval...</div>';
+    msg.innerHTML='<div class="alert alert-info">Logging in...</div>';
     const cred=await signInWithEmailAndPassword(auth, email, password);
     const user=cred.user;
     
@@ -229,7 +229,7 @@ window.emailLogin=async()=>{
 window.googleLogin=async()=>{
   const msg=document.getElementById('msg');
   try{
-    msg.innerHTML='<div class="alert alert-info">Opening Google... Checking CEO approval...</div>';
+    msg.innerHTML='<div class="alert alert-info">Opening Google...</div>';
     const provider=new GoogleAuthProvider();
     const cred=await signInWithPopup(auth, provider);
     const user=cred.user;
