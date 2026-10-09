@@ -2,66 +2,73 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Register - Save Any Name - LOVE CARE GLOBAL HOME NURSING</title>
+<title>Client Registration | LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f6f7fb;color:#111827;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
-.wrap{width:100%;max-width:460px}
-.card{background:white;border-radius:20px;padding:22px;border:1px solid #e5e7eb;box-shadow:0 20px 40px rgba(0,0,0,.08)}
-.logo{width:48px;height:48px;border-radius:14px;background:#16a34a;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;margin:0 auto 10px;font-size:22px}
-h1{text-align:center;font-weight:900;font-size:22px}.sub{text-align:center;font-size:11px;color:#6b7280;margin:6px 0 14px}
-label{font-size:11px;font-weight:800;margin:10px 0 5px;display:block;color:#374151}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.wrap{width:100%;max-width:460px;position:relative;z-index:1}
+.card{background:rgba(28,18,56,.88);border:1px solid rgba(168,85,247,.18);border-radius:24px;padding:22px;backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:flex;align-items:center;justify-content:center;color:#1e0a3a;font-weight:900;margin:0 auto 10px;font-size:22px}
+h1{text-align:center;font-weight:800;font-size:20px;font-family:Plus Jakarta Sans,sans-serif;color:#f3e8ff}
+label{font-size:11px;font-weight:800;margin:10px 0 5px;display:block;color:#c4b5fd;letter-spacing:.04em;text-transform:uppercase}
 .inputWrap{position:relative}
-input,select{width:100%;padding:12px 42px 12px 12px;border-radius:12px;border:1.5px solid #e5e7eb;background:#f9fafb;font-size:13px;outline:none}
-input:focus,select:focus{border-color:#16a34a;background:white;box-shadow:0 0 0 3px rgba(34,197,94,.12)}
-.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:white;border:1px solid #e5e7eb;width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.7}
-.btn{width:100%;padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:10px;text-decoration:none}
-.btnGreen{background:#16a34a;color:white}.btnLight{background:#f3f4f6;border:1px solid #e5e7eb;color:#111827}.btnGoogle{background:#111827;color:white}
+input,select{width:100%;padding:12px 42px 12px 12px;border-radius:12px;border:1.5px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);color:#f3e8ff;font-size:13px;outline:none}
+input:focus,select:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-shadow:0 0 0 3px rgba(168,85,247,.18)}
+.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.18);width:34px;height:34px;border-radius:10px;cursor:pointer;display:grid;place-items:center}
+.btn{width:100%;padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:10px;text-decoration:none;transition:.2s}
+.btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35)}
+.btnLight{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);color:#e9d5ff}
+.btnGoogle{background:#ffffff;color:#111827;border:1px solid rgba(0,0,0,.08)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.alert{padding:10px;border-radius:10px;font-size:11px;font-weight:700;margin:8px 0;border:1px solid}
+.alert-error{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);color:#fca5a5}
+.alert-success{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25);color:#86efac}
+.alert-info{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);color:#93c5fd}
 </style>
 </head>
 <body>
+<div class="bg"></div>
 <div class="wrap"><div class="card">
-<div class="logo">👤</div>
-<h1>Create Client Account - Any Name</h1>
-<p class="sub">Anyone who registers and logs in, his name will appear with welcome - Cedis/Dollar + Start/End Time + Conditions</p>
+<div class="logo">ðŸ‘¤</div>
+<h1>Create Client Account</h1>
+
+<div id="msg"></div>
 
 <button class="btn btnGoogle" onclick="googleRegister()">
-<svg width="20" height="20" viewBox="0 0 48 48"><path fill="white" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="white" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="white" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="white" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-Continue with Google - Any Name Auto Saved
+<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+Continue with Google
 </button>
 
-<div style="text-align:center;margin:12px 0;color:#9ca3af;font-size:12px;font-weight:800">OR REGISTER WITH EMAIL</div>
+<div style="text-align:center;margin:12px 0;color:#6b5b8a;font-size:11px;font-weight:800">OR</div>
 
-<label>Full Name - Anyone's Name Will Appear With Welcome *</label>
-<input id="fullName" type="text" placeholder="e.g., Kwame Mensah, Ama Doe - Anyone's name">
+<label>Full Name *</label>
+<input id="fullName" type="text" placeholder="e.g., Kwame Mensah">
 
 <div class="grid2">
 <div><label>Email *</label><input id="email" type="email" placeholder="client@email.com"></div>
 <div><label>Phone *</label><input id="phone" type="tel" placeholder="055..."></div>
 </div>
 
-<label>Password - Eye Toggle Fading With Slash Line *</label>
+<label>Password *</label>
 <div class="inputWrap">
-<input id="password" type="password" placeholder="Password - eye toggle fading with slash line">
-<button class="eyeBtn" type="button" onclick="toggleEye('password',this)[STRIPPED 15 bytes]eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3[STRIPPED 22 bytes]eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+<input id="password" type="password" placeholder="Password">
+<button class="eyeBtn" type="button" onclick="toggleEye('password',this)">
+<svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+<svg class="eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
 </button>
 </div>
 
-<label>Country - 8 Countries *</label>
-<select id="country"><option value="">Select country</option><option value="GH">🇬🇭 Ghana</option><option value="NG">🇳🇬 Nigeria</option><option value="ZA">🇿🇦 South Africa</option><option value="GB">🇬🇧 UK</option><option value="US">🇺🇸 USA</option><option value="AU">🇦🇺 Australia</option><option value="AE">🇦🇪 UAE</option><option value="CA">🇨🇦 Canada</option><option value="OTHER">🌍 Other</option></select>
+<label>Country *</label>
+<select id="country"><option value="">Select country</option><option value="GH" selected>Ghana</option><option value="NG">Nigeria</option><option value="ZA">South Africa</option><option value="GB">UK</option><option value="US">USA</option><option value="AU">Australia</option><option value="AE">UAE</option><option value="CA">Canada</option><option value="OTHER">Other</option></select>
 
-<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px;margin-top:10px;font-size:11px">
-<div><b>GPS Actual Name:</b> <span id="gpsName" style="color:#15803d;font-weight:700">Loading actual name...</span></div>
-<div><span id="latlng" style="font-size:10px;color:#6b7280"></span></div>
-<button class="btn btnLight" onclick="getGPS()" type="button">📍 Enable GPS - Actual Name Required</button>
-</div>
-
-<button class="btn btnGreen" onclick="emailRegister()">✅ Create Client Account - Save Any Name - Welcome Will Show His Name</button>
+<button class="btn btnPurple" onclick="emailRegister()">Create Account</button>
 <div style="display:flex;gap:8px;margin-top:8px">
-<a href="client-login.html" class="btn btnLight" style="flex:1">🔐 Login - Client</a>
-<a href="index.html" class="btn btnLight" style="flex:1">🏠 Home</a>
+<a href="client-login.html" class="btn btnLight" style="flex:1">Login</a>
+<a href="index.html" class="btn btnLight" style="flex:1">Home</a>
 </div>
-<div id="msg" style="font-size:11px;margin-top:10px;text-align:center;color:#dc2626"></div>
 </div></div>
 
 <script type="module">
@@ -74,13 +81,6 @@ const auth=getAuth(app);
 const db=getFirestore(app);
 let currentLat=null, currentLng=null, currentGPSName='';
 
-window.setSession = function(user){
-  localStorage.setItem('lcg_client_uid', user.uid);
-  localStorage.setItem('currentClientId', user.uid);
-  localStorage.setItem('lcg_client_email', user.email||'');
-  localStorage.setItem('lcg_user_type', 'client');
-}
-
 window.toggleEye=(id,btn)=>{
   const input=document.getElementById(id);
   const open=btn.querySelector('.eye-open');
@@ -88,19 +88,16 @@ window.toggleEye=(id,btn)=>{
   if(input.type==='password'){input.type='text'; open.style.display='none'; closed.style.display='block';}
   else{input.type='password'; open.style.display='block'; closed.style.display='none';}
 }
-window.getGPS=()=>{
+function getGPS(){
   navigator.geolocation.getCurrentPosition(async pos=>{
     currentLat=pos.coords.latitude; currentLng=pos.coords.longitude;
-    document.getElementById('latlng').textContent=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`;
     try{
       const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}`);
       const d=await r.json();
       currentGPSName=d.display_name||`${currentLat},${currentLng}`;
-      document.getElementById('gpsName').textContent=currentGPSName;
-    }catch{ currentGPSName=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`; document.getElementById('gpsName').textContent=currentGPSName;}
-  },()=>{document.getElementById('msg').textContent='Enable GPS - Required';},{enableHighAccuracy:true});
+    }catch{ currentGPSName=`${currentLat}, ${currentLng}`;}
+  },()=>{},{enableHighAccuracy:true});
 }
-
 window.emailRegister=async()=>{
   const fullName=document.getElementById('fullName').value.trim();
   const email=document.getElementById('email').value.trim();
@@ -108,72 +105,48 @@ window.emailRegister=async()=>{
   const password=document.getElementById('password').value;
   const country=document.getElementById('country').value;
   const msg=document.getElementById('msg');
-  if(!fullName||!email||!phone||!password||!country){msg.textContent='Fill all fields - Full name required - Anyone\'s name'; return;}
-  if(!currentGPSName){msg.textContent='Enable GPS - Actual name required'; getGPS(); return;}
+  if(!fullName||!email||!phone||!password||!country){msg.innerHTML='<div class="alert alert-error">Fill all fields</div>'; return;}
   try{
-    msg.textContent='Creating account for '+fullName+'...';
+    msg.innerHTML='<div class="alert alert-info">Creating account...</div>';
     const cred=await createUserWithEmailAndPassword(auth, email, password);
     const user=cred.user;
     await updateProfile(user,{displayName:fullName});
     await setDoc(doc(db,'clients',user.uid),{
-      uid:user.uid,
-      email:user.email,
-      fullName:fullName,
-      displayName:fullName,
-      name:fullName,
-      firstName:fullName.split(' ')[0],
-      lastName:fullName.split(' ').slice(1).join(' '),
-      phone:phone,
-      country:country,
-      countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
-      gpsActualName:currentGPSName,
-      actualLocationName:currentGPSName,
-      lat:currentLat,
-      lng:currentLng,
-      createdAt:serverTimestamp(),
-      loginMethod:'email',
-      welcomeMessage:`Welcome back, ${fullName.split(' ')[0]} 👋`
+      uid:user.uid,email:user.email,fullName,displayName:fullName,name:fullName,
+      firstName:fullName.split(' ')[0],lastName:fullName.split(' ').slice(1).join(' '),
+      phone,country,countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
+      gpsActualName:currentGPSName,actualLocationName:currentGPSName,lat:currentLat,lng:currentLng,
+      createdAt:serverTimestamp(),loginMethod:'email'
     });
-    setSession(user);
-    msg.textContent=`✅ Account created for ${fullName} - Welcome will show his name`;
+    localStorage.setItem('lcg_client_uid', user.uid);
+    localStorage.setItem('currentClientId', user.uid);
+    msg.innerHTML='<div class="alert alert-success">Account created</div>';
     setTimeout(()=>{location.href='client-dashboard.html';}, 1000);
   }catch(e){
-    if(e.code==='auth/email-already-in-use'){msg.textContent='Email already registered - Go to Login - Client';}
-    else{msg.textContent='Register failed: '+e.message;}
+    msg.innerHTML='<div class="alert alert-error">Register failed: '+e.message+'</div>';
   }
 }
-
 window.googleRegister=async()=>{
   const msg=document.getElementById('msg');
   const fullNameInput=document.getElementById('fullName').value.trim();
   try{
-    msg.textContent='Opening Google...';
+    msg.innerHTML='<div class="alert alert-info">Opening Google...</div>';
     const provider=new GoogleAuthProvider();
     const cred=await signInWithPopup(auth, provider);
     const user=cred.user;
     const finalFullName=fullNameInput||user.displayName||'Client';
     await setDoc(doc(db,'clients',user.uid),{
-      uid:user.uid,
-      email:user.email,
-      fullName:finalFullName,
-      displayName:finalFullName,
-      name:finalFullName,
-      firstName:finalFullName.split(' ')[0],
-      lastName:finalFullName.split(' ').slice(1).join(' '),
-      photoURL:user.photoURL||'',
-      country:document.getElementById('country').value||'GH',
-      gpsActualName:currentGPSName||'',
-      actualLocationName:currentGPSName||'',
-      lat:currentLat||null,
-      lng:currentLng||null,
-      createdAt:serverTimestamp(),
-      loginMethod:'google',
-      welcomeMessage:`Welcome back, ${finalFullName.split(' ')[0]} 👋`
+      uid:user.uid,email:user.email,fullName:finalFullName,displayName:finalFullName,name:finalFullName,
+      firstName:finalFullName.split(' ')[0],lastName:finalFullName.split(' ').slice(1).join(' '),
+      photoURL:user.photoURL||'',country:document.getElementById('country').value||'GH',
+      gpsActualName:currentGPSName||'',lat:currentLat||null,lng:currentLng||null,
+      createdAt:serverTimestamp(),loginMethod:'google'
     },{merge:true});
-    setSession(user);
-    msg.textContent=`✅ Google account for ${finalFullName}`;
+    localStorage.setItem('lcg_client_uid', user.uid);
+    localStorage.setItem('currentClientId', user.uid);
+    msg.innerHTML='<div class="alert alert-success">Google account created</div>';
     setTimeout(()=>{location.href='client-dashboard.html';}, 1000);
-  }catch(e){msg.textContent='Google register failed: '+e.message;}
+  }catch(e){msg.innerHTML='<div class="alert alert-error">Google register failed: '+e.message+'</div>';}
 }
 window.addEventListener('DOMContentLoaded', getGPS);
 </script>
