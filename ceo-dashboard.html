@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CEO Dashboard - LOVE CARE GLOBAL - THEMED</title>
+<title>CEO Dashboard â€” Registrations Go Straight Here | LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="icon-transparent-512.png">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
@@ -29,15 +31,14 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:10
 .nav{display:flex;justify-content:space-between;align-items:center;margin:10px;padding:10px;background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.12);border-radius:12px}
 .progress{display:flex;gap:6px;justify-content:center;margin:12px}
 .dot{width:12px;height:12px;border-radius:50%;background:rgba(76,29,149,.3);border:1px solid rgba(168,85,247,.18);transition:.2s}.dot.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);box-shadow:0 0 10px rgba(168,85,247,.5)}
-.badge{padding:3px 8px;border-radius:999px;font-size:10px;font-weight:900}
-label{font-size:11px;font-weight:800;color:#c4b5fd;margin:10px 0 6px;display:block;letter-spacing:.05em;text-transform:uppercase}
-input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;font-weight:600;outline:none}
-input:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
-.priceBox{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.15);border-radius:14px;padding:12px}
-.badge-ghs{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.2)}
-.badge-usd{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.2)}
-.liveBanner{background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.1));border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:10px;font-size:11px;color:#86efac;margin-bottom:12px}
-.links a{display:inline-block;margin:2px;padding:5px 10px;background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.18);border-radius:8px;color:#d8b4fe;font-size:11px;text-decoration:none;font-weight:700}
+.nurseCard{border:2px solid rgba(239,68,68,.3);background:rgba(14,10,28,.7);border-radius:16px;padding:12px;margin:10px 0}
+.nurseCard.approved{border-color:rgba(34,197,94,.3);background:rgba(16,101,57,.12)}
+.particulars{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-top:10px}
+@media(max-width:600px){.particulars{grid-template-columns:1fr}}
+.photoBox{width:110px;height:110px;border-radius:14px;overflow:hidden;border:2px solid rgba(168,85,247,.25);background:#1e0a3a}
+.photoBox img{width:100%;height:100%;object-fit:cover}
+.docLinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.docLink{padding:6px 10px;border-radius:8px;font-size:10px;font-weight:800;text-decoration:none;background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
 .statNum{font-weight:900;font-size:22px;color:#f3e8ff}
 </style>
 </head>
@@ -46,151 +47,102 @@ input:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
 <div class="header">
 <div class="leftHead">
 <img src="icon-transparent-512.png" class="logoImg">
-<div><b style="font-size:13px;color:#f3e8ff">👑 CEO DASHBOARD — LOVE CARE GLOBAL</b><div style="font-size:10px;color:#a78bfa">CEO: lovecareglobal@gmail.com | Page <span id="pageNum">1</span>/4 • Themed Purple</div></div>
+<div><b style="font-size:13px;color:#f3e8ff">ðŸ‘‘ CEO DASHBOARD â€” REGISTRATIONS STRAIGHT HERE</b><div style="font-size:10px;color:#a78bfa">CEO: lovecareglobal@gmail.com | Page <span id="pageNum">1</span>/4 â€¢ Pending nurses from Firebase</div></div>
 </div>
 <div style="display:flex;gap:6px;flex-wrap:wrap">
-<a href="nurse-group-chat.html" style="padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;font-size:12px;text-decoration:none;box-shadow:0 6px 16px rgba(245,158,11,.3)">💬 Group Chat</a>
-<button class="btn" style="background:rgba(255,255,255,.08);color:#e9d5ff" onclick="location.href='index.html'">🏠 Home</button>
+<a href="nurse-group-chat.html" style="padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;font-size:12px;text-decoration:none">ðŸ’¬ Group Chat</a>
+<button class="btn" style="background:rgba(255,255,255,.08);color:#e9d5ff" onclick="location.href='index.html'">ðŸ </button>
 </div>
 </div>
 
 <div style="max-width:1150px;margin:0 auto;padding-bottom:40px">
 <div class="progress"><div class="dot active" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div><div class="dot" id="d4"></div></div>
 
-<!-- PAGE 1: Pending + Stats -->
+<!-- PAGE 1: PENDING REGISTRATIONS STRAIGHT FROM FIREBASE -->
 <div id="page1" class="page active">
 <div class="grid4">
-<div class="card" style="text-align:center;border-color:rgba(34,197,94,.25)"><b style="font-size:11px;color:#86efac">Bookings</b><div id="ceoTotalBookings" class="statNum">0</div></div>
-<div class="card" style="text-align:center;border-color:rgba(59,130,246,.25)"><b style="font-size:11px;color:#93c5fd">Nurses</b><div id="ceoTotalNurses" class="statNum">0</div></div>
-<div class="card" style="text-align:center;border-color:rgba(245,158,11,.25)"><b style="font-size:11px;color:#facc15">Earnings</b><div id="ceoPlatformEarnings" class="statNum">0</div></div>
-<div class="card" style="text-align:center;border-color:rgba(239,68,68,.25)"><b style="font-size:11px;color:#fca5a5">SOS</b><div id="ceoSOSCount" class="statNum">0</div></div>
+<div class="card" style="text-align:center"><b style="font-size:11px;color:#86efac">Bookings</b><div id="ceoTotalBookings" class="statNum">0</div></div>
+<div class="card" style="text-align:center"><b style="font-size:11px;color:#93c5fd">Nurses</b><div id="ceoTotalNurses" class="statNum">0</div><small id="pendingCount" style="font-size:10px;color:#facc15">0 pending</small></div>
+<div class="card" style="text-align:center"><b style="font-size:11px;color:#facc15">Earnings</b><div id="ceoPlatformEarnings" class="statNum">0</div></div>
+<div class="card" style="text-align:center"><b style="font-size:11px;color:#fca5a5">SOS</b><div id="ceoSOSCount" class="statNum">0</div></div>
 </div>
 
-<div class="card" style="background:linear-gradient(90deg,rgba(76,29,149,.4),rgba(168,85,247,.25));border-color:rgba(168,85,247,.25)">
+<div class="card" style="background:linear-gradient(90deg,rgba(76,29,149,.4),rgba(168,85,247,.25))">
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-<div><b style="color:#f3e8ff">👑 CEO CONTROL CENTER — KUSIPETER | lovecareglobal@gmail.com</b><div style="font-size:10px;color:#d8b4fe">CEO ↔ Nurse ↔ Client ↔ Staff Live Connection • Purple Themed</div></div>
-<a href="nurse-group-chat.html" style="padding:10px 16px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;font-size:12px;text-decoration:none">💬 Open Group Chat as CEO</a>
+<div><b style="color:#f3e8ff">ðŸ‘‘ CEO: lovecareglobal@gmail.com â€” Registrations Come Straight Here</b><div style="font-size:10px;color:#d8b4fe">Nurses register â†’ Go to pendingNurses + nurses collection + RTDB â†’ You approve here â†’ They can login</div></div>
+<a href="nurse-group-chat.html" style="padding:10px 16px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;font-size:12px;text-decoration:none">ðŸ’¬ Open Group Chat as CEO</a>
 </div>
 </div>
 
 <div class="card">
-<b style="color:#f3e8ff">PAGE 1: Quick Actions & Pricing — ALL BUTTONS + CEDIS/DOLLAR</b><br><br>
-<button class="btn btnGreen" onclick="goTo(2)">👩‍⚕️ Review Nurses →</button>
-<button class="btn btnBlue" onclick="loadNursesForCall()">📞 Nurse Directory</button>
-<button class="btn" style="background:rgba(14,116,144,.3);color:#7dd3fc;border:1px solid rgba(14,116,144,.3)" onclick="loadStaffForCall()">👔 Staff</button>
-<button class="btn btnOrange" onclick="loadClientsForCall()">👨‍👩‍👧 Clients</button>
-<button class="btn btnPurple" onclick="viewLiveMap()">🗺️ Live Map All</button>
-<button class="btn btnYellow" onclick="broadcastToNurses()">📢 To Nurses</button>
-<button class="btn btnYellow" onclick="broadcastToClients()">📢 To Clients</button>
-<button class="btn btnCEO" onclick="goTo(4)">💰 Pricing (Cedis/Dollar) →</button>
-<br><br>
-<b style="color:#d8b4fe">Filters:</b><br>
-<button class="btn btnYellow" onclick="filterNurses('pending')">⏳ Pending</button>
-<button class="btn btnBlue" onclick="filterNurses('all')">📋 All</button>
-<button class="btn btnGreen" onclick="filterNurses('approved')">✅ Approved</button>
-<button class="btn btnGray" onclick="filterNurses('rejected')">❌ Rejected</button>
-<button class="btn btnRed" onclick="filterNurses('blocked')">🚫 Blocked</button>
-<button class="btn btnDark" onclick="removeDemo()">🧹 Remove Demo</button>
-<button class="btn btnGreen" onclick="loadPending()">🔄 Load Pending</button>
+<b style="color:#f3e8ff">PAGE 1: New Registrations â€” View All Particulars Before Approval</b><br>
+<small style="color:#a78bfa">All fields: Photo, ID, Licence, Certificate, CV, Video, GPS, Phone, Email, Qualification, Experience â€” CEO must Approve to allow login</small><br><br>
+<button class="btn btnGreen" onclick="loadPendingFirebase()">ðŸ”„ Load Pending From Firebase</button>
+<button class="btn btnBlue" onclick="loadAllNursesFirebase()">ðŸ“‹ All Nurses Firebase</button>
+<button class="btn btnYellow" onclick="goTo(4)">ðŸ’° Pricing (Cedis/Dollar) â†’</button>
+<button class="btn btnDark" onclick="listenLive()">ðŸ”´ Live Listen</button>
+<div id="liveStatus" style="font-size:10px;color:#a78bfa;margin-top:6px"></div>
 </div>
 
 <div id="pendingSection" class="card" style="border:2px solid rgba(239,68,68,.3);background:rgba(127,29,29,.12)">
-<h3 style="margin:0;color:#fca5a5">🚨 PENDING NURSE REGISTRATIONS - Accept / Reject</h3>
-<p style="font-size:11px;color:#a78bfa">CV, Licence, Photos, Certificate, Video, National ID</p>
-<div id="ceoNurseApplicationsList" style="max-height:600px;overflow-y:auto;background:rgba(14,10,28,.6);border-radius:12px;padding:8px;border:1px solid rgba(239,68,68,.2);margin-top:8px;color:#e8e0ff">Loading pending...</div>
+<h3 style="margin:0;color:#fca5a5">ðŸš¨ PENDING NURSE REGISTRATIONS â€” Straight From Firebase â€” Accept / Reject â€” They Can't Login Until You Approve</h3>
+<p style="font-size:11px;color:#d8b4fe;margin:6px 0">These are nurses who registered. View their particulars: Photo, National ID, Licence, Certificate, CV, Video, GPS Actual Name, Phone, Email, Qualification, Experience. Click Approve to allow login.</p>
+<div id="ceoNurseApplicationsList" style="max-height:900px;overflow-y:auto;background:rgba(14,10,28,.6);border-radius:12px;padding:8px;border:1px solid rgba(239,68,68,.2);margin-top:8px;color:#e8e0ff">Loading pending registrations straight from Firebase... Please wait.</div>
 </div>
-<div class="nav"><button class="btn btnGray" disabled>⬅️ Backwards</button><span style="font-size:12px;color:#a78bfa">Page 1 of 4 - Pending Nurses</span><button class="btn btnGreen" onclick="goTo(2)">Continue →</button></div>
+<div class="nav"><button class="btn btnGray" disabled>â¬…ï¸ Backwards</button><span style="font-size:12px;color:#a78bfa">Page 1 â€” Pending Registrations Straight to CEO</span><button class="btn btnGreen" onclick="goTo(2)">Continue â†’</button></div>
 </div>
 
 <!-- PAGE 2: Verified -->
 <div id="page2" class="page">
 <div class="card" style="border:2px solid rgba(34,197,94,.25);background:rgba(34,197,94,.08)">
-<h3 style="margin:0;color:#86efac">✅ VERIFIED NURSES - View Uploads - PAGE 2</h3>
+<h3 style="margin:0;color:#86efac">âœ… APPROVED NURSES â€” Can Login â€” View Their Particulars</h3>
 <div style="margin:8px 0">
-<button class="btn btnGreen" onclick="loadVerified()">👩‍⚕️ Load Verified</button>
-<button class="btn btnBlue" onclick="viewAllDocs()">📁 Docs Gallery</button>
-<button class="btn btnCEO" onclick="goTo(1)">⬅️ Back</button>
+<button class="btn btnGreen" onclick="loadApprovedFirebase()">ðŸ‘©â€âš•ï¸ Load Approved From Firebase</button>
+<button class="btn btnBlue" onclick="goTo(1)">â¬…ï¸ Pending</button>
 </div>
-<div id="ceoVerifiedNursesList" style="max-height:400px;overflow-y:auto;background:rgba(14,10,28,.6);border-radius:12px;padding:8px;border:1px solid rgba(34,197,94,.2)">No verified yet</div>
+<div id="ceoVerifiedNursesList" style="max-height:600px;overflow-y:auto;background:rgba(14,10,28,.6);border-radius:12px;padding:8px;border:1px solid rgba(34,197,94,.2)">No approved yet â€” click Load Approved</div>
 </div>
-<div class="card"><h3 style="color:#f3e8ff">📞 Call Lists - Live tracking</h3><div id="ceoCallLists" style="max-height:200px;overflow-y:auto;background:rgba(14,10,28,.5);border-radius:8px;padding:8px;border:1px solid rgba(168,85,247,.12)">Click Nurse Directory / Staff / Clients</div><div id="ceoStaffList" style="margin-top:6px"></div></div>
-<div class="card" style="border:1px solid rgba(168,85,247,.2);background:rgba(76,29,149,.12)">
-<h3 style="color:#d8b4fe;margin:0">🔗 CEO ↔ Nurse ↔ Client ↔ Staff Connection Hub</h3><br>
-<div class="grid2">
-<div class="card" style="margin:0"><b>CEO ↔ Nurse</b><br><button class="btn btnGreen" onclick="alert('CEO to Nurse direct')">💬 Message</button><button class="btn btnBlue" onclick="loadNursesForCall()">📞 Call List</button></div>
-<div class="card" style="margin:0"><b>CEO ↔ Client</b><br><button class="btn btnOrange" onclick="loadClientsForCall()">👨‍👩‍👧 Clients</button><button class="btn btnPurple" onclick="viewLiveMap()">🗺️ Map</button></div>
-</div>
-</div>
-<div class="nav"><button class="btn btnGray" onclick="goTo(1)">⬅️ Back</button><span style="font-size:12px;color:#a78bfa">Page 2 - Verified</span><button class="btn btnGreen" onclick="goTo(3)">Continue →</button></div>
+<div class="card"><h3 style="color:#f3e8ff">ðŸ“ž Call Lists</h3><div id="ceoCallLists" style="max-height:200px;overflow-y:auto;background:rgba(14,10,28,.5);border-radius:8px;padding:8px;border:1px solid rgba(168,85,247,.12)">Click to load</div></div>
+<div class="nav"><button class="btn btnGray" onclick="goTo(1)">â¬…ï¸ Back</button><span style="font-size:12px;color:#a78bfa">Page 2 - Approved Nurses</span><button class="btn btnGreen" onclick="goTo(3)">Continue â†’</button></div>
 </div>
 
-<!-- PAGE 3: Bookings / Payouts / Staff -->
+<!-- PAGE 3: Bookings etc -->
 <div id="page3" class="page">
 <div class="grid2">
-<div class="card"><h3 style="color:#f3e8ff">📅 Bookings - Entire App</h3><div id="ceoBookingsList" style="max-height:300px;overflow-y:auto">Loading...</div><button class="btn btnBlue" onclick="loadBookings()">🔄 Load Bookings</button></div>
-<div class="card"><h3 style="color:#f3e8ff">💰 Payout Requests</h3><div id="ceoPayoutsList" style="max-height:300px;overflow-y:auto">Loading...</div><button class="btn btnGreen" onclick="loadPayouts()">🔄 Load Payouts</button></div>
+<div class="card"><h3 style="color:#f3e8ff">ðŸ“… Bookings</h3><div id="ceoBookingsList" style="max-height:300px;overflow-y:auto">Loading...</div><button class="btn btnBlue" onclick="loadBookings()">ðŸ”„ Load</button></div>
+<div class="card"><h3 style="color:#f3e8ff">ðŸ’° Payouts</h3><div id="ceoPayoutsList" style="max-height:300px;overflow-y:auto">Loading...</div><button class="btn btnGreen" onclick="loadPayouts()">ðŸ”„ Load</button></div>
 </div>
-<div class="card"><h3 style="color:#f3e8ff">🔄 Refunds / Disputes</h3><div id="ceoRefundsList" style="max-height:200px;overflow-y:auto"></div><button class="btn btnBlue" onclick="loadRefunds()">Load Refunds</button> <button class="btn btnGreen" onclick="approveRefund()">Approve</button> <button class="btn btnRed" onclick="denyRefund()">Deny</button></div>
-<div class="card"><h3 style="color:#f3e8ff">👔 Staff Management - Entire App</h3><div id="staffListDisplay" style="max-height:150px;overflow-y:auto;background:rgba(14,10,28,.5);padding:8px;border-radius:8px"></div><div class="grid2" style="margin-top:8px"><input id="newStaffId" placeholder="Staff ID"><input id="newStaffPass" placeholder="Password"><input id="newStaffPhone" placeholder="Phone"></div><button class="btn btnGreen" onclick="createStaff()">Create Staff</button><button class="btn btnBlue" onclick="loadStaffList()">Load Staff</button></div>
-<div class="nav"><button class="btn btnGray" onclick="goTo(2)">⬅️ Back</button><span style="font-size:12px;color:#a78bfa">Page 3 - Bookings/Payouts</span><button class="btn btnGreen" onclick="goTo(4)">Pricing →</button></div>
+<div class="nav"><button class="btn btnGray" onclick="goTo(2)">â¬…ï¸ Back</button><span style="font-size:12px;color:#a78bfa">Page 3</span><button class="btn btnGreen" onclick="goTo(4)">Pricing â†’</button></div>
 </div>
 
-<!-- PAGE 4: PRICING + MAP + GROUP CHAT -->
+<!-- PAGE 4: Pricing + Map + Group Chat -->
 <div id="page4" class="page">
 <div class="card">
-<div class="liveBanner">● Live — Prices here instantly update clients: GHS for Ghana (Cedis) and USD for outside Ghana via Paystack • Paystack charges GHS or USD based on currency selection</div>
+<div style="background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.1));border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:10px;font-size:11px;color:#86efac;margin-bottom:12px">â— Live â€” Prices here instantly update clients: GHS for Ghana (Cedis) and USD for outside Ghana via Paystack</div>
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-<a href="nurse-group-chat.html" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;text-decoration:none;font-size:14px;box-shadow:0 8px 20px rgba(245,158,11,.3)">
-<span style="font-size:22px">💬</span><div style="text-align:left"><div>CEO → Nurse Group Chat</div><small style="font-size:10px;opacity:.8">Login as lovecareglobal@gmail.com</small></div>
-</a>
-<button class="btn btnPurple" style="padding:16px;font-size:13px" onclick="viewLiveMap()">🗺️ Live Map All Nurses</button>
+<a href="nurse-group-chat.html" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;text-decoration:none;font-size:14px">ðŸ’¬ CEO â†’ Nurse Group Chat â€” lovecareglobal@gmail.com</a>
+<button class="btn btnPurple" style="padding:16px" onclick="viewLiveMap()">ðŸ—ºï¸ Live Map</button>
 </div>
 
-<h2 style="font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:4px">💰 Set Prices — Cedis (Ghana) & Dollar (Outside Ghana)</h2>
-<p style="font-size:11px;color:#a78bfa;margin-bottom:14px">Ghana clients pay in Cedis (GHS) via Paystack • Outside Ghana / Diaspora pay in Dollar (USD) via Paystack • Care Mode: Hourly, Daily, Weekly, Monthly + quantity + Live-in/Live-out</p>
+<h2 style="font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:4px">ðŸ’° Pricing â€” Cedis for Ghana, Dollar for Outside</h2>
+<p style="font-size:11px;color:#a78bfa;margin-bottom:14px">Ghana clients pay in Cedis (GHS) via Paystack â€¢ Outside Ghana pay in Dollar (USD) via Paystack</p>
 
 <div class="grid2">
-<div class="priceBox">
-<h4><span class="badge badge-ghs">🇬🇭 GHANA — CEDIS (GHS)</span> — For clients in Ghana</h4>
-<label>Hourly Rate (GHS)</label><input id="ghs_hourly" type="number" placeholder="50">
-<label>Daily Rate (8 hrs) — GHS</label><input id="ghs_daily" type="number" placeholder="400">
-<label>Weekly Rate — GHS</label><input id="ghs_weekly" type="number" placeholder="2000">
-<label>Monthly Rate (30 days) — GHS</label><input id="ghs_monthly" type="number" placeholder="7500">
-<div style="margin-top:8px;font-size:10px;color:#6b7280">Client books: e.g., 3 days = Daily Rate x 3 + transport if live-out</div>
-</div>
-<div class="priceBox">
-<h4><span class="badge badge-usd">🇺🇸 OUTSIDE GHANA — DOLLAR (USD)</span> — Diaspora pays via Paystack USD</h4>
-<label>Hourly Rate (USD)</label><input id="usd_hourly" type="number" placeholder="5">
-<label>Daily Rate (8 hrs) — USD</label><input id="usd_daily" type="number" placeholder="35">
-<label>Weekly Rate — USD</label><input id="usd_weekly" type="number" placeholder="150">
-<label>Monthly Rate (30 days) — USD</label><input id="usd_monthly" type="number" placeholder="500">
-<div style="margin-top:8px;font-size:10px;color:#6b7280">Outside Ghana: Weekly 2 = Weekly Rate x 2 = Total in USD via Paystack</div>
-</div>
-</div>
-
-<div style="margin-top:12px;background:rgba(14,10,28,.6);border:1px dashed rgba(168,85,247,.25);border-radius:14px;padding:12px">
-<b style="font-size:12px;color:#f3e8ff">How pricing works with Care Mode + Live type:</b>
-<ul style="font-size:11px;color:#a78bfa;margin:8px 0 0 16px;line-height:1.6">
-<li>Care Mode: Hourly, Daily, Weekly, Monthly — client enters quantity (e.g., 3 weeks)</li>
-<li>Live-In: Nurse stays — conditions: feeding, accommodation type (private/shared), details</li>
-<li>Live-Out: Nurse comes daily — conditions: transport support amount, working hours</li>
-<li>Total = Rate x Quantity + Transport (if live-out) — must be >= minimum</li>
-<li>Currency: GHS for Ghana, USD for outside — Paystack handles both</li>
-</ul>
+<div class="card" style="margin:0;background:rgba(14,10,28,.6)"><b style="color:#86efac">ðŸ‡¬ðŸ‡­ GHANA â€” CEDIS (GHS)</b><br><label>Hourly</label><input id="ghs_hourly" type="number"><label>Daily (8 hrs)</label><input id="ghs_daily" type="number"><label>Weekly</label><input id="ghs_weekly" type="number"><label>Monthly (30 days)</label><input id="ghs_monthly" type="number"></div>
+<div class="card" style="margin:0;background:rgba(14,10,28,.6)"><b style="color:#93c5fd">ðŸ‡ºðŸ‡¸ OUTSIDE â€” DOLLAR (USD)</b><br><label>Hourly</label><input id="usd_hourly" type="number"><label>Daily (8 hrs)</label><input id="usd_daily" type="number"><label>Weekly</label><input id="usd_weekly" type="number"><label>Monthly (30 days)</label><input id="usd_monthly" type="number"></div>
 </div>
 
 <div style="display:flex;gap:10px;margin-top:14px">
-<button class="btn" style="flex:1;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;padding:14px" onclick="saveRates()">💾 Save Prices — Update All Clients Instantly</button>
-<button class="btn btnDark" onclick="resetDefault()">Reset Default</button>
+<button class="btn" style="flex:1;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;padding:14px" onclick="saveRates()">ðŸ’¾ Save Prices</button>
+<button class="btn btnDark" onclick="resetDefault()">Reset</button>
 </div>
-<div id="rateStatus" style="margin-top:10px;font-size:12px;text-align:center;min-height:18px;color:#a78bfa"></div>
-<div id="preview" style="margin-top:10px;font-size:11px;color:#c4b5fd;line-height:1.8;background:rgba(14,10,28,.5);padding:10px;border-radius:10px"></div>
+<div id="rateStatus" style="margin-top:10px;font-size:12px;text-align:center;color:#a78bfa"></div>
+<div id="preview" style="margin-top:10px;font-size:11px;color:#c4b5fd;background:rgba(14,10,28,.5);padding:10px;border-radius:10px"></div>
 </div>
 
-<div class="card"><div id="ceoMap" style="width:100%;height:300px;border-radius:12px;border:1px solid rgba(168,85,247,.15)"></div></div>
-
-<div class="nav"><button class="btn btnGray" onclick="goTo(3)">⬅️ Back</button><span style="font-size:12px;color:#a78bfa">Page 4 - Pricing + Map + Group Chat</span><button class="btn btnDark" onclick="goTo(1)">🏠 Go to Page 1</button></div>
+<div class="card"><div id="ceoMap" style="width:100%;height:300px;border-radius:12px"></div></div>
+<div class="nav"><button class="btn btnGray" onclick="goTo(3)">â¬…ï¸ Back</button><span style="font-size:12px;color:#a78bfa">Page 4 â€” Pricing + Map + Group Chat</span><button class="btn btnDark" onclick="goTo(1)">ðŸ  Page 1</button></div>
 </div>
 
 </div>
@@ -199,7 +151,8 @@ input:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
 var firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 var db=firebase.database();
-var auth=firebase.auth();
+var fs=firebase.firestore();
+var storage=firebase.storage();
 
 var DEFAULTS={GHS:{hourly:50,daily:400,weekly:2000,monthly:7500},USD:{hourly:5,daily:35,weekly:150,monthly:500}};
 
@@ -211,45 +164,202 @@ function goTo(n){
   document.getElementById('pageNum').innerText=n;
   window.scrollTo(0,0);
   if(n===4) loadRates();
+  if(n===1) loadPendingFirebase();
 }
 
-function getApps(){ try{ return JSON.parse(localStorage.getItem('nurseApplications')||'[]'); }catch(e){ return []; } }
-
-function loadPending(){
-  var apps=getApps();
-  var pending=apps.filter(a=>!a.status||a.status==='pending');
+function loadPendingFirebase(){
   var el=document.getElementById('ceoNurseApplicationsList');
-  if(!pending.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:#a78bfa">No pending nurses — Click Load Pending</div>'; return; }
-  el.innerHTML=pending.map(a=>`
-    <div style="border:1px solid rgba(239,68,68,.2);padding:10px;border-radius:10px;margin:6px 0;background:rgba(14,10,28,.5)">
-      <b>${a.name||'Nurse'}</b> - ${a.phone||''} - ${a.email||''}<br>
-      <small style="color:#a78bfa">${a.qualification||''} | ${a.experience||''}yrs</small><br>
-      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btnGreen" onclick="approveNurse('${a.id}')">✅ Approve</button>
-        <button class="btn btnRed" onclick="rejectNurse('${a.id}')">❌ Reject</button>
-        <a href="tel:${a.phone}" class="btn btnBlue">📞 Call</a>
+  el.innerHTML='<div style="padding:20px;text-align:center;color:#a78bfa">Loading pending registrations from Firebase... Checking pendingNurses + nurses collections + RTDB...</div>';
+  
+  // Load from RTDB pendingNurses (fastest - straight from registration)
+  db.ref('pendingNurses').once('value').then(snapRTDB=>{
+    var listRTDB=[];
+    if(snapRTDB.exists()){
+      snapRTDB.forEach(child=>{
+        var v=child.val();
+        if(!v.isApproved || v.status==='pending') listRTDB.push({...v, id:child.key, uid:child.key, source:'RTDB-pendingNurses'});
+      });
+    }
+    // Also load from RTDB nurses where not approved
+    return db.ref('nurses').once('value').then(snapNurses=>{
+      var listNurses=[];
+      if(snapNurses.exists()){
+        snapNurses.forEach(child=>{
+          var v=child.val();
+          if(v.isApproved!==true && v.status!=='approved' && v.status!=='rejected'){
+            if(!listRTDB.find(x=>x.uid===child.key)) listNurses.push({...v, id:child.key, uid:child.key, source:'RTDB-nurses'});
+          }
+        });
+      }
+      var combined=[...listRTDB, ...listNurses];
+      
+      // Also try Firestore pendingNurses collection
+      return fs.collection('pendingNurses').get().then(qs=>{
+        qs.forEach(doc=>{
+          var v=doc.data();
+          if(v.isApproved!==true && v.status!=='pending' && v.status!=='approved' && v.status!=='rejected' || v.status==='pending' || v.isApproved===false){
+            if(!combined.find(x=>x.uid===doc.id)) combined.push({...v, id:doc.id, uid:doc.id, source:'Firestore-pendingNurses'});
+          }
+        });
+        return fs.collection('nurses').where('isApproved','==',false).get().then(qs2=>{
+          qs2.forEach(doc=>{
+            var v=doc.data();
+            if(!combined.find(x=>x.uid===doc.id)) combined.push({...v, id:doc.id, uid:doc.id, source:'Firestore-nurses-false'});
+          });
+          renderPendingList(combined);
+        });
+      }).catch(e=>{
+        console.log('Firestore error', e);
+        renderPendingList(combined);
+      });
+    });
+  }).catch(e=>{
+    el.innerHTML='<div style="color:#fca5a5">Error loading: '+e.message+'</div>';
+  });
+}
+
+function renderPendingList(list){
+  var el=document.getElementById('ceoNurseApplicationsList');
+  document.getElementById('pendingCount').textContent=list.length+' pending';
+  document.getElementById('ceoTotalNurses').textContent=list.length+' pending / total';
+  if(!list.length){
+    el.innerHTML='<div style="padding:30px;text-align:center;color:#a78bfa">âœ… No pending registrations â€” All nurses approved or no registrations yet.<br>When nurses register, they will appear here straight from Firebase with all particulars.</div>';
+    return;
+  }
+  el.innerHTML=list.map(n=>{
+    var photo=n.photoURL||n.profilePhoto||'';
+    var idURL=n.nationalIdURL||n.idURL||'';
+    var licenceURL=n.licenceURL||'';
+    var certURL=n.certificateURL||'';
+    var cvURL=n.cvURL||'';
+    var videoURL=n.videoURL||n.introVideoUrl||'';
+    return `
+    <div class="nurseCard">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div><b style="font-size:14px;color:#f3e8ff">${n.fullName||n.name||'Nurse'}</b> <span style="font-size:9px;background:#fde68a;color:#92400e;padding:2px 6px;border-radius:99px">${n.source||''}</span><br>
+        <small style="color:#a78bfa">${n.email||''} â€¢ ${n.phone||n.phoneNumber||''} â€¢ ${n.country||''} â€¢ ${n.experience||0} yrs â€¢ ${n.qualification||''}</small><br>
+        <small style="color:#d8b4fe">GPS: ${n.gpsActualName||n.actualLocationName||'No GPS'}<br>Lat: ${n.lat||''} Lng: ${n.lng||''}<br>Service: ${(n.services||[n.service]||[]).join(', ')}<br>Bio: ${n.bio||''}</small></div>
+        <div class="photoBox">${photo?`<img src="${photo}" onclick="window.open('${photo}','_blank')">`:'<div style="display:grid;place-items:center;height:100%;color:#6b5b8a">No Photo</div>'}</div>
       </div>
+      <div class="particulars">
+        <div><b style="font-size:11px;color:#d8b4fe">Particulars â€” CEO View All:</b></div>
+        <div>
+          <div class="docLinks">
+            ${photo?`<a class="docLink" href="${photo}" target="_blank">ðŸ“· Photo</a>`:''}
+            ${idURL?`<a class="docLink" href="${idURL}" target="_blank">ðŸªª National ID</a>`:''}
+            ${licenceURL?`<a class="docLink" href="${licenceURL}" target="_blank">ðŸ“œ Licence</a>`:''}
+            ${certURL?`<a class="docLink" href="${certURL}" target="_blank">ðŸŽ“ Certificate</a>`:''}
+            ${cvURL?`<a class="docLink" href="${cvURL}" target="_blank">ðŸ“„ CV</a>`:''}
+            ${videoURL?`<a class="docLink" href="${videoURL}" target="_blank">ðŸŽ¥ Intro Video â€” CEO Watch</a>`:''}
+          </div>
+          ${videoURL?`<video src="${videoURL}" controls style="width:100%;max-width:320px;margin-top:8px;border-radius:10px;border:1px solid rgba(168,85,247,.18)"></video>`:''}
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btnGreen" onclick="approveFirebase('${n.uid}')">âœ… Approve â€” Allow Login</button>
+        <button class="btn btnRed" onclick="rejectFirebase('${n.uid}','${(n.fullName||'').replace(/'/g,'')}')">âŒ Reject â€” Block Login</button>
+        <a href="tel:${n.phone||n.phoneNumber||''}" class="btn btnBlue">ðŸ“ž Call ${n.phone||''}</a>
+        <button class="btn btnDark" onclick="viewOnMap(${n.lat||0},${n.lng||0},'${(n.fullName||'Nurse').replace(/'/g,'')}')">ðŸ—ºï¸ Map</button>
+      </div>
+      <div style="font-size:9px;color:#6b5b8a;margin-top:6px">UID: ${n.uid} â€¢ Created: ${n.timestamp?new Date(n.timestamp).toLocaleString():''} â€¢ Source: ${n.source}</div>
     </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
-function approveNurse(id){
-  var apps=getApps(); var idx=apps.findIndex(a=>a.id===id); if(idx>=0){ apps[idx].status='approved'; localStorage.setItem('nurseApplications',JSON.stringify(apps)); loadPending(); loadStats(); alert('Approved '+apps[idx].name); }
+function approveFirebase(uid){
+  if(!confirm('Approve nurse '+uid+'? They will be able to login as nurse.')) return;
+  // Update RTDB
+  db.ref('nurses/'+uid).update({isApproved:true, status:'approved', verificationStatus:'verified', approvedAt:Date.now(), approvedBy:'CEO lovecareglobal@gmail.com'});
+  db.ref('pendingNurses/'+uid).update({isApproved:true, status:'approved', approvedAt:Date.now()});
+  // Update Firestore
+  fs.collection('nurses').doc(uid).update({isApproved:true, status:'approved', verificationStatus:'verified', approvedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(e=>console.log(e));
+  fs.collection('pendingNurses').doc(uid).update({isApproved:true, status:'approved'}).catch(e=>{});
+  // Remove from ceoNotifications or mark approved
+  db.ref('ceoNotifications/'+uid).update({status:'approved', approvedAt:Date.now()});
+  alert('âœ… Approved! Nurse can now login. Refreshing list...');
+  setTimeout(loadPendingFirebase, 1500);
 }
-function rejectNurse(id){
-  var apps=getApps(); var idx=apps.findIndex(a=>a.id===id); if(idx>=0){ apps[idx].status='rejected'; localStorage.setItem('nurseApplications',JSON.stringify(apps)); loadPending(); alert('Rejected'); }
+
+function rejectFirebase(uid, name){
+  var reason=prompt('Reject '+name+'? Enter reason (will be shown to nurse when they try login):');
+  if(!reason) return;
+  db.ref('nurses/'+uid).update({isApproved:false, status:'rejected', rejectionReason:reason, rejectedAt:Date.now(), rejectedBy:'CEO'});
+  db.ref('pendingNurses/'+uid).update({isApproved:false, status:'rejected', rejectionReason:reason});
+  fs.collection('nurses').doc(uid).update({isApproved:false, status:'rejected', rejectionReason:reason}).catch(e=>{});
+  fs.collection('pendingNurses').doc(uid).update({status:'rejected', rejectionReason:reason}).catch(e=>{});
+  db.ref('ceoNotifications/'+uid).update({status:'rejected', reason:reason});
+  alert('âŒ Rejected '+name+' â€” They cannot login');
+  setTimeout(loadPendingFirebase, 1000);
 }
-function filterNurses(type){
-  var apps=getApps(); var filtered=[];
-  if(type==='pending') filtered=apps.filter(a=>!a.status||a.status==='pending');
-  else if(type==='approved') filtered=apps.filter(a=>a.status==='approved');
-  else if(type==='all') filtered=apps;
-  else if(type==='rejected') filtered=apps.filter(a=>a.status==='rejected');
-  else if(type==='blocked') filtered=apps.filter(a=>a.blocked);
+
+function loadAllNursesFirebase(){
   var el=document.getElementById('ceoNurseApplicationsList');
-  el.innerHTML=filtered.map(a=>`<div style="padding:8px;border-bottom:1px solid rgba(168,85,247,.12)">${a.name} - ${a.phone} - ${a.status||'pending'}</div>`).join('')||'None';
+  el.innerHTML='Loading all nurses from Firebase...';
+  db.ref('nurses').once('value').then(snap=>{
+    var list=[];
+    if(snap.exists()) snap.forEach(c=>{ list.push({...c.val(), uid:c.key}); });
+    renderPendingList(list);
+  });
 }
 
+function loadApprovedFirebase(){
+  var el=document.getElementById('ceoVerifiedNursesList');
+  el.innerHTML='Loading approved...';
+  db.ref('nurses').orderByChild('isApproved').equalTo(true).once('value').then(snap=>{
+    var list=[];
+    if(snap.exists()) snap.forEach(c=>{ list.push({...c.val(), uid:c.key}); });
+    if(!list.length){ el.innerHTML='No approved nurses'; return; }
+    el.innerHTML=list.map(n=>`
+      <div class="nurseCard approved" style="padding:10px">
+        <b>${n.fullName||n.name}</b> â€” ${n.email} â€” ${n.phone}<br>
+        <small style="color:#a78bfa">${n.qualification} â€¢ ${n.experience} yrs â€¢ ${n.gpsActualName||''}</small><br>
+        <div class="docLinks">
+          ${n.photoURL?`<a class="docLink" href="${n.photoURL}" target="_blank">Photo</a>`:''}
+          ${n.licenceURL?`<a class="docLink" href="${n.licenceURL}" target="_blank">Licence</a>`:''}
+          ${n.videoURL?`<a class="docLink" href="${n.videoURL}" target="_blank">Video</a>`:''}
+        </div>
+        <button class="btn btnRed" style="margin-top:6px" onclick="rejectFirebase('${n.uid}','${(n.fullName||'').replace(/'/g,'')}')">âŒ Revoke â€” Block Login</button>
+      </div>
+    `).join('');
+  });
+}
+
+function listenLive(){
+  document.getElementById('liveStatus').textContent='ðŸ”´ Live listening â€” New registrations will appear automatically here...';
+  db.ref('pendingNurses').on('child_added', snap=>{
+    var v=snap.val();
+    if(v.isApproved!==true && v.status!=='approved'){
+      document.getElementById('liveStatus').textContent='ðŸ”´ New registration: '+(v.fullName||'Nurse')+' â€” '+new Date().toLocaleTimeString()+' â€” Refreshing list';
+      loadPendingFirebase();
+    }
+  });
+}
+
+function viewOnMap(lat,lng,name){
+  if(!lat||!lng){ alert('No GPS for '+name); return; }
+  goTo(4);
+  setTimeout(()=>{
+    var el=document.getElementById('ceoMap');
+    if(window.ceoMap) window.ceoMap.remove();
+    window.ceoMap=L.map('ceoMap').setView([lat,lng],13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(window.ceoMap);
+    L.marker([lat,lng]).addTo(window.ceoMap).bindPopup(name).openPopup();
+  },500);
+}
+
+function goTo(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.dot').forEach(d=>d.classList.remove('active'));
+  document.getElementById('page'+n).classList.add('active');
+  document.getElementById('d'+n).classList.add('active');
+  document.getElementById('pageNum').innerText=n;
+  window.scrollTo(0,0);
+  if(n===4) loadRates();
+  if(n===1) loadPendingFirebase();
+}
+
+var DEFAULTS={GHS:{hourly:50,daily:400,weekly:2000,monthly:7500},USD:{hourly:5,daily:35,weekly:150,monthly:500}};
 function loadRates(){
   var status=document.getElementById('rateStatus'); if(!status) return;
   status.textContent='Loading rates...';
@@ -265,15 +375,13 @@ function loadRates(){
     document.getElementById('usd_weekly').value=rates.USD?.weekly||DEFAULTS.USD.weekly;
     document.getElementById('usd_monthly').value=rates.USD?.monthly||DEFAULTS.USD.monthly;
     updatePreview(rates);
-    status.textContent='✅ Rates loaded — Edit and Save';
-  }).catch(e=>{ status.textContent='Error: '+e.message; });
+    status.textContent='âœ… Rates loaded';
+  });
 }
-
 function updatePreview(rates){
   var el=document.getElementById('preview'); if(!el) return;
-  el.innerHTML=`<b style="color:#86efac">🇬🇭 GHS:</b> Hr ₵${rates.GHS?.hourly} | Day ₵${rates.GHS?.daily} | Wk ₵${rates.GHS?.weekly} | Mo ₵${rates.GHS?.monthly}<br><b style="color:#93c5fd">🇺🇸 USD:</b> Hr $${rates.USD?.hourly} | Day $${rates.USD?.daily} | Wk $${rates.USD?.weekly} | Mo $${rates.USD?.monthly}<br><small style="color:#6b7280">Formula: Rate x Quantity + Transport = Total — Paystack GHS for Ghana, USD for outside</small>`;
+  el.innerHTML=`<b style="color:#86efac">ðŸ‡¬ðŸ‡­ GHS:</b> Hr â‚µ${rates.GHS?.hourly} | Day â‚µ${rates.GHS?.daily} | Wk â‚µ${rates.GHS?.weekly} | Mo â‚µ${rates.GHS?.monthly}<br><b style="color:#93c5fd">ðŸ‡ºðŸ‡¸ USD:</b> Hr $${rates.USD?.hourly} | Day $${rates.USD?.daily} | Wk $${rates.USD?.weekly} | Mo $${rates.USD?.monthly}`;
 }
-
 function saveRates(){
   var rates={
     GHS:{hourly:parseFloat(document.getElementById('ghs_hourly').value)||50,daily:parseFloat(document.getElementById('ghs_daily').value)||400,weekly:parseFloat(document.getElementById('ghs_weekly').value)||2000,monthly:parseFloat(document.getElementById('ghs_monthly').value)||7500},
@@ -283,12 +391,11 @@ function saveRates(){
   document.getElementById('rateStatus').textContent='Saving...';
   db.ref('config/rates').set(rates).then(()=>{
     updatePreview(rates);
-    document.getElementById('rateStatus').textContent='✅ Saved! All clients see new Cedis/Dollar prices instantly';
-  }).catch(e=>{ document.getElementById('rateStatus').textContent='❌ '+e.message; });
+    document.getElementById('rateStatus').textContent='âœ… Saved! Clients see new Cedis/Dollar prices';
+  });
 }
-
 function resetDefault(){
-  if(!confirm('Reset to default?')) return;
+  if(!confirm('Reset?')) return;
   document.getElementById('ghs_hourly').value=DEFAULTS.GHS.hourly;
   document.getElementById('ghs_daily').value=DEFAULTS.GHS.daily;
   document.getElementById('ghs_weekly').value=DEFAULTS.GHS.weekly;
@@ -299,21 +406,10 @@ function resetDefault(){
   document.getElementById('usd_monthly').value=DEFAULTS.USD.monthly;
   saveRates();
 }
-
-function loadNursesForCall(){ var apps=getApps(); document.getElementById('ceoCallLists').innerHTML=apps.map(a=>'<div style="padding:8px;border-bottom:1px solid rgba(168,85,247,.12);display:flex;justify-content:space-between"><span>👩‍⚕️ '+a.name+' - '+a.phone+'</span><a href="tel:'+a.phone+'" style="background:#16a34a;color:white;padding:6px 10px;border-radius:6px;text-decoration:none">📞 Call</a></div>').join(''); goTo(2); }
-function loadStaffForCall(){ document.getElementById('ceoCallLists').innerHTML='Loading...'; goTo(2); db.ref('staffUsers').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:6px;border-bottom:1px solid rgba(168,85,247,.12)">'+v.id+' - '+v.phone+'</div>'; }); document.getElementById('ceoCallLists').innerHTML=h||'No staff'; }); }
-function loadClientsForCall(){ document.getElementById('ceoCallLists').innerHTML='Loading clients...'; goTo(2); db.ref('clientUsers').once('value').then(s=>{ var h=''; s.forEach(c=>{ var v=c.val(); h+='<div style="padding:8px;border-bottom:1px solid rgba(168,85,247,.12);display:flex;justify-content:space-between"><span>👤 '+(v.name||c.key)+' - '+v.phone+'</span><a href="tel:'+v.phone+'" style="background:#ff6a00;color:white;padding:6px 10px;border-radius:6px;text-decoration:none">📞</a></div>'; }); document.getElementById('ceoCallLists').innerHTML=h||'No clients'; }); }
-function broadcastToNurses(){ var m=prompt('Broadcast to ALL NURSES:'); if(!m) return; db.ref('broadcasts/nurses').push({message:m,time:Date.now()}); alert('Sent'); }
-function broadcastToClients(){ var m=prompt('Broadcast to ALL CLIENTS:'); if(!m) return; db.ref('broadcasts/clients').push({message:m,time:Date.now()}); alert('Sent'); }
-function viewLiveMap(){ var el=document.getElementById('ceoMap'); if(!el) return; if(window.ceoMap) window.ceoMap.remove(); window.ceoMap=L.map('ceoMap').setView([5.6037,-0.1870],6); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(window.ceoMap); var apps=getApps().filter(a=>a.status==='approved'); apps.forEach(a=>{ if(a.lat&&a.lng) L.marker([a.lat,a.lng]).addTo(window.ceoMap).bindPopup(a.name); }); goTo(4); }
-function loadBookings(){ db.ref('bookings').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var b=c.val(); h+='<div style="border:1px solid rgba(168,85,247,.12);padding:8px;border-radius:8px;margin:4px 0;font-size:11px"><b>#'+c.key+'</b> '+b.service+' | '+b.status+' | '+(b.currency||'')+' '+(b.amount||'')+'</div>'; }); document.getElementById('ceoBookingsList').innerHTML=h||'No bookings'; }); }
+function loadBookings(){ db.ref('bookings').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var b=c.val(); h+='<div style="border:1px solid rgba(168,85,247,.12);padding:8px;border-radius:8px;margin:4px 0;font-size:11px"><b>#'+c.key+'</b> '+b.service+' | '+b.status+'</div>'; }); document.getElementById('ceoBookingsList').innerHTML=h||'No bookings'; }); }
 function loadPayouts(){ db.ref('payoutRequests').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var p=c.val(); h+='<div style="border:1px solid rgba(168,85,247,.12);padding:6px;border-radius:6px;margin:4px 0;font-size:11px"><b>'+p.nurseName+'</b> - '+p.amount+'</div>'; }); document.getElementById('ceoPayoutsList').innerHTML=h||'No payouts'; }); }
-function loadRefunds(){ db.ref('refunds').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var r=c.val(); h+='<div style="border:1px solid rgba(168,85,247,.12);padding:6px;border-radius:6px;margin:4px 0;font-size:11px">'+r.reason+' - '+r.status+'</div>'; }); document.getElementById('ceoRefundsList').innerHTML=h||'No refunds'; }); }
-function removeDemo(){ localStorage.removeItem('nurseApplications'); alert('Demo removed'); loadPending(); }
-function loadVerified(){ var apps=getApps().filter(a=>a.status==='approved'); var el=document.getElementById('ceoVerifiedNursesList'); el.innerHTML=apps.map(a=>'<div style="padding:8px;border-bottom:1px solid rgba(168,85,247,.12);display:flex;justify-content:space-between"><span>✅ '+a.name+' - '+a.phone+'</span><a href="tel:'+a.phone+'" style="background:#16a34a;color:white;padding:4px 8px;border-radius:4px;text-decoration:none">📞</a></div>').join('')||'No verified'; }
-function loadStats(){ var apps=getApps(); var appr=apps.filter(a=>a.status==='approved').length; document.getElementById('ceoTotalNurses').innerText=appr+' / '+apps.length; db.ref('bookings').once('value').then(s=>{ document.getElementById('ceoTotalBookings').innerText=s.numChildren(); }); db.ref('sosAlerts').once('value').then(s=>{ document.getElementById('ceoSOSCount').innerText=s.numChildren(); }); }
 
-document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ loadPending(); loadStats(); loadRates(); }, 800); });
+document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ loadPendingFirebase(); loadRates(); db.ref('bookings').once('value').then(s=>{document.getElementById('ceoTotalBookings').innerText=s.numChildren();}); }, 800); });
 </script>
 </body>
 </html>
