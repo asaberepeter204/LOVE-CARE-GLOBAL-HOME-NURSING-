@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurses Dashboard â€” LOVE CARE GLOBAL</title>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurses Dashboard - LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
@@ -26,24 +28,35 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 .item.nurse{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}
 .item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
 .item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
-.wrap{max-width:480px;margin:0 auto;padding:24px 14px 80px;display:block!important;visibility:visible!important;opacity:1!important}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:20px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:16px;display:block!important}
+.wrap{max-width:480px;margin:0 auto;padding:24px 14px 80px}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:20px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:16px}
 .btnBig{width:100%;padding:18px;border-radius:16px;border:1px solid rgba(168,85,247,.18);background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.18));color:#f3e8ff;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;transition:.2s;margin-bottom:12px;text-decoration:none}
-.btnBig:hover{transform:translateY(-2px);border-color:#a855f7;box-shadow:0 10px 30px rgba(168,85,247,.25)}
-.btnBig .icon{width:48px;height:48px;border-radius:50%;background:rgba(168,85,247,.22);display:grid;place-items:center;font-size:22px;border:1px solid rgba(168,85,247,.18);flex-shrink:0}
-.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;box-shadow:0 8px 20px rgba(168,85,247,.3)}
-.btnPrimary small{color:#1e0a3a!important;opacity:.85}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.22);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
-
-/* Photo styles */
+.btnBig:hover{transform:translateY(-2px);border-color:#a855f7}
+.btnBig .icon{width:48px;height:48px;border-radius:50%;background:rgba(168,85,247,.22);display:grid;place-items:center;border:1px solid rgba(168,85,247,.18);flex-shrink:0}
+.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none}
 .photoWrap{position:relative;width:74px;height:74px;flex-shrink:0}
 #nursePhoto{width:74px;height:74px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:2px solid rgba(168,85,247,.35);box-shadow:0 0 0 4px rgba(168,85,247,.12), 0 8px 20px rgba(0,0,0,.4);display:block}
-#nursePhotoInitial{position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;font-size:28px;color:white;letter-spacing:.02em}
+#nursePhotoInitial{position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;font-size:28px;color:white}
 .onlineDot{position:absolute;right:2px;bottom:2px;width:16px;height:16px;border-radius:50%;background:#22c55e;border:3px solid #1c1238}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.22);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
+#blockScreen{position:fixed;inset:0;z-index:200;background:rgba(14,10,28,.96);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:20px}
+#blockScreen.show{display:flex}
+#sessionBar{position:fixed;bottom:0;left:0;right:0;background:rgba(28,18,56,.92);border-top:1px solid rgba(168,85,247,.15);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#a78bfa;z-index:40;backdrop-filter:blur(12px)}
+.svgIcon{width:22px;height:22px;stroke:#e9d5ff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.svgIconPrimary{stroke:#1e0a3a}
 </style>
 </head>
 <body>
 <div class="bg"></div>
+<div id="blockScreen">
+  <div class="card" style="max-width:360px;text-align:center">
+    <div style="font-size:32px;margin-bottom:12px;font-weight:900;color:#fca5a5">BLOCKED</div>
+    <h2 style="font-family:Plus Jakarta Sans,sans-serif;font-weight:800;color:#f3e8ff;margin-bottom:8px">Access Denied</h2>
+    <p style="font-size:13px;color:#d8b4fe;line-height:1.5;margin-bottom:16px">This email is registered as <b style="color:#fde68a">CLIENT</b>. You cannot access Nurses Dashboard.</p>
+    <a href="client-dashboard.html" class="btnBig btnPrimary" style="justify-content:center">Go to Client Dashboard</a>
+    <button onclick="localStorage.clear(); location.href='nurse-login.html'" class="btnBig" style="justify-content:center">Logout</button>
+  </div>
+</div>
 
 <div class="topbar">
 <div class="left">
@@ -74,8 +87,6 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 </div>
 
 <div class="wrap">
-
-<!-- WELCOME CARD WITH PHOTO + NAME -->
 <div class="card" style="display:flex;gap:16px;align-items:center">
   <div class="photoWrap">
     <img id="nursePhoto" src="icon-transparent-512.png" alt="Nurse photo">
@@ -83,10 +94,10 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
     <div class="onlineDot"></div>
   </div>
   <div style="flex:1;min-width:0">
-    <div id="nurseName" style="font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:18px;color:#f3e8ff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Welcome, Nurse ðŸ‘‹</div>
-    <div id="nurseWelcome" style="font-size:13px;color:#c4b5fd;margin-top:4px">Welcome back to your dashboard</div>
-    <div id="nurseEmail" style="font-size:11px;color:#7c6da6;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-    <span class="badge" style="margin-top:8px;display:inline-block">NURSE â€¢ ONLINE</span>
+    <div id="nurseName" style="font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:18px;color:#f3e8ff">Welcome, Nurse</div>
+    <div id="nurseWelcome" style="font-size:13px;color:#c4b5fd;margin-top:4px">Welcome back</div>
+    <div id="nurseEmail" style="font-size:11px;color:#7c6da6;margin-top:6px"></div>
+    <span class="badge" style="margin-top:8px;display:inline-block">NURSE - ONLINE - <span id="sessionTimer">30m left</span></span>
   </div>
 </div>
 
@@ -94,153 +105,103 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 <h2 style="font-family:Plus Jakarta Sans,sans-serif;font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:14px">Nurses Dashboard</h2>
 
 <a class="btnBig btnPrimary" href="my-job-offer.html">
-<span class="icon">ðŸ’¼</span>
-<span><b>My Job Offer</b><br><small>View & accept paid bookings assigned to you</small></span>
+  <span class="icon"><svg class="svgIcon svgIconPrimary" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+  <span><b>My Job Offer</b><br><small>View and accept paid bookings assigned to you</small></span>
 </a>
 
 <a class="btnBig" href="nurse-group-chat.html">
-<span class="icon">ðŸ’¬</span>
-<span><b>Nurse Group Chat</b><br><small style="font-weight:600;color:#a78bfa">Chat with CEO & other nurses</small></span>
+  <span class="icon"><svg class="svgIcon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+  <span><b>Nurse Group Chat</b><br><small style="font-weight:600;color:#a78bfa">Chat with CEO and other nurses</small></span>
 </a>
 
 <a class="btnBig" href="nurse-settings.html">
-<span class="icon">âš™ï¸</span>
-<span><b>Nurse Settings</b><br><small style="font-weight:600;color:#a78bfa">Profile, location & availability</small></span>
+  <span class="icon"><svg class="svgIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 1-2 0 1.65 1.65 0 0 0-1-.6 1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 1 0-2c.17-.34.43-.64.6-1A1.65 1.65 0 0 0 4.27 9.18l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 6.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 1 2 0c.34.17.64.43 1 .6A1.65 1.65 0 0 0 14.82 6.27l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 .6 1 1.65 1.65 0 0 1 0 2c-.17.34-.43.64-.6 1z"/></svg></span>
+  <span><b>Nurse Settings</b><br><small style="font-weight:600;color:#a78bfa">Profile, location and availability</small></span>
 </a>
 
 <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<a class="btnBig" style="justify-content:center" href="index.html">ðŸ  Home</a>
-<button class="btnBig" style="justify-content:center" onclick="logout()">Logout</button>
+<a class="btnBig" style="justify-content:center" href="index.html">
+  <svg class="svgIcon" style="width:18px;height:18px;margin-right:6px" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  Home
+</a>
+<button class="btnBig" style="justify-content:center" onclick="logout()">
+  <svg class="svgIcon" style="width:18px;height:18px;margin-right:6px" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+  Logout
+</button>
+</div>
 </div>
 </div>
 
+<div id="sessionBar">
+  <span>Session: <b id="sessionBarTime" style="color:#d8b4fe">30:00</b> left</span>
+  <span style="font-size:10px">Auto logout after 30 min</span>
 </div>
 
 <script>
-// Clean guard without debug text
+// 30 MIN SESSION GUARD
 (function(){
   try{
-    const expiry = localStorage.getItem('lcg_session_expiry');
     const logged = localStorage.getItem('lcg_logged_in');
     const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
-    if(!logged || logged!=='true'){
-      // allow to redirect to login
-      // window.location.replace('nurse-login.html');
-      // return; // keep commented if you want soft guard
+    const expiry = parseInt(localStorage.getItem('lcg_session_expiry')||'0');
+    const isClient = localStorage.getItem('lcg_client_uid') && !localStorage.getItem('lcg_nurse_uid');
+    if(isClient || role==='client'){
+      document.getElementById('blockScreen').classList.add('show');
+      return;
     }
-    if(expiry && Date.now() > parseInt(expiry)){
+    if(!logged || logged!=='true' || !expiry || Date.now() > expiry){
       localStorage.clear();
       window.location.replace('nurse-login.html');
       return;
     }
-    if(role && role!=='nurse' && role==='client'){
-      window.location.replace('client-dashboard.html');
-      return;
+    function updateTimer(){
+      const remaining = expiry - Date.now();
+      if(remaining <= 0){ localStorage.clear(); window.location.replace('nurse-login.html'); return; }
+      const mins = Math.floor(remaining/60000);
+      const secs = Math.floor((remaining%60000)/1000);
+      const txt = mins+':'+secs.toString().padStart(2,'0');
+      const el1=document.getElementById('sessionTimer');
+      const el2=document.getElementById('sessionBarTime');
+      if(el1) el1.textContent = mins>0? mins+'m left' : secs+'s left';
+      if(el2) el2.textContent = txt;
     }
-    const SESSION_MS = 30*60*1000;
-    function refresh(){ localStorage.setItem('lcg_session_expiry', (Date.now()+SESSION_MS).toString()); }
-    ['click','keydown','touchstart'].forEach(ev=>document.addEventListener(ev, refresh, {passive:true}));
-  }catch(e){ console.log('guard error', e); }
+    updateTimer(); setInterval(updateTimer, 1000);
+  }catch(e){}
 })();
 </script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
-
 async function loadNurse(){
   try{
-    const uid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId');
-    let nurse=null; 
-    let photoURL = localStorage.getItem('nursePhotoURL') || localStorage.getItem('nursePhoto') || localStorage.getItem('photoURL') || '';
-    let localName = localStorage.getItem('nurseName') || localStorage.getItem('currentNurseName') || '';
-
+    const uid=localStorage.getItem('lcg_nurse_uid');
+    if(!uid) return;
     try{
-      const profRaw = localStorage.getItem('nurseProfile');
-      if(profRaw){
-        const prof=JSON.parse(profRaw); 
-        if(prof.photoURL || prof.photo) photoURL = prof.photoURL || prof.photo || photoURL;
-        if(prof.fullName || prof.name) {
-          localName = prof.fullName || prof.name;
-          nurse = prof;
-        }
-        if(prof.email) nurse = {...prof};
+      const [nurseSnap, clientSnap] = await Promise.all([getDoc(doc(db,'nurses',uid)), getDoc(doc(db,'clients',uid))]);
+      if(clientSnap.exists() && !nurseSnap.exists()){
+        document.getElementById('blockScreen').classList.add('show');
+        return;
       }
     }catch(e){}
-
-    if(uid){
-      try{
-        const snap=await getDoc(doc(db,'nurses',uid)); 
-        if(snap.exists()){
-          const data = snap.data();
-          nurse={...(nurse||{}), ...data}; 
-          // support many possible photo fields
-          const fbPhoto = data.photoURL || data.photo || data.avatar || data.profilePhoto || data.imageURL || data.profileImage;
-          if(fbPhoto) photoURL = fbPhoto;
-          if(data.fullName || data.name) localName = data.fullName || data.name;
-        }
-      }catch(e){console.log('firestore error', e)}
-    }
-
-    const finalName = (nurse && (nurse.fullName || nurse.name)) ? (nurse.fullName || nurse.name) : localName || 'Nurse';
-    const cleanName = finalName.trim() || 'Nurse';
-
-    // 1. Welcome name
-    const nameEl=document.getElementById('nurseName');
-    if(nameEl) nameEl.textContent = `Welcome, ${cleanName} ðŸ‘‹`;
-
-    // 2. Greeting
-    const welcomeEl=document.getElementById('nurseWelcome');
-    if(welcomeEl){
-      const h = new Date().getHours();
-      let g = 'Welcome back to your dashboard';
-      if(h < 12) g = 'Good morning! Ready for your shifts?';
-      else if(h < 18) g = 'Good afternoon! Hope your day is going well';
-      else g = 'Good evening! Thank you for your hard work today';
-      welcomeEl.textContent = g;
-    }
-
-    // 3. Email
-    const emailEl=document.getElementById('nurseEmail');
-    if(emailEl){
-      emailEl.textContent = (nurse && nurse.email) || localStorage.getItem('currentNurseEmail') || localStorage.getItem('nurseEmail') || '';
-    }
-
-    // 4. PHOTO LOGIC - This makes photo appear
-    const imgEl = document.getElementById('nursePhoto');
-    const initialEl = document.getElementById('nursePhotoInitial');
-    
-    if(photoURL && photoURL !== 'icon-transparent-512.png' && photoURL.startsWith('http')){
-      imgEl.src = photoURL;
-      imgEl.style.display = 'block';
-      if(initialEl) initialEl.style.display = 'none';
-      // if image fails, show initial
-      imgEl.onerror = () => {
-        imgEl.style.display = 'none';
-        if(initialEl){
-          initialEl.textContent = cleanName.charAt(0).toUpperCase();
-          initialEl.style.display = 'grid';
-        }
-      };
-    } else {
-      // No photo found -> show initial letter avatar
-      imgEl.style.display = 'none';
-      if(initialEl){
-        initialEl.textContent = cleanName.charAt(0).toUpperCase();
-        initialEl.style.display = 'grid';
-      }
-    }
-
-  }catch(e){
-    console.log('loadNurse error', e);
-  }
+    let nurse=null; let photoURL=localStorage.getItem('nursePhotoURL')||''; let localName=localStorage.getItem('nurseName')||'';
+    try{const prof=JSON.parse(localStorage.getItem('nurseProfile')||'{}'); if(prof.photoURL) photoURL=prof.photoURL; if(prof.fullName||prof.name) localName=prof.fullName||prof.name; nurse=prof;}catch(e){}
+    if(uid){try{const snap=await getDoc(doc(db,'nurses',uid)); if(snap.exists()){const data=snap.data(); nurse={...(nurse||{}),...data}; const fbPhoto=data.photoURL||data.photo||''; if(fbPhoto) photoURL=fbPhoto; if(data.fullName||data.name) localName=data.fullName||data.name;}}catch(e){}}
+    const cleanName=(nurse?.fullName||nurse?.name||localName||'Nurse').trim();
+    document.getElementById('nurseName').textContent='Welcome, '+cleanName;
+    const h=new Date().getHours();
+    document.getElementById('nurseWelcome').textContent=h<12?'Good morning! Ready for your shifts?':h<18?'Good afternoon! Hope your day is going well':'Good evening! Thank you for your hard work today';
+    document.getElementById('nurseEmail').textContent=nurse?.email||localStorage.getItem('currentNurseEmail')||'';
+    const imgEl=document.getElementById('nursePhoto');
+    const initEl=document.getElementById('nursePhotoInitial');
+    if(photoURL && photoURL.startsWith('http')){imgEl.src=photoURL; imgEl.style.display='block'; initEl.style.display='none'; imgEl.onerror=function(){imgEl.style.display='none'; initEl.textContent=cleanName.charAt(0).toUpperCase(); initEl.style.display='grid';};}
+    else{imgEl.style.display='none'; initEl.textContent=cleanName.charAt(0).toUpperCase(); initEl.style.display='grid';}
+  }catch(e){}
 }
-
-window.logout=()=>{ localStorage.clear(); location.href='nurse-login.html'; }
+window.logout=function(){ localStorage.clear(); location.href='nurse-login.html'; }
 window.addEventListener('DOMContentLoaded', loadNurse);
 </script>
 <script>
