@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Dashboard - Registrations Go Straight Here | LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.header{position:sticky;top:0;z-index:99;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);color:white;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.leftHead{display:flex;align-items:center;gap:10px}
+.logoImg{width:40px;height:40px;border-radius:12px;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:14px;margin:10px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5)}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;margin:3px;font-size:11px;transition:.2s}
+.btn:hover{transform:translateY(-1px)}
+.btnGreen{background:linear-gradient(135deg,#16a34a,#4ade80);color:white}.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}.btnRed{background:linear-gradient(135deg,#ef4444,#f87171);color:white}.btnDark{background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}.btnYellow{background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900}.btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}.btnOrange{background:linear-gradient(135deg,#ff6a00,#fb923c);color:white}.btnGray{background:rgba(107,114,128,.2);border:1px solid rgba(107,114,128,.2);color:#d1d5db}
+.btnCEO{background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;box-shadow:0 6px 16px rgba(245,158,11,.3);font-weight:900}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:700px){.grid4{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+.page{display:none}.page.active{display:block}
+.nav{display:flex;justify-content:space-between;align-items:center;margin:10px;padding:10px;background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.12);border-radius:12px}
+.progress{display:flex;gap:6px;justify-content:center;margin:12px}
+.dot{width:12px;height:12px;border-radius:50%;background:rgba(76,29,149,.3);border:1px solid rgba(168,85,247,.18);transition:.2s}.dot.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);box-shadow:0 0 10px rgba(168,85,247,.5)}
+.nurseCard{border:2px solid rgba(239,68,68,.3);background:rgba(14,10,28,.7);border-radius:16px;padding:12px;margin:10px 0}
+.nurseCard.approved{border-color:rgba(34,197,94,.3);background:rgba(16,101,57,.12)}
+.particulars{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-top:10px}
+@media(max-width:600px){.particulars{grid-template-columns:1fr}}
+.photoBox{width:110px;height:110px;border-radius:14px;overflow:hidden;border:2px solid rgba(168,85,247,.25);background:#1e0a3a}
+.photoBox img{width:100%;height:100%;object-fit:cover}
+.docLinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.docLink{padding:6px 10px;border-radius:8px;font-size:10px;font-weight:800;text-decoration:none;background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
+.statNum{font-weight:900;font-size:22px;color:#f3e8ff}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="header">
+<div class="leftHead">
+<img src="icon-transparent-512.png" class="logoImg">
+<div><b style="font-size:13px;color:#f3e8ff">[CEO] CEO DASHBOARD - REGISTRATIONS STRAIGHT HERE</b><div style="font-size:10px;color:#a78bfa">CEO: lovecareglobal@gmail.com | Page <span id="pageNum">1</span>/4  Pending nurses from Firebase</div></div>
+</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<a href="javascript:void(0)" onclick="openGroupChat()" style="padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;font-size:12px;text-decoration:none;cursor:pointer">[CHAT] Group Chat</a>
+<button class="btn" style="background:rgba(255,255,255,.08);color:#e9d5ff" onclick="location.href='index.html'"></button>
+</div>
+</div>
+
+<div style="max-width:1150px;margin:0 auto;padding-bottom:40px">
+<div class="progress"><div class="dot active" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div><div class="dot" id="d4"></div></div>
+
+<!-- PAGE 1: PENDING REGISTRATIONS STRAIGHT FROM FIREBASE -->
+<div id="page1" class="page active">
+<div class="grid4">
+<div class="card" style="text-align:center"><b style="font-size:11px;color:#86efac">Bookings</b><div id="ceoTotalBookings" class="statNum">0</div><small id="ceoClientBookingsSummary" style="font-size:9px;color:#a78bfa">Client details on Page 3</small></div>
+<div class="card" style="text-align:center"><b style="font-size:11px;color:#93c5fd">Nurses</b><div id="ceoTotalNurses" class="statNum">0</div><small id="pendingCount" style="font-size:10px;color:#facc15">0 pending</small></div>
+<div class="card" style="text-align:center"><b style="font-size:11px;color:#facc15">Earnings</b><div id="ceoPlatformEarnings" class="statNum">0</div></div>
+<div class="card" style="text-align:center"><b style="font-size:11px;color:#fca5a5">SOS</b><div id="ceoSOSCount" class="statNum">0</div></div>
+</div>
+
+<div class="card" style="background:linear-gradient(90deg,rgba(76,29,149,.4),rgba(168,85,247,.25))">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div><b style="color:#f3e8ff">[CEO] CEO: lovecareglobal@gmail.com - Registrations Come Straight Here</b><div style="font-size:10px;color:#d8b4fe">Nurses register  Go to pendingNurses + nurses collection + RTDB  You approve here  They can login</div></div>
+<a href="javascript:void(0)" onclick="openGroupChat()" style="padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;font-size:12px;text-decoration:none;cursor:pointer">[CHAT] Open Group Chat as CEO</a>
+</div>
+</div>
+
+<!-- NEW: CEO Group Chat Master Controls - Moved from group chat per CEO request -->
+<div class="card" style="background:linear-gradient(90deg,rgba(245,158,11,.18),rgba(239,68,68,.12));border:1px solid rgba(245,158,11,.3)">
+<b style="color:#facc15">[CEO] GROUP CHAT MASTER CONTROLS - At CEO Dashboard (No inscriptions in chat)</b><br>
+<small style="color:#fcd34d">Master Delete (Wipe All) + Block/Unblock All Registered Nurses - CEO only, no email shown in chat</small><br><br>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn btnRed" onclick="ceoWipeChat()" style="font-size:12px;padding:12px 18px"> MASTER DELETE - Wipe All Group Chat Messages</button>
+<button class="btn btnCEO" onclick="openBlockManager()" style="font-size:12px;padding:12px 18px"> Block/Unblock Manager - List ALL Nurses</button>
+<button class="btn btnDark" onclick="loadBlockedListCEO()" style="font-size:11px">[BLOCKED] View Blocked Only</button>
+</div>
+<div id="ceoChatStatus" style="font-size:11px;color:#fcd34d;margin-top:8px;background:rgba(0,0,0,.2);padding:8px;border-radius:8px">Ready - CEO can wipe chat and block/unblock nurses here. No inscriptions shown in group chat anymore.</div>
+
+<!-- Block Manager in CEO Dashboard -->
+<div id="ceoBlockManager" style="display:none;margin-top:12px;background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);border-radius:14px;padding:12px;max-height:600px;overflow:auto">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+<b style="color:#f3e8ff"> All Registered Nurses - Block/Unblock</b>
+<div style="display:flex;gap:6px">
+<input id="ceoNurseSearch" placeholder=" Search name/email/phone..." oninput="filterCEONurses()" style="padding:8px 10px;border-radius:8px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);color:#f3e8ff;font-size:11px;width:200px">
+<button class="btn btnDark" onclick="loadAllNursesForBlock()" style="padding:6px 10px;font-size:10px"> Refresh</button>
+<button class="btn btnGray" onclick="closeBlockManager()" style="padding:6px 10px;font-size:10px">X Close</button>
+</div>
+</div>
+<div id="ceoNurseCount" style="font-size:10px;color:#a78bfa;margin-bottom:8px">0 nurses</div>
+<div id="ceoBlockList" style="display:grid;gap:8px">Loading nurses...</div>
+</div>
+</div>
+
+<div class="card">
+<b style="color:#f3e8ff">PAGE 1: New Registrations - View All Particulars Before Approval</b><br>
+<small style="color:#a78bfa">All fields: Photo, ID, Licence, Certificate, CV, Video, GPS, Phone, Email, Qualification, Experience - CEO must Approve to allow login</small><br><br>
+<button class="btn btnGreen" onclick="loadPendingFirebase()"> Load Pending From Firebase</button>
+<button class="btn btnBlue" onclick="loadAllNursesFirebase()"> All Nurses Firebase</button>
+<button class="btn btnYellow" onclick="goTo(4)"> Pricing (Cedis/Dollar) </button>
+<button class="btn btnDark" onclick="listenLive()"> Live Listen</button>
+<div id="liveStatus" style="font-size:10px;color:#a78bfa;margin-top:6px"></div>
+</div>
+
+<div id="pendingSection" class="card" style="border:2px solid rgba(239,68,68,.3);background:rgba(127,29,29,.12)">
+<h3 style="margin:0;color:#fca5a5">[PENDING] PENDING NURSE REGISTRATIONS - Straight From Firebase - Accept / Reject - They Can't Login Until You Approve</h3>
+<p style="font-size:11px;color:#d8b4fe;margin:6px 0">These are nurses who registered. View their particulars: Photo, National ID, Licence, Certificate, CV, Video, GPS Actual Name, Phone, Email, Qualification, Experience. Click Approve to allow login.</p>
+<div id="ceoNurseApplicationsList" style="max-height:900px;overflow-y:auto;background:rgba(14,10,28,.6);border-radius:12px;padding:8px;border:1px solid rgba(239,68,68,.2);margin-top:8px;color:#e8e0ff">Loading pending registrations straight from Firebase... Please wait.</div>
+</div>
+<div class="nav"><button class="btn btnGray" disabled> Backwards</button><span style="font-size:12px;color:#a78bfa">Page 1 - Pending Registrations Straight to CEO</span><button class="btn btnGreen" onclick="goTo(2)">Continue </button></div>
+</div>
+
+<!-- PAGE 2: Verified -->
+<div id="page2" class="page">
+<div class="card" style="border:2px solid rgba(34,197,94,.25);background:rgba(34,197,94,.08)">
+<h3 style="margin:0;color:#86efac">[OK] APPROVED NURSES - Can Login - View Their Particulars</h3>
+<div style="margin:8px 0">
+<button class="btn btnGreen" onclick="loadApprovedFirebase()"> Load Approved From Firebase</button>
+<button class="btn btnBlue" onclick="goTo(1)"> Pending</button>
+</div>
+<div id="ceoVerifiedNursesList" style="max-height:600px;overflow-y:auto;background:rgba(14,10,28,.6);border-radius:12px;padding:8px;border:1px solid rgba(34,197,94,.2)">No approved yet - click Load Approved</div>
+</div>
+<div class="card"><h3 style="color:#f3e8ff"> Call Lists</h3><div id="ceoCallLists" style="max-height:200px;overflow-y:auto;background:rgba(14,10,28,.5);border-radius:8px;padding:8px;border:1px solid rgba(168,85,247,.12)">Click to load</div></div>
+<div class="nav"><button class="btn btnGray" onclick="goTo(1)"> Back</button><span style="font-size:12px;color:#a78bfa">Page 2 - Approved Nurses</span><button class="btn btnGreen" onclick="goTo(3)">Continue </button></div>
+</div>
+
+<!-- PAGE 3: Bookings etc -->
+<div id="page3" class="page">
+<div class="grid2">
+<div class="card" style="border:2px solid rgba(245,158,11,.3)"><h3 style="color:#facc15">[LIST] CLIENT BOOKINGS - Name, Phone, Location, Amount, Concern, Booking ID</h3><p style="font-size:10px;color:#a78bfa;margin:4px 0">Shows client name, phone, location, amount paid, his concern, and booking ID with delete button after viewing</p><div id="ceoBookingsList" style="max-height:600px;overflow-y:auto;background:rgba(14,10,28,.6);border-radius:12px;padding:8px;border:1px solid rgba(245,158,11,.2)">Loading client bookings...</div><div style="display:flex;gap:8px;margin-top:8px"><button class="btn btnBlue" onclick="loadBookings()">[RELOAD] Reload Bookings</button><button class="btn btnDark" onclick="document.getElementById('ceoBookingsList').innerHTML=''">Clear View</button></div><div id="ceoClientBookingsDetailed" style="display:none"></div></div>
+<div class="card"><h3 style="color:#f3e8ff"> Payouts</h3><div id="ceoPayoutsList" style="max-height:300px;overflow-y:auto">Loading...</div><button class="btn btnGreen" onclick="loadPayouts()"> Load</button></div>
+</div>
+<div class="nav"><button class="btn btnGray" onclick="goTo(2)"> Back</button><span style="font-size:12px;color:#a78bfa">Page 3</span><button class="btn btnGreen" onclick="goTo(4)">Pricing </button></div>
+</div>
+
+<!-- PAGE 4: Pricing + Map + Group Chat -->
+<div id="page4" class="page">
+<div class="card">
+<div style="background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.1));border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:10px;font-size:11px;color:#86efac;margin-bottom:12px"> Live - Prices here instantly update clients: GHS for Ghana (Cedis) and USD for outside Ghana via Paystack</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+<a href="javascript:void(0)" onclick="openGroupChat()" style="padding:12px 16px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;font-size:14px;text-decoration:none;display:inline-block;margin:10px">[CHAT] CEO Nurse Group Chat - lovecareglobal@gmail.com</a>
+<button class="btn btnPurple" style="padding:16px" onclick="viewLiveMap()"> Live Map</button>
+</div>
+
+<h2 style="font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:4px"> Hourly Pricing - CEO Sets Per Hour Only</h2>
+<p style="font-size:11px;color:#a78bfa;margin-bottom:14px">Set hourly rate only. Clients: Hourly = hourly x qty, Daily = hourly x 8 x qty, Weekly = hourly x 40 x qty, Monthly = hourly x 160 x qty + transport if live-out. Paystack GHS for Ghana, USD for outside.</p>
+
+<div class="grid2">
+<div class="card" style="margin:0;background:rgba(14,10,28,.6);border:2px solid rgba(34,197,94,.2);text-align:center"><b style="color:#86efac"> GHANA - CEDIS PER HOUR (GHS/hr)</b><br><label style="font-size:13px;color:#86efac">Hourly Rate - GHS</label><input id="ghs_hourly" type="number" placeholder="50" style="font-size:22px;font-weight:900;text-align:center"><div id="ghs_calc2" style="margin-top:8px;font-size:10px;color:#6b7280;line-height:1.6"></div></div>
+<div class="card" style="margin:0;background:rgba(14,10,28,.6);border:2px solid rgba(59,130,246,.2);text-align:center"><b style="color:#93c5fd"> OUTSIDE - DOLLAR PER HOUR (USD/hr)</b><br><label style="font-size:13px;color:#93c5fd">Hourly Rate - USD</label><input id="usd_hourly" type="number" placeholder="5" style="font-size:22px;font-weight:900;text-align:center"><div id="usd_calc2" style="margin-top:8px;font-size:10px;color:#6b7280;line-height:1.6"></div></div>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:14px">
+<button class="btn" style="flex:1;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;padding:14px" onclick="saveRates()"> Save Prices</button>
+<button class="btn btnDark" onclick="resetDefault()">Reset</button>
+</div>
+<div id="rateStatus" style="margin-top:10px;font-size:12px;text-align:center;color:#a78bfa"></div>
+<div id="preview" style="margin-top:10px;font-size:11px;color:#c4b5fd;background:rgba(14,10,28,.5);padding:10px;border-radius:10px"></div>
+</div>
+
+<div class="card"><div id="ceoMap" style="width:100%;height:300px;border-radius:12px"></div></div>
+<div class="nav"><button class="btn btnGray" onclick="goTo(3)"> Back</button><span style="font-size:12px;color:#a78bfa">Page 4 - Pricing + Map + Group Chat</span><button class="btn btnDark" onclick="goTo(1)"> Page 1</button></div>
+</div>
+
+</div>
+
+<script>
+var firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+var db=firebase.database();
+var fs=firebase.firestore();
+var auth=firebase.auth();
+var storage=firebase.storage();
+
+// FIX: Ensure Firebase Auth exists for RTDB rules (permission_denied fix)
+function ensureCEOAuth(){
+  return new Promise((resolve)=>{
+    var unsub=auth.onAuthStateChanged(async function(user){
+      unsub();
+      if(user){ resolve(user); }
+      else {
+        try{
+          // Try anonymous sign-in to pass auth != null rules
+          var cred=await auth.signInAnonymously();
+          console.log('Signed in anonymously for CEO dashboard', cred.user.uid);
+          resolve(cred.user);
+        }catch(e){
+          console.log('Anonymous auth failed', e);
+          resolve(null);
+        }
+      }
+    });
+    setTimeout(()=>resolve(auth.currentUser), 3000);
+  });
+}
+
+var DEFAULTS={GHS:{hourly:50,daily:400,weekly:2000,monthly:7500},USD:{hourly:5,daily:35,weekly:150,monthly:500}};
+
+function goTo(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.dot').forEach(d=>d.classList.remove('active'));
+  document.getElementById('page'+n).classList.add('active');
+  document.getElementById('d'+n).classList.add('active');
+  document.getElementById('pageNum').innerText=n;
+  window.scrollTo(0,0);
+  if(n===4) loadRates();
+  if(n===1) loadPendingFirebase();
+}
+
+async function loadPendingFirebase(){
+  var el=document.getElementById('ceoNurseApplicationsList');
+  el.innerHTML='<div style="padding:20px;text-align:center;color:#a78bfa">Checking Firebase Auth to fix permission_denied...<br>Ensuring CEO login...</div>';
+  
+  var user=await ensureCEOAuth();
+  if(!user){
+    el.innerHTML='<div style="padding:15px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:12px;color:#fca5a5">'
+    +'<b>Auth not ready - permission_denied fix:</b><br><br>'
+    +'1. Enable Anonymous Auth in Firebase Console:<br>'
+    +'Firebase Console > Authentication > Sign-in method > Anonymous > Enable > Save<br><br>'
+    +'2. Update Realtime Database Rules to allow auth != null:<br>'
+    +'<div style="background:rgba(0,0,0,.3);padding:8px;border-radius:8px;font-family:monospace;font-size:10px;margin:6px 0;white-space:pre-wrap">{\n  "rules": {\n    "pendingNurses": { ".read": "auth != null", ".write": "auth != null" },\n    "nurses": { ".read": "auth != null", ".write": "auth != null" },\n    "nurses_group_chat": { ".read": "auth != null", ".write": "auth != null" },\n    "bookings": { ".read": "auth != null", ".write": "auth != null" },\n    "config": { ".read": true, ".write": "auth != null" }\n  }\n}</div>'
+    +'3. After fixing, reload this page.<br><br>'
+    +'<button onclick="location.reload()" style="padding:8px 12px;border-radius:8px;background:#ef4444;color:#fff;border:none;font-weight:800">Reload</button> '
+    +'<button onclick="location.href=\'ceo-login-FIXED.html\'" style="padding:8px 12px;border-radius:8px;background:#f59e0b;color:#000;border:none;font-weight:800">Go to CEO Login</button>'
+    +'</div>';
+    return;
+  }
+  
+  el.innerHTML='<div style="padding:20px;text-align:center;color:#a78bfa">Auth OK ('+user.uid.slice(0,8)+'...) - Loading pending registrations from pendingNurses + nurses + Firestore...<br>If still permission_denied, update Rules as shown below.</div>';
+  
+  // Load from RTDB pendingNurses (fastest - straight from registration)
+  db.ref('pendingNurses').once('value').then(snapRTDB=>{
+    var listRTDB=[];
+    if(snapRTDB.exists()){
+      snapRTDB.forEach(child=>{
+        var v=child.val();
+        if(!v.isApproved || v.status==='pending') listRTDB.push({...v, id:child.key, uid:child.key, source:'RTDB-pendingNurses'});
+      });
+    }
+    // Also load from RTDB nurses where not approved
+    return db.ref('nurses').once('value').then(snapNurses=>{
+      var listNurses=[];
+      if(snapNurses.exists()){
+        snapNurses.forEach(child=>{
+          var v=child.val();
+          if(v.isApproved!==true && v.status!=='approved' && v.status!=='rejected'){
+            if(!listRTDB.find(x=>x.uid===child.key)) listNurses.push({...v, id:child.key, uid:child.key, source:'RTDB-nurses'});
+          }
+        });
+      }
+      var combined=[...listRTDB, ...listNurses];
+      
+      // Also try Firestore pendingNurses collection
+      return fs.collection('pendingNurses').get().then(qs=>{
+        qs.forEach(doc=>{
+          var v=doc.data();
+          if(v.isApproved!==true && v.status!=='pending' && v.status!=='approved' && v.status!=='rejected' || v.status==='pending' || v.isApproved===false){
+            if(!combined.find(x=>x.uid===doc.id)) combined.push({...v, id:doc.id, uid:doc.id, source:'Firestore-pendingNurses'});
+          }
+        });
+        return fs.collection('nurses').where('isApproved','==',false).get().then(qs2=>{
+          qs2.forEach(doc=>{
+            var v=doc.data();
+            if(!combined.find(x=>x.uid===doc.id)) combined.push({...v, id:doc.id, uid:doc.id, source:'Firestore-nurses-false'});
+          });
+          renderPendingList(combined);
+        });
+      }).catch(e=>{
+        console.log('Firestore error', e);
+        renderPendingList(combined);
+      });
+    });
+  }).catch(e=>{
+    var msg=(e.message||'').toString();
+    var isPerm=msg.includes('permission_denied')||msg.includes('permission');
+    el.innerHTML='<div style="padding:15px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:12px;color:#fca5a5">'
+    +'<b>Error loading: '+e.message+'</b><br><br>'
+    +(isPerm?'<b>PERMISSION_DENIED FIX:</b><br>Your Realtime Database Rules block reading /pendingNurses.<br><br>Go to Firebase Console > Realtime Database > Rules and paste:<br>'
+    +'<div style="background:rgba(0,0,0,.3);padding:8px;border-radius:8px;font-family:monospace;font-size:10px;margin:6px 0;white-space:pre-wrap">{\n  "rules": {\n    "pendingNurses": { ".read": "auth != null", ".write": "auth != null" },\n    "nurses": { ".read": "auth != null", ".write": "auth != null" },\n    "bookings": { ".read": "auth != null", ".write": "auth != null" },\n    "nurses_group_chat": { ".read": "auth != null", ".write": "auth != null" },\n    "config": { ".read": true, ".write": "auth != null" }\n  }\n}</div>'
+    +'Also enable Anonymous in Authentication > Sign-in method > Anonymous > Enable<br><br>':'')
+    +'<button onclick="loadPendingFirebase()" style="padding:8px 12px;border-radius:8px;background:#22c55e;color:#fff;border:none;font-weight:800">Try Again</button> '
+    +'<button onclick="location.reload()" style="padding:8px 12px;border-radius:8px;background:#ef4444;color:#fff;border:none">Reload</button>'
+    +'</div>';
+  });
+}
+
+function renderPendingList(list){
+  var el=document.getElementById('ceoNurseApplicationsList');
+  document.getElementById('pendingCount').textContent=list.length+' pending';
+  document.getElementById('ceoTotalNurses').textContent=list.length+' pending / total';
+  if(!list.length){
+    el.innerHTML='<div style="padding:30px;text-align:center;color:#a78bfa">[OK] No pending registrations - All nurses approved or no registrations yet.<br>When nurses register, they will appear here straight from Firebase with all particulars.</div>';
+    return;
+  }
+  el.innerHTML=list.map(n=>{
+    var photo=n.photoURL||n.profilePhoto||'';
+    var idURL=n.nationalIdURL||n.idURL||'';
+    var licenceURL=n.licenceURL||'';
+    var certURL=n.certificateURL||'';
+    var cvURL=n.cvURL||'';
+    var videoURL=n.videoURL||n.introVideoUrl||'';
+    return `
+    <div class="nurseCard">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div><b style="font-size:14px;color:#f3e8ff">${n.fullName||n.name||'Nurse'}</b> <span style="font-size:9px;background:#fde68a;color:#92400e;padding:2px 6px;border-radius:99px">${n.source||''}</span><br>
+        <small style="color:#a78bfa">${n.email||''}  ${n.phone||n.phoneNumber||''}  ${n.country||''}  ${n.experience||0} yrs  ${n.qualification||''}</small><br>
+        <small style="color:#d8b4fe">GPS: ${n.gpsActualName||n.actualLocationName||'No GPS'}<br>Lat: ${n.lat||''} Lng: ${n.lng||''}<br>Service: ${(n.services||[n.service]||[]).join(', ')}<br>Bio: ${n.bio||''}</small></div>
+        <div class="photoBox">${photo?`<img src="${photo}" onclick="window.open('${photo}','_blank')">`:'<div style="display:grid;place-items:center;height:100%;color:#6b5b8a">No Photo</div>'}</div>
+      </div>
+      <div class="particulars">
+        <div><b style="font-size:11px;color:#d8b4fe">Particulars - CEO View All:</b></div>
+        <div>
+          <div class="docLinks">
+            ${photo?`<a class="docLink" href="${photo}" target="_blank"> Photo</a>`:''}
+            ${idURL?`<a class="docLink" href="${idURL}" target="_blank"> National ID</a>`:''}
+            ${licenceURL?`<a class="docLink" href="${licenceURL}" target="_blank"> Licence</a>`:''}
+            ${certURL?`<a class="docLink" href="${certURL}" target="_blank"> Certificate</a>`:''}
+            ${cvURL?`<a class="docLink" href="${cvURL}" target="_blank"> CV</a>`:''}
+            ${videoURL?`<a class="docLink" href="${videoURL}" target="_blank"> Intro Video - CEO Watch</a>`:''}
+          </div>
+          ${videoURL?`<video src="${videoURL}" controls style="width:100%;max-width:320px;margin-top:8px;border-radius:10px;border:1px solid rgba(168,85,247,.18)"></video>`:''}
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btnGreen" onclick="approveFirebase('${n.uid}')">[OK] Approve - Allow Login</button>
+        <button class="btn btnRed" onclick="rejectFirebase('${n.uid}','${(n.fullName||'').replace(/'/g,'')}')">[X] Reject - Block Login</button>
+        <a href="tel:${n.phone||n.phoneNumber||''}" class="btn btnBlue"> Call ${n.phone||''}</a>
+        <button class="btn btnDark" onclick="viewOnMap(${n.lat||0},${n.lng||0},'${(n.fullName||'Nurse').replace(/'/g,'')}')"> Map</button>
+      </div>
+      <div style="font-size:9px;color:#6b5b8a;margin-top:6px">UID: ${n.uid}  Created: ${n.timestamp?new Date(n.timestamp).toLocaleString():''}  Source: ${n.source}</div>
+    </div>
+    `;
+  }).join('');
+}
+
+function approveFirebase(uid){
+  if(!confirm('Approve nurse '+uid+'? They will be able to login as nurse.')) return;
+  // Update RTDB
+  db.ref('nurses/'+uid).update({isApproved:true, status:'approved', verificationStatus:'verified', approvedAt:Date.now(), approvedBy:'CEO lovecareglobal@gmail.com'});
+  db.ref('pendingNurses/'+uid).update({isApproved:true, status:'approved', approvedAt:Date.now()});
+  // Update Firestore
+  fs.collection('nurses').doc(uid).update({isApproved:true, status:'approved', verificationStatus:'verified', approvedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(e=>console.log(e));
+  fs.collection('pendingNurses').doc(uid).update({isApproved:true, status:'approved'}).catch(e=>{});
+  // Remove from ceoNotifications or mark approved
+  db.ref('ceoNotifications/'+uid).update({status:'approved', approvedAt:Date.now()});
+  alert('[OK] Approved! Nurse can now login. Refreshing list...');
+  setTimeout(loadPendingFirebase, 1500);
+}
+
+function rejectFirebase(uid, name){
+  var reason=prompt('Reject '+name+'? Enter reason (will be shown to nurse when they try login):');
+  if(!reason) return;
+  db.ref('nurses/'+uid).update({isApproved:false, status:'rejected', rejectionReason:reason, rejectedAt:Date.now(), rejectedBy:'CEO'});
+  db.ref('pendingNurses/'+uid).update({isApproved:false, status:'rejected', rejectionReason:reason});
+  fs.collection('nurses').doc(uid).update({isApproved:false, status:'rejected', rejectionReason:reason}).catch(e=>{});
+  fs.collection('pendingNurses').doc(uid).update({status:'rejected', rejectionReason:reason}).catch(e=>{});
+  db.ref('ceoNotifications/'+uid).update({status:'rejected', reason:reason});
+  alert('[X] Rejected '+name+' - They cannot login');
+  setTimeout(loadPendingFirebase, 1000);
+}
+
+function loadAllNursesFirebase(){
+  var el=document.getElementById('ceoNurseApplicationsList');
+  el.innerHTML='Loading all nurses from Firebase...';
+  db.ref('nurses').once('value').then(snap=>{
+    var list=[];
+    if(snap.exists()) snap.forEach(c=>{ list.push({...c.val(), uid:c.key}); });
+    renderPendingList(list);
+  });
+}
+
+function loadApprovedFirebase(){
+  var el=document.getElementById('ceoVerifiedNursesList');
+  el.innerHTML='Loading approved...';
+  db.ref('nurses').orderByChild('isApproved').equalTo(true).once('value').then(snap=>{
+    var list=[];
+    if(snap.exists()) snap.forEach(c=>{ list.push({...c.val(), uid:c.key}); });
+    if(!list.length){ el.innerHTML='No approved nurses'; return; }
+    el.innerHTML=list.map(n=>`
+      <div class="nurseCard approved" style="padding:10px">
+        <b>${n.fullName||n.name}</b> - ${n.email} - ${n.phone}<br>
+        <small style="color:#a78bfa">${n.qualification}  ${n.experience} yrs  ${n.gpsActualName||''}</small><br>
+        <div class="docLinks">
+          ${n.photoURL?`<a class="docLink" href="${n.photoURL}" target="_blank">Photo</a>`:''}
+          ${n.licenceURL?`<a class="docLink" href="${n.licenceURL}" target="_blank">Licence</a>`:''}
+          ${n.videoURL?`<a class="docLink" href="${n.videoURL}" target="_blank">Video</a>`:''}
+        </div>
+        <button class="btn btnRed" style="margin-top:6px" onclick="rejectFirebase('${n.uid}','${(n.fullName||'').replace(/'/g,'')}')">[X] Revoke - Block Login</button>
+      </div>
+    `).join('');
+  });
+}
+
+function listenLive(){
+  document.getElementById('liveStatus').textContent=' Live listening - New registrations will appear automatically here...';
+  db.ref('pendingNurses').on('child_added', snap=>{
+    var v=snap.val();
+    if(v.isApproved!==true && v.status!=='approved'){
+      document.getElementById('liveStatus').textContent=' New registration: '+(v.fullName||'Nurse')+' - '+new Date().toLocaleTimeString()+' - Refreshing list';
+      loadPendingFirebase();
+    }
+  });
+}
+
+function viewOnMap(lat,lng,name){
+  if(!lat||!lng){ alert('No GPS for '+name); return; }
+  goTo(4);
+  setTimeout(()=>{
+    var el=document.getElementById('ceoMap');
+    if(window.ceoMap) window.ceoMap.remove();
+    window.ceoMap=L.map('ceoMap').setView([lat,lng],13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(window.ceoMap);
+    L.marker([lat,lng]).addTo(window.ceoMap).bindPopup(name).openPopup();
+  },500);
+}
+
+function goTo(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.dot').forEach(d=>d.classList.remove('active'));
+  document.getElementById('page'+n).classList.add('active');
+  document.getElementById('d'+n).classList.add('active');
+  document.getElementById('pageNum').innerText=n;
+  window.scrollTo(0,0);
+  if(n===4) loadRates();
+  if(n===1) loadPendingFirebase();
+}
+
+var DEFAULTS={GHS:{hourly:50},USD:{hourly:5}};
+function calcDerived(h){return {hourly:h,daily:h*8,weekly:h*40,monthly:h*160,daily24:h*24,weekly24:h*168,monthly24:h*720};}
+function loadRates(){
+  var status=document.getElementById('rateStatus'); if(!status) return;
+  status.textContent='Loading hourly rates...';
+  db.ref('config/rates').once('value').then(snap=>{
+    var rates=DEFAULTS;
+    if(snap.exists()){
+      const val=snap.val();
+      rates={GHS:{hourly: val.GHS?.hourly||DEFAULTS.GHS.hourly}, USD:{hourly: val.USD?.hourly||DEFAULTS.USD.hourly}};
+    }
+    document.getElementById('ghs_hourly').value=rates.GHS.hourly;
+    document.getElementById('usd_hourly').value=rates.USD.hourly;
+    updatePreview(rates);
+    status.textContent='[OK] Hourly rates loaded - Days/Weeks multiply by hour';
+  });
+}
+function updatePreview(rates){
+  var el=document.getElementById('preview'); if(!el) return;
+  const ghs=calcDerived(rates.GHS?.hourly||50);
+  const usd=calcDerived(rates.USD?.hourly||5);
+  if(document.getElementById('ghs_calc2')){
+    document.getElementById('ghs_calc2').innerHTML=`Daily 8h=${ghs.daily}  Weekly 40h=${ghs.weekly}  Monthly 160h=${ghs.monthly}<br>Live-in 24h: Daily ${ghs.daily24}`;
+    document.getElementById('usd_calc2').innerHTML=`Daily 8h=$${usd.daily}  Weekly 40h=$${usd.weekly}  Monthly 160h=$${usd.monthly}<br>Live-in 24h: Daily $${usd.daily24}`;
+  }
+  el.innerHTML=`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div style="background:rgba(34,197,94,.08);padding:10px;border-radius:10px;border:1px solid rgba(34,197,94,.2)">
+      <b style="color:#86efac"> GHS - ${ghs.hourly}/hr</b><br>
+      Hourly: ${ghs.hourly} x Qty<br>
+      Daily: ${ghs.hourly} x 8 x Qty = ${ghs.daily}/day<br>
+      Weekly: ${ghs.hourly} x 40 x Qty = ${ghs.weekly}/week<br>
+      Monthly: ${ghs.hourly} x 160 x Qty = ${ghs.monthly}/month<br>
+      <small>Ex: 3 days = ${ghs.hourly} x 8 x 3 = ${ghs.hourly*24}</small>
+    </div>
+    <div style="background:rgba(59,130,246,.08);padding:10px;border-radius:10px;border:1px solid rgba(59,130,246,.2)">
+      <b style="color:#93c5fd"> USD - $${usd.hourly}/hr</b><br>
+      Hourly: $${usd.hourly} x Qty<br>
+      Daily: $${usd.hourly} x 8 x Qty = $${usd.daily}/day<br>
+      Weekly: $${usd.hourly} x 40 x Qty = $${usd.weekly}/week<br>
+      Monthly: $${usd.hourly} x 160 x Qty = $${usd.monthly}/month<br>
+      <small>Ex: 2 weeks = $${usd.hourly} x 40 x 2 = $${usd.hourly*80}</small>
+    </div>
+  </div>
+  <div style="margin-top:8px;font-size:10px;color:#6b7280;text-align:center">Formula: Total = Hourly Rate  Hours Per Mode  Quantity + Transport. Paystack GHS for Ghana, USD for outside.</div>
+  `;
+}
+function saveRates(){
+  const ghsHourly=parseFloat(document.getElementById('ghs_hourly').value)||50;
+  const usdHourly=parseFloat(document.getElementById('usd_hourly').value)||5;
+  const ghsD=calcDerived(ghsHourly);
+  const usdD=calcDerived(usdHourly);
+  var rates={
+    GHS:{hourly:ghsHourly,daily:ghsD.daily,weekly:ghsD.weekly,monthly:ghsD.monthly,daily24:ghsD.daily24,weekly24:ghsD.weekly24,monthly24:ghsD.monthly24},
+    USD:{hourly:usdHourly,daily:usdD.daily,weekly:usdD.weekly,monthly:usdD.monthly,daily24:usdD.daily24,weekly24:usdD.weekly24,monthly24:usdD.monthly24},
+    updatedAt:new Date().toISOString(),updatedBy:'CEO lovecareglobal@gmail.com - Hourly Pricing',
+    pricingMode:'hourly_only'
+  };
+  document.getElementById('rateStatus').textContent='Saving hourly rates...';
+  db.ref('config/rates').set(rates).then(()=>{
+    updatePreview({GHS:{hourly:ghsHourly},USD:{hourly:usdHourly}});
+    document.getElementById('rateStatus').textContent='[OK] Saved! Hourly pricing - Clients now: days x 8 x hourly, weeks x 40 x hourly, etc.';
+  });
+}
+function resetDefault(){
+  if(!confirm('Reset to default hourly? GHS 50/hr, USD 5/hr')) return;
+  document.getElementById('ghs_hourly').value=DEFAULTS.GHS.hourly;
+  document.getElementById('usd_hourly').value=DEFAULTS.USD.hourly;
+  saveRates();
+}
+function loadBookings(){ db.ref('bookings').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var b=c.val(); h+='<div style="border:1px solid rgba(168,85,247,.12);padding:8px;border-radius:8px;margin:4px 0;font-size:11px"><b>#'+c.key+'</b> '+b.service+' | '+b.status+'</div>'; }); document.getElementById('ceoBookingsList').innerHTML=h||'No bookings'; }); }
+function loadPayouts(){ db.ref('payoutRequests').limitToLast(20).once('value').then(s=>{ var h=''; s.forEach(c=>{ var p=c.val(); h+='<div style="border:1px solid rgba(168,85,247,.12);padding:6px;border-radius:6px;margin:4px 0;font-size:11px"><b>'+p.nurseName+'</b> - '+p.amount+'</div>'; }); document.getElementById('ceoPayoutsList').innerHTML=h||'No payouts'; }); }
+
+// ===== NEW: CEO Group Chat Master Controls - Wipe + Block Manager at CEO Dashboard =====
+var ceoAllNursesCache=[], ceoBlockedMap={}, ceoBlockedIds=[];
+function ceoWipeChat(){
+  const confirmWord=prompt('[CEO] CEO MASTER DELETE - Type WIPE to confirm DELETE ALL GROUP CHAT MESSAGES FOREVER:');
+  if(!confirmWord || confirmWord!=='WIPE'){ alert('Cancelled - Must type WIPE'); return; }
+  const reason=prompt('Reason for wipe? (min 5 chars)'); if(!reason||reason.length<5){ alert('Reason required'); return; }
+  if(!confirm('FINAL CONFIRM: DELETE ALL MESSAGES FOREVER?\nReason: '+reason)) return;
+  document.getElementById('ceoChatStatus').textContent='Wiping all chat messages...';
+  db.ref('nurses_group_chat/messages').remove().then(()=>{
+    db.ref('nurses_group_chat/logs').push({action:'WIPE_ALL',by:'CEO',email:'lovecareglobal@gmail.com',reason:reason,timestamp:Date.now()});
+    document.getElementById('ceoChatStatus').textContent='[OK] All group chat messages wiped by CEO at '+new Date().toLocaleString()+' - Reason: '+reason;
+    alert('[OK] All messages wiped');
+  }).catch(e=>{ document.getElementById('ceoChatStatus').textContent='[X] Wipe failed: '+e.message; alert('Wipe failed: '+e.message); });
+}
+function openBlockManager(){
+  document.getElementById('ceoBlockManager').style.display='block';
+  loadAllNursesForBlock();
+}
+function closeBlockManager(){ document.getElementById('ceoBlockManager').style.display='none'; }
+function loadBlockedListCEO(){
+  db.ref('nurses_group_chat/blocked_users').once('value').then(s=>{
+    if(!s.exists()){ document.getElementById('ceoChatStatus').textContent='[OK] No blocked users'; alert('No blocked users'); return; }
+    const val=s.val(); let txt='[BLOCKED] Blocked Users:\n\n'; let c=0;
+    for(const k in val){ c++; txt+=c+'. '+val[k].userName+' - Reason: '+val[k].reason+' (by '+val[k].blockedBy+')\n'; }
+    document.getElementById('ceoChatStatus').textContent='Blocked list loaded - '+c+' blocked';
+    alert(txt);
+  });
+}
+async function loadAllNursesForBlock(){
+  const listEl=document.getElementById('ceoBlockList');
+  const countEl=document.getElementById('ceoNurseCount');
+  listEl.innerHTML='<div style="color:#a78bfa;padding:10px">Loading all registered nurses from Firestore + RTDB...</div>';
+  try{
+    let nursesMap={};
+    // Firestore
+    try{
+      const snap=await firebase.firestore().collection('nurses').get();
+      snap.forEach(doc=>{ const d=doc.data(); const id=d.uid||doc.id; if(!nursesMap[id]) nursesMap[id]={id:id,name:d.fullName||d.name||'Nurse',email:d.email||'',phone:d.phone||'',status:d.status||'pending',isApproved:d.isApproved||false}; });
+    }catch(e){ console.log('firestore load error',e); }
+    // RTDB nurses
+    try{
+      const rtdbSnap=await db.ref('nurses').once('value');
+      if(rtdbSnap.exists()){ const val=rtdbSnap.val(); for(const uid in val){ const d=val[uid]; if(!nursesMap[uid]) nursesMap[uid]={id:uid,name:d.fullName||d.name||'Nurse',email:d.email||'',phone:d.phone||'',status:d.status||'pending',isApproved:d.isApproved||false}; } }
+    }catch(e){}
+    // RTDB pending
+    try{
+      const pendSnap=await db.ref('pendingNurses').once('value');
+      if(pendSnap.exists()){ const val=pendSnap.val(); for(const uid in val){ const d=val[uid]; if(!nursesMap[uid]) nursesMap[uid]={id:uid,name:d.fullName||d.name||'Nurse',email:d.email||'',phone:d.phone||'',status:'pending',isApproved:false}; } }
+    }catch(e){}
+    // blocked
+    try{
+      const bSnap=await db.ref('nurses_group_chat/blocked_users').once('value');
+      ceoBlockedMap={}; ceoBlockedIds=[];
+      if(bSnap.exists()){ const bv=bSnap.val(); for(const k in bv){ ceoBlockedMap[bv[k].userId]=bv[k]; ceoBlockedIds.push(bv[k].userId); } }
+    }catch(e){}
+    ceoAllNursesCache=Object.values(nursesMap).sort((a,b)=>a.name.localeCompare(b.name));
+    countEl.textContent=ceoAllNursesCache.length+' nurses registered  '+ceoBlockedIds.length+' blocked';
+    renderCEONurses();
+  }catch(e){ listEl.innerHTML='<div style="color:#fca5a5">Failed: '+e.message+'</div>'; }
+}
+function renderCEONurses(){
+  const listEl=document.getElementById('ceoBlockList');
+  const search=(document.getElementById('ceoNurseSearch').value||'').toLowerCase();
+  let filtered=ceoAllNursesCache.filter(n=>{ if(!search) return true; return (n.name+' '+(n.email||'')+' '+(n.phone||'')).toLowerCase().includes(search); });
+  if(filtered.length===0){ listEl.innerHTML='<div style="color:#a78bfa;padding:10px">No nurses found</div>'; return; }
+  listEl.innerHTML=filtered.map(n=>{
+    const isBlocked=ceoBlockedIds.includes(n.id);
+    const blockInfo=ceoBlockedMap[n.id];
+    return `<div style="display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:${isBlocked?'rgba(239,68,68,.12)':'rgba(28,18,56,.8)'};border:1px solid ${isBlocked?'rgba(239,68,68,.3)':'rgba(168,85,247,.12)'}">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;color:#fff;font-weight:900;flex-shrink:0">${(n.name||'N').charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:800;font-size:12px;color:#f3e8ff">${n.name} ${isBlocked?'<span style="background:#fee2e2;color:#dc2626;padding:2px 6px;border-radius:999px;font-size:9px">[BLOCKED] BLOCKED</span>':n.isApproved?'<span style="background:#dcfce7;color:#15803d;padding:2px 6px;border-radius:999px;font-size:9px">[OK] Approved</span>':'<span style="background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:999px;font-size:9px"> Pending</span>'}</div><div style="font-size:10px;color:#a78bfa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.email||'No email'}  ${n.phone||'No phone'}  ${n.status}</div>${isBlocked&&blockInfo?`<div style="font-size:10px;color:#fca5a5">Reason: ${blockInfo.reason} by ${blockInfo.blockedBy}</div>`:''}</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${isBlocked?`<button class="btn btnGreen" style="padding:6px 10px;font-size:10px" onclick="ceoToggleBlock('${n.id}','${n.name.replace(/'/g,'')}')">[OK] Unblock</button>`:`<button class="btn btnRed" style="padding:6px 10px;font-size:10px" onclick="ceoToggleBlock('${n.id}','${n.name.replace(/'/g,'')}')">[BLOCKED] Block</button>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+function filterCEONurses(){ renderCEONurses(); }
+function ceoToggleBlock(userId,userName){
+  const isBlocked=ceoBlockedIds.includes(userId);
+  if(isBlocked){
+    if(!confirm('[OK] Unblock '+userName+'?')) return;
+    db.ref('nurses_group_chat/blocked_users').once('value').then(s=>{
+      if(s.exists()){
+        const val=s.val();
+        for(const k in val){ if(val[k].userId===userId){ db.ref('nurses_group_chat/blocked_users/'+k).remove(); } }
+        alert('[OK] Unblocked '+userName); loadAllNursesForBlock();
+      }
+    });
+  }else{
+    const reason=prompt('[BLOCKED] CEO Block - Block '+userName+'? Reason (min 5 chars):'); if(!reason||reason.trim().length<5){ alert('Reason required'); return; }
+    if(!confirm('Block '+userName+'? Reason: '+reason)) return;
+    db.ref('nurses_group_chat/blocked_users').push({userId:userId,userName:userName,reason:reason.trim(),blockedBy:'CEO',blockedByEmail:'lovecareglobal@gmail.com',blockedByRole:'CEO',timestamp:Date.now()}).then(()=>{
+      alert('[BLOCKED] Blocked '+userName); loadAllNursesForBlock();
+    });
+  }
+}
+
+
+// ===== FIX 1: GROUP CHAT TAP FIX =====
+const GROUP_CHAT_HTML_BASE64 = `PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEiPgo8dGl0bGU+TnVyc2VzIEdyb3VwIENoYXQgLSBGSVhFRCBCVVRUT05TIHwgTE9WRSBDQVJFIEdMT0JBTDwvdGl0bGU+CjxzY3JpcHQgc3JjPSJodHRwczovL3d3dy5nc3RhdGljLmNvbS9maXJlYmFzZWpzLzkuMjIuMC9maXJlYmFzZS1hcHAtY29tcGF0LmpzIj48L3NjcmlwdD4KPHNjcmlwdCBzcmM9Imh0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ZpcmViYXNlanMvOS4yMi4wL2ZpcmViYXNlLWRhdGFiYXNlLWNvbXBhdC5qcyI+PC9zY3JpcHQ+CjxzY3JpcHQgc3JjPSJodHRwczovL3d3dy5nc3RhdGljLmNvbS9maXJlYmFzZWpzLzkuMjIuMC9maXJlYmFzZS1maXJlc3RvcmUtY29tcGF0LmpzIj48L3NjcmlwdD4KPHNjcmlwdCBzcmM9Imh0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ZpcmViYXNlanMvOS4yMi4wL2ZpcmViYXNlLWF1dGgtY29tcGF0LmpzIj48L3NjcmlwdD4KPHNjcmlwdCBzcmM9Imh0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ZpcmViYXNlanMvOS4yMi4wL2ZpcmViYXNlLXN0b3JhZ2UtY29tcGF0LmpzIj48L3NjcmlwdD4KPHN0eWxlPgoqe2JveC1zaXppbmc6Ym9yZGVyLWJveDttYXJnaW46MDtwYWRkaW5nOjB9CmJvZHl7Zm9udC1mYW1pbHk6c3lzdGVtLXVpO2JhY2tncm91bmQ6I2YzZjRmNjttaW4taGVpZ2h0OjEwMHZoO2Rpc3BsYXk6ZmxleDtmbGV4LWRpcmVjdGlvbjpjb2x1bW59Ci50b3B7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsIzdjM2FlZCwjMTZhMzRhKTtjb2xvcjojZmZmO3BhZGRpbmc6MTBweCAxMnB4O2Rpc3BsYXk6ZmxleDtqdXN0aWZ5LWNvbnRlbnQ6c3BhY2UtYmV0d2VlbjthbGlnbi1pdGVtczpjZW50ZXI7cG9zaXRpb246c3RpY2t5O3RvcDowO3otaW5kZXg6MTAwfQojY2hhdHtmbGV4OjE7b3ZlcmZsb3cteTphdXRvO3BhZGRpbmc6MTBweDtkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2dhcDoxMHB4O2JhY2tncm91bmQ6I2Y4ZmFmYzttaW4taGVpZ2h0OjQwMHB4fQoubXNne21heC13aWR0aDo4NSU7cGFkZGluZzoxMHB4IDEycHg7Ym9yZGVyLXJhZGl1czoxNHB4O2JhY2tncm91bmQ6I2ZmZjtib3JkZXI6MXB4IHNvbGlkICNlNWU3ZWI7Zm9udC1zaXplOjEzcHg7cG9zaXRpb246cmVsYXRpdmV9Ci5tc2cubWV7YWxpZ24tc2VsZjpmbGV4LWVuZDtiYWNrZ3JvdW5kOiNkY2ZjZTc7Ym9yZGVyLWNvbG9yOiNiYmY3ZDB9Ci5tc2cuY2Vve2JvcmRlci1jb2xvcjojZmRlNjhhO2JhY2tncm91bmQ6I2ZlZmNlOH0KLm1zZy5ibG9ja2Vke29wYWNpdHk6MC41fQoubWV0YXtmb250LXNpemU6MTBweDtjb2xvcjojNmI3MjgwO2ZvbnQtd2VpZ2h0OjgwMDttYXJnaW4tYm90dG9tOjRweDtkaXNwbGF5OmZsZXg7Z2FwOjZweDtmbGV4LXdyYXA6d3JhcDthbGlnbi1pdGVtczpjZW50ZXJ9Ci5iYWRnZXtwYWRkaW5nOjJweCA2cHg7Ym9yZGVyLXJhZGl1czo5OTlweDtmb250LXNpemU6OXB4O2ZvbnQtd2VpZ2h0OjkwMH0KLmJhZGdlLWNlb3tiYWNrZ3JvdW5kOiNmZGU2OGE7Y29sb3I6IzkyNDAwZX0uYmFkZ2UtbnVyc2V7YmFja2dyb3VuZDojZWRlOWZlO2NvbG9yOiM1YjIxYjZ9LmJhZGdlLXN0YWZme2JhY2tncm91bmQ6I2RiZWFmZTtjb2xvcjojMWU0MGFmfS5iYWRnZS1ibG9ja2Vke2JhY2tncm91bmQ6I2ZlZTJlMjtjb2xvcjojZGMyNjI2fS5iYWRnZS1hcHByb3ZlZHtiYWNrZ3JvdW5kOiNkY2ZjZTc7Y29sb3I6IzE1ODAzZH0uYmFkZ2UtcGVuZGluZ3tiYWNrZ3JvdW5kOiNmZWYzYzc7Y29sb3I6IzkyNDAwZX0KLmFjdGlvbnN7ZGlzcGxheTpmbGV4O2dhcDo2cHg7bWFyZ2luLXRvcDo2cHg7ZmxleC13cmFwOndyYXB9Ci5hY3RCdG57Zm9udC1zaXplOjEwcHg7Zm9udC13ZWlnaHQ6ODAwO3BhZGRpbmc6NnB4IDEwcHg7Ym9yZGVyLXJhZGl1czo5OTlweDtib3JkZXI6MXB4IHNvbGlkICNlNWU3ZWI7YmFja2dyb3VuZDojZjlmYWZiO2N1cnNvcjpwb2ludGVyfQouYWN0QnRuLmRlbHtjb2xvcjojZGMyNjI2fS5hY3RCdG4uZWRpdHtjb2xvcjojMjU2M2VifS5hY3RCdG4uYmxvY2t7Y29sb3I6I2ZmZjtiYWNrZ3JvdW5kOiNlZjQ0NDQ7Ym9yZGVyLWNvbG9yOiNlZjQ0NDR9LmFjdEJ0bi51bmJsb2Nre2NvbG9yOiNmZmY7YmFja2dyb3VuZDojMjJjNTVlO2JvcmRlci1jb2xvcjojMjJjNTVlfQouYmFye2JhY2tncm91bmQ6I2ZmZjtib3JkZXItdG9wOjFweCBzb2xpZCAjZTVlN2ViO3BhZGRpbmc6OHB4O2Rpc3BsYXk6ZmxleDtnYXA6NnB4O2FsaWduLWl0ZW1zOmNlbnRlcjtwb3NpdGlvbjpzdGlja3k7Ym90dG9tOjB9Ci5iYXIgaW5wdXR7ZmxleDoxO21pbi13aWR0aDo2MHB4O3BhZGRpbmc6MTJweCAxNHB4O2JvcmRlci1yYWRpdXM6OTk5cHg7Ym9yZGVyOjEuNXB4IHNvbGlkICNlNWU3ZWI7b3V0bGluZTpub25lO2ZvbnQtc2l6ZToxNHB4fQouYnRue3dpZHRoOjQwcHg7aGVpZ2h0OjQwcHg7Ym9yZGVyLXJhZGl1czo1MCU7Ym9yZGVyOm5vbmU7Zm9udC13ZWlnaHQ6OTAwO2N1cnNvcjpwb2ludGVyO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OmNlbnRlcjtmb250LXNpemU6MTZweH0KLnNlbmR7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCMxNmEzNGEsIzdjM2FlZCk7Y29sb3I6I2ZmZn0ubWVkaWF7YmFja2dyb3VuZDojZWZmNmZmO2JvcmRlcjoxcHggc29saWQgI2U1ZTdlYn0uY3ZCdG57YmFja2dyb3VuZDojZmVmM2M3O2JvcmRlcjoxcHggc29saWQgI2ZkZTY4YX0ubWljQnRue2JhY2tncm91bmQ6I2Y5ZmFmYjtib3JkZXI6MXB4IHNvbGlkICNlNWU3ZWJ9Ci5jZW9QYW5lbHtiYWNrZ3JvdW5kOiNmZWZjZTg7Ym9yZGVyOjFweCBzb2xpZCAjZmRlNjhhO3BhZGRpbmc6MTBweCAxMnB4O2Rpc3BsYXk6bm9uZTtnYXA6OHB4O2FsaWduLWl0ZW1zOmNlbnRlcjtmbGV4LXdyYXA6d3JhcH0KLmNlb1BhbmVsLnNob3d7ZGlzcGxheTpmbGV4fQoubG9naW57ZmxleDoxO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OmNlbnRlcjtwYWRkaW5nOjIwcHh9Ci5jYXJke2JhY2tncm91bmQ6I2ZmZjtwYWRkaW5nOjIwcHg7Ym9yZGVyLXJhZGl1czoxNnB4O2JvcmRlcjoxcHggc29saWQgI2U1ZTdlYjttYXgtd2lkdGg6NDAwcHg7d2lkdGg6MTAwJTt0ZXh0LWFsaWduOmNlbnRlcn0KLmFsZXJ0e3BhZGRpbmc6MTJweDtib3JkZXItcmFkaXVzOjEwcHg7Zm9udC1zaXplOjEycHg7Zm9udC13ZWlnaHQ6NzAwO21hcmdpbjo4cHg7YmFja2dyb3VuZDojZmVmMmYyO2JvcmRlcjoxcHggc29saWQgI2ZlY2FjYTtjb2xvcjojZGMyNjI2O2Rpc3BsYXk6YmxvY2t9CmltZy5jaGF0SW1ne21heC13aWR0aDoyMDBweDtib3JkZXItcmFkaXVzOjEwcHg7bWFyZ2luLXRvcDo2cHg7Y3Vyc29yOnBvaW50ZXJ9dmlkZW8uY2hhdFZpZHttYXgtd2lkdGg6MjQwcHg7Ym9yZGVyLXJhZGl1czoxMHB4O21hcmdpbi10b3A6NnB4fS5maWxlQm94e21hcmdpbi10b3A6NnB4O3BhZGRpbmc6OHB4O2JhY2tncm91bmQ6I2Y5ZmFmYjtib3JkZXI6MXB4IHNvbGlkICNlNWU3ZWI7Ym9yZGVyLXJhZGl1czoxMHB4O2Rpc3BsYXk6ZmxleDtnYXA6OHB4O2FsaWduLWl0ZW1zOmNlbnRlcn0KLnByb2dyZXNze2hlaWdodDo2cHg7YmFja2dyb3VuZDojZTVlN2ViO2JvcmRlci1yYWRpdXM6OTk5cHg7ZGlzcGxheTpub25lO21hcmdpbjowIDhweH0ucHJvZ3Jlc3NCYXJ7aGVpZ2h0OjEwMCU7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsIzdjM2FlZCwjMTZhMzRhKTt3aWR0aDowJX0KI2Jsb2NrTWFuYWdlcntwb3NpdGlvbjpmaXhlZDtpbnNldDowO3otaW5kZXg6MjAwO2JhY2tncm91bmQ6cmdiYSgwLDAsMCwuNik7YmFja2Ryb3AtZmlsdGVyOmJsdXIoNnB4KTtkaXNwbGF5Om5vbmU7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7cGFkZGluZzoxMnB4fQojYmxvY2tNYW5hZ2VyLnNob3d7ZGlzcGxheTpmbGV4fQojYmxvY2tNYW5hZ2VyQ2FyZHtiYWNrZ3JvdW5kOiNmZmY7d2lkdGg6MTAwJTttYXgtd2lkdGg6NTYwcHg7bWF4LWhlaWdodDo5MHZoO2JvcmRlci1yYWRpdXM6MThweDtvdmVyZmxvdzpoaWRkZW47ZGlzcGxheTpmbGV4O2ZsZXgtZGlyZWN0aW9uOmNvbHVtbjtib3gtc2hhZG93OjAgMjBweCA2MHB4IHJnYmEoMCwwLDAsLjQpfQouYmxvY2tIZWFkZXJ7cGFkZGluZzoxNHB4O2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLCM3YzNhZWQsIzE2YTM0YSk7Y29sb3I6I2ZmZjtkaXNwbGF5OmZsZXg7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47YWxpZ24taXRlbXM6Y2VudGVyfQouYmxvY2tCb2R5e2ZsZXg6MTtvdmVyZmxvdzphdXRvO3BhZGRpbmc6MTBweDtiYWNrZ3JvdW5kOiNmOGZhZmN9Ci5udXJzZVJvd3tkaXNwbGF5OmZsZXg7Z2FwOjEwcHg7YWxpZ24taXRlbXM6Y2VudGVyO3BhZGRpbmc6MTBweDtib3JkZXI6MXB4IHNvbGlkICNlNWU3ZWI7Ym9yZGVyLXJhZGl1czoxMnB4O2JhY2tncm91bmQ6I2ZmZjttYXJnaW4tYm90dG9tOjhweH0KLm51cnNlUm93LmJsb2NrZWRSb3d7Ym9yZGVyLWNvbG9yOiNmZWNhY2E7YmFja2dyb3VuZDojZmVmMmYyfQoubnVyc2VBdmF0YXJ7d2lkdGg6NDBweDtoZWlnaHQ6NDBweDtib3JkZXItcmFkaXVzOjUwJTtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI2E4NTVmNywjNmQyOGQ5KTtkaXNwbGF5OmdyaWQ7cGxhY2UtaXRlbXM6Y2VudGVyO2NvbG9yOiNmZmY7Zm9udC13ZWlnaHQ6OTAwO2ZsZXgtc2hyaW5rOjB9Ci5udXJzZUluZm97ZmxleDoxO21pbi13aWR0aDowfQoubnVyc2VOYW1le2ZvbnQtd2VpZ2h0OjgwMDtmb250LXNpemU6MTNweDtjb2xvcjojMTExODI3fQoubnVyc2VNZXRhe2ZvbnQtc2l6ZToxMHB4O2NvbG9yOiM2YjcyODB9Cjwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CjxkaXYgY2xhc3M9InRvcCI+PGI+R1JPVVAgQ0hBVCAtIENFTy9TVEFGRi9OVVJTRVMgT05MWSAtIEZJWEVEIEJVVFRPTlM8L2I+PGRpdj48YnV0dG9uIGlkPSJob21lQnRuIiBzdHlsZT0icGFkZGluZzo2cHggMTBweDtib3JkZXItcmFkaXVzOjk5OXB4O2JvcmRlcjpub25lO2ZvbnQtd2VpZ2h0OjkwMDtjdXJzb3I6cG9pbnRlciI+SE9NRTwvYnV0dG9uPiA8YnV0dG9uIGlkPSJyZWxvYWRCdG4iIHN0eWxlPSJwYWRkaW5nOjZweCAxMHB4O2JvcmRlci1yYWRpdXM6OTk5cHg7Ym9yZGVyOm5vbmU7Y3Vyc29yOnBvaW50ZXIiPlJFTE9BRDwvYnV0dG9uPjwvZGl2PjwvZGl2PgoKPGRpdiBpZD0iY2VvUGFuZWwiIGNsYXNzPSJjZW9QYW5lbCI+CjxzcGFuIHN0eWxlPSJmb250LXdlaWdodDo5MDA7Zm9udC1zaXplOjEycHg7Y29sb3I6IzkyNDAwZSI+Q0VPIE1BU1RFUjo8L3NwYW4+CjxidXR0b24gaWQ9IndpcGVCdG4iIHN0eWxlPSJwYWRkaW5nOjhweCAxMnB4O2JvcmRlci1yYWRpdXM6MTBweDtiYWNrZ3JvdW5kOiNkYzI2MjY7Y29sb3I6I2ZmZjtib3JkZXI6bm9uZTtmb250LXdlaWdodDo5MDA7Zm9udC1zaXplOjExcHg7Y3Vyc29yOnBvaW50ZXIiPldJUEUgQUxMIENIQVQ8L2J1dHRvbj4KPGJ1dHRvbiBpZD0iYmxvY2tNZ3JCdG4iIHN0eWxlPSJwYWRkaW5nOjhweCAxMnB4O2JvcmRlci1yYWRpdXM6MTBweDtiYWNrZ3JvdW5kOiMxMTE4Mjc7Y29sb3I6I2ZmZjtib3JkZXI6bm9uZTtmb250LXdlaWdodDo5MDA7Zm9udC1zaXplOjExcHg7Y3Vyc29yOnBvaW50ZXIiPkFsbCBOdXJzZXMgQmxvY2svVW5ibG9jazwvYnV0dG9uPgo8c3BhbiBpZD0idXNlckJhZGdlIiBzdHlsZT0iZm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6ODAwO2NvbG9yOiM2YjcyODA7bWFyZ2luLWxlZnQ6YXV0byI+PC9zcGFuPgo8L2Rpdj4KCjxkaXYgaWQ9InN0YXR1cyI+PC9kaXY+CjxkaXYgaWQ9ImNoYXQiPjxkaXYgaWQ9ImxvYWRpbmciIHN0eWxlPSJ0ZXh0LWFsaWduOmNlbnRlcjtjb2xvcjojOWNhM2FmO3BhZGRpbmc6MjBweCI+TG9hZGluZyBjaGF0Li4uIGZpeGluZyBhdXRoLi4uPC9kaXY+PC9kaXY+Cgo8ZGl2IGlkPSJsb2dpbldhbGwiIGNsYXNzPSJsb2dpbiIgc3R5bGU9ImRpc3BsYXk6bm9uZSI+CjxkaXYgY2xhc3M9ImNhcmQiPgo8ZGl2IHN0eWxlPSJmb250LXNpemU6NDBweCI+TE9DSzwvZGl2Pgo8aDM+TG9naW4gUmVxdWlyZWQ8L2gzPgo8cCBzdHlsZT0iZm9udC1zaXplOjEycHg7Y29sb3I6IzZiNzI4MDttYXJnaW46OHB4IDAiPllvdSBuZWVkIHRvIGxvZ2luIHdpdGggbWFpbiBhY2NvdW50IGZpcnN0LiBDRU8gb3IgTnVyc2UgbG9naW4uPC9wPgo8ZGl2IGlkPSJsb2dpbkVyciI+PC9kaXY+CjxidXR0b24gc3R5bGU9ImJhY2tncm91bmQ6I2Y5ZmFmYjtib3JkZXI6MXB4IHNvbGlkICNlNWU3ZWI7d2lkdGg6MTAwJTtwYWRkaW5nOjEycHg7Ym9yZGVyLXJhZGl1czoxMHB4O2ZvbnQtd2VpZ2h0OjkwMDttYXJnaW4tdG9wOjhweDtjdXJzb3I6cG9pbnRlciIgb25jbGljaz0ibG9jYXRpb24uaHJlZj0naW5kZXguaHRtbCciPkdvIEhvbWU8L2J1dHRvbj4KPC9kaXY+CjwvZGl2PgoKPGRpdiBjbGFzcz0iYmFyIiBpZD0iaW5wdXRCYXIiIHN0eWxlPSJkaXNwbGF5Om5vbmUiPgo8YnV0dG9uIGNsYXNzPSJidG4gbWVkaWEiIGlkPSJwaG90b0J0biIgdGl0bGU9IlBob3RvIj5JTUc8L2J1dHRvbj4KPGJ1dHRvbiBjbGFzcz0iYnRuIG1lZGlhIiBpZD0idmlkZW9CdG4iIHRpdGxlPSJWaWRlbyI+VklEPC9idXR0b24+CjxidXR0b24gY2xhc3M9ImJ0biBjdkJ0biIgaWQ9ImN2QnRuIiB0aXRsZT0iQ1YiPkNWPC9idXR0b24+CjxidXR0b24gY2xhc3M9ImJ0biBtaWNCdG4iIGlkPSJtaWNCdG4iIHRpdGxlPSJWb2ljZSI+TUlDPC9idXR0b24+CjxpbnB1dCB0eXBlPSJmaWxlIiBpZD0icGhvdG9JbiIgYWNjZXB0PSJpbWFnZS8qIiBzdHlsZT0iZGlzcGxheTpub25lIj4KPGlucHV0IHR5cGU9ImZpbGUiIGlkPSJ2aWRlb0luIiBhY2NlcHQ9InZpZGVvLyoiIHN0eWxlPSJkaXNwbGF5Om5vbmUiPgo8aW5wdXQgdHlwZT0iZmlsZSIgaWQ9ImN2SW4iIGFjY2VwdD0iLnBkZiwuZG9jLC5kb2N4LC50eHQiIHN0eWxlPSJkaXNwbGF5Om5vbmUiPgo8aW5wdXQgaWQ9Im1zZ0lucHV0IiBwbGFjZWhvbGRlcj0iV3JpdGUgbWVzc2FnZS4uLiI+CjxidXR0b24gY2xhc3M9ImJ0biBzZW5kIiBpZD0ic2VuZEJ0biI+PjwvYnV0dG9uPgo8L2Rpdj4KPGRpdiBpZD0icHJvZ3Jlc3NXcmFwIiBjbGFzcz0icHJvZ3Jlc3MiPjxkaXYgaWQ9InByb2dyZXNzQmFyIiBjbGFzcz0icHJvZ3Jlc3NCYXIiPjwvZGl2PjwvZGl2PgoKPCEtLSBCbG9jayBNYW5hZ2VyIE1vZGFsIC0tPgo8ZGl2IGlkPSJibG9ja01hbmFnZXIiPgo8ZGl2IGlkPSJibG9ja01hbmFnZXJDYXJkIj4KPGRpdiBjbGFzcz0iYmxvY2tIZWFkZXIiPgo8ZGl2PjxiPkFsbCBSZWdpc3RlcmVkIE51cnNlcyAtIEJsb2NrL1VuYmxvY2sgTWFuYWdlcjwvYj48ZGl2IHN0eWxlPSJmb250LXNpemU6MTBweDtvcGFjaXR5Oi45Ij5DRU8gb25seTwvZGl2PjwvZGl2Pgo8YnV0dG9uIGlkPSJjbG9zZUJsb2NrQnRuIiBzdHlsZT0iYmFja2dyb3VuZDpyZ2JhKDAsMCwwLC4yKTtib3JkZXI6bm9uZTtjb2xvcjojZmZmO3dpZHRoOjMycHg7aGVpZ2h0OjMycHg7Ym9yZGVyLXJhZGl1czo1MCU7Zm9udC13ZWlnaHQ6OTAwO2N1cnNvcjpwb2ludGVyIj5YPC9idXR0b24+CjwvZGl2Pgo8ZGl2IHN0eWxlPSJwYWRkaW5nOjhweDtiYWNrZ3JvdW5kOiNmZmZiZWI7Ym9yZGVyLWJvdHRvbToxcHggc29saWQgI2ZkZTY4YTtkaXNwbGF5OmZsZXg7Z2FwOjZweDtmbGV4LXdyYXA6d3JhcDthbGlnbi1pdGVtczpjZW50ZXIiPgo8aW5wdXQgaWQ9Im51cnNlU2VhcmNoIiBwbGFjZWhvbGRlcj0iU2VhcmNoIG51cnNlIGJ5IG5hbWUsIGVtYWlsLCBwaG9uZS4uLiIgc3R5bGU9ImZsZXg6MTttaW4td2lkdGg6MTgwcHg7cGFkZGluZzoxMHB4O2JvcmRlci1yYWRpdXM6MTBweDtib3JkZXI6MS41cHggc29saWQgI2U1ZTdlYiI+CjxzcGFuIGlkPSJudXJzZUNvdW50IiBzdHlsZT0iZm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6ODAwO2NvbG9yOiM2YjcyODAiPjAgbnVyc2VzPC9zcGFuPgo8YnV0dG9uIGlkPSJyZWZyZXNoTnVyc2VzQnRuIiBzdHlsZT0icGFkZGluZzo4cHggMTJweDtib3JkZXItcmFkaXVzOjEwcHg7YmFja2dyb3VuZDojZjNmNGY2O2JvcmRlcjoxcHggc29saWQgI2U1ZTdlYjtmb250LXdlaWdodDo4MDA7Zm9udC1zaXplOjExcHg7Y3Vyc29yOnBvaW50ZXIiPlJlZnJlc2g8L2J1dHRvbj4KPC9kaXY+CjxkaXYgaWQ9ImJsb2NrTGlzdCIgY2xhc3M9ImJsb2NrQm9keSI+PGRpdiBzdHlsZT0idGV4dC1hbGlnbjpjZW50ZXI7Y29sb3I6IzljYTNhZjtwYWRkaW5nOjIwcHgiPkxvYWRpbmcgYWxsIHJlZ2lzdGVyZWQgbnVyc2VzLi4uPC9kaXY+PC9kaXY+CjxkaXYgc3R5bGU9InBhZGRpbmc6MTBweDtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXRvcDoxcHggc29saWQgI2U1ZTdlYjtkaXNwbGF5OmZsZXg7Z2FwOjhweCI+CjxidXR0b24gaWQ9ImNsb3NlQmxvY2tCdG4yIiBzdHlsZT0iZmxleDoxO3BhZGRpbmc6MTBweDtib3JkZXItcmFkaXVzOjEwcHg7YmFja2dyb3VuZDojZjNmNGY2O2JvcmRlcjoxcHggc29saWQgI2U1ZTdlYjtmb250LXdlaWdodDo4MDA7Y3Vyc29yOnBvaW50ZXIiPkNsb3NlPC9idXR0b24+CjxidXR0b24gaWQ9InJlbG9hZE51cnNlc0J0biIgc3R5bGU9ImZsZXg6MTtwYWRkaW5nOjEwcHg7Ym9yZGVyLXJhZGl1czoxMHB4O2JhY2tncm91bmQ6IzExMTgyNztjb2xvcjojZmZmO2ZvbnQtd2VpZ2h0OjgwMDtjdXJzb3I6cG9pbnRlciI+UmVsb2FkIEFsbCBOdXJzZXM8L2J1dHRvbj4KPC9kaXY+CjwvZGl2Pgo8L2Rpdj4KCjxzY3JpcHQ+CnZhciBmaXJlYmFzZUNvbmZpZz17YXBpS2V5OiJBSXphU3lCNTItWDFEOENnLXdVRFdQZHNfdFI3WDNjRjgyZE1kUmciLGF1dGhEb21haW46IndlYi1jYXJlLTYxOGU4LmZpcmViYXNlYXBwLmNvbSIsZGF0YWJhc2VVUkw6Imh0dHBzOi8vd2ViLWNhcmUtNjE4ZTgtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tIixwcm9qZWN0SWQ6IndlYi1jYXJlLTYxOGU4IixzdG9yYWdlQnVja2V0OiJ3ZWItY2FyZS02MThlOC5maXJlYmFzZXN0b3JhZ2UuYXBwIixtZXNzYWdpbmdTZW5kZXJJZDoiMTA2MjU3ODY2MDY5NCIsYXBwSWQ6IjE6MTA2MjU3ODY2MDY5NDp3ZWI6Zjk0ZGZlMTJjOTI5ZGYwNWJjZTJmNyJ9OwppZighZmlyZWJhc2UuYXBwcy5sZW5ndGgpIGZpcmViYXNlLmluaXRpYWxpemVBcHAoZmlyZWJhc2VDb25maWcpOwp2YXIgZGI9ZmlyZWJhc2UuZGF0YWJhc2UoKTsKdmFyIGZzPWZpcmViYXNlLmZpcmVzdG9yZSgpOwp2YXIgYXV0aD1maXJlYmFzZS5hdXRoKCk7CnZhciBzdG9yYWdlPWZpcmViYXNlLnN0b3JhZ2UoKTsKCnZhciBDRU9fRU1BSUxTPVsnbG92ZWNhcmVnbG9iYWxAZ21haWwuY29tJywnY2VvQGxvdmVjYXJlZ2xvYmFsLmNvbScsJ2FzYWJlcmVwZXRlcjIwNEBnbWFpbC5jb20nLCdhc2FiZXJlcGV0ZXIyMDRAbG92ZWNhcmVnbG9iYWwuY29tJywnbG92ZWNhcmVnbG9iYWxob21lQGdtYWlsLmNvbSddOwp2YXIgY3VyVXNlcj1udWxsLGN1clJvbGU9bnVsbCxibG9ja2VkVXNlcnM9W10sYmxvY2tlZE1hcD17fSxhbGxOdXJzZXNDYWNoZT1bXSxtZWRpYVJlY29yZGVyPW51bGwsYXVkaW9DaHVua3M9W10saXNSZWNvcmRpbmc9ZmFsc2U7CnZhciBmaXJlYmFzZUF1dGhSZWFkeT1mYWxzZTsKCmZ1bmN0aW9uIGVuc3VyZUZpcmViYXNlQXV0aCgpewogIHJldHVybiBuZXcgUHJvbWlzZShmdW5jdGlvbihyZXNvbHZlKXsKICAgIHZhciB1bnN1Yj1hdXRoLm9uQXV0aFN0YXRlQ2hhbmdlZChhc3luYyBmdW5jdGlvbih1c2VyKXsKICAgICAgdW5zdWIoKTsKICAgICAgaWYodXNlcil7IGZpcmViYXNlQXV0aFJlYWR5PXRydWU7IHJlc29sdmUodXNlcik7IH0KICAgICAgZWxzZSB7CiAgICAgICAgdHJ5eyB2YXIgY3JlZD1hd2FpdCBhdXRoLnNpZ25JbkFub255bW91c2x5KCk7IGZpcmViYXNlQXV0aFJlYWR5PXRydWU7IHJlc29sdmUoY3JlZC51c2VyKTsgfQogICAgICAgIGNhdGNoKGUpeyBjb25zb2xlLmVycm9yKCdBbm9ueW1vdXMgYXV0aCBmYWlsZWQnLCBlKTsgcmVzb2x2ZShudWxsKTsgfQogICAgICB9CiAgICB9KTsKICAgIHNldFRpbWVvdXQoZnVuY3Rpb24oKXsgaWYoIWZpcmViYXNlQXV0aFJlYWR5KSByZXNvbHZlKG51bGwpOyB9LCA0MDAwKTsKICB9KTsKfQoKZnVuY3Rpb24gZ2V0U2Vzc2lvblVzZXIoKXsKICB0cnl7CiAgICB2YXIgbG9nZ2VkID0gbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2xjZ19sb2dnZWRfaW4nKTsKICAgIHZhciB1aWQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnbGNnX251cnNlX3VpZCcpIHx8IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdjdXJyZW50TnVyc2VJZCcpIHx8IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdsY2dfdWlkJykgfHwgbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2xjZ19jbGllbnRfdWlkJykgfHwgbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ251cnNlVWlkJyk7CiAgICB2YXIgZW1haWwgPSAobG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2xjZ19udXJzZV9lbWFpbCcpIHx8IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdjdXJyZW50TnVyc2VFbWFpbCcpIHx8IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdsY2dfZW1haWwnKSB8fCBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnY3VycmVudENsaWVudEVtYWlsJykgfHwgbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ251cnNlRW1haWwnKSB8fCAnJykudG9Mb3dlckNhc2UoKTsKICAgIHZhciBuYW1lID0gbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ251cnNlTmFtZScpIHx8IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdjdXJyZW50TnVyc2VOYW1lJykgfHwgbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2xjZ19udXJzZV9uYW1lJykgfHwgbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2xjZ19uYW1lJykgfHwgbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2NsaWVudE5hbWUnKSB8fCBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgndXNlck5hbWUnKSB8fCAoZW1haWw/ZW1haWwuc3BsaXQoJ0AnKVswXTonVXNlcicpOwogICAgdmFyIHJvbGUgPSAobG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2xjZ19yb2xlJykgfHwgbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2N1cnJlbnRVc2VyVHlwZScpIHx8IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdsY2dfdXNlcl90eXBlJykgfHwgJycpLnRvTG93ZXJDYXNlKCk7CiAgICB2YXIgcGhvdG8gPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnbnVyc2VQaG90b1VSTCcpIHx8IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdudXJzZVBob3RvJykgfHwgbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ3Bob3RvVVJMJykgfHwgJyc7CiAgICB2YXIgaXNBcHByb3ZlZCA9IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdsY2dfaXNBcHByb3ZlZCcpPT09J3RydWUnOwogICAgCiAgICAvLyBBTFNPIGNoZWNrIENFTyBkYXNoYm9hcmQgc3BlY2lhbCBrZXlzCiAgICB2YXIgY2VvRW1haWwgPSAobG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2Nlb0VtYWlsJykgfHwgJycpLnRvTG93ZXJDYXNlKCk7CiAgICBpZihjZW9FbWFpbCAmJiBDRU9fRU1BSUxTLmluY2x1ZGVzKGNlb0VtYWlsKSl7CiAgICAgIHJldHVybiB7aWQ6J2Nlb18nK2Nlb0VtYWlsLCBuYW1lOidDRU8nLCBlbWFpbDpjZW9FbWFpbCwgcm9sZTonY2VvJywgcGhvdG9VUkw6JycsIGlzQXBwcm92ZWQ6dHJ1ZX07CiAgICB9CiAgICAKICAgIGlmKHVpZCAmJiBlbWFpbCl7CiAgICAgIGlmKCFyb2xlKXsgcm9sZSA9IENFT19FTUFJTFMuaW5jbHVkZXMoZW1haWwpID8gJ2NlbycgOiAnbnVyc2UnOyB9CiAgICAgIGlmKHJvbGU9PT0nY2xpZW50Jyl7IHJldHVybiB7YmxvY2tlZENsaWVudDp0cnVlLCBlbWFpbDplbWFpbCwgbmFtZTpuYW1lfTsgfQogICAgICByZXR1cm4ge2lkOnVpZCwgbmFtZTpuYW1lLCBlbWFpbDplbWFpbCwgcm9sZTpyb2xlLCBwaG90b1VSTDpwaG90bywgaXNBcHByb3ZlZDppc0FwcHJvdmVkfTsKICAgIH0KICAgIC8vIEZhbGxiYWNrOiBpZiBubyBsb2NhbFN0b3JhZ2UgYnV0IENFTyBlbWFpbCBsaXN0LCBhbGxvdyBDRU8gdmlhIGZpcmViYXNlIGF1dGggb25seQogICAgLy8gQ2hlY2sgaWYgYW5vbnltb3VzIGJ1dCB3ZSBrbm93IENFTyBmcm9tIGVhcmxpZXIgQ0VPIGRhc2hib2FyZCBsb2dpbiB2aWEgc2Vzc2lvblN0b3JhZ2U/CiAgICB2YXIgc3RvcmVkQ0VPID0gc2Vzc2lvblN0b3JhZ2UuZ2V0SXRlbSgnY2VvX2xvZ2dlZF9pbicpOwogICAgaWYoc3RvcmVkQ0VPKXsKICAgICAgcmV0dXJuIHtpZDonY2VvX3RlbXAnLCBuYW1lOidDRU8nLCBlbWFpbDpDRU9fRU1BSUxTWzBdLCByb2xlOidjZW8nLCBwaG90b1VSTDonJywgaXNBcHByb3ZlZDp0cnVlfTsKICAgIH0KICAgIHJldHVybiBudWxsOwogIH1jYXRjaChlKXsgcmV0dXJuIG51bGw7IH0KfQoKYXN5bmMgZnVuY3Rpb24gaW5pdEF1dG9Mb2dpbigpewogIHZhciBsb2dpbldhbGw9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2xvZ2luV2FsbCcpOwogIHZhciBpbnB1dEJhcj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW5wdXRCYXInKTsKICB2YXIgY2VvUGFuZWw9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Nlb1BhbmVsJyk7CiAgdmFyIGNoYXRCb3g9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NoYXQnKTsKICB2YXIgc2Vzc2lvbiA9IGdldFNlc3Npb25Vc2VyKCk7CiAgCiAgLy8gVHJ5IGZpcmViYXNlIGF1dGggYXMgZmFsbGJhY2sgLSBpZiB1c2VyIGlzIGFub24gYnV0IHByZXZpb3VzbHkgbG9nZ2VkIGFzIENFTywgY2hlY2sgZGIgZm9yIENFTyBtYXJrZXIKICBpZighc2Vzc2lvbil7CiAgICAvLyBTdGlsbCB0cnkgdG8gYWxsb3cgQ0VPIGlmIGZpcmViYXNlIGF1dGggZXhpc3RzIGFuZCB3ZSBjYW4gZ3Vlc3MgQ0VPCiAgICB2YXIgZmJVc2VyID0gYXV0aC5jdXJyZW50VXNlcjsKICAgIGlmKCFmYlVzZXIpewogICAgICBhd2FpdCBlbnN1cmVGaXJlYmFzZUF1dGgoKTsKICAgICAgZmJVc2VyID0gYXV0aC5jdXJyZW50VXNlcjsKICAgIH0KICAgIC8vIElmIHN0aWxsIG5vIHNlc3Npb24sIHNob3cgQ0VPIHF1aWNrIGxvZ2luIG9wdGlvbgogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2xvYWRpbmcnKS50ZXh0Q29udGVudD0nTm90IGxvZ2dlZCBpbiB3aXRoIG1haW4gYWNjb3VudCAtIFRyeWluZyBDRU8gYXV0byBsb2dpbi4uLic7CiAgICAvLyBBbGxvdyBDRU8gdG8gZW50ZXIgZW1haWwgbWFudWFsbHkgZm9yIHF1aWNrIGFjY2VzcwogICAgbG9naW5XYWxsLnN0eWxlLmRpc3BsYXk9J2ZsZXgnOwogICAgaW5wdXRCYXIuc3R5bGUuZGlzcGxheT0nbm9uZSc7CiAgICBjZW9QYW5lbC5jbGFzc0xpc3QucmVtb3ZlKCdzaG93Jyk7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbG9naW5FcnInKS5pbm5lckhUTUw9JzxkaXYgY2xhc3M9YWxlcnQ+Q0VPIHF1aWNrIGxvZ2luOiA8YnI+PGlucHV0IGlkPSJxdWlja0VtYWlsIiBwbGFjZWhvbGRlcj0ibG92ZWNhcmVnbG9iYWxAZ21haWwuY29tIiBzdHlsZT0id2lkdGg6MTAwJTtwYWRkaW5nOjEwcHg7Ym9yZGVyLXJhZGl1czo4cHg7Ym9yZGVyOjFweCBzb2xpZCAjZTVlN2ViO21hcmdpbjo2cHggMCI+PGJ1dHRvbiBpZD0icXVpY2tMb2dpbkJ0biIgc3R5bGU9IndpZHRoOjEwMCU7cGFkZGluZzoxMHB4O2JvcmRlci1yYWRpdXM6OHB4O2JhY2tncm91bmQ6IzExMTgyNztjb2xvcjojZmZmO2ZvbnQtd2VpZ2h0OjkwMDtib3JkZXI6bm9uZTtjdXJzb3I6cG9pbnRlciI+TG9naW4gYXMgQ0VPPC9idXR0b24+PC9kaXY+JzsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdxdWlja0xvZ2luQnRuJykub25jbGljaz1mdW5jdGlvbigpewogICAgICB2YXIgZW09ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3F1aWNrRW1haWwnKS52YWx1ZS50b0xvd2VyQ2FzZSgpLnRyaW0oKTsKICAgICAgaWYoIUNFT19FTUFJTFMuaW5jbHVkZXMoZW0pKXsgYWxlcnQoJ09ubHkgQ0VPIGVtYWlscyBhbGxvd2VkOiAnK0NFT19FTUFJTFMuam9pbignLCAnKSk7IHJldHVybjsgfQogICAgICBsb2NhbFN0b3JhZ2Uuc2V0SXRlbSgnY2VvRW1haWwnLCBlbSk7CiAgICAgIGxvY2FsU3RvcmFnZS5zZXRJdGVtKCdsY2dfbnVyc2VfZW1haWwnLCBlbSk7CiAgICAgIGxvY2FsU3RvcmFnZS5zZXRJdGVtKCdsY2dfbnVyc2VfdWlkJywgJ2Nlb18nK2VtKTsKICAgICAgbG9jYWxTdG9yYWdlLnNldEl0ZW0oJ2xjZ19sb2dnZWRfaW4nLCAndHJ1ZScpOwogICAgICBsb2NhbFN0b3JhZ2Uuc2V0SXRlbSgnbGNnX3JvbGUnLCAnY2VvJyk7CiAgICAgIHNlc3Npb25TdG9yYWdlLnNldEl0ZW0oJ2Nlb19sb2dnZWRfaW4nLCAndHJ1ZScpOwogICAgICBsb2NhdGlvbi5yZWxvYWQoKTsKICAgIH07CiAgICByZXR1cm47CiAgfQogIGlmKHNlc3Npb24uYmxvY2tlZENsaWVudCl7CiAgICBsb2dpbldhbGwuc3R5bGUuZGlzcGxheT0nZmxleCc7IGlucHV0QmFyLnN0eWxlLmRpc3BsYXk9J25vbmUnOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2xvZ2luRXJyJykuaW5uZXJIVE1MPSc8ZGl2IGNsYXNzPWFsZXJ0PkFDQ0VTUyBERU5JRUQgLSBDbGllbnRzIG5vdCBhbGxvd2VkIGluIG51cnNlcyBncm91cCBjaGF0LiBZb3VyIGFjY291bnQgJytzZXNzaW9uLmVtYWlsKycgaXMgQ0xJRU5ULjwvZGl2Pic7CiAgICBjaGF0Qm94LmlubmVySFRNTD0nJzsgcmV0dXJuOwogIH0KICBjdXJVc2VyPXNlc3Npb247IGN1clJvbGU9c2Vzc2lvbi5yb2xlOwogIGxvZ2luV2FsbC5zdHlsZS5kaXNwbGF5PSdub25lJzsgaW5wdXRCYXIuc3R5bGUuZGlzcGxheT0nZmxleCc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3VzZXJCYWRnZScpLnRleHRDb250ZW50PWN1clJvbGUudG9VcHBlckNhc2UoKSsnICcrY3VyVXNlci5uYW1lKycgLSAnK2N1clVzZXIuZW1haWw7CiAgaWYoY3VyUm9sZT09PSdjZW8nKSBjZW9QYW5lbC5jbGFzc0xpc3QuYWRkKCdzaG93Jyk7IGVsc2UgY2VvUGFuZWwuY2xhc3NMaXN0LnJlbW92ZSgnc2hvdycpOwogIGlmKENFT19FTUFJTFMuaW5jbHVkZXMoY3VyVXNlci5lbWFpbC50b0xvd2VyQ2FzZSgpKSl7IGN1clJvbGU9J2Nlbyc7IGNlb1BhbmVsLmNsYXNzTGlzdC5hZGQoJ3Nob3cnKTsgY3VyVXNlci5yb2xlPSdjZW8nOyB9CiAgdHJ5ewogICAgYXdhaXQgZW5zdXJlRmlyZWJhc2VBdXRoKCk7CiAgfWNhdGNoKGUpe30KICBzdGFydENoYXQoKTsKICBpZihjdXJSb2xlPT09J2NlbycpIGxvYWRBbGxOdXJzZXMoKTsKfQoKZnVuY3Rpb24gc3RhcnRDaGF0KCl7CiAgdmFyIGNoYXRSZWY9ZGIucmVmKCdudXJzZXNfZ3JvdXBfY2hhdC9tZXNzYWdlcycpOwogIHZhciBibG9ja2VkUmVmPWRiLnJlZignbnVyc2VzX2dyb3VwX2NoYXQvYmxvY2tlZF91c2VycycpOwogIGJsb2NrZWRSZWYub25jZSgndmFsdWUnKS50aGVuKGZ1bmN0aW9uKHMpewogICAgaWYocy5leGlzdHMoKSl7CiAgICAgIGJsb2NrZWRVc2Vycz1bXTsgYmxvY2tlZE1hcD17fTsKICAgICAgdmFyIHZhbD1zLnZhbCgpOwogICAgICBmb3IodmFyIGsgaW4gdmFsKXsgYmxvY2tlZFVzZXJzLnB1c2godmFsW2tdLnVzZXJJZCk7IGJsb2NrZWRNYXBbdmFsW2tdLnVzZXJJZF09dmFsW2tdOyB9CiAgICAgIGlmKGJsb2NrZWRVc2Vycy5pbmNsdWRlcyhjdXJVc2VyLmlkKSAmJiBjdXJSb2xlIT09J2NlbycpewogICAgICAgIHZhciBiPWJsb2NrZWRNYXBbY3VyVXNlci5pZF07CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0YXR1cycpLmlubmVySFRNTD0nPGRpdiBjbGFzcz1hbGVydD5Zb3UgYXJlIGJsb2NrZWQgYnkgQ0VPIC0gUmVhc29uOiAnKyhiP2IucmVhc29uOidNaXNiZWhhdmlvcicpKyc8L2Rpdj4nOwogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbnB1dEJhcicpLnN0eWxlLmRpc3BsYXk9J25vbmUnOwogICAgICB9CiAgICB9CiAgfSk7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NoYXQnKS5pbm5lckhUTUw9Jyc7CiAgY2hhdFJlZi5vbignY2hpbGRfYWRkZWQnLCBmdW5jdGlvbihzbmFwKXsgcmVuZGVyTXNnKHNuYXAua2V5LCBzbmFwLnZhbCgpKTsgfSk7CiAgY2hhdFJlZi5vbignY2hpbGRfY2hhbmdlZCcsIGZ1bmN0aW9uKHNuYXApeyB2YXIgZWw9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21zZ18nK3NuYXAua2V5KTsgaWYoZWwpeyB2YXIgdHh0PWVsLnF1ZXJ5U2VsZWN0b3IoJy5tc2dUZXh0Jyk7IGlmKHR4dCkgdHh0LmlubmVyVGV4dD1zbmFwLnZhbCgpLnRleHR8fCcnOyB9IH0pOwogIGNoYXRSZWYub24oJ2NoaWxkX3JlbW92ZWQnLCBmdW5jdGlvbihzbmFwKXsgdmFyIGVsPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtc2dfJytzbmFwLmtleSk7IGlmKGVsKSBlbC5yZW1vdmUoKTsgfSk7Cn0KCmZ1bmN0aW9uIHJlbmRlck1zZyhpZCxkYXRhKXsKICB2YXIgY2hhdD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2hhdCcpOwogIHZhciBpc01lPWRhdGEudXNlcklkPT09Y3VyVXNlci5pZDsKICB2YXIgaXNDRU89ZGF0YS5yb2xlPT09J2Nlbyd8fENFT19FTUFJTFMuaW5jbHVkZXMoKGRhdGEudXNlckVtYWlsfHwnJykudG9Mb3dlckNhc2UoKSk7CiAgdmFyIGlzQmxvY2tlZD1ibG9ja2VkVXNlcnMuaW5jbHVkZXMoZGF0YS51c2VySWQpOwogIHZhciBkaXY9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7CiAgZGl2LmlkPSdtc2dfJytpZDsKICBkaXYuY2xhc3NOYW1lPSdtc2cnKyhpc01lPycgbWUnOicnKSsoaXNDRU8/JyBjZW8nOicnKSsoaXNCbG9ja2VkPycgYmxvY2tlZCc6JycpOwogIHZhciBtZWRpYUh0bWw9Jyc7CiAgaWYoZGF0YS50eXBlPT09J3Bob3RvJyYmZGF0YS5tZWRpYVVSTCkgbWVkaWFIdG1sPSc8aW1nIGNsYXNzPWNoYXRJbWcgc3JjPSInK2RhdGEubWVkaWFVUkwrJyIgb25jbGljaz0id2luZG93Lm9wZW4oXCcnK2RhdGEubWVkaWFVUkwrJ1wnLFwnX2JsYW5rXCcpIj4nOwogIGVsc2UgaWYoZGF0YS50eXBlPT09J3ZpZGVvJyYmZGF0YS5tZWRpYVVSTCkgbWVkaWFIdG1sPSc8dmlkZW8gY2xhc3M9Y2hhdFZpZCBjb250cm9scyBzcmM9IicrZGF0YS5tZWRpYVVSTCsnIj48L3ZpZGVvPic7CiAgZWxzZSBpZihkYXRhLnR5cGU9PT0nY3YnJiZkYXRhLm1lZGlhVVJMKSBtZWRpYUh0bWw9JzxkaXYgY2xhc3M9ZmlsZUJveD48YSBocmVmPSInK2RhdGEubWVkaWFVUkwrJyIgdGFyZ2V0PSJfYmxhbmsiPicrKGRhdGEuZmlsZU5hbWV8fCdDVicpKyc8L2E+ICgnKyhkYXRhLmZpbGVTaXplfHwnJykrJyk8L2Rpdj4nOwogIGVsc2UgaWYoZGF0YS50eXBlPT09J2F1ZGlvJyYmZGF0YS5tZWRpYVVSTCkgbWVkaWFIdG1sPSc8YXVkaW8gY29udHJvbHMgc3JjPSInK2RhdGEubWVkaWFVUkwrJyIgc3R5bGU9IndpZHRoOjIwMHB4O21hcmdpbi10b3A6NnB4Ij48L2F1ZGlvPic7CiAgdmFyIHRpbWU9bmV3IERhdGUoZGF0YS50aW1lc3RhbXB8fERhdGUubm93KCkpLnRvTG9jYWxlU3RyaW5nKCk7CiAgdmFyIHNhZmVUZXh0PShkYXRhLnRleHR8fCcnKS5yZXBsYWNlKC88L2csJyZsdDsnKTsKICBkaXYuaW5uZXJIVE1MPSc8ZGl2IGNsYXNzPW1ldGE+PHNwYW4gY2xhc3M9ImJhZGdlICcrKGlzQ0VPPydiYWRnZS1jZW8nOmRhdGEucm9sZT09PSdzdGFmZic/J2JhZGdlLXN0YWZmJzonYmFkZ2UtbnVyc2UnKSsnIj4nKyhpc0NFTz8nQ0VPJzooZGF0YS5yb2xlfHwnTlVSU0UnKS50b1VwcGVyQ2FzZSgpKSsnPC9zcGFuPjxiPicrKGRhdGEudXNlck5hbWV8fCdVc2VyJykrJzwvYj4gJysoaXNNZT8nKFlvdSknOicnKSsnICcrKGlzQmxvY2tlZD8nPHNwYW4gY2xhc3M9YmFkZ2UgYmFkZ2UtYmxvY2tlZD5CTE9DS0VEPC9zcGFuPic6JycpKyc8c3BhbiBzdHlsZT0ibWFyZ2luLWxlZnQ6YXV0byI+Jyt0aW1lKyhkYXRhLmVkaXRlZD8nIChlZGl0ZWQpJzonJykrJzwvc3Bhbj48L2Rpdj48ZGl2IGNsYXNzPSJtc2dUZXh0Ij4nK3NhZmVUZXh0Kyc8L2Rpdj4nK21lZGlhSHRtbCsnPGRpdiBpZD0iZWRpdEFyZWFfJytpZCsnIiBzdHlsZT0iZGlzcGxheTpub25lIj48L2Rpdj48ZGl2IGNsYXNzPWFjdGlvbnM+JysoaXNNZXx8Y3VyUm9sZT09PSdjZW8nPyc8YnV0dG9uIGNsYXNzPSJhY3RCdG4gZWRpdCIgZGF0YS1lZGl0PSInK2lkKyciPkVkaXQ8L2J1dHRvbj48YnV0dG9uIGNsYXNzPSJhY3RCdG4gZGVsIiBkYXRhLWRlbD0iJytpZCsnIj5EZWxldGU8L2J1dHRvbj4nOicnKSsoY3VyUm9sZT09PSdjZW8nJiYhaXNNZT8nPGJ1dHRvbiBjbGFzcz0iYWN0QnRuICcrKGlzQmxvY2tlZD8ndW5ibG9jayc6J2Jsb2NrJykrJyIgZGF0YS1ibG9jaz0iJytkYXRhLnVzZXJJZCsnIiBkYXRhLW5hbWU9IicrKGRhdGEudXNlck5hbWV8fCdVc2VyJykucmVwbGFjZSgvIi9nLCcnKSsnIj4nKyhpc0Jsb2NrZWQ/J1VuYmxvY2snOidCbG9jaycpKyc8L2J1dHRvbj4nOicnKSsnPC9kaXY+JzsKICBjaGF0LmFwcGVuZENoaWxkKGRpdik7CiAgY2hhdC5zY3JvbGxUb3A9Y2hhdC5zY3JvbGxIZWlnaHQ7CiAgCiAgLy8gQXR0YWNoIGxpc3RlbmVycyBmb3IgdGhpcyBtZXNzYWdlCiAgdmFyIGVkaXRCdG49ZGl2LnF1ZXJ5U2VsZWN0b3IoJ1tkYXRhLWVkaXRdJyk7CiAgaWYoZWRpdEJ0bikgZWRpdEJ0bi5vbmNsaWNrPWZ1bmN0aW9uKCl7IGVkaXRNc2coaWQpOyB9OwogIHZhciBkZWxCdG49ZGl2LnF1ZXJ5U2VsZWN0b3IoJ1tkYXRhLWRlbF0nKTsKICBpZihkZWxCdG4pIGRlbEJ0bi5vbmNsaWNrPWZ1bmN0aW9uKCl7IGRlbGV0ZU1zZyhpZCk7IH07CiAgdmFyIGJsb2NrQnRuPWRpdi5xdWVyeVNlbGVjdG9yKCdbZGF0YS1ibG9ja10nKTsKICBpZihibG9ja0J0bikgYmxvY2tCdG4ub25jbGljaz1mdW5jdGlvbigpeyB0b2dnbGVCbG9jayh0aGlzLmdldEF0dHJpYnV0ZSgnZGF0YS1ibG9jaycpLCB0aGlzLmdldEF0dHJpYnV0ZSgnZGF0YS1uYW1lJykpOyB9Owp9Cgphc3luYyBmdW5jdGlvbiBzZW5kVGV4dCgpewogIHZhciBpbnB1dD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbXNnSW5wdXQnKTsKICB2YXIgdGV4dD1pbnB1dC52YWx1ZS50cmltKCk7CiAgaWYoIXRleHQpIHJldHVybjsKICBpZihibG9ja2VkVXNlcnMuaW5jbHVkZXMoY3VyVXNlci5pZCkpe2FsZXJ0KCdZb3UgYXJlIGJsb2NrZWQgYnkgQ0VPJyk7cmV0dXJuO30KICBpZighY3VyVXNlcil7YWxlcnQoJ05vdCBsb2dnZWQgaW4nKTtyZXR1cm47fQogIGlmKCFmaXJlYmFzZUF1dGhSZWFkeSl7IHRyeXsgYXdhaXQgZW5zdXJlRmlyZWJhc2VBdXRoKCk7IH1jYXRjaChlKXt9IH0KICB0cnl7CiAgICBhd2FpdCBkYi5yZWYoJ251cnNlc19ncm91cF9jaGF0L21lc3NhZ2VzJykucHVzaCh7dXNlcklkOmN1clVzZXIuaWQsdXNlck5hbWU6Y3VyVXNlci5uYW1lLHVzZXJFbWFpbDpjdXJVc2VyLmVtYWlsLHJvbGU6Y3VyUm9sZSx0aW1lc3RhbXA6RGF0ZS5ub3coKSx0eXBlOid0ZXh0Jyx0ZXh0OnRleHR9KTsKICAgIGlucHV0LnZhbHVlPScnOwogIH1jYXRjaChlKXsKICAgIGlmKGUubWVzc2FnZSAmJiBlLm1lc3NhZ2UuaW5kZXhPZignUEVSTUlTU0lPTl9ERU5JRUQnKT4tMSl7CiAgICAgIGFsZXJ0KCdQRVJNSVNTSU9OX0RFTklFRCAtIEVuYWJsZSBBbm9ueW1vdXMgQXV0aCBpbiBGaXJlYmFzZSBDb25zb2xlJyk7CiAgICB9IGVsc2UgeyBhbGVydCgnU2VuZCBmYWlsZWQ6ICcrZS5tZXNzYWdlKTsgfQogIH0KfQoKYXN5bmMgZnVuY3Rpb24gdXBsb2FkRmlsZShpbnB1dEVsLHR5cGUpewogIHZhciBmaWxlPWlucHV0RWwuZmlsZXNbMF07aWYoIWZpbGUpIHJldHVybjsKICBpZihibG9ja2VkVXNlcnMuaW5jbHVkZXMoY3VyVXNlci5pZCkpe2FsZXJ0KCdCbG9ja2VkJyk7cmV0dXJuO30KICBpZighZmlyZWJhc2VBdXRoUmVhZHkpIGF3YWl0IGVuc3VyZUZpcmViYXNlQXV0aCgpOwogIHZhciBzdGF0dXM9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0YXR1cycpO3ZhciB3cmFwPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwcm9ncmVzc1dyYXAnKTt2YXIgYmFyPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwcm9ncmVzc0JhcicpOwogIHdyYXAuc3R5bGUuZGlzcGxheT0nYmxvY2snO3N0YXR1cy5pbm5lckhUTUw9JzxkaXYgY2xhc3M9YWxlcnQgc3R5bGU9ImJhY2tncm91bmQ6I2VmZjZmZjtib3JkZXItY29sb3I6I2JmZGJmZTtjb2xvcjojMWU0MGFmIj5VcGxvYWRpbmcgJytmaWxlLm5hbWUrJy4uLjwvZGl2Pic7CiAgdHJ5ewogICAgdmFyIHNhZmU9ZmlsZS5uYW1lLnJlcGxhY2UoL1teYS16QS1aMC05Ll8tXS9nLCdfJyk7CiAgICB2YXIgcGF0aD0nZ3JvdXBfY2hhdC8nK3R5cGUrJy8nK0RhdGUubm93KCkrJ18nK3NhZmU7CiAgICB2YXIgc3RvcmFnZVJlZj1zdG9yYWdlLnJlZihwYXRoKTsKICAgIHZhciB0YXNrPXN0b3JhZ2VSZWYucHV0KGZpbGUpOwogICAgdGFzay5vbignc3RhdGVfY2hhbmdlZCcsIGZ1bmN0aW9uKHNuYXApe2Jhci5zdHlsZS53aWR0aD1NYXRoLnJvdW5kKHNuYXAuYnl0ZXNUcmFuc2ZlcnJlZC9zbmFwLnRvdGFsQnl0ZXMqMTAwKSsnJSc7fSk7CiAgICBhd2FpdCB0YXNrO3ZhciB1cmw9YXdhaXQgc3RvcmFnZVJlZi5nZXREb3dubG9hZFVSTCgpOwogICAgdmFyIG1zZ1RleHQ9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21zZ0lucHV0JykudmFsdWV8fHR5cGUrJzogJytmaWxlLm5hbWU7CiAgICBhd2FpdCBkYi5yZWYoJ251cnNlc19ncm91cF9jaGF0L21lc3NhZ2VzJykucHVzaCh7dXNlcklkOmN1clVzZXIuaWQsdXNlck5hbWU6Y3VyVXNlci5uYW1lLHVzZXJFbWFpbDpjdXJVc2VyLmVtYWlsLHJvbGU6Y3VyUm9sZSx0aW1lc3RhbXA6RGF0ZS5ub3coKSx0eXBlOnR5cGUsbWVkaWFVUkw6dXJsLGZpbGVOYW1lOmZpbGUubmFtZSxmaWxlU2l6ZTooZmlsZS5zaXplLzEwMjQvMTAyNCkudG9GaXhlZCgyKSsnTUInLHRleHQ6bXNnVGV4dH0pOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21zZ0lucHV0JykudmFsdWU9Jyc7c3RhdHVzLmlubmVySFRNTD0nPGRpdiBjbGFzcz1hbGVydCBzdHlsZT0iYmFja2dyb3VuZDojZjBmZGY0O2JvcmRlci1jb2xvcjojYmJmN2QwO2NvbG9yOiMxNTgwM2QiPlVwbG9hZGVkITwvZGl2Pic7c2V0VGltZW91dChmdW5jdGlvbigpe3N0YXR1cy5pbm5lckhUTUw9Jyc7d3JhcC5zdHlsZS5kaXNwbGF5PSdub25lJztiYXIuc3R5bGUud2lkdGg9JzAlJzt9LDMwMDApOwogIH1jYXRjaChlKXtzdGF0dXMuaW5uZXJIVE1MPSc8ZGl2IGNsYXNzPWFsZXJ0PicrZS5tZXNzYWdlKyc8L2Rpdj4nO3dyYXAuc3R5bGUuZGlzcGxheT0nbm9uZSc7fQogIGlucHV0RWwudmFsdWU9Jyc7Cn0KCmZ1bmN0aW9uIGVkaXRNc2coaWQpewogIHZhciBjdXI9ZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI21zZ18nK2lkKycgLm1zZ1RleHQnKT8uaW5uZXJUZXh0fHwnJzsKICB2YXIgYXJlYT1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZWRpdEFyZWFfJytpZCk7CiAgYXJlYS5zdHlsZS5kaXNwbGF5PSdibG9jayc7CiAgYXJlYS5pbm5lckhUTUw9Jzx0ZXh0YXJlYSBpZD0iZWRpdElucHV0XycraWQrJyIgc3R5bGU9IndpZHRoOjEwMCU7cGFkZGluZzo4cHg7Ym9yZGVyLXJhZGl1czoxMHB4O2JvcmRlcjoxLjVweCBzb2xpZCAjN2MzYWVkO21hcmdpbi10b3A6NnB4Ij4nK2N1cisnPC90ZXh0YXJlYT48YnI+PGJ1dHRvbiBpZD0ic2F2ZV8nK2lkKyciIHN0eWxlPSJtYXJnaW4tdG9wOjZweDtwYWRkaW5nOjZweCAxMnB4O2JvcmRlci1yYWRpdXM6OHB4O2JhY2tncm91bmQ6IzE2YTM0YTtjb2xvcjojZmZmO2JvcmRlcjpub25lO2ZvbnQtd2VpZ2h0OjgwMDtjdXJzb3I6cG9pbnRlciI+U2F2ZTwvYnV0dG9uPjxidXR0b24gaWQ9ImNhbmNlbF8nK2lkKyciIHN0eWxlPSJtYXJnaW4tbGVmdDo2cHg7cGFkZGluZzo2cHggMTJweDtib3JkZXItcmFkaXVzOjhweDtiYWNrZ3JvdW5kOiM2YjcyODA7Y29sb3I6I2ZmZjtib3JkZXI6bm9uZTtjdXJzb3I6cG9pbnRlciI+Q2FuY2VsPC9idXR0b24+JzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc2F2ZV8nK2lkKS5vbmNsaWNrPWZ1bmN0aW9uKCl7IHNhdmVFZGl0KGlkKTsgfTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2FuY2VsXycraWQpLm9uY2xpY2s9ZnVuY3Rpb24oKXsgY2FuY2VsRWRpdChpZCk7IH07Cn0KZnVuY3Rpb24gY2FuY2VsRWRpdChpZCl7ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2VkaXRBcmVhXycraWQpLnN0eWxlLmRpc3BsYXk9J25vbmUnO30KZnVuY3Rpb24gc2F2ZUVkaXQoaWQpewogIHZhciB0PWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdlZGl0SW5wdXRfJytpZCkudmFsdWUudHJpbSgpO2lmKCF0KSByZXR1cm47CiAgZGIucmVmKCdudXJzZXNfZ3JvdXBfY2hhdC9tZXNzYWdlcy8nK2lkKS51cGRhdGUoe3RleHQ6dCxlZGl0ZWQ6dHJ1ZSxlZGl0ZWRBdDpEYXRlLm5vdygpfSk7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2VkaXRBcmVhXycraWQpLnN0eWxlLmRpc3BsYXk9J25vbmUnOwp9CmZ1bmN0aW9uIGRlbGV0ZU1zZyhpZCl7CiAgaWYoIWNvbmZpcm0oJ0RlbGV0ZSB0aGlzIG1lc3NhZ2U/JykpIHJldHVybjsKICBkYi5yZWYoJ251cnNlc19ncm91cF9jaGF0L21lc3NhZ2VzLycraWQpLnJlbW92ZSgpOwp9CgpmdW5jdGlvbiBjZW9XaXBlQWxsKCl7CiAgaWYoY3VyUm9sZSE9PSdjZW8nKXthbGVydCgnT25seSBDRU8gY2FuIHdpcGUnKTtyZXR1cm47fQogIHZhciBzZXNzaW9uRW1haWw9KGN1clVzZXI/LmVtYWlsfHwnJykudG9Mb3dlckNhc2UoKTsKICBpZihDRU9fRU1BSUxTLmluZGV4T2Yoc2Vzc2lvbkVtYWlsKT09PS0xKXsgYWxlcnQoJ1VuYXV0aG9yaXplZCAtIENFTyBvbmx5Jyk7IHJldHVybjsgfQogIHZhciBjb25maXJtV29yZD1wcm9tcHQoJ0NFTyBXSVBFIEFMTCBDSEFUIC0gVHlwZSBXSVBFIHRvIGNvbmZpcm0gREVMRVRFIEFMTCBNRVNTQUdFUyBGT1JFVkVSOicpOwogIGlmKCFjb25maXJtV29yZCB8fCBjb25maXJtV29yZCE9PSdXSVBFJyl7YWxlcnQoJ0NhbmNlbGxlZCcpO3JldHVybjt9CiAgdmFyIHJlYXNvbj1wcm9tcHQoJ1JlYXNvbiBmb3Igd2lwZT8gKG1pbiA1IGNoYXJzKScpO2lmKCFyZWFzb258fHJlYXNvbi5sZW5ndGg8NSl7YWxlcnQoJ1JlYXNvbiByZXF1aXJlZCcpO3JldHVybjt9CiAgaWYoIWNvbmZpcm0oJ0ZJTkFMIENPTkZJUk06IERFTEVURSBBTEwgTUVTU0FHRVMgRk9SRVZFUj9cblxuQ0VPOiAnK2N1clVzZXIubmFtZSsnXG5SZWFzb246ICcrcmVhc29uKSkgcmV0dXJuOwogIGRiLnJlZignbnVyc2VzX2dyb3VwX2NoYXQvbWVzc2FnZXMnKS5yZW1vdmUoKS50aGVuKGZ1bmN0aW9uKCl7CiAgICBhbGVydCgnQWxsIG1lc3NhZ2VzIHdpcGVkIGJ5IENFTyAtICcrY3VyVXNlci5uYW1lKTsKICAgIGRiLnJlZignbnVyc2VzX2dyb3VwX2NoYXQvbG9ncycpLnB1c2goe2FjdGlvbjonV0lQRV9BTEwnLGJ5OmN1clVzZXIubmFtZSxlbWFpbDpjdXJVc2VyLmVtYWlsLHJlYXNvbjpyZWFzb24sdGltZXN0YW1wOkRhdGUubm93KCl9KTsKICB9KS5jYXRjaChmdW5jdGlvbihlKXthbGVydCgnV2lwZSBmYWlsZWQ6ICcrZS5tZXNzYWdlKTt9KTsKfQoKZnVuY3Rpb24gdG9nZ2xlQmxvY2sodXNlcklkLHVzZXJOYW1lKXsKICBpZihjdXJSb2xlIT09J2Nlbycpe2FsZXJ0KCdPbmx5IENFTyBjYW4gYmxvY2svdW5ibG9jaycpO3JldHVybjt9CiAgdmFyIHNlc3Npb25FbWFpbD0oY3VyVXNlcj8uZW1haWx8fCcnKS50b0xvd2VyQ2FzZSgpOwogIGlmKENFT19FTUFJTFMuaW5kZXhPZihzZXNzaW9uRW1haWwpPT09LTEpe2FsZXJ0KCdDRU8gb25seScpO3JldHVybjt9CiAgdmFyIGlzQmxvY2tlZD1ibG9ja2VkVXNlcnMuaW5kZXhPZih1c2VySWQpIT09LTE7CiAgaWYoaXNCbG9ja2VkKXsKICAgIGlmKCFjb25maXJtKCdVbmJsb2NrICcrdXNlck5hbWUrJz8nKSkgcmV0dXJuOwogICAgZGIucmVmKCdudXJzZXNfZ3JvdXBfY2hhdC9ibG9ja2VkX3VzZXJzJykub25jZSgndmFsdWUnKS50aGVuKGZ1bmN0aW9uKHMpewogICAgICBpZihzLmV4aXN0cygpKXsKICAgICAgICB2YXIgdmFsPXMudmFsKCk7CiAgICAgICAgZm9yKHZhciBrIGluIHZhbCl7IGlmKHZhbFtrXS51c2VySWQ9PT11c2VySWQpeyBkYi5yZWYoJ251cnNlc19ncm91cF9jaGF0L2Jsb2NrZWRfdXNlcnMvJytrKS5yZW1vdmUoKTsgfSB9CiAgICAgICAgYmxvY2tlZFVzZXJzPWJsb2NrZWRVc2Vycy5maWx0ZXIoZnVuY3Rpb24odSl7cmV0dXJuIHUhPT11c2VySWQ7fSk7IGRlbGV0ZSBibG9ja2VkTWFwW3VzZXJJZF07CiAgICAgICAgYWxlcnQoJ1VuYmxvY2tlZCAnK3VzZXJOYW1lKTsgbG9hZEFsbE51cnNlcygpOyByZW5kZXJCbG9ja0xpc3QoKTsKICAgICAgfQogICAgfSk7CiAgfWVsc2V7CiAgICB2YXIgcmVhc29uPXByb21wdCgnQ0VPIEJsb2NrIC0gQmxvY2sgJyt1c2VyTmFtZSsnPyBSZWFzb24gKG1pbiA1IGNoYXJzKTonKTtpZighcmVhc29ufHxyZWFzb24udHJpbSgpLmxlbmd0aDw1KXthbGVydCgnUmVhc29uIHJlcXVpcmVkJyk7cmV0dXJuO30KICAgIGlmKCFjb25maXJtKCdCbG9jayAnK3VzZXJOYW1lKyc/IFJlYXNvbjogJytyZWFzb24pKSByZXR1cm47CiAgICBpZighZmlyZWJhc2VBdXRoUmVhZHkpIGVuc3VyZUZpcmViYXNlQXV0aCgpLnRoZW4oZnVuY3Rpb24oKXsgZG9CbG9jaygpOyB9KTsgZWxzZSBkb0Jsb2NrKCk7CiAgICBmdW5jdGlvbiBkb0Jsb2NrKCl7CiAgICAgIGRiLnJlZignbnVyc2VzX2dyb3VwX2NoYXQvYmxvY2tlZF91c2VycycpLnB1c2goe3VzZXJJZDp1c2VySWQsdXNlck5hbWU6dXNlck5hbWUscmVhc29uOnJlYXNvbi50cmltKCksYmxvY2tlZEJ5OmN1clVzZXIubmFtZSxibG9ja2VkQnlFbWFpbDpjdXJVc2VyLmVtYWlsLGJsb2NrZWRCeVJvbGU6J0NFTycsdGltZXN0YW1wOkRhdGUubm93KCl9KS50aGVuKGZ1bmN0aW9uKCl7CiAgICAgICAgYmxvY2tlZFVzZXJzLnB1c2godXNlcklkKTsgYmxvY2tlZE1hcFt1c2VySWRdPXt1c2VyTmFtZTp1c2VyTmFtZSxyZWFzb246cmVhc29ufTsKICAgICAgICBhbGVydCgnQmxvY2tlZCAnK3VzZXJOYW1lKTsgbG9hZEFsbE51cnNlcygpOyByZW5kZXJCbG9ja0xpc3QoKTsKICAgICAgfSkuY2F0Y2goZnVuY3Rpb24oZSl7YWxlcnQoJ0Jsb2NrIGZhaWxlZDogJytlLm1lc3NhZ2UpO30pOwogICAgfQogIH0KfQoKYXN5bmMgZnVuY3Rpb24gbG9hZEFsbE51cnNlcygpewogIHZhciBsaXN0RWw9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Jsb2NrTGlzdCcpOwogIHZhciBjb3VudEVsPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdudXJzZUNvdW50Jyk7CiAgbGlzdEVsLmlubmVySFRNTD0nPGRpdiBzdHlsZT0idGV4dC1hbGlnbjpjZW50ZXI7Y29sb3I6IzljYTNhZjtwYWRkaW5nOjIwcHgiPkxvYWRpbmcgYWxsIHJlZ2lzdGVyZWQgbnVyc2VzLi4uPC9kaXY+JzsKICB0cnl7CiAgICB2YXIgbnVyc2VzTWFwPXt9OwogICAgdHJ5ewogICAgICB2YXIgcVNuYXA9YXdhaXQgZnMuY29sbGVjdGlvbignbnVyc2VzJykuZ2V0KCk7CiAgICAgIHFTbmFwLmZvckVhY2goZnVuY3Rpb24oZG9jU25hcCl7CiAgICAgICAgdmFyIGQ9ZG9jU25hcC5kYXRhKCk7IHZhciBpZD1kLnVpZHx8ZG9jU25hcC5pZDsKICAgICAgICBpZighbnVyc2VzTWFwW2lkXSkgbnVyc2VzTWFwW2lkXT17aWQ6aWQsIG5hbWU6ZC5mdWxsTmFtZXx8ZC5uYW1lfHxkLmRpc3BsYXlOYW1lfHwnTnVyc2UnLCBlbWFpbDpkLmVtYWlsfHwnJywgcGhvbmU6ZC5waG9uZXx8ZC5waG9uZU51bWJlcnx8JycsIHN0YXR1czpkLnN0YXR1c3x8ZC52ZXJpZmljYXRpb25TdGF0dXN8fCdwZW5kaW5nJywgaXNBcHByb3ZlZDpkLmlzQXBwcm92ZWR8fGZhbHNlfTsKICAgICAgfSk7CiAgICB9Y2F0Y2goZSl7fQogICAgdHJ5ewogICAgICB2YXIgcnRkYlNuYXA9YXdhaXQgZGIucmVmKCdudXJzZXMnKS5vbmNlKCd2YWx1ZScpOwogICAgICBpZihydGRiU25hcC5leGlzdHMoKSl7CiAgICAgICAgdmFyIHZhbD1ydGRiU25hcC52YWwoKTsKICAgICAgICBmb3IodmFyIHVpZCBpbiB2YWwpeyB2YXIgZD12YWxbdWlkXTsgaWYoIW51cnNlc01hcFt1aWRdKSBudXJzZXNNYXBbdWlkXT17aWQ6dWlkLCBuYW1lOmQuZnVsbE5hbWV8fGQubmFtZXx8J051cnNlJywgZW1haWw6ZC5lbWFpbHx8JycsIHBob25lOmQucGhvbmV8fCcnLCBzdGF0dXM6ZC5zdGF0dXN8fCdwZW5kaW5nJywgaXNBcHByb3ZlZDpkLmlzQXBwcm92ZWR8fGZhbHNlfTsgfQogICAgICB9CiAgICB9Y2F0Y2goZSl7fQogICAgdHJ5ewogICAgICB2YXIgcGVuZFNuYXA9YXdhaXQgZGIucmVmKCdwZW5kaW5nTnVyc2VzJykub25jZSgndmFsdWUnKTsKICAgICAgaWYocGVuZFNuYXAuZXhpc3RzKCkpewogICAgICAgIHZhciB2YWw9cGVuZFNuYXAudmFsKCk7CiAgICAgICAgZm9yKHZhciB1aWQgaW4gdmFsKXsgdmFyIGQ9dmFsW3VpZF07IGlmKCFudXJzZXNNYXBbdWlkXSkgbnVyc2VzTWFwW3VpZF09e2lkOnVpZCwgbmFtZTpkLmZ1bGxOYW1lfHxkLm5hbWV8fCdOdXJzZScsIGVtYWlsOmQuZW1haWx8fCcnLCBwaG9uZTpkLnBob25lfHwnJywgc3RhdHVzOmQuc3RhdHVzfHwncGVuZGluZycsIGlzQXBwcm92ZWQ6ZmFsc2V9OyB9CiAgICAgIH0KICAgIH1jYXRjaChlKXt9CiAgICB0cnl7CiAgICAgIHZhciBibG9ja1NuYXA9YXdhaXQgZGIucmVmKCdudXJzZXNfZ3JvdXBfY2hhdC9ibG9ja2VkX3VzZXJzJykub25jZSgndmFsdWUnKTsKICAgICAgYmxvY2tlZFVzZXJzPVtdOyBibG9ja2VkTWFwPXt9OwogICAgICBpZihibG9ja1NuYXAuZXhpc3RzKCkpewogICAgICAgIHZhciBidj1ibG9ja1NuYXAudmFsKCk7IGZvcih2YXIgayBpbiBidil7IGJsb2NrZWRVc2Vycy5wdXNoKGJ2W2tdLnVzZXJJZCk7IGJsb2NrZWRNYXBbYnZba10udXNlcklkXT1idltrXTsgfQogICAgICB9CiAgICB9Y2F0Y2goZSl7fQogICAgYWxsTnVyc2VzQ2FjaGU9T2JqZWN0LnZhbHVlcyhudXJzZXNNYXApLnNvcnQoZnVuY3Rpb24oYSxiKXtyZXR1cm4gYS5uYW1lLmxvY2FsZUNvbXBhcmUoYi5uYW1lKTt9KTsKICAgIGNvdW50RWwudGV4dENvbnRlbnQ9YWxsTnVyc2VzQ2FjaGUubGVuZ3RoKycgbnVyc2VzIHJlZ2lzdGVyZWQnOwogICAgcmVuZGVyQmxvY2tMaXN0KCk7CiAgfWNhdGNoKGUpewogICAgbGlzdEVsLmlubmVySFRNTD0nPGRpdiBjbGFzcz1hbGVydD5GYWlsZWQgdG8gbG9hZDogJytlLm1lc3NhZ2UrJzwvZGl2Pic7CiAgfQp9CgpmdW5jdGlvbiByZW5kZXJCbG9ja0xpc3QoKXsKICB2YXIgbGlzdEVsPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdibG9ja0xpc3QnKTsKICB2YXIgc2VhcmNoPShkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbnVyc2VTZWFyY2gnKS52YWx1ZXx8JycpLnRvTG93ZXJDYXNlKCk7CiAgdmFyIGZpbHRlcmVkPWFsbE51cnNlc0NhY2hlLmZpbHRlcihmdW5jdGlvbihuKXsKICAgIGlmKCFzZWFyY2gpIHJldHVybiB0cnVlOwogICAgcmV0dXJuIChuLm5hbWUrJyAnKyhuLmVtYWlsfHwnJykrJyAnKyhuLnBob25lfHwnJykpLnRvTG93ZXJDYXNlKCkuaW5kZXhPZihzZWFyY2gpPi0xOwogIH0pOwogIGlmKGZpbHRlcmVkLmxlbmd0aD09PTApeyBsaXN0RWwuaW5uZXJIVE1MPSc8ZGl2IHN0eWxlPSJ0ZXh0LWFsaWduOmNlbnRlcjtjb2xvcjojOWNhM2FmO3BhZGRpbmc6MjBweCI+Tm8gbnVyc2VzIGZvdW5kPC9kaXY+JzsgcmV0dXJuOyB9CiAgbGlzdEVsLmlubmVySFRNTD1maWx0ZXJlZC5tYXAoZnVuY3Rpb24obil7CiAgICB2YXIgaXNCbG9ja2VkPWJsb2NrZWRVc2Vycy5pbmRleE9mKG4uaWQpIT09LTE7CiAgICB2YXIgYmxvY2tJbmZvPWJsb2NrZWRNYXBbbi5pZF07CiAgICByZXR1cm4gJzxkaXYgY2xhc3M9Im51cnNlUm93ICcrKGlzQmxvY2tlZD8nYmxvY2tlZFJvdyc6JycpKyciPjxkaXYgY2xhc3M9Im51cnNlQXZhdGFyIj4nKyhuLm5hbWV8fCdOJykuY2hhckF0KDApLnRvVXBwZXJDYXNlKCkrJzwvZGl2PjxkaXYgY2xhc3M9Im51cnNlSW5mbyI+PGRpdiBjbGFzcz0ibnVyc2VOYW1lIj4nK24ubmFtZSsnICcrKGlzQmxvY2tlZD8nPHNwYW4gY2xhc3M9ImJhZGdlIGJhZGdlLWJsb2NrZWQiPkJMT0NLRUQ8L3NwYW4+JzpuLmlzQXBwcm92ZWQ/JzxzcGFuIGNsYXNzPSJiYWRnZSBiYWRnZS1hcHByb3ZlZCI+QXBwcm92ZWQ8L3NwYW4+JzonPHNwYW4gY2xhc3M9ImJhZGdlIGJhZGdlLXBlbmRpbmciPlBlbmRpbmc8L3NwYW4+JykrJzwvZGl2PjxkaXYgY2xhc3M9Im51cnNlTWV0YSI+Jysobi5lbWFpbHx8J05vIGVtYWlsJykrJyAtICcrKG4ucGhvbmV8fCdObyBwaG9uZScpKycgLSAnK24uc3RhdHVzKyc8L2Rpdj4nKyhpc0Jsb2NrZWQmJmJsb2NrSW5mbz8nPGRpdiBjbGFzcz0ibnVyc2VNZXRhIiBzdHlsZT0iY29sb3I6I2RjMjYyNiI+UmVhc29uOiAnK2Jsb2NrSW5mby5yZWFzb24rJyBieSAnK2Jsb2NrSW5mby5ibG9ja2VkQnkrJzwvZGl2Pic6JycpKyc8L2Rpdj48ZGl2IHN0eWxlPSJkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2dhcDo0cHgiPicrKGlzQmxvY2tlZD8nPGJ1dHRvbiBjbGFzcz0iYWN0QnRuIHVuYmxvY2siIGRhdGEtYmlkPSInK24uaWQrJyIgZGF0YS1ibmFtZT0iJytuLm5hbWUucmVwbGFjZSgvIi9nLCcnKSsnIj5VbmJsb2NrPC9idXR0b24+JzonPGJ1dHRvbiBjbGFzcz0iYWN0QnRuIGJsb2NrIiBkYXRhLWJpZD0iJytuLmlkKyciIGRhdGEtYm5hbWU9Iicrbi5uYW1lLnJlcGxhY2UoLyIvZywnJykrJyI+QmxvY2s8L2J1dHRvbj4nKSsnPC9kaXY+PC9kaXY+JzsKICB9KS5qb2luKCcnKTsKICAvLyBhdHRhY2ggYmxvY2sgYnV0dG9ucwogIGxpc3RFbC5xdWVyeVNlbGVjdG9yQWxsKCdbZGF0YS1iaWRdJykuZm9yRWFjaChmdW5jdGlvbihidG4pewogICAgYnRuLm9uY2xpY2s9ZnVuY3Rpb24oKXsgdG9nZ2xlQmxvY2sodGhpcy5nZXRBdHRyaWJ1dGUoJ2RhdGEtYmlkJyksIHRoaXMuZ2V0QXR0cmlidXRlKCdkYXRhLWJuYW1lJykpOyB9OwogIH0pOwp9CmZ1bmN0aW9uIGZpbHRlck51cnNlcygpeyByZW5kZXJCbG9ja0xpc3QoKTsgfQpmdW5jdGlvbiB2aWV3TnVyc2VEZXRhaWxzKHVpZCl7CiAgdmFyIG49YWxsTnVyc2VzQ2FjaGUuZmluZChmdW5jdGlvbih4KXtyZXR1cm4geC5pZD09PXVpZDt9KTsKICBpZighbil7IGFsZXJ0KCdOb3QgZm91bmQnKTsgcmV0dXJuOyB9CiAgYWxlcnQoJ051cnNlIERldGFpbHM6XG5cbk5hbWU6ICcrbi5uYW1lKydcbkVtYWlsOiAnK24uZW1haWwrJ1xuUGhvbmU6ICcrbi5waG9uZSsnXG5TdGF0dXM6ICcrbi5zdGF0dXMrJ1xuQXBwcm92ZWQ6ICcrKG4uaXNBcHByb3ZlZD8nWWVzJzonTm8nKSsnXG5JRDogJytuLmlkKydcbkJsb2NrZWQ6ICcrKGJsb2NrZWRVc2Vycy5pbmRleE9mKG4uaWQpIT09LTE/J1lFUyc6J05vJykpOwp9CmZ1bmN0aW9uIHNob3dCbG9ja2VkKCl7CiAgaWYoY3VyUm9sZSE9PSdjZW8nKXsgYWxlcnQoJ09ubHkgQ0VPIGNhbiBvcGVuIEJsb2NrIE1hbmFnZXInKTsgcmV0dXJuOyB9CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Jsb2NrTWFuYWdlcicpLmNsYXNzTGlzdC5hZGQoJ3Nob3cnKTsKICBsb2FkQWxsTnVyc2VzKCk7Cn0KZnVuY3Rpb24gY2xvc2VCbG9ja01hbmFnZXIoKXsgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Jsb2NrTWFuYWdlcicpLmNsYXNzTGlzdC5yZW1vdmUoJ3Nob3cnKTsgfQoKLy8gRklYRUQ6IEJ1dHRvbiBsaXN0ZW5lcnMgdXNpbmcgYWRkRXZlbnRMaXN0ZW5lciAtIG5vIGlubGluZSBwaG90b0luLmNsaWNrKCkgZmFpbHVyZXMKZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKCl7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2hvbWVCdG4nKS5vbmNsaWNrPWZ1bmN0aW9uKCl7IGxvY2F0aW9uLmhyZWY9J2luZGV4Lmh0bWwnOyB9OwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyZWxvYWRCdG4nKS5vbmNsaWNrPWZ1bmN0aW9uKCl7IGxvY2F0aW9uLnJlbG9hZCgpOyB9OwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd3aXBlQnRuJykub25jbGljaz1jZW9XaXBlQWxsOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdibG9ja01nckJ0bicpLm9uY2xpY2s9c2hvd0Jsb2NrZWQ7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Nsb3NlQmxvY2tCdG4nKS5vbmNsaWNrPWNsb3NlQmxvY2tNYW5hZ2VyOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjbG9zZUJsb2NrQnRuMicpLm9uY2xpY2s9Y2xvc2VCbG9ja01hbmFnZXI7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3JlZnJlc2hOdXJzZXNCdG4nKS5vbmNsaWNrPWxvYWRBbGxOdXJzZXM7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3JlbG9hZE51cnNlc0J0bicpLm9uY2xpY2s9bG9hZEFsbE51cnNlczsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbnVyc2VTZWFyY2gnKS5hZGRFdmVudExpc3RlbmVyKCdpbnB1dCcsIGZpbHRlck51cnNlcyk7CiAgCiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Bob3RvQnRuJykub25jbGljaz1mdW5jdGlvbigpeyBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGhvdG9JbicpLmNsaWNrKCk7IH07CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3ZpZGVvQnRuJykub25jbGljaz1mdW5jdGlvbigpeyBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndmlkZW9JbicpLmNsaWNrKCk7IH07CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2N2QnRuJykub25jbGljaz1mdW5jdGlvbigpeyBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY3ZJbicpLmNsaWNrKCk7IH07CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21pY0J0bicpLm9uY2xpY2s9ZnVuY3Rpb24oKXsgdG9nZ2xlVm9pY2UoKTsgfTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc2VuZEJ0bicpLm9uY2xpY2s9c2VuZFRleHQ7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21zZ0lucHV0JykuYWRkRXZlbnRMaXN0ZW5lcigna2V5cHJlc3MnLCBmdW5jdGlvbihlKXsgaWYoZS5rZXk9PT0nRW50ZXInKSBzZW5kVGV4dCgpOyB9KTsKICAKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGhvdG9JbicpLmFkZEV2ZW50TGlzdGVuZXIoJ2NoYW5nZScsIGZ1bmN0aW9uKCl7IHVwbG9hZEZpbGUodGhpcywncGhvdG8nKTsgfSk7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3ZpZGVvSW4nKS5hZGRFdmVudExpc3RlbmVyKCdjaGFuZ2UnLCBmdW5jdGlvbigpeyB1cGxvYWRGaWxlKHRoaXMsJ3ZpZGVvJyk7IH0pOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjdkluJykuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJywgZnVuY3Rpb24oKXsgdXBsb2FkRmlsZSh0aGlzLCdjdicpOyB9KTsKICAKICBzZXRUaW1lb3V0KGluaXRBdXRvTG9naW4sIDUwMCk7Cn0pOwoKLy8gVm9pY2UKYXN5bmMgZnVuY3Rpb24gdG9nZ2xlVm9pY2UoKXsKICB2YXIgYnRuPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtaWNCdG4nKTsKICBpZighaXNSZWNvcmRpbmcpewogICAgdHJ5ewogICAgICB2YXIgc3RyZWFtPWF3YWl0IG5hdmlnYXRvci5tZWRpYURldmljZXMuZ2V0VXNlck1lZGlhKHthdWRpbzp0cnVlfSk7CiAgICAgIG1lZGlhUmVjb3JkZXI9bmV3IE1lZGlhUmVjb3JkZXIoc3RyZWFtKTthdWRpb0NodW5rcz1bXTsKICAgICAgbWVkaWFSZWNvcmRlci5vbmRhdGFhdmFpbGFibGU9ZnVuY3Rpb24oZSl7YXVkaW9DaHVua3MucHVzaChlLmRhdGEpO307CiAgICAgIG1lZGlhUmVjb3JkZXIub25zdG9wPWFzeW5jIGZ1bmN0aW9uKCl7CiAgICAgICAgdmFyIGJsb2I9bmV3IEJsb2IoYXVkaW9DaHVua3Mse3R5cGU6J2F1ZGlvL3dlYm0nfSk7CiAgICAgICAgaWYoYmxvY2tlZFVzZXJzLmluZGV4T2YoY3VyVXNlci5pZCkhPT0tMSl7YWxlcnQoJ0Jsb2NrZWQnKTtyZXR1cm47fQogICAgICAgIGlmKCFmaXJlYmFzZUF1dGhSZWFkeSkgYXdhaXQgZW5zdXJlRmlyZWJhc2VBdXRoKCk7CiAgICAgICAgdmFyIHdyYXA9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Byb2dyZXNzV3JhcCcpO3ZhciBiYXI9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Byb2dyZXNzQmFyJyk7dmFyIHN0YXR1cz1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc3RhdHVzJyk7CiAgICAgICAgd3JhcC5zdHlsZS5kaXNwbGF5PSdibG9jayc7c3RhdHVzLmlubmVySFRNTD0nPGRpdiBjbGFzcz1hbGVydCBzdHlsZT0iYmFja2dyb3VuZDojZWZmNmZmO2JvcmRlci1jb2xvcjojYmZkYmZlO2NvbG9yOiMxZTQwYWYiPlVwbG9hZGluZyB2b2ljZS4uLjwvZGl2Pic7CiAgICAgICAgdHJ5ewogICAgICAgICAgdmFyIHBhdGg9J2dyb3VwX2NoYXQvYXVkaW8vJytEYXRlLm5vdygpKydfdm9pY2Uud2VibSc7CiAgICAgICAgICB2YXIgc3RvcmFnZVJlZj1zdG9yYWdlLnJlZihwYXRoKTsKICAgICAgICAgIHZhciB0YXNrPXN0b3JhZ2VSZWYucHV0KGJsb2IpOwogICAgICAgICAgdGFzay5vbignc3RhdGVfY2hhbmdlZCcsIGZ1bmN0aW9uKHMpe2Jhci5zdHlsZS53aWR0aD1NYXRoLnJvdW5kKHMuYnl0ZXNUcmFuc2ZlcnJlZC9zLnRvdGFsQnl0ZXMqMTAwKSsnJSc7fSk7CiAgICAgICAgICBhd2FpdCB0YXNrO3ZhciB1cmw9YXdhaXQgc3RvcmFnZVJlZi5nZXREb3dubG9hZFVSTCgpOwogICAgICAgICAgYXdhaXQgZGIucmVmKCdudXJzZXNfZ3JvdXBfY2hhdC9tZXNzYWdlcycpLnB1c2goe3VzZXJJZDpjdXJVc2VyLmlkLHVzZXJOYW1lOmN1clVzZXIubmFtZSx1c2VyRW1haWw6Y3VyVXNlci5lbWFpbCxyb2xlOmN1clJvbGUsdGltZXN0YW1wOkRhdGUubm93KCksdHlwZTonYXVkaW8nLG1lZGlhVVJMOnVybCx0ZXh0OicnfSk7CiAgICAgICAgICBzdGF0dXMuaW5uZXJIVE1MPScnO3dyYXAuc3R5bGUuZGlzcGxheT0nbm9uZSc7YmFyLnN0eWxlLndpZHRoPScwJSc7CiAgICAgICAgfWNhdGNoKGUpe3N0YXR1cy5pbm5lckhUTUw9JzxkaXYgY2xhc3M9YWxlcnQ+Vm9pY2UgZmFpbGVkOiAnK2UubWVzc2FnZSsnPC9kaXY+Jzt3cmFwLnN0eWxlLmRpc3BsYXk9J25vbmUnO30KICAgICAgfTsKICAgICAgbWVkaWFSZWNvcmRlci5zdGFydCgpO2lzUmVjb3JkaW5nPXRydWU7YnRuLnN0eWxlLmJhY2tncm91bmQ9JyNmZWUyZTInO2J0bi50ZXh0Q29udGVudD0nU1RPUCc7CiAgICAgIHNldFRpbWVvdXQoZnVuY3Rpb24oKXtpZihpc1JlY29yZGluZykgdG9nZ2xlVm9pY2UoKTt9LDEyMDAwMCk7CiAgICB9Y2F0Y2goZSl7YWxlcnQoJ01pYyBkZW5pZWQ6ICcrZS5tZXNzYWdlKTt9CiAgfWVsc2V7bWVkaWFSZWNvcmRlci5zdG9wKCk7aXNSZWNvcmRpbmc9ZmFsc2U7YnRuLnN0eWxlLmJhY2tncm91bmQ9JyNmOWZhZmInO2J0bi50ZXh0Q29udGVudD0nTUlDJzt9Cn0KPC9zY3JpcHQ+CjwvYm9keT4KPC9odG1sPgo=`;
+
+function openGroupChat(){
+  try{
+    const html = atob(GROUP_CHAT_HTML_BASE64);
+    const blob = new Blob([html], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    // Save for debugging
+    window._lastGroupChatBlobUrl = url;
+    // Try to open new tab - most reliable for buttons
+    const w = window.open(url, '_blank');
+    if(!w){
+      // Fallback: open in same window modal iframe
+      const modal = document.createElement('div');
+      modal.id='gcModal';
+      modal.style.cssText='position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column';
+      modal.innerHTML=`<div style="background:#7c3aed;color:#fff;padding:12px;display:flex;justify-content:space-between;align-items:center"><b>GROUP CHAT - FIXED BUTTONS</b><button onclick="document.getElementById('gcModal').remove(); URL.revokeObjectURL(window._lastGroupChatBlobUrl)" style="background:#ef4444;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:800">Close</button></div><iframe src="${url}" style="flex:1;border:none;width:100%;background:#fff"></iframe>`;
+      document.body.appendChild(modal);
+    }
+  }catch(e){
+    try{
+      const html = atob(GROUP_CHAT_HTML_BASE64);
+      const nw = window.open('about:blank','_blank');
+      nw.document.open(); nw.document.write(html); nw.document.close();
+    }catch(e2){
+      alert('Group chat open failed: '+e.message);
+    }
+  }
+}
+
+
+// ===== FIX 2: DELETE BUTTON AFTER REJECT =====
+function deleteNurseForever(uid, name){
+  if(!uid){ alert('No UID'); return; }
+  const confirmName = name || uid;
+  if(!confirm('[DELETE] DELETE FOREVER - Remove '+confirmName+' from ALL Firebase locations?\n\nThis will delete:\n- RTDB pendingNurses/'+uid+'\n- RTDB nurses/'+uid+'\n- Firestore nurses/'+uid+'\n- Firestore pendingNurses/'+uid+'\n- ceoNotifications/'+uid+'\n\nHe will have to register again. Continue?')) return;
+  const second = prompt('Type DELETE to confirm permanent removal of '+confirmName+':');
+  if(second !== 'DELETE'){ alert('Cancelled - must type DELETE'); return; }
+  const statusEl = document.getElementById('ceoNurseApplicationsList');
+  // RTDB deletes
+  const tasks = [];
+  tasks.push(db.ref('pendingNurses/'+uid).remove().then(()=>console.log('deleted RTDB pending')).catch(e=>console.log('pending del err',e)));
+  tasks.push(db.ref('nurses/'+uid).remove().then(()=>console.log('deleted RTDB nurses')).catch(e=>console.log('nurses del err',e)));
+  tasks.push(db.ref('ceoNotifications/'+uid).remove().catch(()=>{}));
+  // Firestore deletes
+  tasks.push(fs.collection('pendingNurses').doc(uid).delete().catch(()=>{}));
+  tasks.push(fs.collection('nurses').doc(uid).delete().catch(()=>{}));
+  // Also try to delete from users collection if exists
+  tasks.push(fs.collection('users').doc(uid).delete().catch(()=>{}));
+  Promise.all(tasks).then(()=>{
+    alert('[OK] Deleted '+confirmName+' from Firebase completely');
+    loadPendingFirebase();
+  }).catch(e=>alert('Delete error: '+e.message));
+}
+
+// ===== FIX 3: CLIENT BOOKING DETAILS WITH DELETE BUTTON =====
+let ceoBookingsCache = [];
+async function loadBookings(){
+  const el = document.getElementById('ceoBookingsList');
+  if(!el) return;
+  el.innerHTML = '<div style="padding:12px;text-align:center;color:#a78bfa">Loading client bookings - name, phone, location, amount, concern, booking ID...</div>';
+  try{
+    let bookings = [];
+    // RTDB bookings
+    try{
+      const snap = await db.ref('bookings').once('value');
+      if(snap.exists()){
+        snap.forEach(child=>{
+          const v = child.val();
+          bookings.push({id: child.key, bookingId: v.bookingId || child.key, source:'RTDB-bookings', ...v});
+        });
+      }
+    }catch(e){ console.log('RTDB bookings err', e); }
+    // Also try RTDB clientBookings, client_requests etc
+    const extraPaths = ['clientBookings','bookingsRequests','clientRequests','requests'];
+    for(const p of extraPaths){
+      try{
+        const s = await db.ref(p).once('value');
+        if(s.exists()){
+          s.forEach(c=>{
+            if(!bookings.find(b=>b.id===c.key)) bookings.push({id:c.key, bookingId: c.val().bookingId || c.key, source:'RTDB-'+p, ...c.val()});
+          });
+        }
+      }catch(e){}
+    }
+    // Firestore bookings
+    try{
+      const qs = await fs.collection('bookings').get();
+      qs.forEach(doc=>{
+        if(!bookings.find(b=>b.id===doc.id)) bookings.push({id:doc.id, bookingId: doc.data().bookingId || doc.id, source:'Firestore-bookings', ...doc.data()});
+      });
+    }catch(e){}
+    try{
+      const qs2 = await fs.collection('clientBookings').get();
+      qs2.forEach(doc=>{
+        if(!bookings.find(b=>b.id===doc.id)) bookings.push({id:doc.id, bookingId: doc.data().bookingId || doc.id, source:'Firestore-clientBookings', ...doc.data()});
+      });
+    }catch(e){}
+    
+    ceoBookingsCache = bookings.sort((a,b)=>(b.timestamp||b.createdAt||0)-(a.timestamp||a.createdAt||0));
+    document.getElementById('ceoTotalBookings').innerText = ceoBookingsCache.length;
+    renderBookings(ceoBookingsCache);
+  }catch(e){
+    el.innerHTML = '<div style="color:#fca5a5">Error loading bookings: '+e.message+'</div>';
+  }
+}
+
+function renderBookings(list){
+  const el = document.getElementById('ceoBookingsList');
+  if(!list.length){
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:#a78bfa">No client bookings yet. When clients book, their name, phone, location, amount paid, concern, and booking ID will appear here.</div>';
+    // also update separate client section if exists
+    const clientSection = document.getElementById('ceoClientBookingsDetailed');
+    if(clientSection) clientSection.innerHTML = el.innerHTML;
+    return;
+  }
+  const html = list.map(b=>{
+    const clientName = b.clientName || b.name || b.fullName || b.customerName || b.userName || 'Unknown Client';
+    const phone = b.phone || b.phoneNumber || b.clientPhone || b.customerPhone || b.mobile || '';
+    const location = b.location || b.address || b.clientLocation || b.gpsActualName || b.actualLocationName || b.area || b.city || 'No location';
+    const amount = b.amountPaid || b.amount || b.totalPaid || b.price || b.totalAmount || b.paidAmount || b.cost || 0;
+    const concern = b.concern || b.concernDescription || b.message || b.notes || b.description || b.clientConcern || b.serviceDetails || 'No concern written';
+    const bookingId = b.bookingId || b.bookingID || b.id || 'No ID';
+    const lat = b.lat || b.latitude || 0;
+    const lng = b.lng || b.longitude || 0;
+    const created = b.timestamp ? new Date(b.timestamp).toLocaleString() : (b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate().toLocaleString() : new Date(b.createdAt).toLocaleString()) : '');
+    return `
+      <div style="background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);border-radius:14px;padding:12px;margin:8px 0">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;align-items:center">
+          <b style="color:#f3e8ff;font-size:13px">[CLIENT] ${clientName} <span style="font-size:9px;background:#fde68a;color:#92400e;padding:2px 6px;border-radius:99px">ID: ${bookingId}</span></b>
+          <span style="font-size:10px;color:#86efac">[MONEY] ${amount} GHS / USD</span>
+        </div>
+        <div style="font-size:11px;color:#d8b4fe;margin-top:6px;line-height:1.5">
+          <div>[PHONE] <b>Phone:</b> <a href="tel:${phone}" style="color:#93c5fd">${phone||'No phone'}</a></div>
+          <div>[LOCATION] <b>Location:</b> ${location} ${lat&&lng?`(<span style="color:#a78bfa">Lat:${lat} Lng:${lng}</span>)`:''}</div>
+          <div>[PAID] <b>Amount Paid:</b> <span style="color:#86efac;font-weight:800">${amount}</span></div>
+          <div>[NOTE] <b>Concern:</b> <span style="color:#e8e0ff;background:rgba(0,0,0,.2);padding:4px 8px;border-radius:6px;display:inline-block;margin-top:2px">${concern}</span></div>
+          <div style="margin-top:4px;font-size:9px;color:#6b5b8a">Booking ID: ${bookingId} | UID: ${b.id} | Source: ${b.source} | ${created}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+          <a href="tel:${phone}" class="btn btnBlue" style="padding:6px 10px">[PHONE] Call Client</a>
+          ${lat&&lng?`<button class="btn btnDark" style="padding:6px 10px" onclick="viewOnMap(${lat},${lng},'${clientName.replace(/'/g,'')}')">[MAP] Map</button>`:''}
+          <button class="btn btnRed" style="padding:6px 10px" onclick="deleteBooking('${b.id}','${clientName.replace(/'/g,'')}','${b.source}')">[DELETE] Delete After Viewing</button>
+          <button class="btn btnGreen" style="padding:6px 10px" onclick="markBookingViewed('${b.id}')">[OK] Mark Viewed</button>
+        </div>
+      </div>`;
+  }).join('');
+  el.innerHTML = html;
+  const detailed = document.getElementById('ceoClientBookingsDetailed');
+  if(detailed) detailed.innerHTML = html;
+  // Also update page1 client summary if exists
+  const summary = document.getElementById('ceoClientBookingsSummary');
+  if(summary) summary.innerHTML = `<b style="color:#f3e8ff">${list.length} client bookings</b><div style="font-size:10px;color:#a78bfa">Tap Load on Page 3 to view full details</div>`;
+}
+
+function deleteBooking(bookingId, clientName, source){
+  if(!confirm('[DELETE] Delete booking for '+clientName+'?\nBooking ID: '+bookingId+'\nThis will remove from Firebase. Continue?')) return;
+  const second = prompt('Type DELETE to confirm delete of '+clientName+' booking:');
+  if(second !== 'DELETE'){ alert('Cancelled'); return; }
+  const tasks = [];
+  tasks.push(db.ref('bookings/'+bookingId).remove().catch(()=>{}));
+  tasks.push(db.ref('clientBookings/'+bookingId).remove().catch(()=>{}));
+  tasks.push(db.ref('bookingsRequests/'+bookingId).remove().catch(()=>{}));
+  tasks.push(db.ref('clientRequests/'+bookingId).remove().catch(()=>{}));
+  tasks.push(db.ref('requests/'+bookingId).remove().catch(()=>{}));
+  tasks.push(fs.collection('bookings').doc(bookingId).delete().catch(()=>{}));
+  tasks.push(fs.collection('clientBookings').doc(bookingId).delete().catch(()=>{}));
+  Promise.all(tasks).then(()=>{
+    alert('[OK] Booking for '+clientName+' deleted');
+    loadBookings();
+  });
+}
+
+function markBookingViewed(id){
+  db.ref('bookings/'+id).update({viewedByCEO:true, viewedAt:Date.now()}).catch(()=>{});
+  fs.collection('bookings').doc(id).update({viewedByCEO:true, viewedAt: firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+  alert('[OK] Marked as viewed: '+id);
+}
+
+// Enhance renderPendingList to include delete button
+const originalRenderPendingList = renderPendingList;
+window.renderPendingList = function(list){
+  var el=document.getElementById('ceoNurseApplicationsList');
+  document.getElementById('pendingCount').textContent=list.length+' pending';
+  document.getElementById('ceoTotalNurses').textContent=list.length+' pending / total';
+  if(!list.length){
+    el.innerHTML='<div style="padding:30px;text-align:center;color:#a78bfa">[OK] No pending registrations - All nurses approved or no registrations yet.<br>When nurses register, they will appear here straight from Firebase with all particulars.</div>';
+    return;
+  }
+  el.innerHTML=list.map(n=>{
+    var photo=n.photoURL||n.profilePhoto||'';
+    var idURL=n.nationalIdURL||n.idURL||'';
+    var licenceURL=n.licenceURL||'';
+    var certURL=n.certificateURL||'';
+    var cvURL=n.cvURL||'';
+    var videoURL=n.videoURL||n.introVideoUrl||'';
+    var isRejected = n.status==='rejected' || n.isApproved===false && n.rejectionReason;
+    return `
+    <div class="nurseCard" style="${isRejected?'border-color:rgba(239,68,68,.6);background:rgba(127,29,29,.2)':''}">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div><b style="font-size:14px;color:#f3e8ff">${n.fullName||n.name||'Nurse'} ${isRejected?'<span style="background:#fee2e2;color:#dc2626;padding:2px 6px;border-radius:99px;font-size:9px">REJECTED</span>':''}</b> <span style="font-size:9px;background:#fde68a;color:#92400e;padding:2px 6px;border-radius:99px">${n.source||''}</span><br>
+        <small style="color:#a78bfa">${n.email||''}  ${n.phone||n.phoneNumber||''}  ${n.country||''}  ${n.experience||0} yrs  ${n.qualification||''}</small><br>
+        <small style="color:#d8b4fe">GPS: ${n.gpsActualName||n.actualLocationName||'No GPS'}<br>Lat: ${n.lat||''} Lng: ${n.lng||''}<br>Service: ${(n.services||[n.service]||[]).join(', ')}<br>Bio: ${n.bio||''}<br>${n.rejectionReason?'<b style="color:#fca5a5">Rejection Reason: '+n.rejectionReason+'</b>':''}</small></div>
+        <div class="photoBox">${photo?`<img src="${photo}" onclick="window.open('${photo}','_blank')">`:'<div style="display:grid;place-items:center;height:100%;color:#6b5b8a">No Photo</div>'}</div>
+      </div>
+      <div class="particulars">
+        <div><b style="font-size:11px;color:#d8b4fe">Particulars - CEO View All:</b></div>
+        <div>
+          <div class="docLinks">
+            ${photo?`<a class="docLink" href="${photo}" target="_blank"> Photo</a>`:''}
+            ${idURL?`<a class="docLink" href="${idURL}" target="_blank"> National ID</a>`:''}
+            ${licenceURL?`<a class="docLink" href="${licenceURL}" target="_blank"> Licence</a>`:''}
+            ${certURL?`<a class="docLink" href="${certURL}" target="_blank"> Certificate</a>`:''}
+            ${cvURL?`<a class="docLink" href="${cvURL}" target="_blank"> CV</a>`:''}
+            ${videoURL?`<a class="docLink" href="${videoURL}" target="_blank"> Intro Video - CEO Watch</a>`:''}
+          </div>
+          ${videoURL?`<video src="${videoURL}" controls style="width:100%;max-width:320px;margin-top:8px;border-radius:10px;border:1px solid rgba(168,85,247,.18)"></video>`:''}
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btnGreen" onclick="approveFirebase('${n.uid}')">[OK] Approve - Allow Login</button>
+        <button class="btn btnRed" onclick="rejectFirebase('${n.uid}','${(n.fullName||'').replace(/'/g,'')}')">[X] Reject - Block Login</button>
+        <button class="btn" style="background:#000;color:#f87171;border:1px solid #ef4444" onclick="deleteNurseForever('${n.uid}','${(n.fullName||'').replace(/'/g,'')}')">[DELETE] Delete Forever From Firebase</button>
+        <a href="tel:${n.phone||n.phoneNumber||''}" class="btn btnBlue"> Call ${n.phone||''}</a>
+        <button class="btn btnDark" onclick="viewOnMap(${n.lat||0},${n.lng||0},'${(n.fullName||'Nurse').replace(/'/g,'')}')"> Map</button>
+      </div>
+      <div style="font-size:9px;color:#6b5b8a;margin-top:6px">UID: ${n.uid}  Created: ${n.timestamp?new Date(n.timestamp).toLocaleString():''}  Source: ${n.source}</div>
+    </div>
+    `;
+  }).join('');
+}
+
+
+document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ loadPendingFirebase(); loadRates(); loadBookings(); }, 800); });
+</script>
+</body>
+</html>
