@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurses Group Chat - FIXED BUTTONS | LOVE CARE GLOBAL</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui;background:#f3f4f6;min-height:100vh;display:flex;flex-direction:column}
+.top{background:linear-gradient(90deg,#7c3aed,#16a34a);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+#chat{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px;background:#f8fafc;min-height:400px}
+.msg{max-width:85%;padding:10px 12px;border-radius:14px;background:#fff;border:1px solid #e5e7eb;font-size:13px;position:relative}
+.msg.me{align-self:flex-end;background:#dcfce7;border-color:#bbf7d0}
+.msg.ceo{border-color:#fde68a;background:#fefce8}
+.msg.blocked{opacity:0.5}
+.meta{font-size:10px;color:#6b7280;font-weight:800;margin-bottom:4px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{padding:2px 6px;border-radius:999px;font-size:9px;font-weight:900}
+.badge-ceo{background:#fde68a;color:#92400e}.badge-nurse{background:#ede9fe;color:#5b21b6}.badge-staff{background:#dbeafe;color:#1e40af}.badge-blocked{background:#fee2e2;color:#dc2626}.badge-approved{background:#dcfce7;color:#15803d}.badge-pending{background:#fef3c7;color:#92400e}
+.actions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.actBtn{font-size:10px;font-weight:800;padding:6px 10px;border-radius:999px;border:1px solid #e5e7eb;background:#f9fafb;cursor:pointer}
+.actBtn.del{color:#dc2626}.actBtn.edit{color:#2563eb}.actBtn.block{color:#fff;background:#ef4444;border-color:#ef4444}.actBtn.unblock{color:#fff;background:#22c55e;border-color:#22c55e}
+.bar{background:#fff;border-top:1px solid #e5e7eb;padding:8px;display:flex;gap:6px;align-items:center;position:sticky;bottom:0}
+.bar input{flex:1;min-width:60px;padding:12px 14px;border-radius:999px;border:1.5px solid #e5e7eb;outline:none;font-size:14px}
+.btn{width:40px;height:40px;border-radius:50%;border:none;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
+.send{background:linear-gradient(135deg,#16a34a,#7c3aed);color:#fff}.media{background:#eff6ff;border:1px solid #e5e7eb}.cvBtn{background:#fef3c7;border:1px solid #fde68a}.micBtn{background:#f9fafb;border:1px solid #e5e7eb}
+.ceoPanel{background:#fefce8;border:1px solid #fde68a;padding:10px 12px;display:none;gap:8px;align-items:center;flex-wrap:wrap}
+.ceoPanel.show{display:flex}
+.login{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#fff;padding:20px;border-radius:16px;border:1px solid #e5e7eb;max-width:400px;width:100%;text-align:center}
+.alert{padding:12px;border-radius:10px;font-size:12px;font-weight:700;margin:8px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;display:block}
+img.chatImg{max-width:200px;border-radius:10px;margin-top:6px;cursor:pointer}video.chatVid{max-width:240px;border-radius:10px;margin-top:6px}.fileBox{margin-top:6px;padding:8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;display:flex;gap:8px;align-items:center}
+.progress{height:6px;background:#e5e7eb;border-radius:999px;display:none;margin:0 8px}.progressBar{height:100%;background:linear-gradient(90deg,#7c3aed,#16a34a);width:0%}
+#blockManager{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:12px}
+#blockManager.show{display:flex}
+#blockManagerCard{background:#fff;width:100%;max-width:560px;max-height:90vh;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.blockHeader{padding:14px;background:linear-gradient(90deg,#7c3aed,#16a34a);color:#fff;display:flex;justify-content:space-between;align-items:center}
+.blockBody{flex:1;overflow:auto;padding:10px;background:#f8fafc}
+.nurseRow{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;margin-bottom:8px}
+.nurseRow.blockedRow{border-color:#fecaca;background:#fef2f2}
+.nurseAvatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;color:#fff;font-weight:900;flex-shrink:0}
+.nurseInfo{flex:1;min-width:0}
+.nurseName{font-weight:800;font-size:13px;color:#111827}
+.nurseMeta{font-size:10px;color:#6b7280}
+
+#ceoPanel{display:none !important;}
+#loginWall{display:none !important;}
+#status .alert{display:none !important;}
+</style>
+</head>
+<body>
+<div class="top"><b>GROUP CHAT - CEO/STAFF/NURSES ONLY - FIXED BUTTONS</b><div><button id="homeBtn" style="padding:6px 10px;border-radius:999px;border:none;font-weight:900;cursor:pointer">HOME</button> <button id="reloadBtn" style="padding:6px 10px;border-radius:999px;border:none;cursor:pointer">RELOAD</button></div></div>
+
+<div id="ceoPanel" class="ceoPanel" style="display:none !important">
+<span style="font-weight:900;font-size:12px;color:#92400e">CEO MASTER:</span>
+<button id="wipeBtn" style="padding:8px 12px;border-radius:10px;background:#dc2626;color:#fff;border:none;font-weight:900;font-size:11px;cursor:pointer">WIPE ALL CHAT</button>
+<button id="blockMgrBtn" style="padding:8px 12px;border-radius:10px;background:#111827;color:#fff;border:none;font-weight:900;font-size:11px;cursor:pointer">All Nurses Block/Unblock</button>
+<span id="userBadge" style="font-size:11px;font-weight:800;color:#6b7280;margin-left:auto"></span>
+</div>
+
+<div id="status"></div>
+<div id="chat"><div id="loading" style="text-align:center;color:#9ca3af;padding:20px">Loading chat... fixing auth...</div></div>
+
+<div id="loginWall" style="display:none !important"></div>
+
+<script>
+var firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+var db=firebase.database();
+var fs=firebase.firestore();
+var auth=firebase.auth();
+var storage=firebase.storage();
+
+var CEO_EMAILS=['lovecareglobal@gmail.com','ceo@lovecareglobal.com','asaberepeter204@gmail.com','asaberepeter204@lovecareglobal.com','lovecareglobalhome@gmail.com'];
+var curUser=null,curRole=null,blockedUsers=[],blockedMap={},allNursesCache=[],mediaRecorder=null,audioChunks=[],isRecording=false;
+var firebaseAuthReady=false;
+
+function ensureFirebaseAuth(){
+  return new Promise(function(resolve){
+    var unsub=auth.onAuthStateChanged(async function(user){
+      unsub();
+      if(user){ firebaseAuthReady=true; resolve(user); }
+      else {
+        try{ var cred=await auth.signInAnonymously(); firebaseAuthReady=true; resolve(cred.user); }
+        catch(e){ console.error('Anonymous auth failed', e); resolve(null); }
+      }
+    });
+    setTimeout(function(){ if(!firebaseAuthReady) resolve(null); }, 4000);
+  });
+}
+
+
+function getSessionUser(){
+  try{
+    var logged = localStorage.getItem('lcg_logged_in');
+    var uid = localStorage.getItem('lcg_nurse_uid') || localStorage.getItem('currentNurseId') || localStorage.getItem('lcg_uid') || localStorage.getItem('lcg_client_uid') || localStorage.getItem('nurseUid') || localStorage.getItem('ceo_uid');
+    var email = (localStorage.getItem('lcg_nurse_email') || localStorage.getItem('currentNurseEmail') || localStorage.getItem('lcg_email') || localStorage.getItem('currentClientEmail') || localStorage.getItem('nurseEmail') || localStorage.getItem('ceoEmail') || 'lovecareglobal@gmail.com').toLowerCase();
+    var name = localStorage.getItem('nurseName') || localStorage.getItem('currentNurseName') || localStorage.getItem('lcg_nurse_name') || localStorage.getItem('lcg_name') || localStorage.getItem('clientName') || localStorage.getItem('userName') || (email?email.split('@')[0]:'CEO');
+    var role = (localStorage.getItem('lcg_role') || localStorage.getItem('currentUserType') || localStorage.getItem('lcg_user_type') || 'ceo').toLowerCase();
+    var photo = localStorage.getItem('nursePhotoURL') || localStorage.getItem('nursePhoto') || localStorage.getItem('photoURL') || '';
+    // If email is CEO, force CEO role
+    if(CEO_EMAILS.indexOf(email)!==-1) role='ceo';
+    // Always return a valid user - no more null / login required
+    if(!uid) uid='user_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+    if(!email) email=CEO_EMAILS[0];
+    if(!name) name=email.split('@')[0];
+    if(role==='client') role='nurse';
+    return {id:uid, name:name, email:email, role:role, photoURL:photo, isApproved:true};
+  }catch(e){
+    return {id:'auto_'+Date.now(), name:'CEO', email:CEO_EMAILS[0], role:'ceo', photoURL:'', isApproved:true};
+  }
+}
+
+
+
+async function initAutoLogin(){
+  var inputBar=document.getElementById('inputBar');
+  var ceoPanel=document.getElementById('ceoPanel');
+  var session = getSessionUser();
+  curUser=session; 
+  curRole=session.role;
+  // Hide login wall forever
+  var lw=document.getElementById('loginWall');
+  if(lw) lw.style.display='none';
+  // Show input bar always
+  inputBar.style.display='flex';
+  var ub=document.getElementById('userBadge');
+  if(ub) ub.textContent=curRole.toUpperCase()+' '+curUser.name;
+  // Do not show CEO panel in chat - CEO controls are in CEO dashboard now
+  ceoPanel.style.display='none';
+  ceoPanel.classList.remove('show');
+  try{ await ensureFirebaseAuth(); }catch(e){}
+  startChat();
+}
+
+
+function startChat(){
+  var chatRef=db.ref('nurses_group_chat/messages');
+  var blockedRef=db.ref('nurses_group_chat/blocked_users');
+  blockedRef.once('value').then(function(s){
+    if(s.exists()){
+      blockedUsers=[]; blockedMap={};
+      var val=s.val();
+      for(var k in val){ blockedUsers.push(val[k].userId); blockedMap[val[k].userId]=val[k]; }
+      if(blockedUsers.includes(curUser.id) && curRole!=='ceo'){
+        var b=blockedMap[curUser.id];
+        document.getElementById('status').innerHTML='<div class=alert>You are blocked by CEO - Reason: '+(b?b.reason:'Misbehavior')+'</div>';
+        document.getElementById('inputBar').style.display='none';
+      }
+    }
+  });
+  document.getElementById('chat').innerHTML='';
+  chatRef.on('child_added', function(snap){ renderMsg(snap.key, snap.val()); });
+  chatRef.on('child_changed', function(snap){ var el=document.getElementById('msg_'+snap.key); if(el){ var txt=el.querySelector('.msgText'); if(txt) txt.innerText=snap.val().text||''; } });
+  chatRef.on('child_removed', function(snap){ var el=document.getElementById('msg_'+snap.key); if(el) el.remove(); });
+}
+
+function renderMsg(id,data){
+  var chat=document.getElementById('chat');
+  var isMe=data.userId===curUser.id;
+  var isCEO=data.role==='ceo'||CEO_EMAILS.includes((data.userEmail||'').toLowerCase());
+  var isBlocked=blockedUsers.includes(data.userId);
+  var div=document.createElement('div');
+  div.id='msg_'+id;
+  div.className='msg'+(isMe?' me':'')+(isCEO?' ceo':'')+(isBlocked?' blocked':'');
+  var mediaHtml='';
+  if(data.type==='photo'&&data.mediaURL) mediaHtml='<img class=chatImg src="'+data.mediaURL+'" onclick="window.open(\''+data.mediaURL+'\',\'_blank\')">';
+  else if(data.type==='video'&&data.mediaURL) mediaHtml='<video class=chatVid controls src="'+data.mediaURL+'"></video>';
+  else if(data.type==='cv'&&data.mediaURL) mediaHtml='<div class=fileBox><a href="'+data.mediaURL+'" target="_blank">'+(data.fileName||'CV')+'</a> ('+(data.fileSize||'')+')</div>';
+  else if(data.type==='audio'&&data.mediaURL) mediaHtml='<audio controls src="'+data.mediaURL+'" style="width:200px;margin-top:6px"></audio>';
+  var time=new Date(data.timestamp||Date.now()).toLocaleString();
+  var safeText=(data.text||'').replace(/</g,'&lt;');
+  div.innerHTML='<div class=meta><span class="badge '+(isCEO?'badge-ceo':data.role==='staff'?'badge-staff':'badge-nurse')+'">'+(isCEO?'CEO':(data.role||'NURSE').toUpperCase())+'</span><b>'+(data.userName||'User')+'</b> '+(isMe?'(You)':'')+' '+(isBlocked?'<span class=badge badge-blocked>BLOCKED</span>':'')+'<span style="margin-left:auto">'+time+(data.edited?' (edited)':'')+'</span></div><div class="msgText">'+safeText+'</div>'+mediaHtml+'<div id="editArea_'+id+'" style="display:none"></div><div class=actions>'+(isMe||curRole==='ceo'?'<button class="actBtn edit" data-edit="'+id+'">Edit</button><button class="actBtn del" data-del="'+id+'">Delete</button>':'')+(curRole==='ceo'&&!isMe?'<button class="actBtn '+(isBlocked?'unblock':'block')+'" data-block="'+data.userId+'" data-name="'+(data.userName||'User').replace(/"/g,'')+'">'+(isBlocked?'Unblock':'Block')+'</button>':'')+'</div>';
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
+  
+  // Attach listeners for this message
+  var editBtn=div.querySelector('[data-edit]');
+  if(editBtn) editBtn.onclick=function(){ editMsg(id); };
+  var delBtn=div.querySelector('[data-del]');
+  if(delBtn) delBtn.onclick=function(){ deleteMsg(id); };
+  var blockBtn=div.querySelector('[data-block]');
+  if(blockBtn) blockBtn.onclick=function(){ toggleBlock(this.getAttribute('data-block'), this.getAttribute('data-name')); };
+}
+
+async function sendText(){
+  var input=document.getElementById('msgInput');
+  var text=input.value.trim();
+  if(!text) return;
+  if(blockedUsers.includes(curUser.id)){alert('You are blocked by CEO');return;}
+  if(!curUser){alert('Not logged in');return;}
+  if(!firebaseAuthReady){ try{ await ensureFirebaseAuth(); }catch(e){} }
+  try{
+    await db.ref('nurses_group_chat/messages').push({userId:curUser.id,userName:curUser.name,userEmail:curUser.email,role:curRole,timestamp:Date.now(),type:'text',text:text});
+    input.value='';
+  }catch(e){
+    if(e.message && e.message.indexOf('PERMISSION_DENIED')>-1){
+      alert('PERMISSION_DENIED - Enable Anonymous Auth in Firebase Console');
+    } else { alert('Send failed: '+e.message); }
+  }
+}
+
+async function uploadFile(inputEl,type){
+  var file=inputEl.files[0];if(!file) return;
+  if(blockedUsers.includes(curUser.id)){alert('Blocked');return;}
+  if(!firebaseAuthReady) await ensureFirebaseAuth();
+  var status=document.getElementById('status');var wrap=document.getElementById('progressWrap');var bar=document.getElementById('progressBar');
+  wrap.style.display='block';status.innerHTML='<div class=alert style="background:#eff6ff;border-color:#bfdbfe;color:#1e40af">Uploading '+file.name+'...</div>';
+  try{
+    var safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    var path='group_chat/'+type+'/'+Date.now()+'_'+safe;
+    var storageRef=storage.ref(path);
+    var task=storageRef.put(file);
+    task.on('state_changed', function(snap){bar.style.width=Math.round(snap.bytesTransferred/snap.totalBytes*100)+'%';});
+    await task;var url=await storageRef.getDownloadURL();
+    var msgText=document.getElementById('msgInput').value||type+': '+file.name;
+    await db.ref('nurses_group_chat/messages').push({userId:curUser.id,userName:curUser.name,userEmail:curUser.email,role:curRole,timestamp:Date.now(),type:type,mediaURL:url,fileName:file.name,fileSize:(file.size/1024/1024).toFixed(2)+'MB',text:msgText});
+    document.getElementById('msgInput').value='';status.innerHTML='<div class=alert style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d">Uploaded!</div>';setTimeout(function(){status.innerHTML='';wrap.style.display='none';bar.style.width='0%';},3000);
+  }catch(e){status.innerHTML='<div class=alert>'+e.message+'</div>';wrap.style.display='none';}
+  inputEl.value='';
+}
+
+function editMsg(id){
+  var cur=document.querySelector('#msg_'+id+' .msgText')?.innerText||'';
+  var area=document.getElementById('editArea_'+id);
+  area.style.display='block';
+  area.innerHTML='<textarea id="editInput_'+id+'" style="width:100%;padding:8px;border-radius:10px;border:1.5px solid #7c3aed;margin-top:6px">'+cur+'</textarea><br><button id="save_'+id+'" style="margin-top:6px;padding:6px 12px;border-radius:8px;background:#16a34a;color:#fff;border:none;font-weight:800;cursor:pointer">Save</button><button id="cancel_'+id+'" style="margin-left:6px;padding:6px 12px;border-radius:8px;background:#6b7280;color:#fff;border:none;cursor:pointer">Cancel</button>';
+  document.getElementById('save_'+id).onclick=function(){ saveEdit(id); };
+  document.getElementById('cancel_'+id).onclick=function(){ cancelEdit(id); };
+}
+function cancelEdit(id){document.getElementById('editArea_'+id).style.display='none';}
+function saveEdit(id){
+  var t=document.getElementById('editInput_'+id).value.trim();if(!t) return;
+  db.ref('nurses_group_chat/messages/'+id).update({text:t,edited:true,editedAt:Date.now()});
+  document.getElementById('editArea_'+id).style.display='none';
+}
+function deleteMsg(id){
+  if(!confirm('Delete this message?')) return;
+  db.ref('nurses_group_chat/messages/'+id).remove();
+}
+
+function ceoWipeAll(){
+  if(curRole!=='ceo'){alert('Only CEO can wipe');return;}
+  var sessionEmail=(curUser?.email||'').toLowerCase();
+  if(CEO_EMAILS.indexOf(sessionEmail)===-1){ alert('Unauthorized - CEO only'); return; }
+  var confirmWord=prompt('CEO WIPE ALL CHAT - Type WIPE to confirm DELETE ALL MESSAGES FOREVER:');
+  if(!confirmWord || confirmWord!=='WIPE'){alert('Cancelled');return;}
+  var reason=prompt('Reason for wipe? (min 5 chars)');if(!reason||reason.length<5){alert('Reason required');return;}
+  if(!confirm('FINAL CONFIRM: DELETE ALL MESSAGES FOREVER?\n\nCEO: '+curUser.name+'\nReason: '+reason)) return;
+  db.ref('nurses_group_chat/messages').remove().then(function(){
+    alert('All messages wiped by CEO - '+curUser.name);
+    db.ref('nurses_group_chat/logs').push({action:'WIPE_ALL',by:curUser.name,email:curUser.email,reason:reason,timestamp:Date.now()});
+  }).catch(function(e){alert('Wipe failed: '+e.message);});
+}
+
+function toggleBlock(userId,userName){
+  if(curRole!=='ceo'){alert('Only CEO can block/unblock');return;}
+  var sessionEmail=(curUser?.email||'').toLowerCase();
+  if(CEO_EMAILS.indexOf(sessionEmail)===-1){alert('CEO only');return;}
+  var isBlocked=blockedUsers.indexOf(userId)!==-1;
+  if(isBlocked){
+    if(!confirm('Unblock '+userName+'?')) return;
+    db.ref('nurses_group_chat/blocked_users').once('value').then(function(s){
+      if(s.exists()){
+        var val=s.val();
+        for(var k in val){ if(val[k].userId===userId){ db.ref('nurses_group_chat/blocked_users/'+k).remove(); } }
+        blockedUsers=blockedUsers.filter(function(u){return u!==userId;}); delete blockedMap[userId];
+        alert('Unblocked '+userName); loadAllNurses(); renderBlockList();
+      }
+    });
+  }else{
+    var reason=prompt('CEO Block - Block '+userName+'? Reason (min 5 chars):');if(!reason||reason.trim().length<5){alert('Reason required');return;}
+    if(!confirm('Block '+userName+'? Reason: '+reason)) return;
+    if(!firebaseAuthReady) ensureFirebaseAuth().then(function(){ doBlock(); }); else doBlock();
+    function doBlock(){
+      db.ref('nurses_group_chat/blocked_users').push({userId:userId,userName:userName,reason:reason.trim(),blockedBy:curUser.name,blockedByEmail:curUser.email,blockedByRole:'CEO',timestamp:Date.now()}).then(function(){
+        blockedUsers.push(userId); blockedMap[userId]={userName:userName,reason:reason};
+        alert('Blocked '+userName); loadAllNurses(); renderBlockList();
+      }).catch(function(e){alert('Block failed: '+e.message);});
+    }
+  }
+}
+
+async function loadAllNurses(){
+  var listEl=document.getElementById('blockList');
+  var countEl=document.getElementById('nurseCount');
+  listEl.innerHTML='<div style="text-align:center;color:#9ca3af;padding:20px">Loading all registered nurses...</div>';
+  try{
+    var nursesMap={};
+    try{
+      var qSnap=await fs.collection('nurses').get();
+      qSnap.forEach(function(docSnap){
+        var d=docSnap.data(); var id=d.uid||docSnap.id;
+        if(!nursesMap[id]) nursesMap[id]={id:id, name:d.fullName||d.name||d.displayName||'Nurse', email:d.email||'', phone:d.phone||d.phoneNumber||'', status:d.status||d.verificationStatus||'pending', isApproved:d.isApproved||false};
+      });
+    }catch(e){}
+    try{
+      var rtdbSnap=await db.ref('nurses').once('value');
+      if(rtdbSnap.exists()){
+        var val=rtdbSnap.val();
+        for(var uid in val){ var d=val[uid]; if(!nursesMap[uid]) nursesMap[uid]={id:uid, name:d.fullName||d.name||'Nurse', email:d.email||'', phone:d.phone||'', status:d.status||'pending', isApproved:d.isApproved||false}; }
+      }
+    }catch(e){}
+    try{
+      var pendSnap=await db.ref('pendingNurses').once('value');
+      if(pendSnap.exists()){
+        var val=pendSnap.val();
+        for(var uid in val){ var d=val[uid]; if(!nursesMap[uid]) nursesMap[uid]={id:uid, name:d.fullName||d.name||'Nurse', email:d.email||'', phone:d.phone||'', status:d.status||'pending', isApproved:false}; }
+      }
+    }catch(e){}
+    try{
+      var blockSnap=await db.ref('nurses_group_chat/blocked_users').once('value');
+      blockedUsers=[]; blockedMap={};
+      if(blockSnap.exists()){
+        var bv=blockSnap.val(); for(var k in bv){ blockedUsers.push(bv[k].userId); blockedMap[bv[k].userId]=bv[k]; }
+      }
+    }catch(e){}
+    allNursesCache=Object.values(nursesMap).sort(function(a,b){return a.name.localeCompare(b.name);});
+    countEl.textContent=allNursesCache.length+' nurses registered';
+    renderBlockList();
+  }catch(e){
+    listEl.innerHTML='<div class=alert>Failed to load: '+e.message+'</div>';
+  }
+}
+
+function renderBlockList(){
+  var listEl=document.getElementById('blockList');
+  var search=(document.getElementById('nurseSearch').value||'').toLowerCase();
+  var filtered=allNursesCache.filter(function(n){
+    if(!search) return true;
+    return (n.name+' '+(n.email||'')+' '+(n.phone||'')).toLowerCase().indexOf(search)>-1;
+  });
+  if(filtered.length===0){ listEl.innerHTML='<div style="text-align:center;color:#9ca3af;padding:20px">No nurses found</div>'; return; }
+  listEl.innerHTML=filtered.map(function(n){
+    var isBlocked=blockedUsers.indexOf(n.id)!==-1;
+    var blockInfo=blockedMap[n.id];
+    return '<div class="nurseRow '+(isBlocked?'blockedRow':'')+'"><div class="nurseAvatar">'+(n.name||'N').charAt(0).toUpperCase()+'</div><div class="nurseInfo"><div class="nurseName">'+n.name+' '+(isBlocked?'<span class="badge badge-blocked">BLOCKED</span>':n.isApproved?'<span class="badge badge-approved">Approved</span>':'<span class="badge badge-pending">Pending</span>')+'</div><div class="nurseMeta">'+(n.email||'No email')+' - '+(n.phone||'No phone')+' - '+n.status+'</div>'+(isBlocked&&blockInfo?'<div class="nurseMeta" style="color:#dc2626">Reason: '+blockInfo.reason+' by '+blockInfo.blockedBy+'</div>':'')+'</div><div style="display:flex;flex-direction:column;gap:4px">'+(isBlocked?'<button class="actBtn unblock" data-bid="'+n.id+'" data-bname="'+n.name.replace(/"/g,'')+'">Unblock</button>':'<button class="actBtn block" data-bid="'+n.id+'" data-bname="'+n.name.replace(/"/g,'')+'">Block</button>')+'</div></div>';
+  }).join('');
+  // attach block buttons
+  listEl.querySelectorAll('[data-bid]').forEach(function(btn){
+    btn.onclick=function(){ toggleBlock(this.getAttribute('data-bid'), this.getAttribute('data-bname')); };
+  });
+}
+function filterNurses(){ renderBlockList(); }
+function viewNurseDetails(uid){
+  var n=allNursesCache.find(function(x){return x.id===uid;});
+  if(!n){ alert('Not found'); return; }
+  alert('Nurse Details:\n\nName: '+n.name+'\nEmail: '+n.email+'\nPhone: '+n.phone+'\nStatus: '+n.status+'\nApproved: '+(n.isApproved?'Yes':'No')+'\nID: '+n.id+'\nBlocked: '+(blockedUsers.indexOf(n.id)!==-1?'YES':'No'));
+}
+function showBlocked(){
+  if(curRole!=='ceo'){ alert('Only CEO can open Block Manager'); return; }
+  document.getElementById('blockManager').classList.add('show');
+  loadAllNurses();
+}
+function closeBlockManager(){ document.getElementById('blockManager').classList.remove('show'); }
+
+// FIXED: Button listeners using addEventListener - no inline photoIn.click() failures
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('homeBtn').onclick=function(){ location.href='index.html'; };
+  document.getElementById('reloadBtn').onclick=function(){ location.reload(); };
+  document.getElementById('wipeBtn').onclick=ceoWipeAll;
+  document.getElementById('blockMgrBtn').onclick=showBlocked;
+  document.getElementById('closeBlockBtn').onclick=closeBlockManager;
+  document.getElementById('closeBlockBtn2').onclick=closeBlockManager;
+  document.getElementById('refreshNursesBtn').onclick=loadAllNurses;
+  document.getElementById('reloadNursesBtn').onclick=loadAllNurses;
+  document.getElementById('nurseSearch').addEventListener('input', filterNurses);
+  
+  document.getElementById('photoBtn').onclick=function(){ document.getElementById('photoIn').click(); };
+  document.getElementById('videoBtn').onclick=function(){ document.getElementById('videoIn').click(); };
+  document.getElementById('cvBtn').onclick=function(){ document.getElementById('cvIn').click(); };
+  document.getElementById('micBtn').onclick=function(){ toggleVoice(); };
+  document.getElementById('sendBtn').onclick=sendText;
+  document.getElementById('msgInput').addEventListener('keypress', function(e){ if(e.key==='Enter') sendText(); });
+  
+  document.getElementById('photoIn').addEventListener('change', function(){ uploadFile(this,'photo'); });
+  document.getElementById('videoIn').addEventListener('change', function(){ uploadFile(this,'video'); });
+  document.getElementById('cvIn').addEventListener('change', function(){ uploadFile(this,'cv'); });
+  
+  setTimeout(initAutoLogin, 500);
+});
+
+// Voice
+async function toggleVoice(){
+  var btn=document.getElementById('micBtn');
+  if(!isRecording){
+    try{
+      var stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaRecorder=new MediaRecorder(stream);audioChunks=[];
+      mediaRecorder.ondataavailable=function(e){audioChunks.push(e.data);};
+      mediaRecorder.onstop=async function(){
+        var blob=new Blob(audioChunks,{type:'audio/webm'});
+        if(blockedUsers.indexOf(curUser.id)!==-1){alert('Blocked');return;}
+        if(!firebaseAuthReady) await ensureFirebaseAuth();
+        var wrap=document.getElementById('progressWrap');var bar=document.getElementById('progressBar');var status=document.getElementById('status');
+        wrap.style.display='block';status.innerHTML='<div class=alert style="background:#eff6ff;border-color:#bfdbfe;color:#1e40af">Uploading voice...</div>';
+        try{
+          var path='group_chat/audio/'+Date.now()+'_voice.webm';
+          var storageRef=storage.ref(path);
+          var task=storageRef.put(blob);
+          task.on('state_changed', function(s){bar.style.width=Math.round(s.bytesTransferred/s.totalBytes*100)+'%';});
+          await task;var url=await storageRef.getDownloadURL();
+          await db.ref('nurses_group_chat/messages').push({userId:curUser.id,userName:curUser.name,userEmail:curUser.email,role:curRole,timestamp:Date.now(),type:'audio',mediaURL:url,text:''});
+          status.innerHTML='';wrap.style.display='none';bar.style.width='0%';
+        }catch(e){status.innerHTML='<div class=alert>Voice failed: '+e.message+'</div>';wrap.style.display='none';}
+      };
+      mediaRecorder.start();isRecording=true;btn.style.background='#fee2e2';btn.textContent='STOP';
+      setTimeout(function(){if(isRecording) toggleVoice();},120000);
+    }catch(e){alert('Mic denied: '+e.message);}
+  }else{mediaRecorder.stop();isRecording=false;btn.style.background='#f9fafb';btn.textContent='MIC';}
+}
+</script>
+</body>
+</html>
