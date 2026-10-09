@@ -2,205 +2,131 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Delete Account - Policy + Danger Zone - LOVE CARE GLOBAL HOME NURSING</title>
+<title>How It Works - LOVE CARE GLOBAL HOME NURSING</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f6f7fb;color:#111827}
-.topbar{background:#111827;padding:12px 14px;display:flex;justify-content:space-between;color:white;position:sticky;top:0;z-index:100}
-.wrap{max-width:700px;margin:0 auto;padding:16px}
-.card{background:white;border-radius:16px;padding:18px;border:1px solid #e5e7eb;box-shadow:0 4px 16px rgba(0,0,0,.05);margin-bottom:14px}
-.policy{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px;font-size:12px;line-height:1.6;color:#374151}
-.dangerZone{border:2px dashed #ef4444;border-radius:16px;padding:16px;background:linear-gradient(180deg,rgba(239,68,68,.08),rgba(239,68,68,.02));margin-top:16px}
-.dangerTitle{font-weight:900;color:#ef4444;font-size:14px;display:flex;gap:6px;align-items:center}
-label{font-size:11px;font-weight:800;margin:10px 0 5px;display:block}
-.inputWrap{position:relative}
-input,select,textarea{width:100%;padding:11px 40px 11px 11px;border-radius:10px;border:1.5px solid #e5e7eb;font-size:13px;outline:none;background:#f9fafb}
-input:focus,select:focus,textarea:focus{border-color:#ef4444;background:white;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
-textarea{padding:11px;min-height:70px;resize:none}
-.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:white;border:1px solid #e5e7eb;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.7}
-.btn{width:100%;padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;margin-top:10px}
-.btnRed{background:#ef4444;color:white}.btnDark{background:#111827;color:white}.btnLight{background:#f3f4f6;border:1px solid #e5e7eb;color:#111827}
-.reasonCard{padding:10px;border:1px solid #e5e7eb;border-radius:10px;margin:6px 0;cursor:pointer;display:flex;gap:10px;align-items:flex-start;background:#f9fafb;transition:.2s}
-.reasonCard.selected{border-color:#ef4444;background:#fef2f2}
-.dot{width:18px;height:18px;border-radius:50%;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.reasonCard.selected .dot{border-color:#ef4444}.reasonCard.selected .dot:after{content:"";width:8px;height:8px;background:#ef4444;border-radius:50%}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.wrap{max-width:900px;margin:0 auto;padding:20px 14px 80px}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:14px}
+h1{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:24px;color:#f3e8ff;margin-bottom:6px}
+h2{font-size:16px;color:#f3e8ff;margin:18px 0 8px}
+p,li{font-size:13px;color:#c4b5fd;line-height:1.7}
+ul,ol{margin:8px 0 12px 18px}
+.badge{display:inline-flex;background:rgba(168,85,247,.18);color:#d8b4fe;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid rgba(168,85,247,.18)}
+.step{border:1px solid rgba(168,85,247,.18);border-radius:16px;padding:14px;margin:10px 0;background:rgba(14,10,28,.6);display:flex;gap:12px}
+.stepNum{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;display:grid;place-items:center;flex-shrink:0}
 </style>
 </head>
 <body>
-<div class="topbar"><b>🗑️ DELETE ACCOUNT - POLICY + DANGER ZONE</b><a href="index.html" style="background:white;color:#111827;padding:6px 12px;border-radius:999px;text-decoration:none;font-weight:900;font-size:12px">Home</a></div>
+<div class="bg"></div>
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
+</div>
+<a href="sos.html" class="sosBtn">SOS</a>
+</div>
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">Home</a>
+<a class="item" href="about.html">About</a>
+<a class="item" href="services.html">Services</a>
+<a class="item active" href="how-it-works.html">How It Works</a>
+<a class="item" href="contact.html">Contact</a>
+<a class="item" href="consent-form.html">Consent Form</a>
+<a class="item" href="privacy.html">Privacy</a>
+<a class="item" href="terms.html">Terms</a>
+<a class="item" href="refund.html">Refund</a>
+<a class="item" href="sos.html" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;justify-content:center">SOS</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+</div>
+
 <div class="wrap">
+<span class="badge">How It Works - 7 Simple Steps</span>
+<h1>How It Works</h1>
+<p style="color:#a78bfa;font-size:12px;margin-bottom:14px">Book a verified nurse in 5 minutes. From search to care at your doorstep.</p>
 
-<!-- POLICY SECTION -->
+<div class="card" style="background:linear-gradient(90deg,rgba(76,29,149,.25),rgba(168,85,247,.12))">
+<b style="color:#f3e8ff">For Clients (Patients & Families)</b>
+<p style="font-size:11px;color:#a78bfa;margin-top:4px">No app needed - works on phone browser at peter204.github.io</p>
+</div>
+
+<div class="step"><div class="stepNum">1</div><div><b style="color:#f3e8ff">Search Nearby Nurses on Map</b><br><p>Go to <a href="book-nurse-START-END-HOURS.html" style="color:#d8b4fe">Book Nurse</a> page. Click Use My Location. Map shows nurses within 2km, 5km, 10km, 20km, or All Ghana. Each nurse card shows photo, qualification, experience, status (online), distance.</p></div></div>
+
+<div class="step"><div class="stepNum">2</div><div><b style="color:#f3e8ff">Select Nurse & Enter Details</b><br><p>Tap a nurse card to select. Fill: Your Name (auto from login), Phone with country code (+233 for Ghana, +234 Nigeria, +1 USA, etc.) - this phone is sent to nurse, Patient Name, Age, Service Type (general, elderly, post-surgery, baby care, 24h live-in), Country, Start Time & End Time (e.g., 08:00 to 17:00 = 9 hrs/day), Quantity (how many days/weeks/months), Transport cost.</p></div></div>
+
+<div class="step"><div class="stepNum">3</div><div><b style="color:#f3e8ff">Automatic Price Calculation</b><br><p>System calculates: Hourly Rate x Hours Per Day x Quantity + Transport. Example: 50 GHS/hour x 9 hrs/day (08:00-17:00) x 3 days = 1350 GHS + transport. Hourly rate set by CEO at ceo-dashboard.html → Pricing. You see minimum, you can offer above minimum to attract nurse faster. GHS for Ghana, USD for outside.</p></div></div>
+
+<div class="step"><div class="stepNum">4</div><div><b style="color:#f3e8ff">Pay Securely with Paystack</b><br><p>Click Book Selected Nurse → Paystack popup → Pay with Mobile Money, Card, Bank. Currencies: GHS, NGN, ZAR, USD, GBP. On success, system generates unique Booking ID like LCG-20261009-AB12CD. You see success modal with Booking ID and nurse info. Booking ID is your proof of payment.</p></div></div>
+
+<div class="step"><div class="stepNum">5</div><div><b style="color:#f3e8ff">Nurse Receives Job Offer Instantly</b><br><p>Booking saved to 5 places in Firebase Realtime Database (to fix permission_denied, rules now allow auth != null):<br>
+- bookings/{id}<br>
+- nurseBookings/{nurseId}/{id}<br>
+- myJobOffers/{nurseId}/{id} ← nurse sees this<br>
+- jobOffers/{id}<br>
+- clientBookings/{phone}/{id}<br>
+Nurse logs into nurses-dashboard.html → My Job Offers (my-job-offer.html) → Sees your job with Booking ID, your phone with country code, patient details, amount, address, GPS. Nurse can Call Client, Copy ID, Accept Job, View Details.</p></div></div>
+
+<div class="step"><div class="stepNum">6</div><div><b style="color:#f3e8ff">Nurse Accepts & Care Begins</b><br><p>Nurse clicks Accept Job → Status changes to accepted (local + Firebase). Nurse contacts you via phone. You both confirm Start Date/Time. Nurse arrives, provides care as per service booked. For live-in, provide accommodation. Use Consent Form (consent-form.html) before care.</p></div></div>
+
+<div class="step"><div class="stepNum">7</div><div><b style="color:#f3e8ff">Completion, Rating & Support</b><br><p>After service, rate nurse (ratings collection). For issues: Contact page, SOS page (sos.html) for emergencies - CEO notified via sosAlerts. CEO monitors nurses_group_chat (clean chat, no spam, master delete & block manager at CEO Dashboard only). Refund as per refund.html policy.</p></div></div>
+
+<div class="card" style="margin-top:18px">
+<h2>For Nurses</h2>
+<ol>
+<li>Register at nurse registration page → Upload Photo, National ID, Licence, Certificate, CV, Intro Video, GPS, Phone, Email, Qualification, Experience</li>
+<li>Data goes to pendingNurses (RTDB) + nurses (Firestore) → Status pending</li>
+<li>CEO (lovecareglobal@gmail.com) reviews at ceo-dashboard.html → PAGE 1 Pending Registrations → View All Particulars → Approve/Reject</li>
+<li>Once approved, you can login at nurse-login.html (no CEO button) → Auto-login to nurses-dashboard.html, my-job-offer.html, nurse-group-chat.html (no second login)</li>
+<li>Receive job offers in My Job Offers → Accept → Contact client → Provide care → Get paid via payoutRequests → CEO approves payout at CEO Dashboard</li>
+<li>Chat with other nurses & CEO in Nurses Group Chat (nurse-group-chat.html) - clean chat, no inscriptions, CEO can block misbehaving nurses at CEO Dashboard</li>
+</ol>
+</div>
+
 <div class="card">
-<h2 style="font-weight:900;font-size:18px">📜 Account Deletion Policy - LOVE CARE GLOBAL HOME NURSING</h2>
-<p style="font-size:11px;color:#6b7280;margin:4px 0 10px">Effective: 2025 • 8 Countries: GH, NG, ZA, GB, US, AU, AE, CA, OTHER • One Login System</p>
-
-<div class="policy">
-<b>1. Who Can Delete?</b><br>
-Both Client and Nurse can delete their account <b>by themselves</b> from this page. CEO cannot delete for you. This is self-service Danger Zone.<br><br>
-<b>2. What Gets Deleted?</b><br>
-• Firebase Auth login (Email + Continue with Google)<br>
-• Firestore profile: clients/{uid} or nurses/{uid}<br>
-• Bookings, payments, ratings, earnings, withdrawal history<br>
-• GPS actual place name (e.g., Accra, Greater Accra, Ghana), lat/lng, map data<br>
-• Profile photo, video intro, CV, licence<br>
-• Chat history (anonymized after 30 days)<br><br>
-<b>3. What is Kept for Legal?</b><br>
-• Deletion reason log saved to <code>deletion_logs</code> and <code>account_deletions</code> for CEO dashboard review (reason, more details, GPS actual name, timestamp, country) - kept for 90 days for audit.<br>
-• Payment records anonymized as required by Paystack / law.<br><br>
-<b>4. 8 Countries Rule:</b><br>
-Deletion works in all 8 countries: Ghana (MoMo+Card), Nigeria, South Africa, UK, USA, Australia, UAE, Canada, Other. Outside Ghana: Debit + Virtual Card only. GPS actual name required during deletion to verify location.<br><br>
-<b>5. Re-registration:</b><br>
-After deletion you can register again with same email after 5 minutes. Old data cannot be restored.<br><br>
-<b>6. How to Delete?</b><br>
-Scroll down to Danger Zone → Select reason → Write more details (optional) → Confirm email → Password with eye toggle (fading eye with slash) or Continue with Google re-auth → Type DELETE → Check confirmation → Delete by yourself.<br><br>
-<b>7. Support:</b><br>
-If you have active bookings, complete or cancel them first. For refund, request before deletion via Refund page. Contact: support@lovecareglobal.com<br>
+<h2>For CEO (lovecareglobal@gmail.com)</h2>
+<ul>
+<li>Login at ceo-login-FIXED.html (fixed toLowerCase bug, fixed Chinese mojibake, anonymous auth enabled)</li>
+<li>CEO Dashboard has 4 pages: Pending, Approved, Bookings/Payouts, Pricing/Map/Group Chat Master Controls</li>
+<li>PAGE 1: Pending registrations straight from Firebase - Approve/Reject - nurses can't login until approved</li>
+<li>Group Chat Master Controls (moved from chat to CEO Dashboard as you requested): Master Delete (type WIPE) + Block/Unblock Manager showing ALL registered nurses from Firestore + RTDB, search, block reason</li>
+<li>Pricing: Set GHS hourly and USD hourly - clients see daily = hourly x 8, weekly x 40, monthly x 160, 24h daily x 24 etc.</li>
+<li>Firebase Rules: Both Realtime Database and Firestore must allow auth != null + Anonymous enabled - files provided: firebase-rules-COMPLETE-ALL-OLD-PLUS-NEW.json and firestore.rules</li>
+</ul>
 </div>
 
-<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px;margin-top:10px;font-size:11px">
-<b>Logged in as:</b> <span id="userType">Checking...</span> • <b>Email:</b> <span id="userEmail">...</span><br>
-<b>Actual Location (GPS Actual Name):</b> <span id="gpsName" style="color:#15803d;font-weight:700">Loading actual name...</span><br><span id="latlng" style="font-size:10px;color:#6b7280"></span>
-</div>
-</div>
-
-<!-- DANGER ZONE SECTION - NEW BUTTON TO DELETE BY THEMSELVES WITH REASONS -->
-<div class="card">
-<div class="dangerZone">
-<div class="dangerTitle">🚨 DANGER ZONE - Delete Your Account By Yourself With Reason</div>
-<div style="font-size:11px;color:#dc2626;margin-top:6px;line-height:1.4">CEO will see your reason in dashboard. This is permanent. You delete by yourself — not policy only. New button below does real deletion.</div>
-
-<label style="margin-top:12px;color:#dc2626">Why are you deleting? Select one *</label>
-<div id="reasons">
-<div class="reasonCard" onclick="selectReason('Not satisfied with service',this)"><div class="dot"></div><div><b>😞 Not satisfied</b><br><span style="font-size:10px;color:#6b7280">Nurse or client quality issue</span></div></div>
-<div class="reasonCard" onclick="selectReason('Found another service',this)"><div class="dot"></div><div><b>🔍 Found another service</b></div></div>
-<div class="reasonCard" onclick="selectReason('Too expensive',this)"><div class="dot"></div><div><b>💸 Too expensive</b></div></div>
-<div class="reasonCard" onclick="selectReason('Moving away / Relocating',this)"><div class="dot"></div><div><b>✈️ Moving away</b></div></div>
-<div class="reasonCard" onclick="selectReason('Privacy concerns - GPS actual name',this)"><div class="dot"></div><div><b>🔒 Privacy - GPS actual name</b></div></div>
-<div class="reasonCard" onclick="selectReason('No longer need nursing',this)"><div class="dot"></div><div><b>✅ No longer need nursing</b></div></div>
-<div class="reasonCard" onclick="selectReason('App issues / Bug',this)"><div class="dot"></div><div><b>🐛 App issues</b></div></div>
-<div class="reasonCard" onclick="selectReason('Other',this)"><div class="dot"></div><div><b>📝 Other</b></div></div>
+<div class="card" style="background:linear-gradient(90deg,rgba(34,197,94,.12),rgba(16,101,57,.12));border:1px solid rgba(34,197,94,.2)">
+<b style="color:#86efac">No More 404</b><br>
+<p style="font-size:12px;margin-top:6px">These pages (services.html and how-it-works.html) are now created. Upload them to your GitHub repo asaberepeter204.github.io alongside index.html. Update your menu links to point to services.html and how-it-works.html - they will no longer 404. Same for about.html, contact.html, privacy.html, terms.html, refund.html, consent-form.html, sos.html - create similar pages if missing.</p>
 </div>
 
-<label>Selected Reason *</label><input id="selectedReason" readonly placeholder="Click reason above - Danger Zone">
-
-<label>More details - What should we improve? (Optional but sent to CEO)</label><textarea id="moreDetails" placeholder="Tell us more... CEO will read this in dashboard..."></textarea>
-
-<label>Confirm Email *</label><input id="confirmEmail" placeholder="Type your email">
-
-<label>Password - Eye Toggle Fading Drawing With Slash Line *</label>
-<div class="inputWrap">
-<input id="password" type="password" placeholder="Password - eye toggle fading">
-<button class="eyeBtn" type="button" onclick="toggleEye('password',this)">
-<svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-<svg class="eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-</button>
 </div>
-
-<label>Type DELETE to confirm Danger Zone *</label><input id="typeDelete" placeholder="Type DELETE">
-
-<div style="display:flex;gap:8px;align-items:flex-start;margin:12px 0"><input type="checkbox" id="agree" style="width:16px;height:16px"><label for="agree" style="margin:0;font-size:11px;font-weight:600;color:#dc2626">I understand this is Danger Zone - I delete by myself with reason. My account, GPS actual name, bookings, earnings will be permanently deleted.</label></div>
-
-<button class="btn btnRed" onclick="deleteWithReason()">🗑️ DELETE MY ACCOUNT NOW - DANGER ZONE - With Reason - By Myself</button>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-<a class="btn btnLight" href="client-dashboard.html">👤 Client Dashboard - Delete Button Included</a>
-<a class="btn btnLight" href="nurse-dashboard.html">👩‍⚕️ Nurse Dashboard - Delete Button Included</a>
-</div>
-<a class="btn btnLight" href="index.html">❌ Cancel - Keep Account - LOVE CARE GLOBAL HOME NURSING</a>
-
-</div>
-</div>
-
-<div class="card" style="text-align:center;font-size:10px;color:#9ca3af">Policy + Danger Zone • Both Client & Nurse can delete by themselves with reason • Eye toggle fading drawing with line crossing to close • GPS writes actual name • Reason saved to CEO dashboard • 8 Countries • One Login • LOVE CARE GLOBAL HOME NURSING</div>
-
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth, deleteUser, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithPopup } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-import { getFirestore, doc, getDoc, deleteDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-
-window.selectReason=(reason, el)=>{
-  document.getElementById('selectedReason').value=reason;
-  document.querySelectorAll('.reasonCard').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-}
-window.toggleEye=(id,btn)=>{
-  const input=document.getElementById(id);
-  const open=btn.querySelector('.eye-open');
-  const closed=btn.querySelector('.eye-closed');
-  if(input.type==='password'){input.type='text'; open.style.display='none'; closed.style.display='block'; btn.style.opacity='1';}
-  else{input.type='password'; open.style.display='block'; closed.style.display='none'; btn.style.opacity='.7';}
-}
-async function loadInfo(){
-  const clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
-  const nurseUid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId');
-  const uid=clientUid||nurseUid;
-  const role=clientUid?'CLIENT':'NURSE';
-  const email=auth.currentUser?.email||localStorage.getItem('lcg_client_email')||'';
-  document.getElementById('userType').textContent=role + (uid? ` - ${uid.slice(0,6)}`:'');
-  document.getElementById('userEmail').textContent=email||'Not logged in';
-  document.getElementById('confirmEmail').value=email||'';
-  if(uid){
-    try{
-      const col=role==='CLIENT'?'clients':'nurses';
-      const snap=await getDoc(doc(db,col,uid));
-      if(snap.exists()){
-        const d=snap.data();
-        document.getElementById('gpsName').textContent=d.gpsActualName||d.actualLocationName||d.address||'No GPS actual name yet';
-        document.getElementById('latlng').textContent=d.lat? `${d.lat.toFixed(6)}, ${d.lng.toFixed(6)}`:'';
-      }
-    }catch{}
-  }
-}
-window.deleteWithReason=async()=>{
-  const reason=document.getElementById('selectedReason').value.trim();
-  const more=document.getElementById('moreDetails').value.trim();
-  const confirmEmail=document.getElementById('confirmEmail').value.trim();
-  const typedDelete=document.getElementById('typeDelete').value.trim();
-  const pass=document.getElementById('password').value;
-  const agree=document.getElementById('agree').checked;
-  if(!reason){alert('Select reason - Danger Zone requires reason'); return;}
-  if(!confirmEmail){alert('Confirm email'); return;}
-  if(typedDelete!=='DELETE'){alert('Type DELETE'); return;}
-  if(!agree){alert('Check Danger Zone confirmation'); return;}
-  const user=auth.currentUser;
-  if(!user){alert('Not logged in - Login with Professional Eye Toggle + Continue with Google'); location.href='client-login.html'; return;}
-  if(user.email.toLowerCase()!==confirmEmail.toLowerCase()){alert('Email mismatch'); return;}
-  if(!confirm(`FINAL: Delete ${user.email}?\nReason: ${reason}\n${more}\nYou delete by yourself - Policy + Danger Zone`)){return;}
-  try{
-    if(user.providerData.some(p=>p.providerId==='password')){
-      if(!pass){alert('Enter password - eye toggle fading'); return;}
-      const cred=EmailAuthProvider.credential(user.email, pass);
-      await reauthenticateWithCredential(user, cred);
-    } else {
-      try{const provider=new GoogleAuthProvider(); await reauthenticateWithPopup(user, provider);}catch{}
-    }
-    const uid=user.uid;
-    const isClient=!!localStorage.getItem('lcg_client_uid')||!!localStorage.getItem('currentClientId');
-    const role=isClient?'client':'nurse';
-    const gpsName=document.getElementById('gpsName').textContent;
-    const latlng=document.getElementById('latlng').textContent;
-    try{
-      await setDoc(doc(db,'deletion_logs', uid+'_'+Date.now()), {uid, email:user.email, role, reason, moreDetails:more, gpsActualName:gpsName, latlng, deletedAt:serverTimestamp(), timestamp:new Date().toISOString(), country:localStorage.getItem('currentClientCountry')||localStorage.getItem('currentNurseCountry')||'Unknown'});
-      await setDoc(doc(db,'account_deletions', uid), {uid, email:user.email, role, reason, moreDetails:more, gpsActualName:gpsName, latlng, deletedAt:serverTimestamp()});
-    }catch{}
-    try{await deleteDoc(doc(db,'clients',uid));}catch{}
-    try{await deleteDoc(doc(db,'nurses',uid));}catch{}
-    await deleteUser(user);
-    localStorage.clear(); sessionStorage.clear();
-    alert(`✅ Deleted by yourself - Danger Zone with reason.\nReason: ${reason}\nCEO will see in dashboard. Policy followed. LOVE CARE GLOBAL HOME NURSING`);
-    location.href='index.html';
-  }catch(e){
-    if(e.code==='auth/requires-recent-login'){alert('Login again with Professional + Google + Eye Toggle + GPS Actual Name, then delete with reason');}
-    else{alert('Delete failed: '+e.message);}
-  }
-}
-window.addEventListener('DOMContentLoaded', loadInfo);
+<script>
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
 </script>
 </body>
 </html>
