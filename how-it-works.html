@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How It Works - LOVE CARE GLOBAL HOME NURSING</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.wrap{max-width:900px;margin:0 auto;padding:20px 14px 80px}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:14px}
+h1{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:24px;color:#f3e8ff;margin-bottom:6px}
+h2{font-size:16px;color:#f3e8ff;margin:18px 0 8px}
+p,li{font-size:13px;color:#c4b5fd;line-height:1.7}
+ul,ol{margin:8px 0 12px 18px}
+.badge{display:inline-flex;background:rgba(168,85,247,.18);color:#d8b4fe;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid rgba(168,85,247,.18)}
+.step{border:1px solid rgba(168,85,247,.18);border-radius:16px;padding:14px;margin:10px 0;background:rgba(14,10,28,.6);display:flex;gap:12px}
+.stepNum{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;display:grid;place-items:center;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
+</div>
+<a href="sos.html" class="sosBtn">SOS</a>
+</div>
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">Home</a>
+<a class="item" href="about.html">About</a>
+<a class="item" href="services.html">Services</a>
+<a class="item active" href="how-it-works.html">How It Works</a>
+<a class="item" href="contact.html">Contact</a>
+<a class="item" href="consent-form.html">Consent Form</a>
+<a class="item" href="privacy.html">Privacy</a>
+<a class="item" href="terms.html">Terms</a>
+<a class="item" href="refund.html">Refund</a>
+<a class="item" href="sos.html" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;justify-content:center">SOS</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+</div>
+
+<div class="wrap">
+<span class="badge">How It Works - 7 Simple Steps</span>
+<h1>How It Works</h1>
+<p style="color:#a78bfa;font-size:12px;margin-bottom:14px">Book a verified nurse in 5 minutes. From search to care at your doorstep.</p>
+
+<div class="card" style="background:linear-gradient(90deg,rgba(76,29,149,.25),rgba(168,85,247,.12))">
+<b style="color:#f3e8ff">For Clients (Patients & Families)</b>
+<p style="font-size:11px;color:#a78bfa;margin-top:4px">No app needed - works on phone browser at peter204.github.io</p>
+</div>
+
+<div class="step"><div class="stepNum">1</div><div><b style="color:#f3e8ff">Search Nearby Nurses on Map</b><br><p>Go to <a href="book-nurse-START-END-HOURS.html" style="color:#d8b4fe">Book Nurse</a> page. Click Use My Location. Map shows nurses within 2km, 5km, 10km, 20km, or All Ghana. Each nurse card shows photo, qualification, experience, status (online), distance.</p></div></div>
+
+<div class="step"><div class="stepNum">2</div><div><b style="color:#f3e8ff">Select Nurse & Enter Details</b><br><p>Tap a nurse card to select. Fill: Your Name (auto from login), Phone with country code (+233 for Ghana, +234 Nigeria, +1 USA, etc.) - this phone is sent to nurse, Patient Name, Age, Service Type (general, elderly, post-surgery, baby care, 24h live-in), Country, Start Time & End Time (e.g., 08:00 to 17:00 = 9 hrs/day), Quantity (how many days/weeks/months), Transport cost.</p></div></div>
+
+<div class="step"><div class="stepNum">3</div><div><b style="color:#f3e8ff">Automatic Price Calculation</b><br><p>System calculates: Hourly Rate x Hours Per Day x Quantity + Transport. Example: 50 GHS/hour x 9 hrs/day (08:00-17:00) x 3 days = 1350 GHS + transport. Hourly rate set by CEO at ceo-dashboard.html → Pricing. You see minimum, you can offer above minimum to attract nurse faster. GHS for Ghana, USD for outside.</p></div></div>
+
+<div class="step"><div class="stepNum">4</div><div><b style="color:#f3e8ff">Pay Securely with Paystack</b><br><p>Click Book Selected Nurse → Paystack popup → Pay with Mobile Money, Card, Bank. Currencies: GHS, NGN, ZAR, USD, GBP. On success, system generates unique Booking ID like LCG-20261009-AB12CD. You see success modal with Booking ID and nurse info. Booking ID is your proof of payment.</p></div></div>
+
+<div class="step"><div class="stepNum">5</div><div><b style="color:#f3e8ff">Nurse Receives Job Offer Instantly</b><br><p>Booking saved to 5 places in Firebase Realtime Database (to fix permission_denied, rules now allow auth != null):<br>
+- bookings/{id}<br>
+- nurseBookings/{nurseId}/{id}<br>
+- myJobOffers/{nurseId}/{id} ← nurse sees this<br>
+- jobOffers/{id}<br>
+- clientBookings/{phone}/{id}<br>
+Nurse logs into nurses-dashboard.html → My Job Offers (my-job-offer.html) → Sees your job with Booking ID, your phone with country code, patient details, amount, address, GPS. Nurse can Call Client, Copy ID, Accept Job, View Details.</p></div></div>
+
+<div class="step"><div class="stepNum">6</div><div><b style="color:#f3e8ff">Nurse Accepts & Care Begins</b><br><p>Nurse clicks Accept Job → Status changes to accepted (local + Firebase). Nurse contacts you via phone. You both confirm Start Date/Time. Nurse arrives, provides care as per service booked. For live-in, provide accommodation. Use Consent Form (consent-form.html) before care.</p></div></div>
+
+<div class="step"><div class="stepNum">7</div><div><b style="color:#f3e8ff">Completion, Rating & Support</b><br><p>After service, rate nurse (ratings collection). For issues: Contact page, SOS page (sos.html) for emergencies - CEO notified via sosAlerts. CEO monitors nurses_group_chat (clean chat, no spam, master delete & block manager at CEO Dashboard only). Refund as per refund.html policy.</p></div></div>
+
+<div class="card" style="margin-top:18px">
+<h2>For Nurses</h2>
+<ol>
+<li>Register at nurse registration page → Upload Photo, National ID, Licence, Certificate, CV, Intro Video, GPS, Phone, Email, Qualification, Experience</li>
+<li>Data goes to pendingNurses (RTDB) + nurses (Firestore) → Status pending</li>
+<li>CEO (lovecareglobal@gmail.com) reviews at ceo-dashboard.html → PAGE 1 Pending Registrations → View All Particulars → Approve/Reject</li>
+<li>Once approved, you can login at nurse-login.html (no CEO button) → Auto-login to nurses-dashboard.html, my-job-offer.html, nurse-group-chat.html (no second login)</li>
+<li>Receive job offers in My Job Offers → Accept → Contact client → Provide care → Get paid via payoutRequests → CEO approves payout at CEO Dashboard</li>
+<li>Chat with other nurses & CEO in Nurses Group Chat (nurse-group-chat.html) - clean chat, no inscriptions, CEO can block misbehaving nurses at CEO Dashboard</li>
+</ol>
+</div>
+
+<div class="card">
+<h2>For CEO (lovecareglobal@gmail.com)</h2>
+<ul>
+<li>Login at ceo-login-FIXED.html (fixed toLowerCase bug, fixed Chinese mojibake, anonymous auth enabled)</li>
+<li>CEO Dashboard has 4 pages: Pending, Approved, Bookings/Payouts, Pricing/Map/Group Chat Master Controls</li>
+<li>PAGE 1: Pending registrations straight from Firebase - Approve/Reject - nurses can't login until approved</li>
+<li>Group Chat Master Controls (moved from chat to CEO Dashboard as you requested): Master Delete (type WIPE) + Block/Unblock Manager showing ALL registered nurses from Firestore + RTDB, search, block reason</li>
+<li>Pricing: Set GHS hourly and USD hourly - clients see daily = hourly x 8, weekly x 40, monthly x 160, 24h daily x 24 etc.</li>
+<li>Firebase Rules: Both Realtime Database and Firestore must allow auth != null + Anonymous enabled - files provided: firebase-rules-COMPLETE-ALL-OLD-PLUS-NEW.json and firestore.rules</li>
+</ul>
+</div>
+
+<div class="card" style="background:linear-gradient(90deg,rgba(34,197,94,.12),rgba(16,101,57,.12));border:1px solid rgba(34,197,94,.2)">
+<b style="color:#86efac">No More 404</b><br>
+<p style="font-size:12px;margin-top:6px">These pages (services.html and how-it-works.html) are now created. Upload them to your GitHub repo asaberepeter204.github.io alongside index.html. Update your menu links to point to services.html and how-it-works.html - they will no longer 404. Same for about.html, contact.html, privacy.html, terms.html, refund.html, consent-form.html, sos.html - create similar pages if missing.</p>
+</div>
+
+</div>
+<script>
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
+</body>
+</html>
