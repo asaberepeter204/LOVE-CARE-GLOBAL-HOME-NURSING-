@@ -1,55 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>About Us - LOVE CARE GLOBAL HOME NURSING</title>
-<style>body{font-family:'Segoe UI',Arial,sans-serif;line-height:1.9;margin:0;background:#f8f9ff;color:#222}.container{max-width:850px;margin:0 auto;padding:40px 20px;background:#fff}.header{text-align:center;padding:30px 0;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-radius:15px;margin-bottom:30px}h1{margin:0}h2{color:#7c3aed;margin-top:35px}.meta{background:#f3f0ff;padding:20px;border-radius:10px;margin:25px 0;border-left:5px solid #7c3aed}ul li{margin:8px 0}a{color:#7c3aed;font-weight:bold;text-decoration:none}</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.delete{border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.08);color:#fca5a5}
+.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+.wrap{max-width:900px;margin:0 auto;padding:20px 14px 80px}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:14px}
+h1{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:22px;color:#f3e8ff;margin-bottom:6px;border-bottom:2px solid rgba(168,85,247,.3);padding-bottom:10px}
+h2{font-size:16px;color:#f3e8ff;margin:24px 0 10px;background:rgba(76,29,149,.2);padding:8px 12px;border-radius:10px;border-left:3px solid #a855f7}
+p,li{font-size:13px;color:#c4b5fd;line-height:1.8}
+ul,ol{margin:8px 0 12px 18px}
+.badge{display:inline-flex;background:rgba(168,85,247,.18);color:#d8b4fe;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid rgba(168,85,247,.18)}
+</style>
 </head>
 <body>
-<div class="container">
-<div class="header"><h1>LOVE CARE GLOBAL HOME NURSING</h1><p>Professional Home Nursing Across The Globe</p></div>
-<div class="meta">
-<p><strong>Application Name:</strong> LOVE CARE GLOBAL HOME NURSING</p>
-<p><strong>Official Website:</strong> https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
-<p><strong>Last Updated:</strong> October 5, 2026</p>
-<p><strong>Developer:</strong> Asabere Peter | lovecareglobal@gmail.com</p>
-<p><strong>Headquarters:</strong> Accra, Greater Accra Region, Ghana</p>
+<div class="bg"></div>
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
+</div>
+<a href="sos.html" class="sosBtn">SOS</a>
+</div>
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">Home</a>
+<a class="item active" href="about.html">About</a>
+<a class="item " href="services.html">Services</a>
+<a class="item " href="how-it-works.html">How It Works</a>
+<a class="item " href="contact.html">Contact</a>
+<a class="item consent" href="consent-form.html">Consent Form</a>
+<a class="item " href="privacy.html">Privacy</a>
+<a class="item " href="terms.html">Terms</a>
+<a class="item " href="refund.html">Refund</a>
+<a class="item delete " href="delete-account.html">🗑️ Delete Account</a>
+<a class="item sos" href="sos.html">SOS</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
 </div>
 
-<h2>Who We Are</h2>
-<p>LOVE CARE GLOBAL HOME NURSING is a premium digital healthcare platform established with a single mission: to make professional, compassionate, and affordable home nursing accessible to everyone, everywhere. We bridge the gap between patients in need of home care and highly qualified, verified, and experienced nurses.</p>
-<p>Founded in Ghana, we have expanded our operations to 8 countries including Ghana, Nigeria, United States of America, United Kingdom, Canada, Germany, South Africa, and the United Arab Emirates (UAE). Our platform is built on trust, professionalism, and love for humanity.</p>
+<div class="wrap">
+<span class="badge">About - LOVE CARE GLOBAL</span>
+<div class="card" style="margin-top:12px">
 
-<h2>Our Mission</h2>
-<p>To provide 24/7 reliable, professional, and compassionate home nursing services that allow patients to heal, age, and receive care in the comfort and dignity of their own homes, surrounded by loved ones.</p>
+<h1>About LOVE CARE GLOBAL HOME NURSING</h1>
+<p><b>Your health, our heart.</b> Operated from Accra, Ghana, serving 8 countries: GH, NG, ZA, GB, US, AU, AE, CA, OTHER. 24/7 home nursing.</p>
+<h2>Our Mission</h2><p>Bring licensed, verified nurses to your doorstep - compassionate, professional care at home, not hospital.</p>
+<h2>How We Verify Nurses</h2><p>Photo, National ID, Licence, Certificate, CV, Intro Video, GPS actual name (e.g., Accra, Greater Accra, Ghana), phone, email. CEO reviews at ceo-dashboard.html → Pending Registrations → Approve/Reject. Only approved nurses can login and receive jobs in my-job-offer.html.</p>
+<h2>Why Choose Us</h2><ul><li>Live map search 2km-100km All Ghana</li><li>Hourly pricing from Start/End time, transparent</li><li>Paystack secure (MoMo, Card, Bank)</li><li>Booking ID proof LCG-YYYYMMDD-XXXXXX</li><li>Nurses Group Chat clean, CEO monitored, master delete at CEO Dashboard</li><li>SOS for emergencies</li></ul>
+<h2>CEO</h2><p>lovecareglobal@gmail.com - Manages pending nurses, bookings, payouts, pricing, block manager.</p>
 
-<h2>Our Vision</h2>
-<p>To become Africa's largest and the world's most trusted home nursing network, setting the global standard for home healthcare delivery.</p>
-
-<h2>Our 13 Core Nursing Services</h2>
-<ul>
-<li><strong>1. Elderly Care:</strong> Compassionate support for seniors with daily activities, companionship, and health monitoring.</li>
-<li><strong>2. Post-Surgery Care:</strong> Professional wound dressing, medication management, and recovery monitoring after surgery.</li>
-<li><strong>3. Baby and Mother Care:</strong> Antenatal, postnatal care for mothers and newborn baby care by specialized nurses.</li>
-<li><strong>4. Disability Support:</strong> Daily living assistance and specialized care for persons with disabilities.</li>
-<li><strong>5. Chronic Disease Management:</strong> Long-term care for diabetes, hypertension, stroke patients.</li>
-<li><strong>6. Wound Care:</strong> Professional dressing and infection prevention.</li>
-<li><strong>7. Medication Administration:</strong> Timely and accurate medication giving and monitoring.</li>
-<li><strong>8. Physiotherapy Support:</strong> Basic mobility and rehabilitation support at home.</li>
-<li><strong>9. Palliative Care:</strong> Dignified and compassionate end-of-life care.</li>
-<li><strong>10. Injection and IV Services:</strong> Safe administration at home.</li>
-<li><strong>11. Vital Signs Monitoring:</strong> Regular BP, sugar, temperature checks.</li>
-<li><strong>12. Hospital to Home Transition:</strong> Seamless care after discharge.</li>
-<li><strong>13. Emergency Home Nursing:</strong> Rapid response for urgent care needs.</li>
-</ul>
-
-<h2>Why Choose Us?</h2>
-<p>All our nurses are verified with Nursing and Midwifery Council certificates, background checked, and rated by previous patients. Our app features real-time booking, secure payments, GPS tracking of nurse arrival, and 24/7 customer support. We are available on Android, iOS, and Web as a PWA.</p>
-
-<h2>Legal Information</h2>
-<p>This website and all its pages including About, Privacy Policy, Terms of Service, Contact, Delete Account and Consent pages are the official legal documents for LOVE CARE GLOBAL HOME NURSING as required by Google Play Store and Apple App Store.</p>
-
-<p><a href="index.html">← Back to Home</a> | <a href="privacy-policy.html">Privacy Policy</a> | <a href="terms-of-service.html">Terms of Service</a> | <a href="contact.html">Contact Us</a></p>
+<div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(168,85,247,.12);display:flex;gap:10px;flex-wrap:wrap">
+<a href="index.html" style="padding:10px 16px;border-radius:12px;background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none">← Back to Home</a>
+<a href="delete-account.html" style="padding:10px 16px;border-radius:12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5;text-decoration:none">Delete Account Policy</a>
 </div>
+</div>
+</div>
+<script>
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
 </body>
 </html>
