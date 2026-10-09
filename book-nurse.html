@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Book Nearby Nurse — LOVE CARE GLOBAL</title>
+<title>Book Nurse — Start/End Time Hours | LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="icon-transparent-512.png">
 <script src="https://js.paystack.co/v1/inline.js"></script>
@@ -13,414 +13,329 @@
 body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
 .bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.left{display:flex;align-items:center;gap:12px}
-.hamburger{width:42px;height:42px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
-.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
-.hamburger span+span{margin-top:4px}
-.logoBox{display:flex;align-items:center;gap:10px}
-.logoImg{width:42px;height:42px;border-radius:12px;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
-.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
-.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
-#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
-#overlay.show{display:block}
-#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
-#drawer.open{transform:translateX(0)}
-.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
-.item.client{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}
-.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
-.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
-.page{padding:16px 14px 90px;max-width:900px;margin:0 auto}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:16px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin:12px 0;position:relative}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:16px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin:12px 0}
 label{font-size:11px;font-weight:800;margin:10px 0 6px;display:block;color:#c4b5fd;letter-spacing:.05em;text-transform:uppercase}
 input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;font-weight:600;outline:none}
-input:read-only{background:rgba(76,29,149,.12)!important;color:#d8b4fe!important}
-input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
-.btnSmall{border:none;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer;background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;transition:.2s}
-.btnSmall:hover{background:rgba(168,85,247,.25)}
+input:focus,select:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
+.btnSmall{border:none;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer;background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
 .btnSubmit{width:100%;border:none;border-radius:12px;padding:14px;font-weight:900;cursor:pointer;margin-top:10px;font-size:14px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.3)}
-.mapWrap{width:100%;height:420px;border-radius:16px;border:1px solid rgba(168,85,247,.18);overflow:hidden;position:relative;margin-top:10px}
+.mapWrap{width:100%;height:380px;border-radius:16px;border:1px solid rgba(168,85,247,.18);overflow:hidden;margin-top:10px}
 #map{width:100%;height:100%}
-.nurse-grid{display:grid;grid-template-columns:1fr;gap:12px;max-height:none}
+.nurse-grid{display:grid;grid-template-columns:1fr;gap:12px}
 @media(min-width:600px){.nurse-grid{grid-template-columns:1fr 1fr}}
-.nurse-card{border:1px solid rgba(168,85,247,.14);border-radius:18px;padding:12px;background:rgba(14,10,28,.6);cursor:pointer;transition:.2s;position:relative;overflow:hidden}
-.nurse-card:hover{transform:translateY(-2px);border-color:#a855f7;box-shadow:0 8px 24px rgba(168,85,247,.15)}
-.nurse-card.selected{border-color:#a855f7;background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.15));box-shadow:0 0 0 3px rgba(168,85,247,.2)}
-.online-dot{width:12px;height:12px;border-radius:50%;background:#22c55e;border:2px solid #1c1238;position:absolute;top:12px;right:12px;box-shadow:0 0 8px rgba(34,197,94,.6);animation:pulse 2s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
-.nurse-photo{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(168,85,247,.25);background:#1e0a3a}
-.video-thumb{width:100%;height:110px;border-radius:12px;background:#0e0a1c;object-fit:cover;border:1px solid rgba(168,85,247,.15);margin-top:8px;cursor:pointer}
-.rating{color:#facc15;font-size:12px;font-weight:800}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.18);color:#d8b4fe;border:1px solid rgba(168,85,247,.18);display:inline-flex;align-items:center;gap:4px}
+.nurse-card{border:1px solid rgba(168,85,247,.14);border-radius:18px;padding:12px;background:rgba(14,10,28,.6);cursor:pointer}
+.nurse-card.selected{border-color:#a855f7;background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.15))}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.18);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
 .badge.online{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.25)}
+.calcDisplay{background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.25);border-radius:12px;padding:12px;margin-top:10px;font-size:11px;color:#a78bfa;line-height:1.8}
+.calcDisplay b{color:#f3e8ff}
+.timeBadge{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(76,29,149,.2));border:1px solid rgba(168,85,247,.25);border-radius:10px;padding:8px 12px;font-size:11px;font-weight:800;color:#d8b4fe;display:inline-flex;gap:6px;align-items:center}
 .modalOverlay{position:fixed;inset:0;background:rgba(14,10,28,.88);backdrop-filter:blur(12px);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
 .modalOverlay.show{display:flex}
-.modal{background:rgba(28,18,56,.98);border-radius:24px;padding:0;max-width:420px;width:100%;max-height:90vh;overflow:auto;border:1px solid rgba(168,85,247,.25);box-shadow:0 20px 60px rgba(0,0,0,.7)}
-.modal-header{padding:18px 18px 0;display:flex;gap:14px;align-items:center}
-.modal-body{padding:14px 18px}
-.modal-video{width:100%;height:220px;border-radius:14px;background:#000;object-fit:cover}
-.bookingIdBadge{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;padding:10px 16px;border-radius:12px;font-weight:900;font-size:16px;letter-spacing:.08em;display:inline-block;margin:12px 0;border:2px solid rgba(255,255,255,.2)}
-.hidden{display:none!important}
+.modal{background:rgba(28,18,56,.98);border-radius:24px;padding:24px;max-width:420px;width:100%;border:1px solid rgba(168,85,247,.25)}
+.bookingIdBadge{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;padding:10px 16px;border-radius:12px;font-weight:900;font-size:16px;display:inline-block;margin:12px 0}
 </style>
 </head>
 <body>
 <div class="bg"></div>
-
 <div class="topbar">
-<div class="left">
-<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
-<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
-</div>
-<a href="sos.html" class="sosBtn">SOS</a>
+<div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:40px;height:40px;border-radius:12px;background:#3b0f6e"><div><b style="color:#f3e8ff;font-size:13px">BOOK NURSE — TIME-BASED HOURLY</b><br><small style="color:#a78bfa">Hours from Start/End × Hourly Rate × Qty</small></div></div>
+<a href="index.html" style="padding:8px 14px;border-radius:999px;background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none;font-size:11px;font-weight:800">Home</a>
 </div>
 
-<div id="overlay" onclick="closeD()"></div>
-<div id="drawer">
-<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center"><img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:12px;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div></div>
-<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
-<a class="item client" href="index.html">Home</a>
-<a class="item client" href="client-dashboard.html">Dashboard</a>
-<a class="item client" href="book-nurse.html" style="background:rgba(168,85,247,.22)">Book Nurse</a>
-<a class="item client" href="my-bookings.html">My Bookings</a>
-<a class="item" href="about.html">About</a><a class="item" href="services.html">Services</a><a class="item" href="contact.html">Contact</a>
-<a class="item consent" href="consent-form.html">Consent Form</a><a class="item sos" href="sos.html">SOS</a>
-</div>
-<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
-</div>
-
-<div class="page">
-<h1 style="font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:20px;color:#f3e8ff">Find Nearby Nurses</h1>
-<p style="font-size:11px;color:#a78bfa;margin:4px 0 12px">Online nurses on map — watch video, photo & ratings before booking</p>
+<div style="max-width:900px;margin:0 auto;padding:14px 14px 90px">
 
 <div class="card">
-<label>Your Location</label>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<input id="lat" readonly placeholder="Lat"><input id="lng" readonly placeholder="Lng">
-</div>
-<textarea id="clientAddress" rows="2" style="margin-top:8px" placeholder="Your address"></textarea>
+<h3 style="font-size:13px;color:#f3e8ff">📍 Your Location — Search Nearby Nurses</h3>
 <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
 <button class="btnSmall" onclick="useMyLocation()">📍 Use My Location</button>
-<button class="btnSmall" onclick="searchNearbyNurses()">🔍 Search Nearby (5km)</button>
+<button class="btnSmall" onclick="searchNearbyNurses()">🔍 Search 5km</button>
 <select id="radiusSelect" style="width:auto;padding:8px 12px;border-radius:10px;background:rgba(14,10,28,.7);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-weight:700">
 <option value="2">2 km</option><option value="5" selected>5 km</option><option value="10">10 km</option><option value="20">20 km</option><option value="100">All Ghana</option>
 </select>
 </div>
-<div style="margin-top:8px;font-size:10px;color:#6b7280">Green dot = Online now • Tap nurse on map to see details</div>
-
 <div class="mapWrap"><div id="map"></div></div>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-<b id="nearbyCount" style="font-size:12px;color:#d8b4fe">0 nearby online nurses</b>
+<div style="display:flex;justify-content:space-between;margin-top:10px">
+<b id="nearbyCount" style="font-size:12px;color:#d8b4fe">0 nearby</b>
 <span id="selectedNurseInfo" style="font-size:11px;color:#a78bfa">No nurse selected</span>
 </div>
 </div>
 
 <div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-<h3 style="font-size:14px;font-weight:800;color:#f3e8ff">Nearby Online Nurses</h3>
-<button class="btnSmall" onclick="searchNearbyNurses()">Refresh</button>
-</div>
-<div id="nurseGrid" class="nurse-grid">Searching...</div>
+<h3 style="font-size:14px;color:#f3e8ff">Nearby Online Nurses</h3>
+<div id="nurseGrid" class="nurse-grid" style="margin-top:10px">Searching...</div>
 </div>
 
 <div class="card">
-<h3 style="font-size:14px;font-weight:800;color:#f3e8ff;margin-bottom:8px">Booking Details</h3>
+<h3 style="font-size:14px;color:#f3e8ff;margin-bottom:8px">💰 Booking Details — Hours from Start/End Time</h3>
+
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
 <div><label>Client Name</label><input id="clientFullName" readonly></div>
 <div><label>Client Phone</label><input id="clientPhone" readonly></div>
 </div>
 <input id="clientEmail" type="hidden">
+
 <label>Patient Name *</label><input id="patientName" placeholder="Who needs care?">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
 <div><label>Patient Age</label><input id="patientAge" type="number" placeholder="Age"></div>
 <div><label>Service</label><select id="serviceType"><option>Home Nursing</option><option>Elderly Care</option><option>Post Surgery</option><option>Baby Care</option><option>Palliative Care</option></select></div>
 </div>
 <label>Notes</label><textarea id="patientNotes" rows="2" placeholder="Describe care needed..."></textarea>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div><label>Country</label><select id="countrySelect" onchange="calcTotal()"><option value="GH">Ghana GHS</option><option value="NG">Nigeria NGN</option><option value="ZA">South Africa ZAR</option><option value="US">USA USD</option><option value="GB">UK GBP</option></select></div>
-<div><label>Offer (Min: <span id="minAmount">0</span>)</label><input id="clientOffer" type="number" placeholder="Amount" oninput="calcTotal()"></div>
+
+<div style="background:rgba(76,29,149,.12);border:1px solid rgba(168,85,247,.18);border-radius:14px;padding:14px;margin-top:12px">
+<b style="font-size:12px;color:#f3e8ff">⏱️ Work Hours — Calculated from Start/End Time (No fixed 8 hours)</b>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+<div><label>Start Time *</label><input id="startTime" type="time" value="08:00" onchange="calcTotal()"></div>
+<div><label>End Time *</label><input id="endTime" type="time" value="17:00" onchange="calcTotal()"></div>
+<div><label>Hours Per Day (Auto)</label><div id="hoursPerDayDisplay" class="timeBadge" style="width:100%;justify-content:center;margin-top:6px;padding:12px">9.0 hrs</div></div>
 </div>
-<div style="background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.18);border-radius:12px;padding:10px;margin-top:10px;font-size:12px;color:#a78bfa">Total minimum: <b id="totalDisplay" style="color:#f3e8ff">GHS 0</b> • <span id="modeDisplay">Hourly</span></div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
-<div><label>Start</label><input id="startTime" type="time" value="08:00"></div>
-<div><label>End</label><input id="endTime" type="time" value="17:00"></div>
-<div><label>Care Mode</label><select id="careMode" onchange="calcTotal()"><option value="Hourly">Hourly</option><option value="Daily">Daily</option><option value="Weekly">Weekly</option></select></div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+<div><label>Care Mode</label><select id="careMode" onchange="calcTotal()"><option value="Hourly">Hourly</option><option value="Daily" selected>Daily</option><option value="Weekly">Weekly</option><option value="Monthly">Monthly</option></select></div>
+<div><label>Quantity (Number of Days/Weeks/Months/Hours)</label><input id="quantity" type="number" value="1" min="1" placeholder="e.g., 3 days" oninput="calcTotal()"></div>
+<div><label>Live Type</label><select id="liveType" onchange="calcTotal()"><option value="live-out">Live-Out</option><option value="live-in">Live-In</option></select></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+<div><label>Country / Currency</label><select id="countrySelect" onchange="calcTotal()"><option value="GH">🇬🇭 Ghana — GHS (Cedis)</option><option value="US">🇺🇸 Outside Ghana — USD (Dollar)</option><option value="NG">🇳🇬 Nigeria — NGN</option><option value="GB">🇬🇧 UK — GBP</option></select></div>
+<div><label>Transport (Live-Out Only)</label><input id="transport" type="number" value="0" placeholder="0" oninput="calcTotal()"></div>
+</div>
+
+</div>
+
+<div class="calcDisplay" id="calcDisplay">
+Loading hourly rates from CEO... Set start/end time to calculate hours.
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+<div><label>Your Offer (Min: <span id="minAmount" style="color:#86efac">0</span>)</label><input id="clientOffer" type="number" placeholder="Must be >= minimum"></div>
+<div><label>Total Minimum (From Start/End Hours)</label><div id="totalDisplay" style="padding:12px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border-radius:12px;font-weight:900;font-size:18px;text-align:center">GHS 0</div></div>
 </div>
 
 <div id="bookResult" style="margin-top:12px"></div>
-<button class="btnSubmit" onclick="bookSelectedNurse()">💳 Pay & Book Selected Nurse</button>
-<p style="font-size:10px;color:#6b7280;margin-top:6px;text-align:center">Selected nurse will receive booking in My Job Offers and can Accept/Reject</p>
+<button class="btnSubmit" onclick="bookSelectedNurse()">💳 Pay <span id="payAmount">0</span> & Book Selected Nurse</button>
+<p style="font-size:10px;color:#6b7280;margin-top:8px;text-align:center">⏰ Hours = End Time - Start Time (e.g., 08:00-17:00 = 9hrs). Total = Hourly Rate × Hours Per Day × Quantity + Transport. No fixed 8hrs — uses your time. Paystack GHS for Ghana, USD for outside.</p>
 </div>
 </div>
 
-<!-- NURSE DETAIL MODAL WITH VIDEO, PHOTO, RATINGS -->
-<div id="nurseDetailModal" class="modalOverlay">
-  <div class="modal">
-    <div class="modal-header">
-      <img id="detailPhoto" src="icon-transparent-512.png" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid rgba(168,85,247,.3)">
-      <div style="flex:1">
-        <div id="detailName" style="font-weight:900;font-size:16px;color:#f3e8ff">Nurse Name</div>
-        <div id="detailRating" style="font-size:12px;color:#facc15">⭐ 4.8 (24 reviews)</div>
-        <div id="detailDistance" style="font-size:11px;color:#a78bfa">📍 1.2km away • Online now</div>
-        <div style="margin-top:4px"><span class="badge online">● Online</span> <span id="detailBadge" class="badge">Verified</span></div>
-      </div>
-      <button onclick="closeDetailModal()" style="background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.18);width:32px;height:32px;border-radius:50%;color:#d8b4fe;cursor:pointer">✕</button>
-    </div>
-    <div class="modal-body">
-      <video id="detailVideo" class="modal-video" controls poster="" style="display:none"></video>
-      <div id="noVideoBox" style="background:rgba(14,10,28,.8);border:1px dashed rgba(168,85,247,.18);border-radius:12px;padding:20px;text-align:center;color:#6b7280;font-size:11px">No intro video</div>
-      
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-        <div style="background:rgba(14,10,28,.6);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:#6b7280">RATING</div><div id="detailRatingBig" style="font-weight:900;color:#facc15">4.8 ⭐</div></div>
-        <div style="background:rgba(14,10,28,.6);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:#6b7280">REVIEWS</div><div id="detailReviews" style="font-weight:900;color:#f3e8ff">24</div></div>
-      </div>
-
-      <div id="detailBio" style="font-size:12px;color:#c4b5fd;margin-top:10px;line-height:1.6">Experienced nurse...</div>
-      <div id="detailServices" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"></div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
-        <button class="btnSmall" style="padding:12px" onclick="closeDetailModal()">Close</button>
-        <button class="btnSubmit" style="margin-top:0" onclick="selectFromModal()">✅ Select This Nurse</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SUCCESS MODAL -->
 <div id="successModal" class="modalOverlay">
-  <div class="modal" style="padding:24px;text-align:center">
-    <div style="font-size:48px;margin-bottom:10px">🎉</div>
-    <h2 style="font-weight:800;color:#f3e8ff">Booking Sent!</h2>
-    <p style="font-size:11px;color:#a78bfa;margin-top:4px">Booking ID sent to nurse</p>
-    <div id="modalBookingId" class="bookingIdBadge">LCG-000000-XXXXXX</div>
-    <p id="modalNurseInfo" style="font-size:11px;color:#c4b5fd"></p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
-      <button onclick="copyBookingId()" class="btnSmall" style="padding:12px">📋 Copy ID</button>
-      <button onclick="location.href='my-bookings.html'" class="btnSubmit" style="margin-top:0">My Bookings</button>
-    </div>
-  </div>
+<div class="modal" style="text-align:center">
+<div style="font-size:48px">🎉</div>
+<h2 style="color:#f3e8ff">Booking Sent!</h2>
+<div id="modalBookingId" class="bookingIdBadge">LCG-000000-XXXXXX</div>
+<p id="modalNurseInfo" style="font-size:11px;color:#c4b5fd"></p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+<button onclick="navigator.clipboard.writeText(document.getElementById('modalBookingId').textContent).then(()=>alert('Copied'))" class="btnSmall" style="padding:12px">📋 Copy ID</button>
+<button onclick="location.href='my-bookings.html'" class="btnSubmit" style="margin-top:0">My Bookings</button>
+</div>
+</div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+import { getDatabase, ref, set, get, child, onValue } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const rtdb=getDatabase(app);
 
-const SESSION_MS = 30*60*1000;
-function refreshSession(){ localStorage.setItem('lcg_session_expiry', (Date.now()+SESSION_MS).toString()); }
-(function(){
-  const uid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
-  if(!uid && !localStorage.getItem('lcg_logged_in')){
-    location.replace('client-login.html'); return;
-  }
-  refreshSession();
-  ['click','keydown','touchstart','input'].forEach(ev=>document.addEventListener(ev,refreshSession,{passive:true}));
-})();
-
-const RATES={GH:{rate:50,cur:'GHS'},NG:{rate:5000,cur:'NGN'},ZA:{rate:250,cur:'ZAR'},US:{rate:25,cur:'USD'},GB:{rate:20,cur:'GBP'}};
-let selectedNurseId=null, selectedNurseName='', selectedNursePhone='', selectedNurseData=null, currentDetailNurse=null;
-let currentClient=null, currentMode='Hourly';
-let map=null, markers=[], allNurses=[];
+let selectedNurseId=null, selectedNurseName='', selectedNursePhone='', selectedNurseData=null;
+let currentClient=null;
 let clientLatLng={lat:5.6037,lng:-0.1870};
+let map=null, markers=[], allNurses=[];
+let hourlyRates={GHS:{hourly:50, cur:'GHS'}, USD:{hourly:5, cur:'USD'}, GH:{hourly:50, cur:'GHS'}, US:{hourly:5, cur:'USD'}, NG:{hourly:5000, cur:'NGN'}, GB:{hourly:20, cur:'GBP'}};
+
+function loadRates(){
+  const ratesRef=ref(rtdb,'config/rates');
+  onValue(ratesRef, snap=>{
+    if(snap.exists()){
+      const val=snap.val();
+      hourlyRates.GHS={hourly: val.GHS?.hourly||50, cur:'GHS'};
+      hourlyRates.GH={hourly: val.GHS?.hourly||50, cur:'GHS'};
+      hourlyRates.USD={hourly: val.USD?.hourly||5, cur:'USD'};
+      hourlyRates.US={hourly: val.USD?.hourly||5, cur:'USD'};
+      if(val.NGN) hourlyRates.NG={hourly: val.NGN?.hourly||5000, cur:'NGN'};
+      calcTotal();
+    }
+  });
+  get(ratesRef).then(snap=>{
+    if(snap.exists()){
+      const val=snap.val();
+      hourlyRates.GHS={hourly: val.GHS?.hourly||50, cur:'GHS'};
+      hourlyRates.GH={hourly: val.GHS?.hourly||50, cur:'GHS'};
+      hourlyRates.USD={hourly: val.USD?.hourly||5, cur:'USD'};
+      hourlyRates.US={hourly: val.USD?.hourly||5, cur:'USD'};
+      calcTotal();
+    }
+  });
+}
 
 function initMap(lat=5.6037,lng=-0.1870){
   clientLatLng={lat,lng};
   if(map){ map.setView([lat,lng],13); return; }
   map=L.map('map').setView([lat,lng],13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(map);
-  L.marker([lat,lng],{icon:L.divIcon({html:'<div style="background:#a855f7;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.4)"></div>',className:'',iconSize:[16,16]})}).addTo(map).bindPopup('You are here');
+  L.marker([lat,lng],{icon:L.divIcon({html:'<div style="background:#a855f7;width:16px;height:16px;border-radius:50%;border:3px solid white"></div>',className:'',iconSize:[16,16]})}).addTo(map).bindPopup('You');
 }
-
 function haversine(lat1,lon1,lat2,lon2){
   const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
   const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
-
 async function searchNearbyNurses(){
-  refreshSession();
   const radius=parseFloat(document.getElementById('radiusSelect').value);
   const grid=document.getElementById('nurseGrid');
-  grid.innerHTML='<div style="color:#a78bfa;padding:12px">Searching online nurses within '+radius+'km...</div>';
-  
+  grid.innerHTML='<div style="color:#a78bfa">Searching online nurses...</div>';
   try{
     const snap=await get(child(ref(rtdb),'nurses'));
     let nurses=[];
     if(snap.exists()){
       const data=snap.val();
-      nurses=Object.values(data).map(n=>{
-        // normalize fields
-        return {
-          uid: n.uid||n.id||'',
-          fullName: n.fullName||n.name||'Nurse',
-          name: n.fullName||n.name||'Nurse',
-          photoURL: n.photoURL||n.photo||n.profilePhoto||'',
-          videoURL: n.introVideoUrl||n.videoURL||n.introVideo||n.video||'',
-          rating: n.rating||n.averageRating||4.5,
-          reviewCount: n.reviewCount||n.totalReviews||n.reviews||Math.floor(Math.random()*30)+5,
-          lat: n.lat||n.latitude||null,
-          lng: n.lng||n.longitude||null,
-          phone: n.phone||n.phoneNumber||'',
-          bio: n.bio||n.about||'Experienced professional nurse dedicated to quality home care.',
-          services: n.services||['Home Nursing','Elderly Care'],
-          isAvailable: n.isAvailable!==false,
-          isApproved: n.isApproved!==false,
-          isOnline: n.isOnline!==false,
-          ...n
-        };
-      }).filter(n=> n.lat && n.lng && (n.isAvailable!==false) );
+      nurses=Object.values(data).map(n=>({
+        uid:n.uid||n.id||'',
+        fullName:n.fullName||n.name||'Nurse',
+        photoURL:n.photoURL||'',
+        videoURL:n.introVideoUrl||n.videoURL||'',
+        rating:n.rating||4.5,
+        reviewCount:n.reviewCount||5,
+        lat:n.lat||null,
+        lng:n.lng||null,
+        phone:n.phone||'',
+        bio:n.bio||'Professional nurse',
+        services:n.services||['Home Nursing'],
+        isAvailable:n.isAvailable!==false,
+        isApproved:n.isApproved!==false,
+        ...n
+      })).filter(n=>n.lat&&n.lng&&n.isAvailable&&n.isApproved);
     }
-
-    // demo fallback if no nurses
     if(nurses.length===0){
       nurses=[
-        {uid:'demo1',fullName:'Ama Osei',photoURL:'',videoURL:'https://www.w3schools.com/html/mov_bbb.mp4',rating:4.9,reviewCount:32,lat:5.61,lng:-0.19,phone:'+233240000001',bio:'5 years experience in elderly care and post-surgery.',services:['Elderly Care','Home Nursing'],isAvailable:true},
-        {uid:'demo2',fullName:'Kwesi Mensah',photoURL:'',videoURL:'',rating:4.6,reviewCount:18,lat:5.605,lng:-0.185,phone:'+233240000002',bio:'Specialized in baby care and palliative care.',services:['Baby Care','Palliative'],isAvailable:true},
-        {uid:'demo3',fullName:'Efua Boateng',photoURL:'',videoURL:'',rating:4.8,reviewCount:27,lat:5.595,lng:-0.192,phone:'+233240000003',bio:'Certified home nurse, available 24/7.',services:['Home Nursing'],isAvailable:true},
+        {uid:'demo1',fullName:'Ama Osei',photoURL:'',videoURL:'',rating:4.9,reviewCount:32,lat:5.61,lng:-0.19,phone:'+233240000001',bio:'Elderly care specialist',services:['Elderly Care'],isAvailable:true},
+        {uid:'demo2',fullName:'Kwesi Mensah',photoURL:'',videoURL:'',rating:4.6,reviewCount:18,lat:5.605,lng:-0.185,phone:'+233240000002',bio:'Baby care',services:['Baby Care'],isAvailable:true},
       ];
     }
-
-    // calculate distance and filter by radius and online
     const cLat=clientLatLng.lat, cLng=clientLatLng.lng;
-    allNurses=nurses.map(n=>{
-      const dist = haversine(cLat,cLng, parseFloat(n.lat), parseFloat(n.lng));
-      return {...n, distance: dist, isOnline: true};
-    }).filter(n=> radius>=100 || n.distance<=radius )
-      .sort((a,b)=>a.distance-b.distance);
-
+    allNurses=nurses.map(n=>({...n, distance:haversine(cLat,cLng,parseFloat(n.lat),parseFloat(n.lng))})).filter(n=>radius>=100||n.distance<=radius).sort((a,b)=>a.distance-b.distance);
     renderNurses(allNurses);
     renderMapMarkers(allNurses);
-    document.getElementById('nearbyCount').textContent = `${allNurses.length} nearby online nurses within ${radius}km`;
-
-  }catch(e){
-    grid.innerHTML=`<div style="color:#fca5a5">Error: ${e.message}</div>`;
-  }
+    document.getElementById('nearbyCount').textContent=`${allNurses.length} nearby online nurses`;
+  }catch(e){ grid.innerHTML=`<div style="color:#fca5a5">${e.message}</div>`; }
 }
 window.searchNearbyNurses=searchNearbyNurses;
-window.searchNurses=searchNearbyNurses;
-
 function renderMapMarkers(nurses){
   if(!map) return;
   markers.forEach(m=>map.removeLayer(m)); markers=[];
   nurses.forEach(n=>{
-    const iconHtml=`<div style="position:relative;width:44px;height:44px"><img src="${n.photoURL||'icon-transparent-512.png'}" style="width:40px;height:40px;border-radius:50%;border:2px solid #22c55e;object-fit:cover"><div style="position:absolute;bottom:0;right:0;width:12px;height:12px;background:#22c55e;border:2px solid white;border-radius:50%"></div></div>`;
+    const iconHtml=`<div style="position:relative;width:44px;height:44px"><img src="${n.photoURL||'icon-transparent-512.png'}" style="width:40px;height:40px;border-radius:50%;border:2px solid #22c55e;object-fit:cover"></div>`;
     const icon=L.divIcon({html:iconHtml,className:'',iconSize:[44,44],iconAnchor:[22,22]});
     const m=L.marker([n.lat,n.lng],{icon}).addTo(map);
-    m.bindPopup(`<b>${n.fullName}</b><br>⭐ ${n.rating} (${n.reviewCount})<br>${n.distance.toFixed(1)}km away<br><small style="color:green">● Online</small>`);
-    m.on('click',()=>{ openDetailModal(n); });
+    m.bindPopup(`<b>${n.fullName}</b><br>⭐ ${n.rating} (${n.reviewCount})<br>${n.distance.toFixed(1)}km`);
+    m.on('click',()=>{ selectNurse(n); });
     markers.push(m);
   });
 }
-
 function renderNurses(nurses){
   const grid=document.getElementById('nurseGrid');
-  if(nurses.length===0){
-    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:#a78bfa">No online nurses nearby. Try larger radius.</div>';
-    return;
-  }
+  if(nurses.length===0){ grid.innerHTML='<div style="text-align:center;color:#a78bfa">No nurses nearby — try larger radius</div>'; return; }
   grid.innerHTML=nurses.map(n=>`
-    <div class="nurse-card ${selectedNurseId===n.uid?'selected':''}" onclick="openDetailModalById('${n.uid}')">
-      <div class="online-dot"></div>
+    <div class="nurse-card ${selectedNurseId===n.uid?'selected':''}" onclick="selectNurseById('${n.uid}')">
       <div style="display:flex;gap:12px;align-items:center">
-        <img src="${n.photoURL||'icon-transparent-512.png'}" class="nurse-photo" onerror="this.src='icon-transparent-512.png'">
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:900;color:#f3e8ff;font-size:13px;display:flex;align-items:center;gap:6px">${n.fullName} <span style="font-size:9px;background:#22c55e;color:white;padding:2px 6px;border-radius:99px">ONLINE</span></div>
-          <div class="rating">⭐ ${n.rating} <span style="color:#a78bfa;font-weight:600">(${n.reviewCount} reviews)</span></div>
-          <div style="font-size:10px;color:#a78bfa;margin-top:2px">📍 ${n.distance.toFixed(1)}km away • ${n.bio.slice(0,40)}...</div>
-        </div>
+        <img src="${n.photoURL||'icon-transparent-512.png'}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid rgba(168,85,247,.25)">
+        <div style="flex:1"><div style="font-weight:900;color:#f3e8ff">${n.fullName} <span class="badge online">ONLINE</span></div><div style="font-size:11px;color:#facc15">⭐ ${n.rating} (${n.reviewCount})</div><div style="font-size:10px;color:#a78bfa">📍 ${n.distance.toFixed(1)}km • ${n.bio.slice(0,40)}</div></div>
       </div>
-      ${n.videoURL?`<video class="video-thumb" muted loop playsinline poster="${n.photoURL}"><source src="${n.videoURL}" type="video/mp4"></video><div style="font-size:9px;color:#d8b4fe;margin-top:4px">▶️ Intro video • Tap card to watch</div>`: `<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${(n.services||[]).slice(0,2).map(s=>`<span class="badge">${s}</span>`).join('')}</div>`}
-      <div style="display:flex;gap:6px;margin-top:10px">
-        <button class="btnSmall" style="flex:1" onclick="event.stopPropagation(); openDetailModalById('${n.uid}')">👁️ View Photo, Video & Rating</button>
-        <button class="btnSmall" style="flex:1;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a" onclick="event.stopPropagation(); quickSelect('${n.uid}')">Select</button>
-      </div>
+      <div style="display:flex;gap:6px;margin-top:8px"><button class="btnSmall" style="flex:1" onclick="event.stopPropagation(); selectNurseById('${n.uid}')">Select</button></div>
     </div>
   `).join('');
 }
-
-window.openDetailModalById=(uid)=>{
-  const n=allNurses.find(x=>x.uid===uid);
-  if(n) openDetailModal(n);
-}
-
-function openDetailModal(n){
-  currentDetailNurse=n;
-  document.getElementById('detailPhoto').src=n.photoURL||'icon-transparent-512.png';
-  document.getElementById('detailName').textContent=n.fullName;
-  document.getElementById('detailRating').textContent=`⭐ ${n.rating} (${n.reviewCount} reviews)`;
-  document.getElementById('detailRatingBig').textContent=`${n.rating} ⭐`;
-  document.getElementById('detailReviews').textContent=n.reviewCount;
-  document.getElementById('detailDistance').textContent=`📍 ${n.distance.toFixed(1)}km away • Online now`;
-  document.getElementById('detailBio').textContent=n.bio||'Professional home nurse.';
-  document.getElementById('detailServices').innerHTML=(n.services||[]).map(s=>`<span class="badge">${s}</span>`).join('');
-  
-  const videoEl=document.getElementById('detailVideo');
-  const noVideo=document.getElementById('noVideoBox');
-  if(n.videoURL){
-    videoEl.src=n.videoURL;
-    videoEl.style.display='block';
-    noVideo.style.display='none';
-  }else{
-    videoEl.style.display='none';
-    noVideo.style.display='block';
-  }
-  document.getElementById('nurseDetailModal').classList.add('show');
-}
-window.openDetailModal=openDetailModal;
-
-window.closeDetailModal=()=>{
-  document.getElementById('nurseDetailModal').classList.remove('show');
-  const v=document.getElementById('detailVideo'); v.pause(); v.src='';
-}
-
-window.selectFromModal=()=>{
-  if(!currentDetailNurse) return;
-  selectNurse(currentDetailNurse);
-  closeDetailModal();
-  document.getElementById('nurseGrid').scrollIntoView({behavior:'smooth'});
-}
-
+window.selectNurseById=(uid)=>{ const n=allNurses.find(x=>x.uid===uid); if(n) selectNurse(n); }
 function selectNurse(n){
-  selectedNurseId=n.uid;
-  selectedNurseName=n.fullName;
-  selectedNursePhone=n.phone;
-  selectedNurseData=n;
+  selectedNurseId=n.uid; selectedNurseName=n.fullName; selectedNursePhone=n.phone; selectedNurseData=n;
   document.getElementById('selectedNurseInfo').textContent=`Selected: ${n.fullName} • ${n.distance.toFixed(1)}km • ⭐ ${n.rating}`;
   renderNurses(allNurses);
 }
-
-window.quickSelect=(uid)=>{
-  const n=allNurses.find(x=>x.uid===uid);
-  if(n) selectNurse(n);
-}
-
 async function loadClient(){
-  const uid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
+  const uid=localStorage.getItem('lcg_client_uid');
   try{ if(uid){ const snap=await getDoc(doc(db,'clients',uid)); if(snap.exists()) currentClient=snap.data(); } }catch(e){}
   document.getElementById('clientFullName').value=currentClient?.fullName||localStorage.getItem('clientName')||'';
   document.getElementById('clientPhone').value=currentClient?.phone||localStorage.getItem('clientPhone')||'';
   document.getElementById('clientEmail').value=currentClient?.email||localStorage.getItem('currentClientEmail')||'';
-  document.getElementById('clientAddress').value=currentClient?.actualLocationName||localStorage.getItem('lcg_client_gps_actual_name')||'';
-  document.getElementById('lat').value=currentClient?.lat||localStorage.getItem('lcg_client_lat')||'';
-  document.getElementById('lng').value=currentClient?.lng||localStorage.getItem('lcg_client_lng')||'';
-  if(document.getElementById('lat').value) clientLatLng={lat:parseFloat(document.getElementById('lat').value),lng:parseFloat(document.getElementById('lng').value)};
+}
+
+function calculateHoursFromTime(startStr, endStr){
+  if(!startStr||!endStr) return 0;
+  const [sh, sm] = startStr.split(':').map(Number);
+  const [eh, em] = endStr.split(':').map(Number);
+  let startMins = sh*60+sm;
+  let endMins = eh*60+em;
+  let diffMins = endMins - startMins;
+  if(diffMins<=0) diffMins+=24*60; // overnight e.g., 20:00 to 06:00
+  return diffMins/60; // hours decimal
 }
 
 window.calcTotal=()=>{
-  refreshSession();
   const mode=document.getElementById('careMode').value;
-  currentMode=mode;
+  const quantity=parseFloat(document.getElementById('quantity').value)||1;
+  const liveType=document.getElementById('liveType').value;
   const country=document.getElementById('countrySelect').value;
-  const rate=RATES[country]?.rate||50;
-  let hours=1; if(mode==='Daily') hours=8; if(mode==='Weekly') hours=40;
-  const total=rate*hours;
-  document.getElementById('totalDisplay').textContent=`${RATES[country].cur} ${total}`;
-  document.getElementById('minAmount').textContent=`${RATES[country].cur} ${total}`;
-  document.getElementById('modeDisplay').textContent=mode;
-  return {totalMin:total,totalHours:hours};
+  const transport=parseFloat(document.getElementById('transport').value)||0;
+  const startTime=document.getElementById('startTime').value;
+  const endTime=document.getElementById('endTime').value;
+  
+  const rateObj=hourlyRates[country]||hourlyRates['GH']||{hourly:50,cur:'GHS'};
+  const hourlyRate=rateObj.hourly;
+  
+  const hoursPerDay = calculateHoursFromTime(startTime, endTime);
+  
+  // Update hours per day display
+  document.getElementById('hoursPerDayDisplay').textContent = hoursPerDay>0 ? `${hoursPerDay.toFixed(1)} hrs/day` : 'Set time';
+  
+  if(hoursPerDay<=0){
+    document.getElementById('calcDisplay').innerHTML=`<b style="color:#fca5a5">Please set Start and End time to calculate hours</b>`;
+    return {total:0, baseTotal:0, totalHours:0, hourlyRate, rateObj, quantity, mode, liveType, hoursPerDay};
+  }
+  
+  let totalHours=0;
+  let explanation='';
+  
+  if(mode==='Hourly'){
+    // Hourly: hours per day x quantity (quantity = number of hours slots, or repeats)
+    totalHours = hoursPerDay * quantity;
+    explanation = `${hoursPerDay.toFixed(1)} hrs (from ${startTime} to ${endTime}) × ${quantity} = ${totalHours.toFixed(1)} hrs total`;
+  } else if(mode==='Daily'){
+    // Daily: hours per day x number of days
+    totalHours = hoursPerDay * quantity;
+    explanation = `${hoursPerDay.toFixed(1)} hrs/day × ${quantity} day(s) = ${totalHours.toFixed(1)} hrs total`;
+  } else if(mode==='Weekly'){
+    // Weekly: hours per day x 7 days x number of weeks
+    totalHours = hoursPerDay * 7 * quantity;
+    explanation = `${hoursPerDay.toFixed(1)} hrs/day × 7 days × ${quantity} week(s) = ${totalHours.toFixed(1)} hrs total`;
+  } else if(mode==='Monthly'){
+    // Monthly: hours per day x 30 days x number of months
+    totalHours = hoursPerDay * 30 * quantity;
+    explanation = `${hoursPerDay.toFixed(1)} hrs/day × 30 days × ${quantity} month(s) = ${totalHours.toFixed(1)} hrs total`;
+  }
+  
+  const baseTotal=hourlyRate*totalHours;
+  const total=baseTotal+transport;
+  
+  document.getElementById('totalDisplay').textContent=`${rateObj.cur} ${total.toFixed(2)}`;
+  document.getElementById('minAmount').textContent=`${rateObj.cur} ${total.toFixed(2)}`;
+  document.getElementById('payAmount').textContent=`${rateObj.cur} ${total.toFixed(2)}`;
+  document.getElementById('clientOffer').value=Math.round(total);
+  
+  document.getElementById('calcDisplay').innerHTML=`
+    <b>CEO Hourly Rate:</b> ${rateObj.cur} ${hourlyRate}/hr (set by CEO)<br>
+    <b>Work Hours:</b> ${startTime} → ${endTime} = <b style="color:#86efac">${hoursPerDay.toFixed(1)} hrs per day</b> (calculated from your time, no fixed 8 hrs)<br>
+    <b>Mode:</b> ${mode} • <b>Quantity:</b> ${quantity} • <b>Live:</b> ${liveType}<br>
+    <b>Calculation:</b> ${explanation}<br>
+    <b>Formula:</b> ${rateObj.cur} ${hourlyRate}/hr × ${totalHours.toFixed(1)} hrs = <b style="color:#86efac">${rateObj.cur} ${baseTotal.toFixed(2)}</b> ${transport>0?`+ Transport ${rateObj.cur} ${transport} = <b>Total ${rateObj.cur} ${total.toFixed(2)}</b>`:''}<br>
+    <small style="color:#6b7280">Example: Start 08:00 End 17:00 = 9 hrs. 3 days → 9×3=27 hrs × ₵${hourlyRate} = ₵${(hourlyRate*27).toFixed(2)}. Weekly 2 weeks → 9×7×2=126 hrs × rate.</small>
+  `;
+  
+  return {total, baseTotal, totalHours, hourlyRate, rateObj, quantity, mode, liveType, hoursPerDay, startTime, endTime};
 }
 
 function generateBookingID(){
@@ -430,46 +345,43 @@ function generateBookingID(){
 }
 
 window.bookSelectedNurse=async()=>{
-  refreshSession();
   const patientName=document.getElementById('patientName').value.trim();
   const clientName=document.getElementById('clientFullName').value.trim();
   const clientPhone=document.getElementById('clientPhone').value.trim();
-  const clientEmail=document.getElementById('clientEmail').value.trim()||localStorage.getItem('currentClientEmail')||'';
-  const {totalMin,totalHours}=calcTotal();
+  const clientEmail=document.getElementById('clientEmail').value.trim()||'';
+  const calc=calcTotal();
   const offer=parseFloat(document.getElementById('clientOffer').value||0);
-
-  if(!clientName||!clientPhone){ alert('Client info missing. Go to Dashboard.'); return; }
+  if(!clientName||!clientPhone){ alert('Client info missing'); return; }
   if(!patientName){ alert('Enter patient name'); return; }
-  if(!selectedNurseId){ alert('Please select a nurse from map/list. Tap a nurse to view video/photo/rating then Select.'); return; }
-  if(!offer||offer<totalMin){ alert('Offer below minimum'); return; }
-
+  if(!selectedNurseId){ alert('Select a nurse first'); return; }
+  if(calc.totalHours<=0){ alert('Please set valid Start and End time'); return; }
+  if(offer<calc.total){ alert('Offer below minimum '+calc.total.toFixed(2)); return; }
+  
   const bookingId=generateBookingID();
   const country=document.getElementById('countrySelect').value;
-  const rateObj=RATES[country]||RATES['GH'];
-  const clientPhotoURL=localStorage.getItem('clientPhotoURL')||currentClient?.photoURL||'';
-  const clientId=localStorage.getItem('lcg_client_uid')||'guest';
-  const lat=parseFloat(document.getElementById('lat').value)||clientLatLng.lat;
-  const lng=parseFloat(document.getElementById('lng').value)||clientLatLng.lng;
-
+  const lat=clientLatLng.lat; const lng=clientLatLng.lng;
+  
   const bookingData={
     id:bookingId, bookingId, bookingCode:bookingId, peculiarId:bookingId,
     patientName, patientAge:document.getElementById('patientAge').value, notes:document.getElementById('patientNotes').value,
-    clientName, fullName:clientName, email:clientEmail, clientEmail, phone:clientPhone, clientPhone, contactPhone:clientPhone,
-    address:document.getElementById('clientAddress').value, clientAddress:document.getElementById('clientAddress').value, clientData:currentClient, clientPhotoURL, clientId, clientLat:lat, clientLng:lng,
+    clientName, fullName:clientName, email:clientEmail, clientEmail, phone:clientPhone, clientPhone,
+    address:localStorage.getItem('lcg_client_gps_actual_name')||'', clientLat:lat, clientLng:lng,
     service:document.getElementById('serviceType').value, careType:document.getElementById('serviceType').value,
-    country, currency:rateObj.cur, totalHours, totalMin, clientOffer:offer, amount:offer, rate:rateObj.rate,
-    startTimeDaily:document.getElementById('startTime').value, endTimeDaily:document.getElementById('endTime').value, careMode:currentMode, duration:currentMode,
-    nurseId:selectedNurseId, nurseName:selectedNurseName, nursePhone:selectedNursePhone, nursePhotoURL:selectedNurseData?.photoURL||'', nurseRating:selectedNurseData?.rating||4.5, nurseReviewCount:selectedNurseData?.reviewCount||0, nurseVideoURL:selectedNurseData?.videoURL||'', nurseLat:selectedNurseData?.lat, nurseLng:selectedNurseData?.lng, nurseDistance:selectedNurseData?.distance,
-    time:Date.now(), timeStr:new Date().toLocaleString(), createdAt:Date.now(), status:'pending', payment_status:'paid', visible_to_nurse:true
+    country, currency:calc.rateObj.cur, totalHours:calc.totalHours, hoursPerDay:calc.hoursPerDay, totalMin:calc.total, clientOffer:offer, amount:offer, rate:calc.hourlyRate, hourlyRate:calc.hourlyRate,
+    careMode:calc.mode, quantity:calc.quantity, liveType:calc.liveType, transport:parseFloat(document.getElementById('transport').value)||0,
+    startTimeDaily:calc.startTime, endTimeDaily:calc.endTime, startTime:calc.startTime, endTime:calc.endTime,
+    nurseId:selectedNurseId, nurseName:selectedNurseName, nursePhone:selectedNursePhone,
+    time:Date.now(), createdAt:Date.now(), status:'pending', payment_status:'paid', visible_to_nurse:true,
+    pricingFormula:`${calc.rateObj.cur} ${calc.hourlyRate}/hr x ${calc.totalHours.toFixed(1)}hrs ( ${calc.hoursPerDay.toFixed(1)}hrs/day from ${calc.startTime}-${calc.endTime} x ${calc.mode} ${calc.quantity}) = ${calc.baseTotal.toFixed(2)} + transport ${calc.total-calc.baseTotal} = ${calc.total.toFixed(2)}`
   };
-
+  
   const handler=PaystackPop.setup({
     key:'pk_live_f17ae09bf855010825cbfccdda8e724553ab747b',
     email: clientEmail||'client@lovecareglobal.com',
     amount: Math.round(offer*100),
-    currency: ['GHS','NGN','ZAR','USD','GBP'].includes(rateObj.cur)?rateObj.cur:'GHS',
+    currency: ['GHS','NGN','ZAR','USD','GBP'].includes(calc.rateObj.cur)?calc.rateObj.cur:'GHS',
     ref: bookingId+"_"+Date.now(),
-    onClose:()=>{ document.getElementById('bookResult').innerHTML='<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);padding:12px;border-radius:12px;color:#f87171;font-weight:800">Payment cancelled</div>'; },
+    onClose:()=>{ document.getElementById('bookResult').innerHTML='<div style="background:rgba(239,68,68,.1);padding:12px;border-radius:12px;color:#f87171">Payment cancelled</div>'; },
     callback: async function(res){
       bookingData.paystackRef=res.reference; bookingData.paidAt=new Date().toISOString();
       try{
@@ -482,33 +394,26 @@ window.bookSelectedNurse=async()=>{
         localStorage.setItem('lastBookingId', bookingId);
       }catch(e){ alert('Save error: '+e.message); return; }
       document.getElementById('modalBookingId').textContent=bookingId;
-      document.getElementById('modalNurseInfo').textContent=`${selectedNurseName} will see this in My Job Offers • ${selectedNurseData?.distance?.toFixed(1)||''}km away`;
+      document.getElementById('modalNurseInfo').textContent=`${selectedNurseName} • ${calc.totalHours.toFixed(1)} hrs • ${calc.rateObj.cur} ${calc.total.toFixed(2)} • ${calc.hoursPerDay.toFixed(1)}hrs/day (${calc.startTime}-${calc.endTime}) × ${calc.mode} ${calc.quantity}`;
       document.getElementById('successModal').classList.add('show');
-      document.getElementById('bookResult').innerHTML=`<div style="background:rgba(168,85,247,.18);border:1px solid rgba(168,85,247,.22);padding:12px;border-radius:12px;color:#d8b4fe;font-weight:800">✅ Payment success! Booking ID ${bookingId} sent to ${selectedNurseName}. She can Accept/Reject in her dashboard.</div>`;
+      document.getElementById('bookResult').innerHTML=`<div style="background:rgba(168,85,247,.18);padding:12px;border-radius:12px;color:#d8b4fe">✅ Payment success! Booking ${bookingId} sent to ${selectedNurseName}. ${bookingData.pricingFormula}</div>`;
     }
   });
   handler.openIframe();
 };
 
-window.copyBookingId=()=>{ navigator.clipboard.writeText(document.getElementById('modalBookingId').textContent).then(()=>alert('Copied')); }
-
 window.useMyLocation=()=>{
   if(!navigator.geolocation){ alert('GPS not supported'); return; }
   navigator.geolocation.getCurrentPosition(pos=>{
     const lat=pos.coords.latitude, lng=pos.coords.longitude;
-    document.getElementById('lat').value=lat.toFixed(6); document.getElementById('lng').value=lng.toFixed(6);
     clientLatLng={lat,lng};
     initMap(lat,lng);
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`).then(r=>r.json()).then(d=>document.getElementById('clientAddress').value=d.display_name||'');
     searchNearbyNurses();
   },()=>alert('Location denied'),{enableHighAccuracy:true});
 }
 
-function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
-function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
-
 window.addEventListener('DOMContentLoaded', ()=>{
-  loadClient(); calcTotal();
+  loadClient(); loadRates(); calcTotal();
   const lat=parseFloat(localStorage.getItem('lcg_client_lat')||'5.6037'); const lng=parseFloat(localStorage.getItem('lcg_client_lng')||'-0.1870');
   initMap(lat,lng);
   searchNearbyNurses();
