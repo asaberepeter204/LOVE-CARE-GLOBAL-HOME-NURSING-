@@ -199,13 +199,44 @@ const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const rtdb=getDatabase(app);
 
-// 30 MIN GUARD
+// === FIXED SESSION LOGIC: DO NOT CLEAR AND KICK DURING BOOKING ===
+const SESSION_MS = 30*60*1000; // 30 min
+
+function refreshSession(){
+  // Sliding session: extend expiry on every interaction, but don't force logout here
+  localStorage.setItem('lcg_session_expiry', (Date.now() + SESSION_MS).toString());
+}
+
+// Check login but DO NOT clear storage if expired — just extend automatically for booking flow
 (function(){
-  const expiry=parseInt(localStorage.getItem('lcg_session_expiry')||'0');
-  if(!localStorage.getItem('lcg_logged_in') || Date.now()>expiry){
-    localStorage.clear();
-    location.replace('client-login.html');
+  const logged = localStorage.getItem('lcg_logged_in');
+  const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
+  const uid = localStorage.getItem('lcg_client_uid') || localStorage.getItem('currentClientId');
+  const expiry = parseInt(localStorage.getItem('lcg_session_expiry')||'0');
+
+  // If not logged at all -> go to login
+  if(!logged || logged!=='true' || !uid){
+    // But allow if they have client info in localStorage? still require login
+    if(!localStorage.getItem('clientName') && !localStorage.getItem('currentClientId')){
+      console.log('Not logged, redirecting');
+      // Don't clear, just redirect
+      window.location.replace('client-login.html');
+      return;
+    }
   }
+
+  // If session expired, AUTOMATICALLY EXTEND instead of kicking them
+  if(expiry && Date.now() > expiry){
+    console.log('Session expired, extending automatically for booking flow...');
+    refreshSession(); // extend 30 mins more so they can pay
+  } else {
+    refreshSession();
+  }
+
+  // Auto-refresh session on activity so 30 min counts from last activity, not login time
+  ['click','keydown','touchstart','input'].forEach(ev=>{
+    document.addEventListener(ev, refreshSession, {passive:true});
+  });
 })();
 
 const RATES={GH:{rate:50,cur:'GHS'},NG:{rate:5000,cur:'NGN'},ZA:{rate:250,cur:'ZAR'},US:{rate:25,cur:'USD'},GB:{rate:20,cur:'GBP'}};
@@ -215,6 +246,7 @@ let currentMode='Hourly';
 let map=null, markers=[];
 
 window.openNursePicker=()=>{
+  refreshSession();
   document.getElementById('mapWrap').classList.remove('hidden');
   document.getElementById('nurseList').classList.remove('hidden');
   setTimeout(()=>{ if(map) map.invalidateSize(); }, 300);
@@ -230,10 +262,10 @@ function initMap(lat=5.6037, lng=-0.1870){
 window.initMap=initMap;
 
 async function searchNurses(){
+  refreshSession();
   const list=document.getElementById('nurseList');
   list.innerHTML='<div style="padding:12px;color:#a78bfa">Loading nurses near you...</div>';
   try{
-    // Try RTDB nurses
     const snap=await get(child(ref(rtdb),'nurses'));
     let nurses=[];
     if(snap.exists()){
@@ -241,7 +273,6 @@ async function searchNurses(){
       nurses=Object.values(data).filter(n=>n.lat && n.lng);
     }
     if(nurses.length===0){
-      // fallback demo
       nurses=[
         {uid:'nurse1',fullName:'Ama Nurse',phone:'+233 24 000 0001',photoURL:'',lat:5.61,lng:-0.19,rating:4.8,reviewCount:24},
         {uid:'nurse2',fullName:'Kwesi Care',phone:'+233 24 000 0002',photoURL:'',lat:5.60,lng:-0.18,rating:4.6,reviewCount:18}
@@ -268,6 +299,7 @@ async function searchNurses(){
 window.searchNurses=searchNurses;
 
 function selectNurse(n, el){
+  refreshSession();
   document.querySelectorAll('.nurse-item').forEach(x=>x.classList.remove('selected'));
   el.classList.add('selected');
   selectedNurseId=n.uid||n.id;
@@ -278,23 +310,25 @@ function selectNurse(n, el){
 }
 
 async function loadClient(){
-  const uid=localStorage.getItem('lcg_client_uid');
+  const uid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
   try{
     if(uid){
       const snap=await getDoc(doc(db,'clients',uid));
       if(snap.exists()) currentClient=snap.data();
     }
   }catch(e){}
-  document.getElementById('clientFullName').value = currentClient?.fullName||localStorage.getItem('clientName')||'';
-  document.getElementById('clientPhone').value = currentClient?.phone||localStorage.getItem('clientPhone')||'';
-  document.getElementById('clientEmail').value = currentClient?.email||localStorage.getItem('currentClientEmail')||'';
-  document.getElementById('clientAddress').value = currentClient?.actualLocationName||localStorage.getItem('lcg_client_gps_actual_name')||'';
-  document.getElementById('lat').value = currentClient?.lat||localStorage.getItem('lcg_client_lat')||'';
-  document.getElementById('lng').value = currentClient?.lng||localStorage.getItem('lcg_client_lng')||'';
+  // Try multiple sources so payment works even if session expired
+  document.getElementById('clientFullName').value = currentClient?.fullName||localStorage.getItem('clientName')||localStorage.getItem('currentClientName')||localStorage.getItem('fullName')||'';
+  document.getElementById('clientPhone').value = currentClient?.phone||localStorage.getItem('clientPhone')||localStorage.getItem('currentClientPhone')||'';
+  document.getElementById('clientEmail').value = currentClient?.email||localStorage.getItem('currentClientEmail')||localStorage.getItem('clientEmail')||localStorage.getItem('email')||'';
+  document.getElementById('clientAddress').value = currentClient?.actualLocationName||localStorage.getItem('lcg_client_gps_actual_name')||localStorage.getItem('clientAddress')||'';
+  document.getElementById('lat').value = currentClient?.lat||localStorage.getItem('lcg_client_lat')||localStorage.getItem('lat')||'';
+  document.getElementById('lng').value = currentClient?.lng||localStorage.getItem('lcg_client_lng')||localStorage.getItem('lng')||'';
 }
 window.loadClient=loadClient;
 
 window.calcTotal=()=>{
+  refreshSession();
   const mode=document.getElementById('careMode').value;
   currentMode=mode;
   const country=document.getElementById('countrySelect').value;
@@ -310,6 +344,7 @@ window.calcTotal=()=>{
 }
 
 window.validateOffer=()=>{
+  refreshSession();
   const offer=parseFloat(document.getElementById('clientOffer').value||0);
   const {totalMin}=calcTotal();
   const el=document.getElementById('clientOffer');
@@ -317,17 +352,15 @@ window.validateOffer=()=>{
   else{ el.style.borderColor=''; }
 }
 
-// ===== PECULIAR BOOKING ID GENERATOR =====
 function generateBookingID(){
   const now=new Date();
   const yyyy=now.getFullYear();
   const mm=String(now.getMonth()+1).padStart(2,'0');
   const dd=String(now.getDate()).padStart(2,'0');
   const datePart=`${yyyy}${mm}${dd}`;
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no I,O,0,1 confusing
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let randomPart='';
   for(let i=0;i<6;i++) randomPart+=chars.charAt(Math.floor(Math.random()*chars.length));
-  // peculiar prefix LCG = Love Care Global
   return `LCG-${datePart}-${randomPart}`;
 }
 
@@ -338,115 +371,91 @@ window.copyBookingId=()=>{
 window.goToBookings=()=>{ location.href='my-bookings.html'; }
 
 window.bookNurse=async()=>{
+  refreshSession(); // Extend session right before payment
+
   const patientName=document.getElementById('patientName').value.trim();
-  const clientFullName=document.getElementById('clientFullName').value;
-  const clientPhone=document.getElementById('clientPhone').value;
-  const clientEmail=document.getElementById('clientEmail').value;
-  const clientAddress=document.getElementById('clientAddress').value;
+  const clientFullName=document.getElementById('clientFullName').value.trim();
+  const clientPhone=document.getElementById('clientPhone').value.trim();
+  const clientEmail=document.getElementById('clientEmail').value.trim();
+  const clientAddress=document.getElementById('clientAddress').value.trim();
   const offer=parseFloat(document.getElementById('clientOffer').value||0);
   const {totalMin, totalHours}=calcTotal();
 
-  if(!clientFullName||!clientPhone||!clientEmail){ alert('Login again'); return; }
+  // FIXED: Don't force login again, just use whatever info we have
+  if(!clientFullName || !clientPhone || !clientEmail){
+    // Try to reload from storage one more time
+    await loadClient();
+    const name2=document.getElementById('clientFullName').value.trim();
+    const phone2=document.getElementById('clientPhone').value.trim();
+    const email2=document.getElementById('clientEmail').value.trim();
+    if(!name2 || !phone2 || !email2){
+      alert('Client info missing. Please go back to Client Dashboard and come again, or fill your details manually.');
+      return;
+    }
+  }
+
   if(!patientName){ alert('Enter patient name'); return; }
   if(!offer||offer<totalMin){ alert('Offer below minimum'); return; }
   if(!selectedNurseId){ alert('Click Choose Nurse and select one on map first'); return; }
 
-  // Generate peculiar booking ID
   const bookingId=generateBookingID();
-  const bookingCode=bookingId; // alias for nurse dashboard
-
   const country=document.getElementById('countrySelect').value;
   const rateObj=RATES[country]||RATES['GH'];
   const clientPhotoURL=localStorage.getItem('clientPhotoURL')||currentClient?.photoURL||'';
-  const clientId=localStorage.getItem('lcg_client_uid')||"guest";
+  const clientId=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId')||"guest";
   const lat=parseFloat(document.getElementById('lat').value)||0;
   const lng=parseFloat(document.getElementById('lng').value)||0;
 
   const bookingData={
-    id:bookingId,
-    bookingId:bookingId,
-    bookingCode:bookingCode,
-    bookingID:bookingId,
-    peculiarId:bookingId,
-    patientName,
-    patientAge:document.getElementById('patientAge').value,
-    patientConcerns:patientName,
-    notes:document.getElementById('patientNotes').value,
-    clientName:clientFullName, fullName:clientFullName,
-    email:clientEmail, clientEmail,
-    phone:clientPhone, clientPhone,
-    contactPhone:clientPhone,
-    address:clientAddress, clientAddress,
-    clientData:currentClient,
-    clientPhotoURL,
-    clientId,
-    clientLat:lat, clientLng:lng,
-    service:document.getElementById('serviceType').value,
-    careType:document.getElementById('serviceType').value,
-    country, currency:rateObj.cur,
-    totalHours, totalMin, clientOffer:offer, amount:offer,
-    rate:rateObj.rate,
-    startTimeDaily:document.getElementById('startTime').value,
-    endTimeDaily:document.getElementById('endTime').value,
-    careMode:currentMode, duration:currentMode,
-    genderPref:document.getElementById('genderPref').value,
-    nurseId:selectedNurseId,
-    nurseName:selectedNurseName,
-    nursePhone:selectedNursePhone,
-    nursePhotoURL:selectedNurseData?.photoURL||'',
-    nurseRating:selectedNurseData?.rating||4.5,
-    nurseReviewCount:selectedNurseData?.reviewCount||0,
-    time:Date.now(),
-    timeStr:new Date().toLocaleString(),
-    createdAt:Date.now(),
-    createdAtISO:new Date().toISOString(),
-    status:'pending',
-    payment_status:'paid',
-    visible_to_nurse:true,
-    hasVoiceNote:false
+    id:bookingId, bookingId:bookingId, bookingCode:bookingId, bookingID:bookingId, peculiarId:bookingId,
+    patientName, patientAge:document.getElementById('patientAge').value, patientConcerns:patientName, notes:document.getElementById('patientNotes').value,
+    clientName:document.getElementById('clientFullName').value, fullName:document.getElementById('clientFullName').value,
+    email:document.getElementById('clientEmail').value, clientEmail:document.getElementById('clientEmail').value,
+    phone:document.getElementById('clientPhone').value, clientPhone:document.getElementById('clientPhone').value, contactPhone:document.getElementById('clientPhone').value,
+    address:clientAddress, clientAddress, clientData:currentClient, clientPhotoURL, clientId, clientLat:lat, clientLng:lng,
+    service:document.getElementById('serviceType').value, careType:document.getElementById('serviceType').value,
+    country, currency:rateObj.cur, totalHours, totalMin, clientOffer:offer, amount:offer, rate:rateObj.rate,
+    startTimeDaily:document.getElementById('startTime').value, endTimeDaily:document.getElementById('endTime').value,
+    careMode:currentMode, duration:currentMode, genderPref:document.getElementById('genderPref').value,
+    nurseId:selectedNurseId, nurseName:selectedNurseName, nursePhone:selectedNursePhone, nursePhotoURL:selectedNurseData?.photoURL||'', nurseRating:selectedNurseData?.rating||4.5, nurseReviewCount:selectedNurseData?.reviewCount||0,
+    time:Date.now(), timeStr:new Date().toLocaleString(), createdAt:Date.now(), createdAtISO:new Date().toISOString(),
+    status:'pending', payment_status:'paid', visible_to_nurse:true, hasVoiceNote:false
   };
 
   const handler=PaystackPop.setup({
     key: 'pk_live_f17ae09bf855010825cbfccdda8e724553ab747b',
-    email: clientEmail,
+    email: document.getElementById('clientEmail').value,
     amount: Math.round(offer*100),
     currency: ['GHS','NGN','ZAR','USD','GBP'].includes(rateObj.cur) ? rateObj.cur : 'GHS',
     ref: bookingId+"_"+Date.now(),
     onClose: function(){
-      document.getElementById('bookResult').innerHTML=`<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);padding:12px;border-radius:12px;color:#f87171;font-weight:800">Payment Cancelled - Booking NOT saved. Booking ID ${bookingId} discarded.</div>`;
+      document.getElementById('bookResult').innerHTML=`<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);padding:12px;border-radius:12px;color:#f87171;font-weight:800">Payment Cancelled - Booking NOT saved.</div>`;
     },
     callback: async function(response){
       bookingData.paystackRef=response.reference;
       bookingData.paidAt=new Date().toISOString();
       bookingData.paymentMethod="Paystack";
+      refreshSession(); // Keep session alive after payment
 
       try{
-        // Save locally
-        const phoneKey=clientPhone.replace(/[^0-9]/g,'');
+        const phoneKey=document.getElementById('clientPhone').value.replace(/[^0-9]/g,'');
         let arr=JSON.parse(localStorage.getItem('clientBookings_'+phoneKey)||'[]'); arr.push(bookingData); localStorage.setItem('clientBookings_'+phoneKey, JSON.stringify(arr));
         let all=JSON.parse(localStorage.getItem('clientBookings')||'[]'); all.push(bookingData); localStorage.setItem('clientBookings', JSON.stringify(all));
         localStorage.setItem('lastClientBooking', JSON.stringify(bookingData));
         localStorage.setItem('lastBookingId', bookingId);
         if(selectedNurseId){
           let nArr=JSON.parse(localStorage.getItem('nurseBookings_'+selectedNurseId)||'[]'); nArr.push(bookingData); localStorage.setItem('nurseBookings_'+selectedNurseId, JSON.stringify(nArr));
-          let nurseAll=JSON.parse(localStorage.getItem('nurseBookings')||'[]'); nurseAll.push(bookingData); localStorage.setItem('nurseBookings', JSON.stringify(nurseAll));
         }
-        let ceo=JSON.parse(localStorage.getItem('ceoBookings')||'[]'); ceo.push(bookingData); localStorage.setItem('ceoBookings', JSON.stringify(ceo));
-
-        // Save to Firebase RTDB with Booking ID as key
         await set(ref(rtdb,'bookings/'+bookingId), bookingData);
         await set(ref(rtdb,'bookingsById/'+bookingId), bookingData);
         if(selectedNurseId){
           await set(ref(rtdb,'nurseBookings/'+selectedNurseId+'/'+bookingId), bookingData);
-          await set(ref(rtdb,'nurses/'+selectedNurseId+'/bookings/'+bookingId), bookingData);
           await set(ref(rtdb,'myJobOffers/'+selectedNurseId+'/'+bookingId), bookingData);
           await set(ref(rtdb,'jobOffers/'+bookingId), bookingData);
         }
         await set(ref(rtdb,'clientBookings/'+phoneKey+'/'+bookingId), bookingData);
-
       }catch(e){ console.error('Save error',e); alert('Save error: '+e.message); return; }
 
-      // Show success modal with peculiar Booking ID
       document.getElementById('modalBookingId').textContent=bookingId;
       document.getElementById('successModal').classList.add('show');
       document.getElementById('bookResult').innerHTML=`<div style="background:rgba(168,85,247,.18);border:1px solid rgba(168,85,247,.22);padding:12px;border-radius:12px;color:#d8b4fe;font-weight:800">✅ Payment Successful! Ref: ${response.reference}<br>Booking ID: <b style="color:#f3e8ff;font-size:14px">${bookingId}</b> visible to nurse.</div>`;
