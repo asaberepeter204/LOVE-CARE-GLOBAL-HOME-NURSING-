@@ -23,13 +23,15 @@ body{font-family:system-ui;background:#f3f4f6;min-height:100vh;display:flex;flex
 .bar input{flex:1;min-width:60px;padding:10px 12px;border-radius:999px;border:1.5px solid #e5e7eb;outline:none}
 .btn{width:38px;height:38px;border-radius:50%;border:none;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .send{background:linear-gradient(135deg,#16a34a,#7c3aed);color:#fff}.media{background:#eff6ff;border:1px solid #e5e7eb}.cvBtn{background:#fef3c7;border:1px solid #fde68a}.micBtn{background:#f9fafb;border:1px solid #e5e7eb}.micBtn.rec{background:#fee2e2;animation:pulse 1s infinite}@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
-.ceoPanel{background:#fefce8;border:1px solid #fde68a;padding:8px 12px;display:none;gap:8px;align-items:center;flex-wrap:wrap}
-.ceoPanel.show{display:flex}
+.ceoPanel{display:none !important; /* REMOVED per CEO request — Master controls moved to CEO Dashboard */}
+.ceoPanel.show{display:none !important}
+.autoInfo{display:none !important}
+#blockManager{display:none !important; /* Block manager moved to CEO Dashboard */}
 .login{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}
 .card{background:#fff;padding:20px;border-radius:16px;border:1px solid #e5e7eb;max-width:380px;width:100%;text-align:center}
 .alert{padding:10px;border-radius:10px;font-size:12px;font-weight:700;margin:8px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;display:block}
 img.chatImg{max-width:180px;border-radius:10px;margin-top:6px;cursor:pointer}video.chatVid{max-width:220px;border-radius:10px;margin-top:6px}.fileBox{margin-top:6px;padding:8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;display:flex;gap:8px;align-items:center}.progress{height:5px;background:#e5e7eb;border-radius:999px;display:none}.progressBar{height:100%;background:linear-gradient(90deg,#7c3aed,#16a34a);width:0%}
-.autoInfo{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.15);padding:10px 12px;border-radius:10px;font-size:11px;color:#5b21b6;font-weight:700;margin:8px}
+.autoInfo{display:none !important; /* REMOVED per CEO request — no inscriptions in chat */}
 
 /* Block Manager Modal */
 #blockManager{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:12px}
@@ -179,20 +181,23 @@ async function initAutoLogin(){
   }
   curUser=session; curRole=session.role;
   loginWall.style.display='none'; inputBar.style.display='flex';
-  autoInfo.style.display='block';
-  autoInfo.innerHTML=`✅ Auto-logged in from main login — No second login needed<br>👤 ${curUser.name} (${curUser.email}) • Role: ${curRole.toUpperCase()} ${curRole==='ceo'?'👑':curRole==='nurse'?'👩‍⚕️':'👨‍💼'} • ${curUser.isApproved?'✅ Approved':'⏳ Pending'}<br><small style="color:#6b7280">Fixing Firebase Auth in background to allow sending (anonymous auth) — Fixes PERMISSION_DENIED</small>`;
-  document.getElementById('userBadge').textContent=`${curRole==='ceo'?'👑':curRole==='nurse'?'👩‍⚕️':'👨‍💼'} ${curUser.name} - ${curRole.toUpperCase()}`;
-  if(curRole==='ceo') ceoPanel.classList.add('show'); else ceoPanel.classList.remove('show');
-  if(CEO_EMAILS.includes(curUser.email.toLowerCase())){ curRole='ceo'; ceoPanel.classList.add('show'); curUser.role='ceo'; }
+  // REMOVED inscriptions per CEO request — clean chat, no autoInfo
+  autoInfo.style.display='none';
+  autoInfo.innerHTML='';
+  // CEO panel hidden — Master controls now at CEO Dashboard
+  ceoPanel.style.display='none';
+  ceoPanel.classList.remove('show');
+  // Badge hidden as well (clean chat)
+  const userBadge=document.getElementById('userBadge');
+  if(userBadge) userBadge.style.display='none';
+  if(CEO_EMAILS.includes(curUser.email.toLowerCase())){ curRole='ceo'; curUser.role='ceo'; }
   try{
     await ensureFirebaseAuth();
-    autoInfo.innerHTML+=`<br><small style="color:#22c55e">✅ Firebase Auth Ready — You can now chat (CEO) — Block Manager shows ALL nurses</small>`;
+    // No inscription shown — auth ready silently
   }catch(e){
-    autoInfo.innerHTML+=`<br><small style="color:#ef4444">⚠️ Firebase Auth not ready: ${e.message}</small>`;
+    console.log('Auth not ready', e);
   }
   startChat();
-  // Preload all nurses for block manager
-  if(curRole==='ceo') loadAllNurses();
 }
 
 async function startChat(){
@@ -240,8 +245,8 @@ function renderMsg(id,data){
     ${mediaHtml}
     <div id="editArea_${id}" style="display:none"></div>
     <div class=actions>
-      ${isMe||curRole==='ceo'?`<button class="actBtn edit" onclick="editMsg('${id}')">✏️ Edit</button><button class="actBtn del" onclick="deleteMsg('${id}')">🗑️ Delete</button>`:''}
-      ${curRole==='ceo'&&!isMe?`<button class="actBtn ${isBlocked?'unblock':'block'}" onclick="toggleBlock('${data.userId}','${(data.userName||'User').replace(/'/g,'')}')">${isBlocked?'✅ Unblock':'🚫 Block'}</button>`:''}
+      ${isMe?`<button class="actBtn edit" onclick="editMsg('${id}')">✏️ Edit</button><button class="actBtn del" onclick="deleteMsg('${id}')">🗑️ Delete</button>`:''}
+      <!-- Block/Unblock removed from chat — now at CEO Dashboard per CEO request -->
     </div>
   `;
   chat.appendChild(div);
