@@ -70,10 +70,28 @@ input:focus,select:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,2
 <h3 style="font-size:14px;color:#f3e8ff;margin-bottom:8px">💰 Booking Details — Hours from Start/End Time</h3>
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div><label>Client Name</label><input id="clientFullName" readonly></div>
-<div><label>Client Phone</label><input id="clientPhone" readonly></div>
+<div><label>Client Name</label><input id="clientFullName" placeholder="ASABERE PETER" readonly></div>
+<div>
+<label>Client Phone * — Nurse will get this at Job Offer (with country code)</label>
+<div style="display:flex;gap:6px">
+<select id="phoneCountryCode" style="width:110px;padding:12px 8px;border-radius:12px;background:rgba(14,10,28,.7);border:1px solid rgba(168,85,247,.18);color:#ede9fe;font-weight:800">
+<option value="+233" selected>🇬🇭 +233</option>
+<option value="+234">🇳🇬 +234</option>
+<option value="+27">🇿🇦 +27</option>
+<option value="+1">🇺🇸 +1</option>
+<option value="+44">🇬🇧 +44</option>
+<option value="+91">🇮🇳 +91</option>
+<option value="+971">🇦🇪 +971</option>
+<option value="+254">🇰🇪 +254</option>
+<option value="+256">🇺🇬 +256</option>
+</select>
+<input id="clientPhone" type="tel" placeholder="240000000 — Enter your phone" style="flex:1" oninput="savePhoneLocal()">
+</div>
+<small style="font-size:9px;color:#a78bfa">Full: <span id="fullPhoneDisplay" style="color:#86efac;font-weight:800">+233...</span> — This goes to nurse's My Job Offers</small>
+</div>
 </div>
 <input id="clientEmail" type="hidden">
+<input id="clientPhoneFull" type="hidden">
 
 <label>Patient Name *</label><input id="patientName" placeholder="Who needs care?">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -256,12 +274,104 @@ function selectNurse(n){
   document.getElementById('selectedNurseInfo').textContent=`Selected: ${n.fullName} • ${n.distance.toFixed(1)}km • ⭐ ${n.rating}`;
   renderNurses(allNurses);
 }
+function parsePhoneWithCode(raw){
+  if(!raw) return {code:'+233', number:''};
+  raw=raw.toString().trim();
+  // If raw already has +
+  if(raw.startsWith('+')){
+    // Find code: try longest matching codes from list
+    const codes=['+233','+234','+27','+44','+1','+91','+971','+254','+256'];
+    for(let c of codes.sort((a,b)=>b.length-a.length)){
+      if(raw.startsWith(c)){
+        return {code:c, number:raw.slice(c.length).replace(/^0+/,'')};
+      }
+    }
+    // fallback: first 4 chars as code
+    return {code:raw.slice(0,4), number:raw.slice(4).replace(/^0+/,'')};
+  }
+  // raw without +
+  raw=raw.replace(/[^0-9]/g,'');
+  if(raw.startsWith('233') && raw.length>9){ return {code:'+233', number:raw.slice(3).replace(/^0+/,'')}; }
+  if(raw.startsWith('234') && raw.length>10){ return {code:'+234', number:raw.slice(3).replace(/^0+/,'')}; }
+  return {code:'+233', number:raw.replace(/^0+/,'')};
+}
+
+window.getFullPhone=()=>{
+  const code=document.getElementById('phoneCountryCode')?.value||'+233';
+  let num=document.getElementById('clientPhone')?.value||'';
+  num=num.toString().trim().replace(/[^0-9]/g,'').replace(/^0+/,'');
+  const full = num ? code+num : '';
+  document.getElementById('clientPhoneFull').value=full;
+  const disp=document.getElementById('fullPhoneDisplay');
+  if(disp) disp.textContent=full||code+'...';
+  return full;
+}
+
+window.savePhoneLocal=()=>{
+  const full=getFullPhone();
+  if(full){
+    localStorage.setItem('clientPhone', full);
+    localStorage.setItem('lcg_client_phone', full);
+    localStorage.setItem('currentClientPhone', full);
+  }
+}
+
 async function loadClient(){
-  const uid=localStorage.getItem('lcg_client_uid');
-  try{ if(uid){ const snap=await getDoc(doc(db,'clients',uid)); if(snap.exists()) currentClient=snap.data(); } }catch(e){}
-  document.getElementById('clientFullName').value=currentClient?.fullName||localStorage.getItem('clientName')||'';
-  document.getElementById('clientPhone').value=currentClient?.phone||localStorage.getItem('clientPhone')||'';
-  document.getElementById('clientEmail').value=currentClient?.email||localStorage.getItem('currentClientEmail')||'';
+  const uid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId')||localStorage.getItem('lcg_uid');
+  try{ if(uid){ const snap=await getDoc(doc(db,'clients',uid)); if(snap.exists()) currentClient=snap.data(); } }catch(e){ console.log('client load error',e); }
+  
+  // Try many keys for name and phone - fix empty phone issue from screenshot
+  const nameSources=[
+    currentClient?.fullName, currentClient?.name, currentClient?.displayName,
+    localStorage.getItem('clientName'), localStorage.getItem('lcg_client_name'),
+    localStorage.getItem('currentClientName'), localStorage.getItem('lcg_name'),
+    localStorage.getItem('userName'), localStorage.getItem('fullName'),
+    'ASABERE PETER'
+  ];
+  const phoneSources=[
+    currentClient?.phone, currentClient?.phoneNumber, currentClient?.clientPhone, currentClient?.contactPhone,
+    localStorage.getItem('clientPhone'), localStorage.getItem('lcg_client_phone'),
+    localStorage.getItem('currentClientPhone'), localStorage.getItem('lcg_phone'),
+    localStorage.getItem('phone'), localStorage.getItem('phoneNumber'),
+    localStorage.getItem('currentPhone'), localStorage.getItem('userPhone')
+  ];
+  
+  let foundName=nameSources.find(v=>v && v.toString().trim().length>2)||'';
+  let rawPhone=phoneSources.find(v=>v && v.toString().trim().length>=7)||'';
+  
+  // Also check all localStorage for any phone-like
+  if(!rawPhone){
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k && k.toLowerCase().includes('phone')){
+        const v=localStorage.getItem(k);
+        if(v && v.replace(/[^0-9]/g,'').length>=9){ rawPhone=v; break; }
+      }
+    }
+  }
+  
+  document.getElementById('clientFullName').value=foundName||'';
+  document.getElementById('clientEmail').value=currentClient?.email||localStorage.getItem('currentClientEmail')||localStorage.getItem('clientEmail')||localStorage.getItem('lcg_email')||'';
+  
+  if(rawPhone){
+    const parsed=parsePhoneWithCode(rawPhone);
+    document.getElementById('phoneCountryCode').value=parsed.code;
+    document.getElementById('clientPhone').value=parsed.number;
+    getFullPhone();
+  } else {
+    // Keep Ghana default, leave number empty for client to enter
+    document.getElementById('phoneCountryCode').value='+233';
+    getFullPhone();
+  }
+  
+  // If still empty after all tries, make it editable and focus
+  setTimeout(()=>{
+    const phoneInput=document.getElementById('clientPhone');
+    if(!phoneInput.value){
+      phoneInput.placeholder='Enter your phone — e.g., 240000000';
+      phoneInput.style.borderColor='#f59e0b';
+    }
+  }, 500);
 }
 
 function calculateHoursFromTime(startStr, endStr){
@@ -347,11 +457,13 @@ function generateBookingID(){
 window.bookSelectedNurse=async()=>{
   const patientName=document.getElementById('patientName').value.trim();
   const clientName=document.getElementById('clientFullName').value.trim();
-  const clientPhone=document.getElementById('clientPhone').value.trim();
+  const clientPhoneRaw=document.getElementById('clientPhone').value.trim();
+  const clientPhoneFull=getFullPhone(); // with country code e.g., +233240000000
   const clientEmail=document.getElementById('clientEmail').value.trim()||'';
   const calc=calcTotal();
   const offer=parseFloat(document.getElementById('clientOffer').value||0);
-  if(!clientName||!clientPhone){ alert('Client info missing'); return; }
+  if(!clientName){ alert('Client name missing — Please login again'); return; }
+  if(!clientPhoneRaw || !clientPhoneFull){ alert('Client phone missing — Enter your phone with country code (e.g., +233) — Nurse needs it to contact you'); document.getElementById('clientPhone').focus(); return; }
   if(!patientName){ alert('Enter patient name'); return; }
   if(!selectedNurseId){ alert('Select a nurse first'); return; }
   if(calc.totalHours<=0){ alert('Please set valid Start and End time'); return; }
@@ -360,11 +472,15 @@ window.bookSelectedNurse=async()=>{
   const bookingId=generateBookingID();
   const country=document.getElementById('countrySelect').value;
   const lat=clientLatLng.lat; const lng=clientLatLng.lng;
+  const phoneCountryCode=document.getElementById('phoneCountryCode').value;
   
   const bookingData={
     id:bookingId, bookingId, bookingCode:bookingId, peculiarId:bookingId,
     patientName, patientAge:document.getElementById('patientAge').value, notes:document.getElementById('patientNotes').value,
-    clientName, fullName:clientName, email:clientEmail, clientEmail, phone:clientPhone, clientPhone,
+    clientName, fullName:clientName, 
+    email:clientEmail, clientEmail, 
+    phone:clientPhoneFull, clientPhone:clientPhoneFull, contactPhone:clientPhoneFull, clientPhoneRaw:clientPhoneRaw,
+    phoneCountryCode:phoneCountryCode, clientPhoneWithCode:clientPhoneFull, clientPhoneDisplay:clientPhoneFull,
     address:localStorage.getItem('lcg_client_gps_actual_name')||'', clientLat:lat, clientLng:lng,
     service:document.getElementById('serviceType').value, careType:document.getElementById('serviceType').value,
     country, currency:calc.rateObj.cur, totalHours:calc.totalHours, hoursPerDay:calc.hoursPerDay, totalMin:calc.total, clientOffer:offer, amount:offer, rate:calc.hourlyRate, hourlyRate:calc.hourlyRate,
@@ -385,18 +501,21 @@ window.bookSelectedNurse=async()=>{
     callback: async function(res){
       bookingData.paystackRef=res.reference; bookingData.paidAt=new Date().toISOString();
       try{
-        const phoneKey=clientPhone.replace(/[^0-9]/g,'');
+        const phoneKey=clientPhoneFull.replace(/[^0-9]/g,''); // with country code for nurse to get
         await set(ref(rtdb,'bookings/'+bookingId), bookingData);
         await set(ref(rtdb,'nurseBookings/'+selectedNurseId+'/'+bookingId), bookingData);
         await set(ref(rtdb,'myJobOffers/'+selectedNurseId+'/'+bookingId), bookingData);
         await set(ref(rtdb,'jobOffers/'+bookingId), bookingData);
         await set(ref(rtdb,'clientBookings/'+phoneKey+'/'+bookingId), bookingData);
+        // Save phone for future bookings
+        localStorage.setItem('clientPhone', clientPhoneFull);
+        localStorage.setItem('lcg_client_phone', clientPhoneFull);
         localStorage.setItem('lastBookingId', bookingId);
       }catch(e){ alert('Save error: '+e.message); return; }
       document.getElementById('modalBookingId').textContent=bookingId;
-      document.getElementById('modalNurseInfo').textContent=`${selectedNurseName} • ${calc.totalHours.toFixed(1)} hrs • ${calc.rateObj.cur} ${calc.total.toFixed(2)} • ${calc.hoursPerDay.toFixed(1)}hrs/day (${calc.startTime}-${calc.endTime}) × ${calc.mode} ${calc.quantity}`;
+      document.getElementById('modalNurseInfo').textContent=`${selectedNurseName} • ${calc.totalHours.toFixed(1)} hrs • ${calc.rateObj.cur} ${calc.total.toFixed(2)} • ${calc.hoursPerDay.toFixed(1)}hrs/day (${calc.startTime}-${calc.endTime}) × ${calc.mode} ${calc.quantity} • Client: ${clientPhoneFull}`;
       document.getElementById('successModal').classList.add('show');
-      document.getElementById('bookResult').innerHTML=`<div style="background:rgba(168,85,247,.18);padding:12px;border-radius:12px;color:#d8b4fe">✅ Payment success! Booking ${bookingId} sent to ${selectedNurseName}. ${bookingData.pricingFormula}</div>`;
+      document.getElementById('bookResult').innerHTML=`<div style="background:rgba(168,85,247,.18);padding:12px;border-radius:12px;color:#d8b4fe">✅ Payment success! Booking ${bookingId} sent to ${selectedNurseName}. Phone ${clientPhoneFull} sent to nurse Job Offer. ${bookingData.pricingFormula}</div>`;
     }
   });
   handler.openIframe();
@@ -417,6 +536,8 @@ window.addEventListener('DOMContentLoaded', ()=>{
   const lat=parseFloat(localStorage.getItem('lcg_client_lat')||'5.6037'); const lng=parseFloat(localStorage.getItem('lcg_client_lng')||'-0.1870');
   initMap(lat,lng);
   searchNearbyNurses();
+  // Country code change updates full phone
+  document.getElementById('phoneCountryCode')?.addEventListener('change', ()=>{ getFullPhone(); savePhoneLocal(); });
 });
 </script>
 </body>
