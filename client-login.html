@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Login — LOVE CARE GLOBAL</title>
+<title>Client Login</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="icon-transparent-512.png">
 <script>
@@ -25,70 +25,74 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
 .bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.wrap{width:100%;max-width:440px;padding:16px;position:relative;z-index:1}
-.card{background:rgba(28,18,56,.88);border:1px solid rgba(168,85,247,.18);border-radius:24px;padding:26px;backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(0,0,0,.6)}
-.logoWrap{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;margin:0 auto 12px;font-size:30px;box-shadow:0 8px 24px rgba(168,85,247,.35)}
-h1{text-align:center;font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:22px;color:#f3e8ff}
-.sub{text-align:center;font-size:11px;color:#a78bfa;margin:6px 0 18px;font-weight:600}
-label{font-size:11px;font-weight:800;margin:12px 0 6px;display:block;color:#d8b4fe;letter-spacing:.04em;text-transform:uppercase}
+.wrap{width:100%;max-width:420px;padding:16px;position:relative;z-index:1}
+.card{background:rgba(28,18,56,.88);border:1px solid rgba(168,85,247,.18);border-radius:24px;padding:28px 26px 22px;backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#a855f7,#d8b4fe);margin:0 auto 18px;display:block;box-shadow:0 8px 24px rgba(168,85,247,.35)}
+h1{text-align:center;font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:20px;color:#f3e8ff;letter-spacing:-.02em}
+.label{font-size:10px;font-weight:800;margin:16px 0 6px;display:block;color:#9f8ac0;letter-spacing:.08em;text-transform:uppercase}
 .inputWrap{position:relative}
-input{width:100%;padding:13px 44px 13px 14px;border-radius:14px;border:1.5px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);font-size:13px;outline:none;color:#f3e8ff}
+input{width:100%;padding:13px 44px 13px 14px;border-radius:14px;border:1.5px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);font-size:13.5px;outline:none;color:#f3e8ff;transition:.2s}
 input::placeholder{color:#6b5b8a}
 input:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-shadow:0 0 0 3px rgba(168,85,247,.18)}
 .eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.18);width:36px;height:36px;border-radius:12px;cursor:pointer;display:grid;place-items:center}
 .btn{width:100%;padding:13px;border-radius:14px;font-weight:800;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:12px;transition:.2s;text-decoration:none}
 .btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35);font-weight:900}
-.btnDark{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);color:#e9d5ff}
-.btnGoogle{background:#fff;color:#111827}
-.divider{display:flex;align-items:center;gap:12px;margin:14px 0;color:#6b5b8a;font-size:11px;font-weight:800}
-.divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(168,85,247,.15)}
-.gpsCard{background:rgba(76,29,149,.12);border:1px solid rgba(168,85,247,.18);border-radius:14px;padding:12px;margin-top:12px}
-#msg{font-size:11px;margin-top:12px;text-align:center;min-height:18px;font-weight:700;padding:10px;border-radius:10px;display:none}
+.btnPrimary:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(168,85,247,.45)}
+.btnDark{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);color:#c4b5e3}
+.btnDark:hover{background:rgba(14,10,28,1);border-color:rgba(168,85,247,.3)}
+.btnGoogle{background:#fff;color:#111827;border:1px solid #e5e7eb}
+.btnGoogle:hover{background:#f9fafb}
+.divider{display:flex;align-items:center;gap:12px;margin:18px 0;height:1px;background:rgba(168,85,247,.15)}
+.gps{display:none} /* keep functional but hidden - no inscription */
+#msg{font-size:11px;margin-top:14px;text-align:center;min-height:18px;font-weight:700;padding:10px;border-radius:10px;display:none}
 #msg.show{display:block}
 .success{color:#a7f3d0!important;background:rgba(16,185,129,.12)!important;border:1px solid rgba(16,185,129,.2)}
 .error{color:#fca5a5!important;background:rgba(239,68,68,.12)!important;border:1px solid rgba(239,68,68,.2)}
 .blocked{color:#fde68a!important;background:rgba(245,158,11,.15)!important;border:1px solid rgba(245,158,11,.3)}
+.row{display:flex;gap:8px;margin-top:8px}
+.row a{flex:1}
 </style>
 </head>
 <body>
 <div class="bg"></div>
 <div class="wrap"><div class="card">
-<div class="logoWrap">👤</div>
+
+<div class="logo"></div>
 <h1>Client Login</h1>
-<p class="sub">LOVE CARE GLOBAL HOME NURSING • 30 Min Session</p>
 
 <button class="btn btnGoogle" onclick="googleLogin()">
 <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.3-5.7 7.5-11.3 7.5-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l6-6C34.7 5.1 29.7 3 24 3 12.3 3 2.7 12.6 2.7 24S12.3 45 24 45c10.5 0 21-7.2 21-21 0-1.4-.2-2.7-.4-3.5z"/></svg>
 Continue with Google
 </button>
 
-<div class="divider">OR</div>
+<div class="divider"></div>
 
-<label>Email Address</label>
-<input id="email" type="email" placeholder="client@email.com">
-<label>Password</label>
+<span class="label">Email Address</span>
+<input id="email" type="email" placeholder="email@example.com">
+
+<span class="label">Password</span>
 <div class="inputWrap">
-<input id="password" type="password" placeholder="Enter your password">
+<input id="password" type="password" placeholder="••••••••">
 <button class="eyeBtn" type="button" onclick="toggleEye('password',this)">
 <svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 <svg class="eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.53 9.53A3 3 0 0 0 12 15a3 3 0 0 0 2.47-4.47"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
 </button>
 </div>
 
-<div class="gpsCard">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<b style="font-size:11px;color:#d8b4fe">📍 Your Location</b>
-<span id="gpsName" style="color:#a78bfa;font-weight:700;font-size:10px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Detecting...</span>
-</div>
-<div id="latlng" style="font-size:10px;color:#6b5b8a;margin-top:4px"></div>
+<!-- GPS functional but no inscriptions -->
+<div class="gps">
+  <span id="gpsName"></span>
+  <span id="latlng"></span>
 </div>
 
-<button class="btn btnPrimary" onclick="emailLogin()">🔐 Login to Dashboard</button>
-<a href="client-register.html" class="btn btnDark">📝 Create Client Account</a>
-<div style="display:flex;gap:8px;margin-top:8px">
-<a href="index.html" class="btn btnDark" style="flex:1">🏠 Home</a>
-<a href="nurse-login.html" class="btn btnDark" style="flex:1">👩‍⚕️ Nurse</a>
+<button class="btn btnPrimary" onclick="emailLogin()">Login</button>
+<a href="client-register.html" class="btn btnDark">Create Account</a>
+
+<div class="row">
+<a href="index.html" class="btn btnDark">Home</a>
+<a href="nurse-login.html" class="btn btnDark">Nurse</a>
 </div>
+
 <div id="msg"></div>
 </div></div>
 
@@ -144,13 +148,11 @@ window.toggleEye=(id,btn)=>{
 window.getGPS=()=>{
   navigator.geolocation.getCurrentPosition(async pos=>{
     currentLat=pos.coords.latitude; currentLng=pos.coords.longitude;
-    document.getElementById('latlng').textContent=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`;
     try{
       const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}`);
       const d=await r.json();
       currentGPSName=d.display_name||`${currentLat},${currentLng}`;
-      document.getElementById('gpsName').textContent=currentGPSName.slice(0,60);
-    }catch{ currentGPSName=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`; document.getElementById('gpsName').textContent=currentGPSName;}
+    }catch{ currentGPSName=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`; }
   },()=>{}, {enableHighAccuracy:true});
 }
 async function isNurseOnly(uid){
@@ -171,7 +173,7 @@ window.emailLogin=async()=>{
     const check = await isNurseOnly(user.uid);
     if(check.isNurse && !check.isClient){
       await signOut(auth); localStorage.clear();
-      showMsg('⛔ This email is registered as NURSE. Use Nurse Login.','blocked');
+      showMsg('This email is registered as Nurse. Use Nurse Login.','blocked');
       return;
     }
     let data = check.clientData;
@@ -180,7 +182,7 @@ window.emailLogin=async()=>{
       await setDoc(doc(db,'clients',user.uid), data, {merge:true});
     }
     setSession(user, data||{});
-    showMsg('✅ Success! Redirecting (30 min session)','success');
+    showMsg('Success! Redirecting...','success');
     setTimeout(()=>{ location.href='client-dashboard.html'; }, 700);
   }catch(e){showMsg(e.code==='auth/invalid-credential'?'Invalid credentials':'Login failed: '+e.message,'error');}
 }
@@ -193,7 +195,7 @@ window.googleLogin=async()=>{
     const check = await isNurseOnly(user.uid);
     if(check.isNurse && !check.isClient){
       await signOut(auth); localStorage.clear();
-      showMsg('⛔ This Google account is registered as NURSE. Use Nurse Login.','blocked');
+      showMsg('This Google account is registered as Nurse. Use Nurse Login.','blocked');
       return;
     }
     let data = check.clientData;
@@ -202,7 +204,7 @@ window.googleLogin=async()=>{
       await setDoc(doc(db,'clients',user.uid), data, {merge:true});
     }
     setSession(user, data||{});
-    showMsg('✅ Google success! Redirecting...','success');
+    showMsg('Google success! Redirecting...','success');
     setTimeout(()=>{ location.href='client-dashboard.html'; }, 700);
   }catch(e){showMsg('Google login failed: '+e.message,'error');}
 }
