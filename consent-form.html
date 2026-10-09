@@ -1,45 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Consent & Permissions - LOVE CARE GLOBAL HOME NURSING</title>
-<style>body{font-family:'Segoe UI',Arial,sans-serif;line-height:1.9;margin:0;background:#f8f9ff;color:#222}.container{max-width:850px;margin:0 auto;padding:40px 20px;background:#fff}h1{color:#7c3aed;border-bottom:3px solid #7c3aed;padding-bottom:12px}h2{color:#4c1d95;margin-top:35px}.meta{background:#f3f0ff;padding:20px;border-radius:10px;margin:25px 0;border-left:5px solid #7c3aed}a{color:#7c3aed;font-weight:bold}</style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Consent Form - LOVE CARE GLOBAL HOME NURSING</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.delete{border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.08);color:#fca5a5}
+.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+.wrap{max-width:900px;margin:0 auto;padding:20px 14px 80px}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:14px}
+h1{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:22px;color:#f3e8ff;margin-bottom:6px;border-bottom:2px solid rgba(168,85,247,.3);padding-bottom:10px}
+h2{font-size:16px;color:#f3e8ff;margin:24px 0 10px;background:rgba(76,29,149,.2);padding:8px 12px;border-radius:10px;border-left:3px solid #a855f7}
+p,li{font-size:13px;color:#c4b5fd;line-height:1.8}
+ul,ol{margin:8px 0 12px 18px}
+.badge{display:inline-flex;background:rgba(168,85,247,.18);color:#d8b4fe;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid rgba(168,85,247,.18)}
+</style>
 </head>
 <body>
-<div class="container">
-<h1>User Consent and Permissions</h1>
-<div class="meta">
-<p><strong>App:</strong> LOVE CARE GLOBAL HOME NURSING</p>
-<p><strong>Website:</strong> https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
-<p><strong>Last Updated:</strong> October 5, 2026</p>
+<div class="bg"></div>
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
+</div>
+<a href="sos.html" class="sosBtn">SOS</a>
+</div>
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">Home</a>
+<a class="item " href="about.html">About</a>
+<a class="item " href="services.html">Services</a>
+<a class="item " href="how-it-works.html">How It Works</a>
+<a class="item " href="contact.html">Contact</a>
+<a class="item active" href="consent-form.html">Consent Form</a>
+<a class="item " href="privacy.html">Privacy</a>
+<a class="item " href="terms.html">Terms</a>
+<a class="item " href="refund.html">Refund</a>
+<a class="item delete " href="delete-account.html">🗑️ Delete Account</a>
+<a class="item sos" href="sos.html">SOS</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
 </div>
 
-<p>By downloading and using LOVE CARE GLOBAL HOME NURSING, you provide explicit consent for the data collection and usage described below, in compliance with Ghana Data Protection Act 2012 (Act 843) and Google Play Developer Policies.</p>
+<div class="wrap">
+<span class="badge">Consent Form - Required Before Care</span>
+<div class="card" style="margin-top:12px">
 
-<h2>1. Consent to Data Collection</h2>
-<p>You consent to collection of personal information (name, phone, email, location), health-related information necessary for care (condition, medications, allergies), device information, and usage data. Health information is considered sensitive and is only collected with your explicit checkbox consent during booking.</p>
+<h1>Consent Form - LOVE CARE GLOBAL HOME NURSING</h1>
+<p><b>Must be signed before care begins.</b></p>
+<h2>Patient Consent</h2><p>I consent to receive home nursing care from a verified nurse assigned via LOVE CARE GLOBAL. I understand hourly pricing, Start/End time, quantity, and total hours calculation. I provide accurate health information, address, GPS, phone with country code.</p>
+<h2>Responsibilities</h2><ul><li>Provide safe environment, accommodation for live-in, meals, rest area</li><li>Allow nurse to provide care as booked</li><li>Pay via Paystack, Booking ID is proof</li></ul>
+<h2>Nurse Consent</h2><p>I consent to provide professional care as per service booked, keep confidentiality, arrive on time, no extra charges, use SOS if emergency.</p>
+<h2>Data Consent</h2><p>I consent to collection of name, phone, email, GPS actual name, photo, health info for care, booking history, stored in Firebase (RTDB + Firestore) with auth != null rules, Anonymous auth enabled, as per Privacy Policy.</p>
+<h2>Deletion Consent</h2><p>I understand I can delete account at delete-account.html with reason, GPS actual name saved to deletion_logs for 90 days.</p>
+<p style="margin-top:16px"><b>Sign by booking - booking implies consent. For paper form, contact CEO.</b></p>
 
-<h2>2. Consent to Location</h2>
-<p>Our app requires location permission (ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION) to: show nearby nurses, calculate distance and cost, allow nurse to navigate to your home, and for safety tracking during service. Location is collected only when you request a service or when a service is ongoing. You can deny location but you must manually enter address, which may delay service.</p>
-
-<h2>3. Consent to Communications</h2>
-<p>You consent to receive SMS, email, WhatsApp, and push notifications regarding booking confirmations, nurse arrival, OTP codes, payment receipts, and service updates. You can disable marketing notifications in settings but transactional notifications cannot be disabled for safety.</p>
-
-<h2>4. Consent to Data Sharing with Nurses</h2>
-<p>You consent that when you book a service, your name, phone, address, and care requirements will be shared with the assigned verified nurse solely to deliver the service. Nurses are bound by confidentiality agreements and are prohibited from sharing your data.</p>
-
-<h2>5. Consent to Photos and Records</h2>
-<p>With your permission, nurses may take photos of wounds (with consent) for medical documentation. These are stored securely and shared only with you and authorized medical personnel you approve.</p>
-
-<h2>6. Withdrawal of Consent</h2>
-<p>You may withdraw consent at any time by deleting your account via app or emailing lovecareglobal@gmail.com. Withdrawal does not affect lawfulness of processing before withdrawal. If you withdraw consent for essential data (like location or phone), we may not be able to provide services.</p>
-
-<h2>7. Age Consent</h2>
-<p>By using this app, you confirm you are 18+ or have parent/guardian consent. For patients under 18 or elderly without capacity, consent must be provided by legal guardian.</p>
-
-<p>Questions? Contact: lovecareglobal@gmail.com | https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/contact.html</p>
-
-<p><a href="index.html">← Back to Home</a></p>
+<div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(168,85,247,.12);display:flex;gap:10px;flex-wrap:wrap">
+<a href="index.html" style="padding:10px 16px;border-radius:12px;background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none">← Back to Home</a>
+<a href="delete-account.html" style="padding:10px 16px;border-radius:12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5;text-decoration:none">Delete Account Policy</a>
 </div>
+</div>
+</div>
+<script>
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
 </body>
 </html>
