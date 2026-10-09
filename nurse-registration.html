@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Registration — CEO Approval Required | LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.wrap{width:100%;max-width:540px;position:relative;z-index:1}
+.card{background:rgba(28,18,56,.88);border:1px solid rgba(168,85,247,.18);border-radius:24px;padding:22px;backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-weight:900;margin:0 auto 10px;font-size:24px;color:#1e0a3a}
+h1{text-align:center;font-weight:800;font-size:20px;color:#f3e8ff;font-family:Plus Jakarta Sans,sans-serif}
+.sub{text-align:center;font-size:11px;color:#a78bfa;margin:6px 0 14px;line-height:1.5}
+label{font-size:11px;font-weight:800;margin:10px 0 5px;display:block;color:#c4b5fd;letter-spacing:.04em;text-transform:uppercase}
+.inputWrap{position:relative}
+input,select,textarea{width:100%;padding:12px 42px 12px 12px;border-radius:12px;border:1.5px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);color:#f3e8ff;font-size:13px;outline:none}
+select,textarea{padding-right:12px}
+textarea{resize:vertical;min-height:70px}
+input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.18);background:rgba(14,10,28,.9)}
+.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.18);width:34px;height:34px;border-radius:10px;cursor:pointer;display:grid;place-items:center}
+.btn{width:100%;padding:13px;border-radius:12px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:10px;text-decoration:none;transition:.2s}
+.btn:hover{transform:translateY(-1px)}
+.btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35)}
+.btnLight{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);color:#e9d5ff}
+.btnGoogle{background:#ffffff;color:#111827;border:1px solid rgba(0,0,0,.08)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:500px){.grid2{grid-template-columns:1fr}}
+.fileBox{background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.25);border-radius:12px;padding:10px;margin-top:6px}
+.fileBox input{padding:8px;background:transparent;border:none}
+.req{color:#f87171}
+.alert{padding:10px;border-radius:10px;font-size:11px;font-weight:700;margin:8px 0;border:1px solid}
+.alert-info{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);color:#93c5fd}
+.alert-warn{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.25);color:#fcd34d}
+.alert-success{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25);color:#86efac}
+.alert-error{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);color:#fca5a5}
+.progress{height:4px;background:rgba(76,29,149,.2);border-radius:999px;display:none;margin-top:8px}.progressBar{height:100%;background:linear-gradient(90deg,#a855f7,#d8b4fe);width:0%;border-radius:999px;transition:.3s}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap"><div class="card">
+<div class="logo">👩‍⚕️</div>
+<h1>Nurse Registration — CEO Approval</h1>
+<p class="sub">All registrations go to CEO (lovecareglobal@gmail.com). CEO will view your CV, Licence, Certificate, Photo, Video, National ID and Accept/Reject. You can login ONLY after CEO approves.<br>LOVE CARE GLOBAL • 8 Countries • GPS Actual Name Required</p>
+
+<div class="alert alert-warn">⚠️ <b>CEO Approval Required:</b> After registration, your account is <b>PENDING</b>. CEO must review your particulars and Approve before you can login as nurse.</div>
+
+<button class="btn btnGoogle" onclick="googleRegister()">
+<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+Continue with Google — CEO Approval Still Required
+</button>
+
+<div style="text-align:center;margin:12px 0;color:#6b5b8a;font-size:11px;font-weight:800">OR REGISTER WITH EMAIL — ALL PARTICULARS</div>
+
+<label>Full Name <span class="req">*</span></label>
+<input id="fullName" type="text" placeholder="e.g., Ama Serwaa">
+
+<div class="grid2">
+<div><label>Email <span class="req">*</span></label><input id="email" type="email" placeholder="nurse@email.com"></div>
+<div><label>Phone <span class="req">*</span></label><input id="phone" type="tel" placeholder="055..."></div>
+</div>
+
+<label>Password <span class="req">*</span></label>
+<div class="inputWrap">
+<input id="password" type="password" placeholder="Password">
+<button class="eyeBtn" type="button" onclick="toggleEye('password',this)">
+<svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+<svg class="eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+</button>
+</div>
+
+<div class="grid2">
+<div><label>Country <span class="req">*</span></label>
+<select id="country"><option value="">Select</option><option value="GH">🇬🇭 Ghana</option><option value="NG">🇳🇬 Nigeria</option><option value="ZA">🇿🇦 South Africa</option><option value="GB">🇬🇧 UK</option><option value="US">🇺🇸 USA</option><option value="AU">🇦🇺 Australia</option><option value="AE">🇦🇪 UAE</option><option value="CA">🇨🇦 Canada</option><option value="OTHER">🌍 Other</option></select></div>
+<div><label>Experience (Years) <span class="req">*</span></label><input id="experience" type="number" placeholder="e.g., 3"></div>
+</div>
+
+<label>Qualification <span class="req">*</span></label><input id="qualification" type="text" placeholder="e.g., BSc Nursing, Diploma">
+<label>Services <span class="req">*</span></label>
+<select id="services"><option value="">Select service</option><option>Elderly Care</option><option>Baby Care</option><option>Post Surgery</option><option>Disability Support</option><option>Hospital Support</option><option>Home Injection</option><option>Wound Dressing</option><option>Palliative Care</option><option>Other</option></select>
+
+<label>About You / Bio</label><textarea id="bio" placeholder="Tell CEO about you..."></textarea>
+
+<div style="background:rgba(76,29,149,.12);border:1px solid rgba(168,85,247,.18);border-radius:12px;padding:12px;margin-top:12px">
+<div style="display:flex;justify-content:space-between"><b style="font-size:11px;color:#d8b4fe">📍 GPS Actual Name <span class="req">*</span></b><span id="gpsName" style="color:#22c55e;font-size:10px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Detecting...</span></div>
+<div id="latlng" style="font-size:10px;color:#6b5b8a;margin-top:4px"></div>
+<button class="btn btnLight" onclick="getGPS()" type="button" style="margin-top:8px;padding:8px;font-size:11px">📍 Enable GPS — Required for CEO</button>
+</div>
+
+<h3 style="font-size:13px;color:#f3e8ff;margin:16px 0 8px">📄 Particulars — CEO Will View All Before Approval</h3>
+
+<div class="fileBox"><label>Profile Photo <span class="req">*</span></label><input id="photoFile" type="file" accept="image/*"></div>
+<div class="fileBox"><label>National ID (Photo) <span class="req">*</span></label><input id="idFile" type="file" accept="image/*,.pdf"></div>
+<div class="fileBox"><label>Nursing Licence / Certificate <span class="req">*</span></label><input id="licenceFile" type="file" accept="image/*,.pdf"></div>
+<div class="fileBox"><label>Academic Certificate</label><input id="certFile" type="file" accept="image/*,.pdf"></div>
+<div class="fileBox"><label>CV / Resume</label><input id="cvFile" type="file" accept=".pdf,.doc,.docx"></div>
+<div class="fileBox"><label>Intro Video (CEO will watch before approving)</label><input id="videoFile" type="file" accept="video/*"></div>
+
+<div id="uploadProgress" class="progress"><div id="progressBar" class="progressBar"></div></div>
+<div id="msg"></div>
+
+<button class="btn btnPurple" onclick="emailRegister()">✅ Submit Registration to CEO — Await Approval</button>
+<div style="display:flex;gap:8px;margin-top:8px">
+<a href="nurse-login.html" class="btn btnLight" style="flex:1">🔐 Login — After CEO Approval</a>
+<a href="index.html" class="btn btnLight" style="flex:1">🏠 Home</a>
+</div>
+<div class="alert alert-info" style="margin-top:12px">ℹ️ After registration, you will see <b>PENDING — Awaiting CEO Approval</b>. You cannot login until CEO (lovecareglobal@gmail.com) Approves in CEO Dashboard. CEO can view all your particulars: photo, ID, licence, certificate, CV, video, GPS location, phone, email.</div>
+</div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
+
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const rtdb=getDatabase(app);
+const storage=getStorage(app);
+
+let currentLat=null, currentLng=null, currentGPSName='';
+
+window.toggleEye=(id,btn)=>{
+  const input=document.getElementById(id);
+  const open=btn.querySelector('.eye-open');
+  const closed=btn.querySelector('.eye-closed');
+  if(input.type==='password'){input.type='text'; open.style.display='none'; closed.style.display='block';}
+  else{input.type='password'; open.style.display='block'; closed.style.display='none';}
+}
+window.getGPS=()=>{
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    currentLat=pos.coords.latitude; currentLng=pos.coords.longitude;
+    document.getElementById('latlng').textContent=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`;
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}`);
+      const d=await r.json();
+      currentGPSName=d.display_name||`${currentLat},${currentLng}`;
+      document.getElementById('gpsName').textContent=currentGPSName.slice(0,80);
+    }catch{ currentGPSName=`${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`; document.getElementById('gpsName').textContent=currentGPSName;}
+  },()=>{document.getElementById('msg').innerHTML='<div class="alert alert-error">Enable GPS - Required for CEO approval</div>';},{enableHighAccuracy:true});
+}
+
+async function uploadFile(file, path){
+  if(!file) return '';
+  const storageRef=sRef(storage, path);
+  const task=uploadBytesResumable(storageRef, file);
+  return new Promise((resolve, reject)=>{
+    task.on('state_changed', snap=>{
+      const pct=Math.round(snap.bytesTransferred/snap.totalBytes*100);
+      document.getElementById('uploadProgress').style.display='block';
+      document.getElementById('progressBar').style.width=pct+'%';
+    }, reject, async()=>{
+      const url=await getDownloadURL(storageRef);
+      resolve(url);
+    });
+  });
+}
+
+window.emailRegister=async()=>{
+  const fullName=document.getElementById('fullName').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('password').value;
+  const country=document.getElementById('country').value;
+  const experience=document.getElementById('experience').value;
+  const qualification=document.getElementById('qualification').value.trim();
+  const services=document.getElementById('services').value;
+  const bio=document.getElementById('bio').value.trim();
+  const msg=document.getElementById('msg');
+
+  if(!fullName||!email||!phone||!password||!country||!experience||!qualification||!services){msg.innerHTML='<div class="alert alert-error">Fill all required fields (*)</div>'; return;}
+  if(!currentGPSName){msg.innerHTML='<div class="alert alert-error">Enable GPS — Required</div>'; getGPS(); return;}
+  if(!document.getElementById('photoFile').files[0]){msg.innerHTML='<div class="alert alert-error">Profile Photo required — CEO must see you</div>'; return;}
+  if(!document.getElementById('idFile').files[0]){msg.innerHTML='<div class="alert alert-error">National ID required</div>'; return;}
+  if(!document.getElementById('licenceFile').files[0]){msg.innerHTML='<div class="alert alert-error">Licence required — CEO must verify</div>'; return;}
+
+  try{
+    msg.innerHTML='<div class="alert alert-info">Creating account for '+fullName+'... Please wait — uploading particulars to CEO...</div>';
+    const cred=await createUserWithEmailAndPassword(auth, email, password);
+    const user=cred.user;
+    await updateProfile(user,{displayName:fullName});
+
+    // Upload files
+    const uid=user.uid;
+    const photoURL=await uploadFile(document.getElementById('photoFile').files[0], `nurses/${uid}/photo_${Date.now()}`);
+    const idURL=await uploadFile(document.getElementById('idFile').files[0], `nurses/${uid}/id_${Date.now()}`);
+    const licenceURL=await uploadFile(document.getElementById('licenceFile').files[0], `nurses/${uid}/licence_${Date.now()}`);
+    let certURL=''; if(document.getElementById('certFile').files[0]) certURL=await uploadFile(document.getElementById('certFile').files[0], `nurses/${uid}/cert_${Date.now()}`);
+    let cvURL=''; if(document.getElementById('cvFile').files[0]) cvURL=await uploadFile(document.getElementById('cvFile').files[0], `nurses/${uid}/cv_${Date.now()}`);
+    let videoURL=''; if(document.getElementById('videoFile').files[0]) videoURL=await uploadFile(document.getElementById('videoFile').files[0], `nurses/${uid}/video_${Date.now()}`);
+
+    const data={
+      uid:uid,
+      email:user.email,
+      fullName:fullName,
+      displayName:fullName,
+      name:fullName,
+      phone:phone,
+      phoneNumber:phone,
+      country:country,
+      countryName:document.getElementById('country').options[document.getElementById('country').selectedIndex].text,
+      experience:experience,
+      qualification:qualification,
+      services:[services],
+      service:services,
+      bio:bio,
+      gpsActualName:currentGPSName,
+      actualLocationName:currentGPSName,
+      lat:currentLat,
+      lng:currentLng,
+      photoURL:photoURL,
+      profilePhoto:photoURL,
+      nationalIdURL:idURL,
+      idURL:idURL,
+      licenceURL:licenceURL,
+      certificateURL:certURL,
+      cvURL:cvURL,
+      videoURL:videoURL,
+      introVideoUrl:videoURL,
+      isApproved:false,
+      status:'pending',
+      verificationStatus:'pending',
+      isAvailable:false,
+      rating:0,
+      reviewCount:0,
+      createdAt:serverTimestamp(),
+      timestamp:Date.now(),
+      loginMethod:'email',
+      welcomeMessage:`Welcome back, ${fullName.split(' ')[0]} 👋`
+    };
+
+    await setDoc(doc(db,'nurses',uid), data);
+    await setDoc(doc(db,'pendingNurses',uid), data);
+    // Also save to RTDB for CEO dashboard compatibility
+    await set(ref(rtdb, `nurses/${uid}`), {...data, createdAt:Date.now()});
+    await set(ref(rtdb, `pendingNurses/${uid}`), {...data, createdAt:Date.now()});
+    await set(ref(rtdb, `ceoNotifications/${uid}`), {type:'new_nurse_registration', nurseName:fullName, nurseEmail:email, nursePhone:phone, timestamp:Date.now(), status:'pending', uid:uid});
+
+    msg.innerHTML=`<div class="alert alert-success">✅ Registration submitted to CEO (lovecareglobal@gmail.com)!<br>Your account is <b>PENDING APPROVAL</b>.<br>CEO will view your photo, ID, licence, certificate, CV, video, GPS and Approve/Reject.<br>You CANNOT login until CEO approves. You will receive approval notification.</div>`;
+    setTimeout(()=>{location.href='nurse-login.html';}, 4000);
+  }catch(e){
+    msg.innerHTML=`<div class="alert alert-error">Failed: ${e.message}</div>`;
+  }
+}
+
+window.googleRegister=async()=>{
+  const msg=document.getElementById('msg');
+  const fullNameInput=document.getElementById('fullName').value.trim();
+  try{
+    msg.innerHTML='<div class="alert alert-info">Opening Google...</div>';
+    const provider=new GoogleAuthProvider();
+    const cred=await signInWithPopup(auth, provider);
+    const user=cred.user;
+    const finalFullName=fullNameInput||user.displayName||'Nurse';
+    const data={
+      uid:user.uid,
+      email:user.email,
+      fullName:finalFullName,
+      displayName:finalFullName,
+      name:finalFullName,
+      phone:document.getElementById('phone').value||user.phoneNumber||'',
+      photoURL:user.photoURL||'',
+      country:document.getElementById('country').value||'GH',
+      experience:document.getElementById('experience').value||'',
+      qualification:document.getElementById('qualification').value||'',
+      services:[document.getElementById('services').value||'General'],
+      bio:document.getElementById('bio').value||'',
+      gpsActualName:currentGPSName||'',
+      lat:currentLat||null,
+      lng:currentLng||null,
+      isApproved:false,
+      status:'pending',
+      verificationStatus:'pending',
+      isAvailable:false,
+      rating:0,
+      createdAt:serverTimestamp(),
+      timestamp:Date.now(),
+      loginMethod:'google'
+    };
+    await setDoc(doc(db,'nurses',user.uid), data, {merge:true});
+    await setDoc(doc(db,'pendingNurses',user.uid), data, {merge:true});
+    await set(ref(rtdb, `nurses/${user.uid}`), {...data, createdAt:Date.now()});
+    msg.innerHTML=`<div class="alert alert-success">✅ Google account submitted to CEO — PENDING APPROVAL. CEO must approve before login. Redirecting to login page to wait...</div>`;
+    setTimeout(()=>{location.href='nurse-login.html';}, 3000);
+  }catch(e){msg.innerHTML=`<div class="alert alert-error">Google failed: ${e.message}</div>`;}
+}
+window.addEventListener('DOMContentLoaded', getGPS);
+</script>
+</body>
+</html>
