@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurses Dashboard — LOVE CARE GLOBAL</title>
+<title>Nurses Dashboard â€” LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
@@ -34,6 +34,12 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 .btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;box-shadow:0 8px 20px rgba(168,85,247,.3)}
 .btnPrimary small{color:#1e0a3a!important;opacity:.85}
 .badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.22);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
+
+/* Photo styles */
+.photoWrap{position:relative;width:74px;height:74px;flex-shrink:0}
+#nursePhoto{width:74px;height:74px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:2px solid rgba(168,85,247,.35);box-shadow:0 0 0 4px rgba(168,85,247,.12), 0 8px 20px rgba(0,0,0,.4);display:block}
+#nursePhotoInitial{position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;font-size:28px;color:white;letter-spacing:.02em}
+.onlineDot{position:absolute;right:2px;bottom:2px;width:16px;height:16px;border-radius:50%;background:#22c55e;border:3px solid #1c1238}
 </style>
 </head>
 <body>
@@ -68,58 +74,59 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 </div>
 
 <div class="wrap">
-<div class="card" style="display:flex;gap:14px;align-items:center">
-<img id="nursePhoto" src="icon-transparent-512.png" style="width:64px;height:64px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:1px solid rgba(168,85,247,.18);">
-<div style="flex:1"><div id="nurseName" style="font-weight:900;font-size:15px;color:#f3e8ff">Nurse Dashboard</div><div id="nurseEmail" style="font-size:12px;color:#a78bfa">Welcome back</div><div id="nursePhone" style="font-size:11px;color:#6b5b8a;margin-top:2px"></div><span class="badge" id="nurseStatus">NURSE • ONLINE</span></div>
+
+<!-- WELCOME CARD WITH PHOTO + NAME -->
+<div class="card" style="display:flex;gap:16px;align-items:center">
+  <div class="photoWrap">
+    <img id="nursePhoto" src="icon-transparent-512.png" alt="Nurse photo">
+    <div id="nursePhotoInitial" style="display:none">N</div>
+    <div class="onlineDot"></div>
+  </div>
+  <div style="flex:1;min-width:0">
+    <div id="nurseName" style="font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:18px;color:#f3e8ff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Welcome, Nurse ðŸ‘‹</div>
+    <div id="nurseWelcome" style="font-size:13px;color:#c4b5fd;margin-top:4px">Welcome back to your dashboard</div>
+    <div id="nurseEmail" style="font-size:11px;color:#7c6da6;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+    <span class="badge" style="margin-top:8px;display:inline-block">NURSE â€¢ ONLINE</span>
+  </div>
 </div>
 
 <div class="card">
 <h2 style="font-family:Plus Jakarta Sans,sans-serif;font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:14px">Nurses Dashboard</h2>
-<div id="loginWarning" style="display:none;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25);padding:10px;border-radius:12px;font-size:12px;color:#fca5a5;margin-bottom:12px">⚠️ Not logged in — <a href="nurse-login.html" style="color:#fca5a5;font-weight:800">Login as Nurse</a> to see your jobs</div>
 
 <a class="btnBig btnPrimary" href="my-job-offer.html">
-<span class="icon">💼</span>
+<span class="icon">ðŸ’¼</span>
 <span><b>My Job Offer</b><br><small>View & accept paid bookings assigned to you</small></span>
 </a>
 
 <a class="btnBig" href="nurse-group-chat.html">
-<span class="icon">💬</span>
+<span class="icon">ðŸ’¬</span>
 <span><b>Nurse Group Chat</b><br><small style="font-weight:600;color:#a78bfa">Chat with CEO & other nurses</small></span>
 </a>
 
 <a class="btnBig" href="nurse-settings.html">
-<span class="icon">⚙️</span>
+<span class="icon">âš™ï¸</span>
 <span><b>Nurse Settings</b><br><small style="font-weight:600;color:#a78bfa">Profile, location & availability</small></span>
 </a>
 
 <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<a class="btnBig" style="justify-content:center" href="index.html">🏠 Home</a>
+<a class="btnBig" style="justify-content:center" href="index.html">ðŸ  Home</a>
 <button class="btnBig" style="justify-content:center" onclick="logout()">Logout</button>
 </div>
 </div>
 
-<div class="card" style="font-size:11px;color:#a78bfa">
-<b style="color:#f3e8ff">Debug:</b> <span id="debugInfo"></span><br>
-<button onclick="localStorage.clear(); location.href='nurse-login.html'" style="margin-top:8px;padding:6px 10px;border-radius:8px;background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-size:11px;cursor:pointer">Clear Cache & Re-login</button>
-</div>
 </div>
 
 <script>
-// SOFT GUARD - show page even if not logged, but warn
+// Clean guard without debug text
 (function(){
   try{
     const expiry = localStorage.getItem('lcg_session_expiry');
     const logged = localStorage.getItem('lcg_logged_in');
     const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
-    const debug = document.getElementById('debugInfo');
-    if(debug) debug.textContent = `logged=${logged} role=${role} expiry=${expiry ? new Date(parseInt(expiry)).toLocaleTimeString() : 'none'} uid=${localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId')||'none'}`;
-    
     if(!logged || logged!=='true'){
-      const warn = document.getElementById('loginWarning');
-      if(warn) warn.style.display='block';
-      // Don't redirect immediately, let user see buttons
-      // Only redirect if they click My Job Offer without login - handled by link
-      return;
+      // allow to redirect to login
+      // window.location.replace('nurse-login.html');
+      // return; // keep commented if you want soft guard
     }
     if(expiry && Date.now() > parseInt(expiry)){
       localStorage.clear();
@@ -127,60 +134,112 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
       return;
     }
     if(role && role!=='nurse' && role==='client'){
-      // client trying to open nurse dashboard
       window.location.replace('client-dashboard.html');
       return;
     }
     const SESSION_MS = 30*60*1000;
     function refresh(){ localStorage.setItem('lcg_session_expiry', (Date.now()+SESSION_MS).toString()); }
     ['click','keydown','touchstart'].forEach(ev=>document.addEventListener(ev, refresh, {passive:true}));
-  }catch(e){
-    console.log('guard error', e);
-  }
+  }catch(e){ console.log('guard error', e); }
 })();
 </script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
+
 async function loadNurse(){
   try{
     const uid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId');
     let nurse=null; 
-    let photoURL=localStorage.getItem('nursePhotoURL')||'';
-    try{const prof=JSON.parse(localStorage.getItem('nurseProfile')||'{}'); if(prof.photoURL) photoURL=prof.photoURL; if(prof.name||prof.email) nurse=prof;}catch(e){}
+    let photoURL = localStorage.getItem('nursePhotoURL') || localStorage.getItem('nursePhoto') || localStorage.getItem('photoURL') || '';
+    let localName = localStorage.getItem('nurseName') || localStorage.getItem('currentNurseName') || '';
+
+    try{
+      const profRaw = localStorage.getItem('nurseProfile');
+      if(profRaw){
+        const prof=JSON.parse(profRaw); 
+        if(prof.photoURL || prof.photo) photoURL = prof.photoURL || prof.photo || photoURL;
+        if(prof.fullName || prof.name) {
+          localName = prof.fullName || prof.name;
+          nurse = prof;
+        }
+        if(prof.email) nurse = {...prof};
+      }
+    }catch(e){}
+
     if(uid){
       try{
         const snap=await getDoc(doc(db,'nurses',uid)); 
         if(snap.exists()){
-          nurse=snap.data(); 
-          if(nurse.photoURL||nurse.photo) photoURL=nurse.photoURL||nurse.photo;
+          const data = snap.data();
+          nurse={...(nurse||{}), ...data}; 
+          // support many possible photo fields
+          const fbPhoto = data.photoURL || data.photo || data.avatar || data.profilePhoto || data.imageURL || data.profileImage;
+          if(fbPhoto) photoURL = fbPhoto;
+          if(data.fullName || data.name) localName = data.fullName || data.name;
         }
       }catch(e){console.log('firestore error', e)}
     }
-    if(nurse){
-      const nameEl=document.getElementById('nurseName');
-      if(nameEl) nameEl.textContent=nurse.fullName||nurse.name||'Nurse';
-      const emailEl=document.getElementById('nurseEmail');
-      if(emailEl) emailEl.textContent=nurse.email||localStorage.getItem('currentNurseEmail')||'Nurse account';
-      const phoneEl=document.getElementById('nursePhone');
-      if(phoneEl) phoneEl.textContent=nurse.phone||nurse.phoneFull||localStorage.getItem('nursePhone')||'';
-      if(photoURL){
-        const img=document.getElementById('nursePhoto'); 
-        if(img){ img.src=photoURL; }
-      }
-    }else{
-      // keep default "Nurse Dashboard" text, don't show "Not logged in" that hides buttons
-      const warn=document.getElementById('loginWarning');
-      if(warn && !localStorage.getItem('lcg_nurse_uid')) warn.style.display='block';
+
+    const finalName = (nurse && (nurse.fullName || nurse.name)) ? (nurse.fullName || nurse.name) : localName || 'Nurse';
+    const cleanName = finalName.trim() || 'Nurse';
+
+    // 1. Welcome name
+    const nameEl=document.getElementById('nurseName');
+    if(nameEl) nameEl.textContent = `Welcome, ${cleanName} ðŸ‘‹`;
+
+    // 2. Greeting
+    const welcomeEl=document.getElementById('nurseWelcome');
+    if(welcomeEl){
+      const h = new Date().getHours();
+      let g = 'Welcome back to your dashboard';
+      if(h < 12) g = 'Good morning! Ready for your shifts?';
+      else if(h < 18) g = 'Good afternoon! Hope your day is going well';
+      else g = 'Good evening! Thank you for your hard work today';
+      welcomeEl.textContent = g;
     }
+
+    // 3. Email
+    const emailEl=document.getElementById('nurseEmail');
+    if(emailEl){
+      emailEl.textContent = (nurse && nurse.email) || localStorage.getItem('currentNurseEmail') || localStorage.getItem('nurseEmail') || '';
+    }
+
+    // 4. PHOTO LOGIC - This makes photo appear
+    const imgEl = document.getElementById('nursePhoto');
+    const initialEl = document.getElementById('nursePhotoInitial');
+    
+    if(photoURL && photoURL !== 'icon-transparent-512.png' && photoURL.startsWith('http')){
+      imgEl.src = photoURL;
+      imgEl.style.display = 'block';
+      if(initialEl) initialEl.style.display = 'none';
+      // if image fails, show initial
+      imgEl.onerror = () => {
+        imgEl.style.display = 'none';
+        if(initialEl){
+          initialEl.textContent = cleanName.charAt(0).toUpperCase();
+          initialEl.style.display = 'grid';
+        }
+      };
+    } else {
+      // No photo found -> show initial letter avatar
+      imgEl.style.display = 'none';
+      if(initialEl){
+        initialEl.textContent = cleanName.charAt(0).toUpperCase();
+        initialEl.style.display = 'grid';
+      }
+    }
+
   }catch(e){
     console.log('loadNurse error', e);
   }
 }
+
 window.logout=()=>{ localStorage.clear(); location.href='nurse-login.html'; }
 window.addEventListener('DOMContentLoaded', loadNurse);
 </script>
