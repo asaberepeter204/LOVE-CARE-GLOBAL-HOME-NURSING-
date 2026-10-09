@@ -2,89 +2,92 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Contact LOVE CARE GLOBAL</title>
+<title>Contact Us - LOVE CARE GLOBAL HOME NURSING</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#f1f5f9;color:#111}
-.header{background:linear-gradient(90deg,#16a34a,#2563eb,#7c3aed);color:#fff;padding:14px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000}
-.card{background:#fff;border-radius:16px;padding:14px;margin:10px 12px;border:2px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid #16a34a}
-.btn{padding:12px 16px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;margin:4px 0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.delete{border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.08);color:#fca5a5}
+.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+.wrap{max-width:900px;margin:0 auto;padding:20px 14px 80px}
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:14px}
+h1{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:22px;color:#f3e8ff;margin-bottom:6px;border-bottom:2px solid rgba(168,85,247,.3);padding-bottom:10px}
+h2{font-size:16px;color:#f3e8ff;margin:24px 0 10px;background:rgba(76,29,149,.2);padding:8px 12px;border-radius:10px;border-left:3px solid #a855f7}
+p,li{font-size:13px;color:#c4b5fd;line-height:1.8}
+ul,ol{margin:8px 0 12px 18px}
+.badge{display:inline-flex;background:rgba(168,85,247,.18);color:#d8b4fe;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid rgba(168,85,247,.18)}
 </style>
 </head>
 <body>
-
-<div class="header">
-<div>
-<div style="font-weight:900;font-size:15px">📞 Contact LOVE CARE GLOBAL</div>
-<div style="font-size:12px;opacity:.9;margin-top:2px">Headquartered in Accra, Ghana - 8 Countries Support</div>
+<div class="bg"></div>
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
 </div>
-<a href="./index.html" class="btn" style="background:white;color:#16a34a;padding:8px 14px;border-radius:20px">🏠 Home</a>
+<a href="sos.html" class="sosBtn">SOS</a>
 </div>
-
-<!-- LOVE CARE GLOBAL -->
-<div class="card" style="border-left-color:#16a34a">
-<div style="font-size:18px;font-weight:900;margin-bottom:6px">🌍 LOVE CARE GLOBAL HOME NURSING</div>
-<p style="font-size:13px;line-height:1.5">LOVE CARE GLOBAL HOME NURSING is headquartered in <b>Accra, Ghana,</b> with support teams across all 8 countries.</p>
-<p style="font-size:11px;color:#6b7280;margin-top:6px">Official: https://asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-/</p>
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
 </div>
-
-<!-- General Support & Bookings -->
-<div class="card" style="border-left-color:#2563eb">
-<div style="font-size:15px;font-weight:900">📧 General Support & Bookings</div>
-<div style="margin-top:10px;font-size:13px"><b>Email:</b> lovecareglobal@gmail.com</div>
-<div style="font-size:13px;margin-top:6px"><b>Response Time:</b> Within 2 hours</div>
-<div style="margin-top:10px">
-<a href="mailto:lovecareglobal@gmail.com" class="btn" style="background:#2563eb;color:white">📧 Email Us</a>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">Home</a>
+<a class="item " href="about.html">About</a>
+<a class="item " href="services.html">Services</a>
+<a class="item " href="how-it-works.html">How It Works</a>
+<a class="item active" href="contact.html">Contact</a>
+<a class="item consent" href="consent-form.html">Consent Form</a>
+<a class="item " href="privacy.html">Privacy</a>
+<a class="item " href="terms.html">Terms</a>
+<a class="item " href="refund.html">Refund</a>
+<a class="item delete " href="delete-account.html">🗑️ Delete Account</a>
+<a class="item sos" href="sos.html">SOS</a>
 </div>
-</div>
-
-<!-- Call Support -->
-<div class="card" style="border-left-color:#16a34a">
-<div style="font-size:15px;font-weight:900">📞 Call Support - Available 24/7 - All 8 Countries</div>
-<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-<a href="tel:0544121814" class="btn" style="background:#16a34a;color:white;width:fit-content">📞 Call 0544121814</a>
-<a href="tel:0596672863" class="btn" style="background:#2563eb;color:white;width:fit-content">📞 Call 0596672863</a>
-</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
 </div>
 
-<!-- WhatsApp Support - Only 1 button now -->
-<div class="card" style="border-left-color:#16a34a">
-<div style="font-size:15px;font-weight:900">💬 WhatsApp Support</div>
-<p style="font-size:13px;margin-top:8px"><b>WhatsApp:</b> Available 24/7 - Click to chat directly</p>
-<div style="font-size:14px;color:#16a34a;font-weight:900;margin-top:8px">(+233) 544121814 / 0596672863</div>
-<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-<a href="https://wa.me/233544121814" target="_blank" class="btn" style="background:#16a34a;color:white;width:fit-content">💬 WhatsApp 0544121814</a>
-</div>
-<p style="font-size:11px;color:#6b7280;margin-top:8px">Chat now via WhatsApp App - Fastest response!</p>
-</div>
+<div class="wrap">
+<span class="badge">Contact - 24/7 Support</span>
+<div class="card" style="margin-top:12px">
 
-<!-- Headquarters -->
-<div class="card" style="border-left-color:#ef4444">
-<div style="font-size:15px;font-weight:900">📍 Headquarters</div>
-<div style="font-size:13px;margin-top:8px"><b>Accra, Greater Accra Region, Ghana</b></div>
-<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-<button class="btn" style="background:#16a34a;color:white;width:fit-content" onclick="window.open('https://www.google.com/maps/search/home+nursing+services+near+me+online+nurse/@5.6037,-0.1870,14z','_blank')">📍 Find Nurse Near You</button>
-<button class="btn" style="background:#2563eb;color:white;width:fit-content" onclick="window.open('https://www.google.com/maps?q=5.6037,-0.1870','_blank')">🗺️ View on Map</button>
-</div>
-</div>
+<h1>Contact Us - LOVE CARE GLOBAL HOME NURSING</h1>
+<p>We are here 24/7 across 8 countries.</p>
+<h2>Email</h2><p>lovecareglobal@gmail.com (CEO), support@lovecareglobal.com</p>
+<h2>Phone</h2><p>Check client dashboard or nurse dashboard for local numbers. Provide Booking ID and phone with country code (+233) when contacting.</p>
+<h2>Address</h2><p>Accra, Greater Accra, Ghana - GPS actual name used for verification.</p>
+<h2>For Bookings</h2><p>Use book-nurse-START-END-HOURS.html → Paystack → Booking ID → Nurse receives job at my-job-offer.html</p>
+<h2>For Deletion</h2><p>Use delete-account.html - Policy + Danger Zone - Delete by yourself with reason, GPS saved for audit.</p>
+<h2>SOS</h2><p>Emergency? Use sos.html - CEO and nurses notified via sosAlerts.</p>
 
-<!-- For Nurses -->
-<div class="card" style="border-left-color:#eab308;background:#fffbeb">
-<div style="font-size:15px;font-weight:900">👩‍⚕️ For Nurses - Join Our Team</div>
-<p style="font-size:13px;margin-top:8px">Want to join as a nurse? We are hiring verified nurses in all 8 countries!</p>
-<div style="margin-top:12px">
-<a href="./nurse-registration.html" class="btn" style="background:#eab308;color:#111;width:fit-content">👩‍⚕️ Join as Nurse</a>
+<div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(168,85,247,.12);display:flex;gap:10px;flex-wrap:wrap">
+<a href="index.html" style="padding:10px 16px;border-radius:12px;background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none">← Back to Home</a>
+<a href="delete-account.html" style="padding:10px 16px;border-radius:12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5;text-decoration:none">Delete Account Policy</a>
 </div>
 </div>
-
-<div class="card" style="text-align:center">
-<div style="font-size:11px;color:#6b7280;line-height:1.5">
-© 2026 LOVE CARE GLOBAL HOME NURSING - All Rights Reserved<br>
-Official Website: asaberepeter204.github.io/LOVE-CARE-GLOBAL-HOME-NURSING-
 </div>
-<div style="margin-top:12px">
-<a href="./index.html" class="btn" style="background:#2563eb;color:white">🏠 Back to Home</a>
-</div>
-</div>
-
+<script>
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
 </body>
 </html>
