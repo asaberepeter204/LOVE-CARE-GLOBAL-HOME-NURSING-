@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Dashboard</title>
+<title>Client Dashboard â€” LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
@@ -33,6 +33,13 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 .btnBig .icon{width:48px;height:48px;border-radius:50%;background:rgba(168,85,247,.22);display:grid;place-items:center;font-size:22px;border:1px solid rgba(168,85,247,.18);flex-shrink:0}
 .btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;box-shadow:0 8px 20px rgba(168,85,247,.3)}
 .btnPrimary small{color:#1e0a3a!important;opacity:.85}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.22);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
+
+/* Photo */
+.photoWrap{position:relative;width:74px;height:74px;flex-shrink:0}
+#clientPhoto{width:74px;height:74px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:2px solid rgba(168,85,247,.35);box-shadow:0 0 0 4px rgba(168,85,247,.12), 0 8px 20px rgba(0,0,0,.4);display:block}
+#clientPhotoInitial{position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;font-size:28px;color:white}
+.onlineDot{position:absolute;right:2px;bottom:2px;width:16px;height:16px;border-radius:50%;background:#22c55e;border:3px solid #1c1238}
 </style>
 </head>
 <body>
@@ -69,57 +76,165 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 </div>
 
 <div class="wrap">
-<div class="card" style="display:flex;gap:14px;align-items:center">
-<img id="clientPhoto" src="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:1px solid rgba(168,85,247,.18);display:none">
-<div style="flex:1"><div id="clientName" style="font-weight:900;font-size:15px;color:#f3e8ff">Loading...</div><div id="clientEmail" style="font-size:12px;color:#a78bfa"></div><div id="clientPhone" style="font-size:11px;color:#6b5b8a;margin-top:2px"></div></div>
+<!-- WELCOME WITH PHOTO + NAME -->
+<div class="card" style="display:flex;gap:16px;align-items:center">
+  <div class="photoWrap">
+    <img id="clientPhoto" src="icon-transparent-512.png" alt="Client photo">
+    <div id="clientPhotoInitial" style="display:none">C</div>
+    <div class="onlineDot"></div>
+  </div>
+  <div style="flex:1;min-width:0">
+    <div id="clientName" style="font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:18px;color:#f3e8ff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Welcome, Client ðŸ‘‹</div>
+    <div id="clientWelcome" style="font-size:13px;color:#c4b5fd;margin-top:4px">Welcome back to your dashboard</div>
+    <div id="clientEmail" style="font-size:11px;color:#7c6da6;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+    <span class="badge" style="margin-top:8px;display:inline-block">CLIENT â€¢ ONLINE</span>
+  </div>
 </div>
 
 <div class="card">
 <h2 style="font-family:Plus Jakarta Sans,sans-serif;font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:14px">Client Dashboard</h2>
 
 <a class="btnBig btnPrimary" href="book-nurse.html">
-<span class="icon">📅</span>
-<span><b>Book Nurse</b><br><small>Choose nurse on Google Map — Photo, Video, Rating</small></span>
+<span class="icon">ðŸ“…</span>
+<span><b>Book Nurse</b><br><small>Choose nurse on Google Map â€” Photo, Video, Rating</small></span>
 </a>
 
 <a class="btnBig" href="my-bookings.html">
-<span class="icon">📋</span>
+<span class="icon">ðŸ“‹</span>
 <span><b>Client Bookings</b><br><small style="font-weight:600;color:#a78bfa">View all bookings</small></span>
 </a>
 
 <a class="btnBig" href="client-setting.html">
-<span class="icon">⚙️</span>
+<span class="icon">âš™ï¸</span>
 <span><b>Client Settings</b><br><small style="font-weight:600;color:#a78bfa">Profile & settings</small></span>
 </a>
 
 <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<a class="btnBig" style="justify-content:center" href="index.html">🏠 Home</a>
+<a class="btnBig" style="justify-content:center" href="index.html">ðŸ  Home</a>
 <button class="btnBig" style="justify-content:center" onclick="logout()">Logout</button>
 </div>
 </div>
 </div>
 
+<script>
+// Clean guard - no debug inscriptions
+(function(){
+  try{
+    const expiry = localStorage.getItem('lcg_session_expiry');
+    const logged = localStorage.getItem('lcg_logged_in');
+    const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
+    if(expiry && Date.now() > parseInt(expiry)){
+      localStorage.clear();
+      window.location.replace('client-login.html');
+      return;
+    }
+    if(role && role==='nurse'){
+      window.location.replace('nurses-dashboard.html');
+      return;
+    }
+    const SESSION_MS = 30*60*1000;
+    function refresh(){ localStorage.setItem('lcg_session_expiry', (Date.now()+SESSION_MS).toString()); }
+    ['click','keydown','touchstart'].forEach(ev=>document.addEventListener(ev, refresh, {passive:true}));
+  }catch(e){}
+})();
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
+
 async function loadClient(){
-  const uid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
-  let client=null; let photoURL=localStorage.getItem('clientPhotoURL')||'';
-  try{const prof=JSON.parse(localStorage.getItem('clientProfile')||'{}'); if(prof.photoURL) photoURL=prof.photoURL; if(prof.name||prof.email) client=prof;}catch(e){}
-  if(uid){try{const snap=await getDoc(doc(db,'clients',uid)); if(snap.exists()){client=snap.data(); if(client.photoURL) photoURL=client.photoURL;}}catch(e){}}
-  if(client){
-    document.getElementById('clientName').textContent=client.fullName||client.name||'Client';
-    document.getElementById('clientEmail').textContent=client.email||localStorage.getItem('currentClientEmail')||'';
-    document.getElementById('clientPhone').textContent=client.phone||client.phoneFull||localStorage.getItem('clientPhone')||'';
-    if(photoURL){const img=document.getElementById('clientPhoto'); img.src=photoURL; img.style.display='block';}
-  }else{
-    document.getElementById('clientName').textContent='Not logged in';
-    document.getElementById('clientEmail').textContent='Please login';
+  try{
+    const uid = localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId')||localStorage.getItem('lcg_uid');
+    let client = null;
+    let photoURL = localStorage.getItem('clientPhotoURL')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoURL')||'';
+    let localName = localStorage.getItem('clientName')||localStorage.getItem('currentClientName')||localStorage.getItem('lcg_client_name')||'';
+
+    try{
+      const profRaw = localStorage.getItem('clientProfile');
+      if(profRaw){
+        const prof = JSON.parse(profRaw);
+        if(prof.photoURL || prof.photo) photoURL = prof.photoURL || prof.photo || photoURL;
+        if(prof.fullName || prof.name) localName = prof.fullName || prof.name;
+        client = prof;
+      }
+    }catch(e){}
+
+    // Also check generic user name
+    if(!localName){
+      localName = localStorage.getItem('userName')||localStorage.getItem('lcg_name')||'';
+    }
+
+    if(uid){
+      try{
+        const snap = await getDoc(doc(db,'clients',uid));
+        if(snap.exists()){
+          const data = snap.data();
+          client = {...(client||{}), ...data};
+          const fbPhoto = data.photoURL || data.photo || data.avatar || data.profilePhoto || data.imageURL || data.profileImage;
+          if(fbPhoto) photoURL = fbPhoto;
+          if(data.fullName || data.name) localName = data.fullName || data.name;
+        }
+      }catch(e){ console.log('firestore client error', e); }
+    }
+
+    const finalName = (client && (client.fullName || client.name)) ? (client.fullName || client.name) : localName || 'Client';
+    const cleanName = finalName.trim() || 'Client';
+
+    // NAME WITH WELCOME
+    const nameEl = document.getElementById('clientName');
+    if(nameEl) nameEl.textContent = `Welcome, ${cleanName} ðŸ‘‹`;
+
+    // Greeting
+    const welcomeEl = document.getElementById('clientWelcome');
+    if(welcomeEl){
+      const h = new Date().getHours();
+      let g = 'Welcome back to your dashboard';
+      if(h < 12) g = 'Good morning! How can we help today?';
+      else if(h < 18) g = 'Good afternoon! Ready to book a nurse?';
+      else g = 'Good evening! We are here to care for you';
+      welcomeEl.textContent = g;
+    }
+
+    // Email
+    const emailEl = document.getElementById('clientEmail');
+    if(emailEl){
+      emailEl.textContent = (client && client.email) || localStorage.getItem('currentClientEmail') || localStorage.getItem('clientEmail') || localStorage.getItem('lcg_email') || '';
+    }
+
+    // PHOTO APPEAR
+    const imgEl = document.getElementById('clientPhoto');
+    const initialEl = document.getElementById('clientPhotoInitial');
+
+    if(photoURL && photoURL.startsWith('http')){
+      imgEl.src = photoURL;
+      imgEl.style.display = 'block';
+      if(initialEl) initialEl.style.display = 'none';
+      imgEl.onerror = () => {
+        imgEl.style.display = 'none';
+        if(initialEl){
+          initialEl.textContent = cleanName.charAt(0).toUpperCase();
+          initialEl.style.display = 'grid';
+        }
+      };
+    } else {
+      // show initial avatar
+      imgEl.style.display = 'none';
+      if(initialEl){
+        initialEl.textContent = cleanName.charAt(0).toUpperCase();
+        initialEl.style.display = 'grid';
+      }
+    }
+
+  }catch(e){
+    console.log('loadClient error', e);
   }
 }
+
 window.logout=()=>{ localStorage.clear(); location.href='client-login.html'; }
 window.addEventListener('DOMContentLoaded', loadClient);
 </script>
