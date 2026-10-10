@@ -21,7 +21,6 @@ input:focus,select:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-s
 .btn{width:100%;padding:12px;border-radius:12px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:10px;text-decoration:none;transition:.2s}
 .btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35)}
 .btnLight{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);color:#e9d5ff}
-.btnGoogle{background:#ffffff;color:#111827;border:1px solid rgba(0,0,0,.08)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .alert{padding:10px;border-radius:10px;font-size:11px;font-weight:700;margin:8px 0;border:1px solid}
 .alert-error{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);color:#fca5a5}
@@ -36,13 +35,6 @@ input:focus,select:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-s
 <h1>Create Client Account</h1>
 
 <div id="msg"></div>
-
-<button class="btn btnGoogle" onclick="googleRegister()">
-<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-Continue with Google
-</button>
-
-<div style="text-align:center;margin:12px 0;color:#6b5b8a;font-size:11px;font-weight:800">OR</div>
 
 <label>Full Name *</label>
 <input id="fullName" type="text" placeholder="e.g., Kwame Mensah">
@@ -73,7 +65,7 @@ Continue with Google
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
@@ -125,28 +117,6 @@ window.emailRegister=async()=>{
   }catch(e){
     msg.innerHTML='<div class="alert alert-error">Register failed: '+e.message+'</div>';
   }
-}
-window.googleRegister=async()=>{
-  const msg=document.getElementById('msg');
-  const fullNameInput=document.getElementById('fullName').value.trim();
-  try{
-    msg.innerHTML='<div class="alert alert-info">Opening Google...</div>';
-    const provider=new GoogleAuthProvider();
-    const cred=await signInWithPopup(auth, provider);
-    const user=cred.user;
-    const finalFullName=fullNameInput||user.displayName||'Client';
-    await setDoc(doc(db,'clients',user.uid),{
-      uid:user.uid,email:user.email,fullName:finalFullName,displayName:finalFullName,name:finalFullName,
-      firstName:finalFullName.split(' ')[0],lastName:finalFullName.split(' ').slice(1).join(' '),
-      photoURL:user.photoURL||'',country:document.getElementById('country').value||'GH',
-      gpsActualName:currentGPSName||'',lat:currentLat||null,lng:currentLng||null,
-      createdAt:serverTimestamp(),loginMethod:'google'
-    },{merge:true});
-    localStorage.setItem('lcg_client_uid', user.uid);
-    localStorage.setItem('currentClientId', user.uid);
-    msg.innerHTML='<div class="alert alert-success">Google account created</div>';
-    setTimeout(()=>{location.href='client-dashboard.html';}, 1000);
-  }catch(e){msg.innerHTML='<div class="alert alert-error">Google register failed: '+e.message+'</div>';}
 }
 window.addEventListener('DOMContentLoaded', getGPS);
 </script>
