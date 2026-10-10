@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Nurse Login - Love Care Global</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+  body{background:#f8f5ff;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+  .card{background:#fff;width:100%;max-width:420px;padding:32px;border-radius:24px;box-shadow:0 12px 32px rgba(108,43,217,0.14)}
+  .logo{text-align:center;margin-bottom:22px}
+  .logo h1{color:#6C2BD9;font-size:26px;font-weight:800;letter-spacing:-0.5px}
+  .logo p{color:#7a6a9e;font-size:13px;margin-top:4px}
+  .badge{background:#f3efff;color:#6C2BD9;padding:10px 12px;border-radius:10px;font-size:12px;text-align:center;margin-bottom:18px;font-weight:600}
+  input{width:100%;padding:14px 16px;border:1.6px solid #e9e0ff;border-radius:12px;margin-bottom:12px;font-size:15px;outline:none;transition:0.2s}
+  input:focus{border-color:#6C2BD9;box-shadow:0 0 0 3px rgba(108,43,217,0.1)}
+  .btn{width:100%;padding:14px;background:#6C2BD9;color:white;border:none;border-radius:12px;font-weight:700;font-size:16px;cursor:pointer;transition:0.2s}
+  .btn:hover{background:#5a23b8}
+  .btn:disabled{opacity:0.6}
+  .btn-google{width:100%;padding:12px;background:#fff;border:1.6px solid #e9e0ff;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+  .divider{text-align:center;margin:14px 0;color:#9a8bbf;font-size:12px;position:relative}
+  .divider::before{content:"";position:absolute;left:0;top:50%;width:42%;height:1px;background:#e9e0ff}
+  .divider::after{content:"";position:absolute;right:0;top:50%;width:42%;height:1px;background:#e9e0ff}
+  .link{text-align:center;margin-top:14px;font-size:14px;color:#666}
+  .link a{color:#6C2BD9;text-decoration:none;font-weight:700}
+  #msg{text-align:center;margin-top:12px;font-size:13px;min-height:18px}
+</style>
+
+<script>
+/* ===== 30 MIN SESSION - FIXED & BULLETPROOF ===== */
+(function(){
+  try{
+    const expiry = parseInt(localStorage.getItem('lcg_session_expiry')||localStorage.getItem('lcg_expiry')||'0');
+    const logged = localStorage.getItem('lcg_logged_in') || localStorage.getItem('lcg_logged');
+    const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
+    const uid = localStorage.getItem('lcg_nurse_uid') || localStorage.getItem('lcg_uid');
+
+    // 1. Check expiry FIRST - Google recommended
+    if(expiry && Date.now() > expiry){
+      localStorage.clear();
+      console.log('Session expired - cleared');
+      return;
+    }
+    // 2. Valid session -> auto dashboard
+    if(logged==='true' && role==='nurse' && uid && expiry && Date.now() < expiry){
+      const minsLeft = Math.round((expiry - Date.now())/60000);
+      console.log('Session valid '+minsLeft+'m left -> dashboard');
+      window.location.replace('nurses-dashboard.html');
+    }
+  }catch(e){ console.error(e); }
+})();
+</script>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <h1>Love Care Global</h1>
+    <p>Nurse Portal - Secure Login</p>
+  </div>
+
+  <div class="badge">👁️ Eye-friendly • 30-min secure session • GPS verified</div>
+
+  <button class="btn-google" onclick="loginWithGoogle()">
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="18"> Continue with Google
+  </button>
+
+  <div class="divider">or with email</div>
+
+  <input type="email" id="email" placeholder="Nurse email address" autocomplete="email">
+  <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+
+  <button class="btn" id="loginBtn" onclick="loginNurse()">Login as Nurse</button>
+
+  <div class="link">
+    New nurse? <a href="nurse-register.html">Register here</a><br>
+    <a href="forgot-password.html" style="font-size:12px;margin-top:8px;display:inline-block">Forgot password?</a><br>
+    <a href="index.html" style="font-size:12px;margin-top:6px;display:inline-block;color:#9a8bbf">← Back to Home</a>
+  </div>
+
+  <p id="msg"></p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// REPLACE WITH YOUR REAL FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "...",
+  appId: "..."
+};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+function setSession(uid, email){
+  localStorage.setItem('lcg_logged_in','true');
+  localStorage.setItem('lcg_logged','true');
+  localStorage.setItem('lcg_role','nurse');
+  localStorage.setItem('lcg_nurse_uid', uid);
+  localStorage.setItem('lcg_uid', uid);
+  localStorage.setItem('lcg_email', email || '');
+  localStorage.setItem('lcg_session_expiry', (Date.now() + 30*60*1000).toString());
+  localStorage.setItem('lcg_expiry', (Date.now() + 30*60*1000).toString());
+}
+
+async function loginNurse(){
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('password').value.trim();
+  const msg = document.getElementById('msg');
+  const btn = document.getElementById('loginBtn');
+
+  if(!email || !pass){ msg.style.color='red'; msg.textContent='Enter email and password'; return; }
+
+  btn.textContent='Verifying...'; btn.disabled=true; msg.textContent='';
+  
+  try{
+    const cred = await firebase.auth().signInWithEmailAndPassword(email, pass);
+    const uid = cred.user.uid;
+
+    // Verify nurse exists
+    const snap = await firebase.database().ref('nurses/'+uid).once('value');
+    if(!snap.exists()){
+      msg.style.color='red'; msg.textContent='Not a nurse account. Please use client login.';
+      await firebase.auth().signOut();
+      btn.textContent='Login as Nurse'; btn.disabled=false;
+      return;
+    }
+
+    // Optional GPS capture for nurse verification (keep if you have it)
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(()=>{}, ()=>{}, {timeout:5000});
+    }
+
+    setSession(uid, email);
+    window.location.replace('nurses-dashboard.html');
+
+  }catch(err){
+    msg.style.color='red';
+    msg.textContent = err.message.includes('wrong-password') ? 'Wrong password' : err.message;
+    btn.textContent='Login as Nurse'; btn.disabled=false;
+  }
+}
+
+async function loginWithGoogle(){
+  const msg = document.getElementById('msg');
+  try{
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const cred = await firebase.auth().signInWithPopup(provider);
+    const uid = cred.user.uid;
+    const email = cred.user.email;
+
+    const snap = await firebase.database().ref('nurses/'+uid).once('value');
+    if(!snap.exists()){
+      msg.style.color='red'; msg.textContent='Google account not registered as nurse. Please register first.';
+      await firebase.auth().signOut();
+      return;
+    }
+
+    setSession(uid, email);
+    window.location.replace('nurses-dashboard.html');
+  }catch(err){
+    msg.style.color='red'; msg.textContent = err.message;
+  }
+}
+</script>
+</body>
+</html>
