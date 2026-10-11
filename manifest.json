@@ -10,7 +10,7 @@
     "standalone",
     "window-controls-overlay"
   ],
-  "orientation": "portrait",
+  "orientation": "any",
   "theme_color": "#a855f7",
   "background_color": "#0e0a1c",
   "lang": "en",
@@ -41,26 +41,14 @@
       "purpose": "any"
     },
     {
-      "src": "icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-192x192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-384x384.png",
-      "sizes": "384x384",
+      "src": "icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
@@ -71,7 +59,13 @@
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512x512.png",
+      "src": "icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-transparent-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
@@ -101,7 +95,7 @@
       "url": "/book-nurse.html",
       "icons": [
         {
-          "src": "icon-192x192.png",
+          "src": "icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -114,7 +108,7 @@
       "url": "/sos.html",
       "icons": [
         {
-          "src": "icon-192x192.png",
+          "src": "icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -127,7 +121,7 @@
       "url": "/nurse-group-chat.html",
       "icons": [
         {
-          "src": "icon-192x192.png",
+          "src": "icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -136,33 +130,6 @@
   ],
   "related_applications": [],
   "prefer_related_applications": false,
-  "file_handlers": [
-    {
-      "action": "/index.html",
-      "accept": {
-        "image/*": [
-          ".jpg",
-          ".jpeg",
-          ".png"
-        ]
-      }
-    }
-  ],
-  "protocol_handlers": [
-    {
-      "protocol": "web+lovecare",
-      "url": "/index.html?protocol=%s"
-    }
-  ],
-  "share_target": {
-    "action": "/index.html",
-    "method": "GET",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
   "launch_handler": {
     "client_mode": [
       "navigate-existing",
