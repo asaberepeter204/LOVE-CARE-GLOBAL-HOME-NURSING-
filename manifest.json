@@ -1,16 +1,16 @@
 {
-  "id": "/?source=pwa",
+  "id": "/",
   "name": "LOVE CARE GLOBAL - Home Nursing",
   "short_name": "LoveCare",
   "description": "Licensed nurses to your doorstep - 24/7 in 8 countries. Book verified nurses, live GPS tracking, SOS emergency.",
-  "start_url": "/index.html?source=pwa",
+  "start_url": "/",
   "scope": "/",
   "scope_extensions": [
     {
       "origin": "https://lovecareglobal.com"
     },
     {
-      "origin": "https://asaberepeter204.godaddysites.com"
+      "origin": "https://*.godaddysites.com"
     }
   ],
   "display": "standalone",
@@ -78,6 +78,12 @@
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "icon-transparent-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "screenshots": [
@@ -138,7 +144,7 @@
     }
   ],
   "share_target": {
-    "action": "/index.html",
+    "action": "/",
     "method": "GET",
     "params": {
       "title": "title",
@@ -148,7 +154,7 @@
   },
   "file_handlers": [
     {
-      "action": "/index.html",
+      "action": "/",
       "accept": {
         "image/*": [
           ".jpg",
@@ -162,7 +168,7 @@
   "protocol_handlers": [
     {
       "protocol": "web+lovecare",
-      "url": "/index.html?protocol=%s"
+      "url": "/?protocol=%s"
     },
     {
       "protocol": "mailto",
@@ -179,9 +185,9 @@
       "description": "Quick book a nurse",
       "tag": "quick-book",
       "template": "quick-book-template",
-      "msAcTemplate": "widgets/quick-book.json",
-      "data": "/widgets/quick-book.json",
-      "type": "application/json",
+      "msAcTemplate": "/",
+      "data": "/",
+      "type": "text/html",
       "screenshots": [
         {
           "src": "icon-512x512.png",
@@ -200,7 +206,7 @@
     }
   ],
   "note_taking": {
-    "new_note_url": "/nurse-group-chat.html?type=text"
+    "new_note_url": "/nurse-group-chat.html"
   },
   "related_applications": [],
   "prefer_related_applications": false,
@@ -217,7 +223,7 @@
   "tab_strip": {
     "home_tab": {
       "params": {
-        "homepage": "/index.html"
+        "homepage": "/"
       }
     }
   },
