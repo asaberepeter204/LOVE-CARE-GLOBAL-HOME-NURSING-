@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paystack Test - LOVE CARE GLOBAL</title>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<style>body{font-family:system-ui;background:#0e0a1c;color:#e8e0ff;display:grid;place-items:center;min-height:100vh;padding:20px}
+.card{background:rgba(28,18,56,.8);border:1px solid rgba(168,85,247,.2);border-radius:20px;padding:24px;max-width:400px;width:100%;text-align:center}</style>
+</head><body>
+<div class="card">
+<img src="icon-transparent-512.png" style="width:64px;height:64px;border-radius:12px">
+<h2>Paystack Live Test</h2>
+<p style="color:#a78bfa;font-size:12px">Key: pk_live_f17ae09bf855... (LIVE)</p>
+<input id="email" placeholder="client email" value="test@lovecareglobal.com" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#f3e8ff;margin:10px 0">
+<input id="amount" type="number" placeholder="Amount GHS" value="50" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#f3e8ff;margin:10px 0">
+<button onclick="pay()" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,#a855f7,#d8b4fe);border:none;color:#1e0a3a;font-weight:900;cursor:pointer">ðŸ’³ Test Paystack Payment</button>
+<div id="result" style="margin-top:12px;font-size:11px;color:#86efac"></div>
+</div>
+<script>
+const PAYSTACK_KEY='pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
+function pay(){
+  const email=document.getElementById('email').value;
+  const amount=parseInt(document.getElementById('amount').value)*100;
+  const handler=PaystackPop.setup({
+    key:PAYSTACK_KEY,
+    email,
+    amount,
+    currency:'GHS',
+    ref:''+Date.now(),
+    onClose:()=>{document.getElementById('result').textContent='Payment cancelled'},
+    callback:(res)=>{document.getElementById('result').innerHTML='âœ… Success! Ref: '+res.reference+'<br>Your LIVE key works!'},
+  });
+  handler.openIframe();
+}
+</script>
+</body></html>
