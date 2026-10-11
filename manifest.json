@@ -1,104 +1,110 @@
-
-const CACHE_NAME = 'lovecare-v3-46';
-const OFFLINE_URL = '/offline.html';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/index.html?source=pwa',
-  '/book-nurse.html',
-  '/nurses-registration.html',
-  '/client-registration.html',
-  '/nurse-group-chat.html',
-  '/ceo-dashboard.html',
-  '/contact.html',
-  '/icon-transparent-512.png',
-  '/manifest.json',
-  OFFLINE_URL
-];
-
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
-    })
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.map(k => { if(k !== CACHE_NAME) return caches.delete(k); })))
-  );
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', e => {
-  // Skip non-GET and chrome extensions
-  if(e.request.method !== 'GET' || e.request.url.startsWith('chrome-extension')) return;
-  
-  // For API calls (Firebase), network first
-  if(e.request.url.includes('firebase') || e.request.url.includes('firestore') || e.request.url.includes('googleapis')){
-    e.respondWith(
-      fetch(e.request).catch(()=> caches.match(e.request))
-    );
-    return;
-  }
-  
-  // For pages, network first then cache, then offline
-  e.respondWith(
-    fetch(e.request).then(r => {
-      if(r && r.status === 200 && r.type === 'basic'){
-        const clone = r.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-      }
-      return r;
-    }).catch(()=>{
-      return caches.match(e.request).then(resp=>{
-        return resp || caches.match(OFFLINE_URL) || caches.match('/index.html');
-      });
-    })
-  );
-});
-
-// Background Sync - for offline chat messages
-self.addEventListener('sync', e => {
-  if(e.tag === 'sync-chat-messages'){
-    e.waitUntil(
-      // When back online, sync pending chat messages
-      console.log('Background sync: chat messages')
-    );
-  }
-  if(e.tag === 'sync-bookings'){
-    e.waitUntil(console.log('Background sync: bookings'));
-  }
-});
-
-// Periodic Sync - for periodic content update (optional)
-self.addEventListener('periodicsync', e => {
-  if(e.tag === 'update-nurses'){
-    e.waitUntil(
-      caches.open(CACHE_NAME).then(cache=> cache.add('/book-nurse.html'))
-    );
-  }
-});
-
-// Push Notifications - already good
-self.addEventListener('push', e => {
-  const data = e.data ? e.data.json() : {title:'LOVE CARE GLOBAL', body:'New nurse registration! Tap to view.'};
-  e.waitUntil(
-    self.registration.showNotification(data.title || 'LOVE CARE GLOBAL', {
-      body: data.body || 'New update available',
-      icon: '/icon-transparent-512.png',
-      badge: '/icon-transparent-512.png',
-      vibrate: [200,100,200],
-      data: {url: data.url || '/ceo-dashboard.html'}
-    })
-  );
-});
-
-self.addEventListener('notificationclick', e => {
-  e.notification.close();
-  e.waitUntil(
-    clients.openWindow(e.notification.data.url || '/index.html')
-  );
-});
+{
+  "id": "/?source=pwa",
+  "name": "LOVE CARE GLOBAL - Home Nursing",
+  "short_name": "LoveCare",
+  "description": "Licensed nurses to your doorstep - 24/7 in 8 countries. Book verified nurses, live GPS tracking, SOS emergency.",
+  "start_url": "/index.html?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
+  "orientation": "portrait",
+  "theme_color": "#a855f7",
+  "background_color": "#0e0a1c",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "medical",
+    "health",
+    "lifestyle",
+    "business"
+  ],
+  "icons": [
+    {
+      "src": "icon-transparent-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-transparent-512.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-transparent-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icon-transparent-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "LOVE CARE GLOBAL - Book nurses instantly"
+    },
+    {
+      "src": "icon-transparent-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "24/7 Nursing Care"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book a Nurse",
+      "short_name": "Book",
+      "description": "Book a nurse now",
+      "url": "/book-nurse.html",
+      "icons": [
+        {
+          "src": "icon-transparent-512.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "SOS Emergency",
+      "short_name": "SOS",
+      "description": "Emergency SOS",
+      "url": "/sos.html",
+      "icons": [
+        {
+          "src": "icon-transparent-512.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Group Chat",
+      "short_name": "Chat",
+      "description": "Nurses group chat",
+      "url": "/nurse-group-chat.html",
+      "icons": [
+        {
+          "src": "icon-transparent-512.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "handle_links": "preferred"
+}
