@@ -3,69 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exit | LOVE CARE GLOBAL</title>
-<meta name="theme-color" content="#0e0a1c">
+<title>Exit</title>
 <style>
-  html,body{margin:0;padding:0;background:#0e0a1c;height:100%;overflow:hidden}
+body{margin:0;background:#0e0a1c;color:white;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;text-align:center;padding:20px}
+h2{color:#a855f7}
+button{background:#a855f7;color:white;border:none;padding:14px 32px;border-radius:28px;font-size:18px;font-weight:bold}
 </style>
 </head>
 <body>
+<div style="font-size:64px">💜</div>
+<h2>LOVE CARE GLOBAL</h2>
+<p id="msg">Tap below to exit to home screen</p>
+<br>
+<a id="homeLink" href="intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end">
+  <button>Close App - Go Home</button>
+</a>
+
+<p style="opacity:0.5;font-size:13px;margin-top:30px">App will move to background<br>Press home button ⭕ if needed</p>
+
 <script>
-// V2 - FIXED: No about:blank, goes directly to home screen
-
-(function() {
-  // For PWABuilder APK (TWA) - this is the real close
-  function hardClose() {
-    try {
-      // 1. Try to close the window - works in APK
-      window.close();
-    } catch(e){}
-
-    try {
-      // 2. Try top window
-      window.top.close();
-    } catch(e){}
-
-    try {
-      // 3. Tell Android to move app to background = shows home screen
-      // This works in Trusted Web Activity
-      if (document.visibilityState) {
-        // Move task to back
-        window.history.go(-(window.history.length));
-      }
-    } catch(e){}
-
-    // 4. Last resort: try HOME intent WITHOUT staying in about:blank
-    // We use _self and immediate close after
-    try {
-      var a = document.createElement('a');
-      a.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
-      a.click();
-    } catch(e){}
-  }
-
-  // Try immediately
-  hardClose();
-
-  // Try again after 100ms, 300ms, 600ms
-  setTimeout(hardClose, 100);
-  setTimeout(hardClose, 300);
-  setTimeout(hardClose, 600);
-
-  // If still not closed after 1 sec, show a nice screen
-  // and user just taps X at top - that X DOES go to home!
+// Auto-try to go home on load (needs user gesture on some phones, so button is backup)
+function goHome() {
+  try {
+    // Method 1: HOME intent - this IS the home button
+    window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
+  } catch(e){}
+  
   setTimeout(function(){
-    document.body.innerHTML = `
-      <div style="background:#0e0a1c;color:white;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;text-align:center;padding:20px">
-        <div style="font-size:60px">💜</div>
-        <h2 style="color:#a855f7">LOVE CARE GLOBAL</h2>
-        <p>App closed successfully</p>
-        <p style="opacity:0.6;font-size:14px;margin-top:20px">Tap X at top left to return home</p>
-        <button onclick="window.close()" style="margin-top:20px;background:#a855f7;color:white;border:none;padding:12px 30px;border-radius:25px;font-size:16px">Close App</button>
-      </div>
-    `;
-  }, 1000);
-})();
+    try {
+      // Method 2: Move task to back (puts app in background = shows home)
+      window.history.go(-window.history.length);
+    } catch(e){}
+  }, 200);
+}
+
+// Try auto on load
+window.addEventListener('load', function(){
+  setTimeout(goHome, 300);
+});
+
+// When user taps button, it WILL go home because it's a user gesture
+document.getElementById('homeLink').addEventListener('click', function(e){
+  document.getElementById('msg').innerHTML = "Going to home screen...";
+});
 </script>
 </body>
 </html>
