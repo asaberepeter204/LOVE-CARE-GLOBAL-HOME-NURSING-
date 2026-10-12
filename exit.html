@@ -1,51 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Exit</title>
-<style>
-body{margin:0;background:#0e0a1c;color:white;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;text-align:center;padding:20px}
-h2{color:#a855f7}
-button{background:#a855f7;color:white;border:none;padding:14px 32px;border-radius:28px;font-size:18px;font-weight:bold}
-</style>
 </head>
-<body>
-<div style="font-size:64px">💜</div>
-<h2>LOVE CARE GLOBAL</h2>
-<p id="msg">Tap below to exit to home screen</p>
-<br>
-<a id="homeLink" href="intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end">
-  <button>Close App - Go Home</button>
+<body style="margin:0;background:#0e0a1c;color:white;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;flex-direction:column">
+
+<div style="font-size:70px">💜</div>
+<h2 style="color:#a855f7;margin:15px">LOVE CARE GLOBAL</h2>
+<p>Tap button below to go home</p>
+
+<!-- THIS IS REAL WORKING BUTTON - A LINK STYLED AS BUTTON -->
+<a href="intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end" 
+   style="background:#a855f7;color:white;text-decoration:none;padding:16px 40px;border-radius:30px;font-size:20px;font-weight:bold;margin-top:20px;display:inline-block">
+   CLOSE APP
 </a>
 
-<p style="opacity:0.5;font-size:13px;margin-top:30px">App will move to background<br>Press home button ⭕ if needed</p>
+<p style="opacity:0.5;font-size:12px;margin-top:30px">If not working, press your phone's ⭕ home button</p>
 
-<script>
-// Auto-try to go home on load (needs user gesture on some phones, so button is backup)
-function goHome() {
-  try {
-    // Method 1: HOME intent - this IS the home button
-    window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
-  } catch(e){}
-  
-  setTimeout(function(){
-    try {
-      // Method 2: Move task to back (puts app in background = shows home)
-      window.history.go(-window.history.length);
-    } catch(e){}
-  }, 200);
-}
-
-// Try auto on load
-window.addEventListener('load', function(){
-  setTimeout(goHome, 300);
-});
-
-// When user taps button, it WILL go home because it's a user gesture
-document.getElementById('homeLink').addEventListener('click', function(e){
-  document.getElementById('msg').innerHTML = "Going to home screen...";
-});
-</script>
 </body>
 </html>
