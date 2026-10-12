@@ -3,27 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exiting | LOVE CARE GLOBAL</title>
+<title>Exiting... | LOVE CARE GLOBAL</title>
 <meta name="theme-color" content="#a855f7">
 <style>
-body{margin:0;background:#0e0a1c;color:#fff;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;text-align:center}
-.logo{font-size:56px;animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.1)}}
-h1{color:#a855f7;margin:10px 0}
+  body { margin:0; background:#0e0a1c; color:white; font-family:system-ui; display:flex; align-items:center; justify-content:center; height:100vh; flex-direction:column; }
+  .logo{font-size:48px; animation: pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1} 50%{opacity:.5}}
 </style>
 </head>
 <body>
-<div class="logo">💜</div>
+<div class="logo">ðŸ’œ</div>
+<h2>Thank you for using</h2>
 <h1>LOVE CARE GLOBAL</h1>
 <p>Closing app...</p>
+
 <script>
-function closeApp(){
-  try{window.location.href="intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";}catch(e){}
-  setTimeout(function(){try{window.close();}catch(e){}},400);
-  setTimeout(function(){try{window.location.href="about:blank";}catch(e){}},900);
+function closeApp() {
+  // Hide instantly - app appears to disappear
+  document.body.style.opacity = '0';
+  document.body.style.transition = 'opacity 0.2s';
+  
+  // Try native close (for PWABuilder TWA APK - this closes the activity)
+  try{ if(window.Android && window.Android.exitApp){ window.Android.exitApp(); return; } }catch(e){}
+  try{ window.close(); }catch(e){}
+  try{ self.close(); }catch(e){}
+  try{ window.open('', '_self').close(); }catch(e){}
+  
+  // Clear history stack then close - makes TWA exit
+  try{ window.history.go(-(window.history.length+5)); }catch(e){}
+  
+  setTimeout(()=>{
+    try{ window.close(); }catch(e){}
+    // GO TO PHONE HOME SCREEN - this is what you want!
+    try{
+      window.location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
+    }catch(e){}
+  }, 200);
+  
+  setTimeout(()=>{
+    // Final fallback if still here
+    try{ window.close(); }catch(e){}
+    try{ window.location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end"; }catch(e){}
+  }, 600);
 }
+
+// Auto run on load
 window.addEventListener('load', closeApp);
+// Tap anywhere to close again
 document.addEventListener('click', closeApp);
+document.addEventListener('touchstart', closeApp);
 </script>
 </body>
 </html>
