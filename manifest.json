@@ -89,20 +89,21 @@
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Book nurses"
+      "label": "LOVE CARE GLOBAL - Book nurses instantly"
     },
     {
       "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "24/7 Care"
+      "label": "24/7 Nursing Care"
     }
   ],
   "shortcuts": [
     {
       "name": "Book a Nurse",
       "short_name": "Book",
+      "description": "Book a nurse now",
       "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/book-nurse.html",
       "icons": [
         {
@@ -115,6 +116,7 @@
     {
       "name": "SOS Emergency",
       "short_name": "SOS",
+      "description": "Emergency SOS",
       "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/sos.html",
       "icons": [
         {
@@ -127,6 +129,7 @@
     {
       "name": "Group Chat",
       "short_name": "Chat",
+      "description": "Nurses group chat",
       "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/nurse-group-chat.html",
       "icons": [
         {
@@ -152,7 +155,8 @@
       "accept": {
         "image/*": [
           ".jpg",
-          ".png"
+          ".png",
+          ".pdf"
         ]
       }
     }
@@ -161,12 +165,20 @@
     {
       "protocol": "web+lovecare",
       "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/?protocol=%s"
+    },
+    {
+      "protocol": "mailto",
+      "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/contact.html?mailto=%s"
+    },
+    {
+      "protocol": "sms",
+      "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/contact.html?sms=%s"
     }
   ],
   "widgets": [
     {
       "name": "LoveCare Quick Book",
-      "description": "Quick book",
+      "description": "Quick book a nurse",
       "tag": "quick-book",
       "template": "quick-book-template",
       "msAcTemplate": "/LOVE-CARE-GLOBAL-HOME-NURSING-/",
