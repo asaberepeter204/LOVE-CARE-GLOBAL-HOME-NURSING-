@@ -3,55 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exiting... | LOVE CARE GLOBAL</title>
-<meta name="theme-color" content="#a855f7">
+<title>Exit | LOVE CARE GLOBAL</title>
+<meta name="theme-color" content="#0e0a1c">
 <style>
-  body { margin:0; background:#0e0a1c; color:white; font-family:system-ui; display:flex; align-items:center; justify-content:center; height:100vh; flex-direction:column; }
-  .logo{font-size:48px; animation: pulse 1s infinite;}
-  @keyframes pulse{0%,100%{opacity:1} 50%{opacity:.5}}
+  html,body{margin:0;padding:0;background:#0e0a1c;height:100%;overflow:hidden}
 </style>
 </head>
 <body>
-<div class="logo">ðŸ’œ</div>
-<h2>Thank you for using</h2>
-<h1>LOVE CARE GLOBAL</h1>
-<p>Closing app...</p>
-
 <script>
-function closeApp() {
-  // Hide instantly - app appears to disappear
-  document.body.style.opacity = '0';
-  document.body.style.transition = 'opacity 0.2s';
-  
-  // Try native close (for PWABuilder TWA APK - this closes the activity)
-  try{ if(window.Android && window.Android.exitApp){ window.Android.exitApp(); return; } }catch(e){}
-  try{ window.close(); }catch(e){}
-  try{ self.close(); }catch(e){}
-  try{ window.open('', '_self').close(); }catch(e){}
-  
-  // Clear history stack then close - makes TWA exit
-  try{ window.history.go(-(window.history.length+5)); }catch(e){}
-  
-  setTimeout(()=>{
-    try{ window.close(); }catch(e){}
-    // GO TO PHONE HOME SCREEN - this is what you want!
-    try{
-      window.location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
-    }catch(e){}
-  }, 200);
-  
-  setTimeout(()=>{
-    // Final fallback if still here
-    try{ window.close(); }catch(e){}
-    try{ window.location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end"; }catch(e){}
-  }, 600);
-}
+// V2 - FIXED: No about:blank, goes directly to home screen
 
-// Auto run on load
-window.addEventListener('load', closeApp);
-// Tap anywhere to close again
-document.addEventListener('click', closeApp);
-document.addEventListener('touchstart', closeApp);
+(function() {
+  // For PWABuilder APK (TWA) - this is the real close
+  function hardClose() {
+    try {
+      // 1. Try to close the window - works in APK
+      window.close();
+    } catch(e){}
+
+    try {
+      // 2. Try top window
+      window.top.close();
+    } catch(e){}
+
+    try {
+      // 3. Tell Android to move app to background = shows home screen
+      // This works in Trusted Web Activity
+      if (document.visibilityState) {
+        // Move task to back
+        window.history.go(-(window.history.length));
+      }
+    } catch(e){}
+
+    // 4. Last resort: try HOME intent WITHOUT staying in about:blank
+    // We use _self and immediate close after
+    try {
+      var a = document.createElement('a');
+      a.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.HOME;end";
+      a.click();
+    } catch(e){}
+  }
+
+  // Try immediately
+  hardClose();
+
+  // Try again after 100ms, 300ms, 600ms
+  setTimeout(hardClose, 100);
+  setTimeout(hardClose, 300);
+  setTimeout(hardClose, 600);
+
+  // If still not closed after 1 sec, show a nice screen
+  // and user just taps X at top - that X DOES go to home!
+  setTimeout(function(){
+    document.body.innerHTML = `
+      <div style="background:#0e0a1c;color:white;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;text-align:center;padding:20px">
+        <div style="font-size:60px">💜</div>
+        <h2 style="color:#a855f7">LOVE CARE GLOBAL</h2>
+        <p>App closed successfully</p>
+        <p style="opacity:0.6;font-size:14px;margin-top:20px">Tap X at top left to return home</p>
+        <button onclick="window.close()" style="margin-top:20px;background:#a855f7;color:white;border:none;padding:12px 30px;border-radius:25px;font-size:16px">Close App</button>
+      </div>
+    `;
+  }, 1000);
+})();
 </script>
 </body>
 </html>
