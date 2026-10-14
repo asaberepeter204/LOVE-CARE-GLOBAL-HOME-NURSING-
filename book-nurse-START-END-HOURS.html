@@ -259,7 +259,25 @@ async function loadPaystackKey(){
 loadPaystackKey();
 async function checkNurseAvailability(nurseId){ return true; }
 let paymentMethod='paystack';
-window.setPaymentMethod=(m)=>{ paymentMethod=m; document.getElementById('payMethodPaystack')?.classList.toggle('active',m==='paystack'); document.getElementById('payMethodCOD')?.classList.toggle('active',m==='cod'); const btn=document.getElementById('payBtn'); const total=document.getElementById('totalDisplay').textContent; if(m==='cod'){ btn.innerHTML='📦 Book with 50% Now, 50% Cash on Delivery'; } else { btn.innerHTML=`💳 Pay <span>${total}</span> & Book`; } };
+window.setPaymentMethod=(m)=>{ 
+  paymentMethod=m; 
+  window.paymentMethod=m;
+  localStorage.setItem('lcg_payment_method', m);
+  document.getElementById('payMethodPaystack')?.classList.toggle('active',m==='paystack'); 
+  document.getElementById('payMethodCOD')?.classList.toggle('active',m==='cod'); 
+  const btn=document.getElementById('payBtn'); 
+  const total=document.getElementById('totalDisplay').textContent; 
+  const minSpan=document.getElementById('payAmount');
+  const totalVal = minSpan ? minSpan.textContent : total;
+  if(m==='cod'){ 
+    btn.innerHTML='📦 Book with 50% Now, 50% Cash on Delivery — Pay Now & Open Paystack'; 
+    btn.style.background='linear-gradient(135deg,#a855f7,#d8b4fe)';
+  } else { 
+    btn.innerHTML=`💳 Pay <span id="payAmount">${totalVal}</span> & Book Selected Nurse`; 
+    btn.style.background='linear-gradient(135deg,#a855f7,#d8b4fe)';
+  } 
+  console.log('Payment method set to:', m);
+};
 async function sendReceiptSMS(b){ console.log('SMS to',b.phone,b.id); }
 
 
@@ -731,15 +749,36 @@ window.bookSelectedNurse=async()=>{
   document.getElementById('bookResult').innerHTML='<div style="background:rgba(168,85,247,.12);padding:12px;border-radius:12px;color:#d8b4fe">Opening Paystack secure payment...</div>';
 
   try{
-    const payCurrency = ['GHS','NGN','ZAR','USD','GBP','KES'].includes(calc.rateObj.cur) ? calc.rateObj.cur : 'GHS';
+    // Ensure paymentMethod is current
+    const currentMethod = window.paymentMethod || paymentMethod || localStorage.getItem('lcg_payment_method') || 'paystack';
+    paymentMethod = currentMethod;
+    
+    let payCurrency = 'GHS';
+    if(['GHS','NGN','ZAR','USD','GBP','KES'].includes(calc.rateObj.cur)){
+      payCurrency = calc.rateObj.cur;
+    } else if(country==='US' || calc.rateObj.cur==='USD'){
+      payCurrency='USD';
+    } else {
+      payCurrency='GHS';
+    }
+    
     const payEmail = clientEmail && clientEmail.includes('@') ? clientEmail : `client_${Date.now()}@lovecareglobal.com`;
-    const isCOD = paymentMethod==='cod'; const amountToPayNow = isCOD ? Math.round(offer*0.5*100) : Math.round(offer*100);
+    const isCOD = currentMethod==='cod'; 
+    // Paystack amount must be in pesewas/kobo/cents: GHS 1 = 100 pesewas
+    // For 50% now: if offer is 3600, pay 1800 = 180000 pesewas
+    const fullAmountPesewas = Math.round(offer*100);
+    const amountToPayNow = isCOD ? Math.round((offer*0.5)*100) : fullAmountPesewas;
     const payAmountKobo = amountToPayNow;
     const payAmountDisplay = isCOD ? offer*0.5 : offer;
 
+    console.log('Paystack Debug:', {payCurrency, payEmail, amountToPayNow, payAmountKobo, isCOD, offer, PAYSTACK_PUBLIC_KEY});
 
-    if(payAmountKobo < 100){ // Paystack min
-      throw new Error('Amount too small for Paystack. Minimum is 1 GHS.');
+    if(payAmountKobo < 100){ // Paystack min = 100 pesewas = 1 GHS
+      throw new Error('Amount too small for Paystack. Minimum is 1 GHS (100 pesewas). Your offer: '+offer);
+    }
+    
+    if(!PAYSTACK_PUBLIC_KEY || !PAYSTACK_PUBLIC_KEY.startsWith('pk_')){
+      throw new Error('Invalid Paystack public key: '+PAYSTACK_PUBLIC_KEY);
     }
 
     const handler=PaystackPop.setup({
@@ -758,8 +797,13 @@ window.bookSelectedNurse=async()=>{
       },
       onClose:()=>{
         btn.disabled=false;
-        btn.innerHTML=`💳 Pay <span id="payAmount">${calc.rateObj.cur} ${calc.total.toFixed(2)}</span> & Book Selected Nurse`;
-        document.getElementById('bookResult').innerHTML='<div style="background:rgba(239,68,68,.1);padding:12px;border-radius:12px;color:#f87171;border:1px solid rgba(239,68,68,.2)">⚠️ Payment cancelled — You can try again.</div>';
+        const currentMethod = window.paymentMethod || paymentMethod || 'paystack';
+        if(currentMethod==='cod'){
+          btn.innerHTML='📦 Book with 50% Now, 50% Cash on Delivery — Pay Now & Open Paystack';
+        } else {
+          btn.innerHTML=`💳 Pay <span id="payAmount">${calc.rateObj.cur} ${calc.total.toFixed(2)}</span> & Book Selected Nurse`;
+        }
+        document.getElementById('bookResult').innerHTML='<div style="background:rgba(239,68,68,.1);padding:12px;border-radius:12px;color:#f87171;border:1px solid rgba(239,68,68,.2)">⚠️ Payment cancelled — You can try again. Click the button again to retry.</div>';
       },
       callback: async function(res){
         btn.textContent='✅ Payment OK — Saving...';
@@ -787,7 +831,9 @@ window.bookSelectedNurse=async()=>{
         btn.innerHTML=`💳 Pay <span id="payAmount">${calc.rateObj.cur} ${calc.total.toFixed(2)}</span> & Book Selected Nurse`;
       }
     });
+    console.log('Opening Paystack iframe...');
     handler.openIframe();
+    console.log('Paystack iframe opened');
   }catch(err){
     console.error('Paystack error',err);
     document.getElementById('bookResult').innerHTML=`<div style="background:rgba(239,68,68,.12);padding:12px;border-radius:12px;color:#fca5a5">❌ Payment init failed: ${err.message}. Ensure amount > 0, email valid, and key is correct live key.</div>`;
