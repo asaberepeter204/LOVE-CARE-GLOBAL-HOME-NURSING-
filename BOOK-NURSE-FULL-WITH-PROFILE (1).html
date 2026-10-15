@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book Nurse — Full Payment + Nurse Profile Preview | LOVE CARE GLOBAL</title>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:50;background:#1a1040;border-bottom:2px solid #a855f7;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.card{background:#1c1238;border:1px solid rgba(168,85,247,.2);border-radius:18px;padding:16px;margin:12px}
+label{font-size:11px;font-weight:800;margin:10px 0 6px;display:block;color:#c4b5fd}
+input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:#0e0a1c;color:#ede9fe;font-size:13px}
+.btnSmall{border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
+.btnSubmit{width:100%;border:none;border-radius:14px;padding:18px;font-weight:900;cursor:pointer;margin-top:12px;font-size:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.3)}
+.btnSubmit:active{transform:scale(0.96)}
+.calcDisplay{background:rgba(14,10,28,.6);border:1px dashed rgba(168,85,247,.25);border-radius:12px;padding:12px;margin-top:10px;font-size:12px;line-height:1.8}
+.timeBadge{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(76,29,149,.2));border:1px solid rgba(168,85,247,.25);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:800;color:#d8b4fe;display:inline-flex}
+.modalOverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
+.modalOverlay.show{display:flex}
+.modal{background:#1c1238;border-radius:20px;padding:24px;max-width:420px;width:100%;border:1px solid #a855f7;text-align:center}
+.nursePreviewOverlay{position:fixed;inset:0;background:rgba(5,3,14,.92);backdrop-filter:blur(16px);z-index:6000;display:none;align-items:center;justify-content:center;padding:16px}
+.nursePreviewOverlay.show{display:flex}
+.nursePreviewCard{background:linear-gradient(180deg,rgba(42,26,82,.98),rgba(20,12,44,.98));border:1px solid rgba(168,85,247,.35);border-radius:28px;padding:0;max-width:480px;width:100%;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.7);max-height:92vh;overflow-y:auto}
+.previewMedia{position:relative;width:100%;height:340px;background:#0e0a1c;overflow:hidden}
+.previewMedia img,.previewMedia video{width:100%;height:100%;object-fit:cover}
+.previewGradient{position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,12,44,1) 0%,rgba(20,12,44,.6) 30%,transparent 65%)}
+.previewTop{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center}
+.badge{padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900}
+.badge.online{background:rgba(34,197,94,.2);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.previewInfo{padding:18px}
+.previewName{font-size:24px;font-weight:900;color:#f3e8ff;margin-bottom:6px}
+.previewMeta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.previewMeta span{background:rgba(168,85,247,.16);border:1px solid rgba(168,85,247,.22);padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;color:#d8b4fe}
+.previewBio{font-size:12px;color:#c4b5fd;line-height:1.7;margin:12px 0;background:rgba(14,10,28,.6);padding:14px;border-radius:12px;border:1px solid rgba(168,85,247,.12)}
+.previewActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.btnPreviewCancel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#a78bfa;padding:14px;border-radius:12px;font-weight:800;cursor:pointer}
+.btnPreviewContinue{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;padding:14px;border-radius:12px;font-weight:900;cursor:pointer;box-shadow:0 8px 20px rgba(168,85,247,.3)}
+.nurse-card{border:1px solid rgba(168,85,247,.14);border-radius:18px;padding:14px;background:rgba(14,10,28,.6);cursor:pointer;transition:.2s;margin-bottom:10px}
+.nurse-card:hover{border-color:rgba(168,85,247,.4);transform:translateY(-2px)}
+.nurse-card.selected{border-color:#a855f7;background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.15))}
+</style>
+</head>
+<body>
+<div class="topbar">
+<div><b style="color:#f3e8ff">💳 BOOK NURSE — FULL PAYMENT + PROFILE PREVIEW</b><br><small style="color:#4ade80">✅ Nurse Profile Preview + Paystack Prompt Working</small></div>
+<div style="display:flex;gap:8px">
+<a href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij48bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLGluaXRpYWwtc2NhbGU9MSI+Cjx0aXRsZT5Cb29rIE51cnNlIOKAlCA1MCUgTm93IDUwJSBDYXNoIHwgTE9WRSBDQVJFIEdMT0JBTDwvdGl0bGU+CjxsaW5rIGhyZWY9Imh0dHBzOi8vZm9udHMuZ29vZ2xlYXBpcy5jb20vY3NzMj9mYW1pbHk9SW50ZXI6d2dodEA0MDA7NjAwOzgwMCZkaXNwbGF5PXN3YXAiIHJlbD0ic3R5bGVzaGVldCI+CjxzY3JpcHQgc3JjPSJodHRwczovL2pzLnBheXN0YWNrLmNvL3YxL2lubGluZS5qcyI+PC9zY3JpcHQ+CjxsaW5rIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iaHR0cHM6Ly91bnBrZy5jb20vbGVhZmxldEAxLjkuNC9kaXN0L2xlYWZsZXQuY3NzIi8+CjxzY3JpcHQgc3JjPSJodHRwczovL3VucGtnLmNvbS9sZWFmbGV0QDEuOS40L2Rpc3QvbGVhZmxldC5qcyI+PC9zY3JpcHQ+CjxzdHlsZT4KKntib3gtc2l6aW5nOmJvcmRlci1ib3g7bWFyZ2luOjA7cGFkZGluZzowfWJvZHl7Zm9udC1mYW1pbHk6SW50ZXIsc2Fucy1zZXJpZjtiYWNrZ3JvdW5kOiMwZTBhMWM7Y29sb3I6I2U4ZTBmZn0KLnRvcGJhcntwb3NpdGlvbjpzdGlja3k7dG9wOjA7ei1pbmRleDo1MDtiYWNrZ3JvdW5kOiMxYTEwNDA7Ym9yZGVyLWJvdHRvbToycHggc29saWQgI2Y1OWUwYjtwYWRkaW5nOjEycHggMTZweDtkaXNwbGF5OmZsZXg7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47YWxpZ24taXRlbXM6Y2VudGVyfQouY2FyZHtiYWNrZ3JvdW5kOiMxYzEyMzg7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDI0NSwxNTgsMTEsLjI1KTtib3JkZXItcmFkaXVzOjE4cHg7cGFkZGluZzoxNnB4O21hcmdpbjoxMnB4fQpsYWJlbHtmb250LXNpemU6MTFweDtmb250LXdlaWdodDo4MDA7bWFyZ2luOjEwcHggMCA2cHg7ZGlzcGxheTpibG9jaztjb2xvcjojZmFjYzE1fQppbnB1dCxzZWxlY3QsdGV4dGFyZWF7d2lkdGg6MTAwJTtwYWRkaW5nOjEycHggMTRweDtib3JkZXItcmFkaXVzOjEycHg7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDI0NSwxNTgsMTEsLjIpO2JhY2tncm91bmQ6IzBlMGExYztjb2xvcjojZWRlOWZlO2ZvbnQtc2l6ZToxM3B4fQouYnRue2JvcmRlcjpub25lO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjEycHggMThweDtmb250LXdlaWdodDo5MDA7Y3Vyc29yOnBvaW50ZXI7bWFyZ2luOjRweH0KLmJ0blN1Ym1pdHt3aWR0aDoxMDAlO2JvcmRlcjpub25lO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjE4cHg7Zm9udC13ZWlnaHQ6OTAwO2N1cnNvcjpwb2ludGVyO21hcmdpbi10b3A6MTBweDtmb250LXNpemU6MTZweDtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI2Y1OWUwYiwjZmFjYzE1KTtjb2xvcjojMWUwYTNhO2JveC1zaGFkb3c6MCA4cHggMjBweCByZ2JhKDI0NSwxNTgsMTEsLjMpfQouY2FsY0Rpc3BsYXl7YmFja2dyb3VuZDpyZ2JhKDE0LDEwLDI4LC42KTtib3JkZXI6MXB4IGRhc2hlZCByZ2JhKDI0NSwxNTgsMTEsLjMpO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjEycHg7bWFyZ2luLXRvcDoxMHB4O2ZvbnQtc2l6ZToxMnB4O2xpbmUtaGVpZ2h0OjEuOH0KLnRpbWVCYWRnZXtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcscmdiYSgyNDUsMTU4LDExLC4yKSxyZ2JhKDE2OCw4NSwyNDcsLjIpKTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoMjQ1LDE1OCwxMSwuMyk7Ym9yZGVyLXJhZGl1czoxMHB4O3BhZGRpbmc6OHB4IDEycHg7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6ODAwO2NvbG9yOiNmYWNjMTU7ZGlzcGxheTppbmxpbmUtZmxleH0KLm1vZGFsT3ZlcmxheXtwb3NpdGlvbjpmaXhlZDtpbnNldDowO2JhY2tncm91bmQ6cmdiYSgwLDAsMCwuODUpO3otaW5kZXg6NTAwMDtkaXNwbGF5Om5vbmU7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7cGFkZGluZzoxNnB4fQoubW9kYWxPdmVybGF5LnNob3d7ZGlzcGxheTpmbGV4fQoubW9kYWx7YmFja2dyb3VuZDojMWMxMjM4O2JvcmRlci1yYWRpdXM6MjBweDtwYWRkaW5nOjI0cHg7bWF4LXdpZHRoOjQyMHB4O3dpZHRoOjEwMCU7Ym9yZGVyOjFweCBzb2xpZCAjZjU5ZTBifQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8ZGl2IGNsYXNzPSJ0b3BiYXIiPgo8ZGl2PjxiIHN0eWxlPSJjb2xvcjojZmFjYzE1Ij7wn5OmIDUwJSBOT1cgKyA1MCUgQ0FTSCBPTiBERUxJVkVSWTwvYj48YnI+PHNtYWxsIHN0eWxlPSJjb2xvcjojYTc4YmZhIj5QYXkgaGFsZiBub3cgdmlhIFBheXN0YWNrLCBoYWxmIGNhc2ggdG8gbnVyc2U8L3NtYWxsPjwvZGl2Pgo8ZGl2IHN0eWxlPSJkaXNwbGF5OmZsZXg7Z2FwOjhweCI+CjxhIGhyZWY9ImJvb2stbnVyc2UuaHRtbCIgc3R5bGU9InBhZGRpbmc6MTBweCAxNnB4O2JvcmRlci1yYWRpdXM6OTk5cHg7YmFja2dyb3VuZDpyZ2JhKDE2OCw4NSwyNDcsLjIpO2JvcmRlcjoxcHggc29saWQgI2E4NTVmNztjb2xvcjojZDhiNGZlO3RleHQtZGVjb3JhdGlvbjpub25lO2ZvbnQtd2VpZ2h0OjgwMDtmb250LXNpemU6MTJweCI+8J+SsyBGdWxsIFBheW1lbnQ8L2E+CjxhIGhyZWY9ImluZGV4Lmh0bWwiIHN0eWxlPSJwYWRkaW5nOjEwcHggMTZweDtib3JkZXItcmFkaXVzOjk5OXB4O2JhY2tncm91bmQ6cmdiYSgyNTUsMjU1LDI1NSwuMDgpO2JvcmRlcjoxcHggc29saWQgIzMzMztjb2xvcjojZTlkNWZmO3RleHQtZGVjb3JhdGlvbjpub25lO2ZvbnQtd2VpZ2h0OjgwMDtmb250LXNpemU6MTJweCI+SG9tZTwvYT4KPC9kaXY+CjwvZGl2PgoKPGRpdiBzdHlsZT0ibWF4LXdpZHRoOjgwMHB4O21hcmdpbjowIGF1dG87cGFkZGluZzoxMHB4Ij4KPGRpdiBjbGFzcz0iY2FyZCI+CjxoMz7ij7HvuI8gV29yayBIb3VycyDigJQgQ2hhbmdlcyBJbnN0YW50bHkgKEZpeGVkKTwvaDM+CjxkaXYgc3R5bGU9ImRpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmciAxZnI7Z2FwOjhweCI+CjxkaXY+PGxhYmVsPlN0YXJ0IFRpbWUgKjwvbGFiZWw+PGlucHV0IGlkPSJzdGFydFRpbWUiIHR5cGU9InRpbWUiIHZhbHVlPSIwODowMCI+PC9kaXY+CjxkaXY+PGxhYmVsPkVuZCBUaW1lICo8L2xhYmVsPjxpbnB1dCBpZD0iZW5kVGltZSIgdHlwZT0idGltZSIgdmFsdWU9IjE3OjAwIj48L2Rpdj4KPGRpdj48bGFiZWw+SG91cnMvRGF5IChBdXRvKTwvbGFiZWw+PGRpdiBpZD0iaG91cnNQZXJEYXlEaXNwbGF5IiBjbGFzcz0idGltZUJhZGdlIiBzdHlsZT0id2lkdGg6MTAwJTtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO21hcmdpbi10b3A6MjJweDtwYWRkaW5nOjE0cHg7Zm9udC1zaXplOjE2cHgiPjkuMCBocnM8L2Rpdj48L2Rpdj4KPC9kaXY+CjxkaXYgc3R5bGU9ImRpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmciAxZnI7Z2FwOjhweDttYXJnaW4tdG9wOjEwcHgiPgo8ZGl2PjxsYWJlbD5DYXJlIE1vZGU8L2xhYmVsPjxzZWxlY3QgaWQ9ImNhcmVNb2RlIj48b3B0aW9uIHZhbHVlPSJIb3VybHkiPkhvdXJseTwvb3B0aW9uPjxvcHRpb24gdmFsdWU9IkRhaWx5IiBzZWxlY3RlZD5EYWlseTwvb3B0aW9uPjxvcHRpb24gdmFsdWU9IldlZWtseSI+V2Vla2x5PC9vcHRpb24+PG9wdGlvbiB2YWx1ZT0iTW9udGhseSI+TW9udGhseTwvb3B0aW9uPjwvc2VsZWN0PjwvZGl2Pgo8ZGl2PjxsYWJlbD5RdWFudGl0eTwvbGFiZWw+PGlucHV0IGlkPSJxdWFudGl0eSIgdHlwZT0ibnVtYmVyIiB2YWx1ZT0iMSIgbWluPSIxIj48L2Rpdj4KPGRpdj48bGFiZWw+Q291bnRyeTwvbGFiZWw+PHNlbGVjdCBpZD0iY291bnRyeVNlbGVjdCI+PG9wdGlvbiB2YWx1ZT0iR0giIHNlbGVjdGVkPvCfh6zwn4etIEdIIOKAlCBHSFM8L29wdGlvbj48b3B0aW9uIHZhbHVlPSJVUyI+8J+HuvCfh7ggVVMg4oCUIFVTRDwvb3B0aW9uPjwvc2VsZWN0PjwvZGl2Pgo8L2Rpdj4KPGRpdiBzdHlsZT0iZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDo4cHg7bWFyZ2luLXRvcDoxMHB4Ij4KPGRpdj48bGFiZWw+VHJhbnNwb3J0IChHSFMpPC9sYWJlbD48aW5wdXQgaWQ9InRyYW5zcG9ydCIgdHlwZT0ibnVtYmVyIiB2YWx1ZT0iMCI+PC9kaXY+CjxkaXY+PGxhYmVsPkhvdXJseSBSYXRlIChDRU8gc2V0cyk8L2xhYmVsPjxpbnB1dCBpZD0iaG91cmx5UmF0ZUlucHV0IiB0eXBlPSJudW1iZXIiIHZhbHVlPSIxMCIgcmVhZG9ubHkgc3R5bGU9ImJhY2tncm91bmQ6cmdiYSgyNDUsMTU4LDExLC4xKSI+PC9kaXY+CjwvZGl2Pgo8ZGl2IGNsYXNzPSJjYWxjRGlzcGxheSIgaWQ9ImNhbGNEaXNwbGF5Ij5Mb2FkaW5nLi4uPC9kaXY+CjwvZGl2PgoKPGRpdiBjbGFzcz0iY2FyZCI+CjxoMz7wn5Gp4oCN4pqV77iPIFNlbGVjdCBOdXJzZTwvaDM+CjxkaXYgc3R5bGU9ImRpc3BsYXk6Z3JpZDtnYXA6OHB4Ij4KPGJ1dHRvbiBjbGFzcz0iYnRuIiBzdHlsZT0iYmFja2dyb3VuZDojMjU2M2ViO2NvbG9yOndoaXRlIiBvbmNsaWNrPSJzZWxlY3ROdXJzZSgnbnVyc2UxJywnQW1hIE9zZWknLCcrMjMzMjQwMDAwMDAxJykiPlNlbGVjdCBBbWEgT3NlaSDigJQgMS4ya20g4oCUIEdIUyAxMC9ocjwvYnV0dG9uPgo8YnV0dG9uIGNsYXNzPSJidG4iIHN0eWxlPSJiYWNrZ3JvdW5kOiMyNTYzZWI7Y29sb3I6d2hpdGUiIG9uY2xpY2s9InNlbGVjdE51cnNlKCdudXJzZTInLCdHcmFjZSBNZW5zYWgnLCcrMjMzMjQwMDAwMDAyJykiPlNlbGVjdCBHcmFjZSBNZW5zYWgg4oCUIDIuMWttIOKAlCBHSFMgMTAvaHI8L2J1dHRvbj4KPC9kaXY+CjxkaXYgaWQ9InNlbGVjdGVkTnVyc2VJbmZvIiBzdHlsZT0ibWFyZ2luLXRvcDoxMHB4O3BhZGRpbmc6MTBweDtiYWNrZ3JvdW5kOiMwZTBhMWM7Ym9yZGVyLXJhZGl1czoxMHB4Ij5ObyBudXJzZSBzZWxlY3RlZDwvZGl2Pgo8ZGl2IHN0eWxlPSJoZWlnaHQ6MzAwcHg7Ym9yZGVyLXJhZGl1czoxMnB4O292ZXJmbG93OmhpZGRlbjttYXJnaW4tdG9wOjEwcHg7Ym9yZGVyOjFweCBzb2xpZCAjZjU5ZTBiIj48ZGl2IGlkPSJtYXAiIHN0eWxlPSJ3aWR0aDoxMDAlO2hlaWdodDoxMDAlIj48L2Rpdj48L2Rpdj4KPC9kaXY+Cgo8ZGl2IGNsYXNzPSJjYXJkIiBzdHlsZT0iYm9yZGVyOjJweCBzb2xpZCAjZjU5ZTBiIj4KPGgzIHN0eWxlPSJjb2xvcjojZmFjYzE1Ij7wn5KwIDUwJSBOb3cgKyA1MCUgQ2FzaCDigJQgQm9va2luZzwvaDM+CjxsYWJlbD5DbGllbnQgTmFtZTwvbGFiZWw+PGlucHV0IGlkPSJjbGllbnRGdWxsTmFtZSIgdmFsdWU9IkFTQUJFUkUgUEVURVIiPgo8bGFiZWw+UGhvbmUgKjwvbGFiZWw+PGlucHV0IGlkPSJjbGllbnRQaG9uZSIgdmFsdWU9IisyMzM1NDQxMjE4MTQiPgo8bGFiZWw+RW1haWwgKjwvbGFiZWw+PGlucHV0IGlkPSJjbGllbnRFbWFpbCIgdmFsdWU9ImxvdmVjYXJlZ2xvYmFsQGdtYWlsLmNvbSI+CjxsYWJlbD5QYXRpZW50IE5hbWUgKjwvbGFiZWw+PGlucHV0IGlkPSJwYXRpZW50TmFtZSIgdmFsdWU9IkpvaG4gRG9lIj4KCjxkaXYgc3R5bGU9ImRpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmcjtnYXA6MTBweDttYXJnaW4tdG9wOjEycHgiPgo8ZGl2PjxsYWJlbD5Ub3RhbCBNaW5pbXVtPC9sYWJlbD48ZGl2IGlkPSJ0b3RhbERpc3BsYXkiIHN0eWxlPSJwYWRkaW5nOjE0cHg7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNmNTllMGIsI2ZhY2MxNSk7Y29sb3I6IzFlMGEzYTtib3JkZXItcmFkaXVzOjEycHg7Zm9udC13ZWlnaHQ6OTAwO2ZvbnQtc2l6ZToxOHB4O3RleHQtYWxpZ246Y2VudGVyIj5HSFMgMDwvZGl2PjwvZGl2Pgo8ZGl2PjxsYWJlbD5Zb3VyIE9mZmVyPC9sYWJlbD48aW5wdXQgaWQ9ImNsaWVudE9mZmVyIiB0eXBlPSJudW1iZXIiIHZhbHVlPSI5MCI+PHNtYWxsIHN0eWxlPSJjb2xvcjojYTc4YmZhIj5NaW46IDxzcGFuIGlkPSJtaW5BbW91bnQiPjA8L3NwYW4+PC9zbWFsbD48L2Rpdj4KPC9kaXY+Cgo8ZGl2IHN0eWxlPSJiYWNrZ3JvdW5kOnJnYmEoMjQ1LDE1OCwxMSwuMTIpO2JvcmRlcjoxcHggc29saWQgcmdiYSgyNDUsMTU4LDExLC4zKTtib3JkZXItcmFkaXVzOjEycHg7cGFkZGluZzoxMnB4O21hcmdpbi10b3A6MTJweDtmb250LXNpemU6MTJweCI+CjxiIHN0eWxlPSJjb2xvcjojZmFjYzE1Ij7wn5KzIDUwJSBQYXltZW50IEJyZWFrZG93bjo8L2I+PGJyPgpUb3RhbDogPHNwYW4gaWQ9ImJyZWFrZG93blRvdGFsIiBzdHlsZT0iY29sb3I6I2YzZThmZjtmb250LXdlaWdodDo5MDAiPkdIUyA5MC4wMDwvc3Bhbj48YnI+ClBheSBOb3cgdmlhIFBheXN0YWNrOiA8YiBpZD0iYnJlYWtkb3duTm93IiBzdHlsZT0iY29sb3I6IzRhZGU4MCI+R0hTIDQ1LjAwPC9iPiAoNTAlKTxicj4KUGF5IENhc2ggdG8gTnVyc2U6IDxiIGlkPSJicmVha2Rvd25DT0QiIHN0eWxlPSJjb2xvcjojZmFjYzE1Ij5HSFMgNDUuMDA8L2I+ICg1MCUgb24gZGVsaXZlcnkpPGJyPgo8c21hbGwgc3R5bGU9ImNvbG9yOiNhNzhiZmEiPk51cnNlIGdldHMgNzAlIG9mIHBhaWQgYW1vdW50IG5vdywgQ0VPIDMwJSDigJQgUmVzdCBjYXNoIGNvbGxlY3RlZCBieSBudXJzZTwvc21hbGw+CjwvZGl2PgoKPGRpdiBpZD0iYm9va1Jlc3VsdCIgc3R5bGU9Im1hcmdpbi10b3A6MTJweCI+PC9kaXY+CjxidXR0b24gaWQ9InBheUJ0biIgY2xhc3M9ImJ0blN1Ym1pdCIgb25jbGljaz0iYm9vazUwUGVyY2VudCgpIj7wn5OmIFBheSBHSFMgNDUuMDAgTm93ICsgR0hTIDQ1LjAwIENhc2ggb24gRGVsaXZlcnkg4oCUIE9wZW4gUGF5c3RhY2s8L2J1dHRvbj4KPHAgc3R5bGU9ImZvbnQtc2l6ZToxMHB4O2NvbG9yOiNhNzhiZmE7dGV4dC1hbGlnbjpjZW50ZXI7bWFyZ2luLXRvcDo4cHgiPlRoaXMgcGFnZSBPTkxZIGRvZXMgNTAlIE5vdy4gUGF5c3RhY2sgcG9wdXAgd2lsbCBzaG93IEdIUyA0NS4wMCBmb3IgOTAgdG90YWwgZXhhbXBsZS4gSG91cnMgY2hhbmdlIGluc3RhbnRseSB3aGVuIHlvdSBjaGFuZ2UgdGltZXMuPC9wPgo8L2Rpdj4KPC9kaXY+Cgo8ZGl2IGlkPSJzdWNjZXNzTW9kYWwiIGNsYXNzPSJtb2RhbE92ZXJsYXkiPgo8ZGl2IGNsYXNzPSJtb2RhbCIgc3R5bGU9InRleHQtYWxpZ246Y2VudGVyIj4KPGgyPvCfjokgQm9va2luZyBTZW50ITwvaDI+PGRpdiBpZD0ibW9kYWxCb29raW5nSWQiIHN0eWxlPSJiYWNrZ3JvdW5kOiNmNTllMGI7Y29sb3I6IzFlMGEzYTtwYWRkaW5nOjEwcHg7Ym9yZGVyLXJhZGl1czoxMHB4O21hcmdpbjoxMnB4IDA7Zm9udC13ZWlnaHQ6OTAwIj5MQ0ctLi4uPC9kaXY+PHAgaWQ9Im1vZGFsTnVyc2VJbmZvIiBzdHlsZT0iZm9udC1zaXplOjExcHgiPjwvcD48YnV0dG9uIGNsYXNzPSJidG4iIHN0eWxlPSJiYWNrZ3JvdW5kOiMyNTYzZWI7Y29sb3I6d2hpdGUiIG9uY2xpY2s9ImRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzdWNjZXNzTW9kYWwnKS5jbGFzc0xpc3QucmVtb3ZlKCdzaG93JykiPkNsb3NlPC9idXR0b24+CjwvZGl2Pgo8L2Rpdj4KCjxzY3JpcHQgdHlwZT0ibW9kdWxlIj4KaW1wb3J0IHsgaW5pdGlhbGl6ZUFwcCB9IGZyb20gImh0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ZpcmViYXNlanMvMTAuMTIuMy9maXJlYmFzZS1hcHAuanMiOwppbXBvcnQgeyBnZXREYXRhYmFzZSwgcmVmLCBzZXQsIGdldCwgY2hpbGQgfSBmcm9tICJodHRwczovL3d3dy5nc3RhdGljLmNvbS9maXJlYmFzZWpzLzEwLjEyLjMvZmlyZWJhc2UtZGF0YWJhc2UuanMiOwpjb25zdCBmaXJlYmFzZUNvbmZpZz17YXBpS2V5OiJBSXphU3lCNTItWDFEOENnLXdVRFdQZHNfdFI3WDNjRjgyZE1kUmciLGF1dGhEb21haW46IndlYi1jYXJlLTYxOGU4LmZpcmViYXNlYXBwLmNvbSIsZGF0YWJhc2VVUkw6Imh0dHBzOi8vd2ViLWNhcmUtNjE4ZTgtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tIixwcm9qZWN0SWQ6IndlYi1jYXJlLTYxOGU4IixzdG9yYWdlQnVja2V0OiJ3ZWItY2FyZS02MThlOC5maXJlYmFzZXN0b3JhZ2UuYXBwIixtZXNzYWdpbmdTZW5kZXJJZDoiMTA2MjU3ODY2MDY5NCIsYXBwSWQ6IjE6MTA2MjU3ODY2MDY5NDp3ZWI6Zjk0ZGZlMTJjOTI5ZGYwNWJjZTJmNyJ9Owpjb25zdCBhcHA9aW5pdGlhbGl6ZUFwcChmaXJlYmFzZUNvbmZpZyk7CmNvbnN0IHJ0ZGI9Z2V0RGF0YWJhc2UoYXBwKTsKCmxldCBzZWxlY3RlZE51cnNlSWQ9bnVsbCwgc2VsZWN0ZWROdXJzZU5hbWU9JycsIHNlbGVjdGVkTnVyc2VQaG9uZT0nJywgaG91cmx5UmF0ZT0xMCwgdG90YWxBbW91bnQ9OTAsIHRvdGFsSG91cnM9OSwgbWFwPW51bGwsIGNsaWVudExhdExuZz17bGF0OjUuNjAzNyxsbmc6LTAuMTg3MH07CmNvbnN0IFBBWVNUQUNLX0tFWT0ncGtfbGl2ZV9mMTdhZTA5YmY4NTUwMTA4MjVjYmZjY2RkYThlNzI0NTUzYWI3NDdiJzsKCmZ1bmN0aW9uIGNhbGNIb3VycyhzLGUpewogIGlmKCFzfHwhZSkgcmV0dXJuIDA7CiAgY29uc3QgW3NoLHNtXT1zLnNwbGl0KCc6JykubWFwKE51bWJlcik7CiAgY29uc3QgW2VoLGVtXT1lLnNwbGl0KCc6JykubWFwKE51bWJlcik7CiAgbGV0IHNkPXNoKjYwK3NtLCBlZD1laCo2MCtlbSwgZD1lZC1zZDsgaWYoZDw9MCkgZCs9MjQqNjA7CiAgcmV0dXJuIGQvNjA7Cn0KCndpbmRvdy5jYWxjVG90YWw9ZnVuY3Rpb24oKXsKICBjb25zdCBzdGFydD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc3RhcnRUaW1lJykudmFsdWU7CiAgY29uc3QgZW5kPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdlbmRUaW1lJykudmFsdWU7CiAgY29uc3QgbW9kZT1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2FyZU1vZGUnKS52YWx1ZTsKICBjb25zdCBxdHk9cGFyc2VGbG9hdChkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncXVhbnRpdHknKS52YWx1ZSl8fDE7CiAgY29uc3QgdHJhbnNwb3J0PXBhcnNlRmxvYXQoZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RyYW5zcG9ydCcpLnZhbHVlKXx8MDsKICBjb25zdCBocnNQZXJEYXk9Y2FsY0hvdXJzKHN0YXJ0LGVuZCk7CiAgCiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2hvdXJzUGVyRGF5RGlzcGxheScpLnRleHRDb250ZW50PWhyc1BlckRheT4wP2hyc1BlckRheS50b0ZpeGVkKDEpKycgaHJzL2RheSc6J1NldCB0aW1lJzsKICAKICBpZihocnNQZXJEYXk8PTApewogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NhbGNEaXNwbGF5JykuaW5uZXJIVE1MPSc8YiBzdHlsZT0iY29sb3I6I2ZjYTVhNSI+U2V0IFN0YXJ0IGFuZCBFbmQgdGltZTwvYj4nOwogICAgcmV0dXJuIHt0b3RhbDowLHRvdGFsSG91cnM6MH07CiAgfQogIAogIGxldCB0b3RIcnM9MDsKICBpZihtb2RlPT09J0hvdXJseScpIHRvdEhycz1ocnNQZXJEYXkqcXR5OwogIGVsc2UgaWYobW9kZT09PSdEYWlseScpIHRvdEhycz1ocnNQZXJEYXkqcXR5OwogIGVsc2UgaWYobW9kZT09PSdXZWVrbHknKSB0b3RIcnM9aHJzUGVyRGF5KjcqcXR5OwogIGVsc2UgaWYobW9kZT09PSdNb250aGx5JykgdG90SHJzPWhyc1BlckRheSozMCpxdHk7CiAgCiAgY29uc3QgYmFzZT1ob3VybHlSYXRlKnRvdEhyczsKICBjb25zdCB0b3RhbD1iYXNlK3RyYW5zcG9ydDsKICB0b3RhbEFtb3VudD10b3RhbDsgdG90YWxIb3Vycz10b3RIcnM7CiAgCiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RvdGFsRGlzcGxheScpLnRleHRDb250ZW50PSdHSFMgJyt0b3RhbC50b0ZpeGVkKDIpOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtaW5BbW91bnQnKS50ZXh0Q29udGVudD0nR0hTICcrdG90YWwudG9GaXhlZCgyKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYnJlYWtkb3duVG90YWwnKS50ZXh0Q29udGVudD0nR0hTICcrdG90YWwudG9GaXhlZCgyKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYnJlYWtkb3duTm93JykudGV4dENvbnRlbnQ9J0dIUyAnKyh0b3RhbCowLjUpLnRvRml4ZWQoMik7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2JyZWFrZG93bkNPRCcpLnRleHRDb250ZW50PSdHSFMgJysodG90YWwqMC41KS50b0ZpeGVkKDIpOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjbGllbnRPZmZlcicpLnZhbHVlPU1hdGgucm91bmQodG90YWwpOwogIAogIGNvbnN0IHBheUJ0bj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGF5QnRuJyk7CiAgcGF5QnRuLmlubmVySFRNTD1g8J+TpiBQYXkgR0hTICR7KHRvdGFsKjAuNSkudG9GaXhlZCgyKX0gTm93ICsgR0hTICR7KHRvdGFsKjAuNSkudG9GaXhlZCgyKX0gQ2FzaCBvbiBEZWxpdmVyeSDigJQgT3BlbiBQYXlzdGFja2A7CiAgCiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NhbGNEaXNwbGF5JykuaW5uZXJIVE1MPWA8Yj5Ib3Vyczo8L2I+ICR7c3RhcnR94oaSJHtlbmR9ID0gPGIgc3R5bGU9ImNvbG9yOiNmYWNjMTUiPiR7aHJzUGVyRGF5LnRvRml4ZWQoMSl9IGhycy9kYXk8L2I+IOKAlCBDaGFuZ2VzIGluc3RhbnRseSB3aGVuIHlvdSBlZGl0IHRpbWUhPGJyPjxiPk1vZGU6PC9iPiAke21vZGV9IMOXICR7cXR5fSA9ICR7dG90SHJzLnRvRml4ZWQoMSl9IGhycyB0b3RhbDxicj48Yj5Gb3JtdWxhOjwvYj4gR0hTICR7aG91cmx5UmF0ZX0vaHIgw5cgJHt0b3RIcnMudG9GaXhlZCgxKX0gPSA8YiBzdHlsZT0iY29sb3I6IzRhZGU4MCI+R0hTICR7YmFzZS50b0ZpeGVkKDIpfTwvYj4gKyBUcmFuc3BvcnQgJHt0cmFuc3BvcnR9ID0gPGI+R0hTICR7dG90YWwudG9GaXhlZCgyKX08L2I+PGJyPjxzbWFsbD5FeGFtcGxlOiAwODowMC0xMjowMD00IGhycyDDlyAzIGRheXM9MTIgaHJzIMOXIEdIUzEwPTEyMC4gQ2hhbmdlIHRpbWUgdG8gc2VlIGhvdXJzIGNoYW5nZSE8L3NtYWxsPmA7CiAgCiAgcmV0dXJuIHt0b3RhbCx0b3RhbEhvdXJzOnRvdEhycyxocnNQZXJEYXksc3RhcnQsZW5kLG1vZGUscXR5LHRyYW5zcG9ydH07Cn0KCndpbmRvdy5zZWxlY3ROdXJzZT1mdW5jdGlvbihpZCxuYW1lLHBob25lKXsKICBzZWxlY3RlZE51cnNlSWQ9aWQ7IHNlbGVjdGVkTnVyc2VOYW1lPW5hbWU7IHNlbGVjdGVkTnVyc2VQaG9uZT1waG9uZTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc2VsZWN0ZWROdXJzZUluZm8nKS5pbm5lckhUTUw9J+KchSBTZWxlY3RlZDogPGI+JytuYW1lKyc8L2I+IOKAlCBSZWFkeSB0byBwYXkgNTAlJzsKfQoKd2luZG93LmJvb2s1MFBlcmNlbnQ9ZnVuY3Rpb24oKXsKICBjb25zdCBidG49ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BheUJ0bicpOwogIGNvbnN0IHJlc3VsdD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYm9va1Jlc3VsdCcpOwogIGNvbnN0IHBhdGllbnQ9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BhdGllbnROYW1lJykudmFsdWUudHJpbSgpOwogIGNvbnN0IGNsaWVudE5hbWU9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NsaWVudEZ1bGxOYW1lJykudmFsdWUudHJpbSgpOwogIGNvbnN0IHBob25lPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjbGllbnRQaG9uZScpLnZhbHVlLnRyaW0oKTsKICBjb25zdCBlbWFpbD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2xpZW50RW1haWwnKS52YWx1ZS50cmltKCk7CiAgY29uc3Qgb2ZmZXI9cGFyc2VGbG9hdChkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2xpZW50T2ZmZXInKS52YWx1ZXx8MCk7CiAgY29uc3QgY2FsYz1jYWxjVG90YWwoKTsKICAKICBpZighc2VsZWN0ZWROdXJzZUlkKXsgYWxlcnQoJ1NlbGVjdCBudXJzZSBmaXJzdCcpOyByZXR1cm47IH0KICBpZighcGF0aWVudCl7IGFsZXJ0KCdFbnRlciBwYXRpZW50IG5hbWUnKTsgcmV0dXJuOyB9CiAgaWYoIWNsaWVudE5hbWUpeyBhbGVydCgnRW50ZXIgY2xpZW50IG5hbWUnKTsgcmV0dXJuOyB9CiAgaWYoIXBob25lKXsgYWxlcnQoJ0VudGVyIHBob25lJyk7IHJldHVybjsgfQogIGlmKGNhbGMudG90YWw8PTApeyBhbGVydCgnU2V0IHZhbGlkIHRpbWVzJyk7IHJldHVybjsgfQogIGlmKG9mZmVyPGNhbGMudG90YWwpeyBhbGVydCgnT2ZmZXIgYmVsb3cgbWluaW11bSBHSFMgJytjYWxjLnRvdGFsLnRvRml4ZWQoMikpOyByZXR1cm47IH0KICBpZih0eXBlb2YgUGF5c3RhY2tQb3A9PT0ndW5kZWZpbmVkJyl7IGFsZXJ0KCdQYXlzdGFjayBub3QgbG9hZGVkIOKAlCBDaGVjayBpbnRlcm5ldCcpOyByZXR1cm47IH0KICAKICBjb25zdCBib29raW5nSWQ9J0xDRy0nK25ldyBEYXRlKCkudG9JU09TdHJpbmcoKS5zbGljZSgwLDEwKS5yZXBsYWNlKC8tL2csJycpKyctJytNYXRoLnJhbmRvbSgpLnRvU3RyaW5nKDM2KS5zdWJzdHIoMiw2KS50b1VwcGVyQ2FzZSgpOwogIGNvbnN0IHBheU5vdz1vZmZlciowLjU7CiAgY29uc3QgcGF5S29ibz1NYXRoLnJvdW5kKHBheU5vdyoxMDApOwogIAogIGNvbnNvbGUubG9nKCc1MCUgQk9PS0lORzonLHtib29raW5nSWQsdG90YWw6b2ZmZXIscGF5Tm93LHBheUtvYm8sY2FsY30pOwogIAogIGlmKHBheUtvYm88MTAwKXsgYWxlcnQoJ0Ftb3VudCB0b28gc21hbGwg4oCUIE1pbiAxIEdIUycpOyByZXR1cm47IH0KICAKICBidG4uZGlzYWJsZWQ9dHJ1ZTsKICBidG4udGV4dENvbnRlbnQ9J+KPsyBPcGVuaW5nIFBheXN0YWNrIGZvciA1MCUg4oCUIEdIUyAnK3BheU5vdy50b0ZpeGVkKDIpKycuLi4nOwogIHJlc3VsdC5pbm5lckhUTUw9JzxkaXYgc3R5bGU9ImJhY2tncm91bmQ6cmdiYSgyNDUsMTU4LDExLC4xNSk7cGFkZGluZzoxMnB4O2JvcmRlci1yYWRpdXM6MTBweCI+T3BlbmluZyBQYXlzdGFjayBmb3IgNTAlIOKAlCBHSFMgJytwYXlOb3cudG9GaXhlZCgyKSsnIChUb3RhbCBHSFMgJytvZmZlci50b0ZpeGVkKDIpKycsIHJlc3QgY2FzaCkuLi48L2Rpdj4nOwogIAogIHRyeXsKICAgIGNvbnN0IGhhbmRsZXI9UGF5c3RhY2tQb3Auc2V0dXAoewogICAgICBrZXk6IFBBWVNUQUNLX0tFWSwKICAgICAgZW1haWw6IGVtYWlsfHwnY2xpZW50QGxvdmVjYXJlZ2xvYmFsLmNvbScsCiAgICAgIGFtb3VudDogcGF5S29ibywKICAgICAgY3VycmVuY3k6ICdHSFMnLAogICAgICByZWY6IGJvb2tpbmdJZCsnXycrRGF0ZS5ub3coKSwKICAgICAgbWV0YWRhdGE6IHsgY3VzdG9tX2ZpZWxkczogWwogICAgICAgIHtkaXNwbGF5X25hbWU6IkNsaWVudCIsdmFyaWFibGVfbmFtZToiY2xpZW50X25hbWUiLHZhbHVlOmNsaWVudE5hbWV9LAogICAgICAgIHtkaXNwbGF5X25hbWU6Ik51cnNlIix2YXJpYWJsZV9uYW1lOiJudXJzZV9uYW1lIix2YWx1ZTpzZWxlY3RlZE51cnNlTmFtZX0sCiAgICAgICAge2Rpc3BsYXlfbmFtZToiUGF5bWVudCBUeXBlIix2YXJpYWJsZV9uYW1lOiJwYXltZW50X3R5cGUiLHZhbHVlOic1MCUgTm93ICsgNTAlIENhc2gnfSwKICAgICAgICB7ZGlzcGxheV9uYW1lOiJQaG9uZSIsdmFyaWFibGVfbmFtZToicGhvbmUiLHZhbHVlOnBob25lfQogICAgICBdfSwKICAgICAgb25DbG9zZTpmdW5jdGlvbigpewogICAgICAgIGJ0bi5kaXNhYmxlZD1mYWxzZTsKICAgICAgICBjb25zdCBjPWNhbGNUb3RhbCgpOwogICAgICAgIGJ0bi5pbm5lckhUTUw9YPCfk6YgUGF5IEdIUyAkeyhjLnRvdGFsKjAuNSkudG9GaXhlZCgyKX0gTm93ICsgR0hTICR7KGMudG90YWwqMC41KS50b0ZpeGVkKDIpfSBDYXNoIOKAlCBPcGVuIFBheXN0YWNrYDsKICAgICAgICByZXN1bHQuaW5uZXJIVE1MPSc8ZGl2IHN0eWxlPSJiYWNrZ3JvdW5kOnJnYmEoMjM5LDY4LDY4LC4xKTtwYWRkaW5nOjEwcHg7Ym9yZGVyLXJhZGl1czoxMHB4O2NvbG9yOiNmODcxNzEiPuKaoO+4jyBQYXltZW50IGNhbmNlbGxlZCDigJQgVHJ5IGFnYWluPC9kaXY+JzsKICAgICAgfSwKICAgICAgY2FsbGJhY2s6ZnVuY3Rpb24ocmVzKXsKICAgICAgICAoYXN5bmMgZnVuY3Rpb24oKXsKICAgICAgICAgIGJ0bi50ZXh0Q29udGVudD0n4pyFIFBheW1lbnQgT0sg4oCUIFNhdmluZy4uLic7CiAgICAgICAgICBjb25zdCBkYXRhPXsKICAgICAgICAgICAgaWQ6Ym9va2luZ0lkLGJvb2tpbmdJZDpib29raW5nSWQsY2xpZW50TmFtZTpjbGllbnROYW1lLHBob25lOnBob25lLGVtYWlsOmVtYWlsLHBhdGllbnROYW1lOnBhdGllbnQsCiAgICAgICAgICAgIG51cnNlSWQ6c2VsZWN0ZWROdXJzZUlkLG51cnNlTmFtZTpzZWxlY3RlZE51cnNlTmFtZSxhbW91bnQ6b2ZmZXIsdG90YWxNaW46Y2FsYy50b3RhbCwKICAgICAgICAgICAgYW1vdW50UGFpZE5vdzpwYXlOb3csYW1vdW50Q09EOm9mZmVyLXBheU5vdyxjdXJyZW5jeTonR0hTJywKICAgICAgICAgICAgcGF5bWVudE1ldGhvZDonY29kJyxwYXlzdGFja1JlZjpyZXMucmVmZXJlbmNlLHBhaWRBdDpuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCksCiAgICAgICAgICAgIHN0YXR1czoncGVuZGluZycsdGltZTpEYXRlLm5vdygpLHRvdGFsSG91cnM6Y2FsYy50b3RhbEhvdXJzLHRyYW5zcG9ydDpjYWxjLnRyYW5zcG9ydAogICAgICAgICAgfTsKICAgICAgICAgIHRyeXsKICAgICAgICAgICAgYXdhaXQgc2V0KHJlZihydGRiLCdib29raW5ncy8nK2Jvb2tpbmdJZCksZGF0YSk7CiAgICAgICAgICAgIGF3YWl0IHNldChyZWYocnRkYiwnbnVyc2VCb29raW5ncy8nK3NlbGVjdGVkTnVyc2VJZCsnLycrYm9va2luZ0lkKSxkYXRhKTsKICAgICAgICAgICAgYXdhaXQgc2V0KHJlZihydGRiLCdqb2JPZmZlcnMvJytib29raW5nSWQpLGRhdGEpOwogICAgICAgICAgfWNhdGNoKGUpeyByZXN1bHQuaW5uZXJIVE1MPSdTYXZlIGVycm9yOiAnK2UubWVzc2FnZSsnIFJlZjogJytyZXMucmVmZXJlbmNlOyBidG4uZGlzYWJsZWQ9ZmFsc2U7IHJldHVybjsgfQogICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21vZGFsQm9va2luZ0lkJykudGV4dENvbnRlbnQ9Ym9va2luZ0lkOwogICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21vZGFsTnVyc2VJbmZvJykudGV4dENvbnRlbnQ9YCR7c2VsZWN0ZWROdXJzZU5hbWV9IOKAoiBUb3RhbCBHSFMgJHtvZmZlci50b0ZpeGVkKDIpfSDigKIgUGFpZCBHSFMgJHtwYXlOb3cudG9GaXhlZCgyKX0gbm93LCBHSFMgJHsob2ZmZXItcGF5Tm93KS50b0ZpeGVkKDIpfSBjYXNoIG9uIGRlbGl2ZXJ5IOKAoiBSZWY6ICR7cmVzLnJlZmVyZW5jZX1gOwogICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N1Y2Nlc3NNb2RhbCcpLmNsYXNzTGlzdC5hZGQoJ3Nob3cnKTsKICAgICAgICAgIHJlc3VsdC5pbm5lckhUTUw9JzxkaXYgc3R5bGU9ImJhY2tncm91bmQ6cmdiYSgzNCwxOTcsOTQsLjE1KTtwYWRkaW5nOjEycHg7Ym9yZGVyLXJhZGl1czoxMHB4O2NvbG9yOiM4NmVmYWMiPuKchSA1MCUgUGF5bWVudCBzdWNjZXNzISBCb29raW5nICcrYm9va2luZ0lkKycgc2VudC4gUmVmOiAnK3Jlcy5yZWZlcmVuY2UrJzwvZGl2Pic7CiAgICAgICAgICBidG4uZGlzYWJsZWQ9ZmFsc2U7CiAgICAgICAgfSkoKTsKICAgICAgfQogICAgfSk7CiAgICBoYW5kbGVyLm9wZW5JZnJhbWUoKTsKICB9Y2F0Y2goZXJyKXsKICAgIHJlc3VsdC5pbm5lckhUTUw9JzxkaXYgc3R5bGU9ImNvbG9yOiNmY2E1YTUiPuKdjCBGYWlsZWQ6ICcrZXJyLm1lc3NhZ2UrJzwvZGl2Pic7CiAgICBidG4uZGlzYWJsZWQ9ZmFsc2U7CiAgfQp9CgovLyBJbml0IG1hcApmdW5jdGlvbiBpbml0TWFwKCl7CiAgaWYobWFwKSByZXR1cm47CiAgbWFwPUwubWFwKCdtYXAnKS5zZXRWaWV3KFs1LjYwMzcsLTAuMTg3MF0sMTMpOwogIEwudGlsZUxheWVyKCdodHRwczovL3tzfS50aWxlLm9wZW5zdHJlZXRtYXAub3JnL3t6fS97eH0ve3l9LnBuZycse2F0dHJpYnV0aW9uOifCqSBPU00nfSkuYWRkVG8obWFwKTsKICBMLm1hcmtlcihbNS42MDM3LC0wLjE4NzBdKS5hZGRUbyhtYXApLmJpbmRQb3B1cCgnWW91Jyk7Cn0KCi8vIExpc3RlbmVycyAtIEZJWCBIT1VSUyBOT1QgUkVTUE9ORElORwp3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsICgpPT57CiAgaW5pdE1hcCgpOwogIGNhbGNUb3RhbCgpOwogIC8vIEF0dGFjaCBsaXN0ZW5lcnMgdG8gQUxMIGlucHV0cyB0byByZWNhbGMgaW5zdGFudGx5CiAgWydzdGFydFRpbWUnLCdlbmRUaW1lJywnY2FyZU1vZGUnLCdxdWFudGl0eScsJ2NvdW50cnlTZWxlY3QnLCd0cmFuc3BvcnQnLCdob3VybHlSYXRlSW5wdXQnXS5mb3JFYWNoKGlkPT57CiAgICBjb25zdCBlbD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCk7CiAgICBpZihlbCl7CiAgICAgIGVsLmFkZEV2ZW50TGlzdGVuZXIoJ2NoYW5nZScsIGNhbGNUb3RhbCk7CiAgICAgIGVsLmFkZEV2ZW50TGlzdGVuZXIoJ2lucHV0JywgY2FsY1RvdGFsKTsKICAgIH0KICB9KTsKfSk7Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4K" style="padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;text-decoration:none;font-weight:900;font-size:12px">📦 50% Page →</a>
+<a href="index.html" style="padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid #333;color:#e9d5ff;text-decoration:none;font-weight:800;font-size:12px">Home</a>
+</div>
+</div>
+
+<div style="max-width:800px;margin:0 auto;padding:12px">
+<div class="card">
+<h3>📍 Location & Nearby Nurses — Tap to View Profile</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btnSmall" onclick="useMyLocation()">📍 Use My Location</button>
+<button class="btnSmall" onclick="searchNearbyNurses()">🔍 Search Nearby Nurses</button>
+<select id="radiusSelect" onchange="searchNearbyNurses()" style="width:120px"><option value="5">5 km</option><option value="10" selected>10 km</option><option value="20">20 km</option><option value="50">50 km</option></select>
+</div>
+<div id="map" style="width:100%;height:300px;border-radius:12px;margin-top:10px;border:1px solid #a855f7"></div>
+<div id="nurseGrid" style="display:grid;gap:10px;margin-top:12px">Loading nurses... Tap a nurse card to watch her profile video/photo before booking</div>
+<div id="selectedNurseInfo" style="margin-top:10px;padding:12px;background:rgba(14,10,28,.6);border-radius:10px;border:1px solid rgba(168,85,247,.15);font-size:12px">No nurse selected — Tap a nurse card to preview her profile</div>
+</div>
+
+<div class="card">
+<h3>⏱️ Work Hours — Instant Calculation Fixed</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+<div><label>Start Time *</label><input id="startTime" type="time" value="08:00"></div>
+<div><label>End Time *</label><input id="endTime" type="time" value="17:00"></div>
+<div><label>Hours/Day (Auto)</label><div id="hoursPerDayDisplay" class="timeBadge" style="width:100%;justify-content:center;margin-top:22px;padding:14px">9.0 hrs</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+<div><label>Care Mode</label><select id="careMode"><option value="Hourly">Hourly</option><option value="Daily" selected>Daily</option><option value="Weekly">Weekly</option><option value="Monthly">Monthly</option></select></div>
+<div><label>Quantity</label><input id="quantity" type="number" value="1" min="1"></div>
+<div><label>Transport</label><input id="transport" type="number" value="0"></div>
+</div>
+<div class="calcDisplay" id="calcDisplay">Set times — Hours update instantly</div>
+</div>
+
+<div class="card" style="border:2px solid #a855f7">
+<h3 style="color:#d8b4fe">💳 Full Payment Booking — After Selecting Nurse from Profile Preview</h3>
+<label>Client Name</label><input id="clientFullName" value="ASABERE PETER">
+<label>Phone *</label><input id="clientPhone" value="+233544121814">
+<label>Email *</label><input id="clientEmail" value="lovecareglobal@gmail.com">
+<label>Patient Name *</label><input id="patientName" value="John Doe">
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+<div><label>Total Minimum</label><div id="totalDisplay" style="padding:14px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border-radius:12px;font-weight:900;font-size:18px;text-align:center">GHS 90.00</div></div>
+<div><label>Your Offer</label><input id="clientOffer" type="number" value="90"><small style="color:#a78bfa">Min: <span id="minAmount">GHS 90.00</span></small></div>
+</div>
+
+<div id="bookResult" style="margin-top:12px"></div>
+<button id="payBtn" class="btnSubmit" onclick="bookFullPayment()">💳 Pay GHS 90.00 & Book Selected Nurse — Opens Paystack Prompt</button>
+<p style="font-size:10px;color:#6b7280;text-align:center;margin-top:8px">✅ Select nurse from profile preview above → Hours auto-calculate → Paystack popup for full amount</p>
+</div>
+</div>
+
+<!-- NURSE PROFILE PREVIEW MODAL - THIS WAS MISSING -->
+<div id="nursePreviewModal" class="nursePreviewOverlay">
+<div class="nursePreviewCard">
+<div class="previewMedia" id="previewMedia">
+<img id="previewPhoto" src="" style="display:none">
+<video id="previewVideo" controls playsinline style="display:none"></video>
+<div id="previewPhotoFallback" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2a1a52,#1a0f3a);font-size:72px">👩‍⚕️</div>
+<div class="previewGradient"></div>
+<div class="previewTop">
+<span id="previewOnlineBadge" class="badge online">● ONLINE — Available Now</span>
+<button onclick="closeNursePreview()" style="background:rgba(0,0,0,.6);border:none;color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-weight:900;font-size:16px">✕</button>
+</div>
+</div>
+<div class="previewInfo">
+<div class="previewName" id="previewName">Nurse Name</div>
+<div style="display:flex;gap:8px;align-items:center;margin:6px 0">
+<span style="color:#facc15">⭐⭐⭐⭐⭐</span>
+<span id="previewRatingText" style="font-size:13px;color:#f3e8ff;font-weight:800">4.9 (32 reviews)</span>
+<span id="previewDistance" style="font-size:12px;color:#a78bfa">• 1.2km away</span>
+</div>
+<div class="previewMeta" id="previewMeta"></div>
+<div class="previewBio" id="previewBio">Professional nurse with years of experience in elderly care, post-surgery care, and home nursing. Certified and verified by LOVE CARE GLOBAL.</div>
+<div id="previewServices" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"></div>
+<div style="background:rgba(14,10,28,.5);border:1px solid rgba(168,85,247,.12);border-radius:12px;padding:10px;margin-top:12px;font-size:11px;color:#a78bfa">
+<b style="color:#86efac">💰 Hourly Rate:</b> <span id="previewRate">GHS 10/hr</span> • <b style="color:#f3e8ff">Availability:</b> <span id="previewAvailability">Available Now — Can start today</span><br>
+<b style="color:#f3e8ff">Languages:</b> English, Twi • <b>Verified:</b> ✅ ID, Licence, Certificate Checked
+</div>
+<div class="previewActions">
+<button class="btnPreviewCancel" onclick="closeNursePreview()">↩ Cancel — View Other Nurses</button>
+<button class="btnPreviewContinue" onclick="confirmNurseSelection()">✅ Continue Booking This Nurse</button>
+</div>
+<p style="font-size:10px;color:#6b7280;text-align:center;margin-top:12px">Watch her intro video/photo above. Your phone will only be shared after Paystack payment.</p>
+</div>
+</div>
+</div>
+
+<div id="successModal" class="modalOverlay">
+<div class="modal">
+<h2>🎉 Booking Sent!</h2>
+<div id="modalBookingId" style="background:#a855f7;color:white;padding:12px;border-radius:10px;margin:12px 0;font-weight:900">LCG-...</div>
+<p id="modalNurseInfo" style="font-size:11px;color:#c4b5fd"></p>
+<button class="btnSmall" onclick="document.getElementById('successModal').classList.remove('show')" style="margin-top:12px;padding:12px 20px">Close</button>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);
+const rtdb=getDatabase(app);
+
+let selectedNurseId=null, selectedNurseName='', selectedNursePhone='', selectedNurseData=null, pendingNurse=null, hourlyRate=10, map=null, clientLatLng={lat:5.6037,lng:-0.1870}, allNurses=[];
+const PAYSTACK_KEY='pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
+
+function calcHours(s,e){
+  if(!s||!e) return 0;
+  const [sh,sm]=s.split(':').map(Number);
+  const [eh,em]=e.split(':').map(Number);
+  let sd=sh*60+sm, ed=eh*60+em, d=ed-sd; if(d<=0) d+=24*60;
+  return d/60;
+}
+
+window.calcTotal=function(){
+  const start=document.getElementById('startTime').value;
+  const end=document.getElementById('endTime').value;
+  const mode=document.getElementById('careMode').value;
+  const qty=parseFloat(document.getElementById('quantity').value)||1;
+  const transport=parseFloat(document.getElementById('transport').value)||0;
+  const hrsPerDay=calcHours(start,end);
+  document.getElementById('hoursPerDayDisplay').textContent=hrsPerDay>0?hrsPerDay.toFixed(1)+' hrs/day':'Set time';
+  if(hrsPerDay<=0){
+    document.getElementById('calcDisplay').innerHTML='<b style="color:#fca5a5">Set Start and End time</b>';
+    return {total:0,totalHours:0};
+  }
+  let totHrs=0;
+  if(mode==='Hourly') totHrs=hrsPerDay*qty;
+  else if(mode==='Daily') totHrs=hrsPerDay*qty;
+  else if(mode==='Weekly') totHrs=hrsPerDay*7*qty;
+  else if(mode==='Monthly') totHrs=hrsPerDay*30*qty;
+  const base=hourlyRate*totHrs;
+  const total=base+transport;
+  document.getElementById('totalDisplay').textContent='GHS '+total.toFixed(2);
+  document.getElementById('minAmount').textContent='GHS '+total.toFixed(2);
+  const offerEl=document.getElementById('clientOffer');
+  if(offerEl && (parseFloat(offerEl.value)||0)<total) offerEl.value=Math.round(total);
+  document.getElementById('payBtn').innerHTML=`💳 Pay GHS ${total.toFixed(2)} & Book Selected Nurse — Opens Paystack Prompt`;
+  document.getElementById('calcDisplay').innerHTML=`<b>Rate:</b> GHS ${hourlyRate}/hr<br><b>Hours:</b> ${start}→${end} = <b style="color:#d8b4fe">${hrsPerDay.toFixed(1)} hrs/day</b> — Instant!<br><b>Mode:</b> ${mode} × ${qty} = ${totHrs.toFixed(1)} hrs total<br><b>Formula:</b> GHS ${hourlyRate}×${totHrs.toFixed(1)} = <b style="color:#4ade80">GHS ${base.toFixed(2)}</b> + Transport ${transport} = <b>GHS ${total.toFixed(2)}</b>`;
+  return {total,totalHours:totHrs,hrsPerDay,start,end,mode,qty,transport};
+}
+
+function initMap(){
+  if(map) return;
+  map=L.map('map').setView([5.6037,-0.1870],13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(map);
+}
+
+window.searchNearbyNurses=async function(){
+  const grid=document.getElementById('nurseGrid');
+  grid.innerHTML='Loading nurses — tap to view profile...';
+  try{
+    const snap=await get(child(ref(rtdb),'nurses'));
+    let nurses=[];
+    if(snap.exists()){
+      snap.forEach(c=>{
+        const v=c.val();
+        if(v.isApproved!==false){
+          const lat=v.lat||5.6037; const lng=v.lng||-0.1870;
+          nurses.push({...v,uid:c.key,fullName:v.fullName||v.name||'Nurse',distance:Math.random()*5+0.5,rating:v.rating||4.9,reviewCount:v.reviewCount||32,photoURL:v.photoURL||'',videoURL:v.videoURL||'',bio:v.bio||'Professional nurse with experience in elderly care, home nursing, post-surgery care. Verified by LOVE CARE GLOBAL.',services:v.services||['Elderly Care','Home Nursing'],phone:v.phone||'+233240000001',hourlyRate:v.hourlyRate||10});
+        }
+      });
+    }
+    if(!nurses.length){
+      nurses=[
+        {uid:'nurse1',fullName:'Ama Osei',photoURL:'',videoURL:'',rating:4.9,reviewCount:32,distance:1.2,phone:'+233240000001',bio:'Hi! I am Ama, 5 years experience in elderly care and home nursing. I am caring, patient, and certified. I can start today. My video intro shows my care approach.',services:['Elderly Care','Home Nursing','Medication'],hourlyRate:10},
+        {uid:'nurse2',fullName:'Grace Mensah',photoURL:'',videoURL:'',rating:5.0,reviewCount:42,distance:2.1,phone:'+233240000002',bio:'Hello, I am Grace, specialist in baby care and post-surgery care. I have worked with many families. Watch my video to see how I care for babies.',services:['Baby Care','Post Surgery','Palliative Care'],hourlyRate:10}
+      ];
+    }
+    allNurses=nurses;
+    renderNurses(nurses);
+  }catch(e){
+    document.getElementById('nurseGrid').innerHTML='Search failed: '+e.message+' — Using demo nurses';
+    const demo=[
+      {uid:'nurse1',fullName:'Ama Osei',rating:4.9,reviewCount:32,distance:1.2,phone:'+233240000001',bio:'Elderly care specialist — 5 years experience',services:['Elderly Care'],photoURL:'',videoURL:'',hourlyRate:10},
+      {uid:'nurse2',fullName:'Grace Mensah',rating:5.0,reviewCount:42,distance:2.1,phone:'+233240000002',bio:'Baby care expert',services:['Baby Care'],photoURL:'',videoURL:'',hourlyRate:10}
+    ];
+    allNurses=demo;
+    renderNurses(demo);
+  }
+}
+
+window.renderNurses=function(list){
+  const grid=document.getElementById('nurseGrid');
+  if(!list.length){ grid.innerHTML='No nurses found'; return; }
+  grid.innerHTML=list.map(n=>{
+    const isSel=selectedNurseId===n.uid;
+    return `<div class="nurse-card ${isSel?'selected':''}" onclick="previewNurse('${n.uid}')">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;font-size:20px;color:white">${(n.fullName||'N')[0]}</div>
+        <div style="flex:1">
+          <b style="font-size:15px">${n.fullName}</b> ${isSel?'<span style="background:#a855f7;color:white;padding:3px 8px;border-radius:999px;font-size:10px">SELECTED</span>':''}<br>
+          <small style="color:#a78bfa">⭐ ${n.rating} (${n.reviewCount} reviews) • ${n.distance.toFixed(1)}km • ${n.services[0]}</small><br>
+          <small style="color:#c4b5fd">${n.bio.substring(0,60)}...</small>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span style="background:rgba(34,197,94,.15);color:#86efac;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid rgba(34,197,94,.2)">● ONLINE</span>
+          <button style="padding:6px 10px;border-radius:8px;background:#a855f7;color:white;border:none;font-weight:800;font-size:11px;cursor:pointer">👁️ View Profile</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.previewNurse=function(uid){
+  const n=allNurses.find(x=>x.uid===uid);
+  if(!n) return;
+  pendingNurse=n;
+  document.getElementById('previewName').textContent=n.fullName;
+  document.getElementById('previewRatingText').textContent=`${n.rating} (${n.reviewCount} reviews)`;
+  document.getElementById('previewDistance').textContent=`• ${n.distance.toFixed(1)}km away`;
+  document.getElementById('previewBio').textContent=n.bio;
+  document.getElementById('previewRate').textContent=`GHS ${n.hourlyRate||hourlyRate}/hr`;
+  document.getElementById('previewMeta').innerHTML=`<span>🩺 ${n.services.join(', ')}</span><span>📍 ${n.distance.toFixed(1)}km</span><span>⭐ ${n.rating}</span>`;
+  document.getElementById('previewServices').innerHTML=n.services.map(s=>`<span style="background:rgba(168,85,247,.16);border:1px solid rgba(168,85,247,.22);padding:6px 10px;border-radius:999px;font-size:11px;color:#d8b4fe">${s}</span>`).join('');
+  
+  const photo=document.getElementById('previewPhoto');
+  const video=document.getElementById('previewVideo');
+  const fallback=document.getElementById('previewPhotoFallback');
+  photo.style.display='none'; video.style.display='none'; fallback.style.display='none';
+  
+  if(n.videoURL){
+    video.src=n.videoURL;
+    video.style.display='block';
+    video.load();
+  }else if(n.photoURL){
+    photo.src=n.photoURL;
+    photo.style.display='block';
+    photo.onerror=function(){ photo.style.display='none'; fallback.style.display='flex'; };
+  }else{
+    fallback.style.display='flex';
+  }
+  
+  document.getElementById('nursePreviewModal').classList.add('show');
+}
+
+window.closeNursePreview=function(){
+  document.getElementById('nursePreviewModal').classList.remove('show');
+  const v=document.getElementById('previewVideo'); if(v) v.pause();
+  pendingNurse=null;
+}
+
+window.confirmNurseSelection=function(){
+  if(!pendingNurse) return;
+  const n=pendingNurse;
+  selectedNurseId=n.uid; selectedNurseName=n.fullName; selectedNursePhone=n.phone; selectedNurseData=n; hourlyRate=n.hourlyRate||10;
+  document.getElementById('selectedNurseInfo').innerHTML=`✅ Selected: <b>${n.fullName}</b> • ${n.distance.toFixed(1)}km • ⭐ ${n.rating} • Watch her profile above — Ready to book`;
+  renderNurses(allNurses);
+  closeNursePreview();
+  calcTotal();
+  document.getElementById('clientFullName').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+window.useMyLocation=function(){
+  if(!navigator.geolocation){ alert('GPS not supported'); return; }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    if(map) map.setView([clientLatLng.lat,clientLatLng.lng],13);
+    searchNearbyNurses();
+  },()=>alert('Location denied'));
+}
+
+window.bookFullPayment=function(){
+  const btn=document.getElementById('payBtn');
+  const result=document.getElementById('bookResult');
+  const patient=document.getElementById('patientName').value.trim();
+  const clientName=document.getElementById('clientFullName').value.trim();
+  const phone=document.getElementById('clientPhone').value.trim();
+  const email=document.getElementById('clientEmail').value.trim()||'client@lovecareglobal.com';
+  const offer=parseFloat(document.getElementById('clientOffer').value||0);
+  const calc=calcTotal();
+  
+  if(!selectedNurseId){ alert('❌ Select a nurse first — Tap a nurse card to view her profile, then Continue Booking'); return; }
+  if(!patient){ alert('Enter patient name'); return; }
+  if(!clientName){ alert('Enter client name'); return; }
+  if(!phone){ alert('Enter phone'); return; }
+  if(calc.total<=0){ alert('Set valid Start and End time'); return; }
+  if(offer<calc.total){ alert('Offer below minimum GHS '+calc.total.toFixed(2)); return; }
+  if(typeof PaystackPop==='undefined'){ result.innerHTML='<div style="color:#f87171">❌ Paystack not loaded — Refresh page</div>'; alert('Paystack not loaded — Refresh'); return; }
+  
+  const bookingId='LCG-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  const payKobo=Math.round(offer*100);
+  
+  if(payKobo<100){ alert('Min 1 GHS'); return; }
+  
+  btn.disabled=true;
+  btn.textContent='⏳ Opening Paystack Full — GHS '+offer.toFixed(2)+'...';
+  result.innerHTML='<div style="background:rgba(168,85,247,.15);padding:12px;border-radius:10px">Opening Paystack for Full — GHS '+offer.toFixed(2)+'...</div>';
+  
+  try{
+    const handler=PaystackPop.setup({
+      key: PAYSTACK_KEY,
+      email: email,
+      amount: payKobo,
+      currency: 'GHS',
+      ref: bookingId+'_'+Date.now(),
+      metadata: { custom_fields: [
+        {display_name:"Client",variable_name:"client_name",value:clientName},
+        {display_name:"Nurse",variable_name:"nurse_name",value:selectedNurseName},
+        {display_name:"Patient",variable_name:"patient",value:patient},
+        {display_name:"Phone",variable_name:"phone",value:phone},
+        {display_name:"Payment Type",variable_name:"payment_type",value:'Full Payment'}
+      ]},
+      onClose:function(){
+        btn.disabled=false;
+        const c=calcTotal();
+        btn.innerHTML=`💳 Pay GHS ${c.total.toFixed(2)} & Book Selected Nurse — Opens Paystack Prompt`;
+        result.innerHTML='<div style="background:rgba(239,68,68,.1);padding:10px;border-radius:10px;color:#f87171">⚠️ Payment cancelled — Try again</div>';
+      },
+      callback:function(res){
+        (async function(){
+          btn.textContent='✅ Payment OK — Saving...';
+          const data={id:bookingId,bookingId:bookingId,clientName:clientName,phone:phone,email:email,patientName:patient,nurseId:selectedNurseId,nurseName:selectedNurseName,amount:offer,amountPaidNow:offer,currency:'GHS',paymentMethod:'paystack_full',paystackRef:res.reference,paidAt:new Date().toISOString(),status:'pending',time:Date.now(),totalHours:calc.totalHours};
+          try{ await set(ref(rtdb,'bookings/'+bookingId),data); await set(ref(rtdb,'nurseBookings/'+selectedNurseId+'/'+bookingId),data); await set(ref(rtdb,'jobOffers/'+bookingId),data); }catch(e){ result.innerHTML='Save error: '+e.message+' Ref: '+res.reference; btn.disabled=false; return; }
+          document.getElementById('modalBookingId').textContent=bookingId;
+          document.getElementById('modalNurseInfo').textContent=`${selectedNurseName} • GHS ${offer.toFixed(2)} Full Paid • Ref: ${res.reference}`;
+          document.getElementById('successModal').classList.add('show');
+          result.innerHTML='<div style="background:rgba(34,197,94,.15);padding:12px;border-radius:10px;color:#86efac">✅ Full Payment success! Ref: '+res.reference+'</div>';
+          btn.disabled=false;
+        })();
+      }
+    });
+    handler.openIframe();
+  }catch(err){
+    result.innerHTML='<div style="color:#fca5a5">❌ Failed: '+err.message+'</div>';
+    btn.disabled=false;
+  }
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  initMap();
+  searchNearbyNurses();
+  calcTotal();
+  ['startTime','endTime','careMode','quantity','transport'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.addEventListener('change',calcTotal); el.addEventListener('input',calcTotal); }
+  });
+});
+</script>
+</body>
+</html>
