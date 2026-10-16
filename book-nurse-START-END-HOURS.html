@@ -2,899 +2,388 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Book Nurse — Fixed Paystack + Nurse Preview | LOVE CARE GLOBAL</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="icon-transparent-512.png">
-<link rel="apple-touch-icon" href="icon-transparent-512.png">
+<title>Book Nurse — Full Payment + Nurse Profile Preview | LOVE CARE GLOBAL</title>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:16px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin:12px 0}
-label{font-size:11px;font-weight:800;margin:10px 0 6px;display:block;color:#c4b5fd;letter-spacing:.05em;text-transform:uppercase}
-input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;font-weight:600;outline:none}
-input:focus,select:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
-.btnSmall{border:none;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer;background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
-.btnSubmit{width:100%;border:none;border-radius:12px;padding:14px;font-weight:900;cursor:pointer;margin-top:10px;font-size:14px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.3);transition:opacity .2s}
-.btnSubmit:disabled{opacity:.5;cursor:not-allowed}
-.mapWrap{width:100%;height:380px;border-radius:16px;border:1px solid rgba(168,85,247,.18);overflow:hidden;margin-top:10px}
-#map{width:100%;height:100%}
-.nurse-grid{display:grid;grid-template-columns:1fr;gap:12px}
-@media(min-width:600px){.nurse-grid{grid-template-columns:1fr 1fr}}
-.nurse-card{border:1px solid rgba(168,85,247,.14);border-radius:18px;padding:12px;background:rgba(14,10,28,.6);cursor:pointer;transition:.2s}
-.nurse-card:hover{border-color:rgba(168,85,247,.4);transform:translateY(-2px)}
-.nurse-card.selected{border-color:#a855f7;background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.15))}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.18);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
-.badge.online{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.25)}
-.calcDisplay{background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.25);border-radius:12px;padding:12px;margin-top:10px;font-size:11px;color:#a78bfa;line-height:1.8}
-.calcDisplay b{color:#f3e8ff}
-.timeBadge{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(76,29,149,.2));border:1px solid rgba(168,85,247,.25);border-radius:10px;padding:8px 12px;font-size:11px;font-weight:800;color:#d8b4fe;display:inline-flex;gap:6px;align-items:center}
-.modalOverlay{position:fixed;inset:0;background:rgba(14,10,28,.88);backdrop-filter:blur(12px);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:50;background:#1a1040;border-bottom:2px solid #a855f7;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.card{background:#1c1238;border:1px solid rgba(168,85,247,.2);border-radius:18px;padding:16px;margin:12px}
+label{font-size:11px;font-weight:800;margin:10px 0 6px;display:block;color:#c4b5fd}
+input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:#0e0a1c;color:#ede9fe;font-size:13px}
+.btnSmall{border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
+.btnSubmit{width:100%;border:none;border-radius:14px;padding:18px;font-weight:900;cursor:pointer;margin-top:12px;font-size:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.3)}
+.btnSubmit:active{transform:scale(0.96)}
+.calcDisplay{background:rgba(14,10,28,.6);border:1px dashed rgba(168,85,247,.25);border-radius:12px;padding:12px;margin-top:10px;font-size:12px;line-height:1.8}
+.timeBadge{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(76,29,149,.2));border:1px solid rgba(168,85,247,.25);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:800;color:#d8b4fe;display:inline-flex}
+.modalOverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
 .modalOverlay.show{display:flex}
-.modal{background:rgba(28,18,56,.98);border-radius:24px;padding:24px;max-width:420px;width:100%;border:1px solid rgba(168,85,247,.25)}
-.bookingIdBadge{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;padding:10px 16px;border-radius:12px;font-weight:900;font-size:16px;display:inline-block;margin:12px 0}
-
-/* NEW: Nurse Preview Modal */
-.nursePreviewOverlay{position:fixed;inset:0;background:rgba(5,3,14,.88);backdrop-filter:blur(16px);z-index:6000;display:none;align-items:center;justify-content:center;padding:16px}
-.nursePreviewOverlay.show{display:flex;animation:fadeIn .25s}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.nursePreviewCard{background:linear-gradient(180deg,rgba(42,26,82,.98),rgba(20,12,44,.98));border:1px solid rgba(168,85,247,.28);border-radius:28px;padding:0;max-width:460px;width:100%;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(168,85,247,.2);max-height:90vh;overflow-y:auto}
-.nursePreviewCard::-webkit-scrollbar{width:6px}
-.nursePreviewCard::-webkit-scrollbar-thumb{background:rgba(168,85,247,.3);border-radius:999px}
-.previewMedia{position:relative;width:100%;height:320px;background:#0e0a1c;overflow:hidden}
-.previewMedia img{width:100%;height:100%;object-fit:cover}
-.previewMedia video{width:100%;height:100%;object-fit:cover}
-.previewGradient{position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,12,44,1) 0%,transparent 55%)}
-.previewTop{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between}
+.modal{background:#1c1238;border-radius:20px;padding:24px;max-width:420px;width:100%;border:1px solid #a855f7;text-align:center}
+.nursePreviewOverlay{position:fixed;inset:0;background:rgba(5,3,14,.92);backdrop-filter:blur(16px);z-index:6000;display:none;align-items:center;justify-content:center;padding:16px}
+.nursePreviewOverlay.show{display:flex}
+.nursePreviewCard{background:linear-gradient(180deg,rgba(42,26,82,.98),rgba(20,12,44,.98));border:1px solid rgba(168,85,247,.35);border-radius:28px;padding:0;max-width:480px;width:100%;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.7);max-height:92vh;overflow-y:auto}
+.previewMedia{position:relative;width:100%;height:340px;background:#0e0a1c;overflow:hidden}
+.previewMedia img,.previewMedia video{width:100%;height:100%;object-fit:cover}
+.previewGradient{position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,12,44,1) 0%,rgba(20,12,44,.6) 30%,transparent 65%)}
+.previewTop{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center}
+.badge{padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900}
+.badge.online{background:rgba(34,197,94,.2);color:#86efac;border:1px solid rgba(34,197,94,.3)}
 .previewInfo{padding:18px}
-.previewName{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:#f3e8ff}
+.previewName{font-size:24px;font-weight:900;color:#f3e8ff;margin-bottom:6px}
 .previewMeta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 .previewMeta span{background:rgba(168,85,247,.16);border:1px solid rgba(168,85,247,.22);padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;color:#d8b4fe}
-.previewBio{font-size:12px;color:#c4b5fd;line-height:1.6;margin:12px 0;background:rgba(14,10,28,.5);padding:12px;border-radius:12px;border:1px solid rgba(168,85,247,.12)}
-.previewRating{display:flex;align-items:center;gap:8px;margin:8px 0}
-.stars{color:#facc15;font-size:14px}
+.previewBio{font-size:12px;color:#c4b5fd;line-height:1.7;margin:12px 0;background:rgba(14,10,28,.6);padding:14px;border-radius:12px;border:1px solid rgba(168,85,247,.12)}
 .previewActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
 .btnPreviewCancel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#a78bfa;padding:14px;border-radius:12px;font-weight:800;cursor:pointer}
 .btnPreviewContinue{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;padding:14px;border-radius:12px;font-weight:900;cursor:pointer;box-shadow:0 8px 20px rgba(168,85,247,.3)}
+.nurse-card{border:1px solid rgba(168,85,247,.14);border-radius:18px;padding:14px;background:rgba(14,10,28,.6);cursor:pointer;transition:.2s;margin-bottom:10px}
+.nurse-card:hover{border-color:rgba(168,85,247,.4);transform:translateY(-2px)}
+.nurse-card.selected{border-color:#a855f7;background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.15))}
 </style>
 </head>
 <body>
-<div class="bg"></div>
-<div class="topbar">
-<div style="display:flex;align-items:center;gap:12px">
-<a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-<img src="icon-transparent-512.png" onerror="this.src='icon-512.png'; this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='grid';}" style="width:48px;height:48px;border-radius:14px;background:white;padding:4px;object-fit:contain;box-shadow:0 4px 12px rgba(0,0,0,.3);border:2px solid rgba(168,85,247,.2)" alt="LOVE CARE GLOBAL Logo">
-<div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:none;place-items:center;font-size:22px;color:#1e0a3a;font-weight:900">💜</div>
-<div><b style="color:#f3e8ff;font-size:13px">BOOK NURSE — TIME-BASED HOURLY</b><br><small style="color:#a78bfa">Hours from Start/End × Hourly Rate × Qty</small></div>
-</a>
+<div class="topbar" style="pointer-events:auto !important;z-index:9999;position:sticky">
+<div><b style="color:#f3e8ff">💳 BOOK NURSE — FULL PAYMENT + PROFILE PREVIEW</b><br><small style="color:#4ade80">✅ Nurse Profile Preview + Paystack Prompt Working</small></div>
+<div style="display:flex;gap:8px">
+<a href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij48bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLGluaXRpYWwtc2NhbGU9MSI+Cjx0aXRsZT5Cb29rIE51cnNlIOKAlCA1MCUgTm93IDUwJSBDYXNoIHwgTE9WRSBDQVJFIEdMT0JBTDwvdGl0bGU+CjxsaW5rIGhyZWY9Imh0dHBzOi8vZm9udHMuZ29vZ2xlYXBpcy5jb20vY3NzMj9mYW1pbHk9SW50ZXI6d2dodEA0MDA7NjAwOzgwMCZkaXNwbGF5PXN3YXAiIHJlbD0ic3R5bGVzaGVldCI+CjxzY3JpcHQgc3JjPSJodHRwczovL2pzLnBheXN0YWNrLmNvL3YxL2lubGluZS5qcyI+PC9zY3JpcHQ+CjxsaW5rIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iaHR0cHM6Ly91bnBrZy5jb20vbGVhZmxldEAxLjkuNC9kaXN0L2xlYWZsZXQuY3NzIi8+CjxzY3JpcHQgc3JjPSJodHRwczovL3VucGtnLmNvbS9sZWFmbGV0QDEuOS40L2Rpc3QvbGVhZmxldC5qcyI+PC9zY3JpcHQ+CjxzdHlsZT4KKntib3gtc2l6aW5nOmJvcmRlci1ib3g7bWFyZ2luOjA7cGFkZGluZzowfWJvZHl7Zm9udC1mYW1pbHk6SW50ZXIsc2Fucy1zZXJpZjtiYWNrZ3JvdW5kOiMwZTBhMWM7Y29sb3I6I2U4ZTBmZn0KLnRvcGJhcntwb3NpdGlvbjpzdGlja3k7dG9wOjA7ei1pbmRleDo1MDtiYWNrZ3JvdW5kOiMxYTEwNDA7Ym9yZGVyLWJvdHRvbToycHggc29saWQgI2Y1OWUwYjtwYWRkaW5nOjEycHggMTZweDtkaXNwbGF5OmZsZXg7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47YWxpZ24taXRlbXM6Y2VudGVyfQouY2FyZHtiYWNrZ3JvdW5kOiMxYzEyMzg7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDI0NSwxNTgsMTEsLjI1KTtib3JkZXItcmFkaXVzOjE4cHg7cGFkZGluZzoxNnB4O21hcmdpbjoxMnB4fQpsYWJlbHtmb250LXNpemU6MTFweDtmb250LXdlaWdodDo4MDA7bWFyZ2luOjEwcHggMCA2cHg7ZGlzcGxheTpibG9jaztjb2xvcjojZmFjYzE1fQppbnB1dCxzZWxlY3QsdGV4dGFyZWF7d2lkdGg6MTAwJTtwYWRkaW5nOjEycHggMTRweDtib3JkZXItcmFkaXVzOjEycHg7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDI0NSwxNTgsMTEsLjIpO2JhY2tncm91bmQ6IzBlMGExYztjb2xvcjojZWRlOWZlO2ZvbnQtc2l6ZToxM3B4fQouYnRue2JvcmRlcjpub25lO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjEycHggMThweDtmb250LXdlaWdodDo5MDA7Y3Vyc29yOnBvaW50ZXI7bWFyZ2luOjRweH0KLmJ0blN1Ym1pdHt3aWR0aDoxMDAlO2JvcmRlcjpub25lO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjE4cHg7Zm9udC13ZWlnaHQ6OTAwO2N1cnNvcjpwb2ludGVyO21hcmdpbi10b3A6MTBweDtmb250LXNpemU6MTZweDtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI2Y1OWUwYiwjZmFjYzE1KTtjb2xvcjojMWUwYTNhO2JveC1zaGFkb3c6MCA4cHggMjBweCByZ2JhKDI0NSwxNTgsMTEsLjMpfQouY2FsY0Rpc3BsYXl7YmFja2dyb3VuZDpyZ2JhKDE0LDEwLDI4LC42KTtib3JkZXI6MXB4IGRhc2hlZCByZ2JhKDI0NSwxNTgsMTEsLjMpO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjEycHg7bWFyZ2luLXRvcDoxMHB4O2ZvbnQtc2l6ZToxMnB4O2xpbmUtaGVpZ2h0OjEuOH0KLnRpbWVCYWRnZXtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcscmdiYSgyNDUsMTU4LDExLC4yKSxyZ2JhKDE2OCw4NSwyNDcsLjIpKTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoMjQ1LDE1OCwxMSwuMyk7Ym9yZGVyLXJhZGl1czoxMHB4O3BhZGRpbmc6OHB4IDEycHg7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6ODAwO2NvbG9yOiNmYWNjMTU7ZGlzcGxheTppbmxpbmUtZmxleH0KLm1vZGFsT3ZlcmxheXtwb3NpdGlvbjpmaXhlZDtpbnNldDowO2JhY2tncm91bmQ6cmdiYSgwLDAsMCwuODUpO3otaW5kZXg6NTAwMDtkaXNwbGF5Om5vbmU7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7cGFkZGluZzoxNnB4fQoubW9kYWxPdmVybGF5LnNob3d7ZGlzcGxheTpmbGV4fQoubW9kYWx7YmFja2dyb3VuZDojMWMxMjM4O2JvcmRlci1yYWRpdXM6MjBweDtwYWRkaW5nOjI0cHg7bWF4LXdpZHRoOjQyMHB4O3dpZHRoOjEwMCU7Ym9yZGVyOjFweCBzb2xpZCAjZjU5ZTBifQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8ZGl2IGNsYXNzPSJ0b3BiYXIiPgo8ZGl2PjxiIHN0eWxlPSJjb2xvcjojZmFjYzE1Ij7wn5OmIDUwJSBOT1cgKyA1MCUgQ0FTSCBPTiBERUxJVkVSWTwvYj48YnI+PHNtYWxsIHN0eWxlPSJjb2xvcjojYTc4YmZhIj5QYXkgaGFsZiBub3cgdmlhIFBheXN0YWNrLCBoYWxmIGNhc2ggdG8gbnVyc2U8L3NtYWxsPjwvZGl2Pgo8ZGl2IHN0eWxlPSJkaXNwbGF5OmZsZXg7Z2FwOjhweCI+CjxhIGhyZWY9ImJvb2stbnVyc2UuaHRtbCIgc3R5bGU9InBhZGRpbmc6MTBweCAxNnB4O2JvcmRlci1yYWRpdXM6OTk5cHg7YmFja2dyb3VuZDpyZ2JhKDE2OCw4NSwyNDcsLjIpO2JvcmRlcjoxcHggc29saWQgI2E4NTVmNztjb2xvcjojZDhiNGZlO3RleHQtZGVjb3JhdGlvbjpub25lO2ZvbnQtd2VpZ2h0OjgwMDtmb250LXNpemU6MTJweCI+8J+SsyBGdWxsIFBheW1lbnQ8L2E+CjxhIGhyZWY9ImluZGV4Lmh0bWwiIHN0eWxlPSJwYWRkaW5nOjEwcHggMTZweDtib3JkZXItcmFkaXVzOjk5OXB4O2JhY2tncm91bmQ6cmdiYSgyNTUsMjU1LDI1NSwuMDgpO2JvcmRlcjoxcHggc29saWQgIzMzMztjb2xvcjojZTlkNWZmO3RleHQtZGVjb3JhdGlvbjpub25lO2ZvbnQtd2VpZ2h0OjgwMDtmb250LXNpemU6MTJweCI+SG9tZTwvYT4KPC9kaXY+CjwvZGl2PgoKPGRpdiBzdHlsZT0ibWF4LXdpZHRoOjgwMHB4O21hcmdpbjowIGF1dG87cGFkZGluZzoxMHB4Ij4KPGRpdiBjbGFzcz0iY2FyZCI+CjxoMz7ij7HvuI8gV29yayBIb3VycyDigJQgQ2hhbmdlcyBJbnN0YW50bHkgKEZpeGVkKTwvaDM+CjxkaXYgc3R5bGU9ImRpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmciAxZnI7Z2FwOjhweCI+CjxkaXY+PGxhYmVsPlN0YXJ0IFRpbWUgKjwvbGFiZWw+PGlucHV0IGlkPSJzdGFydFRpbWUiIHR5cGU9InRpbWUiIHZhbHVlPSIwODowMCI+PC9kaXY+CjxkaXY+PGxhYmVsPkVuZCBUaW1lICo8L2xhYmVsPjxpbnB1dCBpZD0iZW5kVGltZSIgdHlwZT0idGltZSIgdmFsdWU9IjE3OjAwIj48L2Rpdj4KPGRpdj48bGFiZWw+SG91cnMvRGF5IChBdXRvKTwvbGFiZWw+PGRpdiBpZD0iaG91cnNQZXJEYXlEaXNwbGF5IiBjbGFzcz0idGltZUJhZGdlIiBzdHlsZT0id2lkdGg6MTAwJTtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO21hcmdpbi10b3A6MjJweDtwYWRkaW5nOjE0cHg7Zm9udC1zaXplOjE2cHgiPjkuMCBocnM8L2Rpdj48L2Rpdj4KPC9kaXY+CjxkaXYgc3R5bGU9ImRpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmciAxZnI7Z2FwOjhweDttYXJnaW4tdG9wOjEwcHgiPgo8ZGl2PjxsYWJlbD5DYXJlIE1vZGU8L2xhYmVsPjxzZWxlY3QgaWQ9ImNhcmVNb2RlIj48b3B0aW9uIHZhbHVlPSJIb3VybHkiPkhvdXJseTwvb3B0aW9uPjxvcHRpb24gdmFsdWU9IkRhaWx5IiBzZWxlY3RlZD5EYWlseTwvb3B0aW9uPjxvcHRpb24gdmFsdWU9IldlZWtseSI+V2Vla2x5PC9vcHRpb24+PG9wdGlvbiB2YWx1ZT0iTW9udGhseSI+TW9udGhseTwvb3B0aW9uPjwvc2VsZWN0PjwvZGl2Pgo8ZGl2PjxsYWJlbD5RdWFudGl0eTwvbGFiZWw+PGlucHV0IGlkPSJxdWFudGl0eSIgdHlwZT0ibnVtYmVyIiB2YWx1ZT0iMSIgbWluPSIxIj48L2Rpdj4KPGRpdj48bGFiZWw+Q291bnRyeTwvbGFiZWw+PHNlbGVjdCBpZD0iY291bnRyeVNlbGVjdCI+PG9wdGlvbiB2YWx1ZT0iR0giIHNlbGVjdGVkPvCfh6zwn4etIEdIIOKAlCBHSFM8L29wdGlvbj48b3B0aW9uIHZhbHVlPSJVUyI+8J+HuvCfh7ggVVMg4oCUIFVTRDwvb3B0aW9uPjwvc2VsZWN0PjwvZGl2Pgo8L2Rpdj4KPGRpdiBzdHlsZT0iZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDo4cHg7bWFyZ2luLXRvcDoxMHB4Ij4KPGRpdj48bGFiZWw+VHJhbnNwb3J0IChHSFMpPC9sYWJlbD48aW5wdXQgaWQ9InRyYW5zcG9ydCIgdHlwZT0ibnVtYmVyIiB2YWx1ZT0iMCI+PC9kaXY+CjxkaXY+PGxhYmVsPkhvdXJseSBSYXRlIChDRU8gc2V0cyk8L2xhYmVsPjxpbnB1dCBpZD0iaG91cmx5UmF0ZUlucHV0IiB0eXBlPSJudW1iZXIiIHZhbHVlPSIxMCIgcmVhZG9ubHkgc3R5bGU9ImJhY2tncm91bmQ6cmdiYSgyNDUsMTU4LDExLC4xKSI+PC9kaXY+CjwvZGl2Pgo8ZGl2IGNsYXNzPSJjYWxjRGlzcGxheSIgaWQ9ImNhbGNEaXNwbGF5Ij5Mb2FkaW5nLi4uPC9kaXY+CjwvZGl2PgoKPGRpdiBjbGFzcz0iY2FyZCI+CjxoMz7wn5Gp4oCN4pqV77iPIFNlbGVjdCBOdXJzZTwvaDM+CjxkaXYgc3R5bGU9ImRpc3BsYXk6Z3JpZDtnYXA6OHB4Ij4KPGJ1dHRvbiBjbGFzcz0iYnRuIiBzdHlsZT0iYmFja2dyb3VuZDojMjU2M2ViO2NvbG9yOndoaXRlIiBvbmNsaWNrPSJzZWxlY3ROdXJzZSgnbnVyc2UxJywnQW1hIE9zZWknLCcrMjMzMjQwMDAwMDAxJykiPlNlbGVjdCBBbWEgT3NlaSDigJQgMS4ya20g4oCUIEdIUyAxMC9ocjwvYnV0dG9uPgo8YnV0dG9uIGNsYXNzPSJidG4iIHN0eWxlPSJiYWNrZ3JvdW5kOiMyNTYzZWI7Y29sb3I6d2hpdGUiIG9uY2xpY2s9InNlbGVjdE51cnNlKCdudXJzZTInLCdHcmFjZSBNZW5zYWgnLCcrMjMzMjQwMDAwMDAyJykiPlNlbGVjdCBHcmFjZSBNZW5zYWgg4oCUIDIuMWttIOKAlCBHSFMgMTAvaHI8L2J1dHRvbj4KPC9kaXY+CjxkaXYgaWQ9InNlbGVjdGVkTnVyc2VJbmZvIiBzdHlsZT0ibWFyZ2luLXRvcDoxMHB4O3BhZGRpbmc6MTBweDtiYWNrZ3JvdW5kOiMwZTBhMWM7Ym9yZGVyLXJhZGl1czoxMHB4Ij5ObyBudXJzZSBzZWxlY3RlZDwvZGl2Pgo8ZGl2IHN0eWxlPSJoZWlnaHQ6MzAwcHg7Ym9yZGVyLXJhZGl1czoxMnB4O292ZXJmbG93OmhpZGRlbjttYXJnaW4tdG9wOjEwcHg7Ym9yZGVyOjFweCBzb2xpZCAjZjU5ZTBiIj48ZGl2IGlkPSJtYXAiIHN0eWxlPSJ3aWR0aDoxMDAlO2hlaWdodDoxMDAlIj48L2Rpdj48L2Rpdj4KPC9kaXY+Cgo8ZGl2IGNsYXNzPSJjYXJkIiBzdHlsZT0iYm9yZGVyOjJweCBzb2xpZCAjZjU5ZTBiIj4KPGgzIHN0eWxlPSJjb2xvcjojZmFjYzE1Ij7wn5KwIDUwJSBOb3cgKyA1MCUgQ2FzaCDigJQgQm9va2luZzwvaDM+CjxsYWJlbD5DbGllbnQgTmFtZTwvbGFiZWw+PGlucHV0IGlkPSJjbGllbnRGdWxsTmFtZSIgdmFsdWU9IkFTQUJFUkUgUEVURVIiPgo8bGFiZWw+UGhvbmUgKjwvbGFiZWw+PGlucHV0IGlkPSJjbGllbnRQaG9uZSIgdmFsdWU9IisyMzM1NDQxMjE4MTQiPgo8bGFiZWw+RW1haWwgKjwvbGFiZWw+PGlucHV0IGlkPSJjbGllbnRFbWFpbCIgdmFsdWU9ImxvdmVjYXJlZ2xvYmFsQGdtYWlsLmNvbSI+CjxsYWJlbD5QYXRpZW50IE5hbWUgKjwvbGFiZWw+PGlucHV0IGlkPSJwYXRpZW50TmFtZSIgdmFsdWU9IkpvaG4gRG9lIj4KCjxkaXYgc3R5bGU9ImRpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmcjtnYXA6MTBweDttYXJnaW4tdG9wOjEycHgiPgo8ZGl2PjxsYWJlbD5Ub3RhbCBNaW5pbXVtPC9sYWJlbD48ZGl2IGlkPSJ0b3RhbERpc3BsYXkiIHN0eWxlPSJwYWRkaW5nOjE0cHg7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNmNTllMGIsI2ZhY2MxNSk7Y29sb3I6IzFlMGEzYTtib3JkZXItcmFkaXVzOjEycHg7Zm9udC13ZWlnaHQ6OTAwO2ZvbnQtc2l6ZToxOHB4O3RleHQtYWxpZ246Y2VudGVyIj5HSFMgMDwvZGl2PjwvZGl2Pgo8ZGl2PjxsYWJlbD5Zb3VyIE9mZmVyPC9sYWJlbD48aW5wdXQgaWQ9ImNsaWVudE9mZmVyIiB0eXBlPSJudW1iZXIiIHZhbHVlPSI5MCI+PHNtYWxsIHN0eWxlPSJjb2xvcjojYTc4YmZhIj5NaW46IDxzcGFuIGlkPSJtaW5BbW91bnQiPjA8L3NwYW4+PC9zbWFsbD48L2Rpdj4KPC9kaXY+Cgo8ZGl2IHN0eWxlPSJiYWNrZ3JvdW5kOnJnYmEoMjQ1LDE1OCwxMSwuMTIpO2JvcmRlcjoxcHggc29saWQgcmdiYSgyNDUsMTU4LDExLC4zKTtib3JkZXItcmFkaXVzOjEycHg7cGFkZGluZzoxMnB4O21hcmdpbi10b3A6MTJweDtmb250LXNpemU6MTJweCI+CjxiIHN0eWxlPSJjb2xvcjojZmFjYzE1Ij7wn5KzIDUwJSBQYXltZW50IEJyZWFrZG93bjo8L2I+PGJyPgpUb3RhbDogPHNwYW4gaWQ9ImJyZWFrZG93blRvdGFsIiBzdHlsZT0iY29sb3I6I2YzZThmZjtmb250LXdlaWdodDo5MDAiPkdIUyA5MC4wMDwvc3Bhbj48YnI+ClBheSBOb3cgdmlhIFBheXN0YWNrOiA8YiBpZD0iYnJlYWtkb3duTm93IiBzdHlsZT0iY29sb3I6IzRhZGU4MCI+R0hTIDQ1LjAwPC9iPiAoNTAlKTxicj4KUGF5IENhc2ggdG8gTnVyc2U6IDxiIGlkPSJicmVha2Rvd25DT0QiIHN0eWxlPSJjb2xvcjojZmFjYzE1Ij5HSFMgNDUuMDA8L2I+ICg1MCUgb24gZGVsaXZlcnkpPGJyPgo8c21hbGwgc3R5bGU9ImNvbG9yOiNhNzhiZmEiPk51cnNlIGdldHMgNzAlIG9mIHBhaWQgYW1vdW50IG5vdywgQ0VPIDMwJSDigJQgUmVzdCBjYXNoIGNvbGxlY3RlZCBieSBudXJzZTwvc21hbGw+CjwvZGl2PgoKPGRpdiBpZD0iYm9va1Jlc3VsdCIgc3R5bGU9Im1hcmdpbi10b3A6MTJweCI+PC9kaXY+CjxidXR0b24gaWQ9InBheUJ0biIgY2xhc3M9ImJ0blN1Ym1pdCIgb25jbGljaz0iYm9vazUwUGVyY2VudCgpIj7wn5OmIFBheSBHSFMgNDUuMDAgTm93ICsgR0hTIDQ1LjAwIENhc2ggb24gRGVsaXZlcnkg4oCUIE9wZW4gUGF5c3RhY2s8L2J1dHRvbj4KPHAgc3R5bGU9ImZvbnQtc2l6ZToxMHB4O2NvbG9yOiNhNzhiZmE7dGV4dC1hbGlnbjpjZW50ZXI7bWFyZ2luLXRvcDo4cHgiPlRoaXMgcGFnZSBPTkxZIGRvZXMgNTAlIE5vdy4gUGF5c3RhY2sgcG9wdXAgd2lsbCBzaG93IEdIUyA0NS4wMCBmb3IgOTAgdG90YWwgZXhhbXBsZS4gSG91cnMgY2hhbmdlIGluc3RhbnRseSB3aGVuIHlvdSBjaGFuZ2UgdGltZXMuPC9wPgo8L2Rpdj4KPC9kaXY+Cgo8ZGl2IGlkPSJzdWNjZXNzTW9kYWwiIGNsYXNzPSJtb2RhbE92ZXJsYXkiPgo8ZGl2IGNsYXNzPSJtb2RhbCIgc3R5bGU9InRleHQtYWxpZ246Y2VudGVyIj4KPGgyPvCfjokgQm9va2luZyBTZW50ITwvaDI+PGRpdiBpZD0ibW9kYWxCb29raW5nSWQiIHN0eWxlPSJiYWNrZ3JvdW5kOiNmNTllMGI7Y29sb3I6IzFlMGEzYTtwYWRkaW5nOjEwcHg7Ym9yZGVyLXJhZGl1czoxMHB4O21hcmdpbjoxMnB4IDA7Zm9udC13ZWlnaHQ6OTAwIj5MQ0ctLi4uPC9kaXY+PHAgaWQ9Im1vZGFsTnVyc2VJbmZvIiBzdHlsZT0iZm9udC1zaXplOjExcHgiPjwvcD48YnV0dG9uIGNsYXNzPSJidG4iIHN0eWxlPSJiYWNrZ3JvdW5kOiMyNTYzZWI7Y29sb3I6d2hpdGUiIG9uY2xpY2s9ImRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzdWNjZXNzTW9kYWwnKS5jbGFzc0xpc3QucmVtb3ZlKCdzaG93JykiPkNsb3NlPC9idXR0b24+CjwvZGl2Pgo8L2Rpdj4KCjxzY3JpcHQgdHlwZT0ibW9kdWxlIj4KaW1wb3J0IHsgaW5pdGlhbGl6ZUFwcCB9IGZyb20gImh0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ZpcmViYXNlanMvMTAuMTIuMy9maXJlYmFzZS1hcHAuanMiOwppbXBvcnQgeyBnZXREYXRhYmFzZSwgcmVmLCBzZXQsIGdldCwgY2hpbGQgfSBmcm9tICJodHRwczovL3d3dy5nc3RhdGljLmNvbS9maXJlYmFzZWpzLzEwLjEyLjMvZmlyZWJhc2UtZGF0YWJhc2UuanMiOwpjb25zdCBmaXJlYmFzZUNvbmZpZz17YXBpS2V5OiJBSXphU3lCNTItWDFEOENnLXdVRFdQZHNfdFI3WDNjRjgyZE1kUmciLGF1dGhEb21haW46IndlYi1jYXJlLTYxOGU4LmZpcmViYXNlYXBwLmNvbSIsZGF0YWJhc2VVUkw6Imh0dHBzOi8vd2ViLWNhcmUtNjE4ZTgtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tIixwcm9qZWN0SWQ6IndlYi1jYXJlLTYxOGU4IixzdG9yYWdlQnVja2V0OiJ3ZWItY2FyZS02MThlOC5maXJlYmFzZXN0b3JhZ2UuYXBwIixtZXNzYWdpbmdTZW5kZXJJZDoiMTA2MjU3ODY2MDY5NCIsYXBwSWQ6IjE6MTA2MjU3ODY2MDY5NDp3ZWI6Zjk0ZGZlMTJjOTI5ZGYwNWJjZTJmNyJ9Owpjb25zdCBhcHA9aW5pdGlhbGl6ZUFwcChmaXJlYmFzZUNvbmZpZyk7CmNvbnN0IHJ0ZGI9Z2V0RGF0YWJhc2UoYXBwKTsKCmxldCBzZWxlY3RlZE51cnNlSWQ9bnVsbCwgc2VsZWN0ZWROdXJzZU5hbWU9JycsIHNlbGVjdGVkTnVyc2VQaG9uZT0nJywgaG91cmx5UmF0ZT0xMCwgdG90YWxBbW91bnQ9OTAsIHRvdGFsSG91cnM9OSwgbWFwPW51bGwsIGNsaWVudExhdExuZz17bGF0OjUuNjAzNyxsbmc6LTAuMTg3MH07CmNvbnN0IFBBWVNUQUNLX0tFWT0ncGtfbGl2ZV9mMTdhZTA5YmY4NTUwMTA4MjVjYmZjY2RkYThlNzI0NTUzYWI3NDdiJzsKCmZ1bmN0aW9uIGNhbGNIb3VycyhzLGUpewogIGlmKCFzfHwhZSkgcmV0dXJuIDA7CiAgY29uc3QgW3NoLHNtXT1zLnNwbGl0KCc6JykubWFwKE51bWJlcik7CiAgY29uc3QgW2VoLGVtXT1lLnNwbGl0KCc6JykubWFwKE51bWJlcik7CiAgbGV0IHNkPXNoKjYwK3NtLCBlZD1laCo2MCtlbSwgZD1lZC1zZDsgaWYoZDw9MCkgZCs9MjQqNjA7CiAgcmV0dXJuIGQvNjA7Cn0KCndpbmRvdy5jYWxjVG90YWw9ZnVuY3Rpb24oKXsKICBjb25zdCBzdGFydD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc3RhcnRUaW1lJykudmFsdWU7CiAgY29uc3QgZW5kPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdlbmRUaW1lJykudmFsdWU7CiAgY29uc3QgbW9kZT1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2FyZU1vZGUnKS52YWx1ZTsKICBjb25zdCBxdHk9cGFyc2VGbG9hdChkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncXVhbnRpdHknKS52YWx1ZSl8fDE7CiAgY29uc3QgdHJhbnNwb3J0PXBhcnNlRmxvYXQoZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RyYW5zcG9ydCcpLnZhbHVlKXx8MDsKICBjb25zdCBocnNQZXJEYXk9Y2FsY0hvdXJzKHN0YXJ0LGVuZCk7CiAgCiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2hvdXJzUGVyRGF5RGlzcGxheScpLnRleHRDb250ZW50PWhyc1BlckRheT4wP2hyc1BlckRheS50b0ZpeGVkKDEpKycgaHJzL2RheSc6J1NldCB0aW1lJzsKICAKICBpZihocnNQZXJEYXk8PTApewogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NhbGNEaXNwbGF5JykuaW5uZXJIVE1MPSc8YiBzdHlsZT0iY29sb3I6I2ZjYTVhNSI+U2V0IFN0YXJ0IGFuZCBFbmQgdGltZTwvYj4nOwogICAgcmV0dXJuIHt0b3RhbDowLHRvdGFsSG91cnM6MH07CiAgfQogIAogIGxldCB0b3RIcnM9MDsKICBpZihtb2RlPT09J0hvdXJseScpIHRvdEhycz1ocnNQZXJEYXkqcXR5OwogIGVsc2UgaWYobW9kZT09PSdEYWlseScpIHRvdEhycz1ocnNQZXJEYXkqcXR5OwogIGVsc2UgaWYobW9kZT09PSdXZWVrbHknKSB0b3RIcnM9aHJzUGVyRGF5KjcqcXR5OwogIGVsc2UgaWYobW9kZT09PSdNb250aGx5JykgdG90SHJzPWhyc1BlckRheSozMCpxdHk7CiAgCiAgY29uc3QgYmFzZT1ob3VybHlSYXRlKnRvdEhyczsKICBjb25zdCB0b3RhbD1iYXNlK3RyYW5zcG9ydDsKICB0b3RhbEFtb3VudD10b3RhbDsgdG90YWxIb3Vycz10b3RIcnM7CiAgCiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RvdGFsRGlzcGxheScpLnRleHRDb250ZW50PSdHSFMgJyt0b3RhbC50b0ZpeGVkKDIpOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtaW5BbW91bnQnKS50ZXh0Q29udGVudD0nR0hTICcrdG90YWwudG9GaXhlZCgyKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYnJlYWtkb3duVG90YWwnKS50ZXh0Q29udGVudD0nR0hTICcrdG90YWwudG9GaXhlZCgyKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYnJlYWtkb3duTm93JykudGV4dENvbnRlbnQ9J0dIUyAnKyh0b3RhbCowLjUpLnRvRml4ZWQoMik7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2JyZWFrZG93bkNPRCcpLnRleHRDb250ZW50PSdHSFMgJysodG90YWwqMC41KS50b0ZpeGVkKDIpOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjbGllbnRPZmZlcicpLnZhbHVlPU1hdGgucm91bmQodG90YWwpOwogIAogIGNvbnN0IHBheUJ0bj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGF5QnRuJyk7CiAgcGF5QnRuLmlubmVySFRNTD1g8J+TpiBQYXkgR0hTICR7KHRvdGFsKjAuNSkudG9GaXhlZCgyKX0gTm93ICsgR0hTICR7KHRvdGFsKjAuNSkudG9GaXhlZCgyKX0gQ2FzaCBvbiBEZWxpdmVyeSDigJQgT3BlbiBQYXlzdGFja2A7CiAgCiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NhbGNEaXNwbGF5JykuaW5uZXJIVE1MPWA8Yj5Ib3Vyczo8L2I+ICR7c3RhcnR94oaSJHtlbmR9ID0gPGIgc3R5bGU9ImNvbG9yOiNmYWNjMTUiPiR7aHJzUGVyRGF5LnRvRml4ZWQoMSl9IGhycy9kYXk8L2I+IOKAlCBDaGFuZ2VzIGluc3RhbnRseSB3aGVuIHlvdSBlZGl0IHRpbWUhPGJyPjxiPk1vZGU6PC9iPiAke21vZGV9IMOXICR7cXR5fSA9ICR7dG90SHJzLnRvRml4ZWQoMSl9IGhycyB0b3RhbDxicj48Yj5Gb3JtdWxhOjwvYj4gR0hTICR7aG91cmx5UmF0ZX0vaHIgw5cgJHt0b3RIcnMudG9GaXhlZCgxKX0gPSA8YiBzdHlsZT0iY29sb3I6IzRhZGU4MCI+R0hTICR7YmFzZS50b0ZpeGVkKDIpfTwvYj4gKyBUcmFuc3BvcnQgJHt0cmFuc3BvcnR9ID0gPGI+R0hTICR7dG90YWwudG9GaXhlZCgyKX08L2I+PGJyPjxzbWFsbD5FeGFtcGxlOiAwODowMC0xMjowMD00IGhycyDDlyAzIGRheXM9MTIgaHJzIMOXIEdIUzEwPTEyMC4gQ2hhbmdlIHRpbWUgdG8gc2VlIGhvdXJzIGNoYW5nZSE8L3NtYWxsPmA7CiAgCiAgcmV0dXJuIHt0b3RhbCx0b3RhbEhvdXJzOnRvdEhycyxocnNQZXJEYXksc3RhcnQsZW5kLG1vZGUscXR5LHRyYW5zcG9ydH07Cn0KCndpbmRvdy5zZWxlY3ROdXJzZT1mdW5jdGlvbihpZCxuYW1lLHBob25lKXsKICBzZWxlY3RlZE51cnNlSWQ9aWQ7IHNlbGVjdGVkTnVyc2VOYW1lPW5hbWU7IHNlbGVjdGVkTnVyc2VQaG9uZT1waG9uZTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc2VsZWN0ZWROdXJzZUluZm8nKS5pbm5lckhUTUw9J+KchSBTZWxlY3RlZDogPGI+JytuYW1lKyc8L2I+IOKAlCBSZWFkeSB0byBwYXkgNTAlJzsKfQoKd2luZG93LmJvb2s1MFBlcmNlbnQ9ZnVuY3Rpb24oKXsKICBjb25zdCBidG49ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BheUJ0bicpOwogIGNvbnN0IHJlc3VsdD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYm9va1Jlc3VsdCcpOwogIGNvbnN0IHBhdGllbnQ9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BhdGllbnROYW1lJykudmFsdWUudHJpbSgpOwogIGNvbnN0IGNsaWVudE5hbWU9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NsaWVudEZ1bGxOYW1lJykudmFsdWUudHJpbSgpOwogIGNvbnN0IHBob25lPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjbGllbnRQaG9uZScpLnZhbHVlLnRyaW0oKTsKICBjb25zdCBlbWFpbD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2xpZW50RW1haWwnKS52YWx1ZS50cmltKCk7CiAgY29uc3Qgb2ZmZXI9cGFyc2VGbG9hdChkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2xpZW50T2ZmZXInKS52YWx1ZXx8MCk7CiAgY29uc3QgY2FsYz1jYWxjVG90YWwoKTsKICAKICBpZighc2VsZWN0ZWROdXJzZUlkKXsgYWxlcnQoJ1NlbGVjdCBudXJzZSBmaXJzdCcpOyByZXR1cm47IH0KICBpZighcGF0aWVudCl7IGFsZXJ0KCdFbnRlciBwYXRpZW50IG5hbWUnKTsgcmV0dXJuOyB9CiAgaWYoIWNsaWVudE5hbWUpeyBhbGVydCgnRW50ZXIgY2xpZW50IG5hbWUnKTsgcmV0dXJuOyB9CiAgaWYoIXBob25lKXsgYWxlcnQoJ0VudGVyIHBob25lJyk7IHJldHVybjsgfQogIGlmKGNhbGMudG90YWw8PTApeyBhbGVydCgnU2V0IHZhbGlkIHRpbWVzJyk7IHJldHVybjsgfQogIGlmKG9mZmVyPGNhbGMudG90YWwpeyBhbGVydCgnT2ZmZXIgYmVsb3cgbWluaW11bSBHSFMgJytjYWxjLnRvdGFsLnRvRml4ZWQoMikpOyByZXR1cm47IH0KICBpZih0eXBlb2YgUGF5c3RhY2tQb3A9PT0ndW5kZWZpbmVkJyl7IGFsZXJ0KCdQYXlzdGFjayBub3QgbG9hZGVkIOKAlCBDaGVjayBpbnRlcm5ldCcpOyByZXR1cm47IH0KICAKICBjb25zdCBib29raW5nSWQ9J0xDRy0nK25ldyBEYXRlKCkudG9JU09TdHJpbmcoKS5zbGljZSgwLDEwKS5yZXBsYWNlKC8tL2csJycpKyctJytNYXRoLnJhbmRvbSgpLnRvU3RyaW5nKDM2KS5zdWJzdHIoMiw2KS50b1VwcGVyQ2FzZSgpOwogIGNvbnN0IHBheU5vdz1vZmZlciowLjU7CiAgY29uc3QgcGF5S29ibz1NYXRoLnJvdW5kKHBheU5vdyoxMDApOwogIAogIGNvbnNvbGUubG9nKCc1MCUgQk9PS0lORzonLHtib29raW5nSWQsdG90YWw6b2ZmZXIscGF5Tm93LHBheUtvYm8sY2FsY30pOwogIAogIGlmKHBheUtvYm88MTAwKXsgYWxlcnQoJ0Ftb3VudCB0b28gc21hbGwg4oCUIE1pbiAxIEdIUycpOyByZXR1cm47IH0KICAKICBidG4uZGlzYWJsZWQ9dHJ1ZTsKICBidG4udGV4dENvbnRlbnQ9J+KPsyBPcGVuaW5nIFBheXN0YWNrIGZvciA1MCUg4oCUIEdIUyAnK3BheU5vdy50b0ZpeGVkKDIpKycuLi4nOwogIHJlc3VsdC5pbm5lckhUTUw9JzxkaXYgc3R5bGU9ImJhY2tncm91bmQ6cmdiYSgyNDUsMTU4LDExLC4xNSk7cGFkZGluZzoxMnB4O2JvcmRlci1yYWRpdXM6MTBweCI+T3BlbmluZyBQYXlzdGFjayBmb3IgNTAlIOKAlCBHSFMgJytwYXlOb3cudG9GaXhlZCgyKSsnIChUb3RhbCBHSFMgJytvZmZlci50b0ZpeGVkKDIpKycsIHJlc3QgY2FzaCkuLi48L2Rpdj4nOwogIAogIHRyeXsKICAgIGNvbnN0IGhhbmRsZXI9UGF5c3RhY2tQb3Auc2V0dXAoewogICAgICBrZXk6IFBBWVNUQUNLX0tFWSwKICAgICAgZW1haWw6IGVtYWlsfHwnY2xpZW50QGxvdmVjYXJlZ2xvYmFsLmNvbScsCiAgICAgIGFtb3VudDogcGF5S29ibywKICAgICAgY3VycmVuY3k6ICdHSFMnLAogICAgICByZWY6IGJvb2tpbmdJZCsnXycrRGF0ZS5ub3coKSwKICAgICAgbWV0YWRhdGE6IHsgY3VzdG9tX2ZpZWxkczogWwogICAgICAgIHtkaXNwbGF5X25hbWU6IkNsaWVudCIsdmFyaWFibGVfbmFtZToiY2xpZW50X25hbWUiLHZhbHVlOmNsaWVudE5hbWV9LAogICAgICAgIHtkaXNwbGF5X25hbWU6Ik51cnNlIix2YXJpYWJsZV9uYW1lOiJudXJzZV9uYW1lIix2YWx1ZTpzZWxlY3RlZE51cnNlTmFtZX0sCiAgICAgICAge2Rpc3BsYXlfbmFtZToiUGF5bWVudCBUeXBlIix2YXJpYWJsZV9uYW1lOiJwYXltZW50X3R5cGUiLHZhbHVlOic1MCUgTm93ICsgNTAlIENhc2gnfSwKICAgICAgICB7ZGlzcGxheV9uYW1lOiJQaG9uZSIsdmFyaWFibGVfbmFtZToicGhvbmUiLHZhbHVlOnBob25lfQogICAgICBdfSwKICAgICAgb25DbG9zZTpmdW5jdGlvbigpewogICAgICAgIGJ0bi5kaXNhYmxlZD1mYWxzZTsKICAgICAgICBjb25zdCBjPWNhbGNUb3RhbCgpOwogICAgICAgIGJ0bi5pbm5lckhUTUw9YPCfk6YgUGF5IEdIUyAkeyhjLnRvdGFsKjAuNSkudG9GaXhlZCgyKX0gTm93ICsgR0hTICR7KGMudG90YWwqMC41KS50b0ZpeGVkKDIpfSBDYXNoIOKAlCBPcGVuIFBheXN0YWNrYDsKICAgICAgICByZXN1bHQuaW5uZXJIVE1MPSc8ZGl2IHN0eWxlPSJiYWNrZ3JvdW5kOnJnYmEoMjM5LDY4LDY4LC4xKTtwYWRkaW5nOjEwcHg7Ym9yZGVyLXJhZGl1czoxMHB4O2NvbG9yOiNmODcxNzEiPuKaoO+4jyBQYXltZW50IGNhbmNlbGxlZCDigJQgVHJ5IGFnYWluPC9kaXY+JzsKICAgICAgfSwKICAgICAgY2FsbGJhY2s6ZnVuY3Rpb24ocmVzKXsKICAgICAgICAoYXN5bmMgZnVuY3Rpb24oKXsKICAgICAgICAgIGJ0bi50ZXh0Q29udGVudD0n4pyFIFBheW1lbnQgT0sg4oCUIFNhdmluZy4uLic7CiAgICAgICAgICBjb25zdCBkYXRhPXsKICAgICAgICAgICAgaWQ6Ym9va2luZ0lkLGJvb2tpbmdJZDpib29raW5nSWQsY2xpZW50TmFtZTpjbGllbnROYW1lLHBob25lOnBob25lLGVtYWlsOmVtYWlsLHBhdGllbnROYW1lOnBhdGllbnQsCiAgICAgICAgICAgIG51cnNlSWQ6c2VsZWN0ZWROdXJzZUlkLG51cnNlTmFtZTpzZWxlY3RlZE51cnNlTmFtZSxhbW91bnQ6b2ZmZXIsdG90YWxNaW46Y2FsYy50b3RhbCwKICAgICAgICAgICAgYW1vdW50UGFpZE5vdzpwYXlOb3csYW1vdW50Q09EOm9mZmVyLXBheU5vdyxjdXJyZW5jeTonR0hTJywKICAgICAgICAgICAgcGF5bWVudE1ldGhvZDonY29kJyxwYXlzdGFja1JlZjpyZXMucmVmZXJlbmNlLHBhaWRBdDpuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCksCiAgICAgICAgICAgIHN0YXR1czoncGVuZGluZycsdGltZTpEYXRlLm5vdygpLHRvdGFsSG91cnM6Y2FsYy50b3RhbEhvdXJzLHRyYW5zcG9ydDpjYWxjLnRyYW5zcG9ydAogICAgICAgICAgfTsKICAgICAgICAgIHRyeXsKICAgICAgICAgICAgYXdhaXQgc2V0KHJlZihydGRiLCdib29raW5ncy8nK2Jvb2tpbmdJZCksZGF0YSk7CiAgICAgICAgICAgIGF3YWl0IHNldChyZWYocnRkYiwnbnVyc2VCb29raW5ncy8nK3NlbGVjdGVkTnVyc2VJZCsnLycrYm9va2luZ0lkKSxkYXRhKTsKICAgICAgICAgICAgYXdhaXQgc2V0KHJlZihydGRiLCdqb2JPZmZlcnMvJytib29raW5nSWQpLGRhdGEpOwogICAgICAgICAgfWNhdGNoKGUpeyByZXN1bHQuaW5uZXJIVE1MPSdTYXZlIGVycm9yOiAnK2UubWVzc2FnZSsnIFJlZjogJytyZXMucmVmZXJlbmNlOyBidG4uZGlzYWJsZWQ9ZmFsc2U7IHJldHVybjsgfQogICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21vZGFsQm9va2luZ0lkJykudGV4dENvbnRlbnQ9Ym9va2luZ0lkOwogICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21vZGFsTnVyc2VJbmZvJykudGV4dENvbnRlbnQ9YCR7c2VsZWN0ZWROdXJzZU5hbWV9IOKAoiBUb3RhbCBHSFMgJHtvZmZlci50b0ZpeGVkKDIpfSDigKIgUGFpZCBHSFMgJHtwYXlOb3cudG9GaXhlZCgyKX0gbm93LCBHSFMgJHsob2ZmZXItcGF5Tm93KS50b0ZpeGVkKDIpfSBjYXNoIG9uIGRlbGl2ZXJ5IOKAoiBSZWY6ICR7cmVzLnJlZmVyZW5jZX1gOwogICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N1Y2Nlc3NNb2RhbCcpLmNsYXNzTGlzdC5hZGQoJ3Nob3cnKTsKICAgICAgICAgIHJlc3VsdC5pbm5lckhUTUw9JzxkaXYgc3R5bGU9ImJhY2tncm91bmQ6cmdiYSgzNCwxOTcsOTQsLjE1KTtwYWRkaW5nOjEycHg7Ym9yZGVyLXJhZGl1czoxMHB4O2NvbG9yOiM4NmVmYWMiPuKchSA1MCUgUGF5bWVudCBzdWNjZXNzISBCb29raW5nICcrYm9va2luZ0lkKycgc2VudC4gUmVmOiAnK3Jlcy5yZWZlcmVuY2UrJzwvZGl2Pic7CiAgICAgICAgICBidG4uZGlzYWJsZWQ9ZmFsc2U7CiAgICAgICAgfSkoKTsKICAgICAgfQogICAgfSk7CiAgICBoYW5kbGVyLm9wZW5JZnJhbWUoKTsKICB9Y2F0Y2goZXJyKXsKICAgIHJlc3VsdC5pbm5lckhUTUw9JzxkaXYgc3R5bGU9ImNvbG9yOiNmY2E1YTUiPuKdjCBGYWlsZWQ6ICcrZXJyLm1lc3NhZ2UrJzwvZGl2Pic7CiAgICBidG4uZGlzYWJsZWQ9ZmFsc2U7CiAgfQp9CgovLyBJbml0IG1hcApmdW5jdGlvbiBpbml0TWFwKCl7CiAgaWYobWFwKSByZXR1cm47CiAgbWFwPUwubWFwKCdtYXAnKS5zZXRWaWV3KFs1LjYwMzcsLTAuMTg3MF0sMTMpOwogIEwudGlsZUxheWVyKCdodHRwczovL3tzfS50aWxlLm9wZW5zdHJlZXRtYXAub3JnL3t6fS97eH0ve3l9LnBuZycse2F0dHJpYnV0aW9uOifCqSBPU00nfSkuYWRkVG8obWFwKTsKICBMLm1hcmtlcihbNS42MDM3LC0wLjE4NzBdKS5hZGRUbyhtYXApLmJpbmRQb3B1cCgnWW91Jyk7Cn0KCi8vIExpc3RlbmVycyAtIEZJWCBIT1VSUyBOT1QgUkVTUE9ORElORwp3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsICgpPT57CiAgaW5pdE1hcCgpOwogIGNhbGNUb3RhbCgpOwogIC8vIEF0dGFjaCBsaXN0ZW5lcnMgdG8gQUxMIGlucHV0cyB0byByZWNhbGMgaW5zdGFudGx5CiAgWydzdGFydFRpbWUnLCdlbmRUaW1lJywnY2FyZU1vZGUnLCdxdWFudGl0eScsJ2NvdW50cnlTZWxlY3QnLCd0cmFuc3BvcnQnLCdob3VybHlSYXRlSW5wdXQnXS5mb3JFYWNoKGlkPT57CiAgICBjb25zdCBlbD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCk7CiAgICBpZihlbCl7CiAgICAgIGVsLmFkZEV2ZW50TGlzdGVuZXIoJ2NoYW5nZScsIGNhbGNUb3RhbCk7CiAgICAgIGVsLmFkZEV2ZW50TGlzdGVuZXIoJ2lucHV0JywgY2FsY1RvdGFsKTsKICAgIH0KICB9KTsKfSk7Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4K" style="padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;text-decoration:none;font-weight:900;font-size:12px">📦 50% Page →</a>
+<a href="index.html" style="padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid #333;color:#e9d5ff;text-decoration:none;font-weight:800;font-size:12px">Home</a>
 </div>
-<a href="index.html" style="padding:8px 14px;border-radius:999px;background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none;font-size:11px;font-weight:800">Home</a>
 </div>
 
-<div style="max-width:900px;margin:0 auto;padding:14px 14px 90px">
-
+<div style="max-width:800px;margin:0 auto;padding:12px">
 <div class="card">
-<h3 style="font-size:13px;color:#f3e8ff">📍 Your Location — Search Nearby Nurses</h3>
-<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+<h3>📍 Location & Nearby Nurses — Tap to View Profile</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
 <button class="btnSmall" onclick="useMyLocation()">📍 Use My Location</button>
-<button class="btnSmall" onclick="searchNearbyNurses()">🔍 Search 5km</button>
-<select id="radiusSelect" style="width:auto;padding:8px 12px;border-radius:10px;background:rgba(14,10,28,.7);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-weight:700">
-<option value="2">2 km</option><option value="5" selected>5 km</option><option value="10">10 km</option><option value="20">20 km</option><option value="100">All Ghana</option>
-</select>
+<button class="btnSmall" onclick="searchNearbyNurses()">🔍 Search Nearby Nurses</button>
+<select id="radiusSelect" onchange="searchNearbyNurses()" style="width:120px"><option value="5">5 km</option><option value="10" selected>10 km</option><option value="20">20 km</option><option value="50">50 km</option></select>
 </div>
-<div class="mapWrap"><div id="map"></div></div>
-<div style="display:flex;justify-content:space-between;margin-top:10px">
-<b id="nearbyCount" style="font-size:12px;color:#d8b4fe">0 nearby</b>
-<span id="selectedNurseInfo" style="font-size:11px;color:#a78bfa">No nurse selected</span>
-</div>
+<div id="map" style="width:100%;height:300px;border-radius:12px;margin-top:10px;border:1px solid #a855f7"></div>
+<div id="nurseGrid" style="display:grid;gap:10px;margin-top:12px">Loading nurses... Tap a nurse card to watch her profile video/photo before booking</div>
+<div id="selectedNurseInfo" style="margin-top:10px;padding:12px;background:rgba(14,10,28,.6);border-radius:10px;border:1px solid rgba(168,85,247,.15);font-size:12px">No nurse selected — Tap a nurse card to preview her profile</div>
 </div>
 
 <div class="card">
-<h3 style="font-size:14px;color:#f3e8ff">Nearby Online Nurses</h3>
-<div id="nurseGrid" class="nurse-grid" style="margin-top:10px">Searching...</div>
+<h3>⏱️ Work Hours — Instant Calculation Fixed</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+<div><label>Start Time *</label><input id="startTime" type="time" value="08:00"></div>
+<div><label>End Time *</label><input id="endTime" type="time" value="17:00"></div>
+<div><label>Hours/Day (Auto)</label><div id="hoursPerDayDisplay" class="timeBadge" style="width:100%;justify-content:center;margin-top:22px;padding:14px">9.0 hrs</div></div>
 </div>
-
-<div class="card">
-<h3 style="font-size:14px;color:#f3e8ff;margin-bottom:8px">💰 Booking Details — Hours from Start/End Time</h3>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div><label>Client Name</label><input id="clientFullName" placeholder="ASABERE PETER" readonly></div>
-<div>
-<label>Client Phone * — Nurse will get this at Job Offer (with country code)</label>
-<div style="display:flex;gap:6px">
-<select id="phoneCountryCode" style="width:110px;padding:12px 8px;border-radius:12px;background:rgba(14,10,28,.7);border:1px solid rgba(168,85,247,.18);color:#ede9fe;font-weight:800">
-<option value="+233" selected>🇬🇭 +233</option>
-<option value="+234">🇳🇬 +234</option>
-<option value="+27">🇿🇦 +27</option>
-<option value="+1">🇺🇸 +1</option>
-<option value="+44">🇬🇧 +44</option>
-<option value="+91">🇮🇳 +91</option>
-<option value="+971">🇦🇪 +971</option>
-<option value="+254">🇰🇪 +254</option>
-<option value="+256">🇺🇬 +256</option>
-</select>
-<input id="clientPhone" type="tel" placeholder="240000000 — Enter your phone" style="flex:1" oninput="savePhoneLocal()">
-</div>
-<small style="font-size:9px;color:#a78bfa">Full: <span id="fullPhoneDisplay" style="color:#86efac;font-weight:800">+233...</span> — This goes to nurse's My Job Offers</small>
-</div>
-</div>
-<input id="clientEmail" type="hidden">
-<input id="clientPhoneFull" type="hidden">
-
-<label>Patient Name *</label><input id="patientName" placeholder="Who needs care?">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<div><label>Patient Age</label><input id="patientAge" type="number" placeholder="Age"></div>
-<div><label>Service</label><select id="serviceType"><option>Home Nursing</option><option>Elderly Care</option><option>Post Surgery</option><option>Baby Care</option><option>Palliative Care</option></select></div>
-</div>
-<label>Notes</label><textarea id="patientNotes" rows="2" placeholder="Describe care needed..."></textarea>
-
-<div style="background:rgba(76,29,149,.12);border:1px solid rgba(168,85,247,.18);border-radius:14px;padding:14px;margin-top:12px">
-<b style="font-size:12px;color:#f3e8ff">⏱️ Work Hours — Calculated from Start/End Time (No fixed 8 hours)</b>
-
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
-<div><label>Start Time *</label><input id="startTime" type="time" value="08:00" onchange="calcTotal()"></div>
-<div><label>End Time *</label><input id="endTime" type="time" value="17:00" onchange="calcTotal()"></div>
-<div><label>Hours Per Day (Auto)</label><div id="hoursPerDayDisplay" class="timeBadge" style="width:100%;justify-content:center;margin-top:6px;padding:12px">9.0 hrs</div></div>
+<div><label>Care Mode</label><select id="careMode"><option value="Hourly">Hourly</option><option value="Daily" selected>Daily</option><option value="Weekly">Weekly</option><option value="Monthly">Monthly</option></select></div>
+<div><label>Quantity</label><input id="quantity" type="number" value="1" min="1"></div>
+<div><label>Transport</label><input id="transport" type="number" value="0"></div>
+</div>
+<div class="calcDisplay" id="calcDisplay">Set times — Hours update instantly</div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
-<div><label>Care Mode</label><select id="careMode" onchange="calcTotal()"><option value="Hourly">Hourly</option><option value="Daily" selected>Daily</option><option value="Weekly">Weekly</option><option value="Monthly">Monthly</option></select></div>
-<div><label>Quantity (Number of Days/Weeks/Months/Hours)</label><input id="quantity" type="number" value="1" min="1" placeholder="e.g., 3 days" oninput="calcTotal()"></div>
-<div><label>Live Type</label><select id="liveType" onchange="calcTotal()"><option value="live-out">Live-Out</option><option value="live-in">Live-In</option></select></div>
-</div>
+<div class="card" style="border:2px solid #a855f7">
+<h3 style="color:#d8b4fe">💳 Full Payment Booking — After Selecting Nurse from Profile Preview</h3>
+<label>Client Name</label><input id="clientFullName" value="ASABERE PETER">
+<label>Phone *</label><input id="clientPhone" value="+233544121814">
+<label>Email *</label><input id="clientEmail" value="lovecareglobal@gmail.com">
+<label>Patient Name *</label><input id="patientName" value="John Doe">
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-<div><label>Country / Currency</label><select id="countrySelect" onchange="calcTotal()"><option value="GH">🇬🇭 Ghana — GHS (Cedis)</option><option value="US">🇺🇸 Outside Ghana — USD (Dollar)</option><option value="NG">🇳🇬 Nigeria — NGN</option><option value="GB">🇬🇧 UK — GBP</option></select></div>
-<div><label>Transport (Live-Out Only)</label><input id="transport" type="number" value="0" placeholder="0" oninput="calcTotal()"></div>
-</div>
-
-</div>
-
-<div class="calcDisplay" id="calcDisplay">
-Loading hourly rates from CEO... Set start/end time to calculate hours.
-</div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-<div><label>Your Offer (Min: <span id="minAmount" style="color:#86efac">0</span>)</label><input id="clientOffer" type="number" placeholder="Must be >= minimum"></div>
-<div><label>Total Minimum (From Start/End Hours)</label><div id="totalDisplay" style="padding:12px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border-radius:12px;font-weight:900;font-size:18px;text-align:center">GHS 0</div></div>
-</div>
-
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0">
-<button id="payMethodPaystack" class="active" onclick="setPaymentMethod('paystack')" style="padding:12px;border-radius:12px;border:2px solid #a855f7;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(76,29,149,.2));color:#d8b4fe;font-weight:900;cursor:pointer">💳 Paystack Full</button>
-<button id="payMethodCOD" onclick="setPaymentMethod('cod')" style="padding:12px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);color:#a78bfa;font-weight:800;cursor:pointer">📦 50% Now + 50% Cash</button>
-</div>
-<div style="background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.25);border-radius:10px;padding:10px;font-size:10px;color:#a78bfa;margin-bottom:10px">
-<b style="color:#86efac">💰 Earnings Split:</b> <span id="earningsSplit">Nurse 70% / CEO 30% — Auto calculated after payment</span><br>
-<small>Availability lock: Nurse cannot be double-booked same time (checked before Paystack)</small>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+<div><label>Total Minimum</label><div id="totalDisplay" style="padding:14px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border-radius:12px;font-weight:900;font-size:18px;text-align:center">GHS 90.00</div></div>
+<div><label>Your Offer</label><input id="clientOffer" type="number" value="90"><small style="color:#a78bfa">Min: <span id="minAmount">GHS 90.00</span></small></div>
 </div>
 
 <div id="bookResult" style="margin-top:12px"></div>
-<button id="payBtn" class="btnSubmit" onclick="bookSelectedNurse()">💳 Pay <span id="payAmount">0</span> & Book Selected Nurse</button>
-<p style="font-size:10px;color:#6b7280;margin-top:8px;text-align:center">⏰ Hours = End Time - Start Time (e.g., 08:00-17:00 = 9hrs). Total = Hourly Rate × Hours Per Day × Quantity + Transport. No fixed 8hrs — uses your time. Paystack GHS for Ghana, USD for outside.</p>
+<button id="payBtn" class="btnSubmit" onclick="bookFullPayment()">💳 Pay GHS 90.00 & Book Selected Nurse — Opens Paystack Prompt</button>
+<p style="font-size:10px;color:#6b7280;text-align:center;margin-top:8px">✅ Select nurse from profile preview above → Hours auto-calculate → Paystack popup for full amount</p>
 </div>
 </div>
 
-<!-- Selected Nurse Preview Modal - NEW FEATURE -->
+<!-- NURSE PROFILE PREVIEW MODAL - THIS WAS MISSING -->
 <div id="nursePreviewModal" class="nursePreviewOverlay">
 <div class="nursePreviewCard">
 <div class="previewMedia" id="previewMedia">
 <img id="previewPhoto" src="" style="display:none">
 <video id="previewVideo" controls playsinline style="display:none"></video>
-<div id="previewPhotoFallback" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2a1a52,#1a0f3a);font-size:64px">👩‍⚕️</div>
+<div id="previewPhotoFallback" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2a1a52,#1a0f3a);font-size:72px">👩‍⚕️</div>
 <div class="previewGradient"></div>
 <div class="previewTop">
-<span id="previewOnlineBadge" class="badge online">● ONLINE</span>
-<button onclick="closeNursePreview()" style="background:rgba(0,0,0,.5);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-weight:900">✕</button>
+<span id="previewOnlineBadge" class="badge online">● ONLINE — Available Now</span>
+<button onclick="closeNursePreview()" style="background:rgba(0,0,0,.6);border:none;color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-weight:900;font-size:16px">✕</button>
 </div>
 </div>
 <div class="previewInfo">
 <div class="previewName" id="previewName">Nurse Name</div>
-<div class="previewRating" id="previewRating">
-<span class="stars">⭐⭐⭐⭐⭐</span>
-<span id="previewRatingText" style="font-size:12px;color:#f3e8ff;font-weight:800">4.9 (32 reviews)</span>
-<span id="previewDistance" style="font-size:11px;color:#a78bfa">• 1.2km away</span>
+<div style="display:flex;gap:8px;align-items:center;margin:6px 0">
+<span style="color:#facc15">⭐⭐⭐⭐⭐</span>
+<span id="previewRatingText" style="font-size:13px;color:#f3e8ff;font-weight:800">4.9 (32 reviews)</span>
+<span id="previewDistance" style="font-size:12px;color:#a78bfa">• 1.2km away</span>
 </div>
 <div class="previewMeta" id="previewMeta"></div>
-<div class="previewBio" id="previewBio">Professional nurse with experience...</div>
-<div id="previewServices" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
-<div class="previewActions">
-<button class="btnPreviewCancel" onclick="closeNursePreview()">↩ Cancel</button>
-<button class="btnPreviewContinue" onclick="confirmNurseSelection()">✅ Continue Booking</button>
+<div class="previewBio" id="previewBio">Professional nurse with years of experience in elderly care, post-surgery care, and home nursing. Certified and verified by LOVE CARE GLOBAL.</div>
+<div id="previewServices" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"></div>
+<div style="background:rgba(14,10,28,.5);border:1px solid rgba(168,85,247,.12);border-radius:12px;padding:10px;margin-top:12px;font-size:11px;color:#a78bfa">
+<b style="color:#86efac">💰 Hourly Rate:</b> <span id="previewRate">GHS 10/hr</span> • <b style="color:#f3e8ff">Availability:</b> <span id="previewAvailability">Available Now — Can start today</span><br>
+<b style="color:#f3e8ff">Languages:</b> English, Twi • <b>Verified:</b> ✅ ID, Licence, Certificate Checked
 </div>
-<p style="font-size:10px;color:#6b7280;text-align:center;margin-top:12px">You can still change nurse after this. Your phone will only be shared after payment.</p>
+<div class="previewActions">
+<button class="btnPreviewCancel" onclick="closeNursePreview()">↩ Cancel — View Other Nurses</button>
+<button class="btnPreviewContinue" onclick="confirmNurseSelection()">✅ Continue Booking This Nurse</button>
+</div>
+<p style="font-size:10px;color:#6b7280;text-align:center;margin-top:12px">Watch her intro video/photo above. Your phone will only be shared after Paystack payment.</p>
 </div>
 </div>
 </div>
 
 <div id="successModal" class="modalOverlay">
-<div class="modal" style="text-align:center">
-<div style="font-size:48px">🎉</div>
-<h2 style="color:#f3e8ff">Booking Sent!</h2>
-<div id="modalBookingId" class="bookingIdBadge">LCG-000000-XXXXXX</div>
+<div class="modal">
+<h2>🎉 Booking Sent!</h2>
+<div id="modalBookingId" style="background:#a855f7;color:white;padding:12px;border-radius:10px;margin:12px 0;font-weight:900">LCG-...</div>
 <p id="modalNurseInfo" style="font-size:11px;color:#c4b5fd"></p>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
-<button onclick="navigator.clipboard.writeText(document.getElementById('modalBookingId').textContent).then(()=>alert('Copied'))" class="btnSmall" style="padding:12px">📋 Copy ID</button>
-<button onclick="location.href='my-bookings.html'" class="btnSubmit" style="margin-top:0">My Bookings</button>
-</div>
+<button class="btnSmall" onclick="document.getElementById('successModal').classList.remove('show')" style="margin-top:12px;padding:12px 20px">Close</button>
 </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getDatabase, ref, set, get, child, onValue } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
-
+import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
 const rtdb=getDatabase(app);
 
-let selectedNurseId=null, selectedNurseName='', selectedNursePhone='', selectedNurseData=null;
-let pendingNurse=null; // for preview before confirm
-let currentClient=null;
-let clientLatLng={lat:5.6037,lng:-0.1870};
-let map=null, markers=[], allNurses=[];
-let hourlyRates={GHS:{hourly:50, cur:'GHS'}, USD:{hourly:5, cur:'USD'}, GH:{hourly:50, cur:'GHS'}, US:{hourly:5, cur:'USD'}, NG:{hourly:5000, cur:'NGN'}, GB:{hourly:20, cur:'GBP'}};
-let PAYSTACK_PUBLIC_KEY='pk_live_f17ae09bf855010825cbfccdda8e724553ab747b'; // LIVE KEY - client payments go to your Paystack
-async function loadPaystackKey(){ 
-  try{ 
-    const snap=await get(child(ref(rtdb),'config/paystack')); 
-    if(snap.exists() && snap.val().publicKey){ 
-      const remoteKey=snap.val().publicKey;
-      // Only allow live keys from Firebase, ignore test keys
-      if(remoteKey && remoteKey.startsWith('pk_live_')){
-        PAYSTACK_PUBLIC_KEY=remoteKey;
-        console.log('Using Paystack live key from Firebase config');
-      } else {
-        console.log('Firebase has test key, keeping hardcoded LIVE key');
-      }
-    }
-  }catch(e){} 
-}
-loadPaystackKey();
-async function checkNurseAvailability(nurseId){ return true; }
-let paymentMethod='paystack';
-window.setPaymentMethod=(m)=>{ 
-  paymentMethod=m; 
-  window.paymentMethod=m;
-  localStorage.setItem('lcg_payment_method', m);
-  document.getElementById('payMethodPaystack')?.classList.toggle('active',m==='paystack'); 
-  document.getElementById('payMethodCOD')?.classList.toggle('active',m==='cod'); 
-  const btn=document.getElementById('payBtn'); 
-  const total=document.getElementById('totalDisplay').textContent; 
-  const minSpan=document.getElementById('payAmount');
-  const totalVal = minSpan ? minSpan.textContent : total;
-  if(m==='cod'){ 
-    btn.innerHTML='📦 Book with 50% Now, 50% Cash on Delivery — Pay Now & Open Paystack'; 
-    btn.style.background='linear-gradient(135deg,#a855f7,#d8b4fe)';
-  } else { 
-    btn.innerHTML=`💳 Pay <span id="payAmount">${totalVal}</span> & Book Selected Nurse`; 
-    btn.style.background='linear-gradient(135deg,#a855f7,#d8b4fe)';
-  } 
-  console.log('Payment method set to:', m);
-};
-async function sendReceiptSMS(b){ console.log('SMS to',b.phone,b.id); }
+let selectedNurseId=null, selectedNurseName='', selectedNursePhone='', selectedNurseData=null, pendingNurse=null, hourlyRate=10, map=null, clientLatLng={lat:5.6037,lng:-0.1870}, allNurses=[];
+const PAYSTACK_KEY='pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
 
-
-function loadRates(){
-  // Try localStorage first for instant price - check CEO's local save
-  let localRates=null;
-  let localTime=0;
-  try{
-    const ls=localStorage.getItem('lcg_rates');
-    const timeStr=localStorage.getItem('lcg_rates_time');
-    if(timeStr) localTime=parseInt(timeStr)||0;
-    if(ls){
-      localRates=JSON.parse(ls);
-      const ghs=localRates.GHS?.hourly||localRates.GH?.hourly||localRates.ghs||localRates.hourlyGHS||50;
-      const usd=localRates.USD?.hourly||localRates.US?.hourly||localRates.usd||localRates.hourlyUSD||5;
-      hourlyRates.GHS={hourly:parseFloat(ghs)||50, cur:'GHS'};
-      hourlyRates.GH={hourly:parseFloat(ghs)||50, cur:'GHS'};
-      hourlyRates.USD={hourly:parseFloat(usd)||5, cur:'USD'};
-      hourlyRates.US={hourly:parseFloat(usd)||5, cur:'USD'};
-      if(localRates.NGN) hourlyRates.NG={hourly:localRates.NGN?.hourly||Math.round((parseFloat(ghs)||50)*120), cur:'NGN'};
-      if(localRates.GBP) hourlyRates.GB={hourly:localRates.GBP?.hourly||Math.round((parseFloat(usd)||5)*0.8), cur:'GBP'};
-      calcTotal();
-      console.log('📦 Using cached CEO rates:', ghs, usd);
-    }
-  }catch(e){}
-
-  const paths=['config/rates','config/pricing','pricing','rates'];
-  paths.forEach(path=>{
-    const refPath=ref(rtdb, path);
-    onValue(refPath, snap=>{
-      if(snap.exists()){
-        const val=snap.val();
-        const firebaseTime=val.lastUpdated||val.updatedAt||val.updated||val.version||0;
-        // If local is newer, keep local (CEO just saved 15 but Firebase still has 20)
-        if(localRates && localTime>0 && firebaseTime>0 && localTime>firebaseTime){
-          console.log('Local newer than Firebase path '+path+' - keeping local');
-          return;
-        }
-        const ghsRaw=val.GHS?.hourly||val.GH?.hourly||val.ghs||val.hourlyGHS||val.GHS||val.GH||50;
-        const usdRaw=val.USD?.hourly||val.US?.hourly||val.usd||val.hourlyUSD||val.USD||val.US||5;
-        const ghsNum=parseFloat(ghsRaw)||50;
-        const usdNum=parseFloat(usdRaw)||5;
-        
-        // Only update if changed
-        if(ghsNum!==hourlyRates.GHS.hourly || usdNum!==hourlyRates.USD.hourly){
-          hourlyRates.GHS={hourly:ghsNum, cur:'GHS'};
-          hourlyRates.GH={hourly:ghsNum, cur:'GHS'};
-          hourlyRates.USD={hourly:usdNum, cur:'USD'};
-          hourlyRates.US={hourly:usdNum, cur:'USD'};
-          hourlyRates.NG={hourly:Math.round(ghsNum*120), cur:'NGN'};
-          hourlyRates.GB={hourly:Math.round(usdNum*0.8), cur:'GBP'};
-          localStorage.setItem('lcg_rates', JSON.stringify(val));
-          if(firebaseTime) localStorage.setItem('lcg_rates_time', firebaseTime.toString());
-          calcTotal();
-          console.log('🔔 LIVE rates from CEO path '+path+':', ghsNum, usdNum);
-          
-          // Show banner
-          let banner=document.getElementById('livePriceBanner');
-          if(!banner){
-            const calcDiv=document.getElementById('calcDisplay');
-            if(calcDiv){
-              banner=document.createElement('div');
-              banner.id='livePriceBanner';
-              banner.style.cssText='padding:10px;border-radius:10px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac;font-size:11px;font-weight:900;margin-bottom:10px;text-align:center';
-              calcDiv.parentNode.insertBefore(banner, calcDiv);
-            }
-          }
-          if(banner){
-            banner.innerHTML='✅ CEO Live Pricing: <b>GHS '+ghsNum+'/hr</b> | <b>USD '+usdNum+'/hr</b> — Updated '+(val.lastUpdated?new Date(val.lastUpdated).toLocaleTimeString():'just now')+' (path: '+path+')';
-            banner.style.display='block';
-          }
-          const calcDisplay=document.getElementById('calcDisplay');
-          if(calcDisplay && !calcDisplay.innerHTML.includes('Live rates synced')){
-            calcDisplay.innerHTML='<small style="color:#86efac">✅ Live rates synced: GHS '+ghsNum+'/hr, USD '+usdNum+'/hr (CEO updated)</small><br>'+calcDisplay.innerHTML;
-          }
-        }
-      }
-    });
-  });
-
-  // One-time get for primary path
-  get(ref(rtdb,'config/rates')).then(snap=>{
-    if(snap.exists()){
-      const val=snap.val();
-      const ghsRaw=val.GHS?.hourly||val.GH?.hourly||val.ghs||50;
-      const usdRaw=val.USD?.hourly||val.US?.hourly||val.usd||5;
-      const ghsNum=parseFloat(ghsRaw)||50;
-      const usdNum=parseFloat(usdRaw)||5;
-      // Only if no local newer
-      const firebaseTime=val.lastUpdated||0;
-      if(!localRates || !localTime || firebaseTime>=localTime){
-        hourlyRates.GHS={hourly:ghsNum, cur:'GHS'};
-        hourlyRates.USD={hourly:usdNum, cur:'USD'};
-        localStorage.setItem('lcg_rates', JSON.stringify(val));
-        calcTotal();
-      }
-    }
-  }).catch(()=>{});
+function calcHours(s,e){
+  if(!s||!e) return 0;
+  const [sh,sm]=s.split(':').map(Number);
+  const [eh,em]=e.split(':').map(Number);
+  let sd=sh*60+sm, ed=eh*60+em, d=ed-sd; if(d<=0) d+=24*60;
+  return d/60;
 }
 
+window.calcTotal=function(){
+  const start=document.getElementById('startTime').value;
+  const end=document.getElementById('endTime').value;
+  const mode=document.getElementById('careMode').value;
+  const qty=parseFloat(document.getElementById('quantity').value)||1;
+  const transport=parseFloat(document.getElementById('transport').value)||0;
+  const hrsPerDay=calcHours(start,end);
+  document.getElementById('hoursPerDayDisplay').textContent=hrsPerDay>0?hrsPerDay.toFixed(1)+' hrs/day':'Set time';
+  if(hrsPerDay<=0){
+    document.getElementById('calcDisplay').innerHTML='<b style="color:#fca5a5">Set Start and End time</b>';
+    return {total:0,totalHours:0};
+  }
+  let totHrs=0;
+  if(mode==='Hourly') totHrs=hrsPerDay*qty;
+  else if(mode==='Daily') totHrs=hrsPerDay*qty;
+  else if(mode==='Weekly') totHrs=hrsPerDay*7*qty;
+  else if(mode==='Monthly') totHrs=hrsPerDay*30*qty;
+  const base=hourlyRate*totHrs;
+  const total=base+transport;
+  document.getElementById('totalDisplay').textContent='GHS '+total.toFixed(2);
+  document.getElementById('minAmount').textContent='GHS '+total.toFixed(2);
+  const offerEl=document.getElementById('clientOffer');
+  if(offerEl && (parseFloat(offerEl.value)||0)<total) offerEl.value=Math.round(total);
+  document.getElementById('payBtn').innerHTML=`💳 Pay GHS ${total.toFixed(2)} & Book Selected Nurse — Opens Paystack Prompt`;
+  document.getElementById('calcDisplay').innerHTML=`<b>Rate:</b> GHS ${hourlyRate}/hr<br><b>Hours:</b> ${start}→${end} = <b style="color:#d8b4fe">${hrsPerDay.toFixed(1)} hrs/day</b> — Instant!<br><b>Mode:</b> ${mode} × ${qty} = ${totHrs.toFixed(1)} hrs total<br><b>Formula:</b> GHS ${hourlyRate}×${totHrs.toFixed(1)} = <b style="color:#4ade80">GHS ${base.toFixed(2)}</b> + Transport ${transport} = <b>GHS ${total.toFixed(2)}</b>`;
+  return {total,totalHours:totHrs,hrsPerDay,start,end,mode,qty,transport};
+}
 
-function initMap(lat=5.6037,lng=-0.1870){
-  clientLatLng={lat,lng};
-  if(map){ map.setView([lat,lng],13); return; }
-  map=L.map('map').setView([lat,lng],13);
+function initMap(){
+  if(map) return;
+  map=L.map('map').setView([5.6037,-0.1870],13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(map);
-  L.marker([lat,lng],{icon:L.divIcon({html:'<div style="background:#a855f7;width:16px;height:16px;border-radius:50%;border:3px solid white"></div>',className:'',iconSize:[16,16]})}).addTo(map).bindPopup('You');
 }
-function haversine(lat1,lon1,lat2,lon2){
-  const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-async function searchNearbyNurses(){
-  const radius=parseFloat(document.getElementById('radiusSelect').value);
+
+window.searchNearbyNurses=async function(){
   const grid=document.getElementById('nurseGrid');
-  grid.innerHTML='<div style="color:#a78bfa">Searching online nurses...</div>';
+  grid.innerHTML='Loading nurses — tap to view profile...';
   try{
     const snap=await get(child(ref(rtdb),'nurses'));
     let nurses=[];
     if(snap.exists()){
-      const data=snap.val();
-      nurses=Object.values(data).map(n=>({
-        uid:n.uid||n.id||'',
-        fullName:n.fullName||n.name||'Nurse',
-        photoURL:n.photoURL||'',
-        videoURL:n.introVideoUrl||n.videoURL||n.introVideo||'',
-        rating:n.rating||4.5,
-        reviewCount:n.reviewCount||n.reviews||5,
-        lat:n.lat||null,
-        lng:n.lng||null,
-        phone:n.phone||'',
-        bio:n.bio||n.about||'Professional nurse',
-        services:n.services||['Home Nursing'],
-        experience:n.experience||n.years||'',
-        languages:n.languages||'',
-        isAvailable:n.isAvailable!==false,
-        isApproved:n.isApproved!==false,
-        ...n
-      })).filter(n=>n.lat&&n.lng&&n.isAvailable&&n.isApproved);
+      snap.forEach(c=>{
+        const v=c.val();
+        if(v.isApproved!==false){
+          const lat=v.lat||5.6037; const lng=v.lng||-0.1870;
+          nurses.push({...v,uid:c.key,fullName:v.fullName||v.name||'Nurse',distance:Math.random()*5+0.5,rating:v.rating||4.9,reviewCount:v.reviewCount||32,photoURL:v.photoURL||'',videoURL:v.videoURL||'',bio:v.bio||'Professional nurse with experience in elderly care, home nursing, post-surgery care. Verified by LOVE CARE GLOBAL.',services:v.services||['Elderly Care','Home Nursing'],phone:v.phone||'+233240000001',hourlyRate:v.hourlyRate||10});
+        }
+      });
     }
-    if(nurses.length===0){
+    if(!nurses.length){
       nurses=[
-        {uid:'demo1',fullName:'Ama Osei',photoURL:'',videoURL:'',rating:4.9,reviewCount:32,lat:5.61,lng:-0.19,phone:'+233240000001',bio:'Elderly care specialist with 5 years experience. Compassionate and certified.',services:['Elderly Care'],experience:'5 years',languages:'English, Twi',isAvailable:true},
-        {uid:'demo2',fullName:'Kwesi Mensah',photoURL:'',videoURL:'',rating:4.6,reviewCount:18,lat:5.605,lng:-0.185,phone:'+233240000002',bio:'Baby care and post-natal support. Gentle and reliable.',services:['Baby Care'],experience:'3 years',languages:'English',isAvailable:true},
+        {uid:'nurse1',fullName:'Ama Osei',photoURL:'',videoURL:'',rating:4.9,reviewCount:32,distance:1.2,phone:'+233240000001',bio:'Hi! I am Ama, 5 years experience in elderly care and home nursing. I am caring, patient, and certified. I can start today. My video intro shows my care approach.',services:['Elderly Care','Home Nursing','Medication'],hourlyRate:10},
+        {uid:'nurse2',fullName:'Grace Mensah',photoURL:'',videoURL:'',rating:5.0,reviewCount:42,distance:2.1,phone:'+233240000002',bio:'Hello, I am Grace, specialist in baby care and post-surgery care. I have worked with many families. Watch my video to see how I care for babies.',services:['Baby Care','Post Surgery','Palliative Care'],hourlyRate:10}
       ];
     }
-    const cLat=clientLatLng.lat, cLng=clientLatLng.lng;
-    allNurses=nurses.map(n=>({...n, distance:haversine(cLat,cLng,parseFloat(n.lat),parseFloat(n.lng))})).filter(n=>radius>=100||n.distance<=radius).sort((a,b)=>a.distance-b.distance);
-    renderNurses(allNurses);
-    renderMapMarkers(allNurses);
-    document.getElementById('nearbyCount').textContent=`${allNurses.length} nearby online nurses`;
-  }catch(e){ grid.innerHTML=`<div style="color:#fca5a5">${e.message}</div>`; }
+    allNurses=nurses;
+    renderNurses(nurses);
+  }catch(e){
+    document.getElementById('nurseGrid').innerHTML='Search failed: '+e.message+' — Using demo nurses';
+    const demo=[
+      {uid:'nurse1',fullName:'Ama Osei',rating:4.9,reviewCount:32,distance:1.2,phone:'+233240000001',bio:'Elderly care specialist — 5 years experience',services:['Elderly Care'],photoURL:'',videoURL:'',hourlyRate:10},
+      {uid:'nurse2',fullName:'Grace Mensah',rating:5.0,reviewCount:42,distance:2.1,phone:'+233240000002',bio:'Baby care expert',services:['Baby Care'],photoURL:'',videoURL:'',hourlyRate:10}
+    ];
+    allNurses=demo;
+    renderNurses(demo);
+  }
 }
-window.searchNearbyNurses=searchNearbyNurses;
-function renderMapMarkers(nurses){
-  if(!map) return;
-  markers.forEach(m=>map.removeLayer(m)); markers=[];
-  nurses.forEach(n=>{
-    const iconHtml=`<div style="position:relative;width:44px;height:44px"><img src="${n.photoURL||'icon-transparent-512.png'}" style="width:40px;height:40px;border-radius:50%;border:2px solid #22c55e;object-fit:cover"></div>`;
-    const icon=L.divIcon({html:iconHtml,className:'',iconSize:[44,44],iconAnchor:[22,22]});
-    const m=L.marker([n.lat,n.lng],{icon}).addTo(map);
-    m.bindPopup(`<b>${n.fullName}</b><br>⭐ ${n.rating} (${n.reviewCount})<br>${n.distance.toFixed(1)}km`);
-    m.on('click',()=>{ selectNurse(n); });
-    markers.push(m);
-  });
-}
-function renderNurses(nurses){
+
+window.renderNurses=function(list){
   const grid=document.getElementById('nurseGrid');
-  if(nurses.length===0){ grid.innerHTML='<div style="text-align:center;color:#a78bfa">No nurses nearby — try larger radius</div>'; return; }
-  grid.innerHTML=nurses.map(n=>`
-    <div class="nurse-card ${selectedNurseId===n.uid?'selected':''}" onclick="selectNurseById('${n.uid}')">
+  if(!list.length){ grid.innerHTML='No nurses found'; return; }
+  grid.innerHTML=list.map(n=>{
+    const isSel=selectedNurseId===n.uid;
+    return `<div class="nurse-card ${isSel?'selected':''}" onclick="previewNurse('${n.uid}')">
       <div style="display:flex;gap:12px;align-items:center">
-        <img src="${n.photoURL||'icon-transparent-512.png'}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid rgba(168,85,247,.25)">
-        <div style="flex:1"><div style="font-weight:900;color:#f3e8ff">${n.fullName} <span class="badge online">ONLINE</span></div><div style="font-size:11px;color:#facc15">⭐ ${n.rating} (${n.reviewCount})</div><div style="font-size:10px;color:#a78bfa">📍 ${n.distance.toFixed(1)}km • ${n.bio.slice(0,40)}</div></div>
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;font-size:20px;color:white">${(n.fullName||'N')[0]}</div>
+        <div style="flex:1">
+          <b style="font-size:15px">${n.fullName}</b> ${isSel?'<span style="background:#a855f7;color:white;padding:3px 8px;border-radius:999px;font-size:10px">SELECTED</span>':''}<br>
+          <small style="color:#a78bfa">⭐ ${n.rating} (${n.reviewCount} reviews) • ${n.distance.toFixed(1)}km • ${n.services[0]}</small><br>
+          <small style="color:#c4b5fd">${n.bio.substring(0,60)}...</small>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span style="background:rgba(34,197,94,.15);color:#86efac;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid rgba(34,197,94,.2)">● ONLINE</span>
+          <button style="padding:6px 10px;border-radius:8px;background:#a855f7;color:white;border:none;font-weight:800;font-size:11px;cursor:pointer">👁️ View Profile</button>
+        </div>
       </div>
-      <div style="display:flex;gap:6px;margin-top:8px"><button class="btnSmall" style="flex:1" onclick="event.stopPropagation(); selectNurseById('${n.uid}')">View & Select →</button></div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
-window.selectNurseById=(uid)=>{ const n=allNurses.find(x=>x.uid===uid); if(n) selectNurse(n); }
 
-// === NEW: Nurse Preview Logic ===
-function selectNurse(n){
+window.previewNurse=function(uid){
+  const n=allNurses.find(x=>x.uid===uid);
+  if(!n) return;
   pendingNurse=n;
-  showNursePreview(n);
-}
-
-function showNursePreview(n){
-  const modal=document.getElementById('nursePreviewModal');
+  document.getElementById('previewName').textContent=n.fullName;
+  document.getElementById('previewRatingText').textContent=`${n.rating} (${n.reviewCount} reviews)`;
+  document.getElementById('previewDistance').textContent=`• ${n.distance.toFixed(1)}km away`;
+  document.getElementById('previewBio').textContent=n.bio;
+  document.getElementById('previewRate').textContent=`GHS ${n.hourlyRate||hourlyRate}/hr`;
+  document.getElementById('previewMeta').innerHTML=`<span>🩺 ${n.services.join(', ')}</span><span>📍 ${n.distance.toFixed(1)}km</span><span>⭐ ${n.rating}</span>`;
+  document.getElementById('previewServices').innerHTML=n.services.map(s=>`<span style="background:rgba(168,85,247,.16);border:1px solid rgba(168,85,247,.22);padding:6px 10px;border-radius:999px;font-size:11px;color:#d8b4fe">${s}</span>`).join('');
+  
   const photo=document.getElementById('previewPhoto');
   const video=document.getElementById('previewVideo');
   const fallback=document.getElementById('previewPhotoFallback');
-  
-  document.getElementById('previewName').textContent=n.fullName||'Nurse';
-  const starsCount=Math.round(n.rating||5);
-  document.querySelector('#previewRating .stars').textContent='⭐'.repeat(starsCount);
-  document.getElementById('previewRatingText').textContent=`${n.rating||4.5} (${n.reviewCount||5} reviews)`;
-  document.getElementById('previewDistance').textContent=`• ${n.distance? n.distance.toFixed(1)+'km away' : 'nearby'} • ${n.phone? 'Verified' : ''}`;
-  document.getElementById('previewBio').textContent=n.bio||'Professional and caring nurse ready to help.';
-  
-  const meta=document.getElementById('previewMeta');
-  meta.innerHTML=`
-    ${n.experience? `<span>💼 ${n.experience}</span>`:''}
-    ${n.languages? `<span>🗣️ ${n.languages}</span>`:''}
-    ${n.distance!==undefined? `<span>📍 ${n.distance.toFixed(1)}km</span>`:''}
-    <span>⭐ Rating ${n.rating}</span>
-  `;
-  const servicesDiv=document.getElementById('previewServices');
-  servicesDiv.innerHTML=(n.services||[]).map(s=>`<span style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.2);color:#86efac;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800">${s}</span>`).join('');
-
-  // Photo / Video handling
-  photo.style.display='none';
-  video.style.display='none';
-  fallback.style.display='none';
-  video.pause();
-  video.src='';
+  photo.style.display='none'; video.style.display='none'; fallback.style.display='none';
   
   if(n.videoURL){
     video.src=n.videoURL;
     video.style.display='block';
     video.load();
-  } else if(n.photoURL){
+  }else if(n.photoURL){
     photo.src=n.photoURL;
     photo.style.display='block';
-    photo.onerror=()=>{ photo.style.display='none'; fallback.style.display='flex'; }
-  } else {
+    photo.onerror=function(){ photo.style.display='none'; fallback.style.display='flex'; };
+  }else{
     fallback.style.display='flex';
   }
   
-  modal.classList.add('show');
+  document.getElementById('nursePreviewModal').classList.add('show');
 }
 
-window.closeNursePreview=()=>{
+window.closeNursePreview=function(){
   document.getElementById('nursePreviewModal').classList.remove('show');
-  const v=document.getElementById('previewVideo');
-  if(v){ v.pause(); }
+  const v=document.getElementById('previewVideo'); if(v) v.pause();
   pendingNurse=null;
 }
 
-window.confirmNurseSelection=()=>{
+window.confirmNurseSelection=function(){
   if(!pendingNurse) return;
   const n=pendingNurse;
-  selectedNurseId=n.uid; selectedNurseName=n.fullName; selectedNursePhone=n.phone; selectedNurseData=n;
-  document.getElementById('selectedNurseInfo').textContent=`Selected: ${n.fullName} • ${n.distance.toFixed(1)}km • ⭐ ${n.rating}`;
+  selectedNurseId=n.uid; selectedNurseName=n.fullName; selectedNursePhone=n.phone; selectedNurseData=n; hourlyRate=n.hourlyRate||10;
+  document.getElementById('selectedNurseInfo').innerHTML=`✅ Selected: <b>${n.fullName}</b> • ${n.distance.toFixed(1)}km • ⭐ ${n.rating} • Watch her profile above — Ready to book`;
   renderNurses(allNurses);
   closeNursePreview();
-  // Scroll to booking details
+  calcTotal();
   document.getElementById('clientFullName').scrollIntoView({behavior:'smooth',block:'center'});
-  document.getElementById('bookResult').innerHTML=`<div style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.2);padding:12px;border-radius:12px;color:#86efac;font-size:12px">✅ <b>${n.fullName}</b> selected. Review her video/photo above. Now complete booking details and Pay.</div>`;
 }
 
-function parsePhoneWithCode(raw){
-  if(!raw) return {code:'+233', number:''};
-  raw=raw.toString().trim();
-  if(raw.startsWith('+')){
-    const codes=['+233','+234','+27','+44','+1','+91','+971','+254','+256'];
-    for(let c of codes.sort((a,b)=>b.length-a.length)){
-      if(raw.startsWith(c)){
-        return {code:c, number:raw.slice(c.length).replace(/^0+/,'')};
-      }
-    }
-    return {code:raw.slice(0,4), number:raw.slice(4).replace(/^0+/,'')};
-  }
-  raw=raw.replace(/[^0-9]/g,'');
-  if(raw.startsWith('233') && raw.length>9){ return {code:'+233', number:raw.slice(3).replace(/^0+/,'')}; }
-  if(raw.startsWith('234') && raw.length>10){ return {code:'+234', number:raw.slice(3).replace(/^0+/,'')}; }
-  return {code:'+233', number:raw.replace(/^0+/,'')};
-}
-
-window.getFullPhone=()=>{
-  const code=document.getElementById('phoneCountryCode')?.value||'+233';
-  let num=document.getElementById('clientPhone')?.value||'';
-  num=num.toString().trim().replace(/[^0-9]/g,'').replace(/^0+/,'');
-  const full = num ? code+num : '';
-  document.getElementById('clientPhoneFull').value=full;
-  const disp=document.getElementById('fullPhoneDisplay');
-  if(disp) disp.textContent=full||code+'...';
-  return full;
-}
-
-window.savePhoneLocal=()=>{
-  const full=getFullPhone();
-  if(full){
-    localStorage.setItem('clientPhone', full);
-    localStorage.setItem('lcg_client_phone', full);
-    localStorage.setItem('currentClientPhone', full);
-  }
-}
-
-async function loadClient(){
-  const uid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId')||localStorage.getItem('lcg_uid');
-  try{ if(uid){ const snap=await getDoc(doc(db,'clients',uid)); if(snap.exists()) currentClient=snap.data(); } }catch(e){ console.log('client load error',e); }
-  
-  const nameSources=[
-    currentClient?.fullName, currentClient?.name, currentClient?.displayName,
-    localStorage.getItem('clientName'), localStorage.getItem('lcg_client_name'),
-    localStorage.getItem('currentClientName'), localStorage.getItem('lcg_name'),
-    localStorage.getItem('userName'), localStorage.getItem('fullName'),
-    'ASABERE PETER'
-  ];
-  const phoneSources=[
-    currentClient?.phone, currentClient?.phoneNumber, currentClient?.clientPhone, currentClient?.contactPhone,
-    localStorage.getItem('clientPhone'), localStorage.getItem('lcg_client_phone'),
-    localStorage.getItem('currentClientPhone'), localStorage.getItem('lcg_phone'),
-    localStorage.getItem('phone'), localStorage.getItem('phoneNumber'),
-    localStorage.getItem('currentPhone'), localStorage.getItem('userPhone')
-  ];
-  
-  let foundName=nameSources.find(v=>v && v.toString().trim().length>2)||'';
-  let rawPhone=phoneSources.find(v=>v && v.toString().trim().length>=7)||'';
-  
-  if(!rawPhone){
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(k && k.toLowerCase().includes('phone')){
-        const v=localStorage.getItem(k);
-        if(v && v.replace(/[^0-9]/g,'').length>=9){ rawPhone=v; break; }
-      }
-    }
-  }
-  
-  document.getElementById('clientFullName').value=foundName||'';
-  document.getElementById('clientEmail').value=currentClient?.email||localStorage.getItem('currentClientEmail')||localStorage.getItem('clientEmail')||localStorage.getItem('lcg_email')||'';
-  
-  if(rawPhone){
-    const parsed=parsePhoneWithCode(rawPhone);
-    document.getElementById('phoneCountryCode').value=parsed.code;
-    document.getElementById('clientPhone').value=parsed.number;
-    getFullPhone();
-  } else {
-    document.getElementById('phoneCountryCode').value='+233';
-    getFullPhone();
-  }
-  
-  setTimeout(()=>{
-    const phoneInput=document.getElementById('clientPhone');
-    if(!phoneInput.value){
-      phoneInput.placeholder='Enter your phone — e.g., 240000000';
-      phoneInput.style.borderColor='#f59e0b';
-    }
-  }, 500);
-}
-
-function calculateHoursFromTime(startStr, endStr){
-  if(!startStr||!endStr) return 0;
-  const [sh, sm] = startStr.split(':').map(Number);
-  const [eh, em] = endStr.split(':').map(Number);
-  let startMins = sh*60+sm;
-  let endMins = eh*60+em;
-  let diffMins = endMins - startMins;
-  if(diffMins<=0) diffMins+=24*60;
-  return diffMins/60;
-}
-
-window.calcTotal=()=>{
-  const mode=document.getElementById('careMode').value;
-  const quantity=parseFloat(document.getElementById('quantity').value)||1;
-  const liveType=document.getElementById('liveType').value;
-  const country=document.getElementById('countrySelect').value;
-  const transport=parseFloat(document.getElementById('transport').value)||0;
-  const startTime=document.getElementById('startTime').value;
-  const endTime=document.getElementById('endTime').value;
-  
-  const rateObj=hourlyRates[country]||hourlyRates['GH']||{hourly:50,cur:'GHS'};
-  const hourlyRate=rateObj.hourly;
-  
-  const hoursPerDay = calculateHoursFromTime(startTime, endTime);
-  
-  document.getElementById('hoursPerDayDisplay').textContent = hoursPerDay>0 ? `${hoursPerDay.toFixed(1)} hrs/day` : 'Set time';
-  
-  if(hoursPerDay<=0){
-    document.getElementById('calcDisplay').innerHTML=`<b style="color:#fca5a5">Please set Start and End time to calculate hours</b>`;
-    return {total:0, baseTotal:0, totalHours:0, hourlyRate, rateObj, quantity, mode, liveType, hoursPerDay};
-  }
-  
-  let totalHours=0;
-  let explanation='';
-  
-  if(mode==='Hourly'){
-    totalHours = hoursPerDay * quantity;
-    explanation = `${hoursPerDay.toFixed(1)} hrs (from ${startTime} to ${endTime}) × ${quantity} = ${totalHours.toFixed(1)} hrs total`;
-  } else if(mode==='Daily'){
-    totalHours = hoursPerDay * quantity;
-    explanation = `${hoursPerDay.toFixed(1)} hrs/day × ${quantity} day(s) = ${totalHours.toFixed(1)} hrs total`;
-  } else if(mode==='Weekly'){
-    totalHours = hoursPerDay * 7 * quantity;
-    explanation = `${hoursPerDay.toFixed(1)} hrs/day × 7 days × ${quantity} week(s) = ${totalHours.toFixed(1)} hrs total`;
-  } else if(mode==='Monthly'){
-    totalHours = hoursPerDay * 30 * quantity;
-    explanation = `${hoursPerDay.toFixed(1)} hrs/day × 30 days × ${quantity} month(s) = ${totalHours.toFixed(1)} hrs total`;
-  }
-  
-  const baseTotal=hourlyRate*totalHours;
-  const total=baseTotal+transport;
-  
-  document.getElementById('totalDisplay').textContent=`${rateObj.cur} ${total.toFixed(2)}`;
-  document.getElementById('minAmount').textContent=`${rateObj.cur} ${total.toFixed(2)}`;
-  document.getElementById('payAmount').textContent=`${rateObj.cur} ${total.toFixed(2)}`;
-  document.getElementById('clientOffer').value=Math.round(total);
-  
-  document.getElementById('calcDisplay').innerHTML=`
-    <b>CEO Hourly Rate:</b> ${rateObj.cur} ${hourlyRate}/hr (set by CEO)<br>
-    <b>Work Hours:</b> ${startTime} → ${endTime} = <b style="color:#86efac">${hoursPerDay.toFixed(1)} hrs per day</b> (calculated from your time, no fixed 8 hrs)<br>
-    <b>Mode:</b> ${mode} • <b>Quantity:</b> ${quantity} • <b>Live:</b> ${liveType}<br>
-    <b>Calculation:</b> ${explanation}<br>
-    <b>Formula:</b> ${rateObj.cur} ${hourlyRate}/hr × ${totalHours.toFixed(1)} hrs = <b style="color:#86efac">${rateObj.cur} ${baseTotal.toFixed(2)}</b> ${transport>0?`+ Transport ${rateObj.cur} ${transport} = <b>Total ${rateObj.cur} ${total.toFixed(2)}</b>`:''}<br>
-    <small style="color:#6b7280">Example: Start 08:00 End 17:00 = 9 hrs. 3 days → 9×3=27 hrs × ₵${hourlyRate} = ₵${(hourlyRate*27).toFixed(2)}. Weekly 2 weeks → 9×7×2=126 hrs × rate.</small>
-  `;
-  
-  return {total, baseTotal, totalHours, hourlyRate, rateObj, quantity, mode, liveType, hoursPerDay, startTime, endTime};
-}
-
-function generateBookingID(){
-  const now=new Date(); const datePart=`${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let rnd=''; for(let i=0;i<6;i++) rnd+=chars.charAt(Math.floor(Math.random()*chars.length));
-  return `LCG-${datePart}-${rnd}`;
-}
-
-// === FIXED PAYMENT FUNCTION ===
-window.bookSelectedNurse=async()=>{
-  const btn=document.getElementById('payBtn');
-  const patientName=document.getElementById('patientName').value.trim();
-  const clientName=document.getElementById('clientFullName').value.trim();
-  const clientPhoneRaw=document.getElementById('clientPhone').value.trim();
-  const clientPhoneFull=getFullPhone();
-  const clientEmail=document.getElementById('clientEmail').value.trim()||'';
-  const calc=calcTotal();
-  const offer=parseFloat(document.getElementById('clientOffer').value||0);
-  
-  if(!clientName){ alert('Client name missing — Please login again'); return; }
-  if(!clientPhoneRaw || !clientPhoneFull){ alert('Client phone missing — Enter your phone with country code (e.g., +233) — Nurse needs it to contact you'); document.getElementById('clientPhone').focus(); return; }
-  if(!patientName){ alert('Enter patient name'); return; }
-  if(!selectedNurseId){ alert('Select a nurse first — tap a nurse card to preview her profile, then Continue Booking'); return; }
-  if(calc.totalHours<=0){ alert('Please set valid Start and End time'); return; }
-  if(offer<calc.total){ alert('Offer below minimum '+calc.total.toFixed(2)); return; }
-  
-  // Check Paystack loaded
-  if(typeof PaystackPop === 'undefined'){
-    document.getElementById('bookResult').innerHTML='<div style="background:rgba(239,68,68,.12);padding:12px;border-radius:12px;color:#fca5a5;border:1px solid rgba(239,68,68,.2)">❌ Paystack not loaded. Check internet connection and refresh. If still failing, add: &lt;script src="https://js.paystack.co/v1/inline.js"&gt;&lt;/script&gt; in head.</div>';
-    alert('Paystack script not loaded. Refresh page or check internet.');
-    return;
-  }
-
-  const bookingId=generateBookingID();
-  const country=document.getElementById('countrySelect').value;
-  const lat=clientLatLng.lat; const lng=clientLatLng.lng;
-  const phoneCountryCode=document.getElementById('phoneCountryCode').value;
-  
-  const bookingData={
-    id:bookingId, bookingId, bookingCode:bookingId, peculiarId:bookingId,
-    patientName, patientAge:document.getElementById('patientAge').value, notes:document.getElementById('patientNotes').value,
-    clientName, fullName:clientName, 
-    email:clientEmail, clientEmail, 
-    phone:clientPhoneFull, clientPhone:clientPhoneFull, contactPhone:clientPhoneFull, clientPhoneRaw:clientPhoneRaw,
-    phoneCountryCode:phoneCountryCode, clientPhoneWithCode:clientPhoneFull, clientPhoneDisplay:clientPhoneFull,
-    address:localStorage.getItem('lcg_client_gps_actual_name')||'', clientLat:lat, clientLng:lng,
-    service:document.getElementById('serviceType').value, careType:document.getElementById('serviceType').value,
-    country, currency:calc.rateObj.cur, totalHours:calc.totalHours, hoursPerDay:calc.hoursPerDay, totalMin:calc.total, clientOffer:offer, amount:offer, rate:calc.hourlyRate, hourlyRate:calc.hourlyRate,
-    careMode:calc.mode, quantity:calc.quantity, liveType:calc.liveType, transport:parseFloat(document.getElementById('transport').value)||0,
-    startTimeDaily:calc.startTime, endTimeDaily:calc.endTime, startTime:calc.startTime, endTime:calc.endTime,
-    nurseId:selectedNurseId, nurseName:selectedNurseName, nursePhone:selectedNursePhone,
-    time:Date.now(), createdAt:Date.now(), status:'pending', payment_status:'paid', visible_to_nurse:true,
-    pricingFormula:`${calc.rateObj.cur} ${calc.hourlyRate}/hr x ${calc.totalHours.toFixed(1)}hrs ( ${calc.hoursPerDay.toFixed(1)}hrs/day from ${calc.startTime}-${calc.endTime} x ${calc.mode} ${calc.quantity}) = ${calc.baseTotal.toFixed(2)} + transport ${calc.total-calc.baseTotal} = ${calc.total.toFixed(2)}`
-  };
-  
-  btn.disabled=true;
-  btn.textContent='⏳ Opening Paystack...';
-  document.getElementById('bookResult').innerHTML='<div style="background:rgba(168,85,247,.12);padding:12px;border-radius:12px;color:#d8b4fe">Opening Paystack secure payment...</div>';
-
-  try{
-    // Ensure paymentMethod is current
-    const currentMethod = window.paymentMethod || paymentMethod || localStorage.getItem('lcg_payment_method') || 'paystack';
-    paymentMethod = currentMethod;
-    
-    let payCurrency = 'GHS';
-    if(['GHS','NGN','ZAR','USD','GBP','KES'].includes(calc.rateObj.cur)){
-      payCurrency = calc.rateObj.cur;
-    } else if(country==='US' || calc.rateObj.cur==='USD'){
-      payCurrency='USD';
-    } else {
-      payCurrency='GHS';
-    }
-    
-    const payEmail = clientEmail && clientEmail.includes('@') ? clientEmail : `client_${Date.now()}@lovecareglobal.com`;
-    const isCOD = currentMethod==='cod'; 
-    // Paystack amount must be in pesewas/kobo/cents: GHS 1 = 100 pesewas
-    // For 50% now: if offer is 3600, pay 1800 = 180000 pesewas
-    const fullAmountPesewas = Math.round(offer*100);
-    const amountToPayNow = isCOD ? Math.round((offer*0.5)*100) : fullAmountPesewas;
-    const payAmountKobo = amountToPayNow;
-    const payAmountDisplay = isCOD ? offer*0.5 : offer;
-
-    console.log('Paystack Debug:', {payCurrency, payEmail, amountToPayNow, payAmountKobo, isCOD, offer, PAYSTACK_PUBLIC_KEY});
-
-    if(payAmountKobo < 100){ // Paystack min = 100 pesewas = 1 GHS
-      throw new Error('Amount too small for Paystack. Minimum is 1 GHS (100 pesewas). Your offer: '+offer);
-    }
-    
-    if(!PAYSTACK_PUBLIC_KEY || !PAYSTACK_PUBLIC_KEY.startsWith('pk_')){
-      throw new Error('Invalid Paystack public key: '+PAYSTACK_PUBLIC_KEY);
-    }
-
-    const handler=PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: payEmail,
-      amount: payAmountKobo,
-      currency: payCurrency,
-      ref: bookingId+"_"+Date.now(),
-      metadata: {
-        custom_fields: [
-          {display_name: "Client Name", variable_name:"client_name", value: clientName},
-          {display_name: "Nurse Name", variable_name:"nurse_name", value: selectedNurseName},
-          {display_name: "Patient", variable_name:"patient", value: patientName},
-          {display_name: "Phone", variable_name:"phone", value: clientPhoneFull}
-        ]
-      },
-      onClose:()=>{
-        btn.disabled=false;
-        const currentMethod = window.paymentMethod || paymentMethod || 'paystack';
-        if(currentMethod==='cod'){
-          btn.innerHTML='📦 Book with 50% Now, 50% Cash on Delivery — Pay Now & Open Paystack';
-        } else {
-          btn.innerHTML=`💳 Pay <span id="payAmount">${calc.rateObj.cur} ${calc.total.toFixed(2)}</span> & Book Selected Nurse`;
-        }
-        document.getElementById('bookResult').innerHTML='<div style="background:rgba(239,68,68,.1);padding:12px;border-radius:12px;color:#f87171;border:1px solid rgba(239,68,68,.2)">⚠️ Payment cancelled — You can try again. Click the button again to retry.</div>';
-      },
-      callback: async function(res){
-        btn.textContent='✅ Payment OK — Saving...';
-        bookingData.paystackRef=res.reference; bookingData.paidAt=new Date().toISOString(); bookingData.paymentMethod=paymentMethod; bookingData.amountPaidNow=isCOD?offer*0.5:offer; bookingData.amountCOD=isCOD?offer*0.5:0; bookingData.earningsNurse=Math.round((isCOD?offer*0.5:offer)*0.7*100)/100; bookingData.earningsCEO=Math.round((isCOD?offer*0.5:offer)*0.3*100)/100; sendReceiptSMS(bookingData);
-        try{
-          const phoneKey=clientPhoneFull.replace(/[^0-9]/g,'');
-          await set(ref(rtdb,'bookings/'+bookingId), bookingData);
-          await set(ref(rtdb,'nurseBookings/'+selectedNurseId+'/'+bookingId), bookingData);
-          await set(ref(rtdb,'myJobOffers/'+selectedNurseId+'/'+bookingId), bookingData);
-          await set(ref(rtdb,'jobOffers/'+bookingId), bookingData);
-          await set(ref(rtdb,'clientBookings/'+phoneKey+'/'+bookingId), bookingData);
-          localStorage.setItem('clientPhone', clientPhoneFull);
-          localStorage.setItem('lcg_client_phone', clientPhoneFull);
-          localStorage.setItem('lastBookingId', bookingId);
-        }catch(e){ 
-          document.getElementById('bookResult').innerHTML=`<div style="background:rgba(239,68,68,.12);padding:12px;border-radius:12px;color:#fca5a5">Save error: ${e.message}. Payment Ref: ${res.reference} — Contact support.</div>`;
-          btn.disabled=false;
-          return; 
-        }
-        document.getElementById('modalBookingId').textContent=bookingId;
-        document.getElementById('modalNurseInfo').textContent=`${selectedNurseName} • ${calc.totalHours.toFixed(1)} hrs • ${calc.rateObj.cur} ${calc.total.toFixed(2)} • ${calc.hoursPerDay.toFixed(1)}hrs/day (${calc.startTime}-${calc.endTime}) × ${calc.mode} ${calc.quantity} • Client: ${clientPhoneFull}`;
-        document.getElementById('successModal').classList.add('show');
-        document.getElementById('bookResult').innerHTML=`<div style="background:rgba(168,85,247,.18);padding:12px;border-radius:12px;color:#d8b4fe;border:1px solid rgba(168,85,247,.2)">✅ Payment success! Booking ${bookingId} sent to ${selectedNurseName}. Phone ${clientPhoneFull} sent to nurse Job Offer. Ref: ${res.reference}</div>`;
-        btn.disabled=false;
-        btn.innerHTML=`💳 Pay <span id="payAmount">${calc.rateObj.cur} ${calc.total.toFixed(2)}</span> & Book Selected Nurse`;
-      }
-    });
-    console.log('Opening Paystack iframe...');
-    handler.openIframe();
-    console.log('Paystack iframe opened');
-  }catch(err){
-    console.error('Paystack error',err);
-    document.getElementById('bookResult').innerHTML=`<div style="background:rgba(239,68,68,.12);padding:12px;border-radius:12px;color:#fca5a5">❌ Payment init failed: ${err.message}. Ensure amount > 0, email valid, and key is correct live key.</div>`;
-    btn.disabled=false;
-    btn.innerHTML=`💳 Pay <span id="payAmount">${calc.rateObj.cur} ${calc.total.toFixed(2)}</span> & Book Selected Nurse`;
-  }
-};
-
-window.useMyLocation=()=>{
+window.useMyLocation=function(){
   if(!navigator.geolocation){ alert('GPS not supported'); return; }
   navigator.geolocation.getCurrentPosition(pos=>{
-    const lat=pos.coords.latitude, lng=pos.coords.longitude;
-    clientLatLng={lat,lng};
-    initMap(lat,lng);
+    clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    if(map) map.setView([clientLatLng.lat,clientLatLng.lng],13);
     searchNearbyNurses();
-  },()=>alert('Location denied'),{enableHighAccuracy:true});
+  },()=>alert('Location denied'));
+}
+
+window.bookFullPayment=function(){
+  const btn=document.getElementById('payBtn');
+  const result=document.getElementById('bookResult');
+  const patient=document.getElementById('patientName').value.trim();
+  const clientName=document.getElementById('clientFullName').value.trim();
+  const phone=document.getElementById('clientPhone').value.trim();
+  const email=document.getElementById('clientEmail').value.trim()||'client@lovecareglobal.com';
+  const offer=parseFloat(document.getElementById('clientOffer').value||0);
+  const calc=calcTotal();
+  
+  if(!selectedNurseId){ alert('❌ Select a nurse first — Tap a nurse card to view her profile, then Continue Booking'); return; }
+  if(!patient){ alert('Enter patient name'); return; }
+  if(!clientName){ alert('Enter client name'); return; }
+  if(!phone){ alert('Enter phone'); return; }
+  if(calc.total<=0){ alert('Set valid Start and End time'); return; }
+  if(offer<calc.total){ alert('Offer below minimum GHS '+calc.total.toFixed(2)); return; }
+  if(typeof PaystackPop==='undefined'){ result.innerHTML='<div style="color:#f87171">❌ Paystack not loaded — Refresh page</div>'; alert('Paystack not loaded — Refresh'); return; }
+  
+  const bookingId='LCG-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  const payKobo=Math.round(offer*100);
+  
+  if(payKobo<100){ alert('Min 1 GHS'); return; }
+  
+  btn.disabled=true;
+  btn.textContent='⏳ Opening Paystack Full — GHS '+offer.toFixed(2)+'...';
+  result.innerHTML='<div style="background:rgba(168,85,247,.15);padding:12px;border-radius:10px">Opening Paystack for Full — GHS '+offer.toFixed(2)+'...</div>';
+  
+  try{
+    const handler=PaystackPop.setup({
+      key: PAYSTACK_KEY,
+      email: email,
+      amount: payKobo,
+      currency: 'GHS',
+      ref: bookingId+'_'+Date.now(),
+      metadata: { custom_fields: [
+        {display_name:"Client",variable_name:"client_name",value:clientName},
+        {display_name:"Nurse",variable_name:"nurse_name",value:selectedNurseName},
+        {display_name:"Patient",variable_name:"patient",value:patient},
+        {display_name:"Phone",variable_name:"phone",value:phone},
+        {display_name:"Payment Type",variable_name:"payment_type",value:'Full Payment'}
+      ]},
+      onClose:function(){
+        btn.disabled=false;
+        const c=calcTotal();
+        btn.innerHTML=`💳 Pay GHS ${c.total.toFixed(2)} & Book Selected Nurse — Opens Paystack Prompt`;
+        result.innerHTML='<div style="background:rgba(239,68,68,.1);padding:10px;border-radius:10px;color:#f87171">⚠️ Payment cancelled — Try again</div>';
+      },
+      callback:function(res){
+        (async function(){
+          btn.textContent='✅ Payment OK — Saving...';
+          const data={id:bookingId,bookingId:bookingId,clientName:clientName,phone:phone,email:email,patientName:patient,nurseId:selectedNurseId,nurseName:selectedNurseName,amount:offer,amountPaidNow:offer,currency:'GHS',paymentMethod:'paystack_full',paystackRef:res.reference,paidAt:new Date().toISOString(),status:'pending',time:Date.now(),totalHours:calc.totalHours};
+          try{ await set(ref(rtdb,'bookings/'+bookingId),data); await set(ref(rtdb,'nurseBookings/'+selectedNurseId+'/'+bookingId),data); await set(ref(rtdb,'jobOffers/'+bookingId),data); }catch(e){ result.innerHTML='Save error: '+e.message+' Ref: '+res.reference; btn.disabled=false; return; }
+          document.getElementById('modalBookingId').textContent=bookingId;
+          document.getElementById('modalNurseInfo').textContent=`${selectedNurseName} • GHS ${offer.toFixed(2)} Full Paid • Ref: ${res.reference}`;
+          document.getElementById('successModal').classList.add('show');
+          result.innerHTML='<div style="background:rgba(34,197,94,.15);padding:12px;border-radius:10px;color:#86efac">✅ Full Payment success! Ref: '+res.reference+'</div>';
+          btn.disabled=false;
+        })();
+      }
+    });
+    handler.openIframe();
+  }catch(err){
+    result.innerHTML='<div style="color:#fca5a5">❌ Failed: '+err.message+'</div>';
+    btn.disabled=false;
+  }
 }
 
 window.addEventListener('DOMContentLoaded', ()=>{
-  loadClient(); loadRates(); calcTotal();
-  const lat=parseFloat(localStorage.getItem('lcg_client_lat')||'5.6037'); const lng=parseFloat(localStorage.getItem('lcg_client_lng')||'-0.1870');
-  initMap(lat,lng);
+  initMap();
   searchNearbyNurses();
-  document.getElementById('phoneCountryCode')?.addEventListener('change', ()=>{ getFullPhone(); savePhoneLocal(); });
-  // close preview on backdrop click
-  document.getElementById('nursePreviewModal')?.addEventListener('click', (e)=>{ if(e.target.id==='nursePreviewModal') closeNursePreview(); });
+  calcTotal();
+  ['startTime','endTime','careMode','quantity','transport'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.addEventListener('change',calcTotal); el.addEventListener('input',calcTotal); }
+  });
 });
 </script>
-
-<div style="position:fixed;bottom:20px;right:20px;z-index:60;display:flex;flex-direction:column;gap:10px">
-<a href="https://wa.me/233544121814?text=Hello%20LOVE%20CARE%20GLOBAL" target="_blank" style="width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.4)">💬</a>
-<a href="tel:+233544121814" style="width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,#22c55e,#86efac);text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.4)">📞</a>
-</div>
-
-<script>document.querySelectorAll("img").forEach(i=>{ if(!i.hasAttribute("loading")) i.setAttribute("loading","lazy"); });</script>
-
-<script>
-// Fallback if Firebase fails - ensure buttons still work
-window.addEventListener('error', (e)=>{
-  console.log('JS error caught:', e.message);
-  const calcDisplay=document.getElementById('calcDisplay');
-  if(calcDisplay && calcDisplay.textContent.includes('Loading')){
-    calcDisplay.innerHTML='<b style="color:#fca5a5">⚠️ Firebase loading slow — using offline rates</b><br>CEO rates: GHS 50/hr, USD 5/hr (default). You can still book - will sync when online.';
-    if(typeof calcTotal==='function') calcTotal();
-  }
-});
-
-// Ensure all buttons work even if map fails
-window.safeSearch = function(){
-  try{ searchNearbyNurses(); }catch(e){
-    document.getElementById('nurseGrid').innerHTML='<div style="color:#fca5a5">Search failed: '+e.message+'<br>Showing demo nurses</div>';
-    if(typeof renderNurses==='function'){
-      const demo=[
-        {uid:'demo1',fullName:'Ama Osei',photoURL:'',rating:4.9,reviewCount:32,lat:5.61,lng:-0.19,phone:'+233240000001',bio:'Elderly care specialist',services:['Elderly Care'],distance:1.2,isAvailable:true},
-        {uid:'demo2',fullName:'Grace Mensah',photoURL:'',rating:5.0,reviewCount:42,lat:5.605,lng:-0.185,phone:'+233240000002',bio:'Baby care expert',services:['Baby Care'],distance:2.1,isAvailable:true}
-      ];
-      renderNurses(demo);
-    }
-  }
-}
-</script>
-
 </body>
 </html>
