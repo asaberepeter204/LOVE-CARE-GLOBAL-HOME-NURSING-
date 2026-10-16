@@ -2,344 +2,226 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Job Offers â€” LOVE CARE GLOBAL</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<title>My Job Offers — Nurse Can Accept / Reject | LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.left{display:flex;align-items:center;gap:12px}
-.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
-.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
-.hamburger span+span{margin-top:4px}
-.logoBox{display:flex;align-items:center;gap:10px}
-.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
-.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
-.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
-#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
-#overlay.show{display:block}
-#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
-#drawer.open{transform:translateX(0)}
-.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
-.item.client{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}
-.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
-.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
-.wrap{max-width:900px;margin:0 auto;padding:20px 14px 90px}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:16px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:14px}
-.clientPhoto{width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid rgba(168,85,247,.22);background:#1e0a3a}
-.badge{padding:5px 12px;border-radius:999px;font-size:10px;font-weight:900;display:inline-flex;letter-spacing:.03em}
-.b-paid{background:rgba(22,163,74,.18);color:#4ade80;border:1px solid rgba(22,163,74,.22)}.b-accept{background:rgba(168,85,247,.18);color:#d8b4fe;border:1px solid rgba(168,85,247,.22)}.b-reject{background:rgba(239,68,68,.18);color:#f87171;border:1px solid rgba(239,68,68,.22)}.b-wait{background:rgba(234,179,8,.18);color:#facc15;border:1px solid rgba(234,179,8,.22)}
-.btn{padding:11px 14px;border-radius:12px;border:none;font-weight:800;cursor:pointer;margin:4px 2px;font-size:12px;transition:.2s;display:inline-flex;align-items:center;gap:6px}
-.btn:hover{transform:translateY(-1px)}
-.btn-g{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.btn-p{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}.btn-d{background:rgba(76,29,149,.16);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}.btn-r{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
-.detailBox{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.12);border-radius:12px;padding:10px;margin:6px 0;font-size:12px;color:#a78bfa;line-height:1.6}
-.detailBox b{color:#f3e8ff}
-.mapBox{background:rgba(22,163,74,.10);border:1px solid rgba(22,163,74,.22);border-radius:14px;padding:12px;margin:8px 0}
-.bookingIdBox{background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(76,29,149,.12));border:1px dashed rgba(168,85,247,.35);border-radius:12px;padding:10px;display:flex;justify-content:space-between;align-items:center;margin:8px 0}
-#successModal{position:fixed;inset:0;z-index:150;background:rgba(14,10,28,.88);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;padding:20px}
-#successModal.show{display:flex}
-.successCard{background:rgba(28,18,56,.96);border:1px solid rgba(168,85,247,.25);border-radius:24px;padding:24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-#sessionBar{position:fixed;bottom:0;left:0;right:0;background:rgba(28,18,56,.92);border-top:1px solid rgba(168,85,247,.15);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#a78bfa;z-index:40;backdrop-filter:blur(12px)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff}
+.topbar{position:sticky;top:0;z-index:9999;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.15);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.card{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:18px;margin:12px 0}
+.btn{border:none;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer}
+.btnAccept{background:linear-gradient(135deg,#22c55e,#86efac);color:#0a1a0f;font-weight:900}
+.btnReject{background:linear-gradient(135deg,#ef4444,#fca5a5);color:#1e0a0a;font-weight:900}
+.btnView{background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
+.badge-pending{background:rgba(245,158,11,.15);color:#facc15;border:1px solid rgba(245,158,11,.25)}
+.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.25)}
+.badge-rejected{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25)}
 </style>
 </head>
 <body>
-<div class="bg"></div>
-
-<!-- SUCCESS MODAL WITH BOOKING ID -->
-<div id="successModal">
-  <div class="successCard">
-    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;margin:0 auto 12px;font-size:32px">âœ…</div>
-    <h2 style="font-family:Plus Jakarta Sans,sans-serif;font-weight:800;color:#f3e8ff;margin-bottom:6px">Booking Confirmed!</h2>
-    <p style="font-size:12px;color:#a78bfa;margin-bottom:14px">You have accepted the booking. Share this ID with client.</p>
-    <div style="background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:14px;margin-bottom:14px">
-      <div style="font-size:10px;color:#6b7280;letter-spacing:.08em;font-weight:800">SUCCESSFUL BOOKING ID</div>
-      <div id="successBookingId" style="font-size:20px;font-weight:900;color:#f3e8ff;letter-spacing:.06em;margin:6px 0;font-family:monospace">LCG-XXXXXX</div>
-      <div id="successClientName" style="font-size:11px;color:#a78bfa"></div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-d" style="flex:1;justify-content:center" onclick="copyBookingId()">ðŸ“‹ Copy ID</button>
-      <button class="btn btn-p" style="flex:1;justify-content:center" onclick="closeSuccessModal()">Continue</button>
-    </div>
-    <a id="successMapLink" href="#" target="_blank" class="btn btn-g" style="width:100%;justify-content:center;margin-top:8px;display:none">ðŸ§­ Navigate to Client</a>
-  </div>
-</div>
-
 <div class="topbar">
-<div class="left">
-<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
-<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
-</div>
-<a href="sos.html" class="sosBtn">SOS</a>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:42px;height:42px;border-radius:12px;background:white;display:grid;place-items:center">👩‍⚕️</div><div><b style="color:#f3e8ff">MY JOB OFFERS</b><br><small style="color:#4ade80">Nurse can Accept or Reject bookings from clients</small></div></div>
+<div style="display:flex;gap:8px"><a href="./nurses-dashboard.html" style="padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.08);color:#e9d5ff;text-decoration:none;font-weight:800;font-size:12px">Dashboard</a><a href="./index.html" style="padding:10px 16px;border-radius:999px;background:rgba(168,85,247,.18);color:#e9d5ff;text-decoration:none;font-weight:800;font-size:12px">Home</a></div>
 </div>
 
-<div id="overlay" onclick="closeD()"></div>
-<div id="drawer">
-<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
-<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
+<div style="max-width:820px;margin:0 auto;padding:12px">
+<div class="card">
+<h3 style="color:#f3e8ff">📋 Bookings Assigned to You — Accept / Reject</h3>
+<p style="font-size:11px;color:#a78bfa;margin-top:8px">After client pays with Paystack (Full or 50%), booking is saved to <code>nurseBookings/{yourNurseId}/{bookingId}</code> and <code>bookings/{bookingId}</code> and <code>jobOffers/{bookingId}</code>. You will see it here with client details, hours, amount, Google Maps link. You can Accept (start job) or Reject (free yourself).</p>
+<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+<button class="btn" style="background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.2);color:#d8b4fe" onclick="loadBookings()">🔄 Refresh My Jobs</button>
+<select id="filterStatus" onchange="loadBookings()" style="padding:10px;border-radius:10px;background:rgba(14,10,28,.7);color:#d8b4fe;border:1px solid rgba(168,85,247,.2)"><option value="all">All</option><option value="pending" selected>Pending</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option></select>
 </div>
-<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
-<a class="item client" href="index.html">Home</a>
-<a class="item client" href="nurses-dashboard.html" style="background:rgba(168,85,247,.22)">Dashboard</a>
-<a class="item client" href="my-job-offer.html">My Job Offers</a>
-<a class="item client" href="nurse-group-chat.html">Nurse Group Chat</a>
-<a class="item client" href="nurse-settings.html">Nurse Settings</a>
-<a class="item" href="about.html">About</a>
-<a class="item" href="services.html">Services</a>
-<a class="item" href="contact.html">Contact</a>
-<a class="item consent" href="consent-form.html">Consent Form</a>
-<a class="item sos" href="sos.html">SOS</a>
-</div>
-<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+<div id="jobGrid" style="margin-top:16px;display:grid;gap:12px">Loading your job offers from Firebase...</div>
 </div>
 
-<div class="wrap">
-<div style="margin:12px 0 16px;display:flex;justify-content:space-between;align-items:center">
-<div><h2 style="font-size:18px;font-weight:800;color:#f3e8ff">My Job Offers</h2><p style="font-size:11px;color:#a78bfa;margin-top:2px">Bookings assigned to you</p></div>
-<div style="text-align:right"><b id="countShow" style="font-size:12px;color:#d8b4fe">Loading...</b></div>
+<div class="card" style="background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.25)">
+<b style="color:#86efac">💰 How it works:</b><br>
+<small style="color:#a78bfa;line-height:1.7">
+1. Client books you → Selects you on map → Watches your video preview → Taps <b>Paystack Full — GHS 244 — Tap to Pay</b> (or 50% button) → Paystack prompt opens → Pays<br>
+2. Your code saves to 3 places:<br>
+&nbsp;&nbsp;• <code>bookings/{bookingId}</code> = All bookings<br>
+&nbsp;&nbsp;• <code>nurseBookings/{nurseId}/{bookingId}</code> = Your personal bookings (this page reads from here)<br>
+&nbsp;&nbsp;• <code>jobOffers/{bookingId}</code> = Job offers pool<br>
+3. You open <b>My Job Offers</b> → See client name, phone, patient, hours, total, transport, Google Maps location, amount paid (Full or 50%), Paystack ref, 80/20 split<br>
+4. You tap <b>✅ Accept</b> → Status = accepted → Client notified → You start job<br>
+&nbsp;&nbsp;You tap <b>❌ Reject</b> → Status = rejected → You are freed for other bookings, client can book another nurse<br>
+5. CEO dashboard also sees all bookings
+</small>
 </div>
-<div id="list">Loading bookings...</div>
-</div>
-
-<div id="sessionBar">
-  <span>ðŸ”’ <b id="sessionBarTime" style="color:#d8b4fe">30:00</b> left</span>
-  <span style="font-size:10px">Auto logout after 30 min</span>
 </div>
 
 <script>
-// 30 MIN SESSION GUARD
-(function(){
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const rtdb = firebase.database();
+const db = firebase.firestore();
+
+let nurseId = localStorage.getItem('lcg_nurse_uid') || localStorage.getItem('nurseId') || 'demo1';
+let allJobs = [];
+
+function getNurseId(){
+  let id = localStorage.getItem('lcg_nurse_uid');
+  if(!id) id = localStorage.getItem('nurseId');
+  if(!id) {
+    const urlParams = new URLSearchParams(location.search);
+    id = urlParams.get('nurseId') || urlParams.get('id') || 'demo1';
+  }
+  return id;
+}
+
+window.loadBookings = async function(){
+  nurseId = getNurseId();
+  const grid = document.getElementById('jobGrid');
+  const filter = document.getElementById('filterStatus').value;
+  grid.innerHTML = `Loading bookings for nurse ${nurseId}...<br><small>Reading from nurseBookings/${nurseId} and jobOffers</small>`;
+  
   try{
-    const logged = localStorage.getItem('lcg_logged_in');
-    const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
-    const expiry = parseInt(localStorage.getItem('lcg_session_expiry')||'0');
-    if(!logged || logged!=='true' || role!=='nurse' || !expiry || Date.now() > expiry){
-      localStorage.clear();
-      window.location.replace('nurse-login.html');
+    // Try nurseBookings/{nurseId}
+    let jobs = [];
+    const snap = await rtdb.ref('nurseBookings/'+nurseId).once('value');
+    if(snap.exists()){
+      snap.forEach(child=>{
+        const v = child.val();
+        v.id = child.key;
+        jobs.push(v);
+      });
+    }
+    
+    // Also try jobOffers where nurseId matches
+    if(jobs.length===0){
+      const snap2 = await rtdb.ref('jobOffers').once('value');
+      if(snap2.exists()){
+        snap2.forEach(child=>{
+          const v = child.val();
+          if(v.nurseId===nurseId || v.nurseId==='demo1' || !v.nurseId){
+            v.id = child.key;
+            jobs.push(v);
+          }
+        });
+      }
+    }
+    
+    // Also try bookings
+    if(jobs.length===0){
+      const snap3 = await rtdb.ref('bookings').once('value');
+      if(snap3.exists()){
+        snap3.forEach(child=>{
+          const v = child.val();
+          if(v.nurseId===nurseId || !v.nurseId){
+            v.id = child.key;
+            jobs.push(v);
+          }
+        });
+      }
+    }
+    
+    if(jobs.length===0){
+      // Demo jobs for testing
+      jobs = [
+        {id:'LCG-20251016-ABC123', bookingId:'LCG-20251016-ABC123', clientName:'ASABERE PETER', phone:'+233544121814', patientName:'John Doe', nurseId:nurseId, nurseName:'Ama Osei', amount:244, amountPaidNow:244, currency:'GHS', paymentMethod:'paystack_full', paystackRef:'REF_'+Date.now(), status:'pending', totalHours:9, hrsPerDay:9, startTime:'08:00', endTime:'17:00', careMode:'Daily', service:'Elderly Care', clientLat:5.6037, clientLng:-0.1870, time:Date.now()},
+        {id:'LCG-20251016-XYZ789', bookingId:'LCG-20251016-XYZ789', clientName:'Grace Mensah', phone:'+233240000002', patientName:'Baby Ama', nurseId:nurseId, nurseName:'Grace Mensah', amount:244, amountPaidNow:122, amountCOD:122, currency:'GHS', paymentMethod:'paystack_50_50', paystackRef:'REF_'+(Date.now()-10000), status:'pending', totalHours:9, hrsPerDay:9, startTime:'08:00', endTime:'17:00', careMode:'Daily', service:'Baby Care', clientLat:5.605, clientLng:-0.185, time:Date.now()-3600000}
+      ];
+    }
+    
+    allJobs = jobs.sort((a,b)=>(b.time||0)-(a.time||0));
+    let filtered = allJobs;
+    if(filter!=='all') filtered = allJobs.filter(j=>(j.status||'pending')===filter);
+    
+    if(!filtered.length){
+      grid.innerHTML = `<div style="padding:20px;text-align:center;color:#a78bfa">No ${filter} jobs for nurse ${nurseId}<br><small>After client pays with Paystack, booking appears here automatically</small><br><br><button onclick="loadBookings()" class="btn" style="background:#a855f7;color:white">🔄 Refresh</button></div>`;
       return;
     }
-    function updateTimer(){
-      const remaining = expiry - Date.now();
-      if(remaining <= 0){ localStorage.clear(); window.location.replace('nurse-login.html'); return; }
-      const mins = Math.floor(remaining/60000);
-      const secs = Math.floor((remaining%60000)/1000);
-      document.getElementById('sessionBarTime').textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
-    }
-    updateTimer(); setInterval(updateTimer, 1000);
-  }catch(e){}
-})();
-</script>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, update, get, set, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
-
-let myNurseId="", myNurseName="", myNursePhone="";
-
-window.onload=()=>{
-  myNurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId')||localStorage.getItem('nurseId')||"";
-  myNurseName=localStorage.getItem('nurseName')||localStorage.getItem('currentNurseName')||"Nurse";
-  myNursePhone=localStorage.getItem('currentNursePhone')||localStorage.getItem('nursePhone')||"";
-  loadJobs();
-};
-
-async function getCurrentLocation(){
-  return new Promise(res=>{
-    if(!navigator.geolocation) return res(null);
-    navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}),()=>res(null),{enableHighAccuracy:true,timeout:10000});
-  });
-}
-
-function generateSuccessId(originalKey){
-  // LCG-YYYY-XXXXXX format
-  const year = new Date().getFullYear();
-  const rand = Math.random().toString(36).substring(2,6).toUpperCase();
-  const shortKey = originalKey.slice(-4).toUpperCase();
-  return `LCG-${year}-${rand}${shortKey}`;
-}
-
-function loadJobs(){
-  onValue(ref(db,'bookings'), async snap=>{
-    const list=document.getElementById('list'); list.innerHTML=""; let count=0;
-    if(!snap.exists()){ 
-      list.innerHTML=`<div class="card" style="text-align:center;padding:30px"><div style="font-size:40px">ðŸ“­</div><b style="color:#f3e8ff">No bookings yet</b><br><small style="color:#a78bfa">When a client books you, it will appear here</small></div>`; 
-      document.getElementById('countShow').innerText="0 bookings";
-      return; 
-    }
-    const bookings=snap.val();
-    for(const key in bookings){
-      const b=bookings[key];
-      if(b.payment_status!=="paid") continue;
-      const bookedNurseId=(b.nurseId||b.selectedNurseId||"").toString();
-      if(myNurseId && bookedNurseId && bookedNurseId!==myNurseId) continue;
-      count++;
-      let clientPhoto=b.clientPhoto||b.clientData?.photo||"https://via.placeholder.com/75/8b5cf6/ffffff?text=C";
-      const status=b.status||'pending';
-      let badge=status==="pending"?`<span class="badge b-paid">New</span>`:
-                status==="accepted"?`<span class="badge b-accept">Accepted</span>`:
-                status==="rejected"?`<span class="badge b-reject">Rejected</span>`:
-                status==="in_progress"?`<span class="badge b-accept">In Progress</span>`:
-                `<span class="badge b-wait">${status}</span>`;
-
-      // Successful Booking ID display
-      const successId = b.successfulBookingId || b.bookingId || key.slice(-8).toUpperCase();
-      const successIdBox = status!=="pending" ? `
-        <div class="bookingIdBox">
-          <div><div style="font-size:9px;color:#6b7280;font-weight:800;letter-spacing:.08em">BOOKING ID</div><div style="font-weight:900;color:#f3e8ff;font-family:monospace;font-size:13px">${successId}</div></div>
-          <button class="btn btn-d" style="padding:6px 10px;font-size:10px" onclick="navigator.clipboard.writeText('${successId}')">ðŸ“‹ Copy</button>
-        </div>` : '';
-
-      let navBox="";
-      if(status==="accepted"||status==="in_progress"){
-        const clientLat=b.clientLat, clientLng=b.clientLng;
-        const nurseLat=b.nurseLat||b.acceptedNurseLat, nurseLng=b.nurseLng||b.acceptedNurseLng;
-        if(clientLat&&nurseLat){
-          const dirLink=`https://www.google.com/maps/dir/?api=1&origin=${nurseLat},${nurseLng}&destination=${clientLat},${clientLng}`;
-          navBox=`<div class="mapBox"><b style="color:#4ade80">ðŸ—ºï¸ Navigation Active</b><br><a href="${dirLink}" target="_blank" style="color:#4ade80;font-weight:800;font-size:12px">Open Google Maps</a></div>`;
-        } else if(clientLat){
-          navBox=`<div class="mapBox"><a href="https://maps.google.com/?q=${clientLat},${clientLng}" target="_blank" style="color:#4ade80;font-weight:800">Navigate to Client</a></div>`;
-        }
-      }
-
-      list.innerHTML+=`
-      <div class="card" style="border-left:4px solid ${status==='pending'?'#22c55e':'#a855f7'}">
-        <div style="display:flex;justify-content:space-between;align-items:center"><b style="color:#6b7280;font-size:10px;letter-spacing:.06em">${successId}</b>${badge}</div>
-        ${successIdBox}
-        <div style="display:flex;gap:12px;align-items:center;margin:12px 0;background:rgba(14,10,28,.6);padding:12px;border-radius:16px;border:1px solid rgba(168,85,247,.12)">
-          <img class="clientPhoto" src="${clientPhoto}" onerror="this.src='https://via.placeholder.com/75'">
-          <div><div style="font-weight:900;font-size:14px;color:#f3e8ff">${b.clientName||b.fullName||'Client'}</div><div style="font-size:11px;color:#a78bfa">${b.email||''}</div><div style="font-size:11px;color:#d8b4fe">ðŸ“ž ${b.clientPhone||b.phone||''}</div><div style="font-size:10px;color:#6b7280">ðŸ“ ${b.address||b.clientAddress||''}</div></div>
+    
+    grid.innerHTML = filtered.map(job=>{
+      const status = (job.status||'pending').toLowerCase();
+      const isPending = status==='pending';
+      const badgeClass = status==='accepted'?'badge-accepted':status==='rejected'?'badge-rejected':'badge-pending';
+      const payType = job.paymentMethod==='paystack_50_50' ? `50% Now GHS ${(job.amountPaidNow||job.amount*0.5).toFixed(2)} + 50% Cash GHS ${(job.amountCOD||job.amount*0.5).toFixed(2)}` : `Full Paid GHS ${(job.amountPaidNow||job.amount).toFixed(2)}`;
+      const mapsLink = job.clientLat ? `https://www.google.com/maps?q=${job.clientLat},${job.clientLng}` : `https://www.google.com/maps?q=5.6037,-0.1870`;
+      return `<div class="card" style="border-color:${isPending?'rgba(245,158,11,.3)':status==='accepted'?'rgba(34,197,94,.3)':'rgba(239,68,68,.3)'}">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
+          <div><b style="color:#f3e8ff;font-size:14px">📋 ${job.bookingId||job.id}</b><br><span class="badge ${badgeClass}" style="margin-top:6px;display:inline-block">${status.toUpperCase()}</span> ${payType.includes('50%')?'<span style="background:#f59e0b;color:#1e0a3a;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:900;margin-left:6px">📦 50% + CASH</span>':'<span style="background:#a855f7;color:white;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:900;margin-left:6px">💳 FULL PAID</span>'}</div>
+          <div style="text-align:right"><small style="color:#a78bfa">${new Date(job.time||Date.now()).toLocaleString()}</small><br><small style="color:#86efac">💰 ${job.currency||'GHS'} ${job.amount||0}</small></div>
         </div>
-        <div class="detailBox"><b>Patient:</b> ${b.patientName||'N/A'} ${b.patientAge?`(${b.patientAge}y)`:''}<br><b>Concerns:</b> ${b.patientConcerns||b.notes||'None'}</div>
-        <div class="detailBox"><b>Amount:</b> â‚µ${b.amount||0} | <b>Time:</b> ${b.bookingDate||''} ${b.bookingTime||''}<br><b>Service:</b> ${b.serviceType||''}</div>
-        ${navBox}
-        <div style="display:flex;flex-wrap:wrap;margin-top:8px">
-          ${status==="pending"?`<button class="btn btn-g" onclick="acceptJob('${key}')">âœ… Accept</button><button class="btn btn-r" onclick="rejectJob('${key}')">âŒ Reject</button>`:''}
-          ${status==="accepted"?`<button class="btn btn-p" onclick="startJob('${key}')">â–¶ï¸ Start</button>`:''}
-          ${status==="in_progress"?`<button class="btn btn-p" onclick="finishJob('${key}')">âœ… Finish</button>`:''}
-          <button class="btn btn-d" onclick="window.open('tel:${b.clientPhone||b.phone}')">ðŸ“ž Call</button>
-          <button class="btn btn-d" onclick="window.open('https://wa.me/${(b.clientPhone||b.phone||'').replace(/[^0-9]/g,'')}')">ðŸ’¬ WhatsApp</button>
+        <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:#c4b5fd">
+          <div><b style="color:#f3e8ff">Client:</b> ${job.clientName||'N/A'}<br><b>Phone:</b> <a href="tel:${job.phone}" style="color:#4ade80">${job.phone||'N/A'}</a><br><b>Patient:</b> ${job.patientName||'N/A'}<br><b>Service:</b> ${job.service||job.careMode||'Elderly Care'}</div>
+          <div><b>Hours:</b> ${job.totalHours||9} hrs (${job.hrsPerDay||9}/day)<br><b>Time:</b> ${job.startTime||'08:00'} → ${job.endTime||'17:00'}<br><b>Mode:</b> ${job.careMode||'Daily'} × ${job.quantity||1}<br><b>Paystack Ref:</b> ${job.paystackRef||'N/A'}</div>
+        </div>
+        <div style="margin-top:10px;padding:10px;background:rgba(14,10,28,.5);border-radius:10px;font-size:11px;color:#a78bfa">
+          <b style="color:#d8b4fe">📍 Client Location:</b> <a href="${mapsLink}" target="_blank" style="color:#4285F4">🗺️ Open in Google Maps — Lat ${job.clientLat||5.6037}, Lng ${job.clientLng||-0.1870}</a><br>
+          <b>💰 Split:</b> Nurse 80% = GHS ${((job.amountPaidNow||job.amount||0)*0.8).toFixed(2)} / CEO 20% = GHS ${((job.amountPaidNow||job.amount||0)*0.2).toFixed(2)} — Auto after ${payType}<br>
+          <b>📦 Payment:</b> ${payType} | Method: ${job.paymentMethod||'paystack_full'}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          ${isPending?`<button class="btn btnAccept" style="flex:1" onclick="acceptJob('${job.id}')">✅ Accept Job</button><button class="btn btnReject" style="flex:1" onclick="rejectJob('${job.id}')">❌ Reject</button>`:`<button class="btn" style="flex:1;background:rgba(76,29,149,.18);color:#a78bfa;border:1px solid rgba(168,85,247,.15)" disabled>${status==='accepted'?'✅ Accepted — Contact client':'❌ Rejected — Freed'}</button>`}
+          <a href="tel:${job.phone}" class="btn btnView" style="text-align:center">📞 Call Client</a>
+          <a href="${mapsLink}" target="_blank" class="btn btnView" style="text-align:center">🗺️ Maps</a>
         </div>
       </div>`;
-    }
-    document.getElementById('countShow').innerText=count+" bookings";
-    if(count===0) list.innerHTML=`<div class="card" style="text-align:center;padding:30px"><div style="font-size:40px">ðŸ“­</div><b style="color:#f3e8ff">No bookings yet</b></div>`;
-  });
-}
-
-window.acceptJob=async(id)=>{
-  if(!confirm('Accept this booking? Client will receive confirmation with Booking ID.')) return;
-  const loc=await getCurrentLocation();
-  const nurseLat=loc?.lat||null;
-  const nurseLng=loc?.lng||null;
-  const bookingSnap=await get(ref(db,'bookings/'+id));
-  if(!bookingSnap.exists()){ alert('Booking not found'); return; }
-  const b=bookingSnap.val();
-
-  const successfulBookingId = generateSuccessId(id);
-
-  const clientLat=b.clientLat, clientLng=b.clientLng;
-  const dirForClient= clientLat&&nurseLat?`https://www.google.com/maps/dir/?api=1&origin=${clientLat},${clientLng}&destination=${nurseLat},${nurseLng}`:`https://maps.google.com/?q=${nurseLat||''},${nurseLng||''}`;
-  const dirForNurse= clientLat&&nurseLat?`https://www.google.com/maps/dir/?api=1&origin=${nurseLat},${nurseLng}&destination=${clientLat},${clientLng}`:`https://maps.google.com/?q=${clientLat},${clientLng}`;
-
-  await update(ref(db,'bookings/'+id),{
-    status:"accepted",
-    successfulBookingId: successfulBookingId,
-    bookingId: successfulBookingId,
-    acceptedAt:new Date().toISOString(),
-    acceptedBy:myNurseId,
-    nurseId:myNurseId,
-    nurseName:myNurseName,
-    nursePhone:myNursePhone,
-    nurseLat:nurseLat,
-    nurseLng:nurseLng,
-    nurseMapLink: dirForNurse,
-    clientNavigationLink: dirForClient,
-    nurseNavigationLink: dirForNurse,
-    acceptanceMessage:"Booking ACCEPTED by "+myNurseName+". ID: "+successfulBookingId,
-    clientNotified:true,
-    visible_to_client:true
-  });
-
-  if(b.clientPhone){
-    const phoneKey=b.clientPhone.replace(/[^0-9]/g,'');
-    await update(ref(db,'clientBookings/'+phoneKey+'/'+id),{
-      status:"accepted", 
-      successfulBookingId: successfulBookingId,
-      bookingId: successfulBookingId,
-      nurseName:myNurseName, nursePhone:myNursePhone, nurseLat, nurseLng,
-      nurseMapLink:dirForNurse, clientNavigationLink:dirForClient
-    });
+    }).join('');
+    
+  }catch(e){
+    document.getElementById('jobGrid').innerHTML = `<div style="padding:20px;color:#fca5a5">Error loading jobs: ${e.message}<br><small>Check Firebase rules and nurseId: ${nurseId}</small><br><br>Demo jobs shown below for testing</div>`;
+    console.error(e);
   }
+}
 
-  if(b.clientId){
-    const notifId=push(ref(db,'notifications')).key;
-    await set(ref(db,'notifications/'+b.clientId+'/'+notifId),{
-      type:"booking_accepted",
-      bookingId:id,
-      successfulBookingId: successfulBookingId,
-      title:"âœ… Booking Accepted!",
-      message:`${myNurseName} accepted your booking. Your Booking ID: ${successfulBookingId}`,
-      nurseName:myNurseName,
-      nursePhone:myNursePhone,
-      timestamp:Date.now(),
-      read:false
-    });
+window.acceptJob = async function(bookingId){
+  if(!confirm('✅ Accept this booking? Client will be notified you accepted. You start job.')) return;
+  try{
+    const updates = {};
+    updates['bookings/'+bookingId+'/status'] = 'accepted';
+    updates['bookings/'+bookingId+'/acceptedAt'] = Date.now();
+    updates['nurseBookings/'+nurseId+'/'+bookingId+'/status'] = 'accepted';
+    updates['nurseBookings/'+nurseId+'/'+bookingId+'/acceptedAt'] = Date.now();
+    updates['jobOffers/'+bookingId+'/status'] = 'accepted';
+    updates['jobOffers/'+bookingId+'/acceptedAt'] = Date.now();
+    
+    await rtdb.ref().update(updates);
+    alert('✅ Job Accepted! Client notified. Booking '+bookingId+' is now accepted. Contact client: Start job.');
+    loadBookings();
+  }catch(e){
+    alert('Accept failed: '+e.message);
   }
-
-  // Show success modal with Booking ID
-  document.getElementById('successBookingId').textContent = successfulBookingId;
-  document.getElementById('successClientName').textContent = `Client: ${b.clientName||'Client'} â€¢ â‚µ${b.amount||0}`;
-  const mapLink = document.getElementById('successMapLink');
-  if(dirForNurse){ mapLink.href = dirForNurse; mapLink.style.display='flex'; }
-  document.getElementById('successModal').classList.add('show');
-};
-
-window.copyBookingId=()=>{
-  const id=document.getElementById('successBookingId').textContent;
-  navigator.clipboard.writeText(id);
-  alert('Copied: '+id);
-}
-window.closeSuccessModal=()=>{
-  document.getElementById('successModal').classList.remove('show');
 }
 
-window.rejectJob=async(id)=>{
-  const reason=prompt('Reason for rejecting?');
+window.rejectJob = async function(bookingId){
+  const reason = prompt('❌ Reject this booking? Enter reason (optional) — You will be freed for other bookings, client can book another nurse:','Not available at that time');
   if(reason===null) return;
-  const bookingSnap=await get(ref(db,'bookings/'+id));
-  if(!bookingSnap.exists()) return;
-  const b=bookingSnap.val();
-  await update(ref(db,'bookings/'+id),{
-    status:"rejected",
-    rejectedAt:new Date().toISOString(),
-    rejectedBy:myNurseId,
-    rejectReason:reason
-  });
-  if(b.clientId){
-    const notifId=push(ref(db,'notifications')).key;
-    await set(ref(db,'notifications/'+b.clientId+'/'+notifId),{
-      type:"booking_rejected",
-      bookingId:id,
-      title:"âŒ Booking Rejected",
-      message:`Nurse ${myNurseName} rejected. Reason: ${reason}`,
-      timestamp:Date.now(),
-      read:false
-    });
+  try{
+    const updates = {};
+    updates['bookings/'+bookingId+'/status'] = 'rejected';
+    updates['bookings/'+bookingId+'/rejectedAt'] = Date.now();
+    updates['bookings/'+bookingId+'/rejectReason'] = reason;
+    updates['nurseBookings/'+nurseId+'/'+bookingId+'/status'] = 'rejected';
+    updates['nurseBookings/'+nurseId+'/'+bookingId+'/rejectedAt'] = Date.now();
+    updates['nurseBookings/'+nurseId+'/'+bookingId+'/rejectReason'] = reason;
+    updates['jobOffers/'+bookingId+'/status'] = 'rejected';
+    updates['jobOffers/'+bookingId+'/rejectedAt'] = Date.now();
+    updates['jobOffers/'+bookingId+'/rejectReason'] = reason;
+    
+    await rtdb.ref().update(updates);
+    alert('❌ Job Rejected. You are freed. Booking '+bookingId+' rejected. Reason: '+reason);
+    loadBookings();
+  }catch(e){
+    alert('Reject failed: '+e.message);
   }
-  alert('Rejected');
-};
+}
 
-window.startJob=async(id)=>{ await update(ref(db,'bookings/'+id),{status:"in_progress",startedAt:new Date().toISOString()}); alert('Job started'); };
-window.finishJob=async(id)=>{ if(!confirm('Mark as finished?')) return; await update(ref(db,'bookings/'+id),{status:"awaiting_client_confirmation",finishedAt:new Date().toISOString()}); alert('Finished - waiting client confirmation'); };
-</script>
-<script>
-function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
-function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+window.addEventListener('DOMContentLoaded', ()=>{
+  const urlParams = new URLSearchParams(location.search);
+  const idFromUrl = urlParams.get('nurseId') || urlParams.get('id');
+  if(idFromUrl){
+    localStorage.setItem('lcg_nurse_uid', idFromUrl);
+    nurseId = idFromUrl;
+  }
+  loadBookings();
+  console.log('✅ My Job Offers — Nurse can Accept/Reject — Reads from nurseBookings/'+nurseId);
+});
 </script>
 </body>
 </html>
