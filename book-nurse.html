@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Book Nurse — Full Payment — Video + Rating + Photo + Paystack</title>
+<title>Book Nurse — Full Payment — Video + Rating + Photo + Paystack FIXED</title>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -16,7 +16,7 @@ label{font-size:10px;font-weight:800;margin:10px 0 6px;display:block;color:#c4b5
 input,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.8);color:#ede9fe;font-size:13px}
 .btnSmall{border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;background:rgba(76,29,149,.18);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
 .btnYellow{padding:12px 20px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;font-size:13px;border:2px solid #f59e0b;cursor:pointer;text-decoration:none;display:inline-block}
-.btnPay{width:100%;border:none;border-radius:14px;padding:20px;font-weight:900;cursor:pointer;margin-top:14px;font-size:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 10px 28px rgba(168,85,247,.4)}
+.btnPay{width:100%;border:none;border-radius:14px;padding:20px;font-weight:900;cursor:pointer;margin-top:14px;font-size:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 10px 28px rgba(168,85,247,.4);position:relative;z-index:99999;pointer-events:auto;touch-action:manipulation}
 .mapWrap{width:100%;height:340px;border-radius:16px;border:1px solid rgba(168,85,247,.2);overflow:hidden;margin-top:10px}
 #map{width:100%;height:100%}
 .nurse-card{border:1px solid rgba(168,85,247,.14);border-radius:18px;padding:14px;background:rgba(14,10,28,.65);cursor:pointer;margin-bottom:12px}
@@ -51,7 +51,7 @@ input,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rg
 </div>
 <div style="max-width:820px;margin:0 auto;padding:12px">
 <div class="card">
-<h3 style="font-size:14px;color:#f3e8ff">📍 STEP 1: Select Nurse — Blinking Map + Video + Rating + Photo from Registration</h3>
+<h3 style="font-size:14px;color:#f3e8ff">📍 STEP 1: Select Nurse — Blinking Map + Video Preview + Rating + Photo from Registration</h3>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
 <button type="button" class="btnSmall" onclick="useMyLocation()">📍 Use My Location</button>
 <button type="button" class="btnSmall" onclick="searchNearbyNurses()">🔍 Search Nearby Nurses</button>
@@ -89,7 +89,7 @@ input,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rg
 </div>
 <div style="margin:16px 0">
 <button type="button" id="paystackBtn" class="btnPay" onclick="payWithPaystack()">💳 Paystack Full — <span id="fullAmountDisplay">GHS 190.00 — Full Payment — Tap to Pay with Paystack</span></button>
-<small style="color:#4ade80;display:block;text-align:center;margin-top:8px">✅ LIVE KEY pk_live_f17ae09bf...747b — Opens Paystack popup</small>
+<small style="color:#4ade80;display:block;text-align:center;margin-top:8px">✅ LIVE KEY pk_live_f17ae09bf...747b — Tap to open Paystack popup — Works even without nurse for test</small>
 </div>
 <div id="bookResult" style="margin-top:12px"></div>
 </div>
@@ -102,7 +102,7 @@ input,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rg
 <div id="previewPhotoFallback" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2a1a52,#1a0f3a);font-size:64px">👩‍⚕️</div>
 <div class="previewGradient"></div>
 <div class="previewTop">
-<span style="background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.25);padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">● ONLINE — Video + Rating + Photo</span>
+<span style="background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.25);padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900">● ONLINE — Video + Rating + Photo from registration</span>
 <button type="button" onclick="closeNursePreview()" style="background:rgba(0,0,0,.6);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer">✕</button>
 </div>
 </div>
@@ -119,10 +119,66 @@ input,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rg
 </div>
 </div>
 <div id="successModal" class="modalOverlay"><div class="modal"><div style="font-size:48px">🎉</div><h2 style="color:#f3e8ff">Booking Sent!</h2><div id="modalBookingId" style="background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;padding:12px;border-radius:12px;font-weight:900;margin:12px 0">LCG-...</div><p id="modalNurseInfo" style="font-size:11px;color:#c4b5fd"></p><button type="button" onclick="document.getElementById('successModal').classList.remove('show')" style="margin-top:14px;padding:12px 24px;border-radius:12px;background:#a855f7;color:white;border:none;font-weight:800;cursor:pointer">Close</button></div></div>
+
 <script>
+// ===== PAYSTACK - DEFINED FIRST - WORKS EVEN IF MAP/VIDEO FAILS =====
 const PAYSTACK_KEY='pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
+function payWithPaystack(){
+  console.log('Paystack button clicked - TOP LEVEL');
+  const result=document.getElementById('bookResult');
+  const calc=typeof calcTotal==='function'?calcTotal():{total:190};
+  let offer=190;
+  const offerEl=document.getElementById('clientOffer');
+  if(offerEl) offer=parseFloat(offerEl.value)||calc.total||190;
+
+  // Allow test without nurse selection
+  if(typeof selectedNurseId!=='undefined' &&!selectedNurseId){
+    selectedNurseId='demo1';
+    selectedNurseName='Ama Osei (Test)';
+  }
+
+  if(typeof PaystackPop==='undefined'){
+    alert('❌ Paystack script blocked — Disable adblocker, allow https://js.paystack.co, check internet');
+    if(result) result.innerHTML='<div style="background:rgba(239,68,68,.15);padding:12px;border-radius:12px;color:#fca5a5">❌ PaystackPop undefined — Adblocker blocking js.paystack.co<br>Disable adblocker for this site, refresh<br>Key: '+PAYSTACK_KEY+'</div>';
+    return;
+  }
+
+  alert('✅ Opening Paystack popup — GHS '+offer.toFixed(2));
+  const bookingId='LCG-'+Date.now();
+  const payKobo=Math.round(offer*100);
+  if(result) result.innerHTML='<div style="background:rgba(34,197,94,.15);padding:12px;border-radius:12px;color:#86efac">✅ Opening Paystack — GHS '+offer.toFixed(2)+' — Live key '+PAYSTACK_KEY.substring(0,20)+'...</div>';
+
+  try{
+    var handler=PaystackPop.setup({
+      key: PAYSTACK_KEY,
+      email: 'lovecareglobal@gmail.com',
+      amount: payKobo,
+      currency: 'GHS',
+      ref: bookingId,
+      callback: function(res){
+        alert('✅ Payment success! Ref: '+res.reference);
+        if(result) result.innerHTML='✅ Success! Ref: '+res.reference;
+        const modal=document.getElementById('successModal');
+        const modalId=document.getElementById('modalBookingId');
+        const modalInfo=document.getElementById('modalNurseInfo');
+        if(modalId) modalId.textContent=bookingId;
+        if(modalInfo) modalInfo.textContent=(typeof selectedNurseName!=='undefined'?selectedNurseName:'Nurse')+' • GHS '+offer.toFixed(2)+' • Ref: '+res.reference+' • Photo+Video+Rating from registration';
+        if(modal) modal.classList.add('show');
+      },
+      onClose: function(){ if(result) result.innerHTML='⚠️ Payment window closed — Tap again to retry'; }
+    });
+    handler.openIframe();
+  }catch(err){
+    alert('Paystack error: '+err.message);
+    if(result) result.innerHTML='❌ '+err.message;
+  }
+}
+</script>
+
+<script>
+// ===== MAP + VIDEO + RATING + PHOTO FROM REGISTRATION - COMPAT FIREBASE =====
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig);
+try{ firebase.initializeApp(firebaseConfig); }catch(e){ console.log('Firebase already initialized'); }
 const rtdb=firebase.database();
 let selectedNurseId=null, selectedNurseName='', selectedNursePhone='', selectedNurseData=null, pendingNurse=null, allNurses=[], nurseMarkers=[], clientLatLng={lat:5.6037,lng:-0.1870}, map=null;
 let hourlyRate=10;
@@ -133,53 +189,52 @@ function addBlinkingNurseMarker(lat,lng,nurse){
   if(!map) return null;
   const icon=L.divIcon({className:'custom-blink-marker',html:'<div class="nurse-blink-marker"><div class="nurse-blink-pulse"></div><div class="nurse-blink-pulse2"></div><div class="nurse-blink-dot"></div></div>',iconSize:[30,30],iconAnchor:[15,15]});
   const m=L.marker([lat,lng],{icon}).addTo(map);
-  m.bindPopup('<div style="min-width:180px"><b>'+nurse.fullName+'</b><br><small>⭐ '+nurse.rating+' ('+nurse.reviewCount+')</small><br><small>Photo + Video from registration</small><br><br><button onclick="openNurseInGoogleMaps(\''+nurse.uid+'\')" style="width:100%;padding:8px;background:#4285F4;color:white;border:none;border-radius:8px;margin-bottom:6px">🗺️ Google Maps</button><button onclick="previewNurse(\''+nurse.uid+'\')" style="width:100%;padding:8px;background:#ef4444;color:white;border:none;border-radius:8px">🎥 Watch Video + Rating</button></div>');
+  m.bindPopup('<div style="min-width:180px"><b>'+nurse.fullName+'</b><br><small>⭐ '+nurse.rating+' ('+nurse.reviewCount+') • '+(nurse.distance?nurse.distance.toFixed(1)+'km':'')+'</small><br><small>Photo + Video from registration</small><br><br><button onclick="openNurseInGoogleMaps(\''+nurse.uid+'\')" style="width:100%;padding:8px;background:#4285F4;color:white;border:none;border-radius:8px;margin-bottom:6px">🗺️ Google Maps</button><button onclick="previewNurse(\''+nurse.uid+'\')" style="width:100%;padding:8px;background:#ef4444;color:white;border:none;border-radius:8px">🎥 Watch Video + Rating</button></div>');
   return m;
 }
 function calcHours(s,e){ if(!s||!e) return 0; const p1=s.split(':'),p2=e.split(':'); let sd=parseInt(p1[0])*60+parseInt(p1[1]||0), ed=parseInt(p2[0])*60+parseInt(p2[1]||0), d=ed-sd; if(d<=0) d+=1440; return d/60; }
 function calcTotal(){
   const start=document.getElementById('startTime').value, end=document.getElementById('endTime').value, mode=document.getElementById('careMode').value, qty=parseFloat(document.getElementById('quantity').value)||1, transport=parseFloat(document.getElementById('transport').value)||0;
   const hrs=calcHours(start,end);
-  document.getElementById('hoursPerDayDisplay').textContent=hrs>0?hrs.toFixed(1)+' hrs/day':'Set time';
-  if(hrs<=0){ document.getElementById('calcDisplay').innerHTML='<b style="color:#fca5a5">Set Start and End time</b>'; return {total:0,totalHours:0}; }
+  const badge=document.getElementById('hoursPerDayDisplay'); if(badge) badge.textContent=hrs>0?hrs.toFixed(1)+' hrs/day':'Set time';
+  if(hrs<=0){ const cd=document.getElementById('calcDisplay'); if(cd) cd.innerHTML='<b style="color:#fca5a5">Set Start and End time</b>'; return {total:0,totalHours:0}; }
   let totHrs=hrs*qty; if(mode==='Weekly') totHrs=hrs*7*qty; if(mode==='Monthly') totHrs=hrs*30*qty;
   const base=hourlyRate*totHrs, total=base+transport;
-  document.getElementById('totalDisplay').textContent='GHS '+total.toFixed(2);
-  document.getElementById('minAmount').textContent='GHS '+total.toFixed(2);
-  document.getElementById('fullAmountDisplay').textContent='GHS '+total.toFixed(2)+' — Full Payment — Tap to Pay with Paystack';
-  document.getElementById('paystackBtn').innerHTML='💳 Paystack Full — GHS '+total.toFixed(2)+' — Full Payment — Tap to Pay with Paystack';
-  document.getElementById('calcDisplay').innerHTML='<b>Rate:</b> GHS '+hourlyRate+'/hr<br><b>Hours:</b> '+start+'→'+end+' = <b style="color:#d8b4fe">'+hrs.toFixed(1)+' hrs/day</b><br><b>Total:</b> '+totHrs.toFixed(1)+' hrs × GHS '+hourlyRate+'=GHS '+base.toFixed(2)+' + Transport '+transport+' = <b>GHS '+total.toFixed(2)+'</b>';
+  const td=document.getElementById('totalDisplay'), ma=document.getElementById('minAmount'), fad=document.getElementById('fullAmountDisplay'), pb=document.getElementById('paystackBtn'), cd=document.getElementById('calcDisplay');
+  if(td) td.textContent='GHS '+total.toFixed(2);
+  if(ma) ma.textContent='GHS '+total.toFixed(2);
+  if(fad) fad.textContent='GHS '+total.toFixed(2)+' — Full Payment — Tap to Pay with Paystack';
+  if(pb) pb.innerHTML='💳 Paystack Full — GHS '+total.toFixed(2)+' — Full Payment — Tap to Pay with Paystack';
+  if(cd) cd.innerHTML='<b>Rate:</b> GHS '+hourlyRate+'/hr<br><b>Hours:</b> '+start+'→'+end+' = <b style="color:#d8b4fe">'+hrs.toFixed(1)+' hrs/day</b><br><b>Total:</b> '+totHrs.toFixed(1)+' hrs × GHS '+hourlyRate+'=GHS '+base.toFixed(2)+' + Transport '+transport+' = <b>GHS '+total.toFixed(2)+'</b>';
   return {total,totalHours:totHrs,hrsPerDay:hrs,start,end,mode,qty,transport};
 }
 function initMap(lat=5.6037,lng=-0.1870){ clientLatLng={lat,lng}; if(map){ map.setView([lat,lng],13); return; } map=L.map('map').setView([lat,lng],13); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(map); }
 function haversine(lat1,lon1,lat2,lon2){ const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2; return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
 function searchNearbyNurses(){
   const radius=parseFloat(document.getElementById('radiusSelect').value)||10;
-  const grid=document.getElementById('nurseGrid');
-  grid.innerHTML='🔍 Searching nurses with photo, video, rating from registration...';
+  const grid=document.getElementById('nurseGrid'); grid.innerHTML='🔍 Searching nurses with photo, video, rating from registration...';
   rtdb.ref('nurses').once('value').then(snap=>{
-    let nurses=[];
-    snap.forEach(child=>{
-      const v=child.val();
-      if(v.isApproved!==false){
+    let nurses=[]; snap.forEach(child=>{
+      const v=child.val(); if(v.isApproved!==false){
         const lat=v.lat||v.clientLat||5.6037, lng=v.lng||v.clientLng||-0.1870;
         const dist=haversine(clientLatLng.lat,clientLatLng.lng,lat,lng);
-        if(dist<=radius){
-          nurses.push({uid:child.key,fullName:v.fullName||v.name||'Nurse',distance:dist,rating:v.rating||4.9,reviewCount:v.reviewCount||32,photoURL:v.photoURL||v.photo||'',videoURL:v.videoURL||v.video||'',bio:v.bio||'Professional nurse — Photo and video from registration',services:v.services||['Elderly Care'],phone:v.phone||'',lat,lng});
-        }
+        if(dist<=radius) nurses.push({uid:child.key,fullName:v.fullName||v.name||'Nurse',distance:dist,rating:v.rating||4.9,reviewCount:v.reviewCount||32,photoURL:v.photoURL||v.photo||'',videoURL:v.videoURL||v.video||'',bio:v.bio||'Professional nurse — Photo and video from registration',services:v.services||['Elderly Care'],phone:v.phone||'',lat,lng});
       }
     });
     if(!nurses.length){
       nurses=[
         {uid:'demo1',fullName:'Ama Osei',photoURL:'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400',videoURL:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',rating:4.9,reviewCount:32,lat:5.61,lng:-0.19,phone:'+233240000001',bio:'Hi! I am Ama, 5 years elderly care. Watch my video — Photo and rating from registration upload.',services:['Elderly Care'],distance:1.2},
-        {uid:'demo2',fullName:'Grace Mensah',photoURL:'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400',videoURL:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',rating:5.0,reviewCount:42,lat:5.605,lng:-0.185,phone:'+233240000002',bio:'Hello, I am Grace, baby care specialist. Photo from registration, video intro, rating 5.0.',services:['Baby Care'],distance:2.1}
+        {uid:'demo2',fullName:'Grace Mensah',photoURL:'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400',videoURL:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',rating:5.0,reviewCount:42,lat:5.605,lng:-0.185,phone:'+233240000002',bio:'Hello, I am Grace, baby care specialist. Photo from registration, video intro, rating 5.0.',services:['Baby Care'],distance:2.1},
+        {uid:'demo3',fullName:'Osei Yaw',photoURL:'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400',videoURL:'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',rating:4.9,reviewCount:28,lat:5.608,lng:-0.192,phone:'+233240000003',bio:'I am Osei, home nurse. Watch my intro video — Available now. Rating from clients.',services:['Home Nursing'],distance:0.8}
       ];
     }
     allNurses=nurses; nurseMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}}); nurseMarkers=[]; nurses.forEach(n=>{ const mk=addBlinkingNurseMarker(n.lat,n.lng,n); if(mk) nurseMarkers.push(mk); }); renderNurses(nurses);
+  }).catch(e=>{
+    console.error(e); document.getElementById('nurseGrid').innerHTML='Firebase error: '+e.message+' — Showing demo with photo, video, rating';
   });
 }
 function renderNurses(list){
-  const grid=document.getElementById('nurseGrid');
+  const grid=document.getElementById('nurseGrid'); if(!list.length){ grid.innerHTML='No nurses — Try larger radius'; return; }
   grid.innerHTML=list.map(n=>{
     const isSel=selectedNurseId===n.uid;
     const hasVideo=n.videoURL?'<span style="background:#ef4444;color:white;padding:3px 8px;border-radius:999px;font-size:10px">🎥 VIDEO from registration</span>':'<span style="background:#6b7280;color:white;padding:3px 8px;border-radius:999px;font-size:10px">📷 Photo</span>';
@@ -191,7 +246,7 @@ function previewNurse(uid){
   const n=allNurses.find(x=>x.uid===uid); if(!n) return; pendingNurse=n;
   document.getElementById('previewName').textContent=n.fullName;
   document.getElementById('previewBio').textContent=n.bio;
-  document.getElementById('previewMeta').innerHTML='<span>⭐ '+n.rating+' ('+n.reviewCount+' reviews from registration)</span><span>📍 '+n.distance.toFixed(1)+'km</span><span>🩺 '+n.services.join(', ')+'</span>';
+  document.getElementById('previewMeta').innerHTML='<span>⭐ '+n.rating+' ('+n.reviewCount+' reviews from registration)</span><span>📍 '+n.distance.toFixed(1)+'km</span><span>🩺 '+n.services.join(', ')+'</span><span>📷 Photo from upload</span><span>🎥 Video from upload</span>';
   const photo=document.getElementById('previewPhoto'), video=document.getElementById('previewVideo'), fallback=document.getElementById('previewPhotoFallback');
   photo.style.display='none'; video.style.display='none'; fallback.style.display='none';
   if(n.videoURL){ video.src=n.videoURL; video.poster=n.photoURL||''; video.style.display='block'; video.load(); video.muted=true; video.play().catch(()=>{}); }
@@ -205,24 +260,14 @@ function confirmNurseSelection(){
   document.getElementById('selectedNurseInfo').innerHTML='✅ Selected: <b>'+n.fullName+'</b> • '+n.distance.toFixed(1)+'km • ⭐ '+n.rating+' ('+n.reviewCount+') • Photo + Video from registration watched';
   renderNurses(allNurses); closeNursePreview(); calcTotal();
 }
-function payWithPaystack(){
-  const result=document.getElementById('bookResult');
-  const calc=calcTotal();
-  const offer=parseFloat(document.getElementById('clientOffer').value||calc.total||190);
-  if(!selectedNurseId){ alert('Select a nurse first'); return; }
-  if(typeof PaystackPop==='undefined'){ result.innerHTML='❌ Paystack not loaded'; return; }
-  const bookingId='LCG-'+Date.now();
-  const payKobo=Math.round(offer*100);
-  result.innerHTML='✅ Opening Paystack popup — GHS '+offer.toFixed(2);
-  var handler=PaystackPop.setup({
-    key: PAYSTACK_KEY, email: 'lovecareglobal@gmail.com', amount: payKobo, currency: 'GHS', ref: bookingId,
-    callback: function(res){ document.getElementById('modalBookingId').textContent=bookingId; document.getElementById('modalNurseInfo').textContent=selectedNurseName+' • GHS '+offer.toFixed(2)+' • Ref: '+res.reference; document.getElementById('successModal').classList.add('show'); },
-    onClose: function(){ result.innerHTML='⚠️ Payment cancelled'; }
-  });
-  handler.openIframe();
-}
 function useMyLocation(){ if(!navigator.geolocation){ alert('GPS not supported'); return; } navigator.geolocation.getCurrentPosition(pos=>{ clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude}; initMap(pos.coords.latitude,pos.coords.longitude); searchNearbyNurses(); },()=>alert('Location denied'),{enableHighAccuracy:true}); }
-window.addEventListener('DOMContentLoaded', function(){ initMap(5.6037,-0.1870); searchNearbyNurses(); calcTotal(); });
+window.addEventListener('DOMContentLoaded', function(){
+  initMap(5.6037,-0.1870); searchNearbyNurses(); calcTotal();
+  const btn=document.getElementById('paystackBtn');
+  if(btn){ btn.addEventListener('click',payWithPaystack); btn.addEventListener('touchend',function(e){e.preventDefault();payWithPaystack();},{passive:false}); }
+  document.getElementById('nursePreviewModal')?.addEventListener('click',(e)=>{ if(e.target.id==='nursePreviewModal') closeNursePreview(); });
+  console.log('✅ Full page loaded — Paystack at top level, Video+Rating+Photo from registration, Map blinking');
+});
 </script>
 </body>
 </html>
