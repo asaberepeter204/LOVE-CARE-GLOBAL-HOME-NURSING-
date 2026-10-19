@@ -1,9 +1,154 @@
 {
-  "lastBooking": null,
+  "appName": "LOVE CARE GLOBAL HOME NURSING",
+  "lastUpdated": "2026-05-13T05:15:00Z",
   "quickActions": [
-    "Book Nurse",
-    "My Bookings",
-    "Alerts",
-    "SOS"
-  ]
+    {
+      "name": "Book Nurse",
+      "url": "./book-nurse.html",
+      "icon": "./icon-192.png",
+      "description": "Book verified nurse now"
+    },
+    {
+      "name": "My Bookings",
+      "url": "./my-bookings.html",
+      "icon": "./icon-192.png",
+      "description": "Track live bookings"
+    },
+    {
+      "name": "Alerts",
+      "url": "./alerts.html",
+      "icon": "./icon-192.png",
+      "description": "Nurse accept/reject alerts"
+    },
+    {
+      "name": "SOS Emergency",
+      "url": "./sos.html",
+      "icon": "./icon-192.png",
+      "description": "Emergency help"
+    }
+  ],
+  "stats": {
+    "totalNurses": 1247,
+    "availableNow": 342,
+    "countries": 8,
+    "bookingsToday": 89
+  },
+  "nearbyNurses": [
+    {
+      "uid": "nurse_001",
+      "fullName": "Sarah Johnson",
+      "photoURL": "./icon-512x512.png",
+      "rating": 4.9,
+      "distance": 1.2,
+      "services": [
+        "Elderly Care",
+        "Post-Op Care"
+      ],
+      "isAvailable": true,
+      "hourlyRateGHS": 45,
+      "hourlyRateUSD": 4,
+      "verified": true,
+      "bio": "5 years experience in elderly care - Licensed RN",
+      "phone": "+233244123456",
+      "location": {
+        "lat": 5.6037,
+        "lng": -0.187
+      }
+    },
+    {
+      "uid": "nurse_002",
+      "fullName": "Grace Asabere",
+      "photoURL": "./icon-512x512.png",
+      "rating": 4.8,
+      "distance": 2.5,
+      "services": [
+        "Child Care",
+        "General Nursing"
+      ],
+      "isAvailable": true,
+      "hourlyRateGHS": 40,
+      "hourlyRateUSD": 3.5,
+      "verified": true,
+      "bio": "Pediatric specialist - 3 years experience",
+      "phone": "+233244123457",
+      "location": {
+        "lat": 5.6037,
+        "lng": -0.187
+      }
+    },
+    {
+      "uid": "nurse_003",
+      "fullName": "Mary Osei",
+      "photoURL": "./icon-512x512.png",
+      "rating": 5.0,
+      "distance": 3.1,
+      "services": [
+        "Elderly Care",
+        "Dementia Care"
+      ],
+      "isAvailable": false,
+      "hourlyRateGHS": 50,
+      "hourlyRateUSD": 4.5,
+      "verified": true,
+      "bio": "Expert in dementia care - 7 years",
+      "phone": "+233244123458",
+      "location": {
+        "lat": 5.6037,
+        "lng": -0.187
+      }
+    }
+  ],
+  "featuredNurses": [
+    {
+      "uid": "nurse_featured_01",
+      "fullName": "Dr. Peter Asabere - CEO Nurse Team",
+      "photoURL": "./icon-512x512.png",
+      "rating": 5.0,
+      "services": [
+        "All Services",
+        "Emergency Care"
+      ],
+      "isAvailable": true,
+      "verified": true,
+      "isCEO": true,
+      "bio": "Founder of LOVE CARE GLOBAL - Leading nursing team across 8 countries"
+    }
+  ],
+  "recentBookings": [
+    {
+      "bookingId": "LCG-20260513-ABC123",
+      "nurseName": "Sarah Johnson",
+      "nurseId": "nurse_001",
+      "status": "accepted",
+      "time": "2026-05-13T04:30:00Z",
+      "amount": 405,
+      "currency": "GHS"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "alert_001",
+      "type": "nurse_accepted",
+      "title": "\u2705 Nurse Accepted!",
+      "body": "Sarah Johnson accepted your booking - Track live now",
+      "bookingId": "LCG-20260513-ABC123",
+      "timestamp": "2026-05-13T04:35:00Z",
+      "isRead": false
+    },
+    {
+      "id": "alert_002",
+      "type": "booking_reminder",
+      "title": "\ud83d\udcc5 Upcoming Booking",
+      "body": "Your booking with Grace Asabere starts in 1 hour",
+      "bookingId": "LCG-20260513-XYZ789",
+      "timestamp": "2026-05-13T03:00:00Z",
+      "isRead": true
+    }
+  ],
+  "nursesByService": {
+    "Elderly Care": 456,
+    "Child Care": 234,
+    "Post-Op Care": 189,
+    "General Nursing": 368
+  }
 }
