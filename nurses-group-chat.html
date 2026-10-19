@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurses Group Chat - FAST | LOVE CARE GLOBAL</title>
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;background:#f3f4f6;min-height:100vh;display:flex;flex-direction:column}
+.top{background:linear-gradient(90deg,#7c3aed,#16a34a);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.top b{font-size:12px}
+#chat{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px;background:#f8fafc;min-height:400px;scroll-behavior:smooth}
+.msg{max-width:85%;padding:10px 12px;border-radius:14px;background:#fff;border:1px solid #e5e7eb;font-size:13px;position:relative;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.me{align-self:flex-end;background:#dcfce7;border-color:#bbf7d0}
+.msg.ceo{border-color:#fde68a;background:#fefce8}
+.msg.blocked{opacity:0.5}
+.meta{font-size:10px;color:#6b7280;font-weight:800;margin-bottom:4px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{padding:2px 6px;border-radius:999px;font-size:9px;font-weight:900}
+.badge-ceo{background:#fde68a;color:#92400e}.badge-nurse{background:#ede9fe;color:#5b21b6}.badge-staff{background:#dbeafe;color:#1e40af}.badge-blocked{background:#fee2e2;color:#dc2626}
+.actions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.actBtn{font-size:10px;font-weight:800;padding:6px 10px;border-radius:999px;border:1px solid #e5e7eb;background:#f9fafb;cursor:pointer}
+.actBtn.del{color:#dc2626}.actBtn.edit{color:#2563eb}.actBtn.block{color:#fff;background:#ef4444;border-color:#ef4444}.actBtn.unblock{color:#fff;background:#22c55e;border-color:#22c55e}
+.bar{background:#fff;border-top:1px solid #e5e7eb;padding:8px;display:flex;gap:6px;align-items:center;position:sticky;bottom:0;z-index:50}
+.bar input{flex:1;min-width:60px;padding:12px 14px;border-radius:999px;border:1.5px solid #e5e7eb;outline:none;font-size:14px}
+.btn{width:40px;height:40px;border-radius:50%;border:none;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
+.send{background:linear-gradient(135deg,#16a34a,#7c3aed);color:#fff}.media{background:#eff6ff;border:1px solid #e5e7eb}.cvBtn{background:#fef3c7;border:1px solid #fde68a}.micBtn{background:#f9fafb;border:1px solid #e5e7eb}
+.skeleton{height:60px;background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:12px}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.progress{height:6px;background:#e5e7eb;border-radius:999px;display:none;margin:0 8px}.progressBar{height:100%;background:linear-gradient(90deg,#7c3aed,#16a34a);width:0%;transition:.2s}
+#blockManager{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:12px}
+#blockManager.show{display:flex}
+#blockManagerCard{background:#fff;width:100%;max-width:560px;max-height:90vh;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.blockHeader{padding:14px;background:linear-gradient(90deg,#7c3aed,#16a34a);color:#fff;display:flex;justify-content:space-between;align-items:center}
+.blockBody{flex:1;overflow:auto;padding:10px;background:#f8fafc}
+.nurseRow{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;margin-bottom:8px}
+.floatingCall{position:fixed;bottom:80px;right:16px;z-index:60;display:flex;flex-direction:column;gap:8px}
+.callBtn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:20px;text-decoration:none;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+<div class="top"><b id="topTitle">GROUP CHAT - FAST LOADING</b><div style="display:flex;gap:6px"><span id="msgCount" style="background:rgba(255,255,255,.2);padding:4px 8px;border-radius:999px;font-size:10px">0 msgs</span><button id="homeBtn" style="padding:6px 10px;border-radius:999px;border:none;font-weight:900;cursor:pointer;font-size:11px">HOME</button><button id="reloadBtn" style="padding:6px 10px;border-radius:999px;border:none;cursor:pointer;font-size:11px">↻</button></div></div>
+
+<div id="status"></div>
+<div id="progressWrap" class="progress"><div id="progressBar" class="progressBar"></div></div>
+
+<div id="chat">
+<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton" style="width:70%"></div>
+<div style="text-align:center;color:#9ca3af;padding:10px;font-size:11px">⚡ Optimized loading — showing last 100 messages only</div>
+</div>
+
+<div class="bar" id="inputBar" style="display:flex">
+<button class="btn media" id="photoBtn" title="Photo">📷</button>
+<button class="btn cvBtn" id="cvBtn" title="File">📄</button>
+<input id="msgInput" placeholder="Type message..." autocomplete="off">
+<button class="btn micBtn" id="micBtn" title="Voice">🎤</button>
+<button class="btn send" id="sendBtn" title="Send">➤</button>
+</div>
+
+<input type="file" id="photoIn" accept="image/*" style="display:none">
+<input type="file" id="videoIn" accept="video/*" style="display:none">
+<input type="file" id="cvIn" accept=".pdf,.doc,.docx,image/*" style="display:none">
+
+<div id="blockManager"><div id="blockManagerCard"><div class="blockHeader"><b>Block Manager</b><button id="closeBlockBtn" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer">X</button></div><div style="padding:10px;display:flex;gap:6px"><input id="nurseSearch" placeholder="Search nurse..." style="flex:1;padding:10px;border-radius:10px;border:1px solid #e5e7eb"><button id="refreshNursesBtn" style="padding:8px 12px;border-radius:10px;border:none;background:#7c3aed;color:#fff;font-weight:800;cursor:pointer">Refresh</button></div><div id="nurseCount" style="font-size:10px;color:#6b7280;padding:0 10px">0 nurses</div><div id="blockList" class="blockBody">Loading...</div><div style="padding:10px;display:flex;gap:8px"><button id="closeBlockBtn2" style="flex:1;padding:10px;border-radius:10px;border:1px solid #e5e7eb;background:#fff;cursor:pointer">Close</button></div></div></div>
+
+<div class="floatingCall">
+<a href="https://wa.me/233544121814" target="_blank" class="callBtn" style="background:linear-gradient(135deg,#25D366,#128C7E);color:white" title="WhatsApp CEO">💬</a>
+<a href="tel:+233544121814" class="callBtn" style="background:linear-gradient(135deg,#22c55e,#86efac)" title="Call CEO">📞</a>
+</div>
+
+<script type="module">
+// === FAST VERSION - Modular Firebase v10 + Pagination + Cache ===
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js';
+import { getDatabase, ref, push, onChildAdded, onChildChanged, onChildRemoved, query, limitToLast, orderByChild, get, remove, update, off } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js';
+import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js';
+
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+const auth=getAuth(app);
+const storage=getStorage(app);
+
+const CEO_EMAILS=['lovecareglobal@gmail.com','ceo@lovecareglobal.com','asaberepeter204@gmail.com','asaberepeter204@lovecareglobal.com','lovecareglobalhome@gmail.com'];
+let curUser=null, curRole=null, blockedUsers=[], blockedMap={}, allNursesCache=[], msgCount=0, mediaRecorder=null, audioChunks=[], isRecording=false;
+let lastMsgKey=null;
+
+function getSessionUser(){
+  try{
+    const uid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId')||localStorage.getItem('lcg_uid')||localStorage.getItem('nurseUid')||'user_'+Date.now();
+    const email=(localStorage.getItem('lcg_nurse_email')||localStorage.getItem('lcg_email')||localStorage.getItem('nurseEmail')||'lovecareglobal@gmail.com').toLowerCase();
+    const name=localStorage.getItem('nurseName')||localStorage.getItem('lcg_nurse_name')||localStorage.getItem('lcg_name')||email.split('@')[0]||'CEO';
+    let role=(localStorage.getItem('lcg_role')||'ceo').toLowerCase();
+    if(CEO_EMAILS.includes(email)) role='ceo';
+    if(role==='client') role='nurse';
+    return {id:uid, name, email, role, isApproved:true};
+  }catch(e){ return {id:'auto_'+Date.now(), name:'CEO', email:CEO_EMAILS[0], role:'ceo', isApproved:true}; }
+}
+
+async function ensureAuth(){
+  return new Promise(res=>{
+    const unsub=onAuthStateChanged(auth, async user=>{
+      unsub();
+      if(user) res(user);
+      else { try{ const cred=await signInAnonymously(auth); res(cred.user);}catch{res(null);} }
+    });
+    setTimeout(()=>res(null), 3000);
+  });
+}
+
+async function initFast(){
+  const session=getSessionUser();
+  curUser=session; curRole=session.role;
+  document.getElementById('topTitle').textContent=`GROUP CHAT - ${curRole.toUpperCase()} ${curUser.name} - FAST`;
+  await ensureAuth();
+  startFastChat();
+  loadBlockedFast();
+}
+
+function startFastChat(){
+  const chatEl=document.getElementById('chat');
+  chatEl.innerHTML=''; // clear skeletons
+  const chatRef=ref(db,'nurses_group_chat/messages');
+  const q=query(chatRef, orderByChild('timestamp'), limitToLast(100)); // ONLY last 100 - FAST
+  
+  let firstLoad=true;
+  onChildAdded(q, snap=>{
+    renderMsgFast(snap.key, snap.val(), !firstLoad);
+    msgCount++; document.getElementById('msgCount').textContent=msgCount+' msgs';
+    if(firstLoad && msgCount>95) firstLoad=false;
+  });
+  
+  onChildChanged(ref(db,'nurses_group_chat/messages'), snap=>{
+    const el=document.getElementById('msg_'+snap.key);
+    if(el){ const txt=el.querySelector('.msgText'); if(txt) txt.innerText=snap.val().text||''; }
+  });
+  onChildRemoved(ref(db,'nurses_group_chat/messages'), snap=>{
+    const el=document.getElementById('msg_'+snap.key); if(el) el.remove();
+  });
+  
+  // Auto scroll after initial load
+  setTimeout(()=>{ chatEl.scrollTop=chatEl.scrollHeight; }, 800);
+}
+
+function renderMsgFast(id,data,animate=true){
+  const chat=document.getElementById('chat');
+  if(document.getElementById('msg_'+id)) return; // dedupe
+  const isMe=data.userId===curUser.id;
+  const isCEO=data.role==='ceo'||CEO_EMAILS.includes((data.userEmail||'').toLowerCase());
+  const isBlocked=blockedUsers.includes(data.userId);
+  const div=document.createElement('div');
+  div.id='msg_'+id;
+  div.className='msg'+(isMe?' me':'')+(isCEO?' ceo':'')+(isBlocked?' blocked':'');
+  if(!animate) div.style.animation='none';
+  
+  let mediaHtml='';
+  if(data.type==='photo'&&data.mediaURL) mediaHtml=`<img loading="lazy" style="max-width:180px;border-radius:10px;margin-top:6px;cursor:pointer" src="${data.mediaURL}" onclick="window.open('${data.mediaURL}','_blank')" alt="photo">`;
+  else if(data.type==='video'&&data.mediaURL) mediaHtml=`<video loading="lazy" style="max-width:220px;border-radius:10px;margin-top:6px" controls preload="metadata" src="${data.mediaURL}"></video>`;
+  else if(data.type==='cv'&&data.mediaURL) mediaHtml=`<div style="margin-top:6px;padding:8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px"><a href="${data.mediaURL}" target="_blank">${data.fileName||'File'}</a></div>`;
+  else if(data.type==='audio'&&data.mediaURL) mediaHtml=`<audio controls preload="none" src="${data.mediaURL}" style="width:200px;margin-top:6px"></audio>`;
+  
+  const time=new Date(data.timestamp||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const safeText=(data.text||'').replace(/</g,'&lt;');
+  
+  div.innerHTML=`<div class=meta><span class="badge ${isCEO?'badge-ceo':'badge-nurse'}">${isCEO?'CEO':(data.role||'NURSE').toUpperCase()}</span><b>${data.userName||'User'}</b>${isMe?' (You)':''}${isBlocked?'<span class=badge badge-blocked>BLOCKED</span>':''}<span style="margin-left:auto">${time}${data.edited?' (edited)':''}</span></div><div class="msgText">${safeText}</div>${mediaHtml}<div class=actions>${(isMe||curRole==='ceo')?`<button class="actBtn edit" data-edit="${id}">Edit</button><button class="actBtn del" data-del="${id}">Del</button>`:''}</div>`;
+  
+  chat.appendChild(div);
+  if(animate) chat.scrollTop=chat.scrollHeight;
+  
+  div.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editMsg(b.dataset.edit));
+  div.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteMsg(b.dataset.del));
+}
+
+async function loadBlockedFast(){
+  try{
+    const snap=await get(ref(db,'nurses_group_chat/blocked_users'));
+    blockedUsers=[]; blockedMap={};
+    if(snap.exists()){
+      const val=snap.val();
+      for(const k in val){ blockedUsers.push(val[k].userId); blockedMap[val[k].userId]=val[k]; }
+    }
+    if(blockedUsers.includes(curUser.id) && curRole!=='ceo'){
+      document.getElementById('status').innerHTML=`<div style="padding:10px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:12px;font-weight:700;margin:8px;border-radius:10px">You are blocked by CEO - ${blockedMap[curUser.id]?.reason||''}</div>`;
+      document.getElementById('inputBar').style.display='none';
+    }
+  }catch(e){}
+}
+
+// Send text - optimized
+async function sendTextFast(){
+  const input=document.getElementById('msgInput');
+  const text=input.value.trim();
+  if(!text) return;
+  if(blockedUsers.includes(curUser.id)){ alert('Blocked'); return; }
+  input.value='';
+  try{
+    await push(ref(db,'nurses_group_chat/messages'), {userId:curUser.id,userName:curUser.name,userEmail:curUser.email,role:curRole,timestamp:Date.now(),type:'text',text});
+  }catch(e){ alert('Send failed: '+e.message); input.value=text; }
+}
+
+// Upload with compression
+async function uploadFileFast(file, type){
+  if(blockedUsers.includes(curUser.id)){ alert('Blocked'); return; }
+  const status=document.getElementById('status'); const wrap=document.getElementById('progressWrap'); const bar=document.getElementById('progressBar');
+  wrap.style.display='block';
+  let fileToUpload=file;
+  // Compress images to <1.5MB
+  if(type==='photo' && file.type.startsWith('image/') && file.size>1024*1024){
+    try{
+      const canvas=document.createElement('canvas');
+      const img=new Image();
+      const url=URL.createObjectURL(file);
+      await new Promise(res=>{ img.onload=res; img.src=url; });
+      const maxW=1280;
+      let w=img.width, h=img.height;
+      if(w>maxW){ h=h*(maxW/w); w=maxW; }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const blob=await new Promise(res=>canvas.toBlob(res,'image/jpeg',0.7));
+      fileToUpload=new File([blob], file.name.replace(/\.\\w+$/,'.jpg'), {type:'image/jpeg'});
+      URL.revokeObjectURL(url);
+    }catch{}
+  }
+  
+  try{
+    const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const path=`group_chat/${type}/${Date.now()}_${safe}`;
+    const storageRef=sRef(storage, path);
+    const task=uploadBytesResumable(storageRef, fileToUpload);
+    task.on('state_changed', snap=>{ bar.style.width=Math.round(snap.bytesTransferred/snap.totalBytes*100)+'%'; });
+    await task;
+    const url=await getDownloadURL(storageRef);
+    await push(ref(db,'nurses_group_chat/messages'), {userId:curUser.id,userName:curUser.name,userEmail:curUser.email,role:curRole,timestamp:Date.now(),type,mediaURL:url,fileName:file.name,fileSize:(file.size/1024/1024).toFixed(2)+'MB',text:document.getElementById('msgInput').value||`${type}: ${file.name}`});
+    document.getElementById('msgInput').value='';
+    wrap.style.display='none'; bar.style.width='0%';
+  }catch(e){ status.innerHTML=`<div style="padding:10px;background:#fef2f2;color:#dc2626;font-size:12px">${e.message}</div>`; wrap.style.display='none'; }
+}
+
+window.deleteMsg=async(id)=>{
+  if(!confirm('Delete this message?')) return;
+  try{ await remove(ref(db,`nurses_group_chat/messages/${id}`)); }catch(e){ alert(e.message); }
+}
+window.editMsg=async(id)=>{
+  const cur=document.querySelector(`#msg_${id} .msgText`)?.innerText||'';
+  const newText=prompt('Edit message:', cur);
+  if(newText===null) return;
+  try{ await update(ref(db,`nurses_group_chat/messages/${id}`), {text:newText, edited:true, editedAt:Date.now()}); }catch(e){ alert(e.message); }
+}
+window.toggleBlock=async(uid,name)=>{
+  const isBlocked=blockedUsers.includes(uid);
+  if(isBlocked){
+    if(!confirm(`Unblock ${name}?`)) return;
+    try{ const snap=await get(ref(db,'nurses_group_chat/blocked_users')); if(snap.exists()){ const val=snap.val(); for(const k in val){ if(val[k].userId===uid){ await remove(ref(db,`nurses_group_chat/blocked_users/${k}`)); } } } blockedUsers=blockedUsers.filter(x=>x!==uid); alert('Unblocked'); }catch(e){ alert(e.message); }
+  }else{
+    const reason=prompt(`Block ${name}? Reason:`)||'Misbehavior';
+    try{ await push(ref(db,'nurses_group_chat/blocked_users'), {userId:uid, userName:name, reason, blockedBy:curUser.name, timestamp:Date.now()}); blockedUsers.push(uid); alert('Blocked'); }catch(e){ alert(e.message); }
+  }
+}
+
+// Block manager - lazy load nurses only when opened
+async function loadAllNursesFast(){
+  const listEl=document.getElementById('blockList'); const countEl=document.getElementById('nurseCount');
+  listEl.innerHTML='Loading nurses... (optimized)';
+  try{
+    // Only load approved nurses, limit 200
+    const snap=await get(query(ref(db,'nurses'), limitToLast(200)));
+    const map={};
+    if(snap.exists()){
+      snap.forEach(child=>{ const v=child.val(); if(v.fullName||v.name) map[child.key]={id:child.key, name:v.fullName||v.name, email:v.email||'', phone:v.phone||'', status:v.status||'', isApproved:v.isApproved}; });
+    }
+    allNursesCache=Object.values(map).sort((a,b)=>a.name.localeCompare(b.name));
+    countEl.textContent=allNursesCache.length+' nurses';
+    renderBlockListFast();
+  }catch(e){ listEl.innerHTML=`Failed: ${e.message}`; }
+}
+function renderBlockListFast(){
+  const listEl=document.getElementById('blockList');
+  const search=(document.getElementById('nurseSearch').value||'').toLowerCase();
+  const filtered=allNursesCache.filter(n=> !search || (n.name+' '+n.email).toLowerCase().includes(search));
+  if(!filtered.length){ listEl.innerHTML='<div style="text-align:center;color:#9ca3af;padding:20px">No nurses</div>'; return; }
+  listEl.innerHTML=filtered.slice(0,50).map(n=>{
+    const isBlocked=blockedUsers.includes(n.id);
+    return `<div class="nurseRow" style="${isBlocked?'border-color:#fecaca;background:#fef2f2':''}"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;color:#fff;font-weight:900">${(n.name||'N')[0]}</div><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:12px">${n.name} ${isBlocked?'<span class=badge badge-blocked>BLOCKED</span>':''}</div><div style="font-size:10px;color:#6b7280">${n.email}</div></div><button class="actBtn ${isBlocked?'unblock':'block'}" onclick="toggleBlock('${n.id}','${n.name.replace(/'/g,'')}')">${isBlocked?'Unblock':'Block'}</button></div>`;
+  }).join('') + (filtered.length>50?`<div style="text-align:center;color:#9ca3af;font-size:11px;padding:10px">Showing 50 of ${filtered.length} — use search to filter</div>`:'');
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('homeBtn').onclick=()=>location.href='index.html';
+  document.getElementById('reloadBtn').onclick=()=>location.reload();
+  document.getElementById('sendBtn').onclick=sendTextFast;
+  document.getElementById('msgInput').addEventListener('keypress', e=>{ if(e.key==='Enter') sendTextFast(); });
+  document.getElementById('photoBtn').onclick=()=>document.getElementById('photoIn').click();
+  document.getElementById('cvBtn').onclick=()=>document.getElementById('cvIn').click();
+  document.getElementById('photoIn').addEventListener('change', function(){ if(this.files[0]) uploadFileFast(this.files[0],'photo'); this.value=''; });
+  document.getElementById('cvIn').addEventListener('change', function(){ if(this.files[0]) uploadFileFast(this.files[0],'cv'); this.value=''; });
+  document.getElementById('closeBlockBtn').onclick=()=>document.getElementById('blockManager').classList.remove('show');
+  document.getElementById('closeBlockBtn2').onclick=()=>document.getElementById('blockManager').classList.remove('show');
+  document.getElementById('refreshNursesBtn').onclick=loadAllNursesFast;
+  document.getElementById('nurseSearch').addEventListener('input', renderBlockListFast);
+  
+  // Voice with same fast logic
+  document.getElementById('micBtn').onclick=async()=>{
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      const mr=new MediaRecorder(stream); const chunks=[];
+      mr.ondataavailable=e=>chunks.push(e.data);
+      mr.onstop=async()=>{
+        const blob=new Blob(chunks,{type:'audio/webm'});
+        const file=new File([blob],'voice.webm',{type:'audio/webm'});
+        uploadFileFast(file,'audio');
+      };
+      mr.start();
+      document.getElementById('micBtn').textContent='STOP';
+      document.getElementById('micBtn').style.background='#fee2e2';
+      setTimeout(()=>{ if(mr.state==='recording') mr.stop(); document.getElementById('micBtn').textContent='🎤'; document.getElementById('micBtn').style.background='#f9fafb'; }, 60000);
+      setTimeout(()=>{ 
+        const stopHandler=()=>{ if(mr.state==='recording'){ mr.stop(); document.getElementById('micBtn').textContent='🎤'; document.getElementById('micBtn').style.background='#f9fafb'; } };
+        document.getElementById('micBtn').onclick=stopHandler;
+      },100);
+    }catch(e){ alert('Mic denied: '+e.message); }
+  };
+  
+  setTimeout(initFast, 300);
+});
+
+// Expose for CEO dashboard to open block manager
+window.showBlocked=()=>{
+  document.getElementById('blockManager').classList.add('show');
+  loadAllNursesFast();
+};
+</script>
+</body>
+</html>
