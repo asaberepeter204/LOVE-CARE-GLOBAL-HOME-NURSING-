@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Dashboard - ALL BUTTONS FIXED | LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;overflow-x:hidden}
+.header{position:sticky;top:0;z-index:100;background:#1a1040;border-bottom:2px solid #a855f7;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.22);border-radius:18px;padding:16px;margin:12px;position:relative;z-index:1}
+.btn{border:none;border-radius:12px;padding:14px 20px;font-weight:900;cursor:pointer;margin:5px;font-size:13px;transition:.15s;pointer-events:auto!important;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;z-index:10;min-height:48px;display:inline-flex;align-items:center;justify-content:center}
+.btn:active{transform:scale(0.93)!important}
+.btnGreen{background:linear-gradient(135deg,#16a34a,#4ade80);color:white;box-shadow:0 4px 14px rgba(34,197,94,.35)}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
+.btnRed{background:linear-gradient(135deg,#dc2626,#ef4444);color:white;box-shadow:0 4px 14px rgba(239,68,68,.4)}
+.btnYellow{background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a}
+.btnGray{background:rgba(255,255,255,.1);color:#d8b4fe;border:1px solid rgba(168,85,247,.22)}
+.btnDark{background:rgba(76,29,149,.28);border:1px solid rgba(168,85,247,.28);color:#d8b4fe}
+.btnLive{background:linear-gradient(135deg,#22c55e,#86efac);color:#052e16;box-shadow:0 4px 16px rgba(34,197,94,.45);border:2px solid #22c55e;animation:livePulse 2s infinite}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}50%{box-shadow:0 0 0 10px rgba(34,197,94,0)}}
+.page{display:none;animation:fadeIn .3s}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.dot{width:14px;height:14px;border-radius:50%;background:#333;display:inline-block;margin:3px;transition:.2s}
+.dot.active{background:#a855f7;box-shadow:0 0 12px #a855f7}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
+input,select{padding:12px;border-radius:12px;border:1px solid rgba(168,85,247,.22);background:#0e0a1c;color:white;width:100%;font-size:13px}
+#ceoLiveMap{width:100%;height:520px;border-radius:16px;background:#0e0a1c;border:2px solid rgba(34,197,94,.4)}
+.nurse-blink{position:relative;width:32px;height:32px}
+.nurse-blink-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;background:#22c55e;border-radius:50%;border:3px solid white;box-shadow:0 0 14px rgba(34,197,94,.9);z-index:2}
+.nurse-blink-pulse{position:absolute;top:50%;left:50%;width:16px;height:16px;background:rgba(34,197,94,.5);border-radius:50%;animation:blinkPulse 2s infinite}
+@keyframes blinkPulse{0%{transform:translate(-50%,-50%) scale(.8);opacity:1}50%{transform:translate(-50%,-50%) scale(1.8);opacity:.6}100%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
+.sosBlink .nurse-blink-dot{background:#ef4444;box-shadow:0 0 14px rgba(239,68,68,.9)}
+.clientPin{width:28px;height:28px;background:#f59e0b;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;display:grid;place-items:center}
+.clientPin span{transform:rotate(45deg);font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div>
+<b>👑 [CEO] DASHBOARD - ALL BUTTONS FIXED</b><br>
+<small style="color:#a78bfa">CEO: lovecareglobal@gmail.com | Page <span id="pageNum">1</span>/5 | <span style="color:#4ade80">● LIVE — Buttons Fixed with window.* + touch-action</span> | <span id="authStatus" style="color:#facc15">Auth: Checking...</span></small>
+</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<button type="button" class="btn btnLive" onclick="goTo(5)" style="font-size:12px">👑 LIVE MONITORING — Track All Nurses</button>
+<button type="button" class="btn btnGray" onclick="location.href='index.html'">Home</button>
+<button type="button" class="btn btnGray" onclick="location.reload()">🔄 Reload</button>
+</div>
+</div>
+
+<div style="text-align:center;padding:10px;background:rgba(14,10,28,.6)">
+<span class="dot active" id="dot1"></span><span class="dot" id="dot2"></span><span class="dot" id="dot3"></span><span class="dot" id="dot4"></span><span class="dot" id="dot5"></span>
+<span style="font-size:10px;color:#6b7280;margin-left:10px" id="debugTop">All buttons fixed — Click any button below</span>
+</div>
+
+<!-- PAGE 1 - PENDING + GROUP CHAT CONTROLS -->
+<div id="page1" class="page active">
+
+<div class="card" style="background:linear-gradient(90deg,rgba(127,29,29,.22),rgba(245,158,11,.18));border:2px solid rgba(239,68,68,.35)">
+<h3 style="color:#fecaca">🚨 CEO GROUP CHAT MASTER CONTROLS — FIXED</h3>
+<p style="font-size:12px;color:#fcd34d;margin:8px 0">Master Delete + Block/Unblock — CEO only — Buttons now fixed with window.*</p>
+<div style="display:grid;gap:10px">
+<button type="button" class="btn btnRed" onclick="ceoMasterDelete()" style="padding:18px;font-size:14px">🗑️ MASTER DELETE — Clear ALL Chat Messages — CLICK TO TEST</button>
+<button type="button" class="btn btnYellow" onclick="openBlockManager()" style="padding:18px">🚫 Block / Unblock Manager — List ALL Nurses — CLICK</button>
+<button type="button" class="btn btnDark" onclick="loadBlockedListCEO()">👁️ View Blocked Only — CLICK</button>
+<button type="button" class="btn btnDark" onclick="openGroupChat()">💬 Open Group Chat (nurse-group-chat.html) — CLICK</button>
+</div>
+<div id="ceoChatStatus" style="margin-top:12px;padding:12px;background:rgba(0,0,0,.3);border-radius:12px;border:1px solid rgba(245,158,11,.2);font-size:12px;color:#fcd34d">✅ Buttons fixed — Click any button above. If button doesn't respond, check console (F12) for error. All functions attached to window.*</div>
+
+<div id="ceoBlockManager" style="display:none;margin-top:16px;background:#0e0a1c;border-radius:16px;padding:14px;border:1px solid rgba(168,85,247,.3)">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+<b>👥 All Nurses — Block/Unblock</b>
+<div style="display:flex;gap:6px">
+<input id="ceoNurseSearch" placeholder="Search..." oninput="filterCEONurses()" style="width:160px;padding:8px">
+<button type="button" class="btn btnBlue" onclick="loadAllNursesForBlock()" style="padding:8px">🔄 Reload</button>
+<button type="button" class="btn btnGray" onclick="closeBlockManager()" style="padding:8px">X Close</button>
+</div>
+</div>
+<div id="ceoNurseCount" style="font-size:11px;color:#a78bfa">0 nurses</div>
+<div id="ceoBlockList" style="display:grid;gap:8px;margin-top:8px">Click Block Manager to load</div>
+</div>
+</div>
+
+<div class="card">
+<h3>⏳ PENDING REGISTRATIONS — Buttons Fixed</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+<button type="button" class="btn btnGreen" onclick="loadPendingFirebase()">🔄 Reload Pending — CLICK</button>
+<button type="button" class="btn btnBlue" onclick="goTo(2)">Page 2 Approved →</button>
+<button type="button" class="btn btnLive" onclick="goTo(5)">👑 Page 5 LIVE MONITORING →</button>
+<button type="button" class="btn btnBlue" onclick="goTo(3)">Page 3 Bookings →</button>
+</div>
+<input id="searchPending" placeholder="🔍 Search name/email/phone..." oninput="filterPending()" style="margin-bottom:8px">
+<div id="pendingCount" style="font-size:12px;color:#facc15">0 pending</div>
+<div id="ceoNurseApplicationsList" style="max-height:800px;overflow:auto;background:#0e0a1c;border-radius:12px;padding:10px;margin-top:8px">Click Reload Pending — If button doesn't work, hard refresh Ctrl+Shift+R</div>
+</div>
+</div>
+
+<!-- PAGE 2 - APPROVED -->
+<div id="page2" class="page">
+<div class="card">
+<h3>✅ APPROVED NURSES — Buttons Fixed</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+<button type="button" class="btn btnGreen" onclick="loadApprovedFirebase()">🔄 Load Approved — CLICK</button>
+<button type="button" class="btn btnGray" onclick="goTo(1)">← Page 1</button>
+<button type="button" class="btn btnLive" onclick="goTo(5)">👑 LIVE MONITORING →</button>
+<button type="button" class="btn btnBlue" onclick="goTo(3)">Page 3 →</button>
+</div>
+<input id="searchApproved" placeholder="Search approved..." oninput="filterApproved()" style="margin-bottom:8px">
+<div id="ceoVerifiedNursesList" style="background:#0e0a1c;padding:10px;border-radius:12px">No approved yet — Click Load Approved</div>
+</div>
+</div>
+
+<!-- PAGE 3 - BOOKINGS -->
+<div id="page3" class="page">
+<div class="card" style="border:2px solid #f59e0b">
+<h3 style="color:#facc15">📋 CLIENT BOOKINGS — Delete & Export — Buttons Fixed</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+<button type="button" class="btn btnBlue" onclick="loadBookings()">🔄 Reload Bookings — CLICK</button>
+<button type="button" class="btn btnYellow" onclick="exportBookingsCSV()">📥 Export CSV — CLICK</button>
+<button type="button" class="btn btnRed" onclick="deleteAllBookings()">🗑️ Delete All Demo — CLICK</button>
+<button type="button" class="btn btnGray" onclick="goTo(2)">← Back</button>
+<button type="button" class="btn btnLive" onclick="goTo(5)">👑 LIVE MONITORING — Track All →</button>
+<button type="button" class="btn btnGray" onclick="goTo(4)">Page 4 Pricing →</button>
+</div>
+<input id="searchBookings" placeholder="🔍 Search client/nurse/phone..." oninput="filterBookings()" style="margin-bottom:8px">
+<div id="bookingsCount" style="margin:8px 0;color:#facc15;font-size:12px">0 bookings</div>
+<div id="ceoBookingsList" style="max-height:700px;overflow:auto;background:#0e0a1c;padding:10px;border-radius:12px">Click Reload Bookings — If buttons like picture, hard refresh</div>
+</div>
+</div>
+
+<!-- PAGE 4 - PRICING -->
+<div id="page4" class="page">
+<div class="card">
+<h3>💰 Pricing — Buttons Fixed</h3>
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0">
+<div>GHS: <input id="rateGHS" type="number" value="15" style="width:120px"></div>
+<div>USD: <input id="rateUSD" type="number" value="5" style="width:120px"></div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button type="button" class="btn btnYellow" onclick="saveRates()">💾 Save Rates — CLICK — Working</button>
+<button type="button" class="btn btnGray" onclick="goTo(3)">← Page 3</button>
+<button type="button" class="btn btnLive" onclick="goTo(5)">👑 LIVE MONITORING →</button>
+</div>
+<div id="rateMsg" style="margin-top:12px;color:#86efac;font-size:12px">Loading rates...</div>
+<div style="margin-top:12px;padding:10px;background:rgba(14,10,28,.5);border-radius:10px;font-size:10px;color:#6b7280">CEO rates change affects book-nurse price calculation in real-time. Book-nurse pages listen to config/rates</div>
+</div>
+</div>
+
+<!-- PAGE 5 - CEO LIVE MONITORING - ALL NURSES MOVING LIVE -->
+<div id="page5" class="page">
+<div class="card" style="border:2px solid #22c55e;background:linear-gradient(90deg,rgba(34,197,94,.12),rgba(16,185,129,.08))">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div><h3 style="color:#86efac">👑 CEO LIVE MONITORING — All Nurses Moving Live After Accepting Booking</h3>
+<small style="color:#a7f3d0">Monitor everyone and all moves at a time • Nurses on way to client • Blinking green = Live • Yellow = Client • Red = SOS • Every move visible</small></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<button type="button" class="btn btnGreen" onclick="loadCEOLiveMonitoring()">🔄 Refresh Live — CLICK</button>
+<button type="button" class="btn btnBlue" onclick="centerAllNursesMap()">🌍 Center All — CLICK</button>
+<button type="button" class="btn btnDark" onclick="toggleFollowCEO()" id="followBtnCEO">📍 Follow: ON — CLICK</button>
+<button type="button" class="btn btnGray" onclick="goTo(3)">← Bookings</button>
+<button type="button" class="btn btnGray" onclick="goTo(1)">Page 1</button>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0">
+<div style="background:#0e0a1c;border-radius:12px;padding:10px;text-align:center"><b id="ceoLiveActive" style="font-size:20px;color:#86efac">0</b><br><small style="font-size:9px;color:#6b7280">ACTIVE NURSES LIVE</small></div>
+<div style="background:#0e0a1c;border-radius:12px;padding:10px;text-align:center"><b id="ceoLiveEnRoute" style="font-size:20px;color:#facc15">0</b><br><small style="font-size:9px;color:#6b7280">EN ROUTE TO CLIENT</small></div>
+<div style="background:#0e0a1c;border-radius:12px;padding:10px;text-align:center"><b id="ceoLiveSOS" style="font-size:20px;color:#ef4444">0</b><br><small style="font-size:9px;color:#6b7280">SOS EMERGENCY</small></div>
+<div style="background:#0e0a1c;border-radius:12px;padding:10px;text-align:center"><b id="ceoLiveTotal" style="font-size:20px;color:#a78bfa">0</b><br><small style="font-size:9px;color:#6b7280">TOTAL TRACKED TODAY</small></div>
+</div>
+
+<div id="ceoLiveMap"></div>
+
+<div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap">
+<select id="ceoLiveFilter" onchange="filterCEOLive()" style="padding:10px;border-radius:10px;width:200px;background:#0e0a1c;color:#d8b4fe;border:1px solid rgba(168,85,247,.2)"><option value="all">All Active Live</option><option value="en_route">En Route Only</option><option value="accepted">Accepted Only</option><option value="sos">SOS Only</option></select>
+<input id="ceoLiveSearch" placeholder="Search nurse/client/phone..." oninput="filterCEOLive()" style="flex:1;min-width:180px">
+<button type="button" class="btn btnYellow" onclick="window.open('./ceo-live-monitoring.html','_blank')" style="padding:10px">🔗 Open Full Live Map (ceo-live-monitoring.html) — CLICK</button>
+</div>
+
+<div id="ceoLiveList" style="max-height:500px;overflow:auto;background:#0e0a1c;border-radius:12px;padding:10px">Loading CEO live monitoring... When nurse accepts booking via my-job-offer, they appear here with blinking green dot moving live to client. CEO can monitor every move at a time. If not loading, click Refresh Live</div>
+</div>
+
+<div class="card" style="background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.2)">
+<small style="color:#6b7280;font-size:10px">
+<b>How CEO lively monitoring works after accepting booking:</b><br>
+1. Client books nurse via book-nurse.html → Booking in ceoBookings pending<br>
+2. Nurse accepts via my-job-offer.html → acceptJob() starts live GPS watchPosition every 5 sec → Saves to nurseLiveLocations/{nurseId}, ceoBookings/{id}/nurseLat/Lng<br>
+3. CEO Page 5 listens to ceoBookings where nurseLiveTracking=true + nurseLiveLocations → Shows blinking green dots moving live<br>
+4. CEO sees distance, ETA, trail, speed — Can call nurse/client, focus map, SOS<br><br>
+<b>Fix for buttons not responding:</b> All functions now attached to window.* — Added touch-action:manipulation, pointer-events:auto!important, z-index:10, type="button" — If still not working, check console F12 for JS error, ensure Firebase Anonymous Auth enabled in Firebase Console > Authentication > Sign-in method, hard refresh Ctrl+Shift+R
+</small>
+</div>
+</div>
+
+<script>
+// Firebase
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const fs=firebase.firestore();
+
+// Global variables
+let pendingListCache=[], approvedCache=[], ceoBookingsCache=[], ceoLiveBookings=[], ceoLiveMarkers={}, ceoLiveClientMarkers={}, ceoLiveRoutes={}, ceoLiveTrails={}, ceoLiveMap=null, ceoLiveFollow=true, ceoLiveSelected=null;
+
+// === FIXED goTo - Attached to window ===
+function goTo(n){
+  console.log('goTo clicked:', n);
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const page=document.getElementById('page'+n);
+  if(page) page.classList.add('active');
+  document.querySelectorAll('.dot').forEach((d,i)=>{ d.classList.toggle('active', i===(n-1)); });
+  const numEl=document.getElementById('pageNum');
+  if(numEl) numEl.textContent=n;
+  window.scrollTo(0,0);
+  if(n===2) loadApprovedFirebase();
+  if(n===3) loadBookings();
+  if(n===4) loadRates();
+  if(n===5){ setTimeout(()=>{ initCEOLiveMap(); loadCEOLiveMonitoring(); }, 300); }
+  document.getElementById('debugTop').textContent='Page '+n+' — Button clicked OK — goTo('+n+') works';
+}
+window.goTo=goTo;
+
+// Group Chat Controls - FIXED with window.*
+function ceoMasterDelete(){
+  console.log('ceoMasterDelete clicked');
+  if(!confirm('🚨 MASTER DELETE — Delete ALL messages in nurses_group_chat/messages?\n\nCannot be undone!')) return;
+  const c=prompt('Type DELETE to confirm:');
+  if(c!=='DELETE') return alert('Cancelled');
+  const status=document.getElementById('ceoChatStatus');
+  status.textContent='Deleting...';
+  db.ref('nurses_group_chat/messages').remove().then(()=>{
+    status.textContent='✅ All chat messages deleted by CEO';
+    status.style.background='rgba(34,197,94,.2)';
+    alert('✅ Master Delete Done — All messages cleared');
+  }).catch(e=>{ status.textContent='❌ Error: '+e.message; alert('Error: '+e.message); });
+}
+window.ceoMasterDelete=ceoMasterDelete;
+
+function openBlockManager(){
+  console.log('openBlockManager clicked');
+  document.getElementById('ceoBlockManager').style.display='block';
+  loadAllNursesForBlock();
+  document.getElementById('ceoChatStatus').textContent='Block Manager opened — Loading nurses...';
+}
+window.openBlockManager=openBlockManager;
+
+function closeBlockManager(){
+  document.getElementById('ceoBlockManager').style.display='none';
+}
+window.closeBlockManager=closeBlockManager;
+
+function loadAllNursesForBlock(){
+  console.log('loadAllNursesForBlock clicked');
+  db.ref('nurses').once('value').then(snap=>{
+    let list=[];
+    if(snap.exists()){
+      snap.forEach(c=>{ list.push({...c.val(), uid:c.key}); });
+    }
+    pendingListCache=list;
+    document.getElementById('ceoNurseCount').textContent=list.length+' nurses';
+    renderCEONurseBlockList(list);
+    document.getElementById('ceoChatStatus').textContent='Loaded '+list.length+' nurses for block/unblock';
+  }).catch(e=>{ document.getElementById('ceoChatStatus').textContent='Error: '+e.message; });
+}
+window.loadAllNursesForBlock=loadAllNursesForBlock;
+
+function renderCEONurseBlockList(list){
+  const el=document.getElementById('ceoBlockList');
+  if(!list.length){ el.innerHTML='No nurses found'; return; }
+  el.innerHTML=list.map(n=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#1a1040;border-radius:10px;border:1px solid rgba(168,85,247,.2)"><div><b>${n.fullName||'Nurse'}</b><br><small>${n.email||''} • ${n.phone||''}</small><br><small style="color:${n.isBlocked?'#ef4444':'#4ade80'}">${n.isBlocked?'🚫 BLOCKED':'✅ Active'}</small></div><div style="display:flex;gap:6px"><button type="button" class="btn ${n.isBlocked?'btnGreen':'btnRed'}" onclick="toggleCEOBlock('${n.uid}', ${!!n.isBlocked})" style="padding:8px">${n.isBlocked?'Unblock':'Block'}</button><button type="button" class="btn btnDark" onclick="viewCEONurse('${n.uid}')" style="padding:8px">View</button></div></div>`).join('');
+}
+window.renderCEONurseBlockList=renderCEONurseBlockList;
+
+function filterCEONurses(){
+  const q=document.getElementById('ceoNurseSearch').value.toLowerCase();
+  const filtered=pendingListCache.filter(n=>(n.fullName||'').toLowerCase().includes(q)||(n.email||'').toLowerCase().includes(q));
+  renderCEONurseBlockList(filtered);
+}
+window.filterCEONurses=filterCEONurses;
+
+function toggleCEOBlock(uid, currentlyBlocked){
+  const action=currentlyBlocked?'unblock':'block';
+  if(!confirm((currentlyBlocked?'Unblock':'Block')+' nurse '+uid+'?')) return;
+  db.ref('nurses/'+uid+'/isBlocked').set(!currentlyBlocked).then(()=>{
+    alert((currentlyBlocked?'Unblocked':'Blocked')+' '+uid);
+    loadAllNursesForBlock();
+  });
+}
+window.toggleCEOBlock=toggleCEOBlock;
+
+function viewCEONurse(uid){ alert('Nurse ID: '+uid+'\nView in approved list'); goTo(2); }
+window.viewCEONurse=viewCEONurse;
+
+function loadBlockedListCEO(){
+  console.log('loadBlockedListCEO clicked');
+  db.ref('nurses').once('value').then(snap=>{
+    let list=[];
+    if(snap.exists()){
+      snap.forEach(c=>{ const v=c.val(); if(v.isBlocked) list.push({...v, uid:c.key}); });
+    }
+    document.getElementById('ceoBlockManager').style.display='block';
+    document.getElementById('ceoNurseCount').textContent=list.length+' blocked';
+    renderCEONurseBlockList(list);
+    document.getElementById('ceoChatStatus').textContent='Showing '+list.length+' blocked nurses';
+  });
+}
+window.loadBlockedListCEO=loadBlockedListCEO;
+
+function openGroupChat(){
+  console.log('openGroupChat clicked');
+  window.open('./nurse-group-chat.html','_blank');
+}
+window.openGroupChat=openGroupChat;
+
+// PENDING
+function loadPendingFirebase(){
+  console.log('loadPendingFirebase clicked');
+  const el=document.getElementById('ceoNurseApplicationsList');
+  if(el) el.innerHTML='Loading pending...';
+  document.getElementById('pendingCount').textContent='Loading...';
+  db.ref('pendingNurses').once('value').then(snap=>{
+    let list=[];
+    if(snap.exists()){
+      snap.forEach(c=>{ list.push({...c.val(), uid:c.key}); });
+    }
+    pendingListCache=list;
+    renderPending(list);
+    document.getElementById('pendingCount').textContent=list.length+' pending';
+    document.getElementById('debugTop').textContent='Loaded '+list.length+' pending — Buttons working';
+  }).catch(e=>{ if(el) el.innerHTML='Error: '+e.message+' — Check Firebase rules'; });
+}
+window.loadPendingFirebase=loadPendingFirebase;
+
+function renderPending(list){
+  const el=document.getElementById('ceoNurseApplicationsList');
+  if(!list.length){ el.innerHTML='No pending registrations'; return; }
+  el.innerHTML=list.map(n=>`<div style="padding:12px;border-bottom:1px solid rgba(168,85,247,.2);background:#1a1040;border-radius:10px;margin-bottom:8px"><b>${n.fullName||'Nurse'}</b> — ${n.email||''} — ${n.phone||''}<br><small>${n.bio||''} — Services: ${(n.services||[]).join(', ')}</small><br><div style="margin-top:8px;display:flex;gap:6px"><button type="button" class="btn btnGreen" onclick="approveFirebase('${n.uid}')">✅ Approve — CLICK</button><button type="button" class="btn btnRed" onclick="rejectFirebase('${n.uid}')">❌ Reject — CLICK</button><button type="button" class="btn btnDark" onclick="viewPendingNurse('${n.uid}')">View</button></div></div>`).join('');
+}
+
+function filterPending(){
+  const q=document.getElementById('searchPending').value.toLowerCase();
+  const filtered=pendingListCache.filter(n=>(n.fullName||'').toLowerCase().includes(q)||(n.email||'').toLowerCase().includes(q));
+  renderPending(filtered);
+}
+window.filterPending=filterPending;
+
+function viewPendingNurse(uid){ const n=pendingListCache.find(x=>x.uid===uid); alert(JSON.stringify(n,null,2)); }
+window.viewPendingNurse=viewPendingNurse;
+
+function approveFirebase(uid){
+  console.log('approveFirebase clicked', uid);
+  if(!confirm('Approve nurse '+uid+'?')) return;
+  db.ref('pendingNurses/'+uid).once('value').then(snap=>{
+    let data=snap.val()||{uid};
+    data.isApproved=true; data.status='approved'; data.approvedAt=Date.now();
+    db.ref('nurses/'+uid).set(data).then(()=>{
+      db.ref('pendingNurses/'+uid).remove();
+      alert('✅ Approved '+uid);
+      loadPendingFirebase();
+    }).catch(e=>alert('Error: '+e.message));
+  });
+}
+window.approveFirebase=approveFirebase;
+
+function rejectFirebase(uid){
+  console.log('rejectFirebase clicked', uid);
+  if(!confirm('Reject nurse '+uid+'?')) return;
+  db.ref('pendingNurses/'+uid).remove().then(()=>{ alert('Rejected'); loadPendingFirebase(); });
+}
+window.rejectFirebase=rejectFirebase;
+
+// APPROVED
+function loadApprovedFirebase(){
+  console.log('loadApprovedFirebase clicked');
+  db.ref('nurses').once('value').then(snap=>{
+    let list=[];
+    if(snap.exists()){
+      snap.forEach(c=>{ const v=c.val(); if(v.isApproved) list.push({...v, uid:c.key}); });
+    }
+    approvedCache=list;
+    const el=document.getElementById('ceoVerifiedNursesList');
+    if(!list.length){ el.innerHTML='No approved nurses yet'; return; }
+    el.innerHTML=list.map(n=>`<div style="padding:10px;background:#1a1040;border-radius:10px;margin-bottom:8px;border:1px solid rgba(168,85,247,.2)"><b>${n.fullName||'Nurse'}</b> — ${n.email||''} — ${n.phone||''}<br><small>${(n.services||[]).join(', ')}</small><br><button type="button" class="btn btnRed" onclick="rejectFirebase('${n.uid}')" style="padding:6px;margin-top:6px">Unapprove</button></div>`).join('');
+  });
+}
+window.loadApprovedFirebase=loadApprovedFirebase;
+
+function filterApproved(){
+  const q=document.getElementById('searchApproved').value.toLowerCase();
+  const filtered=approvedCache.filter(n=>(n.fullName||'').toLowerCase().includes(q));
+  const el=document.getElementById('ceoVerifiedNursesList');
+  el.innerHTML=filtered.map(n=>`<div style="padding:10px;background:#1a1040;border-radius:10px;margin-bottom:8px"><b>${n.fullName}</b></div>`).join('');
+}
+window.filterApproved=filterApproved;
+
+// BOOKINGS
+function loadBookings(){
+  console.log('loadBookings clicked');
+  const el=document.getElementById('ceoBookingsList');
+  if(el) el.innerHTML='Loading bookings...';
+  db.ref('bookings').once('value').then(snap=>{
+    let list=[];
+    if(snap.exists()){
+      snap.forEach(c=>{ list.push({id:c.key, ...c.val()}); });
+    }
+    ceoBookingsCache=list.sort((a,b)=>(b.time||0)-(a.time||0));
+    renderBookings(ceoBookingsCache);
+    document.getElementById('bookingsCount').textContent=list.length+' bookings — Buttons fixed';
+  }).catch(e=>{ if(el) el.innerHTML='Error: '+e.message; });
+}
+window.loadBookings=loadBookings;
+
+function renderBookings(list){
+  const el=document.getElementById('ceoBookingsList');
+  if(!list.length){ el.innerHTML='No bookings yet — When client books via book-nurse, it appears here'; return; }
+  el.innerHTML=list.slice(0,100).map(b=>{
+    const isDemo=(b.clientName||'').toLowerCase().includes('demo')||(b.phone||'').includes('0553000000');
+    return `<div style="padding:12px;border-radius:12px;background:${isDemo?'rgba(245,158,11,.12)':'#1a1040'};border:1px solid ${isDemo?'#f59e0b':'#a855f733'};margin-bottom:8px">
+      <b>${b.clientName||'Client'} → ${b.nurseName||''} ${isDemo?'(DEMO)':''}</b> <span style="background:${b.status==='accepted'?'#22c55e':b.status==='rejected'?'#ef4444':'#f59e0b'};color:white;padding:2px 6px;border-radius:999px;font-size:9px">${(b.status||'pending').toUpperCase()}</span><br>
+      <small>📞 ${b.phone||''} | 💰 ${b.currency||'GHS'} ${b.amount||0} | 🕐 ${b.totalHours||9}hrs | ${b.id} | ${b.time?new Date(b.time).toLocaleString():''}</small><br>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" class="btn btnBlue" onclick="viewBooking('${b.id}')" style="padding:8px">👁️ View — CLICK</button>
+        <button type="button" class="btn btnRed" onclick="deleteBooking('${b.id}')" style="padding:8px">🗑️ Delete — CLICK</button>
+        <a href="tel:${b.phone||''}" class="btn btnGreen" style="padding:8px;text-decoration:none">📞 Call</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterBookings(){
+  const q=document.getElementById('searchBookings').value.toLowerCase();
+  const filtered=ceoBookingsCache.filter(b=>(b.clientName||'').toLowerCase().includes(q)||(b.phone||'').includes(q));
+  renderBookings(filtered);
+}
+window.filterBookings=filterBookings;
+
+function viewBooking(id){
+  const b=ceoBookingsCache.find(x=>x.id===id);
+  if(!b) return alert('Not found');
+  alert(`ID: ${b.id}\nClient: ${b.clientName}\nPhone: ${b.phone}\nNurse: ${b.nurseName}\nAmount: ${b.currency||'GHS'} ${b.amount}\nStatus: ${b.status}\nDate: ${b.time?new Date(b.time).toLocaleString():''}`);
+}
+window.viewBooking=viewBooking;
+
+function deleteBooking(id){
+  console.log('deleteBooking clicked', id);
+  if(!confirm('Delete booking '+id+'?')) return;
+  if(prompt('Type DELETE:')!=='DELETE') return;
+  db.ref('bookings/'+id).remove();
+  db.ref('jobOffers/'+id).remove();
+  const b=ceoBookingsCache.find(x=>x.id===id);
+  if(b&&b.nurseId){ db.ref('nurseBookings/'+b.nurseId+'/'+id).remove(); }
+  alert('✅ Deleted '+id);
+  loadBookings();
+}
+window.deleteBooking=deleteBooking;
+
+function deleteAllBookings(){
+  console.log('deleteAllBookings clicked');
+  if(!confirm('Delete ALL '+ceoBookingsCache.length+' bookings?')) return;
+  if(prompt('Type DELETE ALL:')!=='DELETE ALL') return;
+  ceoBookingsCache.forEach(b=>{
+    db.ref('bookings/'+b.id).remove();
+    db.ref('jobOffers/'+b.id).remove();
+  });
+  alert('Deleted all');
+  loadBookings();
+}
+window.deleteAllBookings=deleteAllBookings;
+
+function exportBookingsCSV(){
+  console.log('exportBookingsCSV clicked');
+  if(!ceoBookingsCache.length){ alert('No bookings'); return; }
+  let csv='ID,Client,Nurse,Phone,Amount,Currency,Status,Date\n';
+  ceoBookingsCache.forEach(b=>{
+    csv+=`"${b.id}","${b.clientName||''}","${b.nurseName||''}","${b.phone||''}","${b.amount||''}","${b.currency||''}","${b.status||''}","${b.time?new Date(b.time).toLocaleString():''}"\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='BOOKINGS-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  alert('Exported '+ceoBookingsCache.length+' bookings — CSV downloaded');
+}
+window.exportBookingsCSV=exportBookingsCSV;
+
+// RATES
+function loadRates(){
+  console.log('loadRates clicked');
+  db.ref('config/rates').on('value', (snap)=>{
+    if(snap.exists()){
+      const v=snap.val();
+      document.getElementById('rateGHS').value=v.GHS?.hourly||15;
+      document.getElementById('rateUSD').value=v.USD?.hourly||5;
+      document.getElementById('rateMsg').textContent='📡 Live rates: GHS '+(v.GHS?.hourly||15)+' /hr — Book-nurse pages auto-update — Buttons fixed';
+    }
+  });
+}
+window.loadRates=loadRates;
+
+function saveRates(){
+  console.log('saveRates clicked');
+  const ghs=parseFloat(document.getElementById('rateGHS').value)||15;
+  const usd=parseFloat(document.getElementById('rateUSD').value)||5;
+  db.ref('config/rates').set({GHS:{hourly:ghs},USD:{hourly:usd},lastUpdated:Date.now(),lastUpdatedBy:'CEO',ceoEmail:'lovecareglobal@gmail.com'}).then(()=>{
+    document.getElementById('rateMsg').textContent='✅ Saved GHS '+ghs+' USD '+usd+' — LIVE! Book-nurse pages now use GHS '+ghs+'/hr';
+    alert('✅ Rates saved! All book-nurse pages now use GHS '+ghs+'/hr');
+  }).catch(e=>alert('Error: '+e.message));
+}
+window.saveRates=saveRates;
+
+// === CEO LIVE MONITORING - PAGE 5 ===
+function initCEOLiveMap(){
+  if(ceoLiveMap) return;
+  ceoLiveMap = L.map('ceoLiveMap',{zoomControl:false}).setView([5.6037,-0.1870], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(ceoLiveMap);
+}
+window.initCEOLiveMap=initCEOLiveMap;
+
+function createCEONurseIcon(isSOS){
+  return L.divIcon({className:'', html:`<div class="nurse-blink ${isSOS?'sosBlink':''}"><div class="nurse-blink-pulse"></div><div class="nurse-blink-dot"></div></div>`, iconSize:[32,32], iconAnchor:[16,16]});
+}
+function createCEOClientIcon(){
+  return L.divIcon({className:'', html:`<div class="clientPin"><span>👤</span></div>`, iconSize:[28,28], iconAnchor:[14,28]});
+}
+function calcDistCEO(lat1,lng1,lat2,lng2){
+  const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function formatETACEO(km){const mins=Math.round(km/30*60); return mins<60?mins+' min': Math.floor(mins/60)+'h '+mins%60+'m';}
+
+function loadCEOLiveMonitoring(){
+  console.log('loadCEOLiveMonitoring clicked — CEO lively monitoring');
+  initCEOLiveMap();
+  const listEl=document.getElementById('ceoLiveList');
+  if(listEl) listEl.innerHTML='Loading CEO live monitoring... Listening to ceoBookings where nurse accepted and live tracking active — Buttons fixed';
+  
+  db.ref('ceoBookings').on('value', snap=>{
+    const bookings=[];
+    if(snap.exists()){
+      snap.forEach(child=>{
+        const v=child.val(); const id=child.key;
+        const status=(v.status||'').toLowerCase();
+        if(v.nurseLiveTracking || ['accepted','en_route','enroute','on_the_way','arrived','in_progress'].includes(status)){
+          bookings.push({...v, id, bookingId:id});
+        }
+      });
+    }
+    ceoLiveBookings=bookings.sort((a,b)=>(b.time||0)-(a.time||0));
+    renderCEOLiveList();
+    updateCEOLiveMap();
+    document.getElementById('debugTop').textContent='CEO Live: '+bookings.length+' active nurses tracked live';
+  });
+
+  db.ref('nurseLiveLocations').on('value', snap=>{
+    if(!snap.exists()) return;
+    snap.forEach(child=>{
+      const loc=child.val(); const nurseId=child.key;
+      const booking=ceoLiveBookings.find(b=>b.nurseId===nurseId);
+      if(booking){
+        updateCEONurseMarker(booking.bookingId, loc.lat||loc.latitude, loc.lng||loc.longitude, loc.isSOS||false, loc);
+      }
+    });
+  });
+}
+window.loadCEOLiveMonitoring=loadCEOLiveMonitoring;
+
+function updateCEONurseMarker(bookingId, lat, lng, isSOS, loc){
+  const booking=ceoLiveBookings.find(b=>b.bookingId===bookingId);
+  if(!booking) return;
+  booking.nurseLat=lat; booking.nurseLng=lng; booking.lastUpdate=Date.now(); booking.isSOS=isSOS; booking.liveData=loc;
+  
+  if(ceoLiveMarkers[bookingId]){
+    ceoLiveMarkers[bookingId].setLatLng([lat,lng]);
+  } else {
+    ceoLiveMarkers[bookingId]=L.marker([lat,lng],{icon:createCEONurseIcon(isSOS)}).addTo(ceoLiveMap);
+    ceoLiveMarkers[bookingId].on('click',()=>focusCEOLive(bookingId));
+  }
+  
+  const dist = (booking.clientLat&&booking.clientLng)? calcDistCEO(lat,lng,booking.clientLat,booking.clientLng):0;
+  ceoLiveMarkers[bookingId].bindPopup(`<b>${booking.nurseName||'Nurse'}</b> ${isSOS?'🆘 SOS':''}<br>Client: ${booking.clientName||''}<br>${dist.toFixed(2)} km • ETA ${formatETACEO(dist)}`);
+  
+  if(!ceoLiveTrails[bookingId]) ceoLiveTrails[bookingId]=[];
+  ceoLiveTrails[bookingId].push([lat,lng]);
+  if(ceoLiveTrails[bookingId].length>40) ceoLiveTrails[bookingId].shift();
+  
+  if(booking.clientLat&&booking.clientLng){
+    if(ceoLiveRoutes[bookingId]) ceoLiveMap.removeLayer(ceoLiveRoutes[bookingId]);
+    ceoLiveRoutes[bookingId]=L.polyline([[lat,lng],[booking.clientLat,booking.clientLng]],{color:isSOS?'#ef4444':'#22c55e',weight:3,dashArray:'10 10'}).addTo(ceoLiveMap);
+  }
+  
+  if(ceoLiveFollow) centerAllNursesMap();
+  renderCEOLiveList();
+}
+window.updateCEONurseMarker=updateCEONurseMarker;
+
+function updateCEOLiveMap(){
+  const activeIds=new Set(ceoLiveBookings.map(b=>b.bookingId));
+  Object.keys(ceoLiveMarkers).forEach(id=>{ if(!activeIds.has(id)){ ceoLiveMap.removeLayer(ceoLiveMarkers[id]); delete ceoLiveMarkers[id]; } });
+  
+  ceoLiveBookings.forEach(b=>{
+    const nLat=b.nurseLat||b.nurseLiveLat, nLng=b.nurseLng||b.nurseLiveLng, cLat=b.clientLat, cLng=b.clientLng;
+    if(nLat&&nLng && !ceoLiveMarkers[b.bookingId]){
+      ceoLiveMarkers[b.bookingId]=L.marker([nLat,nLng],{icon:createCEONurseIcon(b.isSOS||false)}).addTo(ceoLiveMap);
+    }
+    if(cLat&&cLng && !ceoLiveClientMarkers[b.bookingId]){
+      ceoLiveClientMarkers[b.bookingId]=L.marker([cLat,cLng],{icon:createCEOClientIcon()}).addTo(ceoLiveMap);
+    }
+  });
+  
+  const activeEl=document.getElementById('ceoLiveActive');
+  const enRouteEl=document.getElementById('ceoLiveEnRoute');
+  const sosEl=document.getElementById('ceoLiveSOS');
+  const totalEl=document.getElementById('ceoLiveTotal');
+  if(activeEl) activeEl.textContent=ceoLiveBookings.length;
+  if(enRouteEl) enRouteEl.textContent=ceoLiveBookings.filter(b=>['en_route','enroute'].includes((b.status||'').toLowerCase())).length;
+  if(sosEl) sosEl.textContent=ceoLiveBookings.filter(b=>b.isSOS).length;
+  if(totalEl) totalEl.textContent=ceoLiveBookings.length;
+}
+window.updateCEOLiveMap=updateCEOLiveMap;
+
+function renderCEOLiveList(){
+  const filter=document.getElementById('ceoLiveFilter')?.value||'all';
+  const search=(document.getElementById('ceoLiveSearch')?.value||'').toLowerCase();
+  let filtered=ceoLiveBookings;
+  if(filter==='en_route') filtered=filtered.filter(b=>['en_route','enroute','on_the_way'].includes((b.status||'').toLowerCase()));
+  if(filter==='accepted') filtered=filtered.filter(b=>(b.status||'').toLowerCase()==='accepted');
+  if(filter==='sos') filtered=filtered.filter(b=>b.isSOS);
+  if(search) filtered=filtered.filter(b=>(b.nurseName||'').toLowerCase().includes(search)||(b.clientName||'').toLowerCase().includes(search)||(b.phone||'').includes(search));
+  
+  const list=document.getElementById('ceoLiveList');
+  if(!filtered.length){
+    list.innerHTML='<div style="padding:20px;text-align:center;color:#6b7280;font-size:12px">No live nurses currently on way<br>When nurse accepts booking via my-job-offer, they appear here with blinking green dot moving live to client<br>CEO monitors every move at a time<br><br>Click Refresh Live to reload — Buttons fixed with window.*</div>';
+    return;
+  }
+  
+  list.innerHTML=filtered.map(b=>{
+    const dist=(b.nurseLat&&b.clientLat)?calcDistCEO(b.nurseLat,b.nurseLng,b.clientLat,b.clientLng):0;
+    const isSOS=b.isSOS;
+    return `<div style="padding:10px;border-radius:12px;background:${isSOS?'rgba(239,68,68,.15)':'#1a1040'};border:1px solid ${isSOS?'#ef4444':'#a855f733'};margin-bottom:8px;cursor:pointer" onclick="focusCEOLive('${b.bookingId}')">
+      <div style="display:flex;justify-content:space-between"><b>${b.nurseName||'Nurse'} → ${b.clientName||'Client'}</b><small style="color:${isSOS?'#ef4444':'#22c55e'}">${(b.status||'accepted').toUpperCase()} ${isSOS?'🆘':''}</small></div>
+      <small style="color:#a78bfa">📍 ${dist?dist.toFixed(2)+' km • ETA '+formatETACEO(dist):'Calculating route'} • ${b.currency||'GHS'} ${b.amount||0} • ${b.phone||''}</small><br>
+      <small style="color:#6b7280">Last: ${b.lastUpdate?new Date(b.lastUpdate).toLocaleTimeString():'Waiting GPS'} • ${b.liveData? 'Speed '+Math.round((b.liveData.speed||0)*3.6)+' km/h' : ''}</small>
+      <div style="display:flex;gap:4px;margin-top:6px"><button type="button" class="btn btnDark" style="padding:6px;font-size:10px" onclick="event.stopPropagation();focusCEOLive('${b.bookingId}')">📍 Focus — CLICK</button><button type="button" class="btn btnGreen" style="padding:6px;font-size:10px" onclick="event.stopPropagation();window.open('tel:${b.phone||''}')">📞 Client — CLICK</button></div>
+    </div>`;
+  }).join('');
+}
+window.renderCEOLiveList=renderCEOLiveList;
+
+function focusCEOLive(id){
+  console.log('focusCEOLive clicked', id);
+  const b=ceoLiveBookings.find(x=>x.bookingId===id);
+  if(!b) return;
+  if(b.nurseLat&&b.nurseLng) ceoLiveMap.flyTo([b.nurseLat,b.nurseLng],15);
+  else if(b.clientLat&&b.clientLng) ceoLiveMap.flyTo([b.clientLat,b.clientLng],14);
+}
+window.focusCEOLive=focusCEOLive;
+
+function centerAllNursesMap(){
+  console.log('centerAllNursesMap clicked');
+  const all=[]; Object.values(ceoLiveMarkers).forEach(m=>all.push(m.getLatLng())); Object.values(ceoLiveClientMarkers).forEach(m=>all.push(m.getLatLng()));
+  if(all.length) ceoLiveMap.fitBounds(L.latLngBounds(all).pad(0.2)); else ceoLiveMap.setView([5.6037,-0.1870],11);
+}
+window.centerAllNursesMap=centerAllNursesMap;
+
+function toggleFollowCEO(){
+  ceoLiveFollow=!ceoLiveFollow;
+  const btn=document.getElementById('followBtnCEO');
+  if(btn) btn.textContent=ceoLiveFollow?'📍 Follow: ON — CLICK':'📍 Follow: OFF — CLICK';
+  console.log('toggleFollowCEO', ceoLiveFollow);
+}
+window.toggleFollowCEO=toggleFollowCEO;
+
+function filterCEOLive(){ renderCEOLiveList(); }
+window.filterCEOLive=filterCEOLive;
+
+// INIT - FIXED AUTH
+firebase.auth().onAuthStateChanged(user=>{
+  const authEl=document.getElementById('authStatus');
+  if(user){
+    authEl.textContent='Auth: ✅ '+ (user.isAnonymous?'Anonymous':'CEO');
+    authEl.style.color='#4ade80';
+  } else {
+    authEl.textContent='Auth: Signing in anonymously...';
+    firebase.auth().signInAnonymously().then(()=>{ authEl.textContent='Auth: ✅ Anonymous — Buttons fixed'; authEl.style.color='#4ade80'; }).catch(e=>{
+      authEl.textContent='Auth: ❌ '+e.message+' — Enable Anonymous in Firebase Console > Authentication';
+      authEl.style.color='#ef4444';
+      document.getElementById('ceoChatStatus').innerHTML='⚠️ Firebase Auth Error: '+e.message+'<br>Fix: Go to Firebase Console > Authentication > Sign-in method > Enable Anonymous<br>Then hard refresh Ctrl+Shift+R';
+    });
+  }
+});
+
+setTimeout(()=>{ loadPendingFirebase(); loadBookings(); loadRates(); }, 1000);
+
+// Global error handler
+window.addEventListener('error', (e)=>{
+  console.error('JS Error:', e.message, e.filename, e.lineno);
+  const top=document.getElementById('debugTop');
+  if(top) top.textContent='⚠️ JS Error: '+e.message+' — Check F12 console — Buttons may fail';
+  const status=document.getElementById('ceoChatStatus');
+  if(status){ status.innerHTML='⚠️ JS Error: '+e.message+' — Hard refresh Ctrl+Shift+R — Check console F12'; status.style.background='rgba(239,68,68,.2)'; }
+});
+
+console.log('CEO Dashboard ALL BUTTONS FIXED loaded — All functions attached to window.*');
+</script>
+</body>
+</html>
