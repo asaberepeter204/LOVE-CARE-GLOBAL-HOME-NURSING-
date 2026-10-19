@@ -1,13 +1,10 @@
 {
   "name": "LOVE CARE GLOBAL HOME NURSING",
   "short_name": "LoveCare Global",
-  "description": "Your health, our heart. Licensed nurses to your doorstep - 24/7 in 8 countries. Book verified nurses with live GPS tracking, video profiles, ratings, secure Paystack GHS/USD, SOS emergency, real-time accept/reject notifications.",
-  "start_url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/",
-  "scope": "/LOVE-CARE-GLOBAL-HOME-NURSING-/",
+  "description": "Your health, our heart. Licensed nurses to your doorstep - 24/7 in 8 countries. Book verified nurses with live GPS tracking, video profiles, ratings, secure Paystack GHS/USD, SOS emergency, real-time accept/reject notifications and alerts.",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone"
-  ],
   "orientation": "any",
   "theme_color": "#a855f7",
   "background_color": "#0e0a1c",
@@ -20,76 +17,70 @@
   ],
   "icons": [
     {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-72x72.png",
+      "src": "./icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-96x96.png",
+      "src": "./icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-128x128.png",
+      "src": "./icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-192x192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-192x192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-512x512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-512x512.png",
+      "src": "./icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-transparent-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "screenshots": [
     {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-512x512.png",
+      "src": "./icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide",
       "label": "LOVE CARE GLOBAL - Book nurses instantly"
     },
     {
-      "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-512x512.png",
+      "src": "./icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
@@ -101,10 +92,10 @@
       "name": "Book a Nurse",
       "short_name": "Book",
       "description": "Book a verified nurse now",
-      "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/book-nurse.html",
+      "url": "./book-nurse.html",
       "icons": [
         {
-          "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-192x192.png",
+          "src": "./icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -114,10 +105,10 @@
       "name": "My Bookings",
       "short_name": "Bookings",
       "description": "Track your bookings live",
-      "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/my-bookings.html",
+      "url": "./my-bookings.html",
       "icons": [
         {
-          "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-192x192.png",
+          "src": "./icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -127,10 +118,10 @@
       "name": "Alerts",
       "short_name": "Alerts",
       "description": "Real-time alerts",
-      "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/alerts.html",
+      "url": "./alerts.html",
       "icons": [
         {
-          "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-192x192.png",
+          "src": "./icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -140,10 +131,10 @@
       "name": "SOS Emergency",
       "short_name": "SOS",
       "description": "Emergency SOS",
-      "url": "/LOVE-CARE-GLOBAL-HOME-NURSING-/sos.html",
+      "url": "./sos.html",
       "icons": [
         {
-          "src": "/LOVE-CARE-GLOBAL-HOME-NURSING-/icon-192x192.png",
+          "src": "./icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
