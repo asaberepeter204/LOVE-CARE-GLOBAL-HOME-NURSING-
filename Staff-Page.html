@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Staff Page - All CEO Features Except Group Chat | LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;overflow-x:hidden}
+.header{position:sticky;top:0;z-index:100;background:#1a1040;border-bottom:2px solid #a855f7;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.22);border-radius:18px;padding:16px;margin:12px;position:relative;z-index:1}
+.btn{border:none;border-radius:12px;padding:14px 20px;font-weight:900;cursor:pointer;margin:5px;font-size:13px;transition:.15s;pointer-events:auto!important;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;z-index:10;min-height:48px;display:inline-flex;align-items:center;justify-content:center}
+.btn:active{transform:scale(0.93)!important}
+.btnGreen{background:linear-gradient(135deg,#16a34a,#4ade80);color:white}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
+.btnRed{background:linear-gradient(135deg,#dc2626,#ef4444);color:white}
+.btnYellow{background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a}
+.btnGray{background:rgba(255,255,255,.1);color:#d8b4fe;border:1px solid rgba(168,85,247,.22)}
+.btnDark{background:rgba(76,29,149,.28);border:1px solid rgba(168,85,247,.28);color:#d8b4fe}
+.btnLive{background:linear-gradient(135deg,#22c55e,#86efac);color:#052e16;box-shadow:0 4px 16px rgba(34,197,94,.45);border:2px solid #22c55e;animation:livePulse 2s infinite}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}50%{box-shadow:0 0 0 10px rgba(34,197,94,0)}}
+.page{display:none}.page.active{display:block}
+.dot{width:14px;height:14px;border-radius:50%;background:#333;display:inline-block;margin:3px}
+.dot.active{background:#a855f7;box-shadow:0 0 12px #a855f7}
+input,select{padding:12px;border-radius:12px;border:1px solid rgba(168,85,247,.22);background:#0e0a1c;color:white;width:100%;font-size:13px}
+#ceoLiveMap{width:100%;height:520px;border-radius:16px;background:#0e0a1c;border:2px solid rgba(34,197,94,.4)}
+
+/* STAFF LOGIN OVERLAY - MUST SIGN IN BEFORE ACCESS */
+#staffLoginOverlay{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,rgba(14,10,28,.98),rgba(42,26,82,.98));backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:16px}
+.loginCard{background:linear-gradient(180deg,rgba(42,26,82,.98),rgba(20,12,44,.98));border:2px solid rgba(168,85,247,.4);border-radius:24px;max-width:420px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(168,85,247,.2)}
+.loginLogo{width:64px;height:64px;border-radius:18px;background:white;display:grid;place-items:center;font-size:32px;margin:0 auto 16px;box-shadow:0 8px 24px rgba(168,85,247,.4)}
+.staffBadge{padding:4px 10px;border-radius:999px;font-size:9px;font-weight:900;background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.25);display:inline-block}
+.nurse-blink{position:relative;width:32px;height:32px}
+.nurse-blink-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;background:#22c55e;border-radius:50%;border:3px solid white;box-shadow:0 0 14px rgba(34,197,94,.9);z-index:2}
+.nurse-blink-pulse{position:absolute;top:50%;left:50%;width:16px;height:16px;background:rgba(34,197,94,.5);border-radius:50%;animation:blinkPulse 2s infinite}
+@keyframes blinkPulse{0%{transform:translate(-50%,-50%) scale(.8);opacity:1}50%{transform:translate(-50%,-50%) scale(1.8);opacity:.6}100%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
+.clientPin{width:28px;height:28px;background:#f59e0b;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;display:grid;place-items:center}
+.clientPin span{transform:rotate(45deg);font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- STAFF LOGIN - MUST SIGN IN BEFORE ACCESS - CEO CREATES PASSWORD FOR EACH -->
+<div id="staffLoginOverlay">
+<div class="loginCard">
+<div class="loginLogo">👥</div>
+<div style="text-align:center;margin-bottom:16px">
+<h2 style="color:#f3e8ff;font-size:20px;font-weight:900">Staff Login</h2>
+<p style="font-size:12px;color:#a78bfa;margin:6px 0">LOVE CARE GLOBAL HOME NURSING</p>
+<span class="staffBadge">STAFF ONLY — CEO Creates Password For Each</span>
+<p style="font-size:10px;color:#6b7280;margin-top:8px">Enter your Staff Email and Password created by CEO (lovecareglobal@gmail.com). CEO can change your password anytime.</p>
+</div>
+
+<div style="display:grid;gap:12px">
+<label style="font-size:11px;color:#d8b4fe;font-weight:800">Staff Email / Username</label>
+<input id="staffEmail" type="text" placeholder="e.g., staff1@lovecareglobal.com or staff1" autocomplete="username">
+<label style="font-size:11px;color:#d8b4fe;font-weight:800">Password (Created by CEO)</label>
+<input id="staffPassword" type="password" placeholder="Password given by CEO" autocomplete="current-password" onkeydown="if(event.key==='Enter') staffLogin()">
+<div id="staffLoginStatus" style="padding:10px;border-radius:12px;background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.15);font-size:11px;color:#a78bfa;min-height:36px">Enter your credentials — CEO creates password for each staff individually</div>
+<button type="button" class="btn btnLive" onclick="staffLogin()" style="width:100%;padding:16px;font-size:14px">🔐 Sign In — Staff Access</button>
+<button type="button" class="btn btnDark" onclick="staffForgot()" style="width:100%">❓ Forgot Password? Contact CEO</button>
+</div>
+
+<div style="margin-top:16px;padding:10px;background:rgba(14,10,28,.5);border-radius:12px;border:1px dashed rgba(168,85,247,.2)">
+<small style="font-size:9px;color:#6b7280"><b>How Staff Login Works:</b><br>
+• CEO creates password for each staff in CEO Dashboard → Staff Management (ceo-staff-manager.html)<br>
+• Staff uses that Email + Password to access staff-page.html<br>
+• CEO can change each person's password anytime — Old password stops working instantly<br>
+• Staff cannot access nurses group chat controls (exempted) — Only CEO can<br>
+• All other CEO features: Pending, Approved, Bookings, Pricing, Live Monitoring — Included<br>
+• Firebase path: staffAccounts/{email_sanitized} = {email, password, name, role, active}</small>
+</div>
+
+<div style="margin-top:12px;text-align:center">
+<a href="./index.html" style="font-size:11px;color:#a78bfa;text-decoration:none">← Back to Home</a> • 
+</div>
+</div>
+</div>
+
+<!-- MAIN STAFF DASHBOARD - ALL CEO FEATURES EXCEPT GROUP CHAT BLOCK -->
+<div id="staffMain" style="display:none">
+
+<div class="header">
+<div>
+<b>👥 STAFF DASHBOARD — All CEO Features Except Group Chat</b><br>
+<small style="color:#a78bfa">Staff: <span id="staffNameDisplay" style="color:#86efac;font-weight:900">Staff</span> | Role: <span id="staffRoleDisplay">Staff</span> | Page <span id="pageNum">1</span>/5 | <span style="color:#4ade80">● LIVE</span> | <span id="authStatus" style="color:#facc15">Auth: Checking...</span></small><br>
+<small style="color:#6b7280;font-size:9px">Group Chat Controls Exempted — Only CEO can access group chat master controls</small>
+</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<button type="button" class="btn btnLive" onclick="goTo(5)" style="font-size:11px">👑 LIVE MONITORING</button>
+<button type="button" class="btn btnBlue" onclick="window.open('./nurses-group-chat.html','_blank')" style="font-size:11px">💬 Nurse Group Chat</button>
+<button type="button" class="btn btnBlue" onclick="window.open('./nurses-geoup-chat.html','_blank')" style="font-size:11px">💬 Nurses Geoup Chat</button>
+<button type="button" class="btn btnDark" onclick="staffLogout()" style="font-size:11px">🚪 Logout</button>
+<button type="button" class="btn btnGray" onclick="location.href='index.html'" style="font-size:11px">Home</button>
+</div>
+</div>
+
+<div style="text-align:center;padding:10px;background:rgba(14,10,28,.6)">
+<span class="dot active" id="dot1"></span><span class="dot" id="dot2"></span><span class="dot" id="dot3"></span><span class="dot" id="dot4"></span><span class="dot" id="dot5"></span>
+<span style="font-size:10px;color:#6b7280;margin-left:10px" id="debugTop">Staff Page — All CEO features except group chat block — Sign-in required</span>
+</div>
+
+<!-- PAGE 1 - PENDING (GROUP CHAT BLOCK EXEMPTED) -->
+<div id="page1" class="page active">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<h3>⏳ PENDING REGISTRATIONS — Staff Access</h3>
+<span class="staffBadge">Staff View — Group Chat Controls Removed</span>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+<button type="button" class="btn btnGreen" onclick="loadPendingFirebase()">🔄 Reload Pending</button>
+<button type="button" class="btn btnBlue" onclick="window.open('./nurses-group-chat.html','_blank')" style="font-size:12px">💬 Nurses Group Chat → Open nurses-group-chat.html</button>
+<button type="button" class="btn btnBlue" onclick="goTo(2)">Page 2 Approved →</button>
+<button type="button" class="btn btnLive" onclick="goTo(5)">👑 LIVE MONITORING →</button>
+<button type="button" class="btn btnBlue" onclick="goTo(3)">Page 3 Bookings →</button>
+</div>
+<input id="searchPending" placeholder="🔍 Search name/email/phone..." oninput="filterPending()" style="margin-bottom:8px">
+<div id="pendingCount" style="font-size:12px;color:#facc15">0 pending</div>
+<div id="ceoNurseApplicationsList" style="max-height:800px;overflow:auto;background:#0e0a1c;border-radius:12px;padding:10px;margin-top:8px">Click Reload Pending</div>
+</div>
+</div>
+
+<!-- PAGE 2 - APPROVED -->
+<div id="page2" class="page">
+<div class="card">
+<h3>✅ APPROVED NURSES — Staff Access</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+<button type="button" class="btn btnGreen" onclick="loadApprovedFirebase()">🔄 Load Approved</button>
+<button type="button" class="btn btnGray" onclick="goTo(1)">← Page 1</button>
+<button type="button" class="btn btnLive" onclick="goTo(5)">👑 LIVE MONITORING →</button>
+<button type="button" class="btn btnBlue" onclick="goTo(3)">Page 3 →</button>
+</div>
+<input id="searchApproved" placeholder="Search approved..." oninput="filterApproved()" style="margin-bottom:8px">
+<div id="ceoVerifiedNursesList" style="background:#0e0a1c;padding:10px;border-radius:12px">No approved yet</div>
+</div>
+</div>
+
+<!-- PAGE 3 - BOOKINGS -->
+<div id="page3" class="page">
+<div class="card" style="border:2px solid #f59e0b">
+<h3 style="color:#facc15">📋 CLIENT BOOKINGS — Staff Access — Delete & Export</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+<button type="button" class="btn btnBlue" onclick="loadBookings()">🔄 Reload Bookings</button>
+<button type="button" class="btn btnYellow" onclick="exportBookingsCSV()">📥 Export CSV</button>
+<button type="button" class="btn btnRed" onclick="deleteAllBookings()">🗑️ Delete All</button>
+<button type="button" class="btn btnGray" onclick="goTo(2)">← Back</button>
+<button type="button" class="btn btnLive" onclick="goTo(5)">👑 LIVE MONITORING →</button>
+<button type="button" class="btn btnGray" onclick="goTo(4)">Page 4 →</button>
+</div>
+<input id="searchBookings" placeholder="🔍 Search client/nurse/phone..." oninput="filterBookings()" style="margin-bottom:8px">
+<div id="bookingsCount" style="margin:8px 0;color:#facc15;font-size:12px">0 bookings</div>
+<div id="ceoBookingsList" style="max-height:700px;overflow:auto;background:#0e0a1c;padding:10px;border-radius:12px">Click Reload Bookings</div>
+</div>
+</div>
+
+<!-- PAGE 4 - PRICING -->
+<div id="page4" class="page">
+<div class="card">
+<h3>💰 Pricing — Staff Can View & Edit (CEO Configured)</h3>
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0">
+<div>GHS: <input id="rateGHS" type="number" value="15" style="width:120px"></div>
+<div>USD: <input id="rateUSD" type="number" value="5" style="width:120px"></div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button type="button" class="btn btnYellow" onclick="saveRates()">💾 Save Rates</button>
+<button type="button" class="btn btnGray" onclick="goTo(3)">← Page 3</button>
+<button type="button" class="btn btnLive" onclick="goTo(5)">👑 LIVE MONITORING →</button>
+</div>
+<div id="rateMsg" style="margin-top:12px;color:#86efac;font-size:12px">Loading rates...</div>
+</div>
+</div>
+
+<!-- PAGE 5 - LIVE MONITORING -->
+<div id="page5" class="page">
+<div class="card" style="border:2px solid #22c55e;background:linear-gradient(90deg,rgba(34,197,94,.12),rgba(16,185,129,.08))">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div><h3 style="color:#86efac">👑 LIVE MONITORING — All Nurses Moving Live After Accepting Booking</h3>
+<small style="color:#a7f3d0">Staff can monitor every move • Nurses on way to client • Blinking green = Live • Yellow = Client • Red = SOS</small></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<button type="button" class="btn btnGreen" onclick="loadCEOLiveMonitoring()">🔄 Refresh Live</button>
+<button type="button" class="btn btnBlue" onclick="centerAllNursesMap()">🌍 Center All</button>
+<button type="button" class="btn btnDark" onclick="toggleFollowCEO()" id="followBtnCEO">📍 Follow: ON</button>
+<button type="button" class="btn btnGray" onclick="goTo(3)">← Bookings</button>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0">
+<div style="background:#0e0a1c;border-radius:12px;padding:10px;text-align:center"><b id="ceoLiveActive" style="font-size:20px;color:#86efac">0</b><br><small style="font-size:9px;color:#6b7280">ACTIVE NURSES LIVE</small></div>
+<div style="background:#0e0a1c;border-radius:12px;padding:10px;text-align:center"><b id="ceoLiveEnRoute" style="font-size:20px;color:#facc15">0</b><br><small style="font-size:9px;color:#6b7280">EN ROUTE</small></div>
+<div style="background:#0e0a1c;border-radius:12px;padding:10px;text-align:center"><b id="ceoLiveSOS" style="font-size:20px;color:#ef4444">0</b><br><small style="font-size:9px;color:#6b7280">SOS</small></div>
+<div style="background:#0e0a1c;border-radius:12px;padding:10px;text-align:center"><b id="ceoLiveTotal" style="font-size:20px;color:#a78bfa">0</b><br><small style="font-size:9px;color:#6b7280">TOTAL TODAY</small></div>
+</div>
+
+<div id="ceoLiveMap"></div>
+
+<div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap">
+<select id="ceoLiveFilter" onchange="filterCEOLive()" style="padding:10px;border-radius:10px;width:200px;background:#0e0a1c;color:#d8b4fe;border:1px solid rgba(168,85,247,.2)"><option value="all">All Active Live</option><option value="en_route">En Route Only</option><option value="accepted">Accepted Only</option><option value="sos">SOS Only</option></select>
+<input id="ceoLiveSearch" placeholder="Search nurse/client/phone..." oninput="filterCEOLive()" style="flex:1;min-width:180px">
+<button type="button" class="btn btnYellow" onclick="window.open('./ceo-live-monitoring.html','_blank')" style="padding:10px">🔗 Full Live Map</button>
+</div>
+
+<div id="ceoLiveList" style="max-height:500px;overflow:auto;background:#0e0a1c;border-radius:12px;padding:10px">Loading live monitoring...</div>
+</div>
+</div>
+
+<div style="text-align:center;padding:12px">
+<small style="color:#6b7280;font-size:10px">Staff Page — All CEO features except Nurses Group Chat block — Group Chat controls exempted — Only CEO (lovecareglobal@gmail.com) can access group chat master controls in ceo-dashboard.html<br>Staff logged in as <span id="staffFooterName">Staff</span> — Password created by CEO — CEO can change anytime in ceo-staff-manager.html</small>
+</div>
+
+</div>
+
+<script>
+// Firebase
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+
+// Global
+let pendingListCache=[], approvedCache=[], ceoBookingsCache=[], ceoLiveBookings=[], ceoLiveMarkers={}, ceoLiveClientMarkers={}, ceoLiveRoutes={}, ceoLiveTrails={}, ceoLiveMap=null, ceoLiveFollow=true, currentStaff=null;
+
+// === STAFF AUTHENTICATION - CEO CREATES PASSWORD FOR EACH ===
+function sanitizeEmail(email){
+  return email.toLowerCase().replace(/[^a-z0-9]/g,'_');
+}
+
+function staffLogin(){
+  const emailInput=document.getElementById('staffEmail').value.trim();
+  const passwordInput=document.getElementById('staffPassword').value.trim();
+  const status=document.getElementById('staffLoginStatus');
+  
+  if(!emailInput || !passwordInput){
+    status.textContent='❌ Enter both Email and Password';
+    status.style.background='rgba(239,68,68,.15)';
+    status.style.borderColor='rgba(239,68,68,.3)';
+    status.style.color='#fca5a5';
+    return;
+  }
+  
+  status.textContent='🔐 Checking credentials...';
+  status.style.background='rgba(168,85,247,.15)';
+  status.style.color='#d8b4fe';
+  
+  const sanitized=sanitizeEmail(emailInput);
+  
+  // Check staffAccounts path
+  db.ref('staffAccounts/'+sanitized).once('value').then(snap=>{
+    if(!snap.exists()){
+      status.textContent='❌ Staff account not found: '+emailInput+' — Contact CEO (lovecareglobal@gmail.com) to create password for you';
+      status.style.background='rgba(239,68,68,.15)';
+      status.style.color='#fca5a5';
+      return;
+    }
+    
+    const data=snap.val();
+    if(!data.active){
+      status.textContent='❌ Account disabled by CEO — Contact CEO';
+      status.style.background='rgba(239,68,68,.15)';
+      status.style.color='#fca5a5';
+      return;
+    }
+    
+    // Check password (plain comparison - in production hash)
+    if(data.password!==passwordInput){
+      status.textContent='❌ Wrong password for '+emailInput+' — CEO can change your password anytime in ceo-staff-manager.html';
+      status.style.background='rgba(239,68,68,.15)';
+      status.style.color='#fca5a5';
+      // Log failed attempt
+      db.ref('staffLoginLogs').push({email:emailInput, time:Date.now(), success:false, ip:'client'});
+      return;
+    }
+    
+    // Success
+    currentStaff=data;
+    localStorage.setItem('lcg_staff_session', JSON.stringify({email:emailInput, sanitized:sanitized, name:data.name||emailInput, role:data.role||'Staff', time:Date.now()}));
+    
+    status.textContent='✅ Login success — Welcome '+ (data.name||emailInput);
+    status.style.background='rgba(34,197,94,.15)';
+    status.style.color='#86efac';
+    
+    // Log success
+    db.ref('staffLoginLogs').push({email:emailInput, name:data.name, time:Date.now(), success:true});
+    db.ref('staffAccounts/'+sanitized+'/lastLogin').set(Date.now());
+    
+    setTimeout(()=>{ showStaffDashboard(data); }, 800);
+    
+  }).catch(e=>{
+    status.textContent='❌ Error: '+e.message+' — Check internet and Firebase rules';
+    status.style.background='rgba(239,68,68,.15)';
+    status.style.color='#fca5a5';
+  });
+}
+window.staffLogin=staffLogin;
+
+function showStaffDashboard(staffData){
+  document.getElementById('staffLoginOverlay').style.display='none';
+  document.getElementById('staffMain').style.display='block';
+  document.getElementById('staffNameDisplay').textContent=staffData.name||staffData.email;
+  document.getElementById('staffRoleDisplay').textContent=staffData.role||'Staff';
+  document.getElementById('staffFooterName').textContent=staffData.name||staffData.email;
+  document.getElementById('debugTop').textContent='Staff: '+(staffData.name||staffData.email)+' — Group Chat controls exempted — All other CEO features included';
+  
+  // Load data
+  setTimeout(()=>{ loadPendingFirebase(); loadBookings(); loadRates(); }, 500);
+  
+  // Auth status
+  firebase.auth().signInAnonymously().then(()=>{ document.getElementById('authStatus').textContent='Auth: ✅ Staff '+ (staffData.name||''); document.getElementById('authStatus').style.color='#4ade80'; });
+}
+
+function staffLogout(){
+  if(!confirm('Logout staff account?')) return;
+  localStorage.removeItem('lcg_staff_session');
+  currentStaff=null;
+  document.getElementById('staffMain').style.display='none';
+  document.getElementById('staffLoginOverlay').style.display='flex';
+  document.getElementById('staffPassword').value='';
+  document.getElementById('staffLoginStatus').textContent='Logged out — Enter credentials again — CEO can change your password anytime';
+}
+window.staffLogout=staffLogout;
+
+function staffForgot(){
+  alert('❓ Forgot Password?\n\nContact CEO (lovecareglobal@gmail.com) to reset your password.\n\nCEO can create a new password for you in ceo-staff-manager.html — Your old password will stop working instantly when CEO changes it.');
+}
+window.staffForgot=staffForgot;
+
+// Auto-check existing session
+window.addEventListener('DOMContentLoaded', ()=>{
+  const sessionStr=localStorage.getItem('lcg_staff_session');
+  if(sessionStr){
+    try{
+      const session=JSON.parse(sessionStr);
+      const age=Date.now()- (session.time||0);
+      if(age<24*60*60*1000){ // 24h session
+        const sanitized=session.sanitized;
+        db.ref('staffAccounts/'+sanitized).once('value').then(snap=>{
+          if(snap.exists()){
+            const data=snap.val();
+            if(data.active){
+              currentStaff=data;
+              showStaffDashboard(data);
+              document.getElementById('staffEmail').value=session.email;
+            }
+          }
+        });
+      }
+    }catch(e){}
+  }
+  
+  // Firebase anonymous auth for data access
+  firebase.auth().onAuthStateChanged(user=>{
+    const authEl=document.getElementById('authStatus');
+    if(authEl){
+      if(user){ authEl.textContent='Auth: ✅ '+ (user.isAnonymous?'Staff Session':'Staff'); authEl.style.color='#4ade80'; }
+      else { firebase.auth().signInAnonymously().catch(e=>{ authEl.textContent='Auth: ❌ '+e.message; }); }
+    }
+  });
+});
+
+// === ALL CEO FEATURES EXCEPT GROUP CHAT BLOCK - SAME AS CEO DASHBOARD ===
+function goTo(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const page=document.getElementById('page'+n);
+  if(page) page.classList.add('active');
+  document.querySelectorAll('.dot').forEach((d,i)=>{ d.classList.toggle('active', i===(n-1)); });
+  document.getElementById('pageNum').textContent=n;
+  window.scrollTo(0,0);
+  if(n===2) loadApprovedFirebase();
+  if(n===3) loadBookings();
+  if(n===4) loadRates();
+  if(n===5){ setTimeout(()=>{ initCEOLiveMap(); loadCEOLiveMonitoring(); }, 300); }
+}
+window.goTo=goTo;
+
+function loadPendingFirebase(){
+  const el=document.getElementById('ceoNurseApplicationsList');
+  if(el) el.innerHTML='Loading pending...';
+  db.ref('pendingNurses').once('value').then(snap=>{
+    let list=[];
+    if(snap.exists()){ snap.forEach(c=>{ list.push({...c.val(), uid:c.key}); }); }
+    pendingListCache=list;
+    renderPending(list);
+    document.getElementById('pendingCount').textContent=list.length+' pending';
+  });
+}
+window.loadPendingFirebase=loadPendingFirebase;
+
+function renderPending(list){
+  const el=document.getElementById('ceoNurseApplicationsList');
+  if(!list.length){ el.innerHTML='No pending registrations'; return; }
+  el.innerHTML=list.map(n=>`<div style="padding:12px;background:#1a1040;border-radius:10px;margin-bottom:8px;border:1px solid rgba(168,85,247,.2)"><b>${n.fullName||'Nurse'}</b> — ${n.email||''} — ${n.phone||''}<br><small>${n.bio||''}</small><br><div style="margin-top:8px;display:flex;gap:6px"><button type="button" class="btn btnGreen" onclick="approveFirebase('${n.uid}')" style="padding:8px">✅ Approve</button><button type="button" class="btn btnRed" onclick="rejectFirebase('${n.uid}')" style="padding:8px">❌ Reject</button></div></div>`).join('');
+}
+function filterPending(){
+  const q=document.getElementById('searchPending').value.toLowerCase();
+  const filtered=pendingListCache.filter(n=>(n.fullName||'').toLowerCase().includes(q));
+  renderPending(filtered);
+}
+window.filterPending=filterPending;
+function approveFirebase(uid){
+  if(!confirm('Approve '+uid+'?')) return;
+  db.ref('pendingNurses/'+uid).once('value').then(snap=>{
+    let data=snap.val()||{uid}; data.isApproved=true; data.status='approved'; data.approvedAt=Date.now();
+    db.ref('nurses/'+uid).set(data).then(()=>{ db.ref('pendingNurses/'+uid).remove(); alert('Approved'); loadPendingFirebase(); });
+  });
+}
+window.approveFirebase=approveFirebase;
+function rejectFirebase(uid){ if(confirm('Reject '+uid+'?')) db.ref('pendingNurses/'+uid).remove().then(()=>loadPendingFirebase()); }
+window.rejectFirebase=rejectFirebase;
+
+function loadApprovedFirebase(){
+  db.ref('nurses').once('value').then(snap=>{
+    let list=[];
+    if(snap.exists()){ snap.forEach(c=>{ const v=c.val(); if(v.isApproved) list.push({...v, uid:c.key}); }); }
+    approvedCache=list;
+    const el=document.getElementById('ceoVerifiedNursesList');
+    el.innerHTML=list.length? list.map(n=>`<div style="padding:10px;background:#1a1040;border-radius:10px;margin-bottom:8px"><b>${n.fullName}</b> — ${n.email}</div>`).join('') : 'No approved yet';
+  });
+}
+window.loadApprovedFirebase=loadApprovedFirebase;
+function filterApproved(){
+  const q=document.getElementById('searchApproved').value.toLowerCase();
+  const filtered=approvedCache.filter(n=>(n.fullName||'').toLowerCase().includes(q));
+  document.getElementById('ceoVerifiedNursesList').innerHTML=filtered.map(n=>`<div>${n.fullName}</div>`).join('');
+}
+window.filterApproved=filterApproved;
+
+function loadBookings(){
+  db.ref('bookings').once('value').then(snap=>{
+    let list=[];
+    if(snap.exists()){ snap.forEach(c=>{ list.push({id:c.key, ...c.val()}); }); }
+    ceoBookingsCache=list.sort((a,b)=>(b.time||0)-(a.time||0));
+    renderBookings(ceoBookingsCache);
+    document.getElementById('bookingsCount').textContent=list.length+' bookings';
+  });
+}
+window.loadBookings=loadBookings;
+function renderBookings(list){
+  const el=document.getElementById('ceoBookingsList');
+  if(!list.length){ el.innerHTML='No bookings yet'; return; }
+  el.innerHTML=list.slice(0,100).map(b=>`<div style="padding:12px;background:#1a1040;border-radius:12px;margin-bottom:8px;border:1px solid rgba(168,85,247,.2)"><b>${b.clientName||'Client'} → ${b.nurseName||''}</b> — ${b.currency||'GHS'} ${b.amount||0} — ${(b.status||'pending').toUpperCase()}<br><small>${b.phone||''} | ${b.id} | ${b.time?new Date(b.time).toLocaleString():''}</small><br><div style="margin-top:6px;display:flex;gap:6px"><button type="button" class="btn btnBlue" onclick="viewBooking('${b.id}')" style="padding:6px">View</button><button type="button" class="btn btnRed" onclick="deleteBooking('${b.id}')" style="padding:6px">Delete</button></div></div>`).join('');
+}
+function filterBookings(){
+  const q=document.getElementById('searchBookings').value.toLowerCase();
+  const filtered=ceoBookingsCache.filter(b=>(b.clientName||'').toLowerCase().includes(q));
+  renderBookings(filtered);
+}
+window.filterBookings=filterBookings;
+function viewBooking(id){ const b=ceoBookingsCache.find(x=>x.id===id); alert(JSON.stringify(b,null,2)); }
+window.viewBooking=viewBooking;
+function deleteBooking(id){
+  if(!confirm('Delete '+id+'?')) return;
+  if(prompt('Type DELETE:')!=='DELETE') return;
+  db.ref('bookings/'+id).remove(); db.ref('jobOffers/'+id).remove();
+  alert('Deleted'); loadBookings();
+}
+window.deleteBooking=deleteBooking;
+function deleteAllBookings(){
+  if(!confirm('Delete ALL?')) return;
+  if(prompt('Type DELETE ALL:')!=='DELETE ALL') return;
+  ceoBookingsCache.forEach(b=>{ db.ref('bookings/'+b.id).remove(); });
+  alert('Deleted all'); loadBookings();
+}
+window.deleteAllBookings=deleteAllBookings;
+function exportBookingsCSV(){
+  if(!ceoBookingsCache.length){ alert('No bookings'); return; }
+  let csv='ID,Client,Nurse,Phone,Amount,Currency,Status,Date\n';
+  ceoBookingsCache.forEach(b=>{ csv+=`"${b.id}","${b.clientName||''}","${b.nurseName||''}","${b.phone||''}","${b.amount||''}","${b.currency||''}","${b.status||''}","${b.time?new Date(b.time).toLocaleString():''}"\n`; });
+  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='BOOKINGS.csv'; a.click();
+}
+window.exportBookingsCSV=exportBookingsCSV;
+function loadRates(){
+  db.ref('config/rates').on('value', snap=>{
+    if(snap.exists()){
+      const v=snap.val();
+      document.getElementById('rateGHS').value=v.GHS?.hourly||15;
+      document.getElementById('rateUSD').value=v.USD?.hourly||5;
+      document.getElementById('rateMsg').textContent='Live rates: GHS '+(v.GHS?.hourly||15)+' /hr';
+    }
+  });
+}
+window.loadRates=loadRates;
+function saveRates(){
+  const ghs=parseFloat(document.getElementById('rateGHS').value)||15;
+  const usd=parseFloat(document.getElementById('rateUSD').value)||5;
+  db.ref('config/rates').set({GHS:{hourly:ghs},USD:{hourly:usd},lastUpdated:Date.now()}).then(()=>{ document.getElementById('rateMsg').textContent='Saved GHS '+ghs+' USD '+usd; alert('Rates saved'); });
+}
+window.saveRates=saveRates;
+
+// LIVE MONITORING (SAME AS CEO)
+function initCEOLiveMap(){
+  if(ceoLiveMap) return;
+  ceoLiveMap = L.map('ceoLiveMap',{zoomControl:false}).setView([5.6037,-0.1870], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(ceoLiveMap);
+}
+function createCEONurseIcon(isSOS){ return L.divIcon({className:'', html:`<div class="nurse-blink ${isSOS?'sosBlink':''}"><div class="nurse-blink-pulse"></div><div class="nurse-blink-dot"></div></div>`, iconSize:[32,32], iconAnchor:[16,16]}); }
+function createCEOClientIcon(){ return L.divIcon({className:'', html:`<div class="clientPin"><span>👤</span></div>`, iconSize:[28,28], iconAnchor:[14,28]}); }
+function calcDistCEO(lat1,lng1,lat2,lng2){ const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180; const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2; return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
+function formatETACEO(km){const mins=Math.round(km/30*60); return mins<60?mins+' min': Math.floor(mins/60)+'h '+mins%60+'m';}
+function loadCEOLiveMonitoring(){
+  initCEOLiveMap();
+  db.ref('ceoBookings').on('value', snap=>{
+    const bookings=[];
+    if(snap.exists()){ snap.forEach(child=>{ const v=child.val(); const id=child.key; if(v.nurseLiveTracking || ['accepted','en_route','arrived'].includes((v.status||'').toLowerCase())) bookings.push({...v, id, bookingId:id}); }); }
+    ceoLiveBookings=bookings.sort((a,b)=>(b.time||0)-(a.time||0));
+    renderCEOLiveList(); updateCEOLiveMap();
+  });
+  db.ref('nurseLiveLocations').on('value', snap=>{
+    if(!snap.exists()) return;
+    snap.forEach(child=>{
+      const loc=child.val(); const nurseId=child.key;
+      const booking=ceoLiveBookings.find(b=>b.nurseId===nurseId);
+      if(booking) updateCEONurseMarker(booking.bookingId, loc.lat||loc.latitude, loc.lng||loc.longitude, loc.isSOS||false, loc);
+    });
+  });
+}
+window.loadCEOLiveMonitoring=loadCEOLiveMonitoring;
+function updateCEONurseMarker(bookingId, lat, lng, isSOS, loc){
+  const booking=ceoLiveBookings.find(b=>b.bookingId===bookingId);
+  if(!booking) return;
+  booking.nurseLat=lat; booking.nurseLng=lng; booking.lastUpdate=Date.now(); booking.isSOS=isSOS;
+  if(ceoLiveMarkers[bookingId]) ceoLiveMarkers[bookingId].setLatLng([lat,lng]);
+  else ceoLiveMarkers[bookingId]=L.marker([lat,lng],{icon:createCEONurseIcon(isSOS)}).addTo(ceoLiveMap);
+  const dist = (booking.clientLat&&booking.clientLng)? calcDistCEO(lat,lng,booking.clientLat,booking.clientLng):0;
+  ceoLiveMarkers[bookingId].bindPopup(`<b>${booking.nurseName||'Nurse'}</b><br>${dist.toFixed(2)} km • ETA ${formatETACEO(dist)}`);
+  if(booking.clientLat&&booking.clientLng){
+    if(ceoLiveRoutes[bookingId]) ceoLiveMap.removeLayer(ceoLiveRoutes[bookingId]);
+    ceoLiveRoutes[bookingId]=L.polyline([[lat,lng],[booking.clientLat,booking.clientLng]],{color:isSOS?'#ef4444':'#22c55e',weight:3,dashArray:'10 10'}).addTo(ceoLiveMap);
+  }
+  renderCEOLiveList();
+}
+function updateCEOLiveMap(){
+  const activeIds=new Set(ceoLiveBookings.map(b=>b.bookingId));
+  Object.keys(ceoLiveMarkers).forEach(id=>{ if(!activeIds.has(id)){ ceoLiveMap.removeLayer(ceoLiveMarkers[id]); delete ceoLiveMarkers[id]; } });
+  ceoLiveBookings.forEach(b=>{
+    if(b.nurseLat&&b.nurseLng && !ceoLiveMarkers[b.bookingId]) ceoLiveMarkers[b.bookingId]=L.marker([b.nurseLat,b.nurseLng],{icon:createCEONurseIcon(b.isSOS)}).addTo(ceoLiveMap);
+    if(b.clientLat&&b.clientLng && !ceoLiveClientMarkers[b.bookingId]) ceoLiveClientMarkers[b.bookingId]=L.marker([b.clientLat,b.clientLng],{icon:createCEOClientIcon()}).addTo(ceoLiveMap);
+  });
+  document.getElementById('ceoLiveActive').textContent=ceoLiveBookings.length;
+  document.getElementById('ceoLiveEnRoute').textContent=ceoLiveBookings.filter(b=>['en_route'].includes((b.status||'').toLowerCase())).length;
+  document.getElementById('ceoLiveSOS').textContent=ceoLiveBookings.filter(b=>b.isSOS).length;
+  document.getElementById('ceoLiveTotal').textContent=ceoLiveBookings.length;
+}
+function renderCEOLiveList(){
+  const list=document.getElementById('ceoLiveList');
+  if(!ceoLiveBookings.length){ list.innerHTML='No live nurses'; return; }
+  list.innerHTML=ceoLiveBookings.map(b=>{
+    const dist=(b.nurseLat&&b.clientLat)?calcDistCEO(b.nurseLat,b.nurseLng,b.clientLat,b.clientLng):0;
+    return `<div style="padding:10px;background:#1a1040;border-radius:10px;margin-bottom:8px"><b>${b.nurseName||'Nurse'} → ${b.clientName||'Client'}</b><br><small>${dist?dist.toFixed(2)+' km • ETA '+formatETACEO(dist):'Calculating'} • ${b.currency||'GHS'} ${b.amount||0}</small></div>`;
+  }).join('');
+}
+function centerAllNursesMap(){
+  const all=[]; Object.values(ceoLiveMarkers).forEach(m=>all.push(m.getLatLng())); Object.values(ceoLiveClientMarkers).forEach(m=>all.push(m.getLatLng()));
+  if(all.length) ceoLiveMap.fitBounds(L.latLngBounds(all).pad(0.2)); else ceoLiveMap.setView([5.6037,-0.1870],11);
+}
+window.centerAllNursesMap=centerAllNursesMap;
+function toggleFollowCEO(){ ceoLiveFollow=!ceoLiveFollow; document.getElementById('followBtnCEO').textContent=ceoLiveFollow?'📍 Follow: ON':'📍 Follow: OFF'; }
+window.toggleFollowCEO=toggleFollowCEO;
+function filterCEOLive(){ renderCEOLiveList(); }
+window.filterCEOLive=filterCEOLive;
+</script>
+<script>function openGroupChat(){ window.open("./nurses-group-chat.html","_blank"); } window.openGroupChat=openGroupChat;</script></body>
+</html>
