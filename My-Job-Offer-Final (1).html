@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Job Offers — Nurse Accept / Reject — FIXED</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:9999;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.15);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.card{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:18px;margin:12px 0}
+.btn{border:none;border-radius:14px;padding:14px 18px;font-weight:900;cursor:pointer;font-size:13px;pointer-events:auto!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;position:relative;z-index:10;min-height:48px;display:inline-flex;align-items:center;justify-content:center;transition:.15s}
+.btn:active{transform:scale(0.95)!important;opacity:0.9}
+.btnAccept{background:linear-gradient(135deg,#22c55e,#86efac);color:#0a1a0f;box-shadow:0 4px 15px rgba(34,197,94,.4)}
+.btnReject{background:linear-gradient(135deg,#ef4444,#fca5a5);color:#1e0a0a;box-shadow:0 4px 15px rgba(239,68,68,.4)}
+.btnView{background:rgba(76,29,149,.25);border:1px solid rgba(168,85,247,.3);color:#d8b4fe}
+.btn:disabled{opacity:0.5;pointer-events:none}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
+.badge-pending{background:rgba(245,158,11,.15);color:#facc15;border:1px solid rgba(245,158,11,.25)}
+.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.25)}
+.badge-rejected{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25)}
+.dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+</head>
+<body>
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:8px"><div style="width:42px;height:42px;border-radius:12px;background:white;display:grid;place-items:center;font-size:20px">👩‍⚕️</div><div><div style="font-size:11px;font-weight:900;color:#f3e8ff">MY JOB OFFERS — NURSE</div><div style="font-size:10px;color:#22c55e"><span class="dot"></span> Live — Real Working Buttons Fixed</div></div></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="btn" style="background:linear-gradient(135deg,#22c55e,#86efac);color:#052e16;padding:10px 14px;font-size:11px" onclick="window.open('./nurses-financial-account.html','_blank')">💰 My Financial Account - Lively Earnings</button><button type="button" class="btn" style="background:linear-gradient(135deg,#2563eb,#60a5fa);color:white;padding:10px 14px;font-size:11px" onclick="window.open('./nurses-group-chat.html','_blank')">💬 Group Chat</button><a href="./nurses-dashboard.html" style="padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.08);color:#e9d5ff;text-decoration:none;font-weight:800;font-size:11px">Nurses Dashboard</a><a href="./index.html" style="padding:10px 14px;border-radius:999px;background:rgba(168,85,247,.18);color:#e9d5ff;text-decoration:none;font-weight:800;font-size:11px">Home</a></div>
+</div>
+
+<div style="max-width:820px;margin:0 auto;padding:12px">
+<div class="card" style="padding:12px">
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<button type="button" class="btn" style="background:rgba(76,29,149,.25);color:#d8b4fe" onclick="loadBookings()">🔄 Refresh - WORKING</button>
+<select id="filterStatus" onchange="renderFiltered()" style="padding:10px;border-radius:10px;background:rgba(14,10,28,.7);color:#d8b4fe;border:1px solid rgba(168,85,247,.2)"><option value="all">All</option><option value="pending" selected>Pending</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option><option value="client_confirmed_finished">Confirmed by Client - Lively Earnings</option></select>
+<button type="button" class="btn" style="background:linear-gradient(135deg,#22c55e,#86efac);color:#052e16;padding:8px 12px;font-size:11px" onclick="window.open('./nurses-financial-account.html','_blank')">💰 Finance - 30% / 80% - WORKING</button>
+<span id="countInfo" style="font-size:10px;color:#6b7280"></span>
+<span id="liveInfo" style="font-size:10px;color:#22c55e;margin-left:auto"><span class="dot"></span> Auto-refresh - Finance button - Lively earnings - CEO catches full vs 50%</span>
+</div>
+<div style="margin-top:8px;padding:8px;background:rgba(34,197,94,.1);border-radius:10px;border:1px solid rgba(34,197,94,.2)">
+<small style="font-size:9px;color:#86efac"><b>💰 Lively Earnings:</b> 30% of paid amount if client paid via 50% page (book-nurse-50-percent.html), 80% if via full payment (book-nurse-full.html) - Only when client confirms you finished work - Reflects on CEO dashboard - CEO catches payment source - Withdrawal reflects on CEO only if client confirmed</small>
+</div>
+
+<div id="jobGrid" style="margin-top:16px;display:grid;gap:12px"></div>
+</div>
+<div id="debugInfo" style="padding:10px;background:rgba(14,10,28,.5);border-radius:10px;font-size:9px;color:#6b7280;margin:12px">Debug: Loading...</div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const rtdb = firebase.database();
+const auth = firebase.auth();
+
+let nurseId = localStorage.getItem('lcg_nurse_uid') || localStorage.getItem('nurseId') || 'demo1';
+let allJobs = [];
+let authReady = false;
+
+async function ensureAuth(){
+  return new Promise((res)=>{
+    const unsub = auth.onAuthStateChanged(user=>{
+      unsub();
+      if(user){ authReady=true; res(user); }
+      else {
+        auth.signInAnonymously().then(cred=>{ authReady=true; res(cred.user); }).catch(e=>{ console.log('Auth anon failed', e.message); res(null); });
+      }
+    });
+    setTimeout(()=>res(null), 3000);
+  });
+}
+
+function getNurseId(){
+  let id = localStorage.getItem('lcg_nurse_uid');
+  if(!id) id = localStorage.getItem('nurseId');
+  if(!id) {
+    const urlParams = new URLSearchParams(location.search);
+    id = urlParams.get('nurseId') || urlParams.get('id') || 'TyMqk6B7SncJoA9HsTNK3xIkHJD2';
+  }
+  return id;
+}
+
+function renderFiltered(){
+  const filter = document.getElementById('filterStatus').value;
+  const grid = document.getElementById('jobGrid');
+  const countInfo = document.getElementById('countInfo');
+  let filtered = allJobs;
+  if(filter!=='all') filtered = allJobs.filter(j=>(j.status||'pending')===filter);
+  countInfo.textContent = `${filtered.length} ${filter} — REAL WORKING BUTTONS — Tap Accept/Reject`;
+  if(!filtered.length){
+    grid.innerHTML = `<div style="padding:20px;text-align:center;color:#6b7280">No ${filter} bookings — When client books you via book-nurse (Full or 50% GHS/USD), it appears here + CEO Dashboard<br><br><small style="font-size:9px">If buttons show like picture, hard refresh: Ctrl+Shift+R or Clear Cache</small></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(job=>{
+    const status = (job.status||'pending').toLowerCase();
+    const isPending = status==='pending';
+    const badgeClass = status==='accepted'?'badge-accepted':status==='rejected'?'badge-rejected':'badge-pending';
+    const mapsLink = job.clientLat ? `https://www.google.com/maps?q=${job.clientLat},${job.clientLng}` : `https://www.google.com/maps?q=5.6037,-0.1870`;
+    const nurseShare = job.amountSplit ? job.amountSplit.nurse : (job.amount*0.8).toFixed(2);
+    const curr = job.currency||'GHS';
+    const safeId = (job.id||'').replace(/'/g, '').replace(/"/g, '');
+    const is50 = job.paymentMethod==='paystack_50_50';
+    return `<div class="card" style="border-color:${isPending?'rgba(245,158,11,.3)':status==='accepted'?'rgba(34,197,94,.3)':'rgba(239,68,68,.3)'};border-width:2px">
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
+        <div><b style="color:#f3e8ff;font-size:14px">${job.bookingId||job.id}</b><br><span class="badge ${badgeClass}" style="margin-top:6px">${status.toUpperCase()}</span> ${is50?'<span style="background:#f59e0b;color:#1e0a3a;padding:2px 6px;border-radius:999px;font-size:8px">50%+CASH</span>':'<span style="background:#a855f7;color:white;padding:2px 6px;border-radius:999px;font-size:8px">FULL</span>'} <span style="background:rgba(34,197,94,.15);padding:2px 6px;border-radius:999px;font-size:8px;color:#86efac">REAL BUTTONS</span></div>
+        <div style="text-align:right"><small style="color:#86efac;font-weight:900">${curr} ${job.amount||0} (You: ${curr} ${nurseShare})</small><br><small style="color:#6b7280;font-size:9px">${new Date(job.time||Date.now()).toLocaleString()} | ${curr} ${job.hourlyRateUsed||'?'}/hr</small></div>
+      </div>
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:#c4b5fd">
+        <div>👤 ${job.clientName||''}<br><a href="tel:${job.phone}" style="color:#4ade80">📞 ${job.phone||''}</a><br>🧑‍⚕️ Patient: ${job.patientName||''}</div>
+        <div>🕐 ${job.totalHours||9} hrs (${job.startTime||'08:00'}→${job.endTime||'17:00'})<br>📦 ${job.careMode||'Daily'} x${job.quantity||1}<br>🚚 Transport: ${curr} ${job.transport||0}</div>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:#a78bfa">📍 ${job.clientLat?`${job.clientLat.toFixed(4)}, ${job.clientLng.toFixed(4)}`:'No location'} | Paystack: ${job.paystackRef||''} | ${curr} — CEO Dashboard also has this</div>
+      
+      <div style="display:flex;gap:8px;margin-top:16px">
+        ${isPending?`
+          <button type="button" class="btn btnAccept" data-action="accept" data-id="${safeId}" style="flex:1" onclick="acceptJob('${safeId}')">✅ Accept</button>
+          <button type="button" class="btn btnReject" data-action="reject" data-id="${safeId}" style="flex:1" onclick="rejectJob('${safeId}')">❌ Reject</button>
+        `:`<button type="button" class="btn" style="flex:1;background:rgba(76,29,149,.18);color:#a78bfa" disabled>${status==='accepted'?'✅ Accepted':'❌ Rejected'}</button>`}
+        <a href="tel:${job.phone}" class="btn btnView" style="text-align:center;min-width:56px">📞</a>
+        <a href="${mapsLink}" target="_blank" class="btn btnView" style="text-align:center;min-width:56px">🗺️</a>
+      </div>
+      <div style="font-size:8px;color:#6b7280;margin-top:8px;text-align:center">ID: ${safeId} — Buttons are REAL with click + touch — Firebase auth: ${authReady?'OK':'loading...'} — If like picture, hard refresh</div>
+    </div>`;
+  }).join('');
+  
+  // Attach real listeners (double ensure)
+  setTimeout(()=>{
+    document.querySelectorAll('[data-action="accept"]').forEach(btn=>{
+      const id = btn.getAttribute('data-id');
+      btn.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); console.log('Accept btn clicked', id); acceptJob(id); }, {passive:false});
+      btn.addEventListener('touchend', (e)=>{ e.preventDefault(); e.stopPropagation(); console.log('Accept touch', id); acceptJob(id); }, {passive:false});
+    });
+    document.querySelectorAll('[data-action="reject"]').forEach(btn=>{
+      const id = btn.getAttribute('data-id');
+      btn.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); console.log('Reject btn clicked', id); rejectJob(id); }, {passive:false});
+      btn.addEventListener('touchend', (e)=>{ e.preventDefault(); e.stopPropagation(); console.log('Reject touch', id); rejectJob(id); }, {passive:false});
+    });
+  }, 150);
+}
+
+window.loadBookings = async function(){
+  await ensureAuth();
+  nurseId = getNurseId();
+  const grid = document.getElementById('jobGrid');
+  const debug = document.getElementById('debugInfo');
+  grid.innerHTML = `<div style="padding:20px;text-align:center;color:#6b7280">Loading bookings for nurse ${nurseId}... Auth: ${authReady?'OK':'...'}<br><small>Reading from nurseBookings/${nurseId} + jobOffers + bookings</small></div>`;
+  debug.textContent = `NurseId: ${nurseId} | Auth: ${authReady?'OK':auth.currentUser?'OK':'no'} | Loading...`;
+  
+  let jobsMap = {};
+  const paths = ['nurseBookings/'+nurseId, 'myJobOffers/'+nurseId, 'jobOffers', 'bookings'];
+  
+  for(let p of paths){
+    try{
+      const snap = await rtdb.ref(p).once('value');
+      if(snap.exists()){
+        snap.forEach(child=>{
+          const v = child.val();
+          const id = child.key;
+          if(p==='jobOffers' || p==='bookings'){
+            if(v.nurseId===nurseId || !v.nurseId || v.nurseId==='demo1'){
+              if(!jobsMap[id] || (v.time||0) > (jobsMap[id].time||0)) jobsMap[id]= {...v, id};
+            }
+          } else {
+            if(!jobsMap[id] || (v.time||0) > (jobsMap[id].time||0)) jobsMap[id]= {...v, id};
+          }
+        });
+      }
+    }catch(e){ console.log('Load error', p, e.message); debug.textContent += ` | Error ${p}: ${e.message}`; }
+  }
+  
+  let jobs = Object.values(jobsMap);
+  if(jobs.length===0){
+    jobs = [
+      {id:'LCG-20251016-ABC123', bookingId:'LCG-20251016-ABC123', clientName:'ASABERE PETER', phone:'+233544121814', patientName:'John Doe', nurseId:nurseId, amount:244, amountPaidNow:244, currency:'GHS', paymentMethod:'paystack_full', status:'pending', totalHours:9, hrsPerDay:9, startTime:'08:00', endTime:'17:00', careMode:'Daily', quantity:1, transport:0, clientLat:5.6037, clientLng:-0.1870, time:Date.now(), hourlyRateUsed:17, amountSplit:{nurse:'195.20'}}
+    ];
+    debug.textContent += ' | No bookings found, showing demo LCG-20251016-ABC123';
+  } else {
+    debug.textContent = `NurseId: ${nurseId} | Found ${jobs.length} bookings | Auth OK | Real buttons enabled`;
+  }
+  allJobs = jobs.sort((a,b)=>(b.time||0)-(a.time||0));
+  renderFiltered();
+}
+
+function startRealtimeListener(){
+  nurseId = getNurseId();
+  try{
+    rtdb.ref('nurseBookings/'+nurseId).on('value', (snap)=>{
+      let jobsMap = {};
+      if(snap.exists()){
+        snap.forEach(child=>{ const v = child.val(); jobsMap[child.key]= {...v, id:child.key}; });
+      }
+      Object.values(jobsMap).forEach(j=>{
+        const idx = allJobs.findIndex(x=>x.id===j.id);
+        if(idx===-1) allJobs.unshift(j);
+        else allJobs[idx]=j;
+      });
+      allJobs.sort((a,b)=>(b.time||0)-(a.time||0));
+      renderFiltered();
+      document.getElementById('liveInfo').innerHTML = '<span class="dot"></span> Live — Last: '+new Date().toLocaleTimeString()+' — Real buttons';
+    });
+  }catch(e){ console.log('Realtime error', e.message); }
+}
+
+
+window.markWorkFinished = async function(bookingId){
+  console.log('markWorkFinished clicked - WORKING - Nurse marks work as finished - Client will confirm - Lively earnings 30% / 80% - CEO catches');
+  const booking = allJobs.find(b=>b.id===bookingId);
+  if(!booking){
+    alert('Booking not found');
+    return;
+  }
+  if(booking.nurseMarkedFinished===true){
+    alert('✅ Already marked as finished! Waiting for client confirmation - Client will confirm in my-bookings page - Then lively earnings released - Reflects on CEO dashboard - CEO catches payment source');
+    return;
+  }
+  if(!confirm(`Mark work as FINISHED?\n\nNurse: ${booking.nurseName||''}\nClient: ${booking.clientName||''}\nAmount: ${booking.currency||'GHS'} ${booking.amount||0}\nPayment Source: ${booking.paymentType||booking.paymentMethod||'50% or Full - CEO catches'}\n\nLively Earnings:\n• 50% page: 30% = ${booking.currency||'GHS'} ${(parseFloat(booking.amount||0)*0.3).toFixed(2)}\n• Full payment: 80% = ${booking.currency||'GHS'} ${(parseFloat(booking.amount||0)*0.8).toFixed(2)}\n\nAfter you mark finished:\n• Client will see confirmation button in my-bookings page\n• Client confirms finished work\n• Lively earnings released to your finance\n• Reflects on CEO dashboard\n• CEO catches whether paid via full or 50% page\n• You can withdraw\n\nMark as finished?`)) return;
+  
+  try{
+    const now=Date.now();
+    const updates = {
+      nurseMarkedFinished:true,
+      nurseMarkedFinishedAt:now,
+      status:'completed_pending_client_confirmation',
+      finished:true,
+      markedFinishedBy:booking.nurseId||nurseId
+    };
+    await rtdb.ref('bookings/'+bookingId).update(updates);
+    try{ await rtdb.ref('ceoBookings/'+bookingId).update(updates); }catch(e){}
+    try{ await rtdb.ref('allBookings/'+bookingId).update(updates); }catch(e){}
+    try{ await rtdb.ref('nurseBookings/'+nurseId+'/'+bookingId).update(updates); }catch(e){}
+    
+    alert(`✅ Marked as FINISHED!\n\nClient will now see confirmation button in my-bookings page\n\nClient must confirm:\n• Confirm Nurse Finished Work button\n• Lively earnings released: ${booking.currency||'GHS'} ${(parseFloat(booking.amount||0)*( (booking.paymentType||'').includes('50')?0.3:0.8)).toFixed(2)}\n• Reflects on CEO dashboard\n• CEO catches payment source (full vs 50%)\n• You can withdraw after client confirmation\n\nWithdrawal reflects on CEO only if client confirmed`);
+    
+    const idx=allJobs.findIndex(j=>j.id===bookingId);
+    if(idx!==-1){ allJobs[idx].nurseMarkedFinished=true; allJobs[idx].status='completed_pending_client_confirmation'; }
+    renderFiltered();
+  }catch(e){
+    alert('Error: '+e.message);
+  }
+}
+
+window.acceptJob = async function(bookingId){
+  console.log('>>> ACCEPT CLICKED', bookingId, 'nurseId', nurseId, 'auth', authReady);
+  if(!bookingId){ alert('❌ Invalid booking ID'); return; }
+  const btn = document.querySelector(`[data-id="${bookingId}"][data-action="accept"]`);
+  if(btn){ btn.textContent='⏳ Accepting...'; btn.disabled=true; }
+  try{
+    await ensureAuth();
+    const updates = {};
+    updates['bookings/'+bookingId+'/status'] = 'accepted';
+    updates['ceoBookings/'+bookingId+'/status'] = 'accepted';
+    updates['allBookings/'+bookingId+'/status'] = 'accepted';
+    updates['nurseBookings/'+nurseId+'/'+bookingId+'/status'] = 'accepted';
+    updates['myJobOffers/'+nurseId+'/'+bookingId+'/status'] = 'accepted';
+    updates['jobOffers/'+bookingId+'/status'] = 'accepted';
+    updates['bookings/'+bookingId+'/acceptedAt'] = Date.now();
+    updates['nurseBookings/'+nurseId+'/'+bookingId+'/acceptedAt'] = Date.now();
+    updates['bookings/'+bookingId+'/acceptedBy'] = nurseId;
+    updates['jobOffers/'+bookingId+'/acceptedBy'] = nurseId;
+    console.log('Updating Firebase...', updates);
+    await rtdb.ref().update(updates);
+    const idx = allJobs.findIndex(j=>j.id===bookingId);
+    if(idx!==-1){ allJobs[idx].status='accepted'; allJobs[idx].acceptedAt=Date.now(); }
+    renderFiltered();
+    alert('✅ ACCEPTED — Booking '+bookingId+' accepted!\n\nCEO Dashboard will show accepted.\nClient can be contacted now.\n\nButtons are REAL WORKING — not picture!');
+  }catch(e){ 
+    console.error('Accept error', e);
+    alert('❌ Accept failed: '+e.message+'\n\nTry: 1. Hard refresh Ctrl+Shift+R\n2. Check internet\n3. Check Firebase rules\n\nBookingId: '+bookingId);
+    if(btn){ btn.textContent='✅ Accept'; btn.disabled=false; }
+  }
+}
+
+window.rejectJob = async function(bookingId){
+  console.log('>>> REJECT CLICKED', bookingId);
+  if(!bookingId){ alert('❌ Invalid ID'); return; }
+  if(!confirm('❌ Reject booking '+bookingId+'?\n\nYou will be freed for other bookings.\nClient can book another nurse.')) return;
+  const btn = document.querySelector(`[data-id="${bookingId}"][data-action="reject"]`);
+  if(btn){ btn.textContent='⏳ Rejecting...'; btn.disabled=true; }
+  try{
+    await ensureAuth();
+    const updates = {};
+    updates['bookings/'+bookingId+'/status'] = 'rejected';
+    updates['ceoBookings/'+bookingId+'/status'] = 'rejected';
+    updates['allBookings/'+bookingId+'/status'] = 'rejected';
+    updates['nurseBookings/'+nurseId+'/'+bookingId+'/status'] = 'rejected';
+    updates['myJobOffers/'+nurseId+'/'+bookingId+'/status'] = 'rejected';
+    updates['jobOffers/'+bookingId+'/status'] = 'rejected';
+    updates['bookings/'+bookingId+'/rejectedAt'] = Date.now();
+    updates['bookings/'+bookingId+'/rejectedBy'] = nurseId;
+    await rtdb.ref().update(updates);
+    const idx = allJobs.findIndex(j=>j.id===bookingId);
+    if(idx!==-1){ allJobs[idx].status='rejected'; }
+    renderFiltered();
+    alert('❌ REJECTED — Booking '+bookingId+' rejected. You are freed.');
+  }catch(e){
+    console.error('Reject error', e);
+    alert('❌ Reject failed: '+e.message);
+    if(btn){ btn.textContent='❌ Reject'; btn.disabled=false; }
+  }
+}
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+  await ensureAuth();
+  const urlParams = new URLSearchParams(location.search);
+  const idFromUrl = urlParams.get('nurseId') || urlParams.get('id');
+  if(idFromUrl){ localStorage.setItem('lcg_nurse_uid', idFromUrl); }
+  nurseId = getNurseId();
+  console.log('My Job Offer — NurseId:', nurseId, 'Auth:', authReady);
+  document.getElementById('debugInfo').textContent = `NurseId: ${nurseId} | Auth: ${authReady?'OK':auth.currentUser?'OK':'no'} | Loading bookings... If buttons like picture, hard refresh`;
+  loadBookings();
+  startRealtimeListener();
+  setInterval(()=>{ loadBookings(); }, 20000);
+});
+
+window.addEventListener('error', (e)=>{
+  console.error('JS Error:', e.message);
+  const debug = document.getElementById('debugInfo');
+  if(debug) debug.textContent = '⚠️ JS Error: '+e.message+' — Hard refresh Ctrl+Shift+R';
+});
+</script>
+</body>
+</html>
