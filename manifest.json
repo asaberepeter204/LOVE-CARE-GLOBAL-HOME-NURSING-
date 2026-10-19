@@ -7,6 +7,12 @@
   "scope": "/",
   "scope_extensions": [
     {
+      "origin": "https://lovecareglobal.com"
+    },
+    {
+      "origin": "https://www.lovecareglobal.com"
+    },
+    {
       "origin": "https://asaberepeter204.github.io"
     }
   ],
@@ -128,7 +134,7 @@
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Verified Nurses"
+      "label": "Verified Nurses - Live Tracking"
     }
   ],
   "shortcuts": [
@@ -236,18 +242,18 @@
   "widgets": [
     {
       "name": "LoveCare Quick Book",
-      "description": "Quick book a nurse - Live tracking",
+      "description": "Quick book a nurse - Live tracking - Book verified nurses instantly",
       "tag": "quick-book",
       "template": "quick-book-template",
-      "msAcTemplate": "./",
-      "data": "./",
-      "type": "text/html",
+      "msAcTemplate": "./widget-template.json",
+      "data": "./widget-data.json",
+      "type": "application/json",
       "screenshots": [
         {
           "src": "./icon-512x512.png",
           "sizes": "512x512",
           "type": "image/png",
-          "label": "Widget"
+          "label": "LoveCare Quick Book Widget"
         }
       ],
       "icons": [
@@ -262,7 +268,17 @@
   "note_taking": {
     "new_note_url": "./nurse-group-chat.html"
   },
-  "related_applications": [],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://lovecareglobal.com/manifest.json"
+    },
+    {
+      "platform": "play",
+      "id": "com.lovecareglobal.homenursing",
+      "url": "https://play.google.com/store/apps/details?id=com.lovecareglobal.homenursing"
+    }
+  ],
   "prefer_related_applications": false,
   "launch_handler": {
     "client_mode": [
