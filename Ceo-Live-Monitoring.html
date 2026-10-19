@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO LIVE MONITORING - All Nurses Live Tracking</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0a0614;color:#e8e0ff;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+.topbar{height:64px;background:linear-gradient(90deg,rgba(14,10,28,.98),rgba(42,26,82,.98));backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.2);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:1000;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px}
+.logoIcon{width:42px;height:42px;border-radius:12px;background:white;display:grid;place-items:center;font-size:22px;box-shadow:0 0 20px rgba(168,85,247,.4)}
+.liveDot{width:10px;height:10px;border-radius:50%;background:#22c55e;animation:pulseDot 1.5s infinite;display:inline-block}
+@keyframes pulseDot{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,.7)}50%{opacity:.7;box-shadow:0 0 0 8px rgba(34,197,94,0)}}
+.main{flex:1;display:flex;overflow:hidden}
+.sidebar{width:380px;background:rgba(14,10,28,.92);border-right:1px solid rgba(168,85,247,.15);display:flex;flex-direction:column;overflow:hidden}
+.mapArea{flex:1;position:relative;background:#0e0a1c}
+#map{width:100%;height:100%}
+.controls{padding:12px;border-bottom:1px solid rgba(168,85,247,.12);display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:rgba(28,18,56,.6)}
+.btn{border:none;border-radius:10px;padding:9px 12px;font-weight:800;font-size:11px;cursor:pointer;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#86efac);color:#052e16}
+.btnRed{background:linear-gradient(135deg,#ef4444,#fca5a5);color:#450a0a}
+.btnDark{background:rgba(76,29,149,.25);border:1px solid rgba(168,85,247,.25);color:#d8b4fe}
+.select{padding:8px 10px;border-radius:10px;background:rgba(14,10,28,.7);color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:11px;font-weight:700}
+.stats{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;background:rgba(14,10,28,.5);border-bottom:1px solid rgba(168,85,247,.12)}
+.stat{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.12);border-radius:12px;padding:10px;text-align:center}
+.stat b{font-size:18px;display:block;color:#f3e8ff}
+.stat small{font-size:9px;color:#a78bfa;text-transform:uppercase;font-weight:800;letter-spacing:.5px}
+.list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
+.nurseCard{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.12);border-radius:16px;padding:12px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.nurseCard:hover{border-color:rgba(168,85,247,.35);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.nurseCard.active{border-color:#a855f7;background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(76,29,149,.12));box-shadow:0 0 0 2px rgba(168,85,247,.3),0 8px 24px rgba(168,85,247,.2)}
+.nurseCard.enroute{border-left:4px solid #22c55e}
+.nurseCard.accepted{border-left:4px solid #f59e0b}
+.nurseCard.sos{border-left:4px solid #ef4444;background:linear-gradient(135deg,rgba(239,68,68,.18),rgba(127,29,29,.12));animation:shake 0.5s ease-in-out infinite alternate}
+@keyframes shake{0%{transform:translateX(0)}100%{transform:translateX(1px)}}
+.badge{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:900;display:inline-block}
+.badge-green{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.25)}
+.badge-yellow{background:rgba(245,158,11,.15);color:#facc15;border:1px solid rgba(245,158,11,.25)}
+.badge-red{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25)}
+.badge-purple{background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.25)}
+.avatar{width:44px;height:44px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;color:white;flex-shrink:0}
+.progress{height:4px;background:rgba(168,85,247,.12);border-radius:999px;overflow:hidden;margin-top:8px}
+.progressBar{height:100%;background:linear-gradient(90deg,#22c55e,#a855f7);border-radius:999px;transition:width .8s}
+.leaflet-popup-content{margin:12px!important;min-width:260px}
+.nurse-blink{position:relative;width:32px;height:32px}
+.nurse-blink-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;background:#22c55e;border-radius:50%;border:3px solid white;box-shadow:0 0 12px rgba(34,197,94,.9);z-index:2}
+.nurse-blink-pulse{position:absolute;top:50%;left:50%;width:16px;height:16px;background:rgba(34,197,94,.5);border-radius:50%;animation:blinkPulse 2s infinite}
+.nurse-blink-pulse2{position:absolute;top:50%;left:50%;width:16px;height:16px;background:rgba(34,197,94,.25);border-radius:50%;animation:blinkPulse 2s infinite .7s}
+@keyframes blinkPulse{0%{transform:translate(-50%,-50%) scale(.8);opacity:1}50%{transform:translate(-50%,-50%) scale(1.8);opacity:.6}100%{transform:translate(-50%,-50%) scale(2.8);opacity:0}}
+.sosBlink .nurse-blink-dot{background:#ef4444;box-shadow:0 0 12px rgba(239,68,68,.9)}
+.sosBlink .nurse-blink-pulse,.sosBlink .nurse-blink-pulse2{background:rgba(239,68,68,.5)}
+.clientMarker{width:28px;height:28px;background:#f59e0b;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 4px 12px rgba(245,158,11,.5);display:grid;place-items:center}
+.clientMarker span{transform:rotate(45deg);font-size:14px}
+.routeLine{stroke-dasharray:8 8;animation:dashMove 1s linear infinite}
+@keyframes dashMove{to{stroke-dashoffset:-16}}
+.modalOverlay{position:fixed;inset:0;background:rgba(5,3,14,.85);backdrop-filter:blur(14px);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
+.modalOverlay.show{display:flex}
+.modalCard{background:linear-gradient(180deg,rgba(42,26,82,.98),rgba(20,12,44,.98));border:1px solid rgba(168,85,247,.3);border-radius:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+<div class="topbar">
+<div class="logo">
+<div class="logoIcon">👑</div>
+<div>
+<div style="font-weight:900;font-size:13px;color:#f3e8ff;display:flex;align-items:center;gap:6px">CEO LIVE MONITORING <span class="liveDot"></span> <span style="font-size:10px;background:rgba(34,197,94,.15);color:#86efac;padding:2px 8px;border-radius:999px;border:1px solid rgba(34,197,94,.25)">LIVE TRACKING ALL NURSES</span></div>
+<div style="font-size:10px;color:#a78bfa;font-weight:700">Monitor every move after accepting booking → On way to client • Real-time GPS + SOS • 8 Countries</div>
+</div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<button class="btn btnDark" onclick="centerAll()">🌍 Center All</button>
+<button class="btn btnDark" onclick="toggleTrails()">🛤️ Trails</button>
+<a href="./index.html" class="btn btnDark" style="text-decoration:none">Home</a>
+<a href="./nurses-dashboard.html" class="btn btnPrimary" style="text-decoration:none">Nurses Dashboard</a>
+</div>
+</div>
+
+<div class="main">
+<div class="sidebar">
+<div class="controls">
+<select id="statusFilter" class="select" onchange="filterBookings()">
+<option value="all">All Active (Accepted + En Route)</option>
+<option value="accepted">Accepted Only</option>
+<option value="en_route">En Route Only</option>
+<option value="arrived">Arrived</option>
+<option value="sos">🆘 SOS Emergency</option>
+</select>
+<button class="btn btnDark" onclick="loadCEOData()">🔄 Refresh</button>
+<button class="btn btnGreen" onclick="toggleAutoRefresh()" id="autoBtn">⏸️ Auto ON</button>
+</div>
+
+<div class="stats">
+<div class="stat"><b id="statActive">0</b><small>Active Nurses</small></div>
+<div class="stat"><b id="statEnRoute">0</b><small>En Route</small></div>
+<div class="stat"><b id="statSOS">0</b><small>SOS</small></div>
+</div>
+
+<div class="list" id="nurseList">
+<div style="padding:20px;text-align:center;color:#6b7280;font-size:12px">Loading CEO live data from Firebase...<br>Listening to bookings where nurse accepted and on way to client<br><br>Firebase: ceoBookings + allBookings + nurseLocations</div>
+</div>
+
+<div style="padding:8px 12px;border-top:1px solid rgba(168,85,247,.12);background:rgba(14,10,28,.5);font-size:9px;color:#6b7280">
+<div id="debugCEO">CEO Dashboard — Live Monitoring All Moves</div>
+</div>
+</div>
+
+<div class="mapArea">
+<div id="map"></div>
+<div style="position:absolute;top:12px;left:12px;z-index:400;background:rgba(14,10,28,.9);backdrop-filter:blur(12px);border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:10px 14px;max-width:280px">
+<div style="font-size:11px;font-weight:900;color:#f3e8ff;display:flex;align-items:center;gap:6px"><span class="liveDot"></span> CEO LIVE MONITORING MODE</div>
+<div style="font-size:10px;color:#a78bfa;margin-top:4px">Each blinking green dot = Nurse live location updating every 5 sec after accepting booking<br>Yellow pin = Client location • Dashed line = Route to client • Red blink = SOS</div>
+<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+<span class="badge badge-green">🟢 Nurse Live</span>
+<span class="badge badge-yellow">🟡 Client</span>
+<span class="badge badge-red">🔴 SOS</span>
+</div>
+</div>
+
+<div style="position:absolute;bottom:12px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px">
+<button class="btn btnDark" onclick="map.zoomIn()">➕ Zoom In</button>
+<button class="btn btnDark" onclick="map.zoomOut()">➖ Zoom Out</button>
+<button class="btn btnPrimary" onclick="enableFollowMode()" id="followBtn">📍 Follow All</button>
+</div>
+</div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modalOverlay" id="detailModal">
+<div class="modalCard" style="padding:0;overflow:hidden">
+<div id="modalContent"></div>
+<div style="padding:12px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid rgba(168,85,247,.12)">
+<button class="btn btnDark" onclick="closeModal()">Close</button>
+</div>
+</div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const rtdb = firebase.database();
+const auth = firebase.auth();
+
+let map, markers={}, clientMarkers={}, routeLines={}, trails={}, activeBookings=[], selectedId=null;
+let autoRefresh=true, followMode=true, showTrails=true;
+let ceoListener=null, locationListeners={};
+
+function initMap(){
+  map = L.map('map',{zoomControl:false}).setView([5.6037,-0.1870], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(map);
+}
+
+function createNurseIcon(isSOS=false){
+  const cls = isSOS ? 'nurse-blink sosBlink' : 'nurse-blink';
+  const dotColor = isSOS ? '#ef4444' : '#22c55e';
+  return L.divIcon({
+    className: '',
+    html: `<div class="${cls}"><div class="nurse-blink-pulse"></div><div class="nurse-blink-pulse2"></div><div class="nurse-blink-dot"></div></div>`,
+    iconSize: [32,32],
+    iconAnchor: [16,16]
+  });
+}
+
+function createClientIcon(){
+  return L.divIcon({
+    className: '',
+    html: `<div class="clientMarker"><span>👤</span></div>`,
+    iconSize: [28,28],
+    iconAnchor: [14,28]
+  });
+}
+
+function calcDistance(lat1,lng1,lat2,lng2){
+  const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function formatETA(distKm){
+  const speed=30; // km/h avg in Accra traffic
+  const mins=Math.round(distKm/speed*60);
+  if(mins<1) return '1 min';
+  if(mins<60) return mins+' min';
+  const h=Math.floor(mins/60); const m=mins%60;
+  return h+'h '+m+'m';
+}
+
+async function loadCEOData(){
+  document.getElementById('debugCEO').textContent='Loading CEO live monitoring...';
+  try{
+    await auth.signInAnonymously();
+    // Listen to ceoBookings and allBookings for accepted/en_route
+    if(ceoListener) rtdb.ref('ceoBookings').off('value', ceoListener);
+    ceoListener = rtdb.ref('ceoBookings').on('value', snap=>{
+      const bookings={};
+      if(snap.exists()){
+        snap.forEach(child=>{
+          const v=child.val(); const id=child.key;
+          const status=(v.status||'pending').toLowerCase();
+          if(['accepted','en_route','enroute','on_the_way','on_the_way_to_client','arrived','in_progress'].includes(status) || v.nurseLiveTracking){
+            bookings[id]={...v, id, bookingId:id};
+          }
+        });
+      }
+      // Also check allBookings for more
+      rtdb.ref('allBookings').once('value').then(snap2=>{
+        if(snap2.exists()){
+          snap2.forEach(child=>{
+            const v=child.val(); const id=child.key;
+            const status=(v.status||'').toLowerCase();
+            if(['accepted','en_route','enroute','on_the_way','arrived'].includes(status)){
+              if(!bookings[id]) bookings[id]={...v, id, bookingId:id};
+            }
+          });
+        }
+        activeBookings=Object.values(bookings).sort((a,b)=>(b.time||0)-(a.time||0));
+        renderList();
+        updateMap();
+        document.getElementById('debugCEO').textContent=`CEO: ${activeBookings.length} active nurses tracked live | Firebase live listener ON`;
+      });
+    });
+
+    // Listen to nurse live locations
+    rtdb.ref('nurseLiveLocations').on('value', snap=>{
+      if(!snap.exists()) return;
+      snap.forEach(child=>{
+        const loc=child.val(); const nurseId=child.key;
+        const booking = activeBookings.find(b=>b.nurseId===nurseId || b.nurseId===loc.nurseId);
+        if(booking){
+          // Update marker live
+          const lat=loc.lat||loc.latitude, lng=loc.lng||loc.longitude;
+          if(lat&&lng) updateNurseMarker(booking.bookingId, lat, lng, loc.isSOS||false, loc);
+        }
+      });
+    });
+
+    // Also listen to individual nurseLocations
+    rtdb.ref('nurseLocations').on('value', snap=>{
+      if(!snap.exists()) return;
+      snap.forEach(child=>{
+        const loc=child.val(); const nurseId=child.key;
+        const booking = activeBookings.find(b=>b.nurseId===nurseId);
+        if(booking){
+          const lat=loc.lat||loc.latitude, lng=loc.lng||loc.longitude;
+          if(lat&&lng) updateNurseMarker(booking.bookingId, lat, lng, false, loc);
+        }
+      });
+    });
+
+  }catch(e){
+    document.getElementById('debugCEO').textContent='Error: '+e.message;
+  }
+}
+
+function updateNurseMarker(bookingId, lat, lng, isSOS, locData){
+  const booking = activeBookings.find(b=>b.bookingId===bookingId);
+  if(!booking) return;
+  booking.nurseLat=lat; booking.nurseLng=lng; booking.lastUpdate=Date.now(); booking.isSOS=isSOS;
+  if(locData) booking.liveData=locData;
+
+  // Update or create marker
+  if(markers[bookingId]){
+    markers[bookingId].setLatLng([lat,lng]);
+    if(isSOS) markers[bookingId].setIcon(createNurseIcon(true));
+  } else {
+    markers[bookingId]=L.marker([lat,lng],{icon:createNurseIcon(isSOS)}).addTo(map);
+    markers[bookingId].on('click',()=>focusBooking(bookingId));
+  }
+
+  // Popup
+  const dist = (booking.clientLat && booking.clientLng) ? calcDistance(lat,lng,booking.clientLat,booking.clientLng) : 0;
+  markers[bookingId].bindPopup(`
+    <div style="font-family:Inter,sans-serif">
+      <b style="color:#0e0a1c">${booking.nurseName||'Nurse'}</b> ${isSOS?'<span style="background:#ef4444;color:white;padding:2px 6px;border-radius:999px;font-size:9px">SOS</span>':''}<br>
+      <small>📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}</small><br>
+      <small>👤 Client: ${booking.clientName||'Client'} — ${booking.patientName||''}</small><br>
+      <small>📏 ${dist.toFixed(2)} km to client — ETA ${formatETA(dist)}</small><br>
+      <small>💰 ${booking.currency||'GHS'} ${booking.amount||0} — ${booking.status}</small><br>
+      <div style="margin-top:6px;display:flex;gap:4px">
+        <button onclick="focusBooking('${bookingId}')" style="padding:6px 10px;border-radius:8px;background:#a855f7;color:white;border:none;font-weight:800;font-size:10px">Focus</button>
+        <button onclick="showDetail('${bookingId}')" style="padding:6px 10px;border-radius:8px;background:#22c55e;color:#052e16;border:none;font-weight:800;font-size:10px">Details</button>
+      </div>
+    </div>
+  `);
+
+  // Trail
+  if(showTrails){
+    if(!trails[bookingId]) trails[bookingId]=[];
+    trails[bookingId].push([lat,lng]);
+    if(trails[bookingId].length>50) trails[bookingId].shift();
+    if(routeLines[bookingId+'_trail']) map.removeLayer(routeLines[bookingId+'_trail']);
+    routeLines[bookingId+'_trail']=L.polyline(trails[bookingId],{color:isSOS?'#ef4444':'#a855f7',weight:3,opacity:.6,dashArray:'6 8'}).addTo(map);
+  }
+
+  // Update route line to client
+  if(booking.clientLat && booking.clientLng){
+    if(routeLines[bookingId]) map.removeLayer(routeLines[bookingId]);
+    routeLines[bookingId]=L.polyline([[lat,lng],[booking.clientLat,booking.clientLng]],{color:isSOS?'#ef4444':'#22c55e',weight:3,opacity:.8,dashArray:'10 10'}).addTo(map);
+  }
+
+  if(followMode) centerAll();
+  renderList();
+}
+
+function updateMap(){
+  // Clear old markers for bookings that no longer active
+  const activeIds = new Set(activeBookings.map(b=>b.bookingId));
+  Object.keys(markers).forEach(id=>{
+    if(!activeIds.has(id)){
+      map.removeLayer(markers[id]); delete markers[id];
+      if(clientMarkers[id]){map.removeLayer(clientMarkers[id]); delete clientMarkers[id];}
+      if(routeLines[id]){map.removeLayer(routeLines[id]); delete routeLines[id];}
+    }
+  });
+
+  activeBookings.forEach(b=>{
+    const nurseLat = b.nurseLat || b.nurseLiveLat || b.nurseLatitude || (b.nurseLocation&&b.nurseLocation.lat);
+    const nurseLng = b.nurseLng || b.nurseLiveLng || b.nurseLongitude || (b.nurseLocation&&b.nurseLocation.lng);
+    const clientLat = b.clientLat || b.clientLatitude;
+    const clientLng = b.clientLng || b.clientLongitude;
+    const isSOS = b.isSOS || b.sos || b.status==='sos';
+
+    if(nurseLat && nurseLng){
+      updateNurseMarker(b.bookingId, nurseLat, nurseLng, isSOS, b.liveData);
+    } else if(b.nurseId){
+      // Try to get latest from nurseLiveLocations
+      rtdb.ref('nurseLiveLocations/'+b.nurseId).once('value').then(snap=>{
+        if(snap.exists()){
+          const loc=snap.val();
+          const lat=loc.lat||loc.latitude, lng=loc.lng||loc.longitude;
+          if(lat&&lng) updateNurseMarker(b.bookingId, lat, lng, loc.isSOS||isSOS, loc);
+        }
+      });
+    }
+
+    if(clientLat && clientLng){
+      if(!clientMarkers[b.bookingId]){
+        clientMarkers[b.bookingId]=L.marker([clientLat,clientLng],{icon:createClientIcon()}).addTo(map);
+        clientMarkers[b.bookingId].bindPopup(`<b>👤 Client: ${b.clientName||'Client'}</b><br>Patient: ${b.patientName||''}<br>📍 ${clientLat.toFixed(5)}, ${clientLng.toFixed(5)}`);
+      } else {
+        clientMarkers[b.bookingId].setLatLng([clientLat,clientLng]);
+      }
+    }
+  });
+
+  // Stats
+  const active = activeBookings.length;
+  const enRoute = activeBookings.filter(b=>['en_route','enroute','on_the_way'].includes((b.status||'').toLowerCase()) || (b.nurseLat && b.clientLat)).length;
+  const sos = activeBookings.filter(b=>b.isSOS||b.sos).length;
+  document.getElementById('statActive').textContent=active;
+  document.getElementById('statEnRoute').textContent=enRoute;
+  document.getElementById('statSOS').textContent=sos;
+}
+
+function renderList(){
+  const filter = document.getElementById('statusFilter').value;
+  let filtered = activeBookings;
+  if(filter==='accepted') filtered=activeBookings.filter(b=>(b.status||'').toLowerCase()==='accepted');
+  if(filter==='en_route') filtered=activeBookings.filter(b=>['en_route','enroute','on_the_way'].includes((b.status||'').toLowerCase()));
+  if(filter==='arrived') filtered=activeBookings.filter(b=>(b.status||'').toLowerCase()==='arrived');
+  if(filter==='sos') filtered=activeBookings.filter(b=>b.isSOS||b.sos);
+
+  const list=document.getElementById('nurseList');
+  if(!filtered.length){
+    list.innerHTML=`<div style="padding:20px;text-align:center;color:#6b7280;font-size:12px">No ${filter} nurses currently on way<br><br>When nurse accepts booking via my-job-offer.html, they appear here with live blinking dot<br>CEO can monitor every move at a time<br><br>Firebase paths watched:<br>• ceoBookings<br>• allBookings<br>• nurseLiveLocations<br>• nurseLocations<br><br><small>Make a test booking in book-nurse.html → Accept in my-job-offer → See live here</small></div>`;
+    return;
+  }
+
+  list.innerHTML=filtered.map(b=>{
+    const status=(b.status||'accepted').toLowerCase();
+    const isEnRoute = ['en_route','enroute','on_the_way'].includes(status) || (b.nurseLat && b.clientLat);
+    const isSOS = b.isSOS||b.sos;
+    const dist = (b.nurseLat && b.clientLat) ? calcDistance(b.nurseLat,b.nurseLng,b.clientLat,b.clientLng) : (b.distance||0);
+    const isActive = selectedId===b.bookingId;
+    const cardClass = isSOS?'nurseCard sos': isEnRoute?'nurseCard enroute active': status==='accepted'?'nurseCard accepted':'nurseCard';
+    const finalClass = isActive? cardClass+' active': cardClass;
+    return `<div class="${finalClass}" onclick="focusBooking('${b.bookingId}')">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div class="avatar">${(b.nurseName||'N')[0]}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <b style="font-size:13px;color:#f3e8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.nurseName||'Nurse'}</b>
+            ${isSOS?'<span class="badge badge-red">🆘 SOS</span>':''}
+            <span class="badge ${isEnRoute?'badge-green':'badge-yellow'}">${isEnRoute?'🟢 EN ROUTE':'🟡 ACCEPTED'}</span>
+            ${b.lastUpdate?`<span class="badge badge-purple">⏱️ ${Math.round((Date.now()-b.lastUpdate)/1000/60)}m ago</span>`:''}
+          </div>
+          <div style="font-size:11px;color:#a78bfa;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">👤 ${b.clientName||'Client'} → Patient: ${b.patientName||'Patient'} • ${b.currency||'GHS'} ${b.amount||0}</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">📍 ${dist?dist.toFixed(2)+' km to client • ETA '+formatETA(dist):'Calculating route...'} • ${b.careMode||'Care'} ${b.totalHours||''}h</div>
+          <div class="progress"><div class="progressBar" style="width:${isEnRoute? Math.max(10, 100-Math.min(90, dist*10))+'%' : '15%'}"></div></div>
+          <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+            <button class="btn btnDark" style="padding:6px 10px;font-size:10px" onclick="event.stopPropagation();focusBooking('${b.bookingId}')">📍 Focus Map</button>
+            <button class="btn btnPrimary" style="padding:6px 10px;font-size:10px" onclick="event.stopPropagation();showDetail('${b.bookingId}')">👁️ Details</button>
+            <button class="btn btnGreen" style="padding:6px 10px;font-size:10px" onclick="event.stopPropagation();callNurse('${b.nurseId}','${b.nurseName}')">📞 Nurse</button>
+            <button class="btn btnDark" style="padding:6px 10px;font-size:10px" onclick="event.stopPropagation();callClient('${b.phone}','${b.clientName}')">👤 Client</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function focusBooking(id){
+  selectedId=id;
+  const b=activeBookings.find(x=>x.bookingId===id);
+  if(!b) return;
+  renderList();
+  if(b.nurseLat && b.nurseLng){
+    map.flyTo([b.nurseLat,b.nurseLng], 15, {duration:1});
+    if(markers[id]) markers[id].openPopup();
+  } else if(b.clientLat && b.clientLng){
+    map.flyTo([b.clientLat,b.clientLng], 14);
+  }
+}
+
+function centerAll(){
+  const group=[];
+  Object.values(markers).forEach(m=>group.push(m.getLatLng()));
+  Object.values(clientMarkers).forEach(m=>group.push(m.getLatLng()));
+  if(group.length){
+    const bounds=L.latLngBounds(group);
+    map.fitBounds(bounds.pad(0.2));
+  } else {
+    map.setView([5.6037,-0.1870], 11);
+  }
+}
+
+function showDetail(id){
+  const b=activeBookings.find(x=>x.bookingId===id);
+  if(!b) return;
+  const dist=(b.nurseLat&&b.clientLat)?calcDistance(b.nurseLat,b.nurseLng,b.clientLat,b.clientLng):0;
+  document.getElementById('modalContent').innerHTML=`
+    <div style="padding:18px">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+        <div class="avatar" style="width:56px;height:56px;font-size:20px">${(b.nurseName||'N')[0]}</div>
+        <div>
+          <b style="font-size:16px;color:#f3e8ff">${b.nurseName||'Nurse'}</b> ${b.isSOS?'<span class="badge badge-red">SOS</span>':''}<br>
+          <small style="color:#a78bfa">⭐ ${b.rating||'4.8'} • ${b.services?b.services[0]:'Nursing'} • ID: ${b.nurseId||''}</small><br>
+          <small style="color:#6b7280">Booking: ${b.bookingId} • ${b.status}</small>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0">
+        <div style="background:rgba(14,10,28,.6);border-radius:12px;padding:10px"><small style="color:#a78bfa">Client</small><br><b>${b.clientName||'Client'}</b><br><small>${b.phone||''}</small><br><small>Patient: ${b.patientName||''}</small></div>
+        <div style="background:rgba(14,10,28,.6);border-radius:12px;padding:10px"><small style="color:#a78bfa">Route</small><br><b>${dist.toFixed(2)} km</b><br><small>ETA ${formatETA(dist)}</small><br><small>${b.currency||'GHS'} ${b.amount||0}</small></div>
+      </div>
+      <div style="background:rgba(14,10,28,.6);border-radius:12px;padding:12px;margin:12px 0">
+        <b style="font-size:12px">Live GPS</b><br>
+        <small style="font-size:10px;color:#a78bfa">Nurse: ${b.nurseLat?b.nurseLat.toFixed(6)+', '+b.nurseLng.toFixed(6):'Waiting for location update... (nurse app must send location every 5 sec after accepting)'}<br>Client: ${b.clientLat?b.clientLat.toFixed(6)+', '+b.clientLng.toFixed(6):'No client location'}<br>Last update: ${b.lastUpdate? new Date(b.lastUpdate).toLocaleTimeString(): 'Never'}</small>
+        ${b.liveData?`<br><small style="font-size:10px;color:#6b7280">Speed: ${b.liveData.speed||0} km/h • Accuracy: ${b.liveData.accuracy||0}m • Heading: ${b.liveData.heading||0}°</small>`:''}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btnGreen" onclick="callNurse('${b.nurseId}','${b.nurseName}')">📞 Call Nurse</button>
+        <button class="btn btnPrimary" onclick="callClient('${b.phone}','${b.clientName}')">👤 Call Client</button>
+        <button class="btn btnDark" onclick="focusBooking('${b.bookingId}');closeModal()">📍 Focus Map</button>
+        <button class="btn btnRed" onclick="triggerSOS('${b.bookingId}')">🆘 SOS Alert</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeModal(){document.getElementById('detailModal').classList.remove('show');}
+function filterBookings(){renderList();}
+function toggleAutoRefresh(){autoRefresh=!autoRefresh; document.getElementById('autoBtn').textContent=autoRefresh?'⏸️ Auto ON':'▶️ Auto OFF';}
+function toggleTrails(){showTrails=!showTrails; if(!showTrails){Object.values(trails).forEach(()=>{}); Object.keys(routeLines).forEach(k=>{if(k.includes('_trail')){map.removeLayer(routeLines[k]); delete routeLines[k];}});}}
+function enableFollowMode(){followMode=!followMode; document.getElementById('followBtn').textContent=followMode?'📍 Follow All':'📍 Follow OFF'; document.getElementById('followBtn').className=followMode?'btn btnPrimary':'btn btnDark';}
+function callNurse(id,name){alert('📞 Calling Nurse: '+name+'\nID: '+id+'\n\nIn real app, this opens phone dialer or in-app call via Firebase');}
+function callClient(phone,name){if(phone) window.open('tel:'+phone); else alert('Client phone not available');}
+function triggerSOS(id){if(confirm('🆘 Trigger SOS for booking '+id+'?')){rtdb.ref('ceoBookings/'+id+'/isSOS').set(true); rtdb.ref('sosAlerts/'+id).set({bookingId:id,time:Date.now(),type:'ceo_triggered'}); alert('SOS triggered - All markers will blink red');}}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  initMap();
+  loadCEOData();
+  setInterval(()=>{ if(autoRefresh) loadCEOData(); }, 15000);
+});
+
+document.getElementById('detailModal').addEventListener('click',e=>{ if(e.target.id==='detailModal') closeModal(); });
+</script>
+</body>
+</html>
