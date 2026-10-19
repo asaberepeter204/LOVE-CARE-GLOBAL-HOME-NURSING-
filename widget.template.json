@@ -1,5 +1,182 @@
 {
   "template": "quick-book-template",
   "name": "LoveCare Quick Book",
-  "description": "Book a nurse instantly"
+  "description": "Quick book a nurse - Live tracking - Nearby nurses",
+  "version": "2.0",
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "LOVE CARE GLOBAL",
+          "weight": "Bolder",
+          "size": "Medium",
+          "color": "Accent"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${stats.availableNow} nurses available now in ${stats.countries} countries",
+          "size": "Small",
+          "isSubtle": true
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Nearby Nurses",
+          "weight": "Bolder",
+          "size": "Medium"
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "${nearbyNurses[0].photoURL}",
+                  "size": "Small",
+                  "style": "Person"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${nearbyNurses[0].fullName}",
+                  "weight": "Bolder"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "\u2b50 ${nearbyNurses[0].rating} \u2022 ${nearbyNurses[0].distance}km \u2022 ${nearbyNurses[0].services[0]}",
+                  "size": "Small",
+                  "isSubtle": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "${nearbyNurses[1].photoURL}",
+                  "size": "Small",
+                  "style": "Person"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${nearbyNurses[1].fullName}",
+                  "weight": "Bolder"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "\u2b50 ${nearbyNurses[1].rating} \u2022 ${nearbyNurses[1].distance}km \u2022 ${nearbyNurses[1].services[0]}",
+                  "size": "Small",
+                  "isSubtle": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Quick Actions",
+          "weight": "Bolder",
+          "size": "Medium"
+        },
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.OpenUrl",
+              "title": "\ud83d\udcc5 Book Nurse",
+              "url": "${quickActions[0].url}"
+            },
+            {
+              "type": "Action.OpenUrl",
+              "title": "\ud83d\udccd My Bookings",
+              "url": "${quickActions[1].url}"
+            },
+            {
+              "type": "Action.OpenUrl",
+              "title": "\ud83d\udd14 Alerts",
+              "url": "${quickActions[2].url}"
+            },
+            {
+              "type": "Action.OpenUrl",
+              "title": "\ud83c\udd98 SOS",
+              "url": "${quickActions[3].url}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "${alerts[0].title}",
+          "weight": "Bolder",
+          "color": "Good",
+          "size": "Small"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${alerts[0].body}",
+          "size": "Small",
+          "wrap": true
+        }
+      ]
+    }
+  ],
+  "dataBinding": {
+    "nearbyNurses": "nearbyNurses",
+    "featuredNurses": "featuredNurses",
+    "stats": "stats",
+    "quickActions": "quickActions",
+    "alerts": "alerts",
+    "recentBookings": "recentBookings"
+  },
+  "actions": [
+    {
+      "verb": "bookNurse",
+      "url": "./book-nurse.html"
+    },
+    {
+      "verb": "trackBooking",
+      "url": "./my-bookings.html"
+    },
+    {
+      "verb": "viewAlerts",
+      "url": "./alerts.html"
+    }
+  ]
 }
