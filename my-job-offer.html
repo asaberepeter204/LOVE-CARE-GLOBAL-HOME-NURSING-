@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Job Offer - REAL FOR BEGINNERS</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--faint:#6b6788;--gold:#facc15;--green:#34d399}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Instrument Sans",sans-serif}
+header{position:sticky;top:0;z-index:10;background:rgba(12,10,30,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.offer{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;font-size:11px;border:1px solid var(--line)}
+.btn-gold{background:var(--gold);color:#000;font-weight:700;border-radius:999px;padding:10px 20px;border:0;cursor:pointer}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:10px 20px;cursor:pointer}
+.empty{padding:70px 24px;text-align:center;border:1px dashed rgba(255,255,255,.12);border-radius:20px;background:rgba(26,22,51,.6)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 18px;border-radius:999px;font-size:13px;z-index:100}
+.live-dot{width:8px;height:8px;border-radius:999px;background:var(--green);animation:pulse 1.5s infinite;display:inline-block}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+import React, {useState,useEffect} from "https://esm.sh/react@18.2.0";
+import ReactDOM from "https://esm.sh/react-dom@18.2.0/client";
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const rtdb=firebase.database();
+
+function getNurse(){
+  const KEYS=['nurse','nurseData','currentUser','user','auth_user','nurse_profile'];
+  for(const store of [localStorage, sessionStorage]){
+    for(const k of KEYS){
+      try{
+        const raw=store.getItem(k);
+        if(!raw) continue;
+        const d=JSON.parse(raw);
+        const o=d.user||d.nurse||d.data||d;
+        const full=o.fullName||o.name||o.displayName;
+        if(full) return {id:(o.id||o.nurseId||o.uid||full.toLowerCase().replace(/\s+/g,'-')).toLowerCase().replace(/[^a-z0-9-]/g,''), fullName:full, firstName:o.firstName||full.split(' ')[0], location:o.location||'Accra', photo:o.photo||null};
+      }catch{}
+    }
+  }
+  const p=new URLSearchParams(location.search);
+  const q=p.get('nurse')||p.get('name');
+  if(q) return {id:q.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''), fullName:q, firstName:q.split(' ')[0], location:'Accra', photo:null};
+  return {id:'asabere-peter', fullName:'Asabere Peter', firstName:'Asabere', location:'East Legon', photo:null};
+}
+
+function App(){
+  const [nurse]=useState(()=>getNurse());
+  const [offers,setOffers]=useState([]);
+  const [stats,setStats]=useState({totalJobs:0, activeJobs:0, rating:0, reviews:0, balanceGHS:0, balanceUSD:0});
+  const [loading,setLoading]=useState(true);
+  const [toast,setToast]=useState(null);
+  const [selAccept,setSelAccept]=useState(null);
+  const [selNav,setSelNav]=useState(null);
+  const [selReject,setSelReject]=useState(null);
+
+  useEffect(()=>{
+    const nurseId=nurse.id;
+    const offersRef=rtdb.ref('myJobOffers/'+nurseId);
+    offersRef.on('value', snap=>{
+      const val=snap.val();
+      const arr = val ? Object.values(val).sort((a,b)=>(b.time||0)-(a.time||0)) : [];
+      setOffers(arr);
+      const active = arr.filter(o=> o.status==='ACCEPTED' || o.status==='ARRIVED' || o.status==='PENDING').length;
+      const completed = arr.filter(o=> o.status==='COMPLETED').length;
+      let balance=0;
+      arr.forEach(o=>{
+        if(o.status==='ACCEPTED' || o.status==='ARRIVED' || o.status==='COMPLETED'){
+          const amt=parseFloat(o.amount||0);
+          balance+= o.amountSplit?.nurse || amt*0.8;
+        }
+      });
+      setStats({
+        totalJobs: arr.length,
+        activeJobs: active,
+        rating: 0,
+        reviews: 0,
+        balanceGHS: balance,
+        balanceUSD: balance/15.5
+      });
+      setLoading(false);
+    });
+
+    const nurseRef=rtdb.ref('nurses/'+nurseId);
+    nurseRef.on('value', snap=>{
+      if(snap.exists()){
+        const d=snap.val();
+        setStats(prev=>({...prev, rating:d.rating||0, reviews:d.reviews||0}));
+      }
+    });
+
+    const ratingRef=rtdb.ref('ratings/'+nurseId);
+    ratingRef.on('value', snap=>{
+      if(snap.exists()){
+        const arr=Object.values(snap.val());
+        const avg=arr.reduce((s,r)=>s+parseFloat(r.rating||0),0)/arr.length;
+        setStats(prev=>({...prev, rating:avg.toFixed(1), reviews:arr.length}));
+      }
+    });
+
+    return ()=>{ offersRef.off(); nurseRef.off(); ratingRef.off(); };
+  },[nurse.id]);
+
+  const initials=nurse.fullName.split(' ').filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('')||'AP';
+  const showToast=(m)=>{ setToast(m); setTimeout(()=>setToast(null),3000); };
+
+  return React.createElement('div',null,
+    React.createElement('header',null,
+      React.createElement('div',{className:'wrap',style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'18px 20px'}},
+        React.createElement('div',{style:{display:'flex',gap:14,alignItems:'center'}},
+          React.createElement('div',{style:{width:52,height:52,borderRadius:999,background:'#231e44',display:'grid',placeItems:'center',fontWeight:700,color:'#fbbf24',border:'1px solid var(--line)',position:'relative'}},
+            initials,
+            React.createElement('span',{style:{position:'absolute',right:-2,bottom:-2,width:12,height:12,background:'var(--green)',borderRadius:999,border:'2px solid var(--bg)'}})
+          ),
+          React.createElement('div',null,
+            React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center'}},
+              React.createElement('h1',{style:{margin:0,fontFamily:'Fraunces',fontSize:22}},'My Job Offer'),
+              React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0',borderColor:'rgba(52,211,153,.2)'}},React.createElement('span',{className:'live-dot'}),' LIVE')
+            ),
+            React.createElement('div',{style:{fontSize:13.5,color:'var(--muted)',marginTop:4}},
+              'Welcome ',React.createElement('span',{style:{color:'var(--text)',fontWeight:600}},nurse.firstName),' — ',nurse.fullName,' · ',nurse.location
+            )
+          )
+        ),
+        React.createElement('div',{className:'badge',style:{padding:'8px 14px',background:'var(--card)'}},'⭐ ',stats.rating||0,' Trust 98%')
+      )
+    ),
+    React.createElement('main',{className:'wrap',style:{padding:'28px 20px',display:'grid',gridTemplateColumns:'1.2fr .8fr',gap:20}},
+      React.createElement('section',null,
+        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:10,marginBottom:22}},
+          [
+            {k:'TOTAL JOBS', v:loading?'...':String(stats.totalJobs), s: stats.totalJobs===0?'No jobs yet':`${stats.totalJobs} Completed`},
+            {k:'ACTIVE', v:loading?'...':`${stats.activeJobs} jobs`, s: stats.activeJobs===0?'No active':'Elderly Care'},
+            {k:'RATING', v:loading?'...':String(stats.rating), s: `⭐ ${stats.reviews} reviews`},
+            {k:'BALANCE', v:loading?'...':`GHS ${Math.round(stats.balanceGHS)}`, s: `≈ $${stats.balanceUSD.toFixed(2)}`}
+          ].map(x=>
+            React.createElement('div',{key:x.k,className:'stat'},
+              React.createElement('div',{style:{fontSize:11,color:'var(--faint)',textTransform:'uppercase',letterSpacing:'.08em'}},x.k),
+              React.createElement('div',{style:{fontSize:22,fontWeight:700,marginTop:6}},x.v),
+              React.createElement('div',{style:{fontSize:12,color:'var(--muted)',marginTop:4}},x.s)
+            )
+          )
+        ),
+        React.createElement('h2',{style:{fontFamily:'Fraunces',fontSize:18,margin:'0 0 14px',display:'flex',alignItems:'center',gap:8}},
+          'Available Offers',
+          React.createElement('span',{className:'badge',style:{background:offers.length>0?'rgba(52,211,153,.12)':'rgba(255,255,255,.06)',color:offers.length>0?'#a7f3d0':'var(--muted)'}},offers.length+' • REAL'),
+          React.createElement('span',{className:'live-dot'})
+        ),
+        loading?React.createElement('div',{className:'empty'},'Loading live data for '+nurse.fullName+'...'):
+        offers.length===0?
+          React.createElement('div',{className:'empty'},
+            React.createElement('div',{style:{fontSize:50}},'📭'),
+            React.createElement('div',{style:{fontSize:18,fontWeight:700,marginTop:10}},'No job offers yet'),
+            React.createElement('div',{style:{fontSize:14,color:'var(--muted)',marginTop:8,lineHeight:1.6}},
+              'You are logged in as '+nurse.fullName+'.',React.createElement('br'),
+              'When a client books you, the offer will appear here instantly.',React.createElement('br'),
+              React.createElement('span',{style:{fontSize:11,color:'var(--faint)'}},'Beginner: 0 jobs • 0 balance • Real live from Firebase')
+            )
+          )
+        :
+          offers.map(o=>React.createElement('div',{key:o.id,className:'offer'},
+            React.createElement('div',{style:{display:'flex',gap:14}},
+              React.createElement('div',{style:{width:56,height:56,borderRadius:999,background:'#231e44',display:'grid',placeItems:'center',fontWeight:700,color:'#5eead4'}}, (o.clientName||'C').split(' ').map(s=>s[0]).join('').slice(0,2)),
+              React.createElement('div',{style:{flex:1}},
+                React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center'}},
+                  React.createElement('h3',{style:{margin:0,fontSize:17}},o.clientName),
+                  React.createElement('span',{className:'badge',style:{marginLeft:'auto'}},o.status)
+                ),
+                React.createElement('div',{style:{display:'flex',gap:8,marginTop:14}},
+                  (o.status==='PENDING'||!o.status)&&React.createElement(React.Fragment,null,
+                    React.createElement('button',{className:'btn-gold',onClick:()=>setSelAccept(o)},'✅ Accept'),
+                    React.createElement('button',{className:'btn-ghost',onClick:()=>setSelReject(o)},'❌ Reject')
+                  ),
+                  (o.status==='ACCEPTED'||o.status==='ARRIVED')&&React.createElement('button',{className:'btn-gold',style:{background:'#fff'},onClick:()=>setSelNav(o)},'🧭 Navigate')
+                )
+              )
+            )
+          ))
+      ),
+      React.createElement('aside',null,
+        React.createElement('div',{className:'card',style:{padding:20}},
+          React.createElement('h3',{style:{margin:0,fontFamily:'Fraunces'}},'Wallet - '+nurse.fullName),
+          React.createElement('div',{style:{marginTop:12,background:'#0f0b22',padding:14,borderRadius:12,border:'1px solid var(--line)'}},
+            React.createElement('div',{style:{fontSize:11,color:'var(--faint)'}},'Current Balance • LIVE REAL'),
+            React.createElement('div',{style:{fontSize:26,fontWeight:700}},'GHS '+Math.round(stats.balanceGHS)),
+            React.createElement('div',{style:{fontSize:13,color:'var(--muted)'}},'≈ $'+stats.balanceUSD.toFixed(2))
+          )
+        )
+      )
+    ),
+    selAccept&&React.createElement('div',{style:{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',display:'grid',placeItems:'center',zIndex:50,padding:20}},
+      React.createElement('div',{className:'card',style:{padding:24,maxWidth:400,width:'100%'}},
+        React.createElement('h3',{style:{margin:0}},'Accept?'),
+        React.createElement('div',{style:{display:'flex',gap:10,marginTop:16}},
+          React.createElement('button',{className:'btn-gold',style:{flex:1},onClick:()=>{
+            rtdb.ref('myJobOffers/'+nurse.id+'/'+selAccept.id).update({status:'ACCEPTED'});
+            const arr=offers.map(o=>o.id===selAccept.id?{...o,status:'ACCEPTED'}:o);
+            setOffers(arr); localStorage.setItem('jobOffers',JSON.stringify(arr));
+            showToast('Accepted'); setSelAccept(null);
+          }},'Accept'),
+          React.createElement('button',{className:'btn-ghost',style:{flex:1},onClick:()=>setSelAccept(null)},'Cancel')
+        )
+      )
+    ),
+    selReject&&React.createElement('div',{style:{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',display:'grid',placeItems:'center',zIndex:50,padding:20}},
+      React.createElement('div',{className:'card',style:{padding:24,maxWidth:400,width:'100%'}},
+        React.createElement('h3',{style:{margin:0}},'Reject?'),
+        React.createElement('div',{style:{display:'flex',gap:10,marginTop:16}},
+          React.createElement('button',{className:'btn-ghost',style:{flex:1},onClick:()=>{
+            rtdb.ref('myJobOffers/'+nurse.id+'/'+selReject.id).update({status:'REJECTED'});
+            const arr=offers.map(o=>o.id===selReject.id?{...o,status:'REJECTED'}:o);
+            setOffers(arr); localStorage.setItem('jobOffers',JSON.stringify(arr));
+            showToast('Rejected'); setSelReject(null);
+          }},'Reject'),
+          React.createElement('button',{className:'btn-ghost',style:{flex:1},onClick:()=>setSelReject(null)},'Cancel')
+        )
+      )
+    ),
+    selNav&&React.createElement('div',{style:{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',display:'grid',placeItems:'center',zIndex:50,padding:20}},
+      React.createElement('div',{className:'card',style:{padding:24,maxWidth:400,width:'100%'}},
+        React.createElement('h3',{style:{margin:0}},'Navigate'),
+        React.createElement('a',{href:`https://www.google.com/maps/dir/?api=1&destination=${selNav.clientLat||5.635},${selNav.clientLng||-0.146}`,target:'_blank',className:'btn-gold',style:{display:'block',textAlign:'center',textDecoration:'none',marginTop:12}},'Google Maps'),
+        React.createElement('button',{className:'btn-ghost',style:{width:'100%',marginTop:10},onClick:()=>setSelNav(null)},'Close')
+      )
+    ),
+    toast&&React.createElement('div',{className:'toast'},toast)
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
