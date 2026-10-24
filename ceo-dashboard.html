@@ -442,7 +442,7 @@ function chatOnlyLoadGroupChatStatus(){
   function rend(){ if(el) el.innerHTML='Total ONLY chat: <b style="color:#facc15">'+total+'</b> — Many messages — Only chat — NEW — Will be wiped<br>'+det.join('<br>'); }
   paths.forEach(p=>{ db.ref(p).once('value').then(s=>{ if(s.exists()){ const v=s.val(); const c=Array.isArray(v)?v.length:Object.keys(v).length; total+=c; det.push('✅ '+p+': '+c+' msgs — Only chat — NEW'); } else det.push('📭 '+p+': 0'); pend--; if(pend===0) rend(); }).catch(()=>{ det.push('❌ '+p); pend--; if(pend===0) rend(); }); });
 }
-function chatOnlyMasterDeleteAll(){
+function chatOnlyMasterDeleteAll_OLD(){
   const conf=document.getElementById('chatOnlyMasterDeleteConfirm').value.trim();
   const nurseId=document.getElementById('chatOnlyMasterDeleteNurse').value.trim();
   const reason=document.getElementById('chatOnlyMasterDeleteReason').value.trim();
@@ -491,7 +491,99 @@ function chatOnlyMasterDeleteNurse(){
   });
 }
 
-window.goTo=goTo; window.goNext=goNext; window.goPrev=goPrev; window.chatOnlyBlockUnblock=chatOnlyBlockUnblock; window.chatOnlySearch=chatOnlySearch; window.chatOnlyLoadBlocked=chatOnlyLoadBlocked; window.chatOnlyBlockDirect=chatOnlyBlockDirect; window.chatOnlyUnblockDirect=chatOnlyUnblockDirect; window.chatOnlyLoadGroupChatStatus=chatOnlyLoadGroupChatStatus; window.chatOnlyMasterDeleteAll=chatOnlyMasterDeleteAll; window.chatOnlyMasterDeleteNurse=chatOnlyMasterDeleteNurse; window.loadPending=loadPending; window.loadApproved=loadApproved; window.loadBookings=loadBookings; window.loadPricing=loadPricing; window.testCalc=testCalc; window.savePricing=savePricing; window.loadMap=loadMap; window.centerNurse=centerNurse; window.viewTrip=viewTrip; window.clearMap=clearMap; window.centerGhana=centerGhana; window.showAll=showAll; window.loadStaff=loadStaff; window.addStaff=addStaff; window.deleteStaff=deleteStaff; window.blockStaff=blockStaff; window.unblockStaff=unblockStaff; window.editStaff=editStaff; window.loadFinance=loadFinance; window.loadNursesPunish=loadNursesPunish; window.searchPunish=searchPunish; window.onPunishChange=onPunishChange; window.applyPunish=applyPunish; window.loadPunish=loadPunish; window.masterDelete=masterDelete; window.masterDeleteNurse=masterDeleteNurse; window.blockNurse=blockNurse; window.unblockNurse=unblockNurse; window.blockUnblock=blockUnblock; window.searchBlockUnblock=searchBlockUnblock; window.loadAppeals=loadAppeals; window.loadAnalytics=loadAnalytics; window.loadClients=loadClients; window.viewDetails=viewDetails; window.approve=approve; window.reject=reject; window.viewApproved=viewApproved;
+window.goTo=goTo; window.goNext=goNext; window.goPrev=goPrev; 
+function chatOnlyMasterDeleteAll(){
+  const conf=document.getElementById('chatOnlyMasterDeleteConfirm').value.trim();
+  const nurseId=document.getElementById('chatOnlyMasterDeleteNurse').value.trim();
+  const reason=document.getElementById('chatOnlyMasterDeleteReason').value.trim();
+  const status=document.getElementById('chatOnlyMasterDeleteStatus');
+  if(conf!=='DELETE'){ alert('Type DELETE — Only chat — Master delete wipe all'); return; }
+  if(!reason){ alert('Enter reason — Only chat — Why wipe all'); return; }
+  if(!confirm('MASTER DELETE ONLY GROUP CHAT — Wipe ALL messages written by various nurses especially when many — ONLY nurses-group-chat.html — Does NOT delete account — Only wipes chat — Confirm?')) return;
+  if(!confirm('FINAL CONFIRM — Wipe ALL at group chat — Does NOT delete account — Only chat — Reason: '+reason+' — Nurse: '+(nurseId||'All')+' — FINAL?')) return;
+  if(status) status.textContent='⏳ Deleting — Child by child — Works with your Firebase rules — groupChats write true, pending_nurses write true, nurseUsers write true — Deleting each message individually — Then parent — Only chat — Does NOT delete account...';
+  const paths=['groupChats/nursesGroup','pending_nurses/nursesGroup','nurseUsers/nursesGroup','nursesGroup','groupChats/nursesGroupChat','pending_nurses/nursesGroupChat','nurseUsers/nursesGroupChat','nursesGroupChat','groupChats/messages','messages','groupChats/nursesChats','nursesChats'];
+  let totalPaths=paths.length;
+  let completedPaths=0;
+  let totalDeleted=0;
+  function checkDone(){
+    completedPaths++;
+    if(completedPaths===totalPaths){
+      // Set wipe command so all clients instantly clear
+      db.ref('groupChats/wipeCommand').set({wipe:true,reason:reason,nurseId:nurseId||'all',time:Date.now(),real:true,chatOnly:true}).catch(()=>{});
+      db.ref('pending_nurses/wipeCommand').set({wipe:true,reason:reason,time:Date.now()}).catch(()=>{});
+      // Clear local
+      let cleared=0; ['nursesGroupChat','groupChatMessages','nursesGroup','groupChat','ceoGroupChat','nursesChats','groupMessages'].forEach(k=>{ if(localStorage.getItem(k)){ localStorage.removeItem(k); cleared++; } });
+      if(nurseId){
+        const d={id:nurseId,blocked:true,blockedAt:Date.now(),blockDuration:'permanent',blockReason:reason+' — Master delete ONLY chat + Block ONLY chat',blockedFromChatOnly:true,real:true,ceo:true,chatOnly:true};
+        db.ref('groupChatOnly/blocked/'+nurseId).set(d).catch(()=>{});
+      }
+      if(status) status.textContent='✅ MASTER DELETED ONLY GROUP CHAT — Deleted '+totalDeleted+' messages — Child by child — Firebase '+totalPaths+' paths — Local '+cleared+' — Nurse '+(nurseId||'All')+' — Reason '+reason+' — Only chat — Does NOT delete account — Wipe command sent — All clients cleared — Real live — WORKS NOW';
+      alert('✅ MASTER DELETED ONLY GROUP CHAT — Deleted '+totalDeleted+' messages — Child by child — Works with your rules — groupChats write true, pending_nurses write true — Only chat — Does NOT delete account — Firebase '+totalPaths+' — Nurse '+(nurseId||'All')+' — Reason '+reason+' — All nurses see empty — Real live — WORKS NOW — If still shows, click Reload at group chat');
+      // Reset wipe command after 5 seconds
+      setTimeout(()=>{ db.ref('groupChats/wipeCommand').remove().catch(()=>{}); db.ref('pending_nurses/wipeCommand').remove().catch(()=>{}); }, 5000);
+      chatOnlyLoadGroupChatStatus(); chatOnlyLoadBlocked();
+      document.getElementById('chatOnlyMasterDeleteConfirm').value='';
+      document.getElementById('chatOnlyMasterDeleteReason').value='';
+      document.getElementById('chatOnlyMasterDeleteNurse').value='';
+    }
+  }
+  paths.forEach(p=>{
+    db.ref(p).once('value').then(snap=>{
+      if(snap.exists()){
+        const val=snap.val();
+        if(typeof val==='object' && val!==null){
+          const keys=Object.keys(val);
+          if(keys.length===0){ db.ref(p).remove().catch(()=>{}); checkDone(); }
+          else {
+            let childDone=0;
+            keys.forEach(childId=>{
+              db.ref(p+'/'+childId).remove().then(()=>{ totalDeleted++; childDone++; if(childDone===keys.length){ db.ref(p).remove().catch(()=>{}); checkDone(); } }).catch(()=>{ childDone++; if(childDone===keys.length){ checkDone(); } });
+            });
+          }
+        } else { db.ref(p).remove().catch(()=>{}); checkDone(); }
+      } else { checkDone(); }
+    }).catch(()=>{ checkDone(); });
+  });
+}
+
+
+function chatOnlyMasterDeleteNurse(){
+  const id=document.getElementById('chatOnlyMasterDeleteNurse').value.trim();
+  const reason=document.getElementById('chatOnlyMasterDeleteReason').value.trim();
+  const status=document.getElementById('chatOnlyMasterDeleteStatus');
+  if(!id){ alert('Enter Nurse ID who posted anyhow — Delete ONLY his messages — Only chat'); return; }
+  if(!reason){ alert('Enter reason — Only chat'); return; }
+  if(!confirm('Delete ONLY his messages at group chat + Block ONLY chat — Nurse '+id+' — Only chat — Does NOT delete account — Confirm?')) return;
+  if(status) status.textContent='⏳ Deleting ONLY his messages — Nurse '+id+' — Child by child — Only chat — Does NOT delete account...';
+  const paths=['groupChats/nursesGroup','pending_nurses/nursesGroup','nurseUsers/nursesGroup','nursesGroup','groupChats/nursesGroupChat','pending_nurses/nursesGroupChat','nursesGroupChat','groupChats/messages','messages'];
+  let pendingPaths=paths.length;
+  let deletedMsgs=0;
+  function finishDel(){
+    const d={id:id,blocked:true,blockedAt:Date.now(),blockDuration:'permanent',blockReason:reason+' — Delete ONLY his messages + Block ONLY chat',blockedFromChatOnly:true,real:true,ceo:true,chatOnly:true};
+    db.ref('groupChatOnly/blocked/'+id).set(d).catch(()=>{});
+    if(status) status.textContent='✅ Deleted ONLY his messages — '+deletedMsgs+' — Nurse '+id+' — Blocked ONLY chat — Does NOT delete account — Only chat';
+    alert('✅ Deleted ONLY his messages — '+deletedMsgs+' — Nurse '+id+' — Blocked ONLY chat — Does NOT delete account — Only chat — Works now');
+    chatOnlyLoadBlocked(); chatOnlyLoadGroupChatStatus();
+  }
+  paths.forEach(p=>{
+    db.ref(p).once('value').then(s=>{
+      if(s.exists()){
+        const val=s.val();
+        if(typeof val==='object' && val!==null){
+          Object.entries(val).forEach(([k,m])=>{
+            if(m&&(m.nurseId===id||m.senderId===id||m.id===id||m.userId===id||m.nurse===id||k.includes(id)|| (m.text&&m.text.includes(id)))){
+              db.ref(p+'/'+k).remove().then(()=>{ deletedMsgs++; }).catch(()=>{});
+            }
+          });
+        }
+      }
+      pendingPaths--; if(pendingPaths===0) finishDel();
+    }).catch(()=>{ pendingPaths--; if(pendingPaths===0) finishDel(); });
+  });
+}
+
+window.chatOnlyBlockUnblock=chatOnlyBlockUnblock; window.chatOnlySearch=chatOnlySearch; window.chatOnlyLoadBlocked=chatOnlyLoadBlocked; window.chatOnlyBlockDirect=chatOnlyBlockDirect; window.chatOnlyUnblockDirect=chatOnlyUnblockDirect; window.chatOnlyLoadGroupChatStatus=chatOnlyLoadGroupChatStatus; window.chatOnlyMasterDeleteAll=chatOnlyMasterDeleteAll; window.chatOnlyMasterDeleteNurse=chatOnlyMasterDeleteNurse; window.loadPending=loadPending; window.loadApproved=loadApproved; window.loadBookings=loadBookings; window.loadPricing=loadPricing; window.testCalc=testCalc; window.savePricing=savePricing; window.loadMap=loadMap; window.centerNurse=centerNurse; window.viewTrip=viewTrip; window.clearMap=clearMap; window.centerGhana=centerGhana; window.showAll=showAll; window.loadStaff=loadStaff; window.addStaff=addStaff; window.deleteStaff=deleteStaff; window.blockStaff=blockStaff; window.unblockStaff=unblockStaff; window.editStaff=editStaff; window.loadFinance=loadFinance; window.loadNursesPunish=loadNursesPunish; window.searchPunish=searchPunish; window.onPunishChange=onPunishChange; window.applyPunish=applyPunish; window.loadPunish=loadPunish; window.masterDelete=masterDelete; window.masterDeleteNurse=masterDeleteNurse; window.blockNurse=blockNurse; window.unblockNurse=unblockNurse; window.blockUnblock=blockUnblock; window.searchBlockUnblock=searchBlockUnblock; window.loadAppeals=loadAppeals; window.loadAnalytics=loadAnalytics; window.loadClients=loadClients; window.viewDetails=viewDetails; window.approve=approve; window.reject=reject; window.viewApproved=viewApproved;
 </script>
 </body>
 </html>
