@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Booking Receiver — Call Client / Nurse</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;padding:0}
+.topbar{position:sticky;top:0;z-index:9999;background:rgba(14,10,28,.98);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.15);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.card{background:rgba(28,18,56,.9);border:1px solid rgba(168,85,247,.15);border-radius:18px;padding:14px;margin:10px}
+.badge{padding:4px 8px;border-radius:999px;font-size:9px;font-weight:900}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-weight:900;cursor:pointer;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btnCall{background:linear-gradient(135deg,#22c55e,#86efac);color:#0a1a0f}
+.btnCallNurse{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}
+.btnMap{background:#4285F4;color:white}
+.btnWA{background:linear-gradient(135deg,#25D366,#128C7E);color:white}
+.grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:700px){.grid{grid-template-columns:1fr 1fr}}
+.kv{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed rgba(168,85,247,.12);font-size:11px}
+.small{font-size:10px;color:#a78bfa}
+</style>
+</head>
+<body>
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:10px">
+<div style="width:38px;height:38px;border-radius:10px;background:white;display:grid;place-items:center;font-size:20px">👑</div>
+<div><b style="font-size:13px">CEO BOOKING RECEIVER</b><br><small style="color:#4ade80;font-size:10px">Live from BOTH booking files — Call Client / Nurse after Paystack success</small></div>
+</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<a href="ceo-dashboard.html" class="btn" style="background:rgba(255,255,255,.08);color:#e9d5ff;border:1px solid rgba(168,85,247,.15)">← CEO Dashboard</a>
+<a href="ceo-dashboard-finance.html" class="btn" style="background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.15)">💰 Finance</a>
+<a href="index.html" class="btn" style="background:rgba(255,255,255,.06);color:#e9d5ff">Home</a>
+</div>
+</div>
+
+<div style="max-width:1100px;margin:0 auto;padding:10px">
+<div class="card">
+<h3 style="font-size:13px">📞 CEO LIVE BOOKING INBOX — From book-nurse-full.html + book-nurse-50-perc.html</h3>
+<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+<input id="searchBox" placeholder="Search booking ID, client name, nurse, phone..." style="flex:1;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid rgba(168,85,247,.15);background:rgba(14,10,28,.7);color:#ede9fe;font-size:12px" oninput="filterBookings()">
+<select id="filterStatus" onchange="filterBookings()" style="padding:10px;border-radius:10px;background:rgba(14,10,28,.7);color:#d8b4fe;border:1px solid rgba(168,85,247,.15);font-size:11px"><option value="all">All Status</option><option value="pending">Pending</option><option value="accepted">Accepted</option><option value="completed">Completed</option></select>
+<button class="btn" style="background:rgba(168,85,247,.15);color:#d8b4fe" onclick="loadBookings()">🔄 Refresh</button>
+</div>
+<div class="small" style="margin-top:8px">Sources: <b>ceoBookings + allBookings + bookings + jobOffers</b> — Auto merges — CEO can call client OR nurse instantly after successful booking</div>
+</div>
+
+<div id="stats" class="card" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center">
+<div><b id="totalCount">0</b><br><small class="small">Total</small></div>
+<div><b id="todayCount">0</b><br><small class="small">Today</small></div>
+<div><b id="fullCount">0</b><br><small class="small">Full Pay</small></div>
+<div><b id="halfCount">0</b><br><small class="small">50% Now</small></div>
+</div>
+
+<div id="bookingList" class="grid">Loading bookings from Firebase...</div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const rtdb=firebase.database();
+let allBookingsMap={}; let bookingsArray=[];
+
+function formatDate(ts){ if(!ts) return '—'; const d=new Date(ts); return d.toLocaleString('en-GH',{dateStyle:'short',timeStyle:'short'}); }
+
+function renderBookings(list){
+  const el=document.getElementById('bookingList');
+  if(!list.length){ el.innerHTML='<div class="card" style="text-align:center;padding:30px">No bookings yet — Book from book-nurse-full.html or book-nurse-50-percent.html — Paystack success will appear here for CEO to call</div>'; return; }
+  el.innerHTML=list.map(b=>{
+    const is50 = (b.paymentMethod||'').includes('50') || (b.amountPaidNow && b.amount && b.amountPaidNow < b.amount) || b.paymentType==='50%';
+    const typeLabel = is50 ? '📦 50% Now + 50% Cash' : '💳 Full Payment';
+    const typeColor = is50 ? '#facc15' : '#86efac';
+    const clientPhoneClean = (b.phone||b.clientPhone||'').replace(/[^0-9+]/g,'');
+    const nursePhoneClean = (b.nursePhone||(b.nurseData&&b.nurseData.phone)||'').replace(/[^0-9+]/g,'');
+    const clientCallLink = 'tel:'+clientPhoneClean;
+    const nurseCallLink = nursePhoneClean ? 'tel:'+nursePhoneClean : '#';
+    const waClient = 'https://wa.me/'+clientPhoneClean.replace('+','');
+    const waNurse = nursePhoneClean ? 'https://wa.me/'+nursePhoneClean.replace('+','') : '#';
+    const mapsLink = b.clientLat ? 'https://www.google.com/maps?q='+b.clientLat+','+b.clientLng : '#';
+    return '<div class="card" style="border-left:4px solid '+typeColor+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+        +'<b style="font-size:13px">'+(b.bookingId||b.id)+'</b>'
+        +'<span class="badge" style="background:'+typeColor+'22;color:'+typeColor+';border:1px solid '+typeColor+'55">'+typeLabel+'</span>'
+      +'</div>'
+      +'<div style="margin-top:8px">'
+        +'<div class="kv"><span>Client</span><span><b>'+(b.clientName||'—')+'</b> — '+(b.phone||b.clientPhone||'—')+'</span></div>'
+        +'<div class="kv"><span>Patient</span><span>'+(b.patientName||'—')+'</span></div>'
+        +'<div class="kv"><span>Nurse Chosen</span><span><b>'+(b.nurseName||b.nurseId||'—')+'</b> — '+(b.nursePhone||(b.nurseData&&b.nurseData.phone)||'No phone')+'</span></div>'
+        +'<div class="kv"><span>Time / Hours</span><span>'+(b.startTime||'')+' → '+(b.endTime||'')+' • '+(b.totalHours||b.hrsPerDay||0)+' hrs • '+(b.careMode||'')+' x'+(b.quantity||1)+'</span></div>'
+        +'<div class="kv"><span>Amount</span><span><b style="color:'+typeColor+'">'+(b.currency||'GHS')+' '+((b.amount||0).toFixed(2))+'</b> '+(is50?'(Paid Now: '+(b.currency||'GHS')+' '+((b.amountPaidNow||b.amount*0.5).toFixed(2))+' | Cash: '+((b.amount*0.5).toFixed(2))+')':'')+'</span></div>'
+        +'<div class="kv"><span>CEO 20% / Nurse 80%</span><span>CEO: '+((b.amount*0.2).toFixed(2))+' | Nurse: '+((b.amount*0.8).toFixed(2))+'</span></div>'
+        +'<div class="kv"><span>Paystack Ref / Status</span><span>'+(b.paystackRef||'—')+' • <b style="color:#4ade80">'+(b.status||'pending')+'</b></span></div>'
+        +'<div class="kv"><span>Booked At</span><span>'+formatDate(b.time||b.timestamp||b.createdAt)+'</span></div>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">'
+        +'<a href="'+clientCallLink+'" class="btn btnCall">📞 Call Client</a>'
+        +'<a href="'+waClient+'" target="_blank" class="btn btnWA">💬 WA Client</a>'
+        +'<a href="'+nurseCallLink+'" class="btn btnCallNurse">📞 Call Nurse</a>'
+        +(nursePhoneClean?'<a href="'+waNurse+'" target="_blank" class="btn btnWA" style="filter:hue-rotate(260deg)">💬 WA Nurse</a>':'')
+        +(b.clientLat?'<a href="'+mapsLink+'" target="_blank" class="btn btnMap">🗺️ Client Location</a>':'')
+        +'<button class="btn" style="background:rgba(255,255,255,.06);color:#e9d5ff" onclick="markCompleted(\''+(b.bookingId||b.id)+'\')">✅ Mark Done</button>'
+      +'</div>'
+      +'<div class="small" style="margin-top:6px">Source: '+(b._source||'')+' | NurseID: '+(b.nurseId||'')+' | Both booking files support CEO call</div>'
+    +'</div>';
+  }).join('');
+}
+
+function filterBookings(){
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  const status=document.getElementById('filterStatus').value;
+  let filtered=bookingsArray.filter(b=>{
+    const matchQ=!q||JSON.stringify(b).toLowerCase().includes(q);
+    const matchS=status==='all'||(b.status||'pending')===status;
+    return matchQ&&matchS;
+  });
+  renderBookings(filtered);
+}
+
+function markCompleted(id){
+  if(!id) return;
+  rtdb.ref('ceoBookings/'+id+'/status').set('completed');
+  rtdb.ref('allBookings/'+id+'/status').set('completed');
+  rtdb.ref('bookings/'+id+'/status').set('completed');
+  alert('Marked '+id+' completed');
+  loadBookings();
+}
+
+async function loadBookings(){
+  allBookingsMap={};
+  document.getElementById('bookingList').innerHTML='Loading...';
+  const paths=['ceoBookings','allBookings','bookings','jobOffers'];
+  for(let p of paths){
+    try{
+      const snap=await rtdb.ref(p).once('value');
+      if(snap.exists()){
+        snap.forEach(child=>{
+          const v=child.val(); const id=child.key;
+          if(!allBookingsMap[id]){ v._source=p; allBookingsMap[id]=v; }
+          else {
+            if(v.phone||v.clientPhone) allBookingsMap[id].phone=v.phone||v.clientPhone;
+            if(v.nursePhone) allBookingsMap[id].nursePhone=v.nursePhone;
+          }
+        });
+      }
+    }catch(e){ console.log('load error '+p,e.message) }
+  }
+  bookingsArray=Object.values(allBookingsMap);
+  for(let b of bookingsArray){
+    if(b.nurseId && !b.nursePhone){
+      try{
+        const nsnap=await rtdb.ref('nurses/'+b.nurseId).once('value');
+        if(nsnap.exists()){ const nv=nsnap.val(); b.nursePhone=nv.phone||nv.phoneNumber||''; b.nurseData=nv; }
+      }catch(e){}
+    }
+  }
+  bookingsArray.sort((a,b)=>(b.time||0)-(a.time||0));
+  const today=new Date().toDateString();
+  document.getElementById('totalCount').textContent=bookingsArray.length;
+  document.getElementById('todayCount').textContent=bookingsArray.filter(b=>new Date(b.time||0).toDateString()===today).length;
+  document.getElementById('fullCount').textContent=bookingsArray.filter(b=>!((b.paymentMethod||'').includes('50'))).length;
+  document.getElementById('halfCount').textContent=bookingsArray.filter(b=>(b.paymentMethod||'').includes('50')||b.paymentType==='50%').length;
+  renderBookings(bookingsArray);
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  loadBookings();
+  rtdb.ref('ceoBookings').on('child_added',()=>loadBookings());
+});
+</script>
+</body>
+</html>
