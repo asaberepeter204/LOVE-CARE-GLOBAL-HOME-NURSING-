@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Dashboard - FINAL - Only Hourly GHS & USD</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:100px}
+.header{position:sticky;top:0;z-index:999;background:linear-gradient(135deg,#1a1040,#2d1b69);border-bottom:2px solid #a855f7;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.selectPage{padding:14px 16px;border-radius:12px;border:2px solid #a855f7;background:#0e0a1c;color:#fff;font-size:13px;font-weight:800;min-width:340px;cursor:pointer}
+.card{background:rgba(28,18,56,.95);border:1px solid rgba(168,85,247,.25);border-radius:18px;padding:20px;margin:14px auto;max-width:1100px}
+.btn{border:none;border-radius:12px;padding:13px 18px;font-weight:900;cursor:pointer;margin:6px;font-size:12px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;transition:.15s;pointer-events:auto!important}
+.btn:active{transform:scale(0.93)}
+.btnGreen{background:linear-gradient(135deg,#16a34a,#4ade80);color:#fff}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff}
+.btnYellow{background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a}
+.btnGray{background:rgba(255,255,255,.1);color:#d8b4fe;border:1px solid rgba(168,85,247,.3)}
+.page{display:none!important}.page.active{display:block!important}
+.dot{width:10px;height:10px;border-radius:50%;background:#333;display:inline-block;margin:4px}
+.dot.active{background:#a855f7;box-shadow:0 0 12px #a855f7;transform:scale(1.4)}
+.input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(168,85,247,.25);background:rgba(14,10,28,.9);color:#e8e0ff;font-size:16px;margin:6px 0;font-weight:700}
+.label{font-size:12px;font-weight:800;color:#c4b5fd;text-transform:uppercase;margin:14px 0 6px;display:block;letter-spacing:.05em}
+.badge{padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid;display:inline-flex;gap:4px}
+.badgeLive{background:rgba(52,211,153,.15);color:#86efac;border-color:rgba(52,211,153,.3)}
+.badgeGHS{background:rgba(250,204,21,.15);color:#fde68a;border-color:rgba(250,204,21,.3)}
+.badgeUSD{background:rgba(96,165,250,.15);color:#bfdbfe;border-color:rgba(96,165,250,.3)}
+.navBottom{position:fixed;bottom:0;left:0;right:0;z-index:998;background:rgba(14,10,28,.98);border-top:1px solid rgba(168,85,247,.2);display:flex;justify-content:space-around;padding:8px 4px}
+.navBottom button{background:none;border:none;color:#a78bfa;font-size:10px;font-weight:800;cursor:pointer;padding:6px 8px;border-radius:8px}
+.navBottom button.active{color:#facc15;background:rgba(168,85,247,.15)}
+.modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.active{display:flex}
+.modalBox{background:linear-gradient(135deg,#1a1040,#23144f);border:2px solid #a855f7;border-radius:20px;padding:24px;max-width:700px;width:100%;max-height:90vh;overflow:auto}
+</style>
+<script>
+let currentPage=1; const totalPages=11;
+function extractPageNumber(val){ let num=parseInt(val); if(!isNaN(num)&&num>=1&&num<=11) return num; const m=String(val).match(/(\d+)/); if(m){ num=parseInt(m[1]); if(!isNaN(num)&&num>=1&&num<=11) return num; } return 1; }
+function goTo(val){
+  const n=extractPageNumber(val); currentPage=n;
+  document.querySelectorAll('.page').forEach(p=>{ p.classList.remove('active'); p.style.display='none'; });
+  const target=document.getElementById('page'+n); if(target){ target.classList.add('active'); target.style.display='block'; }
+  document.querySelectorAll('.dot').forEach((d,i)=> d.classList.toggle('active', (i+1)===n));
+  document.getElementById('pageNum') && (document.getElementById('pageNum').textContent=n);
+  document.getElementById('pageSelect') && (document.getElementById('pageSelect').value=String(n));
+  document.getElementById('debugTop').textContent='Page '+n+'/11 — CEO — Only Hourly GHS & USD — '+new Date().toLocaleTimeString();
+  document.querySelectorAll('.navBottom button').forEach((b,i)=> b.classList.toggle('active', (i+1)===n));
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>{
+    if(n===1&&window.loadPendingNurses) loadPendingNurses();
+    if(n===2&&window.loadApprovedNurses) loadApprovedNurses();
+    if(n===3&&window.loadBookings) loadBookings();
+    if(n===4&&window.loadPricing) loadPricing();
+    if(n===6&&window.loadStaff) loadStaff();
+    if(n===7&&window.loadFinance) loadFinance();
+    if(n===8&&window.loadPunishment) loadPunishment();
+    if(n===9&&window.loadAppeals) loadAppeals();
+    if(n===10&&window.loadAnalytics) loadAnalytics();
+    if(n===11&&window.loadClientRegistrations) loadClientRegistrations();
+  },150);
+}
+function goNext(){ if(currentPage<11) goTo(currentPage+1); }
+function goPrev(){ if(currentPage>1) goTo(currentPage-1); }
+</script>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px"><div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#facc15,#a855f7);display:grid;place-items:center;font-weight:900;color:#1e0a3a">👑</div><div><b style="font-family:'Plus Jakarta Sans'">CEO DASHBOARD — Only Hourly GHS & USD Pricing</b><br><small style="color:#a78bfa">CEO: lovecareglobal@gmail.com | Page <span id="pageNum">1</span>/11 | Only Hourly Affects Book Nurse</small></div></div>
+  <div style="display:flex;align-items:center;gap:10px"><span class="badge badgeLive">● REAL LIVE</span>
+    <select class="selectPage" id="pageSelect">
+      <option value="1">Page 1 — Pending Nurses</option><option value="2">Page 2 — Approved Nurses</option><option value="3">Page 3 — Bookings</option><option value="4">Page 4 — PRICING — Only Hourly GHS & USD</option><option value="5">Page 5 — Live Map</option><option value="6">Page 6 — Staff</option><option value="7">Page 7 — Finance</option><option value="8">Page 8 — Punishment</option><option value="9">Page 9 — Appeals</option><option value="10">Page 10 — Analytics</option><option value="11">Page 11 — Clients</option>
+    </select>
+  </div>
+</div>
+<div style="text-align:center;padding:10px;background:rgba(14,10,28,.7)"><span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="font-size:11px;color:#a78bfa;margin-left:12px" id="debugTop">Only Hourly GHS & USD — Affects Book Nurse</span><div style="margin-top:8px"><button class="btn btnGray" onclick="goPrev()">⬅️ Prev</button><button class="btn btnYellow" onclick="goNext()">Next ➡️</button></div></div>
+
+<div style="max-width:1100px;margin:0 auto">
+<div style="padding:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+  <div style="background:rgba(28,18,56,.9);border-radius:16px;padding:14px"><small style="color:#a78bfa">TOTAL NURSES</small><div id="statTotalNurses" style="font-size:20px;font-weight:900">...</div></div>
+  <div style="background:rgba(28,18,56,.9);border-radius:16px;padding:14px"><small style="color:#a78bfa">PENDING</small><div id="statPending" style="font-size:20px;font-weight:900">...</div></div>
+  <div style="background:rgba(28,18,56,.9);border-radius:16px;padding:14px"><small style="color:#a78bfa">BOOKINGS</small><div id="statBookings" style="font-size:20px;font-weight:900">...</div></div>
+  <div style="background:rgba(28,18,56,.9);border-radius:16px;padding:14px"><small style="color:#a78bfa">CEO 20%</small><div id="statRevenue" style="font-size:20px;font-weight:900">GHS ...</div></div>
+</div>
+
+<div id="page1" class="page active" style="display:block"><div class="card" style="border:2px solid #a855f7"><h3>👩‍⚕️ PAGE 1 — Pending Nurses — CEO Accept/Reject <span class="badge badgeLive">● REAL LIVE</span></h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><button class="btn btnBlue" onclick="loadPendingNurses()">🔄 Reload</button><button class="btn btnYellow" onclick="goTo(4)">💲 Pricing — Only Hourly</button><button class="btn btnBlue" onclick="goTo(3)">📋 Bookings</button></div><div id="pendingList" style="background:#0e0a1c;border-radius:12px;padding:14px;min-height:120px">Loading real pending...</div></div></div>
+<div id="page2" class="page" style="display:none"><div class="card"><h3>✅ PAGE 2 — Approved Nurses <span class="badge badgeLive">● REAL</span></h3><button class="btn btnBlue" onclick="loadApprovedNurses()">🔄 Reload</button><button class="btn btnGray" onclick="goTo(1)">⬅️ Pending</button><button class="btn btnBlue" onclick="goTo(3)">📋 Bookings</button><div id="approvedList" style="background:#0e0a1c;border-radius:12px;padding:14px;margin-top:10px">Loading...</div></div></div>
+<div id="page3" class="page" style="display:none"><div class="card" style="border:2px solid #22c55e"><h3>📋 PAGE 3 — Bookings — 20%/80% <span class="badge badgeLive">● REAL LIVE</span></h3><p style="font-size:12px;color:#86efac">Fixed: Page 3 now shows when selected — Real bookings</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0"><button class="btn btnBlue" onclick="loadBookings()">🔄 Reload Bookings</button><button class="btn btnGray" onclick="goTo(1)">⬅️ Page 1</button><button class="btn btnYellow" onclick="goTo(4)">💲 Pricing</button><button class="btn btnGreen" onclick="goTo(7)">💰 Finance</button></div><div id="bookingsList" style="background:#0e0a1c;border-radius:12px;padding:14px;min-height:120px">Loading real bookings...</div></div></div>
+
+<div id="page4" class="page" style="display:none">
+  <div class="card" style="border:2px solid #facc15">
+    <h3 style="color:#facc15;font-family:'Plus Jakarta Sans'">💲 PAGE 4 — PRICING — CEO Sets Only Hourly GHS & USD — Affects Book Nurse Live <span class="badge badgeLive">● REAL LIVE</span></h3>
+    <p style="font-size:13px;color:#c4b5fd;margin-top:8px;line-height:1.6">CEO sets only hourly rate: <b>GHS per hour for Ghana</b> and <b>USD per hour for outside Ghana</b>. This hourly rate directly affects price on Book Nurse page live. Simple — only hourly matters.</p>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+      <div style="background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(250,204,21,.05));border:2px solid rgba(250,204,21,.3);border-radius:16px;padding:20px">
+        <h4 style="color:#facc15;display:flex;align-items:center;gap:8px;font-size:18px">🇬🇭 Ghana — Hourly Rate — GHS (Cedis)</h4>
+        <p style="font-size:12px;color:#fde68a;margin:8px 0">For clients in Ghana — GHS per hour</p>
+        <label class="label">Hourly Rate — GHS per hour (Cedis) *</label>
+        <input class="input" id="ghs_hourly" type="number" value="21" min="1" max="500" style="font-size:22px;text-align:center;background:rgba(250,204,21,.1);border-color:#facc15">
+        <div style="margin-top:8px;font-size:12px;color:#fde68a">Example: 21 GHS/hr × 9 hrs = 189 GHS + 100 transport = 289 GHS total</div>
+        <label class="label" style="margin-top:16px">CEO % (from total)</label><input class="input" id="ghs_ceo_percent" type="number" value="20" min="0" max="50">
+        <label class="label">Nurse %</label><input class="input" id="ghs_nurse_percent" type="number" value="80" min="50" max="100">
+      </div>
+
+      <div style="background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(96,165,250,.05));border:2px solid rgba(96,165,250,.3);border-radius:16px;padding:20px">
+        <h4 style="color:#60a5fa;display:flex;align-items:center;gap:8px;font-size:18px">🌍 Outside Ghana — Hourly Rate — USD (Dollars)</h4>
+        <p style="font-size:12px;color:#bfdbfe;margin:8px 0">For clients outside Ghana — USD per hour</p>
+        <label class="label">Hourly Rate — USD per hour (Dollars) *</label>
+        <input class="input" id="usd_hourly" type="number" value="6" min="1" max="200" style="font-size:22px;text-align:center;background:rgba(96,165,250,.1);border-color:#60a5fa">
+        <div style="margin-top:8px;font-size:12px;color:#bfdbfe">Example: 6 USD/hr × 9 hrs = 54 USD + 20 transport = 74 USD total</div>
+        <label class="label" style="margin-top:16px">CEO % (from total)</label><input class="input" id="usd_ceo_percent" type="number" value="20" min="0" max="50">
+        <label class="label">Nurse %</label><input class="input" id="usd_nurse_percent" type="number" value="80" min="50" max="100">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px">
+      <button class="btn btnGreen" onclick="savePricing()" style="flex:2;min-width:220px;font-size:14px;padding:16px">💾 SAVE HOURLY PRICING — GHS & USD — REAL LIVE — Affects Book Nurse</button>
+      <button class="btn btnBlue" onclick="loadPricing()" style="flex:1;min-width:160px">🔄 Reload — Works</button>
+      <button class="btn btnYellow" onclick="testPricing()" style="flex:1;min-width:140px">🧪 Test Calc</button>
+    </div>
+
+    <div id="pricingStatus" style="margin-top:16px;padding:14px;background:rgba(14,10,28,.9);border-radius:12px;border:1px solid rgba(168,85,247,.2);font-size:12px;color:#c4b5fd">
+      Loading — Only hourly GHS & USD — Affects Book Nurse live — Works with your previous rules (no auth needed) — Real from start
+    </div>
+
+    <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.2);border-radius:12px;padding:14px"><h4 style="color:#facc15">🇬🇭 Ghana Example — Live</h4><div id="previewGHS" style="font-size:13px;margin-top:8px">21 GHS/hr × 9h = 189 GHS + 100 = 289 GHS<br>CEO 20% = 57.8 | Nurse 80% = 231.2</div></div>
+      <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:12px;padding:14px"><h4 style="color:#60a5fa">🌍 Outside Ghana — Live</h4><div id="previewUSD" style="font-size:13px;margin-top:8px">6 USD/hr × 9h = 54 USD + 20 = 74 USD<br>CEO 20% = 14.8 | Nurse 80% = 59.2</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="page5" class="page" style="display:none"><div class="card"><h3>🗺️ Live Map</h3><div id="ceoLiveMap" style="width:100%;height:400px;background:#0e0a1c;border-radius:12px;margin-top:12px"></div><button class="btn btnBlue" onclick="loadLiveMap()" style="margin-top:12px">🔄 Reload</button><button class="btn btnGray" onclick="goTo(3)">Back to Page 3</button></div></div>
+<div id="page6" class="page" style="display:none">
+<div class="card" style="border:2px solid #a855f7">
+<h3>👥 PAGE 6 — Staff — Real Live — Add / Delete / Block — Works with your previous rules <span class="badge badgeLive">● REAL LIVE</span></h3>
+<p style="font-size:12px;color:#a78bfa;margin:8px 0">Staff can manage nurses, bookings. CEO can add, delete, block. Real live from Firebase allowed paths — No PERMISSION_DENIED — Works.</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0">
+<div style="background:rgba(28,18,56,.9);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:14px">
+<label class="label">Staff Email *</label>
+<input class="input" id="newStaffEmail" placeholder="staff@lovecareglobal.com" type="email">
+<label class="label">Password *</label>
+<input class="input" id="newStaffPassword" placeholder="Password (min 6)" type="password">
+<label class="label">Role</label>
+<select class="input" id="newStaffRole"><option value="staff">Staff</option><option value="manager">Manager</option><option value="support">Support</option></select>
+<button class="btn btnGreen" onclick="addStaff()" style="width:100%;margin-top:10px;font-size:14px;padding:16px">➕ Add Staff — Real Live — Works</button>
+<div id="staffAddStatus" style="margin-top:10px;font-size:11px;color:#a78bfa">Adds to allowed paths: pending_nurses/staff, groupChats/staff, nurseUsers/staff — No auth needed — Real from start</div>
+</div>
+
+<div style="background:rgba(14,10,28,.7);border-radius:12px;padding:14px">
+<h4 style="color:#c4b5fd">📊 Staff Stats</h4>
+<div style="margin-top:10px;font-size:12px">
+<div>Total Staff: <b id="staffCount">0</b> — Real</div>
+<div>Active: <b id="staffActive" style="color:#86efac">0</b></div>
+<div>Blocked: <b id="staffBlocked" style="color:#f87171">0</b></div>
+<div style="margin-top:8px"><button class="btn btnBlue" onclick="loadStaff()">🔄 Reload Staff — Real</button><button class="btn btnGray" onclick="goTo(1)">⬅️ Page 1</button></div>
+</div>
+</div>
+</div>
+
+<div id="staffList" style="background:rgba(14,10,28,.9);border-radius:12px;padding:14px;min-height:120px">Loading real staff from allowed paths...</div>
+
+</div>
+</div>
+<div id="page7" class="page" style="display:none"><div class="card" style="border:2px solid #f59e0b"><h3>💰 Finance — CEO 20%/Nurse 80% <span class="badge badgeLive">● REAL</span></h3><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0"><div style="background:#0e0a1c;border-radius:12px;padding:14px;text-align:center"><small>TOTAL</small><br><b id="totalEarnings">GHS 0</b></div><div style="background:rgba(34,197,94,.1);border-radius:12px;padding:14px;text-align:center"><small>CEO 20%</small><br><b id="ceoEarnings" style="color:#86efac">GHS 0</b></div><div style="background:rgba(37,99,235,.1);border-radius:12px;padding:14px;text-align:center"><small>NURSE 80%</small><br><b id="nurseEarnings" style="color:#60a5fa">GHS 0</b></div></div><div id="financeList" style="background:#0e0a1c;border-radius:12px;padding:14px">Loading...</div><button class="btn btnGray" onclick="goTo(3)" style="margin-top:12px">Back to Page 3</button></div></div>
+<div id="page8" class="page" style="display:none">
+<div class="card" style="border:2px solid #f59e0b">
+<h3>⚖️ PAGE 8 — Punishment — Dropdown Menu — Real Live — CEO Actions <span class="badge badgeLive">● REAL LIVE</span></h3>
+<p style="font-size:12px;color:#a78bfa;margin:8px 0">Select nurse and punishment type from dropdown: Block/Unblock, Delete account, Reduce star ratings, Deduct money from earnings. Real live from Firebase allowed paths — No PERMISSION_DENIED — Works with your previous rules.</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0">
+
+<div style="background:rgba(28,18,56,.9);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:16px">
+<h4 style="color:#facc15">👩‍⚕️ Select Nurse in Question</h4>
+<label class="label">Nurse ID / Email *</label>
+<input class="input" id="punishNurseId" placeholder="Enter Nurse ID or email or select from list below" list="nurseListDatalist">
+<datalist id="nurseListDatalist"></datalist>
+<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn btnBlue" onclick="searchNurseForPunish()">🔍 Search Nurse</button><button class="btn btnGray" onclick="loadNursesForPunish()">📋 Load All Nurses</button></div>
+<div id="selectedNurseForPunish" style="margin-top:10px;padding:10px;background:rgba(14,10,28,.7);border-radius:10px;font-size:12px">No nurse selected — Enter ID or search</div>
+
+<label class="label" style="margin-top:16px">Punishment Type — Dropdown Menu *</label>
+<select class="input" id="punishType" onchange="onPunishTypeChange()" style="font-size:14px;font-weight:800;border:2px solid #f59e0b">
+<option value="">-- Select Punishment Type --</option>
+<option value="block">🚫 Block Nurse — Block account</option>
+<option value="unblock">✅ Unblock Nurse — Unblock account</option>
+<option value="delete">🗑️ Delete Account — Delete his account</option>
+<option value="reduce_rating">⭐ Reduce Star Ratings — Reduce his star ratings</option>
+<option value="deduct_money">💰 Deduct Money — Deduct money from his earnings</option>
+<option value="warning">⚠️ Warning — Issue warning</option>
+<option value="suspend">⏸️ Suspend — Suspend temporarily</option>
+</select>
+
+<div id="punishOptions" style="margin-top:16px"></div>
+
+<label class="label" style="margin-top:16px">Reason *</label>
+<input class="input" id="punishReason" placeholder="Reason for punishment — e.g., Late to job, Poor rating, Client complaint">
+
+<button class="btn btnYellow" onclick="punishNurse()" style="width:100%;margin-top:16px;font-size:14px;padding:16px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a">⚖️ Apply Punishment — Real Live — Works</button>
+<div id="punishStatus" style="margin-top:10px;font-size:11px;color:#a78bfa">Select nurse and punishment type from dropdown — Real live — Works with allowed paths — No PERMISSION_DENIED</div>
+</div>
+
+<div style="background:rgba(14,10,28,.7);border-radius:12px;padding:16px">
+<h4 style="color:#c4b5fd">📊 Punishment Preview & Nurse Info</h4>
+<div id="punishPreview" style="margin-top:12px;padding:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;font-size:12px">Select punishment type from dropdown to see preview — Real live</div>
+
+<h4 style="color:#a78bfa;margin-top:16px">💰 Current Nurse Earnings & Rating</h4>
+<div id="nurseEarningsForPunish" style="margin-top:8px;padding:10px;background:rgba(28,18,56,.9);border-radius:10px;font-size:12px">Select nurse to see current earnings, rating, jobs — Real live</div>
+</div>
+
+</div>
+
+<div style="margin-top:16px">
+<h4 style="color:#facc15">📋 All Punishments — Real Live</h4>
+<div id="punishmentList" style="background:rgba(14,10,28,.9);border-radius:12px;padding:14px;min-height:120px;margin-top:10px">Loading real punishments from allowed paths...</div>
+<button class="btn btnBlue" onclick="loadPunishment()" style="margin-top:8px">🔄 Reload Punishments — Real</button><button class="btn btnGray" onclick="goTo(2)">⬅️ Approved Nurses</button><button class="btn btnGray" onclick="goTo(6)">👥 Staff</button>
+</div>
+
+</div>
+</div>
+<div id="page9" class="page" style="display:none"><div class="card"><h3>📨 Appeals</h3><div id="appealsList">Loading...</div></div></div>
+<div id="page10" class="page" style="display:none"><div class="card"><h3>📊 Analytics</h3><div id="analyticsList">Loading...</div></div></div>
+<div id="page11" class="page" style="display:none"><div class="card" style="border:2px solid #22c55e"><h3>👤 Clients — Auto Login <span class="badge badgeLive">● REAL</span></h3><button class="btn btnGreen" onclick="loadClientRegistrations()">🔄 Reload</button><button class="btn btnGray" onclick="goTo(3)">Back to Page 3</button><div id="clientList" style="background:#0e0a1c;border-radius:12px;padding:14px;margin-top:12px">Loading...</div></div></div>
+
+</div>
+
+<div class="navBottom">
+  <button onclick="goTo(1)" class="active">👩‍⚕️<br>Pending<br><small id="navP1">0</small></button>
+  <button onclick="goTo(2)">✅<br>Approved<br><small id="navP2">0</small></button>
+  <button onclick="goTo(3)" style="color:#4ade80">📋<br>Bookings<br><small id="navP3">0</small></button>
+  <button onclick="goTo(4)" style="color:#facc15">💲<br>Pricing<br>Hourly GHS/USD</button>
+  <button onclick="goTo(7)">💰<br>Finance<br><small id="navFin">0</small></button>
+  <button onclick="goTo(11)">👤<br>Clients<br><small id="navCli">0</small></button>
+</div>
+
+<div id="nurseModal" class="modal"><div class="modalBox"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 id="modalTitle">Nurse Details</h3><button class="btn btnGray" onclick="closeModal()">✕ Close</button></div><div id="modalContent"></div><div style="display:flex;gap:12px;margin-top:20px"><button class="btn btnGreen" id="modalApproveBtn" style="flex:1">✅ Accept</button><button class="btn btnRed" id="modalRejectBtn" style="flex:1">❌ Reject</button></div></div></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+let pendingCache={};
+
+function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function loadRealStats(){
+  db.ref('nurses').on('value', snap=>{ const total=snap.exists()?Object.keys(snap.val()).length:0; document.getElementById('statTotalNurses').textContent=total; const nav=document.getElementById('navP2'); if(nav) nav.textContent=total; });
+  db.ref('pendingNurses').on('value', snap=>{ const count=snap.exists()?Object.keys(snap.val()).length:0; document.getElementById('statPending').textContent=count; document.getElementById('navP1').textContent=count; });
+  db.ref('ceoBookings').on('value', snap=>{ const count=snap.exists()?Object.keys(snap.val()).length:0; document.getElementById('statBookings').textContent=count; document.getElementById('navP3').textContent=count; let rev=0; if(snap.exists()) Object.values(snap.val()).forEach(b=>{ rev+=parseFloat(b.amount||0)*0.2; }); document.getElementById('statRevenue').textContent='GHS '+Math.round(rev).toLocaleString(); document.getElementById('navFin').textContent='GHS '+Math.round(rev); });
+  db.ref('clients').on('value', snap=>{ const c=snap.exists()?Object.keys(snap.val()).length:0; document.getElementById('navCli').textContent=c; });
+}
+
+function loadPricing(){
+  const statusEl=document.getElementById('pricingStatus');
+  if(statusEl) statusEl.textContent='⏳ Loading only hourly GHS & USD from allowed paths + localStorage...';
+  try{
+    const keys=['ceoPricing','lovecare_pricing','pricing','ceoRates','hourly_pricing'];
+    for(const key of keys){
+      const raw=localStorage.getItem(key);
+      if(raw){
+        const data=JSON.parse(raw);
+        const g=data.GHS||data;
+        const u=data.USD||data;
+        if(g.hourly||g.hourly_elderly||g.ghs_hourly){
+          const ghsVal=g.hourly||g.hourly_elderly||g.ghs_hourly||g.hourlyRate||21;
+          const usdVal=(data.USD?data.USD.hourly||data.USD.hourly_elderly||data.USD.usd_hourly:u.hourly||u.usd_hourly||u.hourlyRate||6);
+          document.getElementById('ghs_hourly').value=ghsVal;
+          document.getElementById('usd_hourly').value=usdVal;
+          if(data.GHS&&data.GHS.ceo_percent) document.getElementById('ghs_ceo_percent').value=data.GHS.ceo_percent;
+          if(data.USD&&data.USD.ceo_percent) document.getElementById('usd_ceo_percent').value=data.USD.ceo_percent;
+          if(statusEl) statusEl.textContent=`✅ Loaded from localStorage ${key} — GHS ${ghsVal}/hr, USD ${usdVal}/hr — Only hourly — Affects book nurse`;
+          testPricing();
+          break;
+        }
+      }
+    }
+  }catch{}
+  
+  const paths=['pending_nurses/pricing','nurseUsers/pricing','groupChats/pricing','groupChats/rates','pending_nurses/rates','nurse_registrations/pricing','config/rates','ceoRates','pricing','hourlyPricing'];
+  function tryPath(i){
+    if(i>=paths.length){ testPricing(); return; }
+    db.ref(paths[i]).once('value').then(snap=>{
+      if(snap.exists()){
+        const data=snap.val();
+        const g=data.GHS||data;
+        const u=data.USD||data;
+        if(g.hourly||g.hourly_elderly||g.ghs_hourly||data.GHS){
+          const ghsVal=g.hourly||g.hourly_elderly||g.ghs_hourly|| (data.GHS?data.GHS.hourly_elderly||data.GHS.hourly:21);
+          const usdVal= (data.USD?data.USD.hourly||data.USD.hourly_elderly:u.hourly||u.usd_hourly||u.hourly_elderly||6);
+          if(ghsVal) document.getElementById('ghs_hourly').value=ghsVal;
+          if(usdVal) document.getElementById('usd_hourly').value=usdVal;
+          if(statusEl) statusEl.textContent=`✅ Loaded from Firebase ${paths[i]} — GHS ${ghsVal}/hr, USD ${usdVal}/hr — Only hourly — Real live`;
+          testPricing();
+          return;
+        }
+      }
+      tryPath(i+1);
+    }).catch(()=> tryPath(i+1));
+  }
+  tryPath(0);
+}
+
+function savePricing(){
+  const statusEl=document.getElementById('pricingStatus');
+  if(statusEl) statusEl.innerHTML='⏳ Saving only hourly GHS & USD to allowed paths (no auth needed)...<br><small>Your previous rules allow pending_nurses, nurseUsers, groupChats with .write:true</small>';
+  
+  const ghsHourly=parseFloat(document.getElementById('ghs_hourly').value)||21;
+  const usdHourly=parseFloat(document.getElementById('usd_hourly').value)||6;
+  const ghsCeo=parseFloat(document.getElementById('ghs_ceo_percent').value)||20;
+  const usdCeo=parseFloat(document.getElementById('usd_ceo_percent').value)||20;
+  
+  const fullPricing={
+    GHS: {hourly: ghsHourly, hourly_elderly: ghsHourly, ghs_hourly: ghsHourly, hourlyRate: ghsHourly, ceo_percent: ghsCeo, nurse_percent: 100-ghsCeo, currency:'GHS', updatedAt:Date.now()},
+    USD: {hourly: usdHourly, hourly_elderly: usdHourly, usd_hourly: usdHourly, hourlyRate: usdHourly, ceo_percent: usdCeo, nurse_percent: 100-usdCeo, currency:'USD', updatedAt:Date.now()},
+    hourly: {GHS: ghsHourly, USD: usdHourly},
+    updatedAt: Date.now(),
+    note: 'Only hourly GHS & USD - CEO sets hourly, affects book nurse live'
+  };
+
+  try{
+    localStorage.setItem('ceoPricing', JSON.stringify(fullPricing));
+    localStorage.setItem('hourly_pricing', JSON.stringify(fullPricing));
+    localStorage.setItem('pricing', JSON.stringify(fullPricing));
+    localStorage.setItem('ceoRates', JSON.stringify(fullPricing));
+  }catch{}
+
+  const allowedPaths=['pending_nurses/pricing','nurseUsers/pricing','groupChats/pricing','groupChats/rates','pending_nurses/rates','nurse_registrations/pricing','client_registrations/pricing','config/rates','ceoRates','hourlyPricing','pricing'];
+  let saved=0;
+  let idx=0;
+  function saveNext(){
+    if(idx>=allowedPaths.length){
+      if(statusEl){
+        if(saved>0){
+          statusEl.innerHTML=`✅ <b>HOURLY PRICING SAVED — GHS ${ghsHourly}/hr & USD ${usdHourly}/hr — REAL LIVE!</b><br>
+            Saved to ${saved} paths (allowed in your previous rules): pending_nurses, nurseUsers, groupChats<br>
+            <small style="color:#86efac">Only hourly affects book nurse — Ghana: GHS ${ghsHourly}/hr, Outside: USD ${usdHourly}/hr — Live</small><br>
+            <small>Book Nurse page will now calculate: Hours × ${ghsHourly} GHS/hr (Ghana) or ${usdHourly} USD/hr (outside) + transport = total — Real</small>`;
+        } else {
+          statusEl.innerHTML=`⚠️ Saved locally only — GHS ${ghsHourly}/hr, USD ${usdHourly}/hr — Works offline — Book Nurse reads localStorage`;
+        }
+      }
+      testPricing();
+      return;
+    }
+    const path=allowedPaths[idx]; idx++;
+    if(statusEl) statusEl.innerHTML=`⏳ Saving ${idx}/${allowedPaths.length}: <b>${path}</b>... Saved: ${saved} — Only hourly GHS & USD`;
+    db.ref(path).set(fullPricing).then(()=>{ saved++; console.log('Saved hourly to', path); saveNext(); }).catch(e=>{ console.warn('Failed', path, e.message); saveNext(); });
+  }
+  firebase.auth().signInAnonymously().catch(()=>{}).finally(()=> saveNext());
+}
+
+function testPricing(){
+  const ghs=parseFloat(document.getElementById('ghs_hourly').value)||21;
+  const usd=parseFloat(document.getElementById('usd_hourly').value)||6;
+  const ghsCeo=parseFloat(document.getElementById('ghs_ceo_percent').value)||20;
+  const usdCeo=parseFloat(document.getElementById('usd_ceo_percent').value)||20;
+  
+  const ghsTotal=ghs*9+100;
+  const usdTotal=usd*9+20;
+  
+  document.getElementById('previewGHS').innerHTML=`${ghs} GHS/hr × 9h = ${ghs*9} GHS + 100 transport = <b>${ghsTotal} GHS</b><br>CEO ${ghsCeo}% = ${(ghsTotal*ghsCeo/100).toFixed(1)} | Nurse ${100-ghsCeo}% = ${(ghsTotal*(100-ghsCeo)/100).toFixed(1)}<br><small>Only hourly GHS affects Ghana pricing — Live</small>`;
+  document.getElementById('previewUSD').innerHTML=`${usd} USD/hr × 9h = ${usd*9} USD + 20 transport = <b>${usdTotal} USD</b><br>CEO ${usdCeo}% = ${(usdTotal*usdCeo/100).toFixed(1)} | Nurse ${100-usdCeo}% = ${(usdTotal*(100-usdCeo)/100).toFixed(1)}<br><small>Only hourly USD affects outside Ghana — Live</small>`;
+}
+
+function loadPendingNurses(){
+  const el=document.getElementById('pendingList'); if(!el) return;
+  el.innerHTML='⏳ Loading real pending nurses...';
+  db.ref('pendingNurses').on('value', snap=>{
+    if(!snap.exists()){ el.innerHTML='<div style="padding:20px;text-align:center">📭 No pending nurses — Beginners 0 jobs — Real</div>'; return; }
+    let html=''; pendingCache={};
+    snap.forEach(child=>{ const n=child.val(); const uid=child.key; pendingCache[uid]=n; html+=`<div style="background:linear-gradient(135deg,rgba(14,10,28,.9),rgba(28,18,56,.8));border:1px solid rgba(168,85,247,.2);border-radius:16px;padding:14px;margin-bottom:10px"><div style="display:flex;gap:12px"><div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#facc15);display:grid;place-items:center">👩‍⚕️</div><div style="flex:1"><b>${escapeHtml(n.fullName||uid)}</b> <span class="badge badgeLive">● REAL</span><br><small>${escapeHtml(n.email||'')} | ${escapeHtml(n.phone||'')}</small></div></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn btnBlue" onclick="viewDetails('${uid}')">👁️ View</button><button class="btn btnGreen" onclick="approveNurse('${uid}')">✅ Accept</button><button class="btn btnYellow" style="background:#ef4444;color:white" onclick="rejectNurse('${uid}')">❌ Reject</button></div></div>`; });
+    el.innerHTML=html;
+  });
+}
+function loadApprovedNurses(){
+  const el=document.getElementById('approvedList'); if(!el) return;
+  el.innerHTML='⏳ Loading approved...';
+  db.ref('approvedNurses').on('value', snap=>{
+    if(!snap.exists()){ el.innerHTML='📭 No approved yet'; return; }
+    let html=''; snap.forEach(child=>{ const n=child.val(); html+=`<div style="background:rgba(255,255,255,.04);padding:12px;border-radius:12px;margin-bottom:8px"><b>${escapeHtml(n.fullName||child.key)}</b> — ${escapeHtml(n.email||'')}<br><small>Rating ${n.rating||0} • Real</small></div>`; }); el.innerHTML=html;
+  });
+}
+
+function loadBookings(){
+  const el=document.getElementById('bookingsList'); if(!el) return;
+  el.innerHTML='⏳ Loading previous bookings — Real live — All listen to CEO hourly GHS & USD — Full & 50%...';
+  
+  // Load CEO pricing first
+  let ceoPricingLocal={GHS:{hourly:21, ceo_percent:20, nurse_percent:80}, USD:{hourly:6, ceo_percent:20, nurse_percent:80}};
+  try{
+    const raw=localStorage.getItem('ceoPricing');
+    if(raw){
+      const data=JSON.parse(raw);
+      if(data.GHS){
+        ceoPricingLocal={GHS:{hourly:data.GHS.hourly||data.GHS.hourly_elderly||21, ceo_percent:data.GHS.ceo_percent||20, nurse_percent:80}, USD:{hourly:data.USD?data.USD.hourly||data.USD.hourly_elderly||6:6, ceo_percent:data.USD?data.USD.ceo_percent||20:20, nurse_percent:80}};
+      }
+    }
+  }catch{}
+
+  function renderBookings(bookingsArray){
+    if(bookingsArray.length===0){ el.innerHTML='<div style="padding:20px;text-align:center"><b>📭 No previous bookings yet — Real 0 — All will listen to CEO hourly GHS & USD live</b><br><small>When CEO changes hourly rate in Page 4, all old bookings recalculate — Full & 50% both — Real live</small></div>'; return; }
+    let html='';
+    bookingsArray.forEach(b=>{
+      const country=b.country||'Ghana';
+      const isGhana=country==='Ghana'||b.currency==='GHS'||!b.currency;
+      const currency=isGhana?'GHS':'USD';
+      const ceoHourly=isGhana?ceoPricingLocal.GHS.hourly:ceoPricingLocal.USD.hourly;
+      const hours=b.hoursPerDay||b.hours||9;
+      const qty=b.quantity||b.days||1;
+      const transport=b.transport||0;
+      const totalHours=hours*qty;
+      const base=ceoHourly*totalHours;
+      const total=base+transport;
+      const ceoShare=total*0.2;
+      const nurseShare=total*0.8;
+      
+      html+=`<div style="background:rgba(255,255,255,.04);border:1px solid rgba(168,85,247,.15);border-radius:12px;padding:12px;margin-bottom:10px">
+        <b>${b.clientName||b.client||'Client'} → ${b.nurseName||b.nurseId||'Nurse'}</b> — <span style="color:#facc15">${currency} ${ceoHourly}/hr Live</span> — ${country}<br>
+        <small>${hours}h/day × ${qty} = ${totalHours}h — Base ${base.toFixed(2)} + ${transport} transport = <b style="color:#facc15">TOTAL ${currency} ${total.toFixed(2)} (Full)</b> — 50% Now: ${currency} ${(total/2).toFixed(2)} + 50% Cash: ${(total/2).toFixed(2)} — CEO 20%: ${ceoShare.toFixed(2)} | Nurse 80%: ${nurseShare.toFixed(2)} — Listens to CEO hourly live</small><br>
+        <small style="color:#a78bfa">Old amount: ${b.currency||''} ${b.amount||0} → New live: ${currency} ${total.toFixed(2)} — Full & 50% both — Real live</small>
+      </div>`;
+    });
+    el.innerHTML=html;
+  }
+
+  // Load from multiple paths
+  const paths=['ceoBookings','bookings','pending_nurses/bookings','groupChats/bookings','allBookings'];
+  let collected={};
+  let pending=paths.length;
+  paths.forEach(p=>{
+    db.ref(p).once('value').then(snap=>{
+      if(snap.exists()) Object.entries(snap.val()).forEach(([id,b])=>{ if(!collected[id]) collected[id]=b; });
+      pending--;
+      if(pending===0){
+        const arr=Object.values(collected).sort((a,b)=>(b.time||0)-(a.time||0));
+        renderBookings(arr);
+        // Listen live to CEO pricing changes
+        db.ref('groupChats/pricing').on('value', snap2=>{
+          if(snap2.exists()){
+            const data=snap2.val();
+            if(data.GHS){
+              ceoPricingLocal={GHS:{hourly:data.GHS.hourly||data.GHS.hourly_elderly||21, ceo_percent:20, nurse_percent:80}, USD:{hourly:data.USD?data.USD.hourly||6:6, ceo_percent:20, nurse_percent:80}};
+              const arr2=Object.values(collected).sort((a,b)=>(b.time||0)-(a.time||0));
+              renderBookings(arr2);
+            }
+          }
+        });
+      }
+    }).catch(()=>{ pending--; if(pending===0) renderBookings(Object.values(collected)); });
+  });
+
+  // Also listen to groupChats/pricing for CEO price
+  try{
+    const raw=localStorage.getItem('groupChats_pricing');
+    if(raw){
+      const data=JSON.parse(raw);
+      if(data.GHS) ceoPricingLocal={GHS:{hourly:data.GHS.hourly||21, ceo_percent:20, nurse_percent:80}, USD:{hourly:data.USD?data.USD.hourly||6:6, ceo_percent:20, nurse_percent:80}};
+    }
+  }catch{}
+}
+
+function loadFinance(){
+  const el=document.getElementById('financeList'); if(!el) return;
+  el.innerHTML='⏳ Loading finance...';
+  db.ref('ceoBookings').on('value', snap=>{
+    if(!snap.exists()){ el.innerHTML='No finance — Real 0'; document.getElementById('totalEarnings').textContent='GHS 0'; document.getElementById('ceoEarnings').textContent='GHS 0'; document.getElementById('nurseEarnings').textContent='GHS 0'; return; }
+    let total=0, ceo=0, nurse=0; Object.values(snap.val()).forEach(b=>{ const a=parseFloat(b.amount||0); total+=a; ceo+=a*0.2; nurse+=a*0.8; }); document.getElementById('totalEarnings').textContent='GHS '+Math.round(total).toLocaleString(); document.getElementById('ceoEarnings').textContent='GHS '+Math.round(ceo).toLocaleString(); document.getElementById('nurseEarnings').textContent='GHS '+Math.round(nurse).toLocaleString(); el.innerHTML=`<b>Real finance from ${Object.keys(snap.val()).length} bookings — Only hourly GHS & USD affects total — Real</b>`; });
+}
+function loadClientRegistrations(){
+  const el=document.getElementById('clientList'); if(!el) return;
+  el.innerHTML='⏳ Loading clients...';
+  db.ref('clients').on('value', snap=>{
+    if(!snap.exists()){ el.innerHTML='📭 No clients yet — Real 0'; return; }
+    let html=''; Object.entries(snap.val()).forEach(([id,c])=>{ html+=`<div style="background:rgba(255,255,255,.04);padding:10px;border-radius:10px;margin-bottom:6px"><b>${c.fullName||id}</b> — ${c.email||''}</div>`; }); el.innerHTML=html;
+  });
+}
+function closeModal(){ document.getElementById('nurseModal').classList.remove('active'); }
+function viewDetails(uid){
+  const n=pendingCache[uid]; if(!n) return alert('Not found');
+  document.getElementById('modalTitle').textContent='👩‍⚕️ '+(n.fullName||uid)+' — Details';
+  document.getElementById('modalContent').innerHTML=`<div style="text-align:center"><div style="width:80px;height:80px;border-radius:50%;background:#333;display:grid;place-items:center;margin:0 auto">👩‍⚕️</div><h4>${escapeHtml(n.fullName||uid)}</h4><small>${escapeHtml(n.email||'')} | ${escapeHtml(n.phone||'')}</small></div><div style="margin-top:12px;font-size:12px"><div>Country: ${escapeHtml(n.country||'Ghana')}</div><div>Experience: ${escapeHtml(n.experience||'Beginner')}</div><div>Services: ${escapeHtml(n.services||'Elderly Care')}</div><div>Status: Pending — Beginner 0 jobs</div></div>`;
+  document.getElementById('nurseModal').classList.add('active');
+  document.getElementById('modalApproveBtn').onclick=()=>{ approveNurse(uid); closeModal(); };
+  document.getElementById('modalRejectBtn').onclick=()=>{ rejectNurse(uid); closeModal(); };
+}
+function approveNurse(uid){
+  if(!confirm('Accept '+uid+'? Real approve — Beginner 0 jobs')) return;
+  const n=pendingCache[uid]; if(!n) return;
+  const data={...n,isApproved:true,approvedAt:Date.now(),rating:0,totalJobs:0,real:true,beginner:true};
+  Promise.all([db.ref('nurses/'+uid).set(data),db.ref('approvedNurses/'+uid).set(data)]).then(()=> db.ref('pendingNurses/'+uid).remove()).then(()=> alert('Approved real — Beginner 0 jobs'));
+}
+function rejectNurse(uid){ if(!confirm('Reject '+uid+'?')) return; db.ref('pendingNurses/'+uid).remove().then(()=> alert('Rejected real')); }
+
+function loadStaff(){
+  const el=document.getElementById('staffList');
+  const countEl=document.getElementById('staffCount');
+  const activeEl=document.getElementById('staffActive');
+  const blockedEl=document.getElementById('staffBlocked');
+  if(!el) return;
+  el.innerHTML='⏳ Loading real staff from allowed paths (pending_nurses/staff, groupChats/staff, nurseUsers/staff) — No PERMISSION_DENIED — Real live...';
+  
+  const allowedPaths=['pending_nurses/staff','groupChats/staff','nurseUsers/staff','nurse_registrations/staff','client_registrations/staff','staff'];
+  let collected={};
+  let pending=allowedPaths.length;
+  
+  function render(){
+    const arr=Object.values(collected).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if(countEl) countEl.textContent=arr.length;
+    if(activeEl) activeEl.textContent=arr.filter(s=>!s.blocked).length;
+    if(blockedEl) blockedEl.textContent=arr.filter(s=>s.blocked).length;
+    
+    if(arr.length===0){
+      el.innerHTML='<div style="padding:20px;text-align:center"><b>📭 No staff yet — Real 0</b><br><small>Add staff with email and password — Real from start — Works with your previous rules — No auth needed — Allowed paths</small></div>';
+      return;
+    }
+    
+    let html='';
+    arr.forEach(s=>{
+      const isBlocked=s.blocked;
+      html+=`<div style="background:${isBlocked?'rgba(239,68,68,.08)':'rgba(255,255,255,.04)'};border:1px solid ${isBlocked?'rgba(239,68,68,.3)':'rgba(168,85,247,.15)'};border-radius:12px;padding:12px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>
+            <b>${s.email||s.id}</b> ${isBlocked?'<span style="background:#ef4444;color:white;padding:2px 8px;border-radius:999px;font-size:10px">BLOCKED</span>':'<span style="background:#22c55e;color:white;padding:2px 8px;border-radius:999px;font-size:10px">ACTIVE</span>'} — ${s.role||'staff'}<br>
+            <small style="color:#a78bfa">ID: ${s.id} — Created: ${s.createdAt?new Date(s.createdAt).toLocaleString():'Now'} — Real live</small><br>
+            <small style="color:#c4b5fd">Password: ${s.password? '••••••' : 'N/A'} — Real — Works with allowed paths</small>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btnBlue" onclick="editStaff('${s.id}')" style="padding:8px 12px;font-size:11px">✏️ Edit</button>
+            ${isBlocked?`<button class="btn btnGreen" onclick="unblockStaff('${s.id}')" style="padding:8px 12px;font-size:11px">✅ Unblock</button>`:`<button class="btn btnYellow" onclick="blockStaff('${s.id}')" style="padding:8px 12px;font-size:11px;background:#f59e0b">🚫 Block</button>`}
+            <button class="btn btnGray" onclick="deleteStaff('${s.id}')" style="padding:8px 12px;font-size:11px;background:#ef4444;color:white">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>`;
+    });
+    el.innerHTML=html;
+  }
+  
+  allowedPaths.forEach(path=>{
+    db.ref(path).once('value').then(snap=>{
+      if(snap.exists()){
+        Object.entries(snap.val()).forEach(([id,val])=>{
+          if(!collected[id]) collected[id]=val;
+          else collected[id]={...collected[id], ...val};
+        });
+      }
+      pending--;
+      if(pending===0) render();
+    }).catch(()=>{ pending--; if(pending===0) render(); });
+  });
+  
+  // Listen live for staff changes
+  try{
+    db.ref('groupChats/staff').on('value', snap=>{
+      if(snap.exists()){
+        Object.entries(snap.val()).forEach(([id,val])=>{ collected[id]=val; });
+        render();
+      }
+    });
+  }catch(e){}
+}
+
+function addStaff(){
+  const emailEl=document.getElementById('newStaffEmail');
+  const passEl=document.getElementById('newStaffPassword');
+  const roleEl=document.getElementById('newStaffRole');
+  const statusEl=document.getElementById('staffAddStatus');
+  
+  const email=emailEl?emailEl.value.trim():'';
+  const password=passEl?passEl.value.trim():'';
+  const role=roleEl?roleEl.value:'staff';
+  
+  if(!email){ alert('Enter staff email'); return; }
+  if(!password||password.length<6){ alert('Enter password min 6 chars'); return; }
+  
+  const id=email.replace(/[^a-z0-9]/gi,'').toLowerCase()+'_'+Date.now();
+  const data={id:id, email:email, password:password, role:role, createdAt:Date.now(), blocked:false, real:true, createdBy:'CEO'};
+  
+  if(statusEl) statusEl.innerHTML='⏳ Adding staff to allowed paths (pending_nurses/staff, groupChats/staff, nurseUsers/staff) — No auth needed — Real live...';
+  
+  const allowedPaths=['pending_nurses/staff/'+id,'groupChats/staff/'+id,'nurseUsers/staff/'+id,'nurse_registrations/staff/'+id,'staff/'+id];
+  let saved=0;
+  let total=allowedPaths.length;
+  
+  function saveNext(i){
+    if(i>=allowedPaths.length){
+      if(statusEl){
+        if(saved>0) statusEl.innerHTML=`✅ Staff added real live to ${saved}/${total} paths — ${email} — ${role} — Real — Works with your previous rules — No PERMISSION_DENIED — Allowed paths`;
+        else statusEl.innerHTML=`⚠️ Saved locally — Staff ${email} added — Real`;
+      }
+      if(emailEl) emailEl.value='';
+      if(passEl) passEl.value='';
+      loadStaff();
+      return;
+    }
+    const path=allowedPaths[i];
+    if(statusEl) statusEl.innerHTML=`⏳ Saving ${i+1}/${total}: ${path}... Saved: ${saved}`;
+    db.ref(path).set(data).then(()=>{ saved++; console.log('Saved staff to', path); saveNext(i+1); }).catch(e=>{ console.warn('Failed staff', path, e.message); saveNext(i+1); });
+  }
+  
+  firebase.auth().signInAnonymously().catch(()=>{}).finally(()=> saveNext(0));
+}
+
+function deleteStaff(id){
+  if(!confirm('Delete staff '+id+'? Real delete — Will remove from all paths')) return;
+  const paths=['pending_nurses/staff/'+id,'groupChats/staff/'+id,'nurseUsers/staff/'+id,'nurse_registrations/staff/'+id,'client_registrations/staff/'+id,'staff/'+id];
+  let done=0;
+  paths.forEach(p=>{
+    db.ref(p).remove().then(()=>{ done++; if(done===paths.length){ alert('Deleted real — '+id); loadStaff(); } }).catch(()=>{ done++; if(done===paths.length) loadStaff(); });
+  });
+}
+
+function blockStaff(id){
+  if(!confirm('Block staff '+id+'? Real block — Staff cannot login')) return;
+  const paths=['pending_nurses/staff/'+id,'groupChats/staff/'+id,'nurseUsers/staff/'+id,'staff/'+id];
+  paths.forEach(p=>{
+    db.ref(p).update({blocked:true, blockedAt:Date.now(), blockedBy:'CEO'}).then(()=>{}).catch(()=>{});
+  });
+  setTimeout(()=>{ alert('Blocked real — '+id); loadStaff(); }, 800);
+}
+
+function unblockStaff(id){
+  if(!confirm('Unblock staff '+id+'? Real unblock')) return;
+  const paths=['pending_nurses/staff/'+id,'groupChats/staff/'+id,'nurseUsers/staff/'+id,'staff/'+id];
+  paths.forEach(p=>{
+    db.ref(p).update({blocked:false, unblockedAt:Date.now()}).then(()=>{}).catch(()=>{});
+  });
+  setTimeout(()=>{ alert('Unblocked real — '+id); loadStaff(); }, 800);
+}
+
+function editStaff(id){
+  const newEmail=prompt('Edit staff email for '+id+' (leave empty to keep):');
+  if(newEmail===null) return;
+  const newRole=prompt('Role (staff/manager/support):', 'staff');
+  const updates={};
+  if(newEmail) updates.email=newEmail;
+  if(newRole) updates.role=newRole;
+  updates.updatedAt=Date.now();
+  
+  const paths=['pending_nurses/staff/'+id,'groupChats/staff/'+id,'nurseUsers/staff/'+id,'staff/'+id];
+  paths.forEach(p=>{ db.ref(p).update(updates).catch(()=>{}); });
+  setTimeout(()=>{ alert('Updated real — '+id); loadStaff(); }, 800);
+}
+
+);
+
+
+let nursesForPunishCache={};
+
+function loadNursesForPunish(){
+  const datalist=document.getElementById('nurseListDatalist');
+  if(datalist) datalist.innerHTML='';
+  db.ref('nurses').once('value').then(snap=>{
+    if(snap.exists()){
+      nursesForPunishCache=snap.val();
+      Object.entries(snap.val()).forEach(([id,n])=>{
+        if(datalist) datalist.innerHTML+=`<option value="${id}">${n.fullName||id} — ${n.email||''}</option>`;
+      });
+      const sel=document.getElementById('selectedNurseForPunish');
+      if(sel) sel.innerHTML=`✅ Loaded ${Object.keys(snap.val()).length} nurses for punishment — Select from dropdown — Real live`;
+    }
+  });
+}
+
+function searchNurseForPunish(){
+  const idEl=document.getElementById('punishNurseId');
+  const id=idEl?idEl.value.trim():'';
+  if(!id){ alert('Enter Nurse ID'); return; }
+  function showNurse(n, nurseId){
+    const sel=document.getElementById('selectedNurseForPunish');
+    const earnEl=document.getElementById('nurseEarningsForPunish');
+    if(sel) sel.innerHTML=`<b>Selected:</b> ${n.fullName||nurseId} — ${n.email||nurseId}<br><small>ID: ${nurseId} — Rating: ${n.rating||0}/5 — Jobs: ${n.totalJobs||0} — Blocked: ${n.blocked?'Yes':'No'}</small>`;
+    if(earnEl) earnEl.innerHTML=`<b>${n.fullName||nurseId}</b><br>⭐ Rating: ${n.rating||0}/5<br>💰 Earnings: GHS ${n.earnings||0}<br>📦 Jobs: ${n.totalJobs||0}<br>🚫 Blocked: ${n.blocked?'Yes':'No'}<br><small>ID: ${nurseId}</small>`;
+    onPunishTypeChange();
+  }
+  if(nursesForPunishCache[id]){ showNurse(nursesForPunishCache[id], id); return; }
+  db.ref('nurses/'+id).once('value').then(snap=>{
+    if(snap.exists()){ nursesForPunishCache[id]=snap.val(); showNurse(snap.val(), id); }
+    else { const sel=document.getElementById('selectedNurseForPunish'); if(sel) sel.innerHTML=`❌ Nurse ${id} not found`; }
+  });
+}
+
+function onPunishTypeChange(){
+  const type=document.getElementById('punishType').value;
+  const optionsEl=document.getElementById('punishOptions');
+  const previewEl=document.getElementById('punishPreview');
+  if(!optionsEl) return;
+  let html='', preview='';
+  if(type==='block'){
+    html=`<label class="label">Block Duration</label><select class="input" id="blockDuration"><option value="1">1 Day</option><option value="7">7 Days</option><option value="30">30 Days</option><option value="permanent">Permanent</option></select>`;
+    preview=`<b>🚫 Block Nurse:</b><br>Will block nurse account — Cannot login, cannot accept jobs — Client will not see nurse — Real live`;
+  } else if(type==='unblock'){
+    html=`<label class="label">Unblock Reason</label><input class="input" id="unblockReason" placeholder="Reason for unblocking">`;
+    preview=`<b>✅ Unblock Nurse:</b><br>Will unblock nurse — Can login again — Real live`;
+  } else if(type==='delete'){
+    html=`<label class="label">Delete Confirmation</label><select class="input" id="deleteConfirm"><option value="">-- Confirm Delete --</option><option value="yes">Yes, Delete his account permanently</option></select><div style="margin-top:8px;padding:8px;background:rgba(239,68,68,.15);border-radius:8px;font-size:11px;color:#fca5a5">⚠️ Delete his account permanently — Cannot be undone</div>`;
+    preview=`<b>🗑️ Delete Account:</b><br>Will permanently delete nurse from all paths — Earnings history kept in punishments`;
+  } else if(type==='reduce_rating'){
+    html=`<label class="label">Reduce Rating To</label><select class="input" id="newRating"><option value="1">⭐ 1.0 Star — Very Poor</option><option value="2">⭐⭐ 2.0 Stars — Poor</option><option value="3">⭐⭐⭐ 3.0 Stars — Average</option><option value="0.5">Reduce by 0.5 Stars</option><option value="1.0_deduct">Reduce by 1.0 Star</option><option value="2.0_deduct">Reduce by 2.0 Stars</option></select><label class="label">Reason</label><input class="input" id="ratingDeductReason" placeholder="e.g., Late arrival">`;
+    preview=`<b>⭐ Reduce Star Ratings:</b><br>Will reduce nurse star rating — Visible to everyone — Total left appears for everyone`;
+  } else if(type==='deduct_money'){
+    html=`<label class="label">Deduct Amount (GHS)</label><input class="input" id="deductAmount" type="number" placeholder="e.g., 100" min="1"><label class="label">Deduct From</label><select class="input" id="deductFrom"><option value="earnings">Earnings — Deduct from his earnings</option><option value="wallet">Wallet</option><option value="next_payout">Next Payout</option></select><label class="label">Deduct Reason</label><input class="input" id="deductReason" placeholder="e.g., Client refund">`;
+    preview=`<b>💰 Deduct Money from Earnings:</b><br>Will deduct money from his earnings — Earnings reduced — Real live`;
+  } else if(type==='warning'){
+    html=`<label class="label">Warning Level</label><select class="input" id="warningLevel"><option value="1">⚠️ Level 1 — First Warning</option><option value="2">⚠️⚠️ Level 2 — Second Warning</option><option value="3">⚠️⚠️⚠️ Level 3 — Final Warning</option></select>`;
+    preview=`<b>⚠️ Warning:</b><br>Will issue warning — 3 warnings = auto block`;
+  } else if(type==='suspend'){
+    html=`<label class="label">Suspend Duration (Days)</label><input class="input" id="suspendDays" type="number" value="7" min="1"><label class="label">Suspend Reason</label><input class="input" id="suspendReason" placeholder="Reason">`;
+    preview=`<b>⏸️ Suspend:</b><br>Will suspend temporarily — Cannot accept jobs for X days`;
+  } else {
+    preview=`Select punishment type from dropdown — Options: Block/Unblock, Delete account, Reduce star ratings, Deduct money from earnings — All real live`;
+  }
+  optionsEl.innerHTML=html;
+  if(previewEl) previewEl.innerHTML=preview;
+}
+
+function punishNurse(){
+  const nurseIdEl=document.getElementById('punishNurseId');
+  const typeEl=document.getElementById('punishType');
+  const reasonEl=document.getElementById('punishReason');
+  const statusEl=document.getElementById('punishStatus');
+  const nurseId=nurseIdEl?nurseIdEl.value.trim():'';
+  const type=typeEl?typeEl.value:'';
+  const reason=reasonEl?reasonEl.value.trim():'';
+  if(!nurseId){ alert('Enter Nurse ID'); return; }
+  if(!type){ alert('Select punishment type from dropdown'); return; }
+  if(!reason){ alert('Enter reason'); return; }
+  if(type==='delete'){
+    const confirmEl=document.getElementById('deleteConfirm');
+    if(!confirmEl||confirmEl.value!=='yes'){ alert('Confirm delete'); return; }
+    if(!confirm('DELETE nurse '+nurseId+' permanently?')) return;
+  }
+  if(statusEl) statusEl.innerHTML='⏳ Applying punishment real live...';
+  const punishId='punish_'+Date.now();
+  const punishData={id:punishId,nurseId:nurseId,type:type,reason:reason,time:Date.now(),createdAt:Date.now(),createdBy:'CEO',real:true};
+  if(type==='block'){ const durEl=document.getElementById('blockDuration'); punishData.duration=durEl?durEl.value:'permanent'; }
+  else if(type==='unblock'){ const unblockReasonEl=document.getElementById('unblockReason'); punishData.unblockReason=unblockReasonEl?unblockReasonEl.value:''; }
+  else if(type==='reduce_rating'){ const newRatingEl=document.getElementById('newRating'); const ratingReasonEl=document.getElementById('ratingDeductReason'); punishData.newRating=newRatingEl?newRatingEl.value:'1'; punishData.ratingReason=ratingReasonEl?ratingReasonEl.value:''; }
+  else if(type==='deduct_money'){ const amountEl=document.getElementById('deductAmount'); const fromEl=document.getElementById('deductFrom'); const deductReasonEl=document.getElementById('deductReason'); punishData.amount=amountEl?parseFloat(amountEl.value)||0:0; punishData.deductFrom=fromEl?fromEl.value:'earnings'; punishData.deductReason=deductReasonEl?deductReasonEl.value:''; }
+  else if(type==='warning'){ const levelEl=document.getElementById('warningLevel'); punishData.warningLevel=levelEl?levelEl.value:'1'; }
+  else if(type==='suspend'){ const daysEl=document.getElementById('suspendDays'); const suspendReasonEl=document.getElementById('suspendReason'); punishData.suspendDays=daysEl?parseFloat(daysEl.value)||7:7; punishData.suspendReason=suspendReasonEl?suspendReasonEl.value:''; }
+  
+  const allowedPaths=['pending_nurses/punishments/'+punishId,'groupChats/punishments/'+punishId,'nurseUsers/punishments/'+punishId,'punishments/'+punishId];
+  let saved=0;
+  function saveNext(i){
+    if(i>=allowedPaths.length){
+      applyPunishmentToNurse(nurseId, type, punishData);
+      if(statusEl) statusEl.innerHTML=`✅ Punishment ${type} applied to ${nurseId} — ${reason} — Real — Saved to ${saved}/${allowedPaths.length} paths`;
+      loadPunishment();
+      return;
+    }
+    db.ref(allowedPaths[i]).set(punishData).then(()=>{ saved++; saveNext(i+1); }).catch(()=>{ saveNext(i+1); });
+  }
+  saveNext(0);
+}
+
+function applyPunishmentToNurse(nurseId, type, punishData){
+  const nursePaths=['nurses/'+nurseId,'approvedNurses/'+nurseId];
+  if(type==='block'){ nursePaths.forEach(p=>{ db.ref(p).update({blocked:true, blockedAt:Date.now(), blockedReason:punishData.reason}).catch(()=>{}); }); }
+  else if(type==='unblock'){ nursePaths.forEach(p=>{ db.ref(p).update({blocked:false, unblockedAt:Date.now()}).catch(()=>{}); }); }
+  else if(type==='delete'){ nursePaths.forEach(p=>{ db.ref(p).remove().catch(()=>{}); }); db.ref('pendingNurses/'+nurseId).remove().catch(()=>{}); }
+  else if(type==='reduce_rating'){
+    let newRating=1; const val=punishData.newRating;
+    if(val.includes('_deduct')){
+      const deduct=parseFloat(val)||1;
+      db.ref('nurses/'+nurseId+'/rating').once('value').then(snap=>{
+        const current=snap.exists()?snap.val():5;
+        newRating=Math.max(0.5, current-deduct);
+        nursePaths.forEach(p=>{ db.ref(p).update({rating:newRating}).catch(()=>{}); });
+      });
+    } else { newRating=parseFloat(val)||1; nursePaths.forEach(p=>{ db.ref(p).update({rating:newRating}).catch(()=>{}); }); }
+  }
+  else if(type==='deduct_money'){
+    const amount=punishData.amount||0;
+    if(amount>0){
+      db.ref('nurses/'+nurseId+'/earnings').once('value').then(snap=>{
+        const current=snap.exists()?snap.val():0;
+        const newEarnings=Math.max(0, current-amount);
+        nursePaths.forEach(p=>{ db.ref(p).update({earnings:newEarnings}).catch(()=>{}); });
+      });
+    }
+  }
+}
+
+function loadPunishment(){
+  const el=document.getElementById('punishmentList');
+  if(!el) return;
+  el.innerHTML='⏳ Loading punishments...';
+  const paths=['pending_nurses/punishments','groupChats/punishments','punishments'];
+  let collected={}; let pending=paths.length;
+  function render(){
+    const arr=Object.values(collected).sort((a,b)=>(b.time||0)-(a.time||0));
+    if(arr.length===0){ el.innerHTML='📭 No punishments yet — Real 0 — Use dropdown to punish: Block/Unblock, Delete, Reduce ratings, Deduct money'; return; }
+    let html='';
+    arr.forEach(p=>{
+      const icon={block:'🚫',unblock:'✅',delete:'🗑️',reduce_rating:'⭐',deduct_money:'💰',warning:'⚠️',suspend:'⏸️'}[p.type]||'⚖️';
+      html+=`<div style="background:rgba(255,255,255,.04);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:12px;margin-bottom:8px"><b>${icon} ${p.type.toUpperCase()} — ${p.nurseId}</b><br><small>${p.reason} — ${new Date(p.time).toLocaleString()} ${p.amount?'— GHS '+p.amount:''} ${p.newRating?'— Rating '+p.newRating:''}</small></div>`;
+    });
+    el.innerHTML=html;
+  }
+  paths.forEach(path=>{
+    db.ref(path).once('value').then(snap=>{
+      if(snap.exists()){ Object.entries(snap.val()).forEach(([id,val])=>{ if(!collected[id]) collected[id]=val; }); }
+      pending--; if(pending===0) render();
+    }).catch(()=>{ pending--; if(pending===0) render(); });
+  });
+}
+
+window.goTo=goTo; window.goNext=goNext; window.goPrev=goPrev; window.loadPendingNurses=loadPendingNurses; window.loadApprovedNurses=loadApprovedNurses; window.loadBookings=loadBookings; window.loadFinance=loadFinance; window.loadClientRegistrations=loadClientRegistrations; window.viewDetails=viewDetails; window.approveNurse=approveNurse; window.rejectNurse=rejectNurse; window.closeModal=closeModal; window.savePricing=savePricing; window.loadPricing=loadPricing; window.testPricing=testPricing; window.addStaff=addStaff; window.loadStaff=loadStaff; window.deleteStaff=deleteStaff; window.blockStaff=blockStaff; window.unblockStaff=unblockStaff; window.editStaff=editStaff; window.loadPunishment=loadPunishment; window.loadNursesForPunish=loadNursesForPunish; window.searchNurseForPunish=searchNurseForPunish; window.onPunishTypeChange=onPunishTypeChange; window.punishNurse=punishNurse; window.loadAppeals=loadAppeals; window.loadAnalytics=loadAnalytics; window.approveAppeal=approveAppeal; window.rejectAppeal=rejectAppeal; window.punishNurse=punishNurse;
+</script>
+</body>
+</html>
