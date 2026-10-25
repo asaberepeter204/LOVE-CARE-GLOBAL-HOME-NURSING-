@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Dashboard — All New CEO Pages — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--faint:#6b6788;--gold:#facc15;--green:#34d399;--red:#ef4444;--blue:#60a5fa;--purple:#a78bfa;--orange:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 400px at 15% 10%, rgba(76,29,149,.25) 0%, transparent 70%),radial-gradient(500px 350px at 85% 15%, rgba(250,204,21,.12) 0%, transparent 60%),linear-gradient(180deg,#0c0a1e 0%, #120e26 50%, #0a0714 100%)}
+header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:16px 20px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.brand{font-family:Fraunces,serif;font-weight:800;font-size:22px;display:flex;align-items:center;gap:10px}
+.brand small{font-family:Instrument Sans,sans-serif;font-size:11px;color:var(--muted);font-weight:400;display:block;margin-top:2px}
+.liveDot{width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 1.5s infinite;box-shadow:0 0 0 4px rgba(34,211,153,.2)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,211,153,.5)}70%{box-shadow:0 0 0 12px rgba(34,211,153,0)}100%{box-shadow:0 0 0 0 rgba(34,211,153,0)}}
+.main{max-width:1200px;margin:0 auto;padding:24px 20px;display:flex;flex-direction:column;gap:20px}
+.section{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px}
+.sectionTitle{font-family:Fraunces,serif;font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sectionDesc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px}
+.btnGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.ceoBtn{background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:16px;padding:16px;text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:10px;transition:.2s;position:relative;overflow:hidden}
+.ceoBtn:hover{transform:translateY(-3px);border-color:rgba(250,204,21,.3);box-shadow:0 10px 30px rgba(0,0,0,.4);background:rgba(26,22,51,.8)}
+.ceoBtn::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--purple));opacity:0;transition:.2s}
+.ceoBtn:hover::before{opacity:1}
+.ceoBtn.new{border-color:rgba(34,211,153,.25);background:linear-gradient(135deg,rgba(34,211,153,.08),rgba(12,10,30,.6))}
+.ceoBtn.new:hover{border-color:rgba(34,211,153,.5);box-shadow:0 10px 30px rgba(34,211,153,.15)}
+.ceoBtn.critical{border-color:rgba(239,68,68,.25);background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(0,0,0,.3))}
+.ceoBtn.critical:hover{border-color:rgba(239,68,68,.5);box-shadow:0 10px 30px rgba(239,68,68,.15)}
+.btnHeader{display:flex;gap:12px;align-items:flex-start}
+.btnIcon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.btnIcon.gold{background:linear-gradient(135deg,#facc15,#fde68a);color:#000}
+.btnIcon.red{background:linear-gradient(135deg,#ef4444,#fca5a5);color:#000}
+.btnIcon.purple{background:linear-gradient(135deg,#a78bfa,#c4b5fd);color:#000}
+.btnIcon.green{background:linear-gradient(135deg,#22c55e,#86efac);color:#000}
+.btnIcon.blue{background:linear-gradient(135deg,#60a5fa,#93c5fd);color:#000}
+.btnIcon.dark{background:#000;color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.btnContent{flex:1;min-width:0}
+.btnTitle{font-family:Fraunces,serif;font-size:15px;font-weight:700;line-height:1.2}
+.btnFile{font-size:10px;color:var(--faint);font-family:monospace;margin-top:2px}
+.btnDesc{font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px}
+.btnMeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.badge{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:800;border:1px solid;display:inline-flex;align-items:center;gap:3px}
+.badgeNew{background:rgba(34,211,153,.15);color:#6ee7b7;border-color:rgba(34,211,153,.25)}
+.badgeHot{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+.badgeCEO{background:rgba(250,204,21,.12);color:#fcd34d;border-color:rgba(250,204,21,.25)}
+.badgeSize{background:rgba(255,255,255,.06);color:var(--faint);border-color:var(--line)}
+.btnAction{margin-top:10px;display:flex;gap:8px}
+.actionBtn{flex:1;padding:8px 12px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:4px;text-align:center}
+.actionOpen{background:var(--gold);color:#000;border-color:var(--gold)}
+.actionTest{background:rgba(255,255,255,.06);color:var(--text);border-color:var(--line)}
+.statsRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;padding:12px;background:rgba(12,10,30,.5);border-radius:12px;border:1px solid var(--line)}
+.stat{flex:1;min-width:120px;text-align:center}
+.statV{font-family:Fraunces,serif;font-size:20px;font-weight:800}
+.statK{font-size:10px;color:var(--faint);text-transform:uppercase;font-weight:700;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<header>
+<div class="wrap" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+<div>
+<div class="brand">👑 CEO Dashboard — All New CEO Pages <span class="liveDot"></span><small>Only buttons of all the new CEO html's we have created so I can open them — LOVE CARE GLOBAL — CEO ONLY — Quick access to all new CEO control pages</small></div>
+</div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<span style="font-size:11px;color:var(--muted)">5 NEW CEO PAGES + 5 UPDATED</span>
+<a href="index.html" style="padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;font-weight:700;text-decoration:none">🏠 Home</a>
+</div>
+</div>
+</header>
+
+<div class="main">
+<div class="section" style="background:linear-gradient(135deg,rgba(250,204,21,.08),rgba(12,10,30,.6));border-color:rgba(250,204,21,.2)">
+<div class="sectionTitle">🚀 NEW CEO PAGES — We Created — 5 New Files — CEO ONLY — Open Them!</div>
+<div class="sectionDesc">All new CEO html's we have created — Client complaint, Nurse complain, CEO complainant, CEO penalize up to deletion, CEO control chat — Click to open — CEO ONLY — Quick access dashboard — As you requested: ceo-dashboard.html which will have only buttons of all the new CEO html's we have created so I can open them</div>
+
+<div class="btnGrid">
+<a href="client-complaint.html" class="ceoBtn new" target="_blank">
+<div class="btnHeader">
+<div class="btnIcon red">⚠️</div>
+<div class="btnContent">
+<div class="btnTitle">Client Complaint — Complain on Booked Nurse Only</div>
+<div class="btnFile">client-complaint.html — 17,318 bytes</div>
+<div class="btnDesc">Client complains about ONLY that booked nurse — Not other nurses — Text + Audio + Video + Photos + Documents — Evidence goes to CEO LIVE — From my-bookings.html button</div>
+<div class="btnMeta"><span class="badge badgeNew">🆕 NEW — Created Now</span><span class="badge badgeCEO">👤 Client → Nurse</span><span class="badge badgeSize">17.3 KB</span></div>
+</div>
+</div>
+<div class="btnAction">
+<span class="actionBtn actionOpen">🚀 Open client-complaint.html</span>
+<span class="actionBtn actionTest">📋 Test: client-complaint.html?bookingId=LCG-...&nurseName=Grace</span>
+</div>
+</a>
+
+<a href="nurse-complain.html" class="ceoBtn new" target="_blank">
+<div class="btnHeader">
+<div class="btnIcon purple">👩‍⚕️</div>
+<div class="btnContent">
+<div class="btnTitle">Nurse Complain — Complain on Client</div>
+<div class="btnFile">nurse-complain.html — 14,597 bytes</div>
+<div class="btnDesc">Nurse complains about client — Text + Audio + Video + Photos + Documents — Evidence — From my-job-offer.html button — Goes to CEO LIVE</div>
+<div class="btnMeta"><span class="badge badgeNew">🆕 NEW — Created Now</span><span class="badge badgeCEO">👩‍⚕️ Nurse → Client</span><span class="badge badgeSize">14.6 KB</span></div>
+</div>
+</div>
+<div class="btnAction">
+<span class="actionBtn actionOpen">🚀 Open nurse-complain.html</span>
+<span class="actionBtn actionTest">📋 Test: nurse-complain.html?bookingId=LCG-...&clientName=Client</span>
+</div>
+</a>
+
+<a href="ceo-complainant.html" class="ceoBtn new" target="_blank">
+<div class="btnHeader">
+<div class="btnIcon red">🚨</div>
+<div class="btnContent">
+<div class="btnTitle">CEO Complainant — Listens to Clients + Nurses Complaints LIVE</div>
+<div class="btnFile">ceo-complainant.html — 20,011 bytes</div>
+<div class="btnDesc">CEO listens to BOTH — Client complaints about booked nurse only + Nurse complaints about client — Text + Audio + Video + Photos — CEO reviews evidence before punishing — Warn, Trust Decrease, Suspend, Block, Resolve</div>
+<div class="btnMeta"><span class="badge badgeNew">🆕 NEW — Created Now</span><span class="badge badgeHot">🔴 LIVE</span><span class="badge badgeCEO">CEO ONLY</span><span class="badge badgeSize">20.0 KB</span></div>
+</div>
+</div>
+<div class="btnAction">
+<span class="actionBtn actionOpen">🚀 Open ceo-complainant.html — LIVE Complaints</span>
+<span class="actionBtn actionTest">👁️ CEO Reviews Evidence Before Punishing</span>
+</div>
+</a>
+
+<a href="ceo-penalize.html" class="ceoBtn critical" target="_blank">
+<div class="btnHeader">
+<div class="btnIcon dark">⚖️💥</div>
+<div class="btnContent">
+<div class="btnTitle">CEO Penalize — Client + Nurse — Up to Deletion of Account</div>
+<div class="btnFile">ceo-penalize.html — 61,105 bytes — BIGGEST</div>
+<div class="btnDesc">CEO can penalize ANY client or nurse: Warn → Trust Decrease (-10 to -100) → Suspend 24H/7D/30D → Block Temp/Permanent → Fine (10%-100% + GHS 100/500) → Require Approval → Require 100% Advance → DELETE ACCOUNT — Up to deletion — FINAL — Cannot login — Email/Phone blocked — Balance frozen — Appeal possible — For both clients and nurses — Any form!</div>
+<div class="btnMeta"><span class="badge badgeNew">🆕 NEW — Created Now</span><span class="badge badgeHot">🗑️ Up to Deletion — FINAL</span><span class="badge badgeCEO">CEO ONLY</span><span class="badge badgeSize">61.1 KB — Biggest</span></div>
+</div>
+</div>
+<div class="btnAction">
+<span class="actionBtn actionOpen" style="background:#000;color:#ef4444;border-color:rgba(239,68,68,.5)">🗑️💥 Open ceo-penalize.html — Up to Deletion</span>
+<span class="actionBtn actionTest">⚖️ Any Form Up to Deletion — Client + Nurse</span>
+</div>
+</a>
+
+<a href="ceo-control-chat.html" class="ceoBtn critical" target="_blank">
+<div class="btnHeader">
+<div class="btnIcon dark">🛡️</div>
+<div class="btnContent">
+<div class="btnTitle">CEO Control Chat — Block/Unblock Nurses + Master Deletion</div>
+<div class="btnFile">ceo-control-chat.html — 49,419 bytes</div>
+<div class="btnDesc">CEO ONLY — Block/unblock nurses from chatting — Master deletion to wipe all messages — DELETE ALL, Delete Selected, Clear Chat, Block All (Mute All), Unblock All, Delete Media, Delete Blocked Messages, Export Chat — Audit log — Live updates — Controls nurses-group-chat.html</div>
+<div class="btnMeta"><span class="badge badgeNew">🆕 NEW — Created Now</span><span class="badge badgeHot">🗑️ Master Deletion</span><span class="badge badgeCEO">CEO ONLY</span><span class="badge badgeSize">49.4 KB</span></div>
+</div>
+</div>
+<div class="btnAction">
+<span class="actionBtn actionOpen" style="background:linear-gradient(135deg,#000,#ef4444);color:#fff">🛡️ Open ceo-control-chat.html — Master Deletion</span>
+<span class="actionBtn actionTest">🚫 Block/Unblock + Wipe All Messages</span>
+</div>
+</a>
+</div>
+
+<div class="statsRow">
+<div class="stat"><div class="statV">5</div><div class="statK">New CEO Pages Created</div></div>
+<div class="stat"><div class="statV">162 KB</div><div class="statK">Total Size — All New</div></div>
+<div class="stat"><div class="statV">Up to Deletion</div><div class="statK">Final Penalty — Delete Account</div></div>
+<div class="stat"><div class="statV">CEO ONLY</div><div class="statK">Legal Protection — Appeal</div></div>
+</div>
+</div>
+
+<div class="section">
+<div class="sectionTitle">📅 UPDATED CLIENT + NURSE PAGES — Complaint Buttons Added</div>
+<div class="sectionDesc">Updated my-bookings.html + my-job-offer.html — Added complaint buttons — Now link to new complaint pages — No CEO tracking button for nurses as requested</div>
+
+<div class="btnGrid">
+<a href="my-bookings.html" class="ceoBtn" target="_blank">
+<div class="btnHeader">
+<div class="btnIcon gold">📅</div>
+<div class="btnContent">
+<div class="btnTitle">My Bookings — Updated — Client Complain Button</div>
+<div class="btnFile">my-bookings.html — 55,091 bytes — Updated</div>
+<div class="btnDesc">Client My Bookings — Fixed: Filter defaults to All so complain button visible — Added GLOBAL complain button — Always visible even with 0 bookings — Button inside each booking card: Complain About ONLY This Booked Nurse → client-complaint.html</div>
+<div class="btnMeta"><span class="badge badgeNew">🔄 UPDATED — Fixed Complain Button</span><span class="badge badgeCEO">Client Page</span><span class="badge badgeSize">55.1 KB</span></div>
+</div>
+</div>
+<div class="btnAction">
+<span class="actionBtn actionOpen">📅 Open my-bookings.html — Complain Button Visible Now!</span>
+<span class="actionBtn actionTest">✅ Fixed: Filter All + Global Complain Button</span>
+</div>
+</a>
+
+<a href="my-job-offer.html" class="ceoBtn" target="_blank">
+<div class="btnHeader">
+<div class="btnIcon purple">💼</div>
+<div class="btnContent">
+<div class="btnTitle">My Job Offer — Updated — Nurse Complain + NO CEO Button</div>
+<div class="btnFile">my-job-offer.html — 26,031 bytes — Updated</div>
+<div class="btnDesc">Nurse My Job Offer — Added Nurse Complain button → nurse-complain.html — REMOVED CEO Tracking button — Nurses CANNOT see CEO live tracking map — Only CEO sees nurse GPS — As you requested! — TEST button when no offers</div>
+<div class="btnMeta"><span class="badge badgeNew">🔄 UPDATED — Nurse Complain + No CEO Button</span><span class="badge badgeCEO">Nurse Page</span><span class="badge badgeSize">26.0 KB</span></div>
+</div>
+</div>
+<div class="btnAction">
+<span class="actionBtn actionOpen">💼 Open my-job-offer.html — Nurse Complain Button</span>
+<span class="actionBtn actionTest">🚫 No CEO Tracking Button — As Requested!</span>
+</div>
+</a>
+
+<a href="nurses-group-chat.html" class="ceoBtn" target="_blank">
+<div class="btnHeader">
+<div class="btnIcon blue">💬</div>
+<div class="btnContent">
+<div class="btnTitle">Nurses Group Chat — Existing — No New File Needed!</div>
+<div class="btnFile">nurses-group-chat.html — 22,521 bytes — Existing</div>
+<div class="btnDesc">Existing group chat — Works with CEO control chat — CEO blocks nurse in ceo-control-chat.html → Nurse sees blocked in nurses-group-chat.html → Cannot chat — No new file needed — Same Firebase path</div>
+<div class="btnMeta"><span class="badge" style="background:rgba(96,165,250,.12);color:#93c5fd;border-color:rgba(96,165,250,.25)">✅ Existing — No New File Needed</span><span class="badge badgeSize">22.5 KB</span></div>
+</div>
+</div>
+<div class="btnAction">
+<span class="actionBtn actionOpen">💬 Open nurses-group-chat.html — Existing Works!</span>
+<span class="actionBtn actionTest">✅ Works with CEO Control Chat — No Update Needed</span>
+</div>
+</a>
+</div>
+</div>
+
+<div class="section">
+<div class="sectionTitle">🏦 Other CEO Pages — Quick Access — Existing</div>
+<div class="sectionDesc">Other CEO pages — Existing — Not new — But useful — Quick access from dashboard</div>
+
+<div class="btnGrid">
+<a href="ceo-finance.html" class="ceoBtn" target="_blank">
+<div class="btnHeader"><div class="btnIcon gold">💰</div><div class="btnContent"><div class="btnTitle">CEO Finance — Finance Dashboard</div><div class="btnFile">ceo-finance.html — Existing</div><div class="btnDesc">CEO Finance — Payments, earnings, withdrawals, transactions — CEO catches payment source — Full vs 50%</div><div class="btnMeta"><span class="badge badgeCEO">CEO Page</span><span class="badge badgeSize">Existing</span></div></div></div>
+<div class="btnAction"><span class="actionBtn actionOpen">💰 Open ceo-finance.html</span></div>
+</a>
+
+<a href="ceo-live-tracking-map.html" class="ceoBtn" target="_blank">
+<div class="btnHeader"><div class="btnIcon green">🗺️</div><div class="btnContent"><div class="btnTitle">CEO Live Tracking Map — Track Nurses LIVE</div><div class="btnFile">ceo-live-tracking-map.html — Existing</div><div class="btnDesc">CEO Live Tracking — Track nurses GPS LIVE — Nurses CANNOT see this — Only CEO — As you requested no CEO button for nurses</div><div class="btnMeta"><span class="badge badgeCEO">CEO ONLY — Nurses Cannot See</span><span class="badge badgeSize">Existing</span></div></div></div>
+<div class="btnAction"><span class="actionBtn actionOpen">🗺️ Open ceo-live-tracking-map.html — CEO Only Tracking</span></div>
+</a>
+
+<a href="sos.html" class="ceoBtn" target="_blank">
+<div class="btnHeader"><div class="btnIcon red">🚨</div><div class="btnContent"><div class="btnTitle">SOS — Emergency</div><div class="btnFile">sos.html — Existing</div><div class="btnDesc">SOS Emergency — For nurses — From my-job-offer.html — ceo-control-chat.html has SOS link too</div><div class="btnMeta"><span class="badge badgeCEO">SOS</span><span class="badge badgeSize">Existing</span></div></div></div>
+<div class="btnAction"><span class="actionBtn actionOpen">🚨 Open sos.html</span></div>
+</a>
+
+<a href="index.html" class="ceoBtn" target="_blank">
+<div class="btnHeader"><div class="btnIcon gold">🏠</div><div class="btnContent"><div class="btnTitle">Home — Index</div><div class="btnFile">index.html — Existing</div><div class="btnDesc">Home page — LOVE CARE GLOBAL — Main landing</div><div class="btnMeta"><span class="badge badgeCEO">Home</span></div></div></div>
+<div class="btnAction"><span class="actionBtn actionOpen">🏠 Open index.html</span></div>
+</a>
+</div>
+</div>
+
+<div style="text-align:center;padding:20px;color:var(--faint);font-size:11px">
+CEO Dashboard — All New CEO Pages — 5 New Files Created — 2 Updated — 1 Existing Works — Total 8 Pages — CEO ONLY — LOVE CARE GLOBAL — 2025 — Up to Deletion of Account — Any Form — For Both Clients and Nurses — Legal Protection — Appeal System<br>
+Files: client-complaint.html (17.3 KB) + nurse-complain.html (14.6 KB) + ceo-complainant.html (20.0 KB) + ceo-penalize.html (61.1 KB) + ceo-control-chat.html (49.4 KB) + my-bookings.html (55.1 KB updated) + my-job-offer.html (26.0 KB updated) + nurses-group-chat.html (22.5 KB existing) = 266 KB Total — CEO Dashboard — ceo-dashboard.html — Only buttons — As you requested!
+</div>
+</div>
+</body>
+</html>
