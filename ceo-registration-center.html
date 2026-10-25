@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Registration Center — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.15);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-family:Plus Jakarta Sans;font-weight:800;font-size:14px}
+.brand small{display:block;font-size:9px;color:#a78bfa}
+.liveDot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 1.5s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.wrap{max-width:1280px;margin:0 auto;padding:18px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;position:sticky;top:58px;z-index:40;background:rgba(14,10,28,.92);padding:10px 0;border-bottom:1px solid rgba(168,85,247,.12)}
+.tab{padding:10px 14px;border-radius:999px;border:1px solid rgba(168,85,247,.18);background:rgba(28,18,56,.6);color:#d8b4fe;font-weight:800;font-size:11px;cursor:pointer}
+.tab.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}
+.input{padding:11px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);color:#ede9fe;font-size:12px;flex:1;min-width:200px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.card{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.15);border-radius:18px;padding:14px}
+.badge{font-size:9px;font-weight:900;padding:4px 8px;border-radius:999px;display:inline-flex}
+.badgePending{background:rgba(251,191,36,.15);color:#fbbf24}
+.badgeApproved{background:rgba(34,197,94,.15);color:#4ade80}
+.badgeRejected{background:rgba(239,68,68,.15);color:#fca5a5}
+.badgeLive{background:rgba(168,85,247,.18);color:#d8b4fe}
+.badgeUpdate{background:rgba(34,197,94,.18);border:1px solid #22c55e;color:#86efac;animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.avatar{width:56px;height:56px;border-radius:50%;background:#2e1065;display:grid;place-items:center;font-weight:900;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.docBtn{font-size:10px;padding:6px 10px;border-radius:999px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.15);color:#d8b4fe;text-decoration:none;font-weight:800;display:inline-flex;margin-right:4px}
+.docBtn.has{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25);color:#86efac}
+.videoBox{margin-top:10px;border-radius:12px;overflow:hidden;background:#000}
+.videoBox video{width:100%;max-height:180px}
+.mapMini{height:120px;border-radius:12px;margin-top:10px;border:1px solid rgba(168,85,247,.15)}
+.btn{flex:1;padding:11px;border-radius:12px;font-weight:900;font-size:12px;border:none;cursor:pointer}
+.btnAccept{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16}
+.btnReject{background:linear-gradient(135deg,#ef4444,#991b1b);color:white}
+.toast{position:fixed;right:14px;bottom:14px;z-index:200;background:#1e0a3a;border:1px solid rgba(168,85,247,.25);color:#ede9fe;padding:12px 16px;border-radius:12px;font-weight:700;font-size:12px;display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+<div><div class="brand">LOVE CARE GLOBAL <span class="liveDot"></span> LIVE <small>CEO REGISTRATION CENTER</small></div></div>
+<div style="display:flex;gap:8px;align-items:center"><span id="counts" style="font-size:11px;color:#a78bfa">Loading...</span><a href="index.html" style="padding:8px 12px;border-radius:999px;background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none;font-size:11px;font-weight:800">🏠 Home</a></div>
+</div>
+<div class="wrap">
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+<input id="search" class="input" placeholder="🔍 Search name, email, phone, country, bio..." oninput="render()">
+<select id="sort" class="input" style="max-width:160px" onchange="render()"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name">Name A-Z</option></select>
+<button class="tab" onclick="reloadData()">🔄 Refresh</button>
+</div>
+<div class="tabs">
+<button class="tab active" data-tab="pendingNurses" onclick="switchTab('pendingNurses')">⏳ Pending Nurses <small id="c_pendingNurses">0</small></button>
+<button class="tab" data-tab="approvedNurses" onclick="switchTab('approvedNurses')">✅ Approved <small id="c_approvedNurses">0</small></button>
+<button class="tab" data-tab="rejectedNurses" onclick="switchTab('rejectedNurses')">🚫 Rejected <small id="c_rejectedNurses">0</small></button>
+<button class="tab" data-tab="pendingClients" onclick="switchTab('pendingClients')">👤 Pending Clients <small id="c_pendingClients">0</small></button>
+<button class="tab" data-tab="approvedClients" onclick="switchTab('approvedClients')">👤 Verified Clients <small id="c_approvedClients">0</small></button>
+<button class="tab" data-tab="allUpdates" onclick="switchTab('allUpdates')">🔄 Live Updates <small id="c_allUpdates">0</small></button>
+</div>
+<div id="grid" class="grid"></div>
+<div id="empty" style="padding:30px;text-align:center;color:#a78bfa;font-size:13px;display:none;border:1px dashed rgba(168,85,247,.2);border-radius:18px">No records yet — New registrations will appear live here 🟢</div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+let allData={pendingNurses:[],approvedNurses:[],rejectedNurses:[],pendingClients:[],approvedClients:[],allUpdates:[]};
+let currentTab='pendingNurses';
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',3500);}
+function switchTab(tab){currentTab=tab;document.querySelectorAll('.tab[data-tab]').forEach(b=>b.classList.remove('active'));document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');render();}
+function formatTime(ts){if(!ts)return'';const diff=Date.now()-ts;if(diff<60000)return'just now';if(diff<3600000)return Math.floor(diff/60000)+'m ago';if(diff<86400000)return Math.floor(diff/3600000)+'h ago';return new Date(ts).toLocaleString();}
+function normalizeNurse(id,v){if(!v)return null;const isApproved=v.isApproved===true||v.approved===true||v.status==='approved';const isRejected=v.isRejected===true||v.rejected===true||v.status==='rejected';const created=v.createdAt||v.registeredAt||v.timestamp||v.updatedAt||0;return{id,type:'nurse',fullName:v.fullName||v.name||'Unnamed Nurse',email:v.email||'',phone:v.phone||v.phoneNumber||'',country:v.country||'',specialty:v.specialty||v.service||'',bio:v.bio||'',qualification:v.qualification||'',experience:v.experience||'',priceShort:v.priceShort||'',priceLong:v.priceLong||'',photo:v.photo||v.photoURL||'',cvUrl:v.cvUrl||v.cvURL||v.cv||'',videoUrl:v.videoUrl||v.videoURL||v.video||'',certificateUrl:v.certificateUrl||'',licenseUrl:v.licenseUrl||v.licenceUrl||v.idURL||'',lat:v.lat||null,lng:v.lng||null,gpsActualName:v.gpsActualName||v.location||'',isApproved,isRejected,status:isApproved?'approved':isRejected?'rejected':'pending',createdAt:created,updatedAt:v.updatedAt||v.settingsUpdatedAt||v.lastUpdate||created,raw:v};}
+function normalizeClient(id,v){if(!v)return null;const isApproved=v.isApproved===true||v.verified===true||v.status==='approved';const created=v.createdAt||v.registeredAt||v.timestamp||v.updatedAt||0;return{id,type:'client',fullName:v.fullName||v.name||'Unnamed Client',email:v.email||'',phone:v.phone||v.phoneNumber||'',country:v.country||'',address:v.address||v.location||'',photo:v.photo||v.photoURL||'',lat:v.lat||null,lng:v.lng||null,gpsActualName:v.gpsActualName||v.location||'',isApproved,status:isApproved?'approved':'pending',createdAt:created,updatedAt:v.updatedAt||v.settingsUpdatedAt||v.lastUpdate||created,raw:v};}
+async function loadAll(){
+toast('Loading live data...');
+const pathsNurse=['nurses','nurse_registrations','pendingNurseRegistrations','nurseUsers','ceoNurseUpdates','ceoRegistrationCenter/nurses'];
+const pathsClient=['clients','client_registrations','pendingClientRegistrations','clientUsers','ceoClientUpdates','ceoRegistrationCenter/clients'];
+let nurseMap={},clientMap={};
+for(const p of pathsNurse){try{const snap=await db.ref(p).once('value');if(snap.exists()){snap.forEach(ch=>{const id=ch.key;const val=ch.val();if(!val)return;if(!nurseMap[id])nurseMap[id]=val;else{const newTime=val.updatedAt||0;const oldTime=nurseMap[id].updatedAt||0;if(newTime>=oldTime)nurseMap[id]={...nurseMap[id],...val};});});}catch(e){}}
+for(const p of pathsClient){try{const snap=await db.ref(p).once('value');if(snap.exists()){snap.forEach(ch=>{const id=ch.key;const val=ch.val();if(!val)return;if(!clientMap[id])clientMap[id]=val;else{const newTime=val.updatedAt||0;const oldTime=clientMap[id].updatedAt||0;if(newTime>=oldTime)clientMap[id]={...clientMap[id],...val};});});}catch(e){}}
+let pendingNurses=[],approvedNurses=[],rejectedNurses=[],pendingClients=[],approvedClients=[],allUpdates=[];
+Object.entries(nurseMap).forEach(([id,v])=>{const n=normalizeNurse(id,v);if(!n)return;allUpdates.push(n);if(n.isApproved)approvedNurses.push(n);else if(n.isRejected)rejectedNurses.push(n);else pendingNurses.push(n);});
+Object.entries(clientMap).forEach(([id,v])=>{const c=normalizeClient(id,v);if(!c)return;allUpdates.push(c);if(c.isApproved)approvedClients.push(c);else pendingClients.push(c);});
+allUpdates.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+allData={pendingNurses,approvedNurses,rejectedNurses,pendingClients,approvedClients,allUpdates};
+document.getElementById('c_pendingNurses').textContent=pendingNurses.length;
+document.getElementById('c_approvedNurses').textContent=approvedNurses.length;
+document.getElementById('c_rejectedNurses').textContent=rejectedNurses.length;
+document.getElementById('c_pendingClients').textContent=pendingClients.length;
+document.getElementById('c_approvedClients').textContent=approvedClients.length;
+document.getElementById('c_allUpdates').textContent=allUpdates.length;
+document.getElementById('counts').textContent=`Nurses: ${pendingNurses.length} pending, ${approvedNurses.length} approved | Clients: ${pendingClients.length} pending`;
+render();attachLive();
+}
+function attachLive(){
+['nurses','clients','nurse_registrations','client_registrations','ceoNurseUpdates','ceoClientUpdates'].forEach(p=>{
+db.ref(p).on('child_changed',snap=>{toast('🔄 LIVE UPDATE: '+(snap.val().fullName||snap.key)+' — '+p);loadAll();});
+db.ref(p).on('child_added',snap=>{const v=snap.val();if(Date.now()-(v.createdAt||v.updatedAt||0)<120000){toast('🆕 NEW: '+(v.fullName||snap.key));loadAll();}});
+});
+}
+function render(){
+const grid=document.getElementById('grid');const empty=document.getElementById('empty');const search=document.getElementById('search').value.toLowerCase().trim();let list=[...(allData[currentTab]||[])];
+if(search){list=list.filter(i=>`${i.fullName} ${i.email} ${i.phone} ${i.country} ${i.bio}`.toLowerCase().includes(search));}
+grid.innerHTML='';if(list.length===0){empty.style.display='block';return;}empty.style.display='none';
+list.forEach(item=>{
+const isNurse=item.type==='nurse';
+const statusBadge=item.status==='approved'?'<span class="badge badgeApproved">✅ Approved</span>':item.status==='rejected'?'<span class="badge badgeRejected">🚫 Rejected</span>':'<span class="badge badgePending">⏳ Pending</span>';
+const liveBadge=(Date.now()-(item.updatedAt||0)<600000)?'<span class="badge badgeUpdate">🔄 Last Update '+formatTime(item.updatedAt)+'</span>':'<span class="badge badgeLive">Updated '+formatTime(item.updatedAt)+'</span>';
+const photoHtml=item.photo?`<img src="${item.photo}" onerror="this.style.display='none'">`:(item.fullName||'C').charAt(0).toUpperCase();
+const videoPlayer=isNurse&&item.videoUrl?`<div class="videoBox"><video src="${item.videoUrl}" controls></video></div>`:'';
+const hasMap=item.lat&&item.lng;
+const mapId=`map_${item.id}_${Math.random().toString(36).slice(2,4)}`;
+const actions=isNurse?`<div style="display:flex;gap:8px;margin-top:12px">${item.status!=='approved'?`<button class="btn btnAccept" onclick="acceptNurse('${item.id}')">✅ ACCEPT</button>`:`<button class="btn" disabled>✅ Approved</button>`}${item.status!=='rejected'?`<button class="btn btnReject" onclick="rejectNurse('${item.id}')">🚫 REJECT</button>`:''}</div>`:`<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btnAccept" onclick="acceptClient('${item.id}')">✅ VERIFY</button></div>`;
+const card=document.createElement('div');card.className='card';
+card.innerHTML=`<div style="display:flex;gap:12px"><div class="avatar">${photoHtml}</div><div style="flex:1"><h3 style="font-size:14px">${item.fullName} ${isNurse?'👩‍⚕️':'👤'}</h3><small style="font-size:11px;color:#a78bfa">📧 ${item.email}<br>📱 ${item.phone}<br>🌍 ${item.country}<br>🕒 ${formatTime(item.createdAt)} • ${formatTime(item.updatedAt)}</small><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${statusBadge} ${liveBadge}</div></div></div>${isNurse?`<div style="margin-top:8px;font-size:11px;color:#c4b5fd"><b>Bio:</b> ${item.bio||'—'}<br><b>Qual:</b> ${item.qualification||''}</div>`:''}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${isNurse?`<a href="${item.cvUrl||'#'}" target="_blank" class="docBtn ${item.cvUrl?'has':''}">📄 CV</a><a href="${item.videoUrl||'#'}" target="_blank" class="docBtn ${item.videoUrl?'has':''}">🎥 Video</a><a href="${item.certificateUrl||'#'}" target="_blank" class="docBtn ${item.certificateUrl?'has':''}">🎓 Cert</a><a href="${item.licenseUrl||'#'}" target="_blank" class="docBtn ${item.licenseUrl?'has':''}">🪪 License</a>`:''}</div>${videoPlayer}<div style="margin-top:8px;font-size:10px;color:#a78bfa">${item.gpsActualName||''} ${hasMap?`<div id="${mapId}" class="mapMini" style="display:block"></div>`:''}</div>${actions}`;
+grid.appendChild(card);
+if(hasMap){setTimeout(()=>{try{const el=document.getElementById(mapId);if(!el)return;const map=L.map(el).setView([item.lat,item.lng],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);L.marker([item.lat,item.lng]).addTo(map);}catch(e){}},400);}
+});
+}
+async function acceptNurse(id){if(!confirm('ACCEPT nurse '+id+'?'))return;const u={isApproved:true,canLogin:true,approved:true,status:'approved',approvedAt:Date.now(),updatedAt:Date.now()};await db.ref('nurses/'+id).update(u);await db.ref('nurse_registrations/'+id).update(u);await db.ref('pendingNurseRegistrations/'+id).update(u);toast('✅ Accepted '+id);loadAll();}
+async function rejectNurse(id){if(!confirm('REJECT '+id+'?'))return;const u={isApproved:false,isRejected:true,rejected:true,canLogin:false,status:'rejected',rejectedAt:Date.now(),updatedAt:Date.now()};await db.ref('nurses/'+id).update(u);await db.ref('nurse_registrations/'+id).update(u);toast('🚫 Rejected');loadAll();}
+async function acceptClient(id){const u={isApproved:true,verified:true,status:'approved',verifiedAt:Date.now(),updatedAt:Date.now()};await db.ref('clients/'+id).update(u);await db.ref('client_registrations/'+id).update(u);toast('✅ Verified');loadAll();}
+function reloadData(){loadAll();}
+window.onload=loadAll;
+</script>
+</body>
+</html>

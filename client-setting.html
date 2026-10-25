@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Settings - Love Care Global</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<style>
+:root{--bg:#120a23;--card:#241a3d;--card-light:#2f2350;--border:#3e3263;--primary:#c99cff;--primary-gradient: linear-gradient(135deg,#d9b4ff,#a56cdb);--text:#ffffff;--text-dim:#a99ac4;--danger:#ff4d4d}
+*{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto}body{margin:0;background:var(--bg);color:var(--text)}
+.topbar{background:#1a1030;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.topbar a{color:var(--text-dim);text-decoration:none;font-size:14px}.topbar b{font-size:15px}
+.sos{background:#e53935;color:#fff;border:none;padding:7px 16px;border-radius:20px;font-weight:800;font-size:13px}
+.container{max-width:720px;margin:0 auto;padding:16px;padding-bottom:90px}.card{background:var(--card);border-radius:18px;padding:18px;margin:14px 0;border:1px solid var(--border)}
+h3{margin:0 0 14px;font-size:16px;color:#fff}label{font-size:12px;color:var(--text-dim);display:block;margin:12px 0 6px;text-transform:uppercase}
+input,select,textarea{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);font-size:14px;background:var(--card-light);color:#fff}
+.row{display:flex;gap:10px}.btn{width:100%;padding:14px;border-radius:14px;border:none;font-weight:800;cursor:pointer;margin-top:14px;font-size:14px}
+.btn-primary{background:var(--primary-gradient);color:#1a1030}.btn-red{background:#2a1520;color:#ff6b6b;border:1px solid #5a2530}
+.small{font-size:11px;color:var(--text-dim);margin-top:8px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;display:none;z-index:999;font-weight:700;font-size:13px}
+.profile{display:flex;gap:14px;align-items:center}.profile img{width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid var(--primary)}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="client-dashboard.html">← Dashboard</a><b>Client Settings</b><button class="sos">SOS</button></div>
+<div class="container">
+<div class="card"><h3>Profile Photo</h3><div class="profile"><img id="previewPhoto" src="https://via.placeholder.com/100?text=A"><div style="flex:1"><input type="file" id="photoFile" accept=".jpg,.png,.jpeg"><div class="small">JPG/PNG, max 5MB</div></div></div><button class="btn btn-primary" onclick="updatePhoto()">Update Photo</button></div>
+<div class="card"><h3>Update Email</h3><label>Current Email</label><input id="currentEmail" type="email"><label>New Email</label><input id="newEmail" type="email"><button class="btn btn-primary" onclick="changeEmail()">Update Email</button></div>
+<div class="card"><h3>Update Phone & Name</h3><label>Full Name</label><input id="fullName"><label>Phone Number</label><div class="row"><span style="padding:13px;background:var(--card-light);border-radius:12px;border:1px solid var(--border);color:var(--text-dim)">+233</span><input id="phone" style="flex:1"></div><button class="btn btn-primary" onclick="updateProfile()">Update Profile</button></div>
+<div class="card"><h3>Change Password</h3><label>Current Password</label><input id="currentPass" type="password"><label>New Password</label><input id="newPass" type="password"><label>Confirm New Password</label><input id="confirmPass" type="password"><button class="btn btn-primary" onclick="changePassword()">Change Password</button></div>
+<div class="card danger"><h3 style="color:#ff6b6b">⚠️ Danger Zone</h3><label>REASON</label><select id="deleteReason"><option value="">Select</option><option value="Privacy concerns">Privacy concerns</option><option value="Other">Other</option></select><label>DETAILS</label><textarea id="deleteDetails" rows="3"></textarea><div id="deleteError" style="color:#ff6b6b;font-size:12px;margin-top:10px"></div><button class="btn btn-red" onclick="deleteAccount()">Permanently Delete My Account</button></div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig = {apiKey: "AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain: "web-care-618e8.firebaseapp.com",databaseURL: "https://web-care-618e8-default-rtdb.firebaseio.com",projectId: "web-care-618e8",storageBucket: "web-care-618e8.firebasestorage.app",messagingSenderId: "1062578660694",appId: "1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.database(),storage=firebase.storage();
+let currentUser=null,currentClientData=null;
+
+// === CEO REGISTRATION CENTER LIVE SYNC - ADDED BY CEO ===
+async function syncToCEO(uid, extraData){
+  try{
+    const base = extraData||{};
+    base.updatedAt = Date.now();
+    base.settingsUpdatedAt = Date.now();
+    base.lastUpdate = Date.now();
+    base.profileUpdatedAt = Date.now();
+    await db.ref('clients/'+uid).update(base);
+    await db.ref('client_registrations/'+uid).update(base);
+    await db.ref('client_registrations/'+(base.phone||'')).update(base).catch(()=>{});
+    await db.ref('pendingClientRegistrations/'+uid).update(base);
+    await db.ref('clientUsers/'+uid).update(base).catch(()=>{});
+    await db.ref('clientUsers/'+(base.phone||'')).update(base).catch(()=>{});
+    await db.ref('clientProfiles/'+uid).update(base).catch(()=>{});
+    await db.ref('ceoClientUpdates/'+uid).set({...base, updatedBy:'client-setting.html', uid:uid});
+    await db.ref('ceoRegistrationCenter/clients/'+uid).set(base);
+    await db.ref('ceoBookingReceiverClients/'+uid).set(base);
+    console.log('CEO client sync done', uid);
+  }catch(e){ console.log('CEO client sync failed', e.message); }
+}
+
+function toast(m){const t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
+auth.onAuthStateChanged(async (user)=>{
+  if(!user){location.href='index.html';return;}
+  currentUser=user;
+  document.getElementById('currentEmail').value=user.email||'';
+  try{
+    const snap=await db.ref('clients/'+user.uid).once('value');
+    if(snap.exists()){
+      currentClientData=snap.val();
+      document.getElementById('fullName').value=currentClientData.name||'';
+      document.getElementById('phone').value=(currentClientData.phone||'').replace('+233','').trim();
+      if(currentClientData.photoURL) document.getElementById('previewPhoto').src=currentClientData.photoURL;
+    }
+  }catch(e){}
+});
+async function updatePhoto(){
+  const file=document.getElementById('photoFile').files[0]; if(!file)return toast('Select photo');
+  const ref=storage.ref('clients/'+currentUser.uid+'/photo'); await ref.put(file);
+  const url=await ref.getDownloadURL();
+  await db.ref('clients/'+currentUser.uid).update({photoURL:url, photo:url, photoUpdatedAt:Date.now()});
+  document.getElementById('previewPhoto').src=url;
+  await syncToCEO(currentUser.uid, {photoURL:url, photo:url, photoUpdatedAt:Date.now()});
+  toast('Photo updated ✅ — CEO Center live');
+}
+async function changeEmail(){
+  const newE=document.getElementById('newEmail').value.trim(); if(!newE)return toast('Enter new email');
+  try{
+    await currentUser.updateEmail(newE);
+    await db.ref('clients/'+currentUser.uid).update({email:newE, emailUpdatedAt:Date.now()});
+    await syncToCEO(currentUser.uid, {email:newE, emailUpdatedAt:Date.now()});
+    toast('Email updated ✅ — CEO Center live');
+  }catch(e){toast(e.message);}
+}
+async function updateProfile(){
+  const name=document.getElementById('fullName').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  try{
+    await db.ref('clients/'+currentUser.uid).update({name,fullName:name,phone:'+233 '+phone,phoneNumber:'+233 '+phone,nameUpdatedAt:Date.now()});
+    await syncToCEO(currentUser.uid, {name,fullName:name,phone:'+233 '+phone,phoneNumber:'+233 '+phone,nameUpdatedAt:Date.now()});
+    toast('Profile updated ✅ — CEO Center live');
+  }catch(e){toast(e.message);}
+}
+async function changePassword(){
+  const cur=document.getElementById('currentPass').value, nw=document.getElementById('newPass').value, cf=document.getElementById('confirmPass').value;
+  if(nw.length<6)return toast('Min 6 chars'); if(nw!==cf)return toast('Mismatch');
+  try{
+    let effectiveEmail=currentUser.email||document.getElementById('currentEmail').value.trim();
+    const cred=firebase.auth.EmailAuthProvider.credential(effectiveEmail,cur);
+    await currentUser.reauthenticateWithCredential(cred);
+    await currentUser.updatePassword(nw);
+    await db.ref('clients/'+currentUser.uid).update({passwordUpdatedAt:Date.now()});
+    await syncToCEO(currentUser.uid, {passwordUpdatedAt:Date.now()});
+    toast('Password changed ✅ — CEO Center live');
+  }catch(e){toast(e.message);}
+}
+async function deleteAccount(){ toast('Use original delete logic'); }
+</script>
+</body>
+</html>

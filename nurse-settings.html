@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Settings — LOVE CARE GLOBAL HOME NURSING</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}
+.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
+.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}
+.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;box-shadow:0 4px 18px rgba(76,29,149,.45);border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.brand small{display:block;font-size:9px;color:#a78bfa;letter-spacing:.12em;margin-top:2px}
+.pill{font-size:10px;padding:5px 9px;border-radius:999px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.18);color:#d8b4fe;font-weight:800}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:1px solid rgba(239,68,68,.3);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
+#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:300px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}
+.drawerHead{padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center}
+.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item:hover{background:rgba(76,29,149,.16)}
+.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+.wrap{max-width:900px;margin:0 auto;padding:20px 14px 60px}
+.card{background:rgba(28,18,56,.75);border:1px solid rgba(168,85,247,.12);border-radius:18px;padding:18px;backdrop-filter:blur(12px);box-shadow:0 12px 36px rgba(0,0,0,.45);margin-bottom:16px}
+.card h2{font-family:Plus Jakarta Sans,sans-serif;font-size:14px;font-weight:800;color:#f3e8ff;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.label{font-size:11px;color:#a78bfa;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin:10px 0 6px;display:block}
+.input, .select, .textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;font-weight:600;outline:none}
+.input:focus, .select:focus, .textarea:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.15)}
+.textarea{min-height:90px;resize:vertical}
+.btn{padding:12px 16px;border-radius:12px;font-weight:900;font-size:13px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;justify-content:center;transition:.15s}
+.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.3)}
+.btnDark{background:rgba(76,29,149,.20);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
+.btnDanger{background:linear-gradient(135deg,#ef4444,#991b1b);color:white;box-shadow:0 8px 20px rgba(239,68,68,.3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.photoBox{display:flex;gap:16px;align-items:center}
+.photoPreview{width:84px;height:84px;border-radius:50%;background:#2e1065;border:2px solid rgba(168,85,247,.18);overflow:hidden;display:grid;place-items:center;font-weight:900;font-size:28px;color:white;flex-shrink:0}
+.photoPreview img{width:100%;height:100%;object-fit:cover}
+.danger{border:1px solid rgba(239,68,68,.28);background:linear-gradient(180deg,rgba(239,68,68,.10),rgba(14,10,28,.7));border-radius:18px;padding:18px}
+.checkRow{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:12px;color:#c4b5fd}
+.toast{position:fixed;right:14px;bottom:14px;z-index:200;background:#1e0a3a;border:1px solid rgba(168,85,247,.18);color:#ede9fe;padding:12px 14px;border-radius:12px;font-weight:700;font-size:12px;display:none;max-width:90vw}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="topbar">
+<div class="left">
+<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
+<div class="logoBox">
+<img src="icon-transparent-512.png" alt="Logo" class="logoImg">
+<div class="brand">LOVE CARE GLOBAL<br>HOME NURSING<small>NURSE SETTINGS</small></div>
+</div>
+</div>
+<div style="display:flex;gap:8px;align-items:center"><span class="pill" id="userStatus">● Not logged in</span><a href="sos.html" class="sosBtn">🚨 SOS</a></div>
+</div>
+<div id="overlay" onclick="closeD()"></div>
+<div id="drawer">
+<div class="drawerHead">
+<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e;border:1px solid rgba(168,85,247,.2)">
+<div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b><div style="font-size:9px;color:#a78bfa;margin-top:3px">MENU LIST</div></div>
+</div>
+<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
+<a class="item" href="index.html">🏠 Home</a>
+<a class="item" href="nurses-dashboard.html">📊 My Dashboard</a>
+<a class="item" href="nurse-settings.html" style="background:rgba(168,85,247,.22);border-color:rgba(168,85,247,.28);color:#f3e8ff">⚙️ Settings — Current</a>
+<a class="item" href="about.html">ℹ️ About Us</a>
+<a class="item" href="services.html">🩺 Services</a>
+<a class="item consent" href="consent-form.html">📝 Consent Form</a>
+<div style="height:1px;background:rgba(168,85,247,.10);margin:4px 0"></div>
+<a class="item" href="privacy.html">🔒 Privacy</a>
+<a class="item" href="terms.html">📜 Terms</a>
+<a class="item sos" href="sos.html">🚨 SOS — sos.html</a>
+</div>
+<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close Menu</button></div>
+</div>
+<div class="wrap">
+<div class="card">
+<h2>Profile Photo</h2>
+<div class="photoBox">
+<div class="photoPreview" id="photoPreview">C</div>
+<div style="flex:1">
+<label class="label">Change Photo</label>
+<input type="file" id="photoInput" accept="image/*" class="input" style="padding:8px">
+<small style="font-size:10px;color:#a78bfa;display:block;margin-top:6px">JPG/PNG, max 5MB. Stored in Firebase Storage / nurses/{uid}/photo</small>
+<div style="display:flex;gap:8px;margin-top:10px"><button class="btn btnPrimary" onclick="uploadPhoto()">⬆ Upload Photo</button><button class="btn btnDark" onclick="removePhotoPreview()">Remove Preview</button></div>
+</div>
+</div>
+</div>
+<div class="card">
+<h2>📄 Documents — CV, Video, Certificate, License</h2>
+<p style="font-size:11px;color:#a78bfa;margin-bottom:12px">Upload your professional documents. Clients see these on Book Nurse map. Max photo 5MB, CV 10MB, Video 50MB, Cert/License 10MB.</p>
+<div class="grid2">
+<div style="border:1px solid rgba(168,85,247,.12);border-radius:12px;padding:12px;background:rgba(14,10,28,.4)">
+<label class="label">📄 CV / Resume (PDF/DOC)</label>
+<div id="cvPreview" style="font-size:11px;color:#c4b5fd;margin:6px 0">No CV uploaded</div>
+<input type="file" id="cvInput" accept=".pdf,.doc,.docx" class="input" style="padding:8px">
+<div style="display:flex;gap:8px;margin-top:8px"><button class="btn btnPrimary" style="flex:1" onclick="uploadDoc('cv')">⬆ Upload CV</button><a id="cvLink" href="#" target="_blank" class="btn btnDark" style="flex:1;display:none">View CV</a></div>
+<div id="cvProgress" style="font-size:10px;color:#a78bfa;margin-top:4px"></div>
+</div>
+<div style="border:1px solid rgba(168,85,247,.12);border-radius:12px;padding:12px;background:rgba(14,10,28,.4)">
+<label class="label">🎥 Intro Video (MP4/MOV)</label>
+<div id="videoPreview" style="font-size:11px;color:#c4b5fd;margin:6px 0">No video uploaded</div>
+<video id="videoPlayer" controls style="width:100%;border-radius:8px;display:none;max-height:160px;background:#000;margin-bottom:6px"></video>
+<input type="file" id="videoInput" accept="video/*" class="input" style="padding:8px">
+<div style="display:flex;gap:8px;margin-top:8px"><button class="btn btnPrimary" style="flex:1" onclick="uploadDoc('video')">⬆ Upload Video</button><a id="videoLink" href="#" target="_blank" class="btn btnDark" style="flex:1;display:none">View Video</a></div>
+<div id="videoProgress" style="font-size:10px;color:#a78bfa;margin-top:4px"></div>
+</div>
+</div>
+<div class="grid2" style="margin-top:12px">
+<div style="border:1px solid rgba(168,85,247,.12);border-radius:12px;padding:12px;background:rgba(14,10,28,.4)">
+<label class="label">🎓 Certificate (JPG/PNG/PDF)</label>
+<div id="certPreview" style="font-size:11px;color:#c4b5fd;margin:6px 0">No certificate uploaded</div>
+<img id="certImg" style="width:100%;border-radius:8px;display:none;max-height:160px;object-fit:contain;background:#0e0a1c;border:1px solid rgba(168,85,247,.12);margin-bottom:6px">
+<input type="file" id="certInput" accept="image/*,.pdf" class="input" style="padding:8px">
+<div style="display:flex;gap:8px;margin-top:8px"><button class="btn btnPrimary" style="flex:1" onclick="uploadDoc('certificate')">⬆ Upload Cert</button><a id="certLink" href="#" target="_blank" class="btn btnDark" style="flex:1;display:none">View Cert</a></div>
+<div id="certProgress" style="font-size:10px;color:#a78bfa;margin-top:4px"></div>
+</div>
+<div style="border:1px solid rgba(168,85,247,.12);border-radius:12px;padding:12px;background:rgba(14,10,28,.4)">
+<label class="label">🪪 Nursing License (JPG/PNG/PDF)</label>
+<div id="licensePreview" style="font-size:11px;color:#c4b5fd;margin:6px 0">No license uploaded</div>
+<img id="licenseImg" style="width:100%;border-radius:8px;display:none;max-height:160px;object-fit:contain;background:#0e0a1c;border:1px solid rgba(168,85,247,.12);margin-bottom:6px">
+<input type="file" id="licenseInput" accept="image/*,.pdf" class="input" style="padding:8px">
+<div style="display:flex;gap:8px;margin-top:8px"><button class="btn btnPrimary" style="flex:1" onclick="uploadDoc('license')">⬆ Upload License</button><a id="licenseLink" href="#" target="_blank" class="btn btnDark" style="flex:1;display:none">View License</a></div>
+<div id="licenseProgress" style="font-size:10px;color:#a78bfa;margin-top:4px"></div>
+</div>
+</div>
+</div>
+<div class="grid2">
+<div class="card">
+<h2>📧 Email</h2>
+<label class="label">Current Email</label>
+<input id="currentEmail" class="input" disabled placeholder="loading...">
+<label class="label">New Email</label>
+<input id="newEmail" class="input" type="email" placeholder="newemail@example.com">
+<label class="label">Current Password (to confirm)</label>
+<input id="emailPassword" class="input" type="password" placeholder="Enter password">
+<button class="btn btnPrimary" style="width:100%;margin-top:12px" onclick="changeEmail()">Update Email</button>
+</div>
+<div class="card">
+<h2>📱 Phone Number</h2>
+<label class="label">Current Phone</label>
+<input id="currentPhone" class="input" disabled placeholder="loading...">
+<label class="label">New Phone Number</label>
+<input id="newPhone" class="input" type="tel" placeholder="+233 20 123 4567">
+<label class="label">Full Name (optional)</label>
+<input id="displayName" class="input" type="text" placeholder="Your full name">
+<button class="btn btnPrimary" style="width:100%;margin-top:12px" onclick="changePhone()">Update Phone & Name</button>
+</div>
+</div>
+<div class="card">
+<h2>🩺 Nurse Professional Info</h2>
+<div class="grid2">
+<div><label class="label">Specialty</label><input id="specialty" class="input" placeholder="e.g. ICU, Elderly Care"></div>
+<div><label class="label">Country</label>
+<select id="countrySel" class="select"><option value="">Select country</option><option value="GH">Ghana</option><option value="NG">Nigeria</option><option value="KE">Kenya</option><option value="ZA">South Africa</option><option value="US">USA</option><option value="UK">UK</option><option value="CA">Canada</option><option value="AE">UAE</option></select>
+</div>
+</div>
+<label class="label">Bio</label>
+<textarea id="bio" class="textarea" placeholder="Tell clients about your experience..."></textarea>
+<div class="grid2">
+<div><label class="label">Short Visit Price (GHS)</label><input id="priceShort" class="input" placeholder="e.g. 150"></div>
+<div><label class="label">Long Visit Price (GHS)</label><input id="priceLong" class="input" placeholder="e.g. 1200"></div>
+</div>
+<div class="grid2">
+<div><label class="label">Work Hours</label><input id="workHours" class="input" placeholder="e.g. 8am-6pm"></div>
+<div><label class="label">Availability</label><select id="availability" class="select"><option value="online">Online</option><option value="offline">Offline</option><option value="busy">Busy</option></select></div>
+</div>
+<button class="btn btnPrimary" style="width:100%;margin-top:12px" onclick="saveNurseInfo()">Save Nurse Info</button>
+</div>
+<div class="card">
+<h2>📍 Location (GPS)</h2>
+<label class="label">GPS Address Name</label>
+<input id="gpsName" class="input" placeholder="Locating..." readonly style="background:rgba(76,29,149,.12)!important;color:#d8b4fe">
+<div class="grid2" style="margin-top:8px">
+<div><label class="label">Latitude</label><input id="lat" class="input" placeholder="Lat"></div>
+<div><label class="label">Longitude</label><input id="lng" class="input" placeholder="Lng"></div>
+</div>
+<div style="display:flex;gap:8px;margin-top:10px"><button class="btn btnDark" style="flex:1" onclick="getGPS()">📍 Refresh GPS</button><button class="btn btnPrimary" style="flex:1" onclick="saveLocation()">Save Location</button></div>
+<div id="mapPreview" style="display:none;margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid rgba(168,85,247,.12)"><iframe id="mapFrame" style="width:100%;height:150px;border:0"></iframe></div>
+</div>
+<div class="card">
+<h2>🔒 Change Password</h2>
+<div class="grid2">
+<div><label class="label">Current Password</label><input id="currentPass" class="input" type="password" placeholder="Current password"></div>
+<div><label class="label">New Password (min 6)</label><input id="newPass" class="input" type="password" placeholder="New password"></div>
+</div>
+<label class="label">Confirm New Password</label>
+<input id="confirmPass" class="input" type="password" placeholder="Confirm new password">
+<button class="btn btnPrimary" style="width:100%;margin-top:12px" onclick="changePassword()">Update Password</button>
+</div>
+<div class="card danger">
+<h2 style="color:#fca5a5">☠️ Danger Zone — Delete Account</h2>
+<p style="font-size:12px;color:#fca5a5;margin-bottom:12px">Deleting your account is permanent. All bookings, data, and profile will be removed from Firebase. This cannot be undone.</p>
+<label class="label" style="color:#fca5a5">Reason for deleting (required)</label>
+<select id="deleteReason" class="select">
+<option value="">Select a reason</option>
+<option value="No longer need service">No longer need service</option>
+<option value="Privacy concerns">Privacy concerns</option>
+<option value="Found alternative service">Found alternative service</option>
+<option value="Poor service experience">Poor service experience</option>
+<option value="Moving out of service area">Moving out of service area</option>
+<option value="Too expensive">Too expensive</option>
+<option value="Other">Other</option>
+</select>
+<label class="label" style="color:#fca5a5">More details (optional)</label>
+<textarea id="deleteDetails" class="textarea" placeholder="Tell us more — we use this to improve..."></textarea>
+<div class="checkRow"><input type="checkbox" id="confirmCheck"><label for="confirmCheck">I understand this will permanently delete my nurse account, bookings, and personal data from LOVE CARE GLOBAL HOME NURSING.</label></div>
+<div class="checkRow"><input type="checkbox" id="confirmData"><label for="confirmData">I have exported or saved any information I need.</label></div>
+<label class="label" style="color:#fca5a5">Enter your password to confirm deletion</label>
+<input id="deletePassword" class="input" type="password" placeholder="Enter password to delete">
+<button class="btn btnDanger" style="width:100%;margin-top:12px" onclick="deleteAccount()">🗑️ Permanently Delete My Account</button>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",
+  authDomain: "web-care-618e8.firebaseapp.com",
+  databaseURL: "https://web-care-618e8-default-rtdb.firebaseio.com",
+  projectId: "web-care-618e8",
+  storageBucket: "web-care-618e8.firebasestorage.app",
+  messagingSenderId: "1062578660694",
+  appId: "1:1062578660694:web:f94dfe12c929df05bce2f7"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const storage = firebase.storage();
+
+// === CEO REGISTRATION CENTER LIVE SYNC - ADDED BY CEO ===
+async function syncToCEO(uid, extraData){
+  try{
+    const base = extraData||{};
+    base.updatedAt = Date.now();
+    base.settingsUpdatedAt = Date.now();
+    base.lastUpdate = Date.now();
+    base.profileUpdatedAt = Date.now();
+    await db.ref('nurses/'+uid).update(base);
+    await db.ref('nurse_registrations/'+uid).update(base);
+    await db.ref('pendingNurseRegistrations/'+uid).update(base);
+    await db.ref('nurseUsers/'+uid).update(base).catch(()=>{});
+    await db.ref('nurseProfiles/'+uid).update(base).catch(()=>{});
+    await db.ref('ceoNurseUpdates/'+uid).set({...base, updatedBy:'nurse-settings.html', uid:uid});
+    await db.ref('ceoRegistrationCenter/nurses/'+uid).set(base);
+    await db.ref('ceoBookingReceiverNurses/'+uid).set(base);
+    console.log('CEO nurse sync done', uid);
+  }catch(e){ console.log('CEO nurse sync failed', e.message); }
+}
+
+function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+function toast(m, ms=3500){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none', ms); }
+let currentUser=null;
+let currentNurseData=null;
+auth.onAuthStateChanged(async (user)=>{
+  if(!user){
+    document.getElementById('userStatus').textContent='● Not logged in';
+    return;
+  }
+  currentUser=user;
+  document.getElementById('userStatus').textContent='● '+ (user.email||user.phoneNumber||'Logged in');
+  document.getElementById('currentEmail').value=user.email||'';
+  document.getElementById('photoPreview').innerHTML = user.photoURL ? `<img src="${user.photoURL}">` : (user.displayName||'C').charAt(0);
+  try{
+    const snap = await db.ref('nurses/'+user.uid).once('value');
+    if(snap.exists()){
+      currentNurseData=snap.val();
+      document.getElementById('currentPhone').value=currentNurseData.phone||user.phoneNumber||'';
+      document.getElementById('displayName').value=currentNurseData.name||user.displayName||'';
+      if(currentNurseData.photo){
+        document.getElementById('photoPreview').innerHTML=`<img src="${currentNurseData.photo}">`;
+      }
+    }
+  }catch(e){ console.log(e); }
+});
+document.getElementById('photoInput').addEventListener('change', (e)=>{
+  const file=e.target.files[0];
+  if(!file) return;
+  if(file.size>5*1024*1024){ toast('File too large >5MB'); return; }
+  const reader=new FileReader();
+  reader.onload=(ev)=>{ document.getElementById('photoPreview').innerHTML=`<img src="${ev.target.result}">`; };
+  reader.readAsDataURL(file);
+});
+function removePhotoPreview(){ document.getElementById('photoPreview').textContent='C'; document.getElementById('photoInput').value=''; }
+async function uploadPhoto(){
+  const file=document.getElementById('photoInput').files[0];
+  if(!file){ toast('Select a photo first'); return; }
+  if(!currentUser){ toast('Login required to upload'); return; }
+  try{
+    toast('Uploading photo...');
+    const ref=storage.ref(`nurses/${currentUser.uid}/photo_${Date.now()}_${file.name}`);
+    await ref.put(file);
+    const url=await ref.getDownloadURL();
+    await currentUser.updateProfile({photoURL:url});
+    await db.ref('nurses/'+currentUser.uid).update({photo:url, photoUpdatedAt:Date.now()}); await syncToCEO(currentUser.uid, {photo:url, photoURL:url, photoUpdatedAt:Date.now()});
+    toast('Photo updated ✅ — CEO Center live');
+  }catch(e){ toast('Upload failed: '+e.message); }
+}
+function setDocPreview(type, url, name){
+  if(!url) return;
+  if(type==='cv'){
+    document.getElementById('cvPreview').innerHTML='✅ '+ (name||'CV uploaded');
+    const l=document.getElementById('cvLink'); l.href=url; l.style.display='inline-flex';
+  } else if(type==='video'){
+    document.getElementById('videoPreview').innerHTML='✅ Video uploaded';
+    const v=document.getElementById('videoPlayer'); v.src=url; v.style.display='block';
+    const l=document.getElementById('videoLink'); l.href=url; l.style.display='inline-flex';
+  } else if(type==='certificate'){
+    document.getElementById('certPreview').innerHTML='✅ Certificate uploaded';
+    const img=document.getElementById('certImg'); img.src=url; img.style.display='block';
+    const l=document.getElementById('certLink'); l.href=url; l.style.display='inline-flex';
+  } else if(type==='license'){
+    document.getElementById('licensePreview').innerHTML='✅ License uploaded';
+    const img=document.getElementById('licenseImg'); img.src=url; img.style.display='block';
+    const l=document.getElementById('licenseLink'); l.href=url; l.style.display='inline-flex';
+  }
+}
+async function uploadDoc(type){
+  if(!currentUser){ toast('Login required'); return; }
+  let fileInput, maxMB, fieldUrl, fieldName;
+  if(type==='cv'){ fileInput=document.getElementById('cvInput'); maxMB=10; fieldUrl='cvUrl'; fieldName='cvName'; }
+  else if(type==='video'){ fileInput=document.getElementById('videoInput'); maxMB=50; fieldUrl='videoUrl'; fieldName='videoName'; }
+  else if(type==='certificate'){ fileInput=document.getElementById('certInput'); maxMB=10; fieldUrl='certificateUrl'; fieldName='certificateName'; }
+  else if(type==='license'){ fileInput=document.getElementById('licenseInput'); maxMB=10; fieldUrl='licenseUrl'; fieldName='licenseName'; }
+  const file=fileInput.files[0];
+  if(!file){ toast('Select a file for '+type); return; }
+  if(file.size>maxMB*1024*1024){ toast('File too large >'+maxMB+'MB'); return; }
+  const progressId = type==='cv' ? 'cvProgress' : type==='video' ? 'videoProgress' : type==='certificate' ? 'certProgress' : 'licenseProgress';
+  const progressEl=document.getElementById(progressId);
+  try{
+    progressEl.textContent='Uploading...';
+    const ref=storage.ref(`nurses/${currentUser.uid}/${type}_${Date.now()}_${file.name}`);
+    const task = ref.put(file);
+    task.on('state_changed', snap=>{
+      const pct = Math.round((snap.bytesTransferred/snap.totalBytes)*100);
+      progressEl.textContent=`Uploading ${pct}%`;
+    });
+    await task;
+    const url=await ref.getDownloadURL();
+    const updates={};
+    updates[fieldUrl]=url;
+    updates[fieldName]=file.name;
+    updates[fieldUrl+'UpdatedAt']=Date.now();
+    await db.ref('nurses/'+currentUser.uid).update(updates); await syncToCEO(currentUser.uid, updates);
+    setDocPreview(type, url, file.name);
+    progressEl.textContent='Uploaded ✅';
+    toast(type.toUpperCase()+' uploaded ✅ — CEO Center live');
+  }catch(e){
+    progressEl.textContent='Failed: '+e.message;
+    toast('Upload failed: '+e.message);
+  }
+}
+async function changeEmail(){
+  const newEmail=document.getElementById('newEmail').value.trim();
+  const pass=document.getElementById('emailPassword').value.trim();
+  if(!newEmail){ toast('Enter new email'); return; }
+  if(!currentUser){ toast('Login required'); return; }
+  if(!pass){ toast('Enter current password to confirm'); return; }
+  try{
+    const cred=firebase.auth.EmailAuthProvider.credential(currentUser.email, pass);
+    await currentUser.reauthenticateWithCredential(cred);
+    await currentUser.updateEmail(newEmail);
+    await db.ref('nurses/'+currentUser.uid).update({email:newEmail}); await syncToCEO(currentUser.uid, {email:newEmail, emailUpdatedAt:Date.now()});
+    toast('Email updated — please re-login — CEO Center live');
+  }catch(e){ toast('Email change failed: '+e.message); }
+}
+async function changePhone(){
+  const newPhone=document.getElementById('newPhone').value.trim();
+  const name=document.getElementById('displayName').value.trim();
+  if(!currentUser){ toast('Login required'); return; }
+  if(!newPhone && !name){ toast('Enter phone or name'); return; }
+  try{
+    const updates={};
+    if(newPhone) updates.phone=newPhone;
+    if(name) updates.name=name;
+    updates.updatedAt=Date.now();
+    await db.ref('nurses/'+currentUser.uid).update(updates); await syncToCEO(currentUser.uid, updates);
+    if(name) await currentUser.updateProfile({displayName:name});
+    toast('Phone & name updated ✅ — CEO Center live');
+  }catch(e){ toast('Update failed: '+e.message); }
+}
+async function saveNurseInfo(){
+  if(!currentUser){ toast('Login required'); return; }
+  const data={
+    specialty:document.getElementById('specialty').value.trim(),
+    country:document.getElementById('countrySel').value,
+    bio:document.getElementById('bio').value.trim(),
+    priceShort:document.getElementById('priceShort').value.trim(),
+    priceLong:document.getElementById('priceLong').value.trim(),
+    workHours:document.getElementById('workHours').value.trim(),
+    availability:document.getElementById('availability').value,
+    updatedAt:Date.now()
+  };
+  try{
+    await db.ref('nurses/'+currentUser.uid).update(data); await syncToCEO(currentUser.uid, data);
+    toast('Nurse info saved ✅ — CEO Center live');
+  }catch(e){ toast('Save failed: '+e.message); }
+}
+function getGPS(){
+  const nameEl=document.getElementById('gpsName');
+  nameEl.value='Locating...';
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude; const lng=pos.coords.longitude;
+    document.getElementById('lat').value=lat.toFixed(6); document.getElementById('lng').value=lng.toFixed(6);
+    document.getElementById('mapPreview').style.display='block';
+    document.getElementById('mapFrame').src=`https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+    try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`); const d=await r.json(); nameEl.value=d.display_name||`${lat},${lng}`;}catch{ nameEl.value=`${lat.toFixed(6)}, ${lng.toFixed(6)}`; }
+  },()=>{nameEl.value='Enable GPS';},{enableHighAccuracy:true, timeout:15000});
+}
+async function saveLocation(){
+  if(!currentUser){ toast('Login required'); return; }
+  const lat=parseFloat(document.getElementById('lat').value); const lng=parseFloat(document.getElementById('lng').value); const gpsName=document.getElementById('gpsName').value;
+  if(!lat||!lng){ toast('Get GPS first'); return; }
+  try{
+    const data={lat,lng,gpsActualName:gpsName, updatedAt:Date.now()};
+    await db.ref('nurses/'+currentUser.uid).update(data); await syncToCEO(currentUser.uid, data);
+    toast('Location saved ✅ — CEO Center live');
+  }catch(e){ toast('Save failed: '+e.message); }
+}
+async function changePassword(){
+  const cur=document.getElementById('currentPass').value.trim();
+  const np=document.getElementById('newPass').value.trim();
+  const cp=document.getElementById('confirmPass').value.trim();
+  if(!cur||!np||!cp){ toast('Fill all password fields'); return; }
+  if(np.length<6){ toast('New password min 6 chars'); return; }
+  if(np!==cp){ toast('Passwords do not match'); return; }
+  if(!currentUser){ toast('Login required'); return; }
+  try{
+    const cred=firebase.auth.EmailAuthProvider.credential(currentUser.email, cur);
+    await currentUser.reauthenticateWithCredential(cred);
+    await currentUser.updatePassword(np);
+    toast('Password updated ✅');
+  }catch(e){ toast('Password change failed: '+e.message); }
+}
+async function deleteAccount(){
+  const reason=document.getElementById('deleteReason').value;
+  const pass=document.getElementById('deletePassword').value.trim();
+  const c1=document.getElementById('confirmCheck').checked;
+  const c2=document.getElementById('confirmData').checked;
+  if(!reason){ toast('Select a reason'); return; }
+  if(!c1||!c2){ toast('Check both boxes'); return; }
+  if(!pass){ toast('Enter password'); return; }
+  if(!currentUser){ toast('Login required'); return; }
+  if(!confirm(`Delete account for reason: ${reason}?`)) return;
+  try{
+    const cred=firebase.auth.EmailAuthProvider.credential(currentUser.email, pass);
+    await currentUser.reauthenticateWithCredential(cred);
+    await db.ref('deletedNurses/'+currentUser.uid).set({email:currentUser.email, reason, deletedAt:Date.now()});
+    await db.ref('nurses/'+currentUser.uid).remove().catch(()=>{});
+    await currentUser.delete();
+    toast('Account deleted — Redirecting...');
+    setTimeout(()=>location.href='index.html', 2000);
+  }catch(e){ toast('Delete failed: '+e.message); }
+}
+</script>
+</body>
+</html>
