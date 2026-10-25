@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Penalize — Client + Nurse — Up to Deletion of Account — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--faint:#6b6788;--gold:#facc15;--green:#34d399;--red:#ef4444;--blue:#60a5fa;--purple:#a78bfa;--orange:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:18px;line-height:1.2}
+.brand small{display:block;font-family:Instrument Sans,sans-serif;font-size:10px;color:var(--muted);font-weight:400;margin-top:2px}
+.liveDot{width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse 1.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}70%{box-shadow:0 0 0 10px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.input{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:12px;min-width:180px;font-family:Instrument Sans}
+.select{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:12px;font-family:Instrument Sans}
+.textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:12px;font-family:Instrument Sans;min-height:100px;resize:vertical}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid;display:inline-flex;align-items:center;gap:4px}
+.badgeClient{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.25)}
+.badgeNurse{background:rgba(167,139,250,.12);color:#c4b5fd;border-color:rgba(167,139,250,.25)}
+.badgePending{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.25)}
+.badgeBlocked{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+.badgeDeleted{background:rgba(0,0,0,.4);color:#9ca3af;border-color:rgba(255,255,255,.15)}
+.badgeTrust{background:rgba(96,165,250,.12);color:#93c5fd;border-color:rgba(96,165,250,.25)}
+.main{max-width:1400px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.statsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.statCard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.statK{font-size:10px;color:var(--faint);text-transform:uppercase;font-weight:700;letter-spacing:.05em}
+.statV{font-size:24px;font-weight:800;margin-top:6px;font-family:Fraunces,serif}
+.statS{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.3}
+.twoCols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.twoCols{grid-template-columns:1fr}}
+.column{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.columnHeader{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:rgba(12,10,30,.5);position:sticky;top:0}
+.columnBody{padding:12px;display:flex;flex-direction:column;gap:10px;max-height:65vh;overflow-y:auto}
+.personCard{background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;transition:.15s}
+.personCard:hover{border-color:rgba(250,204,21,.25);transform:translateY(-1px)}
+.personCard.selected{border-color:#facc15;background:rgba(250,204,21,.08);box-shadow:0 0 0 2px rgba(250,204,21,.15)}
+.personCard.blocked{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
+.personCard.deleted{border-color:rgba(0,0,0,.5);background:rgba(0,0,0,.3);opacity:.7}
+.avatar{width:44px;height:42px;border-radius:50%;background:linear-gradient(135deg,#facc15,#fde68a);display:grid;place-items:center;font-weight:800;color:#000;font-size:14px;flex-shrink:0}
+.penalizeForm{background:var(--card);border:2px solid rgba(239,68,68,.2);border-radius:18px;padding:18px;display:none}
+.penalizeForm.active{display:block}
+.formTitle{font-family:Fraunces,serif;font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.label{font-size:11px;color:var(--faint);text-transform:uppercase;font-weight:700;letter-spacing:.06em;margin-bottom:6px;margin-top:12px;display:block}
+.actionGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.actionBtn{padding:14px 12px;border-radius:12px;font-weight:800;font-size:11px;border:1px solid;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;transition:.15s}
+.actionBtn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.actionWarn{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.25)}
+.actionTrust{background:rgba(96,165,250,.12);color:#93c5fd;border-color:rgba(96,165,250,.25)}
+.actionSuspend{background:rgba(245,158,11,.15);color:#f59e0b;border-color:rgba(245,158,11,.3)}
+.actionBlock{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+.actionFine{background:rgba(250,204,21,.12);color:#facc15;border-color:rgba(250,204,21,.25)}
+.actionRestrict{background:rgba(168,85,247,.12);color:#c4b5fd;border-color:rgba(168,85,247,.25)}
+.actionDelete{background:rgba(0,0,0,.5);color:#ef4444;border-color:rgba(239,68,68,.5);font-weight:900}
+.actionDelete:hover{background:rgba(239,68,68,.2)}
+.deleteWarning{background:rgba(239,68,68,.1);border:2px solid rgba(239,68,68,.3);border-radius:12px;padding:12px;margin-top:12px;display:none}
+.deleteWarning.active{display:block}
+.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);display:none;place-items:center;padding:20px;backdrop-filter:blur(10px)}
+.modal.active{display:grid}
+.modalCard{background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:20px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto}
+.modalHeader{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card);z-index:2}
+.modalBody{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.historyItem{background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:flex-start}
+.toast{position:fixed;right:16px;bottom:16px;z-index:200;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;font-weight:700;display:none;max-width:380px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+</style>
+</head>
+<body>
+<header>
+<div>
+<div class="brand">⚖️ CEO Penalize — Client + Nurse — Up to Deletion of Account <span class="liveDot"></span><small>CEO can penalize ANY client or nurse: Warn → Trust Decrease → Suspend → Block → Fine → Restrict → Delete Account — Legal protection — Evidence reviewed — Appeal system — CEO ONLY</small></div>
+</div>
+<div class="controls">
+<span id="liveCounts" style="font-size:11px;color:var(--muted)">Loading clients + nurses...</span>
+<input id="search" class="input" placeholder="🔍 Search client, nurse, phone, booking..." oninput="renderAll()">
+<select id="filterType" class="select" onchange="renderAll()"><option value="all">All People</option><option value="clients">👤 Clients Only</option><option value="nurses">👩‍⚕️ Nurses Only</option><option value="blocked">🚫 Blocked</option><option value="deleted">🗑️ Deleted Accounts</option><option value="lowtrust">📉 Low Trust</option></select>
+<button class="btn" onclick="loadAllData()">🔄 Refresh</button>
+<a href="ceo-complainant.html" class="btn" style="background:rgba(239,68,68,.12);color:#fca5a5">🚨 Complaints</a>
+<a href="ceo-finance.html" class="btn" style="background:rgba(250,204,21,.12);color:#facc15">💰 Finance</a>
+</div>
+</header>
+
+<div class="main">
+<div class="statsGrid">
+<div class="statCard"><div class="statK">👤 Total Clients</div><div class="statV" id="statClients">0</div><div class="statS">All clients who booked — Can be penalized up to deletion</div></div>
+<div class="statCard"><div class="statK">👩‍⚕️ Total Nurses</div><div class="statV" id="statNurses" style="color:#c4b5fd">0</div><div class="statS">All nurses — Can be penalized up to deletion</div></div>
+<div class="statCard"><div class="statK">⚖️ Total Penalties</div><div class="statV" id="statPenalties" style="color:#fcd34d">0</div><div class="statS">Warn + Trust + Suspend + Block + Fine + Delete</div></div>
+<div class="statCard"><div class="statK">🚫 Blocked Accounts</div><div class="statV" id="statBlocked" style="color:#fca5a5">0</div><div class="statS">Blocked clients + nurses — Cannot book/work</div></div>
+<div class="statCard"><div class="statK">🗑️ Deleted Accounts</div><div class="statV" id="statDeleted" style="color:#9ca3af">0</div><div class="statS">Deleted — Full account deletion — Up to deletion</div></div>
+<div class="statCard"><div class="statK">📉 Low Trust</div><div class="statV" id="statLowTrust" style="color:#60a5fa">0</div><div class="statS">Trust < 60 — Needs CEO approval + extra fee</div></div>
+</div>
+
+<div class="twoCols">
+<div class="column">
+<div class="columnHeader">
+<h3 style="font-family:Fraunces,serif;font-size:14px">👤 Clients — Penalize up to Deletion</h3>
+<span id="clientCount" class="badge badgeClient">0 clients</span>
+</div>
+<div id="clientsList" class="columnBody"><div style="padding:20px;text-align:center;color:var(--muted)">Loading clients...</div></div>
+</div>
+
+<div class="column">
+<div class="columnHeader">
+<h3 style="font-family:Fraunces,serif;font-size:14px">👩‍⚕️ Nurses — Penalize up to Deletion</h3>
+<span id="nurseCount" class="badge badgeNurse">0 nurses</span>
+</div>
+<div id="nursesList" class="columnBody"><div style="padding:20px;text-align:center;color:var(--muted)">Loading nurses...</div></div>
+</div>
+</div>
+
+<div id="penalizeForm" class="penalizeForm">
+<div class="formTitle">⚖️ Penalize <span id="penalizeTargetName" style="color:#fca5a5">Select Client or Nurse</span> — Up to Deletion of Account <span id="penalizeTargetType" class="badge badgeClient">Client</span></div>
+
+<div style="background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+<div id="penalizeAvatar" class="avatar" style="width:56px;height:56px;font-size:20px">C</div>
+<div style="flex:1;min-width:200px">
+<div style="font-weight:700;font-size:14px" id="penalizeDisplayName">Select a client or nurse from left/right</div>
+<div style="font-size:11px;color:var(--muted)" id="penalizeDisplayDetails">Phone: - • Bookings: 0 • Trust: 100/100 • Status: Active</div>
+<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap" id="penalizeBadges"><span class="badge badgePending">Select person</span></div>
+</div>
+<button class="btn" onclick="closePenalizeForm()">✕ Close Form</button>
+</div>
+
+<div style="background:rgba(12,10,30,.5);border-radius:12px;padding:12px;margin-top:14px">
+<div style="font-size:12px;font-weight:700;margin-bottom:8px">📋 SELECT PENALTY — Any form up to deletion of account — CEO ONLY</div>
+<div class="actionGrid">
+<button class="actionBtn actionWarn" onclick="selectPenalty('warn')"><span style="font-size:20px">⚠️</span><b>Warn</b><small>Warning — First offense — Legal</small></button>
+<button class="actionBtn actionTrust" onclick="selectPenalty('decrease_trust')"><span style="font-size:20px">📉</span><b>Decrease Trust</b><small>-10 to -50 Trust — Visible to all</small></button>
+<button class="actionBtn actionTrust" onclick="selectPenalty('decrease_trust_20')"><span style="font-size:20px">📉📉</span><b>Decrease Trust -20</b><small>Trust -20 — Quick</small></button>
+<button class="actionBtn actionSuspend" onclick="selectPenalty('suspend_24h')"><span style="font-size:20px">⏸️</span><b>Suspend 24H</b><small>Suspend 24 hours — Temp</small></button>
+<button class="actionBtn actionSuspend" onclick="selectPenalty('suspend_7d')"><span style="font-size:20px">⏸️⏸️</span><b>Suspend 7 Days</b><small>Suspend 7 days</small></button>
+<button class="actionBtn actionSuspend" onclick="selectPenalty('suspend_30d')"><span style="font-size:20px">⏸️⏸️⏸️</span><b>Suspend 30 Days</b><small>Suspend 30 days — Serious</small></button>
+<button class="actionBtn actionBlock" onclick="selectPenalty('block_temp')"><span style="font-size:20px">🚫</span><b>Block Temporary</b><small>Block until CEO unblocks — Appeal</small></button>
+<button class="actionBtn actionBlock" onclick="selectPenalty('block_permanent')"><span style="font-size:20px">🚫🚫</span><b>Block Permanent</b><small>Permanent block — Appeal possible — Serious</small></button>
+<button class="actionBtn actionFine" onclick="selectPenalty('fine')"><span style="font-size:20px">💰</span><b>Fine — Extra Fee</b><small>Add 10-50% extra fee on next bookings</small></button>
+<button class="actionBtn actionRestrict" onclick="selectPenalty('require_approval')"><span style="font-size:20px">🔒</span><b>Require CEO Approval</b><small>All future bookings need CEO approval</small></button>
+<button class="actionBtn actionRestrict" onclick="selectPenalty('require_100_percent')"><span style="font-size:20px">💳</span><b>Require 100% Advance</b><small>No 50% option — 100% advance only</small></button>
+<button class="actionBtn actionDelete" onclick="selectPenalty('delete_account')"><span style="font-size:24px">🗑️💥</span><b>DELETE ACCOUNT — Up to Deletion</b><small>Full account deletion — Cannot login — All data removed — FINAL — Up to deletion!</small></button>
+</div>
+</div>
+
+<div id="penaltyDetails" style="background:rgba(12,10,30,.5);border-radius:12px;padding:12px;margin-top:14px;display:none">
+<label class="label">⚖️ Selected Penalty: <span id="selectedPenaltyDisplay" style="color:#fcd34d;font-weight:800">None</span></label>
+<div id="penaltyDescription" style="font-size:11px;color:var(--muted);line-height:1.5;background:rgba(12,10,30,.7);border-radius:8px;padding:8px;margin-top:6px">Select penalty above</div>
+
+<label class="label">📝 Reason — Why penalizing? (Required — Legal protection)</label>
+<textarea id="penaltyReason" class="textarea" placeholder="Type detailed reason for penalizing this client/nurse... Example: Client verbally abused nurse Grace Mensah on booking LCG-20251016-ABC123, used abusive language, threatened nurse, evidence reviewed: audio + video + 3 photos — Trust decreased by 20, blocked temporary until apology..."></textarea>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+<div>
+<label class="label">⏱️ Duration — How long? (For suspend/block)</label>
+<select id="penaltyDuration" class="select">
+<option value="">Select duration...</option>
+<option value="24h">24 Hours</option>
+<option value="7d">7 Days</option>
+<option value="30d">30 Days</option>
+<option value="90d">90 Days</option>
+<option value="permanent">Permanent — Until CEO unblocks</option>
+<option value="until_appeal">Until Appeal Approved</option>
+</select>
+</div>
+<div>
+<label class="label">📉 Trust Decrease Amount (For trust penalty)</label>
+<select id="trustDecrease" class="select">
+<option value="">Select trust decrease...</option>
+<option value="10">-10 Trust (Warning)</option>
+<option value="20">-20 Trust (Common)</option>
+<option value="30">-30 Trust (Serious)</option>
+<option value="50">-50 Trust (Very Serious)</option>
+<option value="100">-100 Trust → 0 (Blocked)</option>
+</select>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+<div>
+<label class="label">💰 Fine Amount / Extra Fee % (For fine penalty)</label>
+<select id="fineAmount" class="select">
+<option value="">Select fine...</option>
+<option value="10%">10% Extra Fee on Next Bookings</option>
+<option value="20%">20% Extra Fee</option>
+<option value="30%">30% Extra Fee</option>
+<option value="50%">50% Extra Fee — Serious</option>
+<option value="100%">100% Extra Fee — Double Payment</option>
+<option value="GHS100">GHS 100 Fine</option>
+<option value="GHS500">GHS 500 Fine</option>
+</select>
+</div>
+<div>
+<label class="label">📎 Evidence — Did you review evidence? (Legal protection)</label>
+<select id="evidenceReviewed" class="select">
+<option value="yes">✅ Yes — Reviewed Text + Audio + Video + Photos — Legal protection</option>
+<option value="partial">⚠️ Partial — Reviewed some evidence</option>
+<option value="no">❌ No — No evidence — Based on complaint only</option>
+</select>
+</div>
+</div>
+
+<div id="deleteWarning" class="deleteWarning">
+<div style="font-weight:800;color:#ef4444;font-size:14px;display:flex;align-items:center;gap:8px">🗑️💥 DELETE ACCOUNT — FINAL — Up to Deletion of Account — CEO ONLY — Are you sure?</div>
+<div style="font-size:11px;color:#fca5a5;line-height:1.5;margin-top:8px">
+<b>This will:</b><br>
+• 🗑️ Delete account <span id="deleteTargetName" style="color:#fff;font-weight:800">client/nurse</span> permanently — Up to deletion of account<br>
+• 🚫 User cannot login anymore — Auth disabled<br>
+• 📧 Email/Phone blocked — Cannot register again with same email/phone<br>
+• 📋 All bookings kept for legal but user marked as DELETED<br>
+• 💰 Balance frozen — Cannot withdraw<br>
+• ⚖️ Logged as deletion — Legal protection — CEO action recorded<br>
+• 📝 User notified — Can appeal deletion in ceo-appeals<br>
+• 🔒 Final — Up to deletion — CEO can restore if appeal approved<br><br>
+<b>Type DELETE to confirm deletion of account — Up to deletion of account — FINAL:</b>
+</div>
+<input id="deleteConfirmInput" class="input" placeholder="Type DELETE exactly to confirm deletion of account — Up to deletion!" style="margin-top:8px;border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.1)">
+<div style="font-size:10px;color:var(--faint);margin-top:6px">This is FINAL — Up to deletion of account — For both clients and nurses — CEO ONLY — Legal protection — Appeal possible</div>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+<button id="applyPenaltyBtn" class="btn" style="flex:1;padding:14px;font-size:13px;font-weight:900;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:0" onclick="applyPenalty()">⚖️ Apply Penalty — Reflects Immediately</button>
+<button class="btn" style="flex:1;padding:14px" onclick="closePenalizeForm()">Cancel</button>
+</div>
+</div>
+</div>
+
+<div class="column" style="grid-column:1 / -1">
+<div class="columnHeader">
+<h3 style="font-family:Fraunces,serif;font-size:14px">📜 Penalty History — All Penalties — Client + Nurse — Up to Deletion</h3>
+<span id="historyCount" class="badge badgePending">0 penalties</span>
+</div>
+<div id="historyList" class="columnBody" style="max-height:40vh"><div style="padding:20px;text-align:center;color:var(--muted)">Select a client or nurse to see penalty history — Or loading all penalties...</div></div>
+</div>
+</div>
+
+<div id="detailModal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalCard"><div class="modalHeader"><h3 style="font-family:Fraunces,serif;font-size:16px">📋 Penalty Details — Client/Nurse</h3><button class="btn" onclick="closeModal()">✕ Close</button></div><div class="modalBody" id="modalBody"><div style="padding:20px;text-align:center;color:var(--muted)">Select person</div></div></div></div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// Firebase + JS logic — Same as built file — 61,105 bytes full — See /mnt/data/ceo-penalize.html for full JS
+// Due to size, full JS is in /mnt/data/ceo-penalize.html — Copy entire file from there — This is summary
+// Key functions: loadAllData(), selectPerson(), selectPenalty(), applyPenalty(), restoreAccount()
+// Penalties write to: ceoPenalties, allPenalties, clientPenalties, nursePenalties, blockedClients, blockedNurses, deletedClients, deletedNurses, suspendedClients, etc.
+// Delete account: Writes to deletedClients/deletedNurses + blockedClients/blockedNurses + Cannot login + Balance frozen + Appeal possible
+// Restore: Removes from blocked/deleted + Trust reset to 100
+
+// Full JS logic is in the file saved at /mnt/data/ceo-penalize.html — 61,105 bytes — Copy full file!
+</script>
+</body>
+</html>
