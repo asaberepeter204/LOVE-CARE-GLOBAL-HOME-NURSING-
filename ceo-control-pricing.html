@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Control Pricing — Set Cedis & Dollars Per Hour — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding:16px;padding-bottom:120px;overflow-y:auto}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 320px at 90% 20%, rgba(107,33,168,.18) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 100%)}
+.wrap{width:100%;max-width:520px;margin:0 auto;position:relative;z-index:1}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.2);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin:-16px -16px 16px -16px}
+.brand{font-weight:800;font-size:13px;line-height:1.2}.brand small{display:block;font-size:9px;color:#a78bfa;margin-top:3px}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.18);border-radius:24px;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.6);margin-bottom:16px}
+.logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-weight:900;margin:0 auto 10px;font-size:22px;color:#1e0a3a}
+h1{text-align:center;font-weight:800;font-size:18px;color:#f3e8ff;margin-bottom:6px}
+.subtitle{text-align:center;font-size:11px;color:#a78bfa;margin-bottom:14px;line-height:1.4}
+.badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.badge{padding:5px 10px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid;display:inline-flex}
+.badgeGreen{background:rgba(34,197,94,.12);color:#86efac;border-color:rgba(34,197,94,.25)}
+.badgePurple{background:rgba(168,85,247,.12);color:#d8b4fe;border-color:rgba(168,85,247,.25)}
+.badgeYellow{background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.25)}
+.badgeLive{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.25)}
+.label{font-size:11px;font-weight:800;margin:14px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase;letter-spacing:.04em}
+.input{width:100%;padding:14px 14px;border-radius:12px;border:1.5px solid rgba(168,85,247,.22);background:rgba(14,10,28,.7);color:#f3e8ff;font-size:14px;outline:none}
+.input:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.18);background:rgba(14,10,28,.9)}
+.inputLarge{font-size:18px;font-weight:800;text-align:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.grid2{grid-template-columns:1fr}}
+.btn{width:100%;padding:16px;border-radius:14px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:12px;min-height:54px}
+.btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35)}
+.btnGreen{background:linear-gradient(135deg,#16a34a,#4ade80);color:white}
+.btnLight{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.22);color:#e9d5ff}
+.alert{padding:12px;border-radius:12px;font-size:12px;font-weight:700;margin:10px 0;border:1px solid}
+.alert-info{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.3);color:#93c5fd}
+.alert-success{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.3);color:#86efac}
+.alert-error{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.3);color:#fca5a5}
+.previewBox{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:14px;margin-top:12px}
+.previewLine{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(168,85,247,.12);font-size:12px}
+.previewLine b{color:#f3e8ff}
+.calcBox{background:linear-gradient(135deg, rgba(168,85,247,.15), rgba(216,180,254,.1));border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:12px;margin-top:10px}
+.toast{position:fixed;right:14px;bottom:14px;z-index:200;background:#1e0a3a;border:1px solid rgba(168,85,247,.3);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700;font-size:12px;display:none}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="topbar">
+<div class="brand">LOVE CARE GLOBAL CEO CONTROL PRICING <small>Same UI as book-nurse — CEO sets Cedis & Dollars SEPARATELY per hour — book-nurse calculates automatically</small></div>
+<div style="display:flex;gap:8px;align-items:center"><span class="badge badgeLive">● LIVE Firebase</span><span id="lastUpdate" style="font-size:10px;color:#a78bfa">Not saved</span></div>
+</div>
+<div class="wrap">
+<div class="card">
+<div class="logo">💰</div>
+<h1>CEO Control Pricing</h1>
+<p class="subtitle">Set rate per hour — Cedis and Dollars SEPARATELY — Just like book-nurse looks<br>When you save, both book-nurse-full.html + book-nurse-50-percent.html update LIVE</p>
+<div class="badges">
+<span class="badge badgeGreen">💰 CEO 20% | Nurse 80%</span>
+<span class="badge badgePurple">⏰ Rate Per Hour — Calculated on Book Nurse</span>
+<span class="badge badgeYellow">🌍 Cedis & Dollars Separate</span>
+</div>
+<div id="msg"></div>
+
+<label class="label">💱 Rate Per Hour — GHS Cedis (GH₵) — SEPARATE</label>
+<input id="rateGHS" class="input inputLarge" type="number" step="0.01" value="17" placeholder="e.g., 17" oninput="calcPreview()">
+<small style="font-size:10px;color:#6b7280;display:block;margin-top:6px">Enter Cedis per hour — e.g., 17 GH₵ / hour — For Ghana clients — SEPARATE from Dollars</small>
+
+<label class="label">💵 Rate Per Hour — USD Dollars ($) — SEPARATE</label>
+<input id="rateUSD" class="input inputLarge" type="number" step="0.01" value="8" placeholder="e.g., 8" oninput="calcPreview()">
+<small style="font-size:10px;color:#6b7280;display:block;margin-top:6px">Enter Dollars per hour — e.g., $8 / hour — For international clients — SEPARATE from Cedis</small>
+
+<div class="grid2">
+<div>
+<label class="label">Exchange Rate (Info Only)</label>
+<input id="exchangeRate" class="input" type="number" step="0.01" value="16.50" placeholder="16.50" oninput="calcPreview()">
+<small style="font-size:9px;color:#6b7280">1 USD = ? GHS — For reference only</small>
+</div>
+<div>
+<label class="label">CEO Commission %</label>
+<input id="ceoCommission" class="input" type="number" step="1" value="20" placeholder="20" oninput="calcPreview()">
+<small style="font-size:9px;color:#6b7280">CEO 20% / Nurse 80%</small>
+</div>
+</div>
+
+<div class="grid2">
+<div>
+<label class="label">Full Booking Multiplier</label>
+<input id="fullMultiplier" class="input" type="number" step="0.01" value="1.0" oninput="calcPreview()">
+<small style="font-size:9px;color:#6b7280">book-nurse-full.html</small>
+</div>
+<div>
+<label class="label">50% Booking Multiplier</label>
+<input id="fiftyMultiplier" class="input" type="number" step="0.01" value="1.0" oninput="calcPreview()">
+<small style="font-size:9px;color:#6b7280">book-nurse-50-percent.html</small>
+</div>
+</div>
+
+<div class="grid2">
+<div><label class="label">50% Now %</label><input id="fiftyNow" class="input" type="number" step="1" value="50" oninput="calcPreview()"></div>
+<div><label class="label">50% Cash %</label><input id="fiftyCash" class="input" type="number" step="1" value="50" oninput="calcPreview()"></div>
+</div>
+
+<div class="previewBox">
+<div style="font-size:11px;font-weight:800;color:#d8b4fe;margin-bottom:8px">👀 Live Preview — Same as Book-Nurse Calculates — Per Hour × Hours</div>
+<div class="calcBox">
+<div class="previewLine"><span>Rate Per Hour (Cedis)</span><b id="previewGHSPerHour">GH₵ 17.00 / hour</b></div>
+<div class="previewLine"><span>Rate Per Hour (Dollars)</span><b id="previewUSDPerHour">$ 8.00 / hour</b></div>
+<div class="previewLine"><span>1 hour</span><b id="preview1Hour">GH₵ 17.00 / $ 8.00</b></div>
+<div class="previewLine"><span>8 hours (day shift) — Rate × 8</span><b id="preview8Hour">GH₵ 136.00 / $ 64.00</b></div>
+<div class="previewLine"><span>24 hours (full day) — Rate × 24</span><b id="preview24Hour">GH₵ 408.00 / $ 192.00</b></div>
+</div>
+<div class="previewBox" style="background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.2);margin-top:10px">
+<div style="font-size:11px;font-weight:800">📦 book-nurse-full.html — Full Payment</div>
+<div class="previewLine"><span>8 Hours Total</span><b id="previewFull8Hour">GH₵ 136.00 / $ 64.00</b></div>
+<div class="previewLine"><span>CEO 20% | Nurse 80%</span><b id="previewFullSplit">CEO: GH₵ 27.20 / Nurse: GH₵ 108.80</b></div>
+</div>
+<div class="previewBox" style="background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2);margin-top:10px">
+<div style="font-size:11px;font-weight:800">📦 book-nurse-50-percent.html — 50% Now + 50% Cash</div>
+<div class="previewLine"><span>8 Hours Total</span><b id="previewFifty8Hour">GH₵ 136.00 / $ 64.00</b></div>
+<div class="previewLine"><span>Pay Now Online (50%)</span><b id="previewFiftyNow">GH₵ 68.00 / $ 32.00</b></div>
+<div class="previewLine"><span>Pay Cash to Nurse (50%)</span><b id="previewFiftyCash">GH₵ 68.00 / $ 32.00</b></div>
+</div>
+<pre id="previewJson" style="font-size:10px;color:#c4b5fd;white-space:pre-wrap;background:rgba(0,0,0,.3);padding:8px;border-radius:8px;margin-top:10px"></pre>
+</div>
+
+<button class="btn btnPurple" onclick="savePricing()">💾 Save Pricing — Cedis & Dollars SEPARATELY — Update Both Bookings LIVE</button>
+<button class="btn btnGreen" onclick="loadPricing()">🔄 Reload Current Pricing from Firebase</button>
+<a class="btn btnLight" href="index.html" style="text-decoration:none">🏠 Home</a>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+function showMsg(html,type){const el=document.getElementById('msg');const cls=type==='success'?'alert-success':type==='error'?'alert-error':'alert-info';el.innerHTML=html?`<div class="alert ${cls}">${html}</div>`:'';}
+function getPricingData(){
+  return {
+    ratePerHourGHS: parseFloat(document.getElementById('rateGHS').value)||17,
+    ratePerHourUSD: parseFloat(document.getElementById('rateUSD').value)||8,
+    ratePerDayGHS: (parseFloat(document.getElementById('rateGHS').value)||17)*24,
+    ratePerDayUSD: (parseFloat(document.getElementById('rateUSD').value)||8)*24,
+    exchangeRate: parseFloat(document.getElementById('exchangeRate').value)||16.5,
+    ceoCommission: parseFloat(document.getElementById('ceoCommission').value)||20,
+    nurseCommission: 100-(parseFloat(document.getElementById('ceoCommission').value)||20),
+    fullMultiplier: parseFloat(document.getElementById('fullMultiplier').value)||1,
+    fiftyMultiplier: parseFloat(document.getElementById('fiftyMultiplier').value)||1,
+    fiftyPercentNow: parseFloat(document.getElementById('fiftyNow').value)||50,
+    fiftyPercentCash: parseFloat(document.getElementById('fiftyCash').value)||50,
+    updatedAt: Date.now(), updatedBy: 'ceo-control-pricing.html - Cedis & Dollars Separate Per Hour', lastUpdate: Date.now()
+  };
+}
+function calcPreview(){
+  const data=getPricingData();
+  const ghsPerHour=data.ratePerHourGHS; const usdPerHour=data.ratePerHourUSD;
+  document.getElementById('previewGHSPerHour').textContent=`GH₵ ${ghsPerHour.toFixed(2)} / hour`;
+  document.getElementById('previewUSDPerHour').textContent=`$ ${usdPerHour.toFixed(2)} / hour`;
+  document.getElementById('preview1Hour').textContent=`GH₵ ${(ghsPerHour*1).toFixed(2)} / $ ${(usdPerHour*1).toFixed(2)}`;
+  document.getElementById('preview8Hour').textContent=`GH₵ ${(ghsPerHour*8).toFixed(2)} / $ ${(usdPerHour*8).toFixed(2)} — 8h × rate`;
+  document.getElementById('preview24Hour').textContent=`GH₵ ${(ghsPerHour*24).toFixed(2)} / $ ${(usdPerHour*24).toFixed(2)} — 24h × rate`;
+  document.getElementById('previewFull8Hour').textContent=`GH₵ ${(ghsPerHour*8).toFixed(2)} / $ ${(usdPerHour*8).toFixed(2)} — 8h`;
+  document.getElementById('previewFifty8Hour').textContent=`GH₵ ${(ghsPerHour*8).toFixed(2)} / $ ${(usdPerHour*8).toFixed(2)} — 8h total`;
+  const ceo8h=ghsPerHour*8*0.2; const nurse8h=ghsPerHour*8*0.8;
+  document.getElementById('previewFullSplit').textContent=`CEO: GH₵ ${ceo8h.toFixed(2)} (20%) / Nurse: GH₵ ${nurse8h.toFixed(2)} (80%) for 8h`;
+  const nowGHS=ghsPerHour*8*0.5; const nowUSD=usdPerHour*8*0.5;
+  document.getElementById('previewFiftyNow').textContent=`GH₵ ${nowGHS.toFixed(2)} / $ ${nowUSD.toFixed(2)} — 50% online now`;
+  document.getElementById('previewFiftyCash').textContent=`GH₵ ${nowGHS.toFixed(2)} / $ ${nowUSD.toFixed(2)} — 50% cash to nurse`;
+  document.getElementById('previewJson').textContent=JSON.stringify(data,null,2);
+}
+async function savePricing(){
+  const data=getPricingData();
+  if(data.ratePerHourGHS<=0 || data.ratePerHourUSD<=0){showMsg('Enter both Cedis and Dollars per hour','error');return;}
+  showMsg('⏳ Saving Cedis & Dollars separately per hour — Both bookings will update LIVE...','info');
+  try{
+    await db.ref('ceoPricing').set(data);
+    await db.ref('config/rates').set({
+      GHS:{hourly:data.ratePerHourGHS, daily:data.ratePerDayGHS, perHour:data.ratePerHourGHS, perDay:data.ratePerDayGHS},
+      USD:{hourly:data.ratePerHourUSD, daily:data.ratePerDayUSD, perHour:data.ratePerHourUSD, perDay:data.ratePerDayUSD},
+      exchangeRate:data.exchangeRate, ceoCommission:data.ceoCommission, nurseCommission:data.nurseCommission,
+      fullMultiplier:data.fullMultiplier, fiftyMultiplier:data.fiftyMultiplier,
+      fiftyPercentNow:data.fiftyPercentNow, fiftyPercentCash:data.fiftyPercentCash,
+      updatedAt:Date.now(), updatedBy:'ceo-control-pricing.html - Cedis & Dollars Separate Per Hour'
+    });
+    await db.ref('globalPricing').set(data);
+    await db.ref('ceoPricingControl').set({GHS:{hourly:data.ratePerHourGHS}, USD:{hourly:data.ratePerHourUSD}, updatedAt:Date.now()});
+    showMsg('✅ Pricing saved LIVE! Cedis: GH₵ '+data.ratePerHourGHS.toFixed(2)+'/hour — Dollars: $'+data.ratePerHourUSD.toFixed(2)+'/hour — Both bookings update instantly!','success');
+    document.getElementById('lastUpdate').textContent='Saved: '+new Date().toLocaleString();
+    toast('✅ CEO Pricing LIVE! Cedis & Dollars separately!');
+  }catch(e){showMsg('Save failed: '+e.message,'error');}
+}
+async function loadPricing(){
+  showMsg('Loading current pricing...','info');
+  try{
+    let data=null;
+    const snap=await db.ref('ceoPricing').once('value');
+    if(snap.exists()) data=snap.val();
+    else { const snap2=await db.ref('config/rates').once('value'); if(snap2.exists()){ const v=snap2.val(); data={ratePerHourGHS:v.GHS?.hourly||17, ratePerHourUSD:v.USD?.hourly||8, exchangeRate:v.exchangeRate||16.5}; } }
+    if(!data){showMsg('No pricing yet — Enter Cedis & Dollars per hour and save','info');calcPreview();return;}
+    document.getElementById('rateGHS').value=data.ratePerHourGHS||17;
+    document.getElementById('rateUSD').value=data.ratePerHourUSD||8;
+    document.getElementById('exchangeRate').value=data.exchangeRate||16.5;
+    document.getElementById('ceoCommission').value=data.ceoCommission||20;
+    calcPreview();
+    document.getElementById('lastUpdate').textContent='Loaded: '+new Date(data.updatedAt||Date.now()).toLocaleString();
+    showMsg('✅ Loaded: GH₵ '+(data.ratePerHourGHS||17)+'/hour — $'+(data.ratePerHourUSD||8)+'/hour','success');
+  }catch(e){showMsg('Load failed: '+e.message,'error');}
+}
+window.onload=()=>{loadPricing();calcPreview();};
+</script>
+</body>
+</html>
