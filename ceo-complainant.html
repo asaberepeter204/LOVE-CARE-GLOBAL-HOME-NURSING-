@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Complainant — Listens to Clients + Nurses Complaints — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--faint:#6b6788;--gold:#facc15;--green:#34d399;--red:#ef4444;--blue:#60a5fa;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:18px;line-height:1.2}
+.brand small{display:block;font-family:Instrument Sans,sans-serif;font-size:10px;color:var(--muted);font-weight:400;margin-top:2px}
+.liveDot{width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse 1.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}70%{box-shadow:0 0 0 10px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.input{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:12px;min-width:180px}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid;display:inline-flex;align-items:center;gap:4px}
+.badgeClient{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.25)}
+.badgeNurse{background:rgba(167,139,250,.12);color:#c4b5fd;border-color:rgba(167,139,250,.25)}
+.badgePending{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.25)}
+.badgeResolved{background:rgba(52,211,153,.12);color:#6ee7b7;border-color:rgba(52,211,153,.25)}
+.badgeEvidence{background:rgba(96,165,250,.12);color:#93c5fd;border-color:rgba(96,165,250,.25)}
+.main{max-width:1320px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.statsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.statCard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.statK{font-size:11px;color:var(--faint);text-transform:uppercase;font-weight:700}
+.statV{font-size:26px;font-weight:800;margin-top:6px;font-family:Fraunces,serif}
+.complaintsGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.complaintsGrid{grid-template-columns:1fr}}
+.column{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.columnHeader{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.columnBody{padding:12px;display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow-y:auto}
+.complaintCard{background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;transition:.15s}
+.complaintCard:hover{border-color:rgba(250,204,21,.25)}
+.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#facc15,#fde68a);display:grid;place-items:center;font-weight:800;color:#000;font-size:14px;flex-shrink:0}
+.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);display:none;place-items:center;padding:20px;backdrop-filter:blur(8px)}
+.modal.active{display:grid}
+.modalCard{background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:20px;max-width:760px;width:100%;max-height:90vh;overflow-y:auto}
+.modalHeader{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card)}
+.modalBody{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.toast{position:fixed;right:16px;bottom:16px;z-index:200;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;font-weight:700;display:none}
+.actionGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.actionBtn{padding:12px;border-radius:12px;font-weight:800;font-size:11px;border:1px solid;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.actionWarn{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.25)}
+.actionSuspend{background:rgba(245,158,11,.15);color:#f59e0b;border-color:rgba(245,158,11,.3)}
+.actionBlock{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+.actionTrust{background:rgba(96,165,250,.12);color:#93c5fd;border-color:rgba(96,165,250,.25)}
+.actionResolve{background:rgba(52,211,153,.15);color:#6ee7b7;border-color:rgba(52,211,153,.3)}
+</style>
+</head>
+<body>
+<header>
+<div>
+<div class="brand">🚨 CEO Complainant — Listens to Clients + Nurses Complaints LIVE <span class="liveDot"></span><small>Client complains about booked nurse only (client-complaint.html) + Nurse complains about client (nurse-complain.html) — Text + Audio + Video + Photos — CEO reviews before punishing</small></div>
+</div>
+<div class="controls">
+<span id="liveCounts" style="font-size:11px;color:var(--muted)">Loading...</span>
+<span class="badge badgeClient">👤 Client</span>
+<span class="badge badgeNurse">👩‍⚕️ Nurse</span>
+<input id="search" class="input" placeholder="🔍 Search client, nurse, booking..." oninput="renderComplaints()">
+<button class="btn" onclick="loadComplaints()">🔄 Refresh</button>
+<a href="ceo-finance.html" class="btn" style="background:rgba(250,204,21,.12);color:#facc15">💰 Finance</a>
+</div>
+</header>
+<div class="main">
+<div class="statsGrid">
+<div class="statCard"><div class="statK">🚨 Total Complaints</div><div class="statV" id="statTotal">0</div><div class="statK">All complaints • LIVE</div></div>
+<div class="statCard"><div class="statK">👤 Client → Nurse</div><div class="statV" id="statClient" style="color:#fca5a5">0</div><div class="statK">Client complains on booked nurse only</div></div>
+<div class="statCard"><div class="statK">👩‍⚕️ Nurse → Client</div><div class="statV" id="statNurse" style="color:#c4b5fd">0</div><div class="statK">Nurse complains on client</div></div>
+<div class="statCard"><div class="statK">⏳ Pending + Evidence</div><div class="statV" id="statPending" style="color:#fcd34d">0</div><div class="statK">Pending + Audio + Video + Files</div></div>
+<div class="statCard"><div class="statK">✅ Resolved</div><div class="statV" id="statResolved" style="color:#6ee7b7">0</div><div class="statK">Resolved by CEO</div></div>
+</div>
+<div class="complaintsGrid">
+<div class="column"><div class="columnHeader"><h3 style="font-family:Fraunces,serif;font-size:14px">👤 Client Complaints — Booked Nurse Only</h3><span id="clientCount" class="badge badgeClient">0 client complaints</span></div><div id="clientComplaintsList" class="columnBody"><div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div></div></div>
+<div class="column"><div class="columnHeader"><h3 style="font-family:Fraunces,serif;font-size:14px">👩‍⚕️ Nurse Complaints — About Client</h3><span id="nurseCount" class="badge badgeNurse">0 nurse complaints</span></div><div id="nurseComplaintsList" class="columnBody"><div style="padding:20px;text-align:center;color:var(--muted)">Loading...</div></div></div>
+</div>
+<div class="column" style="grid-column:1 / -1"><div class="columnHeader"><h3 style="font-family:Fraunces,serif;font-size:14px">🚨 All Complaints — CEO Listens to Both — Text + Audio + Video + Photos</h3><span id="allCount" class="badge badgePending">0 total</span></div><div id="allComplaintsList" class="columnBody" style="max-height:50vh"><div style="padding:20px;text-align:center;color:var(--muted)">Loading all complaints...</div></div></div>
+</div>
+<div id="complaintModal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalCard"><div class="modalHeader"><h3 style="font-family:Fraunces,serif;font-size:16px">🚨 Complaint Details — Text + Audio + Video + Photos</h3><button class="btn" onclick="closeModal()">✕ Close</button></div><div class="modalBody" id="modalBody"><div style="padding:20px;text-align:center;color:var(--muted)">Select complaint</div></div></div></div>
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);const db=firebase.database();
+let allComplaints=[], filteredComplaints=[];
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+function formatTime(ts){if(!ts)return'';const d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString();}
+function openModal(){document.getElementById('complaintModal').classList.add('active');}
+function closeModal(){document.getElementById('complaintModal').classList.remove('active');}
+function normalizeComplaint(id, v){
+  if(!v||typeof v!=='object')return null;
+  return{id, complaintId:v.complaintId||id, bookingId:v.bookingId||'', clientName:v.clientName||'Client', clientPhone:v.clientPhone||'', nurseName:v.nurseName||'Nurse', nurseId:v.nurseId||'', service:v.service||'Nursing Care', amount:v.amount||0, complaintType:v.complaintType||'other', complaintText:v.complaintText||'', status:v.status||'pending', from:v.from|| (v.type?.includes('client')?'client':'nurse'), type:v.type||'', createdAt:v.createdAt||v.time||Date.now(), evidenceCount:v.evidenceCount|| (v.evidenceFiles? v.evidenceFiles.length:0) || 0, evidenceFiles:v.evidenceFiles||[], hasAudio:v.hasAudio||false, hasVideo:v.hasVideo||false, audioUrl:v.audioUrl||'', videoUrl:v.videoUrl||'', raw:v};
+}
+async function loadComplaints(){
+  toast('🚨 Loading complaints — Clients + Nurses...');
+  const paths=['allComplaints','clientComplaints','nurseComplaints','ceoComplaints'];
+  let map={};
+  for(const path of paths){
+    try{
+      const snap=await db.ref(path).once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const id=ch.key;const val=ch.val();
+          if(val&&typeof val==='object'&&!map[id]) map[id]=val;
+        });
+      }
+    }catch(e){}
+  }
+  allComplaints=[];Object.entries(map).forEach(([id,v])=>{const c=normalizeComplaint(id,v);if(c) allComplaints.push(c);});
+  allComplaints.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  updateStats();renderComplaints();attachLiveComplaints();
+  toast(`✅ CEO Complainant: ${allComplaints.length} complaints`);
+}
+function updateStats(){
+  const total=allComplaints.length;
+  const clientCount=allComplaints.filter(c=>c.from==='client'||c.type.includes('client_complaint')).length;
+  const nurseCount=allComplaints.filter(c=>c.from==='nurse'||c.type.includes('nurse_complaint')).length;
+  const pending=allComplaints.filter(c=>c.status==='pending').length;
+  const resolved=allComplaints.filter(c=>c.status==='resolved').length;
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statClient').textContent=clientCount;
+  document.getElementById('statNurse').textContent=nurseCount;
+  document.getElementById('statPending').textContent=pending;
+  document.getElementById('statResolved').textContent=resolved;
+  document.getElementById('clientCount').textContent=`${clientCount} client`;
+  document.getElementById('nurseCount').textContent=`${nurseCount} nurse`;
+  document.getElementById('allCount').textContent=`${total} total`;
+  document.getElementById('liveCounts').textContent=`${total} Complaints | ${clientCount} Client→Nurse | ${nurseCount} Nurse→Client`;
+}
+function renderComplaints(){
+  const search=document.getElementById('search').value.toLowerCase().trim();
+  filteredComplaints=[...allComplaints];
+  if(search){filteredComplaints=filteredComplaints.filter(c=>`${c.clientName} ${c.nurseName} ${c.bookingId} ${c.complaintType} ${c.complaintText}`.toLowerCase().includes(search));}
+  renderColumn('clientComplaintsList', filteredComplaints.filter(c=>c.from==='client'||c.type.includes('client_complaint')));
+  renderColumn('nurseComplaintsList', filteredComplaints.filter(c=>c.from==='nurse'||c.type.includes('nurse_complaint')));
+  renderColumn('allComplaintsList', filteredComplaints);
+}
+function renderColumn(elementId, complaints){
+  const container=document.getElementById(elementId);
+  if(complaints.length===0){container.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">No complaints</div>';return;}
+  container.innerHTML='';
+  complaints.forEach(c=>{
+    const isClient=c.from==='client'||c.type.includes('client');
+    const badgeClass=isClient?'badgeClient':'badgeNurse';
+    const badgeText=isClient?'👤 Client → Nurse':'👩‍⚕️ Nurse → Client';
+    const statusBadge=c.status==='pending'?'badgePending':'badgeResolved';
+    const initial=(isClient?c.clientName:c.nurseName||'C').charAt(0).toUpperCase();
+    const card=document.createElement('div');
+    card.className='complaintCard';
+    card.onclick=()=>viewComplaint(c.id);
+    card.innerHTML=`<div style="display:flex;gap:10px;align-items:flex-start"><div class="avatar" style="background:${isClient?'linear-gradient(135deg,#ef4444,#fca5a5)':'linear-gradient(135deg,#a78bfa,#c4b5fd)'}">${initial}</div><div style="flex:1;min-width:0"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge ${badgeClass}">${badgeText}</span><span class="badge ${statusBadge}">${c.status}</span>${c.evidenceCount>0?`<span class="badge badgeEvidence">📎 ${c.evidenceCount}</span>`:''}${c.hasAudio?'<span class="badge badgeEvidence">🎤 Audio</span>':''}${c.hasVideo?'<span class="badge badgeEvidence">🎥 Video</span>':''}</div><div style="font-weight:700;font-size:13px;margin-top:6px">${isClient?`👤 ${c.clientName} complains about 👩‍⚕️ ${c.nurseName}`:`👩‍⚕️ ${c.nurseName} complains about 👤 ${c.clientName}`}</div><div style="font-size:11px;color:var(--muted);margin-top:4px">📋 ${c.bookingId.slice(0,12)} • ${c.complaintType} • ${c.complaintText.substring(0,80)}...<br><small>${formatTime(c.createdAt)}</small></div></div></div>`;
+    container.appendChild(card);
+  });
+}
+function viewComplaint(id){
+  const c=allComplaints.find(x=>x.id===id);if(!c)return;
+  const isClient=c.from==='client'||c.type.includes('client');
+  const modalBody=document.getElementById('modalBody');
+  modalBody.innerHTML=`
+    <div style="display:flex;gap:12px;align-items:center;padding:12px;background:${isClient?'rgba(239,68,68,.08)':'rgba(167,139,250,.08)'};border-radius:14px">
+      <div class="avatar" style="width:56px;height:56px;background:${isClient?'linear-gradient(135deg,#ef4444,#fca5a5)':'linear-gradient(135deg,#a78bfa,#c4b5fd)'};font-size:20px">${(isClient?c.clientName:c.nurseName||'C').charAt(0).toUpperCase()}</div>
+      <div style="flex:1"><div style="font-family:Fraunces,serif;font-size:16px;font-weight:700">${isClient?`👤 ${c.clientName} → 👩‍⚕️ ${c.nurseName}`:`👩‍⚕️ ${c.nurseName} → 👤 ${c.clientName}`}</div><div style="font-size:11px;color:var(--muted)">${c.complaintId} • ${formatTime(c.createdAt)}</div></div>
+    </div>
+    <div style="background:rgba(12,10,30,.5);border-radius:12px;padding:12px"><b>📝 Type:</b> ${c.complaintType}<br><b>Text:</b><div style="margin-top:6px;padding:10px;background:rgba(12,10,30,.7);border-radius:10px;font-size:13px;line-height:1.6">${c.complaintText}</div></div>
+    <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.15);border-radius:12px;padding:12px">
+      <b style="font-size:12px">🎤 Audio + 🎥 Video + 📎 Files — Evidence</b>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">
+        ${c.hasAudio&&c.audioUrl?`<div><b>🎤 Audio:</b><br><audio controls style="width:100%;margin-top:6px"><source src="${c.audioUrl}" type="audio/webm"></audio></div>`:''}
+        ${c.hasVideo&&c.videoUrl?`<div><b>🎥 Video:</b><br><video controls style="width:100%;height:200px;background:#000;border-radius:10px;margin-top:6px"><source src="${c.videoUrl}" type="video/webm"></video></div>`:''}
+        ${c.evidenceFiles.length>0?`<div><b>📎 Files — ${c.evidenceFiles.length} evidence:</b><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${c.evidenceFiles.map((f,idx)=>`<div style="background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;gap:10px;align-items:center"><span>${f.type?.startsWith('image/')?'🖼️':f.type?.startsWith('video/')?'🎥':'📎'}</span><div style="flex:1"><div style="font-weight:700;font-size:12px">${f.name||`Evidence ${idx+1}`}</div><small>${f.type||'File'}</small></div>${f.type?.startsWith('image/')&&f.url?`<img src="${f.url}" style="width:50px;height:50px;object-fit:cover;border-radius:6px">`:''}${f.url?`<a href="${f.url}" target="_blank" class="btn" style="padding:4px 8px;font-size:10px">👁️ View</a>`:''}</div>`).join('')}</div></div>`:''}
+      </div>
+    </div>
+    <div><div style="font-size:12px;font-weight:700;margin-bottom:10px">⚖️ CEO ACTIONS — Review Evidence Before Punishing</div><div class="actionGrid"><button class="actionBtn actionWarn" onclick="ceoAction('${c.id}','warn')">⚠️ Warn</button><button class="actionBtn actionTrust" onclick="ceoAction('${c.id}','decrease_trust')">📉 Decrease Trust</button><button class="actionBtn actionSuspend" onclick="ceoAction('${c.id}','suspend')">⏸️ Suspend</button><button class="actionBtn actionBlock" onclick="ceoAction('${c.id}','block')">🚫 Block</button><button class="actionBtn actionResolve" onclick="ceoAction('${c.id}','resolve')">✅ Resolve</button></div></div>
+  `;
+  openModal();
+}
+async function ceoAction(complaintId, action){
+  const c=allComplaints.find(x=>x.id===complaintId);if(!c)return;
+  let reason=prompt(`CEO ACTION: ${action.toUpperCase()}?\n\nComplaint: ${c.complaintId}\nEnter reason:`);
+  if(reason===null) return;
+  if(!confirm(`Confirm ${action}?`)) return;
+  try{
+    const now=Date.now();
+    const actionData={actionId:`CEO-ACTION-${complaintId}-${now}`, complaintId, action, reason:reason||`CEO ${action} after reviewing evidence`, createdAt:now, complaintDetails:c, evidenceReviewed:true};
+    await db.ref('ceoActions/'+actionData.actionId).set(actionData);
+    await db.ref('allComplaints/'+complaintId).update({status:action==='resolve'?'resolved':action, ceoAction:action, resolvedAt:now});
+    await db.ref('ceoComplaints/'+complaintId).update({status:action==='resolve'?'resolved':action, ceoAction:action});
+    toast(`✅ CEO Action: ${action.toUpperCase()}`);
+    loadComplaints();closeModal();
+  }catch(e){toast('Error: '+e.message);}
+}
+function attachLiveComplaints(){
+  const paths=['allComplaints','clientComplaints','nurseComplaints','ceoComplaints'];
+  paths.forEach(path=>{
+    db.ref(path).on('child_added', snap=>{
+      const v=snap.val(); if(!v||typeof v!=='object')return;
+      if(Date.now()-(v.createdAt||v.time||0)<60000){
+        toast(`🚨 NEW Complaint LIVE`);loadComplaints();
+      }
+    });
+  });
+}
+window.onload=()=>{loadComplaints();setInterval(loadComplaints,20000);};
+</script>
+</body>
+</html>

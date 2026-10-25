@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Complain — Complain on Client — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--faint:#6b6788;--gold:#facc15;--purple:#a78bfa;--red:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:30px}
+header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:18px}
+.btn{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btnPurple{background:linear-gradient(135deg,#a78bfa,#8b5cf6);color:#fff;font-weight:800;border:0}
+.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:800;border:0}
+.wrap{max-width:720px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.cardTitle{font-family:Fraunces,serif;font-size:16px;font-weight:700;margin-bottom:12px}
+.textarea,.select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:13px}
+.textarea{min-height:110px;resize:vertical}
+.label{font-size:11px;color:var(--faint);text-transform:uppercase;font-weight:700;margin-bottom:6px;display:block}
+.uploadZone{border:2px dashed rgba(255,255,255,.12);border-radius:14px;padding:18px;text-align:center;background:rgba(12,10,30,.4);cursor:pointer}
+.filePreview{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.fileItem{background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px}
+.recordingBox{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);border-radius:14px;padding:14px;display:none}
+.recordingBox.active{display:block}
+.recDot{width:10px;height:10px;border-radius:50%;background:var(--purple);display:inline-block;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;font-weight:700;display:none}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">👩‍⚕️ Nurse Complaint — Complain on Client</div>
+<div style="display:flex;gap:8px"><a href="my-job-offer.html" class="btn">📋 My Job Offer</a><a href="index.html" class="btn">🏠 Home</a></div>
+</header>
+<div class="wrap">
+<div class="card" style="background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2)">
+<div class="cardTitle">👤 Complaining About Client — <span id="clientNameDisplay" style="color:#c4b5fd">Loading...</span></div>
+<div style="font-size:12px;color:var(--muted)">Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700">-</span> • Nurse: <span id="nurseNameDisplay">-</span></div>
+</div>
+<div class="card">
+<div class="cardTitle">📝 Complaint Type + Text</div>
+<label class="label">Complaint Type</label>
+<select id="complaintType" class="select">
+<option value="">Select complaint type...</option>
+<option value="abuse">😡 Abuse / Verbal Abuse</option>
+<option value="non_payment">💰 Non Payment</option>
+<option value="unsafe">⚠️ Unsafe Environment</option>
+<option value="harassment">🚫 Harassment</option>
+<option value="false_accusation">❌ False Accusation</option>
+<option value="overwork">😰 Overwork</option>
+<option value="other">📝 Other</option>
+</select>
+<label class="label" style="margin-top:12px">Complaint Text — Detailed</label>
+<textarea id="complaintText" class="textarea" placeholder="Describe what client did... Example: Client verbally abused me, asked extra work not in agreement, house dirty, unsafe..."></textarea>
+</div>
+<div class="card">
+<div class="cardTitle">🎤 Audio + 🎥 Video + 📎 Files — Evidence</div>
+<div class="uploadZone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+<b>Click to upload or drag & drop</b><br><small>Photos, Videos, Documents — Max 20MB</small>
+<input type="file" id="fileInput" multiple accept="image/*,video/*,application/pdf,.doc,.docx" style="display:none" onchange="handleFiles(this.files)">
+</div>
+<div id="filePreview" class="filePreview"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+<button id="startAudioBtn" class="btn btnRed" onclick="startAudioRecording()">🎤 Record Audio</button>
+<button id="stopAudioBtn" class="btn" style="display:none" onclick="stopAudioRecording()">⏹️ Stop Audio</button>
+<button id="startVideoBtn" class="btn btnRed" onclick="startVideoRecording()">🎥 Record Video</button>
+<button id="stopVideoBtn" class="btn" style="display:none" onclick="stopVideoRecording()">⏹️ Stop Video</button>
+</div>
+<div id="audioRecordingBox" class="recordingBox"><span class="recDot"></span> Recording Audio... <span id="audioTimer">00:00</span></div>
+<div id="audioPreview" style="margin-top:10px;display:none"><audio id="audioPlayback" controls style="width:100%"></audio></div>
+<div id="videoRecordingBox" class="recordingBox"><span class="recDot"></span> Recording Video... <span id="videoTimer">00:00</span><video id="videoPreviewLive" autoplay muted style="width:100%;height:200px;background:#000;border-radius:10px;margin-top:10px"></video></div>
+<div id="videoPreview" style="margin-top:10px;display:none"><video id="videoPlayback" controls style="width:100%;height:220px;background:#000;border-radius:10px"></video></div>
+</div>
+<div class="card">
+<div class="cardTitle">✅ Submit Nurse Complaint</div>
+<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+<button class="btn btnPurple" style="flex:1;padding:14px;font-size:13px;font-weight:900" onclick="submitComplaint()">👩‍⚕️ Submit Complaint About This Client</button>
+<button class="btn" style="flex:1;padding:14px" onclick="location.href='my-job-offer.html'">Cancel</button>
+</div>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);const db=firebase.database();
+let bookingId, clientName, clientId, nurseName, nurseId, service, amount;
+let audioRecorder, audioChunks=[], audioBlob=null, audioUrl=null, audioTimerInterval=null, audioSeconds=0;
+let videoRecorder, videoChunks=[], videoBlob=null, videoUrl=null, videoTimerInterval=null, videoSeconds=0, videoStream=null;
+let uploadedFiles=[];
+function getParams(){
+  const p=new URLSearchParams(location.search);
+  bookingId=p.get('bookingId')||'LCG-DEMO';clientName=p.get('clientName')||'Client';clientId=p.get('clientId')||'client_demo';nurseName=p.get('nurseName')||'Nurse';nurseId=p.get('nurseId')||'nurse_demo';service=p.get('service')||'Nursing Care';amount=p.get('amount')||'0';
+  document.getElementById('bookingIdDisplay').textContent=bookingId;document.getElementById('clientNameDisplay').textContent=clientName;document.getElementById('nurseNameDisplay').textContent=nurseName;
+}
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+async function startAudioRecording(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    audioRecorder=new MediaRecorder(stream);audioChunks=[];
+    audioRecorder.ondataavailable=e=>{if(e.data.size>0) audioChunks.push(e.data);};
+    audioRecorder.onstop=()=>{audioBlob=new Blob(audioChunks,{type:'audio/webm'});audioUrl=URL.createObjectURL(audioBlob);document.getElementById('audioPlayback').src=audioUrl;document.getElementById('audioPreview').style.display='block';toast('🎤 Audio recorded');};
+    audioRecorder.start();document.getElementById('startAudioBtn').style.display='none';document.getElementById('stopAudioBtn').style.display='inline-flex';document.getElementById('audioRecordingBox').classList.add('active');
+    audioSeconds=0;audioTimerInterval=setInterval(()=>{audioSeconds++;const m=String(Math.floor(audioSeconds/60)).padStart(2,'0');const s=String(audioSeconds%60).padStart(2,'0');document.getElementById('audioTimer').textContent=`${m}:${s}`;},1000);
+  }catch(e){toast('Audio error: '+e.message);}
+}
+function stopAudioRecording(){if(audioRecorder&&audioRecorder.state!=='inactive'){audioRecorder.stop();audioRecorder.stream.getTracks().forEach(t=>t.stop());}document.getElementById('startAudioBtn').style.display='inline-flex';document.getElementById('stopAudioBtn').style.display='none';document.getElementById('audioRecordingBox').classList.remove('active');clearInterval(audioTimerInterval);}
+async function startVideoRecording(){
+  try{
+    videoStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});document.getElementById('videoPreviewLive').srcObject=videoStream;
+    videoRecorder=new MediaRecorder(videoStream);videoChunks=[];
+    videoRecorder.ondataavailable=e=>{if(e.data.size>0) videoChunks.push(e.data);};
+    videoRecorder.onstop=()=>{videoBlob=new Blob(videoChunks,{type:'video/webm'});videoUrl=URL.createObjectURL(videoBlob);document.getElementById('videoPlayback').src=videoUrl;document.getElementById('videoPreview').style.display='block';toast('🎥 Video recorded');};
+    videoRecorder.start();document.getElementById('startVideoBtn').style.display='none';document.getElementById('stopVideoBtn').style.display='inline-flex';document.getElementById('videoRecordingBox').classList.add('active');
+    videoSeconds=0;videoTimerInterval=setInterval(()=>{videoSeconds++;const m=String(Math.floor(videoSeconds/60)).padStart(2,'0');const s=String(videoSeconds%60).padStart(2,'0');document.getElementById('videoTimer').textContent=`${m}:${s}`;},1000);
+  }catch(e){toast('Video error: '+e.message);}
+}
+function stopVideoRecording(){if(videoRecorder&&videoRecorder.state!=='inactive'){videoRecorder.stop();}if(videoStream){videoStream.getTracks().forEach(t=>t.stop());}document.getElementById('startVideoBtn').style.display='inline-flex';document.getElementById('stopVideoBtn').style.display='none';document.getElementById('videoRecordingBox').classList.remove('active');document.getElementById('videoPreviewLive').srcObject=null;clearInterval(videoTimerInterval);}
+function handleDragOver(e){e.preventDefault();}function handleDragLeave(e){e.preventDefault();}function handleDrop(e){e.preventDefault();handleFiles(e.dataTransfer.files);}
+function handleFiles(files){for(let i=0;i<files.length;i++){const file=files[i];if(file.size>20*1024*1024){toast(`File ${file.name} too big`);continue;}if(uploadedFiles.length>=10){toast('Max 10 files');break;}const reader=new FileReader();reader.onload=e=>{uploadedFiles.push({name:file.name,size:file.size,type:file.type,data:e.target.result});renderFilePreview();};reader.readAsDataURL(file);}}
+function renderFilePreview(){const container=document.getElementById('filePreview');container.innerHTML='';uploadedFiles.forEach((f,idx)=>{const div=document.createElement('div');div.className='fileItem';const isImage=f.type.startsWith('image/');div.innerHTML=`<div style="display:flex;gap:8px;align-items:center"><span>${isImage?'🖼️':'📎'}</span><div><div style="font-weight:700">${f.name}</div><small>${(f.size/1024).toFixed(1)} KB</small></div>${isImage?`<img src="${f.data}" style="width:40px;height:40px;object-fit:cover;border-radius:6px">`:''}</div><button class="btn" style="padding:4px 8px" onclick="removeFile(${idx})">🗑️</button>`;container.appendChild(div);});}
+function removeFile(idx){uploadedFiles.splice(idx,1);renderFilePreview();}
+async function submitComplaint(){
+  const type=document.getElementById('complaintType').value;const text=document.getElementById('complaintText').value.trim();
+  if(!type){toast('Select complaint type');return;}if(!text||text.length<20){toast('Type complaint text — At least 20 chars');return;}
+  if(!confirm(`Submit complaint about client ${clientName}?`)) return;toast('Submitting...');
+  try{
+    const now=Date.now();const complaintId='NURSE-COMP-'+bookingId+'-'+now;const evidenceUrls=[];
+    uploadedFiles.forEach((f,idx)=>{evidenceUrls.push({id:`FILE-${idx}`,name:f.name,type:f.type,size:f.size,url:f.data});});
+    if(audioBlob) evidenceUrls.push({id:'AUDIO-1',name:`audio_${complaintId}.webm`,type:'audio/webm',url:audioUrl});
+    if(videoBlob) evidenceUrls.push({id:'VIDEO-1',name:`video_${complaintId}.webm`,type:'video/webm',url:videoUrl});
+    const complaintData={complaintId, bookingId, clientId, clientName, nurseId, nurseName, service, amount, complaintType:type, complaintText:text, status:'pending', createdAt:now, time:now, evidenceCount:evidenceUrls.length, evidenceFiles:evidenceUrls, hasAudio:!!audioBlob, hasVideo:!!videoBlob, type:'nurse_complaint', from:'nurse', to:'client', reflectsOnCEO:true};
+    await db.ref('nurseComplaints/'+complaintId).set(complaintData);await db.ref('allComplaints/'+complaintId).set(complaintData);await db.ref('ceoComplaints/'+complaintId).set(complaintData);await db.ref('complaintsByBooking/'+bookingId+'/'+complaintId).set(complaintData);
+    toast(`✅ Nurse complaint submitted`);alert(`✅ NURSE COMPLAINT SUBMITTED!\n\nID: ${complaintId}\nClient: ${clientName}\n\nCEO sees it in ceo-complainant.html LIVE`);setTimeout(()=>{location.href='my-job-offer.html';},1500);
+  }catch(e){toast('Error: '+e.message);}
+}
+window.onload=()=>{getParams();};
+</script>
+</body>
+</html>
