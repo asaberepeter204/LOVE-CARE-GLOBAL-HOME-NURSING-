@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Live Tracking Map — SOS → sos.html — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+.topbar{height:56px;background:rgba(14,10,28,.98);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.2);padding:0 14px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;z-index:100}
+.brand{font-weight:800;font-size:13px}.brand small{display:block;font-size:9px;color:#a78bfa}
+.liveDot{width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 1.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btnSmall{padding:7px 12px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(28,18,56,.6);color:#d8b4fe;font-size:11px;font-weight:800;cursor:pointer;text-decoration:none}
+.btnSmall.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}
+.inputSmall{padding:7px 10px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#fff;font-size:11px;min-width:180px}
+.badge{padding:4px 8px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid;display:inline-flex}
+.badgeLive{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.25)}
+.badgeEnRoute{background:rgba(251,191,36,.15);color:#fbbf24;border-color:rgba(251,191,36,.3)}
+.badgeAccepted{background:rgba(34,197,94,.15);color:#4ade80;border-color:#22c55e}
+.main{flex:1;display:flex;overflow:hidden;position:relative}
+.sidebar{width:360px;background:rgba(14,10,28,.92);border-right:1px solid rgba(168,85,247,.15);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;z-index:20}
+.bookingList{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
+.bookingCard{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.15);border-radius:14px;padding:10px;cursor:pointer}
+.bookingCard.active{border-color:#a855f7;background:rgba(76,29,149,.25)}
+.bookingHead{display:flex;gap:10px;align-items:center}
+.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-weight:900;color:#1e0a3a;flex-shrink:0;overflow:hidden}
+.meta{flex:1;min-width:0}.meta h4{font-size:12px;font-weight:800;color:#f3e8ff}.meta small{font-size:10px;color:#a78bfa;display:block}
+.row{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.details{font-size:10px;color:#c4b5fd;line-height:1.4;margin-top:6px;background:rgba(14,10,28,.4);border-radius:8px;padding:6px}
+.mapWrap{flex:1;position:relative;overflow:hidden}#map{width:100%;height:100%;background:#120e26}
+.mapOverlay{position:absolute;top:10px;left:10px;right:10px;z-index:500;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;pointer-events:none}.mapOverlay > *{pointer-events:auto}
+.statsBox{background:rgba(14,10,28,.92);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:10px 12px;font-size:11px}
+.trackingInfo{position:absolute;bottom:10px;left:10px;right:10px;z-index:500;background:rgba(14,10,28,.95);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:12px;display:none;max-height:48%;overflow-y:auto}
+.trackingInfo.active{display:block}
+.trackingActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btnAction{flex:1;min-width:100px;padding:10px;border-radius:10px;font-weight:800;font-size:11px;border:none;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center}
+.btnCall{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16}
+.btnSOS{background:linear-gradient(135deg,#ef4444,#991b1b);color:white;box-shadow:0 4px 12px rgba(239,68,68,.3);animation:blinkSOS 1.2s infinite}
+@keyframes blinkSOS{0%,100%{opacity:1}50%{opacity:.7}}
+.toast{position:fixed;right:14px;bottom:14px;z-index:1000;background:#1e0a3a;border:1px solid rgba(168,85,247,.3);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700;font-size:12px;display:none}
+.customNurseIcon{width:44px;height:44px;border-radius:50%;border:3px solid #22c55e;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-weight:900;color:#1e0a3a;position:relative}
+.pulseRing{position:absolute;inset:-6px;border-radius:50%;border:2px solid #22c55e;animation:pulseRing 1.8s infinite}
+@keyframes pulseRing{0%{transform:scale(0.8);opacity:1}100%{transform:scale(1.6);opacity:0}}
+</style>
+</head>
+<body>
+<div class="topbar">
+<div><div class="brand">LOVE CARE GLOBAL <span class="liveDot"></span> CEO LIVE TRACKING MAP — SOS → sos.html <small>Real-time GPS after accept — SOS button points to sos.html</small></div></div>
+<div class="controls">
+<span id="counts" style="font-size:11px;color:#a78bfa">Loading...</span>
+<span class="badge badgeLive">● LIVE</span>
+<input id="search" class="inputSmall" placeholder="🔍 Search..." oninput="renderList()">
+<button class="btnSmall" onclick="toggleSidebar()">☰ Bookings</button>
+<a href="sos.html" class="btnSmall" style="background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)">🚨 SOS Page → sos.html</a>
+<a href="index.html" class="btnSmall">🏠 Home</a>
+</div>
+</div>
+<div class="main">
+<div id="sidebar" class="sidebar">
+<div style="padding:12px;border-bottom:1px solid rgba(168,85,247,.15)">
+<div style="font-size:12px;font-weight:800;display:flex;justify-content:space-between"><span>📋 Active Bookings — After Accept</span><span id="activeCount" class="badge badgeLive">0</span></div>
+<small style="font-size:10px;color:#a78bfa;margin-top:6px;display:block">SOS button → sos.html — Click card to track LIVE</small>
+</div>
+<div id="bookingList" class="bookingList"></div>
+</div>
+<div class="mapWrap">
+<div id="map"></div>
+<div class="mapOverlay">
+<div class="statsBox"><b>🗺️ CEO Live Tracking</b><br><span id="statTotal">0</span> Active<br><span id="statEnRoute">0</span> En Route<br><span id="statInService">0</span> In Service<br><small style="color:#a78bfa">SOS → sos.html</small></div>
+<div class="statsBox" id="selectedStats" style="display:none"><b id="selectedTitle">Select a booking</b><br><span id="selectedInfo">Click a booking card</span></div>
+</div>
+<div id="trackingInfo" class="trackingInfo"><div id="trackingContent"></div></div>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);const db=firebase.database();
+let map,nurseMarkers={},clientMarkers={},routeLines={},activeBookings=[],filteredBookings=[],selectedBookingId=null,currentFilter='all';
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+function setStatusFilter(status){currentFilter=status;renderList();}
+function formatTime(ts){if(!ts)return'';const diff=Date.now()-ts;if(diff<60000)return'just now';if(diff<3600000)return Math.floor(diff/60000)+'m ago';if(diff<86400000)return Math.floor(diff/3600000)+'h ago';return new Date(ts).toLocaleString();}
+function calcDistance(lat1,lon1,lat2,lon2){if(!lat1||!lon1||!lat2||!lon2)return null;const R=6371;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));return R*c;}
+function calcETA(d){if(!d)return'--';const h=d/30;return h<1?Math.ceil(h*60)+' min':h.toFixed(1)+' hr';}
+function initMap(){map=L.map('map').setView([5.6037,-0.1870],11);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);toast('🗺️ CEO Live Tracking — SOS → sos.html');}
+function normalizeBooking(id,v){
+  if(!v||typeof v!=='object')return null;
+  const statusRaw=(v.status||'accepted').toLowerCase();
+  let status='accepted';
+  if(statusRaw.includes('enroute'))status='enRoute';
+  else if(statusRaw.includes('arrived'))status='arrived';
+  else if(statusRaw.includes('inservice'))status='inService';
+  else if(statusRaw.includes('accepted')||v.accepted===true)status='accepted';
+  const nurseLat=v.nurseLat||v.nurse?.lat||v.liveNurseLat||null;
+  const nurseLng=v.nurseLng||v.nurse?.lng||v.liveNurseLng||null;
+  const clientLat=v.clientLat||v.client?.lat||v.lat||null;
+  const clientLng=v.clientLng||v.client?.lng||v.lng||null;
+  const distance=calcDistance(nurseLat,nurseLng,clientLat,clientLng);
+  return{id,nurseName:v.nurseName||'Nurse',nursePhone:v.nursePhone||'',nursePhoto:v.nursePhoto||'',clientName:v.clientName||'Client',clientPhone:v.clientPhone||'',service:v.service||'Nursing Care',bookingType:v.bookingType||'Full Payment',status,nurseLat,nurseLng,clientLat,clientLng,distance,eta:calcETA(distance),hours:v.hours||'8',totalGHS:v.totalGHS||0,totalUSD:v.totalUSD||0,acceptedAt:v.acceptedAt||Date.now(),lastUpdate:v.lastUpdate||Date.now(),raw:v};
+}
+async function loadAllBookings(){
+  const bookingPaths=['bookings','acceptedBookings','activeBookings','ceoBookings','ceoAcceptedBookings','bookingsFull','bookings50','ceoBookingReceiver','allBookings'];
+  let bookingMap={};
+  for(const path of bookingPaths){
+    try{const snap=await db.ref(path).once('value');if(snap.exists()){snap.forEach(ch=>{const id=ch.key;const val=ch.val();if(!val||typeof val!=='object')return;const isAccepted=val.accepted===true||val.isAccepted===true||val.status==='accepted'||val.acceptedAt;if(!isAccepted)return;if(!bookingMap[id])bookingMap[id]=val;else{const nt=val.lastUpdate||0;const ot=bookingMap[id].lastUpdate||0;if(nt>=ot)bookingMap[id]={...bookingMap[id],...val};}});}}catch(e){}
+  }
+  activeBookings=[];Object.entries(bookingMap).forEach(([id,v])=>{const b=normalizeBooking(id,v);if(b)activeBookings.push(b);});
+  activeBookings.sort((a,b)=>(b.lastUpdate||0)-(a.lastUpdate||0));
+  updateStats();renderList();renderMapMarkers();attachLiveTracking();
+  toast(`✅ CEO Tracking: ${activeBookings.length} active — SOS → sos.html`);
+}
+function updateStats(){
+  const total=activeBookings.length;const enRoute=activeBookings.filter(b=>b.status==='enRoute').length;const inService=activeBookings.filter(b=>b.status==='inService').length;const accepted=activeBookings.filter(b=>b.status==='accepted').length;
+  document.getElementById('counts').textContent=`${total} Active | ${accepted} Accepted | ${enRoute} En Route`;
+  document.getElementById('statTotal').textContent=total;document.getElementById('statEnRoute').textContent=enRoute;document.getElementById('statInService').textContent=inService;document.getElementById('activeCount').textContent=total;
+}
+function renderList(){
+  const listEl=document.getElementById('bookingList');const searchQuery=document.getElementById('search').value.toLowerCase().trim();
+  filteredBookings=[...activeBookings];if(searchQuery)filteredBookings=filteredBookings.filter(b=>`${b.nurseName} ${b.clientName}`.toLowerCase().includes(searchQuery));
+  listEl.innerHTML='';if(filteredBookings.length===0){listEl.innerHTML='<div style="padding:20px;text-align:center;color:#a78bfa;font-size:12px">No bookings<br><small>SOS → sos.html</small></div>';return;}
+  filteredBookings.forEach(b=>{
+    const statusText={accepted:'✅ Accepted',enRoute:'🚗 En Route',arrived:'📍 Arrived',inService:'👩‍⚕️ In Service'}[b.status]||b.status;
+    const card=document.createElement('div');card.className='bookingCard'+(selectedBookingId===b.id?' active':'');card.onclick=()=>selectBooking(b.id);
+    card.innerHTML=`<div class="bookingHead"><div class="avatar">${(b.nurseName||'N').charAt(0)}</div><div class="meta"><h4>${b.nurseName} → ${b.clientName}</h4><small>📋 ${b.id.slice(0,8)} • ${b.service}</small></div></div><div class="row"><span class="badge badgeAccepted">${statusText}</span><span class="badge badgeLive">🔄 ${formatTime(b.lastUpdate)}</span></div><div class="details">Click to track — SOS → sos.html</div>`;
+    listEl.appendChild(card);
+  });
+}
+function renderMapMarkers(){
+  Object.values(nurseMarkers).forEach(m=>map.removeLayer(m));Object.values(clientMarkers).forEach(m=>map.removeLayer(m));Object.values(routeLines).forEach(l=>map.removeLayer(l));
+  nurseMarkers={};clientMarkers={};routeLines={};const bounds=L.latLngBounds();let hasBounds=false;
+  filteredBookings.forEach(b=>{
+    if(b.nurseLat&&b.nurseLng){
+      const nurseIcon=L.divIcon({className:'custom-div-icon',html:`<div class="customNurseIcon"><div class="pulseRing"></div>👩‍⚕️</div>`,iconSize:[44,44],iconAnchor:[22,22]});
+      const marker=L.marker([b.nurseLat,b.nurseLng],{icon:nurseIcon}).addTo(map);
+      marker.bindPopup(`<div><b>👩‍⚕️ ${b.nurseName}</b><br>📋 ${b.id.slice(0,8)}<br><a href="sos.html?bookingId=${b.id}&nurse=${encodeURIComponent(b.nurseName)}" style="color:#ef4444;font-weight:800">🚨 SOS → sos.html</a></div>`);
+      nurseMarkers[b.id]=marker;bounds.extend([b.nurseLat,b.nurseLng]);hasBounds=true;
+    }
+    if(b.clientLat&&b.clientLng){const marker=L.marker([b.clientLat,b.clientLng]).addTo(map);clientMarkers[b.id]=marker;bounds.extend([b.clientLat,b.clientLng]);hasBounds=true;}
+    if(b.nurseLat&&b.clientLat){const line=L.polyline([[b.nurseLat,b.nurseLng],[b.clientLat,b.clientLng]],{color:'#a855f7',weight:3}).addTo(map);routeLines[b.id]=line;}
+  });
+  if(hasBounds&&!selectedBookingId)map.fitBounds(bounds,{padding:[40,40],maxZoom:14});
+}
+function selectBooking(id){
+  selectedBookingId=id;const booking=activeBookings.find(b=>b.id===id);if(!booking)return;renderList();
+  document.getElementById('sidebar').classList.remove('open');
+  if(booking.nurseLat&&booking.nurseLng)map.setView([booking.nurseLat,booking.nurseLng],14);
+  if(nurseMarkers[id])nurseMarkers[id].openPopup();
+  showTrackingInfo(booking);
+}
+function showTrackingInfo(b){
+  const el=document.getElementById('trackingInfo');const content=document.getElementById('trackingContent');
+  const sosUrl=`sos.html?bookingId=${encodeURIComponent(b.id)}&nurseName=${encodeURIComponent(b.nurseName)}&clientName=${encodeURIComponent(b.clientName)}&nursePhone=${encodeURIComponent(b.nursePhone||'')}&clientPhone=${encodeURIComponent(b.clientPhone||'')}&nurseLat=${b.nurseLat||''}&nurseLng=${b.nurseLng||''}&clientLat=${b.clientLat||''}&clientLng=${b.clientLng||''}&service=${encodeURIComponent(b.service||'')}&status=${encodeURIComponent(b.status||'')}&hours=${b.hours||''}`;
+  content.innerHTML=`
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
+      <div class="avatar" style="width:48px;height:48px">${(b.nurseName||'N').charAt(0)}</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:13px">${b.nurseName} → ${b.clientName}</div>
+        <small style="font-size:11px;color:#a78bfa">Booking: ${b.id} • ${b.service} • ${b.hours}h</small><br>
+        <span class="badge badgeAccepted">${b.status}</span> <span class="badge badgeLive">🔄 ${formatTime(b.lastUpdate)}</span>
+      </div>
+      <button class="btnSmall" onclick="document.getElementById('trackingInfo').classList.remove('active')">✕</button>
+    </div>
+    <div class="trackingActions">
+      <button class="btnAction btnCall" onclick="window.open('tel:${b.nursePhone}')">📞 Call Nurse</button>
+      <a href="${sosUrl}" class="btnAction btnSOS">🚨 SOS → sos.html</a>
+      <button class="btnAction" style="background:rgba(168,85,247,.15);color:#d8b4fe" onclick="updateBookingStatus('${b.id}','enRoute')">🚗 En Route</button>
+      <button class="btnAction" style="background:rgba(59,130,246,.15);color:#93c5fd" onclick="updateBookingStatus('${b.id}','arrived')">📍 Arrived</button>
+      <button class="btnAction" style="background:rgba(168,85,247,.15);color:#d8b4fe" onclick="updateBookingStatus('${b.id}','inService')">👩‍⚕️ In Service</button>
+    </div>
+    <small style="font-size:10px;color:#a78bfa;display:block;margin-top:8px">🚨 SOS button points to sos.html — Passes booking ID, nurse, client, GPS — sos.html handles emergency</small>
+  `;
+  el.classList.add('active');
+}
+async function updateBookingStatus(bookingId,newStatus){
+  if(!confirm(`Set ${bookingId.slice(0,8)} to ${newStatus}?`))return;
+  try{const updates={status:newStatus,lastUpdate:Date.now(),updatedAt:Date.now()};const paths=['bookings','acceptedBookings','activeBookings','ceoBookings'];for(const p of paths){try{await db.ref(p+'/'+bookingId).update(updates);}catch(e){}}toast(`✅ ${bookingId.slice(0,8)} → ${newStatus}`);loadAllBookings();}catch(e){toast('Failed: '+e.message);}
+}
+function attachLiveTracking(){
+  const livePaths=['bookings','acceptedBookings','activeBookings','ceoBookings','nurseLocations'];
+  livePaths.forEach(path=>{db.ref(path).on('child_changed',snap=>{const v=snap.val();if(!v||typeof v!=='object')return;const id=snap.key;const existing=activeBookings.find(b=>b.id===id);if(existing){const updated=normalizeBooking(id,{...existing.raw,...v});if(updated){const idx=activeBookings.findIndex(b=>b.id===id);activeBookings[idx]=updated;updateStats();renderList();renderMapMarkers();if(selectedBookingId===id)showTrackingInfo(updated);}}});});
+}
+window.onload=()=>{initMap();loadAllBookings();setInterval(loadAllBookings,30000);};
+</script>
+</body>
+</html>
