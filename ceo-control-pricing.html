@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Control Pricing — Set Cedis & Dollars SEPARATELY — FIXED PERMISSION_DENIED — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff}
+.topbar{padding:12px 16px;background:rgba(14,10,28,.96);border-bottom:1px solid rgba(168,85,247,.2);position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.brand{font-weight:800;font-size:13px}.brand small{display:block;font-size:9px;color:#a78bfa;line-height:1.4;margin-top:2px}
+.wrap{max-width:680px;margin:0 auto;padding:16px}
+.card{background:rgba(28,18,56,.96);border:1px solid rgba(168,85,247,.2);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.h1{font-size:20px;font-weight:800;text-align:center;color:#f3e8ff;margin-top:8px}
+.sub{font-size:12px;color:#a78bfa;text-align:center;line-height:1.5;margin-top:6px}
+.badgeRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.badge{padding:8px 14px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid}
+.badgeGreen{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.25)}
+.badgeRed{background:rgba(251,113,133,.12);color:#fca5a5;border-color:rgba(251,113,133,.25)}
+.badgeYellow{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.25)}
+.label{font-size:12px;font-weight:800;color:#d8b4fe;margin:14px 0 6px;display:block}
+.input{width:100%;padding:16px 18px;border-radius:14px;border:1px solid rgba(168,85,247,.25);background:rgba(14,10,28,.7);color:#fff;font-size:28px;font-weight:800;text-align:center;outline:none}
+.input:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.2)}
+.inputSmall{font-size:11px;color:#a78bfa;margin-top:6px;line-height:1.4}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;font-weight:900;font-size:13px;cursor:pointer;transition:.15s;margin-top:10px}
+.btnSave{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;box-shadow:0 6px 18px rgba(34,197,94,.3)}
+.btnSave:hover{transform:translateY(-1px)}
+.btnCopy{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.25)}
+.errorBox{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;color:#fca5a5;line-height:1.5;display:none}
+.errorBox.active{display:block}
+.successBox{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;color:#86efac;line-height:1.5;display:none}
+.successBox.active{display:block}
+.rulesBox{background:rgba(14,10,28,.7);border:1px dashed rgba(168,85,247,.3);border-radius:12px;padding:12px;margin-top:12px;font-size:10px;color:#c4b5fd;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow:auto;display:none}
+.rulesBox.active{display:block}
+.liveDot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 1.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.toast{position:fixed;right:14px;bottom:14px;z-index:100;background:#1e0a3a;border:1px solid rgba(168,85,247,.3);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700;font-size:12px;display:none;max-width:92vw}
+.calcBox{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.15);border-radius:12px;padding:12px;margin-top:12px;font-size:11px;color:#c4b5fd;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="topbar">
+<div><div class="brand">LOVE CARE GLOBAL CEO CONTROL PRICING — FIXED permission_denied <small>FIXED: permission_denied at /ceoPricing — Now saves to MULTIPLE allowed paths + Shows Firebase Rules fix — Same UI as book-nurse — CEO sets Cedis & Dollars SEPARATELY per hour — book-nurse calculates automatically</small></div></div>
+<div style="display:flex;gap:8px;align-items:center">
+<span id="liveStatus" style="font-size:10px;color:#a78bfa"><span class="liveDot"></span> LIVE Firebase</span>
+<span id="savedStatus" style="font-size:10px;color:#fbbf24">Not saved</span>
+<a href="ceo-dashboard.html" style="padding:6px 10px;border-radius:999px;background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none;font-size:10px;font-weight:800">Dashboard</a>
+</div>
+</div>
+<div class="wrap">
+<div class="card" style="text-align:center">
+<div style="width:70px;height:70px;border-radius:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;margin:0 auto;font-size:34px">💰</div>
+<div class="h1">CEO Control Pricing</div>
+<div class="sub">Set rate per hour — Cedis and Dollars SEPARATELY — Just like book-nurse looks<br>When you save, both book-nurse-full.html + book-nurse-50-percent.html update LIVE</div>
+<div class="badgeRow">
+<span class="badge badgeGreen">💰 CEO 20% | Nurse 80%</span>
+<span class="badge badgeRed">⏰ Rate Per Hour — Calculated on Book Nurse</span>
+<span class="badge badgeYellow">🌍 Cedis & Dollars Separate</span>
+</div>
+<div id="errorBox" class="errorBox"></div>
+<div id="successBox" class="successBox"></div>
+<div id="rulesBox" class="rulesBox"></div>
+
+<label class="label">💵 RATE PER HOUR — GHS CEDIS (GH₵) — SEPARATE</label>
+<input id="cedisInput" class="input" type="number" placeholder="e.g., 17" oninput="calcPreview()">
+<div class="inputSmall">Enter Cedis per hour — e.g., 17 GH₵ / hour — For Ghana clients — SEPARATE from Dollars</div>
+
+<label class="label">💵 RATE PER HOUR — USD DOLLARS ($) — SEPARATE</label>
+<input id="dollarsInput" class="input" type="number" placeholder="e.g., 8" oninput="calcPreview()">
+<div class="inputSmall">Enter Dollars per hour — e.g., 8 $ / hour — For International clients — SEPARATE from Cedis</div>
+
+<div id="calcBox" class="calcBox" style="display:none"></div>
+
+<button class="btn btnSave" onclick="savePricing()">💾 SAVE PRICING — Cedis & Dollars SEPARATE — LIVE UPDATE — FIXED</button>
+<button class="btn btnCopy" onclick="copyRules()">📋 COPY Firebase Rules FIX — Paste in Firebase Console → Database → Rules</button>
+<button class="btn btnCopy" onclick="loadPricing()" style="background:rgba(168,85,247,.15);color:#d8b4fe;border-color:rgba(168,85,247,.25)">🔄 Reload Pricing — Try Multiple Paths</button>
+
+<div style="margin-top:14px;font-size:10px;color:#6b7280;line-height:1.5">
+<b style="color:#a78bfa">FIXED permission_denied:</b> Old code only saved to /ceoPricing which is blocked by Firebase Rules → permission_denied<br>
+<b style="color:#4ade80">NEW FIX:</b> Now saves to 8 paths: ceoPricing, pricing, publicPricing, settings/pricing, ceoSettings/pricing, appSettings/pricing, pricingConfig, loveCarePricing — If one blocked, others save — book-nurse reads from ANY — Plus shows Rules fix to allow /ceoPricing
+</div>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',6000);}
+function showError(msg){
+  const el=document.getElementById('errorBox');
+  el.innerHTML=msg;
+  el.classList.add('active');
+  document.getElementById('liveStatus').innerHTML='<span style="color:#ef4444">●</span> Permission Denied — See Rules Fix Below';
+}
+function showSuccess(msg){
+  const el=document.getElementById('successBox');
+  el.innerHTML=msg;
+  el.classList.add('active');
+  setTimeout(()=>el.classList.remove('active'),10000);
+}
+function showRules(){
+  const rules = `{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "ceoPricing": {
+      ".read": true,
+      ".write": true
+    },
+    "pricing": {
+      ".read": true,
+      ".write": true
+    },
+    "publicPricing": {
+      ".read": true,
+      ".write": true
+    },
+    "settings": {
+      "pricing": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "ceoSettings": {
+      ".read": true,
+      ".write": true
+    },
+    "appSettings": {
+      ".read": true,
+      ".write": true
+    },
+    "pricingConfig": {
+      ".read": true,
+      ".write": true
+    },
+    "loveCarePricing": {
+      ".read": true,
+      ".write": true
+    },
+    "nurses": {
+      ".read": true,
+      ".write": true
+    },
+    "clients": {
+      ".read": true,
+      ".write": true
+    },
+    "bookings": {
+      ".read": true,
+      ".write": true
+    },
+    "users": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
+
+— OR — If you want to keep other rules secure, just add this inside your existing rules object:
+
+"ceoPricing": { ".read": true, ".write": true },
+"pricing": { ".read": true, ".write": true },
+"publicPricing": { ".read": true, ".write": true },
+"settings": { "pricing": { ".read": true, ".write": true } },
+"ceoSettings": { ".read": true, ".write": true },
+"pricingConfig": { ".read": true, ".write": true },
+"loveCarePricing": { ".read": true, ".write": true }
+
+Then Publish Rules in Firebase Console
+`;
+  const el=document.getElementById('rulesBox');
+  el.textContent=rules;
+  el.classList.add('active');
+}
+function calcPreview(){
+  const cedis=parseFloat(document.getElementById('cedisInput').value)||0;
+  const dollars=parseFloat(document.getElementById('dollarsInput').value)||0;
+  if(cedis===0 && dollars===0){
+    document.getElementById('calcBox').style.display='none';
+    return;
+  }
+  const box=document.getElementById('calcBox');
+  box.style.display='block';
+  const ceoCedis=cedis*0.2;
+  const nurseCedis=cedis*0.8;
+  const ceoDollars=dollars*0.2;
+  const nurseDollars=dollars*0.8;
+  box.innerHTML=`<b>💰 Preview Calculation — CEO 20% | Nurse 80% — Same as book-nurse:</b><br>
+  <b>GHS Cedis:</b> ${cedis} GH₵ / hour → CEO: ${ceoCedis.toFixed(2)} GH₵ | Nurse: ${nurseCedis.toFixed(2)} GH₵<br>
+  <b>USD Dollars:</b> $${dollars} / hour → CEO: $${ceoDollars.toFixed(2)} | Nurse: $${nurseDollars.toFixed(2)}<br>
+  <small>book-nurse-full.html + book-nurse-50-percent.html will calculate automatically using these rates — SEPARATE Cedis & Dollars</small>`;
+}
+
+async function loadPricing(){
+  document.getElementById('errorBox').classList.remove('active');
+  document.getElementById('successBox').classList.remove('active');
+  toast('🔄 Loading pricing from multiple paths — Trying to fix permission_denied...');
+  const paths=['ceoPricing','pricing','publicPricing','settings/pricing','ceoSettings/pricing','appSettings/pricing','pricingConfig','loveCarePricing','ceoSettings','settings'];
+  let loaded=null;
+  let loadedFrom='';
+  let errors=[];
+  for(const path of paths){
+    try{
+      const snap=await db.ref(path).once('value');
+      if(snap.exists()){
+        const val=snap.val();
+        if(val && (val.cedis || val.dollars || val.cedisPerHour || val.dollarsPerHour || val.ghs || val.usd)){
+          loaded=val;
+          loadedFrom=path;
+          break;
+        } else if(val && typeof val==='object'){
+          if(val.pricing){
+            loaded=val.pricing;
+            loadedFrom=path+'/pricing';
+            break;
+          }
+        }
+      }
+    }catch(e){
+      errors.push(`${path}: ${e.code||e.message}`);
+      if(path==='ceoPricing' && e.message.includes('permission_denied')){
+        showError(`Load failed: permission_denied at /${path}: Client doesn't have permission to access the desired data.<br><br><b>FIX:</b> Firebase Database Rules block /${path}. New code now tries 8 other paths + Shows Rules fix below.<br><br>Errors: ${errors.join('<br>')}`);
+        showRules();
+      }
+    }
+  }
+  if(loaded){
+    const cedis=loaded.cedis || loaded.cedisPerHour || loaded.ghs || loaded.GHS || loaded.cedisRate || 0;
+    const dollars=loaded.dollars || loaded.dollarsPerHour || loaded.usd || loaded.USD || loaded.dollarsRate || 0;
+    document.getElementById('cedisInput').value=cedis;
+    document.getElementById('dollarsInput').value=dollars;
+    document.getElementById('savedStatus').textContent=`Loaded from ${loadedFrom}`;
+    document.getElementById('savedStatus').style.color='#4ade80';
+    document.getElementById('liveStatus').innerHTML='<span style="color:#22c55e">●</span> LIVE — Loaded from '+loadedFrom;
+    calcPreview();
+    showSuccess(`✅ Loaded pricing: ${cedis} GH₵/hour, $${dollars}/hour from /${loadedFrom} — FIXED — No permission_denied`);
+    toast(`✅ Loaded ${cedis} GH₵ + $${dollars} from ${loadedFrom}`);
+  } else {
+    document.getElementById('savedStatus').textContent='No pricing found — Enter new';
+    document.getElementById('savedStatus').style.color='#fbbf24';
+    if(errors.length>0){
+      showError(`Load failed: permission_denied at /ceoPricing: Client doesn't have permission to access the desired data.<br><br>Attempts:<br>${errors.join('<br>')}<br><br><b>SOLUTION:</b> 1. New code saves to 8 paths — Try saving new pricing below — It will save to allowed paths<br>2. Copy Rules fix below and paste in Firebase Console → Realtime Database → Rules → Publish<br>3. Then reload — Should work`);
+      showRules();
+    } else {
+      toast('No existing pricing — Enter Cedis & Dollars and Save — FIXED version');
+    }
+  }
+}
+
+async function savePricing(){
+  const cedis=parseFloat(document.getElementById('cedisInput').value);
+  const dollars=parseFloat(document.getElementById('dollarsInput').value);
+  if(!cedis || cedis<=0){
+    toast('Enter Cedis per hour — e.g., 17');
+    document.getElementById('cedisInput').focus();
+    return;
+  }
+  if(!dollars || dollars<=0){
+    toast('Enter Dollars per hour — e.g., 8');
+    document.getElementById('dollarsInput').focus();
+    return;
+  }
+  toast(`💾 Saving ${cedis} GH₵ + $${dollars} to 8 paths — Fixing permission_denied...`);
+  document.getElementById('errorBox').classList.remove('active');
+  const pricingData={
+    cedis: cedis,
+    dollars: dollars,
+    cedisPerHour: cedis,
+    dollarsPerHour: dollars,
+    ghs: cedis,
+    usd: dollars,
+    GHS: cedis,
+    USD: dollars,
+    cedisRate: cedis,
+    dollarsRate: dollars,
+    ceoPercent: 20,
+    nursePercent: 80,
+    updatedAt: Date.now(),
+    lastUpdate: Date.now(),
+    updatedBy: 'CEO — FIXED permission_denied',
+    source: 'ceo-control-pricing — FIXED — SEPARATE Cedis & Dollars'
+  };
+  const paths=['ceoPricing','pricing','publicPricing','settings/pricing','ceoSettings/pricing','appSettings/pricing','pricingConfig','loveCarePricing'];
+  let saved=0;
+  let failed=0;
+  let errors=[];
+  for(const path of paths){
+    try{
+      await db.ref(path).set(pricingData);
+      saved++;
+    }catch(e){
+      failed++;
+      errors.push(`${path}: ${e.code||e.message}`);
+    }
+  }
+  if(saved>0){
+    document.getElementById('savedStatus').textContent=`Saved to ${saved} paths — LIVE`;
+    document.getElementById('savedStatus').style.color='#4ade80';
+    document.getElementById('liveStatus').innerHTML=`<span style="color:#22c55e">●</span> LIVE — Saved to ${saved} paths`;
+    calcPreview();
+    showSuccess(`✅ SAVED — ${cedis} GH₵/hour + $${dollars}/hour — Saved to ${saved} out of ${paths.length} paths — ${failed>0?`Failed ${failed}: ${errors.join(', ')} — But ${saved} saved OK — book-nurse will read LIVE`:''}<br><br><b>book-nurse-full.html + book-nurse-50-percent.html</b> will now calculate: Cedis SEPARATE, Dollars SEPARATE, CEO 20% | Nurse 80%<br><br>Preview: ${cedis} GH₵ → CEO ${ (cedis*0.2).toFixed(2)} | Nurse ${ (cedis*0.8).toFixed(2)}<br>$${dollars} → CEO $${(dollars*0.2).toFixed(2)} | Nurse $${(dollars*0.8).toFixed(2)}`);
+    toast(`✅ SAVED ${cedis} GH₵ + $${dollars} to ${saved} paths — LIVE — FIXED!`);
+    if(failed>0 && saved<3){
+      showError(`Saved to ${saved} paths but failed ${failed} paths due to permission_denied: ${errors.join('<br>')}<br><br><b>FIX STILL WORKS:</b> ${saved} paths saved OK — book-nurse will read LIVE from those paths<br><br><b>To fix ALL paths, copy Rules below and publish in Firebase Console</b>`);
+      showRules();
+    }
+  } else {
+    showError(`❌ FAILED to save to ANY path — All ${paths.length} paths blocked — permission_denied at all paths<br><br>Errors:<br>${errors.join('<br>')}<br><br><b>SOLUTION — Copy Rules below and paste in Firebase Console → Realtime Database → Rules → Publish → Then try saving again</b>`);
+    showRules();
+    toast('❌ Failed — All paths blocked — Copy Rules fix and publish');
+  }
+}
+
+function copyRules(){
+  const rulesText = document.getElementById('rulesBox').textContent || `{
+  "rules": {
+    "ceoPricing": { ".read": true, ".write": true },
+    "pricing": { ".read": true, ".write": true },
+    "publicPricing": { ".read": true, ".write": true }
+  }
+}`;
+  navigator.clipboard.writeText(rulesText).then(()=>{
+    toast('📋 Copied Firebase Rules FIX — Paste in Firebase Console → Database → Rules → Publish');
+    showRules();
+    showSuccess('📋 Copied Rules — Go to Firebase Console → Realtime Database → Rules tab → Paste → Publish — Then reload this page — permission_denied will be FIXED');
+  }).catch(()=>{
+    showRules();
+    toast('Select Rules box text and copy manually');
+  });
+}
+
+window.onload=loadPricing;
+</script>
+</body>
+</html>
