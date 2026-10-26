@@ -15,7 +15,7 @@
 ## 📅 BOOKING FLOW
 - [book-nurse.html](https://lovecareglobal.com/book-nurse.html)
 - [book-nurse-full.html](https://lovecareglobal.com/book-nurse-full.html)
-- [book-nurse-50-perc.html](https://lovecareglobal.com/book-nurse-50-perc.html)
+- [book-nurse-50-perc.html](https://lovecareglobal.com/book-nurse-50-percent.html)
 - [book-nurse-START.html](https://lovecareglobal.com/book-nurse-START.html)
 - [find-nurse.html](https://lovecareglobal.com/find-nurse.html)
 - [my-bookings.html](https://lovecareglobal.com/my-bookings.html)
