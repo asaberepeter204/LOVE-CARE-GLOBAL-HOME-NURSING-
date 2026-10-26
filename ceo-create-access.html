@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create Access</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;padding:16px}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 400px at 10% 10%, rgba(76,29,149,.28), transparent 70%),linear-gradient(180deg,#0c0a1e,#120e26)}
+.wrap{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:rgba(26,22,51,.96);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden}
+.header{padding:16px;border-bottom:1px solid rgba(255,255,255,.08);text-align:center}
+.header b{font-size:18px;font-weight:800}
+.body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.inputGroup{display:flex;flex-direction:column;gap:6px}
+.inputGroup label{font-size:12px;font-weight:700}
+.inputGroup input{padding:12px;border-radius:12px;border:1.5px solid rgba(255,255,255,.08);background:rgba(12,10,30,.8);color:#ece8ff;outline:none}
+.btn{padding:12px;border-radius:999px;border:none;font-weight:800;font-size:13px;cursor:pointer}
+.btnGold{background:linear-gradient(135deg,#facc15,#fde68a);color:#000}
+.btnDark{background:rgba(255,255,255,.06);color:#ece8ff;border:1px solid rgba(255,255,255,.08)}
+.status{padding:10px;border-radius:10px;font-size:11px;display:none;text-align:center}
+.status.ok{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac}
+.status.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.list{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow:auto;padding:8px;background:rgba(12,10,30,.6);border-radius:12px;border:1px solid rgba(255,255,255,.08)}
+.row{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(26,22,51,.8)}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#facc15);display:grid;place-items:center;color:#000;font-weight:900}
+.meta{flex:1;min-width:0}
+.meta b{font-size:12px;display:block}
+.meta small{font-size:10px;color:#9a95b8;display:block}
+.del{padding:6px 10px;border-radius:999px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.12);color:#fca5a5;font-size:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap">
+<div class="card">
+<div class="header"><b>Create Access</b></div>
+<div class="body">
+<div class="inputGroup"><label>Full Name</label><input id="name" placeholder="Asabere Peter"></div>
+<div class="inputGroup"><label>Phone Number</label><input id="phone" placeholder="0544121814"></div>
+<div class="inputGroup"><label>Email</label><input id="email" placeholder="ceo@lovecareglobal.com"></div>
+<div id="status" class="status"></div>
+<button class="btn btnGold" onclick="createAccess()">Create</button>
+<a href="ceo-login.html" class="btn btnDark" style="text-decoration:none;text-align:center;display:grid;place-items:center">Go to Login</a>
+
+<b style="font-size:12px;margin-top:8px">Allowed Users</b>
+<div id="accessList" class="list">Loading...</div>
+</div>
+</div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const auth=firebase.auth();
+
+async function ensureAuth(){try{await auth.signInAnonymously();}catch(e){}}
+
+function showStatus(msg, ok){const el=document.getElementById('status');el.textContent=msg;el.className='status '+(ok?'ok':'err');el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+function normalizePhone(p){return (p||'').replace(/[^0-9]/g,'').slice(-10);}
+
+async function createAccess(){
+  const name=document.getElementById('name').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  if(!name || !phone){showStatus('Enter name & phone', false);return;}
+  const phoneNorm=normalizePhone(phone);
+  if(phoneNorm.length<9){showStatus('Enter valid phone', false);return;}
+  try{
+    await ensureAuth();
+    const data={name:name,fullName:name,phone:phone,phoneNorm:phoneNorm,phoneNumber:phone,email:email,createdAt:Date.now(),isAllowed:true,canAccessDashboard:true};
+    await db.ref('ceoAllowedUsers/'+phoneNorm).set(data);
+    await db.ref('ceoAccessList/'+phoneNorm).set(data);
+    await db.ref('ceoDashboardAccess/'+phoneNorm).set(data);
+    await db.ref('allowedCEOs').push(data);
+    showStatus(`Created — ${name} can now login`, true);
+    document.getElementById('name').value='';document.getElementById('phone').value='';document.getElementById('email').value='';
+    loadAccess();
+  }catch(e){showStatus(e.message, false);}
+}
+
+async function loadAccess(){
+  const el=document.getElementById('accessList');
+  el.innerHTML='Loading...';
+  try{
+    await ensureAuth();
+    const snap=await db.ref('ceoAllowedUsers').once('value');
+    let list=[];
+    if(snap.exists()){snap.forEach(ch=>{list.push({id:ch.key, ...ch.val()});});}
+    list=list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if(!list.length){el.innerHTML='<div style="text-align:center;color:#6b6788;padding:20px;font-size:11px">No users</div>';return;}
+    el.innerHTML=list.map(u=>`<div class="row"><div class="avatar">${(u.name||'C')[0].toUpperCase()}</div><div class="meta"><b>${u.name}</b><small>${u.phone} • ${u.email||''}</small></div><button class="del" onclick="deleteAccess('${u.id}')">Delete</button></div>`).join('');
+  }catch(e){el.innerHTML=`<div style="color:#fca5a5">${e.message}</div>`;}
+}
+
+async function deleteAccess(id){
+  if(!confirm('Delete?')) return;
+  try{await ensureAuth();await db.ref('ceoAllowedUsers/'+id).remove();await db.ref('ceoAccessList/'+id).remove();await db.ref('ceoDashboardAccess/'+id).remove();loadAccess();showStatus('Deleted', true);}catch(e){showStatus(e.message,false);}
+}
+
+window.onload=async()=>{await ensureAuth();loadAccess();};
+</script>
+</body>
+</html>
