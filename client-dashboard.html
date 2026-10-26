@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Dashboard - LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.left{display:flex;align-items:center;gap:12px}.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}.hamburger span+span{margin-top:4px}
+.logoBox{display:flex;align-items:center;gap:10px}.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
+.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
+.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
+#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}#overlay.show{display:block}
+#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
+#drawer.open{transform:translateX(0)}.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
+.item.client{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
+.wrap{max-width:480px;margin:0 auto;padding:24px 14px 70px}.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:20px;backdrop-filter:blur(12px);margin-bottom:16px}
+.btn{padding:12px 16px;border-radius:12px;border:none;font-weight:800;cursor:pointer}.status{padding:10px;border-radius:10px;font-size:12px;text-align:center;display:none}
+</style>
+<script>
+// 🔒 ULTRA STRICT CEO PROTECTION - BLOCK NEW GMAIL WITHOUT REGISTRATION
+(function(){const email=(localStorage.getItem('clientEmail')||'').toLowerCase().trim();const isLogged=localStorage.getItem('clientLoggedIn');if(!isLogged||!email){location.replace('client-login.html');return;}})();
+</script>
+<script>
+// 🔒 REAL REGISTRATION CHECK - TELLS NEW CLIENT TO GO BACK AND REGISTER
+async function ultraStrictDashboardCheck(){
+  try{
+    const email=(localStorage.getItem('clientEmail')||'').toLowerCase().trim();if(!email)return;
+    let isRegistered=false;const db=firebase.database();const dbFS=firebase.firestore();
+    const paths=['clients','clientUsers','client_registrations','clientRegistrations','allClients'];
+    for(const p of paths){try{const snap=await db.ref(p).once('value');if(snap.exists()){snap.forEach(ch=>{const v=ch.val()||{};const real=v.profile||v.data||v.clientData||v;const em=(real.email||real.clientEmail||v.email||'').toLowerCase().trim();if(em===email)isRegistered=true;});if(isRegistered)break;}}catch(e){}}
+    if(!isRegistered){try{const fs1=await dbFS.collection('clients').where('email','==',email).get();if(!fs1.empty)isRegistered=true;if(!isRegistered){const fs2=await dbFS.collection('client_registrations').where('email','==',email).get();if(!fs2.empty)isRegistered=true;}}catch(e){}}
+    if(!isRegistered){
+      let count=5;
+      document.body.innerHTML=`<div style="min-height:100vh;display:grid;place-items:center;background:#0c0a1e;color:#fff;font-family:Inter;padding:20px;text-align:center"><div style="max-width:420px;background:#1e1a3a;padding:32px;border:1px solid rgba(255,255,255,.12)"><div style="width:60px;height:60px;background:rgba(239,68,68,.15);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:28px">🚫</div><h2 style="color:#fca5a5;font-size:22px;font-weight:800;margin-bottom:10px">Not Registered</h2><p style="font-size:14px;color:#9a95b8;margin-bottom:8px">Your Gmail <b style="color:#fff">${email}</b> is not registered as Client.</p><p style="font-size:13px;color:#facc15;font-weight:600;margin-bottom:18px">Please go back and complete Client Registration first to access dashboard.</p><p id="countText" style="font-size:12px;color:#a78bfa;margin-bottom:16px">Redirecting to registration in ${count} seconds...</p><button onclick="goRegister()" style="padding:14px 20px;background:#facc15;color:#000;border:none;font-weight:800;cursor:pointer;width:100%;font-size:14px">👉 Go to Registration Now</button><button onclick="goLogin()" style="margin-top:10px;padding:12px 20px;background:transparent;color:#9a95b8;border:1px solid rgba(255,255,255,.15);cursor:pointer;width:100%">Back to Login</button></div></div>`;
+      window.goRegister=function(){localStorage.setItem('pendingGoogleEmail',email);localStorage.clear();sessionStorage.clear();localStorage.setItem('pendingGoogleEmail',email);firebase.auth().signOut().then(()=>{location.replace('client-register.html?from=dashboard_block&email='+encodeURIComponent(email));});};
+      window.goLogin=function(){localStorage.clear();sessionStorage.clear();location.replace('client-login.html');};
+      const timer=setInterval(()=>{count--;const el=document.getElementById('countText');if(el)el.textContent='Redirecting to registration in '+count+' seconds...';if(count<=0){clearInterval(timer);goRegister();}},1000);
+      localStorage.removeItem('clientLoggedIn');try{await firebase.auth().signOut();}catch(e){}return;
+    }
+  }catch(err){console.error(err);}
+}
+</script>
+</head>
+<body>
+<div class="bg"></div>
+<div class="topbar"><div class="left"><div class="hamburger" onclick="toggleDrawer()"><div><span></span><span></span><span></span></div></div><div class="logoBox"><img class="logoImg" src="icon-transparent-512.png" alt="logo"><div class="brand">LOVE CARE<br>GLOBAL</div></div></div><a class="sosBtn" href="sos.html">SOS</a></div>
+<div id="overlay" onclick="toggleDrawer()"></div>
+<div id="drawer"><div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.12);display:flex;justify-content:space-between;align-items:center"><div style="font-weight:800">Menu</div><div onclick="toggleDrawer()" style="cursor:pointer">✕</div></div><div style="padding:14px;display:flex;flex-direction:column;gap:10px"><a class="item client" href="client-dashboard.html">📊 Dashboard</a><a class="item" href="client-profile.html">👤 My Profile</a><a class="item consent" href="consent.html">📝 Give Consent</a><a class="item sos" href="sos.html">🚨 Emergency SOS</a><a class="item" href="#" onclick="logout()">🚪 Logout</a></div></div>
+<div class="wrap"><div class="card"><h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Welcome, <span id="clientName">Client</span> 👋</h2><p style="font-size:13px;color:#a78bfa" id="clientEmailDisplay"></p></div><div class="card"><h3 style="font-size:14px;font-weight:800;margin-bottom:12px">Quick Actions</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><a class="btn" href="consent.html" style="background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;text-align:center;text-decoration:none">Give Consent</a><a class="btn" href="sos.html" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;text-align:center;text-decoration:none">SOS Help</a></div></div><div class="card" id="profileCard"><h3 style="font-size:14px;font-weight:800;margin-bottom:10px">Your Profile</h3><p style="font-size:12px;color:#9a95b8">Loading...</p></div></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth();const db=firebase.database();const dbFS=firebase.firestore();
+function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+function logout(){localStorage.clear();sessionStorage.clear();auth.signOut().then(()=>{location.replace('client-login.html');});}
+setTimeout(()=>{if(typeof firebase!=='undefined')ultraStrictDashboardCheck();},800);
+auth.onAuthStateChanged(async(user)=>{
+  if(!user){const email=localStorage.getItem('clientEmail');if(!email)location.replace('client-login.html');return;}
+  const email=(user.email||localStorage.getItem('clientEmail')||'').toLowerCase();const name=user.displayName||localStorage.getItem('clientName')||'Client';
+  document.getElementById('clientName').textContent=name;document.getElementById('clientEmailDisplay').textContent=email;
+  try{const paths=['clients','clientUsers','client_registrations'];for(const p of paths){const snap=await db.ref(p).once('value');if(snap.exists()){snap.forEach(ch=>{const v=ch.val()||{};const real=v.profile||v.data||v.clientData||v;const em=(real.email||'').toLowerCase();if(em===email){document.getElementById('profileCard').innerHTML=`<h3 style="font-size:14px;font-weight:800;margin-bottom:10px">Your Profile</h3><p style="font-size:13px"><b>Name:</b> ${real.name||real.fullName||name}</p><p style="font-size:13px"><b>Email:</b> ${em}</p><p style="font-size:13px"><b>Phone:</b> ${real.phone||real.phoneNumber||'N/A'}</p>`;}});}}}catch(e){}
+});
+</script>
+</body>
+</html>
