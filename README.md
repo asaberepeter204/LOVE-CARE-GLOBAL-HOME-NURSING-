@@ -12,6 +12,7 @@
 - [ceo-login.html](https://lovecareglobal.com/ceo-login.html)
 - [ceo-staff-password.html](https://lovecareglobal.com/ceo-staff-password.html)
 - https://lovecareglobal.com/ceo-create-access.html
+- https://lovecareglobal.com/ceo-force-wipe-email.html
 
 ## 📅 BOOKING FLOW
 - [book-nurse.html](https://lovecareglobal.com/book-nurse.html)
