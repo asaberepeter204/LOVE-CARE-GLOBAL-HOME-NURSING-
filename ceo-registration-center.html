@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Registration Center — Nurses + Clients — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(700px 400px at 10% 10%,rgba(76,29,149,.25) 0%,transparent 60%),radial-gradient(600px 400px at 90% 20%,rgba(107,33,168,.18) 0%,transparent 60%),linear-gradient(180deg,#0e0a1c,#120e26)}
+.topbar{position:sticky;top:0;z-index:60;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.2);padding:12px 16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.brand{font-weight:800;font-size:13px}.brand small{display:block;font-size:8px;color:#a78bfa;margin-top:2px}
+.liveDot{width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 1.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.wrap{max-width:1360px;margin:0 auto;padding:14px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;position:sticky;top:54px;z-index:50;background:rgba(14,10,28,.96);padding:10px 0;border-bottom:1px solid rgba(168,85,247,.15)}
+.tab{padding:10px 14px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(28,18,56,.6);color:#d8b4fe;font-weight:800;font-size:11px;cursor:pointer}
+.tab.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 6px 18px rgba(168,85,247,.3)}
+.tab small{background:rgba(0,0,0,.2);padding:2px 6px;border-radius:999px;margin-left:4px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.input{padding:10px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#fff;font-size:12px;flex:1;min-width:180px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:16px}
+.card{background:rgba(28,18,56,.96);border:1px solid rgba(168,85,247,.18);border-radius:18px;padding:16px;position:relative;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.card.clientCard{border-color:rgba(59,130,246,.25);background:rgba(22,26,56,.96)}
+.card.blocked{border-color:rgba(239,68,68,.5);background:rgba(56,22,26,.96);box-shadow:0 0 20px rgba(239,68,68,.2)}
+.badge{font-size:9px;font-weight:900;padding:4px 8px;border-radius:999px;display:inline-flex;border:1px solid;margin:2px}
+.badgePending{background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.25)}
+.badgeApproved{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.25)}
+.badgeRejected{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.25)}
+.badgeBlocked{background:rgba(239,68,68,.2);color:#fca5a5;border-color:rgba(239,68,68,.4)}
+.badgeActive{background:rgba(34,197,94,.2);color:#4ade80;border-color:rgba(34,197,94,.4)}
+.badgeName{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.3);font-size:10px}
+.badgeClient{background:rgba(59,130,246,.15);color:#93c5fd;border-color:rgba(59,130,246,.3);font-size:10px}
+.badgeNurse{background:rgba(168,85,247,.15);color:#d8b4fe;border-color:rgba(168,85,247,.3);font-size:10px}
+.head{display:flex;gap:12px}
+.avatar{width:60px;height:60px;border-radius:50%;background:#2e1065;border:2px solid rgba(168,85,247,.25);display:grid;place-items:center;font-weight:900;overflow:hidden;flex-shrink:0;font-size:22px;color:#fff;cursor:pointer}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.meta{flex:1;min-width:0}.meta h3{font-size:16px;font-weight:800;color:#f3e8ff;line-height:1.2}.meta small{font-size:11px;color:#a78bfa;display:block;line-height:1.4;margin-top:4px}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.details{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.15);border-radius:12px;padding:12px;margin-top:10px;font-size:11px;line-height:1.6;color:#c4b5fd}
+.details b{color:#f3e8ff}
+.docRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.docBtn{font-size:10px;padding:8px 12px;border-radius:999px;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.15);color:#d8b4fe;font-weight:800;display:inline-flex;cursor:pointer;text-decoration:none}
+.docBtn.has{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac}
+.mapMini{height:130px;border-radius:12px;margin-top:8px;border:1px solid rgba(168,85,247,.15);overflow:hidden}
+.actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.btn{flex:1;padding:12px;border-radius:12px;font-weight:900;font-size:11px;border:none;cursor:pointer;min-width:110px;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btnAccept{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16}
+.btnReject{background:linear-gradient(135deg,#ef4444,#991b1b);color:white}
+.btnDelete{background:linear-gradient(135deg,#ef4444,#7f1d1d);color:white;box-shadow:0 4px 12px rgba(239,68,68,.3)}
+.btnBlock{background:linear-gradient(135deg,#f59e0b,#d97706);color:white;box-shadow:0 4px 12px rgba(245,158,11,.3)}
+.btnUnblock{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;box-shadow:0 4px 12px rgba(34,197,94,.3)}
+.toast{position:fixed;right:14px;bottom:14px;z-index:200;background:#1e0a3a;border:1px solid rgba(168,85,247,.3);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700;font-size:12px;display:none;max-width:92vw;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.empty{padding:30px;text-align:center;color:#a78bfa;font-size:13px;border:1px dashed rgba(168,85,247,.2);border-radius:18px;background:rgba(28,18,56,.4)}
+.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);display:none;place-items:center;padding:16px}
+.modal.active{display:grid}
+.modalCard{background:#1a1633;border:1px solid rgba(168,85,247,.3);border-radius:20px;max-width:900px;width:100%;max-height:94vh;overflow:auto}
+.modalHeader{padding:16px 18px;border-bottom:1px solid rgba(168,85,247,.15);display:flex;justify-content:space-between;align-items:center}
+.modalBody{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.previewImg{max-width:100%;max-height:72vh;border-radius:12px;display:block;margin:0 auto}
+.deleteWarning{background:rgba(239,68,68,.1);border:2px solid rgba(239,68,68,.3);border-radius:12px;padding:12px;margin-top:10px;display:none}
+.deleteWarning.active{display:block}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="topbar">
+<div><div class="brand">LOVE CARE GLOBAL <span class="liveDot"></span> CEO REGISTRATION CENTER — NURSES + CLIENTS — DELETE/BLOCK/UNBLOCK <small>FIXED: Nurses now have DELETE/BLOCK/UNBLOCK + Clients from Firestore+Realtime</small></div></div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<span id="counts" style="font-size:11px;color:#a78bfa">Loading...</span>
+<a href="ceo-dashboard.html" style="padding:8px 12px;border-radius:999px;background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none;font-size:11px;font-weight:800">Dashboard</a>
+</div>
+</div>
+<div class="wrap">
+<div class="controls">
+<input id="search" class="input" placeholder="Search Asabere Peter, Google client, email, phone..." oninput="render()">
+<select id="sort" class="input" style="max-width:170px" onchange="render()"><option value="updated">Last Update first</option><option value="newest">Newest first</option><option value="name">Name A-Z</option></select>
+<button class="tab" onclick="loadAll()" style="margin:0">Refresh — FIXED</button>
+</div>
+<div class="tabs">
+<button class="tab active" data-tab="pendingNurses" onclick="switchTab('pendingNurses')">Pending Nurses <small id="c_pendingNurses">0</small></button>
+<button class="tab" data-tab="approvedNurses" onclick="switchTab('approvedNurses')">Approved Nurses <small id="c_approvedNurses">0</small></button>
+<button class="tab" data-tab="rejectedNurses" onclick="switchTab('rejectedNurses')">Rejected Nurses <small id="c_rejectedNurses">0</small></button>
+<button class="tab" data-tab="blockedNurses" onclick="switchTab('blockedNurses')">Blocked Nurses <small id="c_blockedNurses">0</small></button>
+<button class="tab" data-tab="clients" onclick="switchTab('clients')">Clients — DELETE/BLOCK <small id="c_clients">0</small></button>
+<button class="tab" data-tab="blockedClients" onclick="switchTab('blockedClients')">Blocked Clients <small id="c_blockedClients">0</small></button>
+<button class="tab" data-tab="allUpdates" onclick="switchTab('allUpdates')">ALL <small id="c_allUpdates">0</small></button>
+</div>
+<div id="grid" class="grid"></div>
+<div id="empty" class="empty" style="display:none">No records</div>
+</div>
+<div id="toast" class="toast"></div>
+<div id="previewModal" class="modal" onclick="if(event.target===this) closePreview()"><div class="modalCard"><div class="modalHeader"><h3 id="previewTitle" style="font-size:14px">Preview</h3><button onclick="closePreview()" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(255,255,255,.06);color:#fff;cursor:pointer">Close</button></div><div class="modalBody" id="previewBody"></div></div></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const dbFS=firebase.firestore();
+let allData={pendingNurses:[],approvedNurses:[],rejectedNurses:[],blockedNurses:[],clients:[],blockedClients:[],allUpdates:[]};
+let currentTab='pendingNurses';
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',7000);}
+function switchTab(tab){currentTab=tab;document.querySelectorAll('.tab[data-tab]').forEach(b=>b.classList.remove('active'));const el=document.querySelector(`.tab[data-tab="${tab}"]`);if(el) el.classList.add('active');render();}
+function formatTime(ts){if(!ts||ts===0)return'no date';const diff=Date.now()-ts;if(diff<60000)return'just now';if(diff<3600000)return Math.floor(diff/60000)+'m ago';if(diff<86400000)return Math.floor(diff/3600000)+'h ago';if(diff<86400000*7)return Math.floor(diff/86400000)+'d ago';return new Date(ts).toLocaleString();}
+function extractRealName(v){
+  if(!v||typeof v!=='object') return 'Unnamed';
+  let name = v.displayName || v.fullName || v.name || v.nurseName || v.clientName || '';
+  if(!name){
+    const first = v.firstName || v.first_name || v.fName || '';
+    const last = v.lastName || v.last_name || v.lName || '';
+    if(first||last) name = `${first} ${last}`.trim();
+  }
+  if(!name && v.email){
+    const en = v.email.split('@')[0].replace(/[._-]/g,' ').replace(/\d+/g,'').trim();
+    if(en.length>2) name = en.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+  }
+  if(!name) name = 'Unnamed';
+  return name.trim().substring(0,60);
+}
+function normalizeNurse(id,v){
+  if(!v||typeof v!=='object') return null;
+  let real=v.profile||v.data||v;
+  if(real.profile) real=real.profile;
+  const isBlocked = real.isBlocked===true || real.blocked===true || real.status==='blocked';
+  const isApproved = real.isApproved===true || real.approved===true || real.status==='approved';
+  const isRejected = real.isRejected===true || real.rejected===true || real.status==='rejected';
+  let status='pending';
+  if(isBlocked) status='blocked';
+  else if(isApproved) status='approved';
+  else if(isRejected) status='rejected';
+  return {
+    id, type:'nurse', fullName: extractRealName(real),
+    email: real.email || '', phone: real.phone || real.phoneNumber || '',
+    country: real.country || '', experience: real.experience || '',
+    qualification: real.qualification || '', services: real.services || '',
+    bio: real.bio || '', referenceName: real.referenceName || '', referencePhone: real.referencePhone || '',
+    lat: real.lat || null, lng: real.lng || null, gpsActualName: real.gpsActualName || real.location || '',
+    photo: real.photo || real.photoURL || '', idURL: real.idURL || '', licenceURL: real.licenceURL || '', cvURL: real.cvURL || '', videoURL: real.videoURL || '',
+    isApproved, isRejected, isBlocked, status, rating: real.rating || 5.0,
+    createdAt: real.createdAt || 0, updatedAt: real.updatedAt || real.lastUpdate || real.createdAt || 0, raw: real
+  };
+}
+function normalizeClient(id,v){
+  if(!v||typeof v!=='object') return null;
+  let real = v.profile || v.data || v.clientData || v.clientInfo || v;
+  if(real.profile) real = real.profile;
+  const isGoogle = real.provider==='google' || real.isGoogleLogin===true;
+  const isBlocked = real.isBlocked===true || real.blocked===true || real.status==='blocked';
+  const photo = real.photo || real.photoURL || real.avatar || '';
+  const email = real.email || real.clientEmail || real.googleEmail || '';
+  const phone = real.phone || real.phoneNumber || real.clientPhone || '';
+  if(!email && !phone) return null;
+  return {
+    id, type:'client', fullName: extractRealName(real),
+    email: email, phone: phone, country: real.country || '', address: real.address || real.location || real.gpsActualName || '',
+    photo: photo, isBlocked: isBlocked, isGoogleLogin: isGoogle, provider: real.provider || (isGoogle?'google':'email'),
+    status: isBlocked?'blocked':'client',
+    createdAt: real.createdAt || 0, updatedAt: real.updatedAt || real.lastUpdate || real.lastLogin || real.createdAt || 0, raw: real
+  };
+}
+async function loadAll(){
+  toast('Loading Nurses+Clients — FIXED...');
+  const nursePaths=['nurses','nurse_registrations','pendingNurseRegistrations','nurseUsers','nurseRegistrations','allNurses'];
+  const clientPaths=['clients','client_registrations','pendingClientRegistrations','clientUsers','clientRegistrations','users','googleClients','googleUsers','clientGoogleLogins','authUsers'];
+  let nurseMap={},clientMap={};
+  for(const p of nursePaths){
+    try{
+      const snap=await db.ref(p).once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const id=ch.key; let val=ch.val(); if(!val||typeof val!=='object') return;
+          let realVal = val.profile || val.data || val;
+          if(!nurseMap[id]) nurseMap[id]=realVal; else nurseMap[id]={...nurseMap[id],...realVal};
+        });
+      }
+    }catch(e){}
+  }
+  for(const p of clientPaths){
+    try{
+      const snap=await db.ref(p).once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const id=ch.key; let val=ch.val(); if(!val||typeof val!=='object') return;
+          let realVal = val.profile || val.data || val.clientData || val.clientInfo || val;
+          if(realVal.role==='nurse' || realVal.type==='nurse') {
+            if(!nurseMap[id]) nurseMap[id]=realVal;
+            return;
+          }
+          if(realVal.services && realVal.qualification && realVal.experience && realVal.licenceURL && !realVal.email?.includes('client')){
+            if(!nurseMap[id]) nurseMap[id]=realVal;
+            return;
+          }
+          if(!clientMap[id]) clientMap[id]=realVal; else clientMap[id]={...clientMap[id],...realVal};
+        });
+      }
+    }catch(e){}
+  }
+  try{
+    const fsSnap = await dbFS.collection('clients').get();
+    fsSnap.forEach(doc=>{ const id=doc.id; const val=doc.data(); if(!val) return; if(!clientMap[id]) clientMap[id]=val; else clientMap[id]={...clientMap[id],...val}; });
+  }catch(e){}
+  try{
+    const fsSnapN = await dbFS.collection('nurses').get();
+    fsSnapN.forEach(doc=>{ const id=doc.id; const val=doc.data(); if(!val) return; if(!nurseMap[id]) nurseMap[id]=val; else nurseMap[id]={...nurseMap[id],...val}; });
+  }catch(e){}
+  try{
+    const fsSnap3 = await dbFS.collection('client_registrations').get();
+    fsSnap3.forEach(doc=>{ const id=doc.id; const val=doc.data(); if(!val) return; if(!clientMap[id]) clientMap[id]=val; });
+  }catch(e){}
+  try{
+    const fsSnap4 = await dbFS.collection('nurse_registrations').get();
+    fsSnap4.forEach(doc=>{ const id=doc.id; const val=doc.data(); if(!val) return; if(!nurseMap[id]) nurseMap[id]=val; });
+  }catch(e){}
+
+  let pending=[],approved=[],rejected=[],blockedN=[],clients=[],blockedC=[],all=[];
+  Object.entries(nurseMap).forEach(([id,v])=>{
+    const n=normalizeNurse(id,v); if(!n) return; all.push(n);
+    if(n.isBlocked) blockedN.push(n);
+    else if(n.isApproved) approved.push(n);
+    else if(n.isRejected) rejected.push(n);
+    else pending.push(n);
+  });
+  Object.entries(clientMap).forEach(([id,v])=>{
+    const c=normalizeClient(id,v);
+    if(!c){
+      if(v.email || v.clientEmail){
+        const forced={id,type:'client',fullName: extractRealName(v.profile||v), email: v.email||v.clientEmail||'', phone: v.phone||'', country:'', address:'', photo: v.photoURL||'', isBlocked: v.isBlocked||false, isGoogleLogin: v.provider==='google', provider:'email', status: v.isBlocked?'blocked':'client', createdAt: v.createdAt||Date.now(), updatedAt: Date.now(), raw: v};
+        if(forced.isBlocked) blockedC.push(forced); else clients.push(forced);
+        all.push(forced);
+      }
+      return;
+    }
+    if(c.isBlocked) blockedC.push(c); else clients.push(c);
+    all.push(c);
+  });
+  all.sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
+  allData={pendingNurses:pending,approvedNurses:approved,rejectedNurses:rejected,blockedNurses:blockedN,clients:clients,blockedClients:blockedC,allUpdates:all};
+  document.getElementById('c_pendingNurses').textContent=pending.length;
+  document.getElementById('c_approvedNurses').textContent=approved.length;
+  document.getElementById('c_rejectedNurses').textContent=rejected.length;
+  document.getElementById('c_blockedNurses').textContent=blockedN.length;
+  document.getElementById('c_clients').textContent=clients.length;
+  document.getElementById('c_blockedClients').textContent=blockedC.length;
+  document.getElementById('c_allUpdates').textContent=all.length;
+  document.getElementById('counts').textContent=`Nurses: ${pending.length}p ${approved.length}a ${rejected.length}r ${blockedN.length}b | Clients: ${clients.length} active ${blockedC.length} blocked`;
+  render();
+  toast(`Loaded: ${pending.length+approved.length+rejected.length+blockedN.length} nurses + ${clients.length+blockedC.length} clients`);
+}
+function viewParticular(url, type, name){
+  if(!url || url.length<5){toast(`No ${type} for ${name}`);return;}
+  const lower=url.toLowerCase(); const isImg=lower.includes('.jpg')||lower.includes('.jpeg')||lower.includes('.png')||lower.includes('image')||type.includes('Photo');
+  const isVid=lower.includes('.mp4')||lower.includes('video')||type.includes('Video');
+  const modal=document.getElementById('previewModal'); const title=document.getElementById('previewTitle'); const body=document.getElementById('previewBody');
+  title.textContent=`${type} — ${name}`;
+  if(isImg && !isVid){
+    body.innerHTML=`<img src="${url}" class="previewImg"><div style="margin-top:12px;display:flex;gap:8px"><a href="${url}" target="_blank" style="flex:1;padding:12px;border-radius:12px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;text-align:center;text-decoration:none;font-weight:800">Open in New Tab</a><button onclick="closePreview()" style="flex:1;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(168,85,247,.2);cursor:pointer">Close</button></div>`;
+  } else if(isVid){
+    body.innerHTML=`<video src="${url}" controls autoplay style="width:100%;max-height:65vh;border-radius:12px;background:#000"></video><div style="margin-top:12px;display:flex;gap:8px"><a href="${url}" target="_blank" style="flex:1;padding:12px;border-radius:12px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;text-align:center;text-decoration:none;font-weight:800">Open in New Tab</a><button onclick="closePreview()" style="flex:1;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(168,85,247,.2);cursor:pointer">Close</button></div>`;
+  } else {
+    body.innerHTML=`<a href="${url}" target="_blank" style="color:#93c5fd;word-break:break-all">${url}</a><iframe src="${url}" style="width:100%;height:65vh;border-radius:12px;border:1px solid rgba(168,85,247,.2);margin-top:12px;background:#fff"></iframe>`;
+  }
+  modal.classList.add('active');
+}
+function closePreview(){document.getElementById('previewModal').classList.remove('active');}
+function render(){
+  const grid=document.getElementById('grid'); const empty=document.getElementById('empty');
+  const search=document.getElementById('search').value.toLowerCase().trim(); const sort=document.getElementById('sort').value;
+  let list=[...(allData[currentTab]||[])];
+  if(search){list=list.filter(i=>`${i.fullName} ${i.email} ${i.phone} ${i.country} ${i.id}`.toLowerCase().includes(search));}
+  if(sort==='name') list.sort((a,b)=>a.fullName.localeCompare(b.fullName));
+  else if(sort==='newest') list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  else list.sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
+  grid.innerHTML=''; if(list.length===0){empty.style.display='block';return;} empty.style.display='none';
+  list.forEach(item=>{
+    const isNurse=item.type==='nurse';
+    const isBlocked=item.isBlocked||item.status==='blocked';
+    const isGoogleClient=item.isGoogleLogin;
+    if(isNurse){
+      const statusBadge=item.status==='blocked'?'<span class="badge badgeBlocked">BLOCKED</span>':item.status==='approved'?'<span class="badge badgeApproved">Approved</span>':item.status==='rejected'?'<span class="badge badgeRejected">Rejected</span>':'<span class="badge badgePending">Pending</span>';
+      const blockBadge=isBlocked?'<span class="badge badgeBlocked">Nurse BLOCKED</span>':'<span class="badge badgeActive">Nurse ACTIVE</span>';
+      const photoHtml=item.photo?`<img src="${item.photo}" style="width:100%;height:100%;object-fit:cover">`:item.fullName.charAt(0).toUpperCase();
+      const details=`<div class="details"><b>Nurse Particulars:</b> ${blockBadge}<br>Email: ${item.email||'no email'}<br>Phone: ${item.phone||'no phone'}<br>Country: ${item.country||'-'}<br>Exp: ${item.experience||'-'}<br>Qual: ${item.qualification||'-'}<br>Services: ${item.services||'-'}<br>Bio: ${item.bio||'-'}<br>Blocked: ${isBlocked?'YES':'NO'}<br>Created: ${formatTime(item.createdAt)} • Updated: ${formatTime(item.updatedAt)}</div>`;
+      const photoBtn=item.photo?`<button class="docBtn has" onclick="viewParticular('${item.photo}','Photo','${item.fullName.replace(/'/g,'')}')">Photo</button>`:`<span class="docBtn" style="opacity:.3">No Photo</span>`;
+      const idBtn=item.idURL?`<button class="docBtn has" onclick="viewParticular('${item.idURL}','ID','${item.fullName.replace(/'/g,'')}')">ID</button>`:`<span class="docBtn" style="opacity:.3">No ID</span>`;
+      const licBtn=item.licenceURL?`<button class="docBtn has" onclick="viewParticular('${item.licenceURL}','Licence','${item.fullName.replace(/'/g,'')}')">Licence</button>`:`<span class="docBtn" style="opacity:.3">No Licence</span>`;
+      const cvBtn=item.cvURL?`<button class="docBtn has" onclick="viewParticular('${item.cvURL}','CV','${item.fullName.replace(/'/g,'')}')">CV</button>`:`<span class="docBtn" style="opacity:.3">No CV</span>`;
+      const vidBtn=item.videoURL?`<button class="docBtn has" onclick="viewParticular('${item.videoURL}','Video','${item.fullName.replace(/'/g,'')}')">Video</button>`:`<span class="docBtn" style="opacity:.3">No Video</span>`;
+      const acceptBtn = item.status!=='approved' && !isBlocked ? `<button class="btn btnAccept" onclick="acceptNurse('${item.id}')">ACCEPT</button>` : '';
+      const rejectBtn = item.status!=='rejected' && !isBlocked ? `<button class="btn btnReject" onclick="rejectNurse('${item.id}')">REJECT</button>` : '';
+      const blockBtn = isBlocked ? `<button class="btn btnUnblock" onclick="unblockNurse('${item.id}')">UNBLOCK NURSE — ${item.fullName}</button>` : `<button class="btn btnBlock" onclick="blockNurse('${item.id}')">BLOCK NURSE — ${item.fullName}</button>`;
+      const deleteBtn = `<button class="btn btnDelete" onclick="deleteNurse('${item.id}')">DELETE NURSE — ${item.fullName}</button>`;
+      const warnBox=`<div id="delWarn_${item.id}" class="deleteWarning"><b style="color:#ef4444">DELETE NURSE — Type DELETE</b><br><input id="delInput_${item.id}" placeholder="Type DELETE" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fff"><div style="display:flex;gap:8px;margin-top:8px"><button onclick="confirmDeleteNurse('${item.id}')" style="flex:1;padding:10px;border-radius:10px;background:#000;color:#ef4444;border:1px solid rgba(239,68,68,.5);font-weight:900;cursor:pointer">CONFIRM DELETE</button><button onclick="cancelDeleteNurse('${item.id}')" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.1);cursor:pointer">Cancel</button></div></div>`;
+      const card=document.createElement('div'); card.className='card'+(isBlocked?' blocked':'');
+      card.innerHTML=`<div class="head"><div class="avatar" onclick="viewParticular('${item.photo}','Photo','${item.fullName.replace(/'/g,'')}')">${photoHtml}</div><div class="meta"><h3>${item.fullName} <span style="font-size:10px;color:#a78bfa">Nurse</span></h3><small>Email: ${item.email}<br>Phone: ${item.phone}</small><div class="row">${statusBadge} <span class="badge badgeNurse">Nurse</span></div></div></div>${details}<div class="docRow">${photoBtn} ${idBtn} ${licBtn} ${cvBtn} ${vidBtn}</div><div class="actions">${acceptBtn} ${rejectBtn}</div><div class="actions">${deleteBtn} ${blockBtn}</div>${warnBox}`;
+      grid.appendChild(card);
+    } else {
+      const statusBadge=isBlocked?'<span class="badge badgeBlocked">BLOCKED</span>':'<span class="badge badgeActive">ACTIVE</span>';
+      const googleBadge=isGoogleClient?'<span class="badge" style="background:rgba(66,133,244,.15);color:#4285f4;border-color:rgba(66,133,244,.3)">Google</span>':'';
+      const photoHtml=item.photo?`<img src="${item.photo}" style="width:100%;height:100%;object-fit:cover">`:item.fullName.charAt(0).toUpperCase();
+      const details=`<div class="details"><b>Client:</b> ${statusBadge} ${googleBadge}<br>Email: ${item.email||'no email'}<br>Phone: ${item.phone||'no phone'}<br>Country: ${item.country||'-'}<br>Address: ${item.address||'-'}<br>Blocked: ${isBlocked?'YES':'NO'}<br>Created: ${formatTime(item.createdAt)}<br>Updated: ${formatTime(item.updatedAt)}</div>`;
+      const photoBtn=item.photo?`<button class="docBtn has" onclick="viewParticular('${item.photo}','Client Photo','${item.fullName.replace(/'/g,'')}')">Photo</button>`:`<span class="docBtn" style="opacity:.3">No Photo</span>`;
+      const blockBtn = isBlocked ? `<button class="btn btnUnblock" onclick="unblockClient('${item.id}')">UNBLOCK — ${item.fullName}</button>` : `<button class="btn btnBlock" onclick="blockClient('${item.id}')">BLOCK — ${item.fullName}</button>`;
+      const deleteBtn=`<button class="btn btnDelete" onclick="deleteClient('${item.id}')">DELETE — ${item.fullName}</button>`;
+      const warnBox=`<div id="delWarn_${item.id}" class="deleteWarning"><b style="color:#ef4444">DELETE — Type DELETE</b><br><input id="delInput_${item.id}" placeholder="Type DELETE" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fff"><div style="display:flex;gap:8px;margin-top:8px"><button onclick="confirmDeleteClient('${item.id}')" style="flex:1;padding:10px;border-radius:10px;background:#000;color:#ef4444;border:1px solid rgba(239,68,68,.5);font-weight:900;cursor:pointer">CONFIRM DELETE</button><button onclick="cancelDeleteClient('${item.id}')" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.1);cursor:pointer">Cancel</button></div></div>`;
+      const card=document.createElement('div'); card.className='card clientCard'+(isBlocked?' blocked':'');
+      card.innerHTML=`<div class="head"><div class="avatar" onclick="viewParticular('${item.photo}','Client Photo','${item.fullName.replace(/'/g,'')}')">${photoHtml}</div><div class="meta"><h3>${item.fullName} <span style="font-size:10px;color:#93c5fd">Client</span> ${isGoogleClient?'<span style="background:#4285f4;color:white;padding:2px 6px;border-radius:999px;font-size:9px">Google</span>':''}</h3><small>Email: ${item.email}<br>Phone: ${item.phone}</small><div class="row"><span class="badge badgeClient">Client</span>${statusBadge} ${googleBadge}</div></div></div>${details}<div class="docRow">${photoBtn}</div><div class="actions">${deleteBtn} ${blockBtn}</div>${warnBox}`;
+      grid.appendChild(card);
+    }
+  });
+}
+// NURSE ACTIONS
+async function acceptNurse(id){ try{ await db.ref('nurses/'+id).update({isApproved:true,isRejected:false,isBlocked:false,status:'approved',approvedAt:Date.now()}); await dbFS.collection('nurses').doc(id).set({isApproved:true,status:'approved'},{merge:true}); toast('✅ Nurse Approved'); loadAll(); }catch(e){ toast('Failed: '+e.message); } }
+async function rejectNurse(id){ if(!confirm('Reject nurse?')) return; try{ await db.ref('nurses/'+id).update({isRejected:true,isApproved:false,status:'rejected',rejectedAt:Date.now()}); await dbFS.collection('nurses').doc(id).set({isRejected:true,status:'rejected'},{merge:true}); toast('Nurse Rejected'); loadAll(); }catch(e){ toast('Failed: '+e.message); } }
+async function blockNurse(id){
+  if(!confirm('BLOCK this NURSE? They will NOT be able to login.')) return;
+  toast('Blocking nurse '+id+'...');
+  try{
+    const paths=['nurses','nurse_registrations','pendingNurseRegistrations','nurseUsers','nurseRegistrations','allNurses'];
+    for(const p of paths){ try{ await db.ref(p+'/'+id).update({isBlocked:true, blocked:true, status:'blocked', blockedAt:Date.now()}); }catch(e){} }
+    try{ await dbFS.collection('nurses').doc(id).set({isBlocked:true, blocked:true, status:'blocked', blockedAt: Date.now()},{merge:true}); }catch(e){}
+    try{ await dbFS.collection('nurse_registrations').doc(id).set({isBlocked:true, blocked:true, status:'blocked'},{merge:true}); }catch(e){}
+    toast('✅ Nurse BLOCKED — Cannot login'); setTimeout(()=>loadAll(),1200);
+  }catch(e){ toast('Block failed: '+e.message); }
+}
+async function unblockNurse(id){
+  if(!confirm('UNBLOCK this nurse?')) return;
+  toast('Unblocking nurse...');
+  try{
+    const paths=['nurses','nurse_registrations','nurseUsers','nurseRegistrations'];
+    for(const p of paths){ try{ await db.ref(p+'/'+id).update({isBlocked:false, blocked:false, status:'approved', unblockedAt:Date.now(), isApproved:true}); }catch(e){} }
+    try{ await dbFS.collection('nurses').doc(id).set({isBlocked:false, blocked:false, status:'approved', isApproved:true},{merge:true}); }catch(e){}
+    toast('✅ Nurse UNBLOCKED'); setTimeout(()=>loadAll(),1200);
+  }catch(e){ toast('Unblock failed: '+e.message); }
+}
+async function deleteNurse(id){
+  const warn=document.getElementById('delWarn_'+id);
+  if(warn && !warn.classList.contains('active')){ warn.classList.add('active'); toast('Type DELETE to confirm'); return; }
+  const input=document.getElementById('delInput_'+id);
+  if(input && input.value!=='DELETE'){ toast('Type DELETE exactly'); return; }
+  if(!confirm('FINAL DELETE — Remove NURSE '+id+' permanently?')) return;
+  toast('Deleting nurse '+id+'...');
+  try{
+    const paths=['nurses','nurse_registrations','pendingNurseRegistrations','nurseUsers','ceoNurseUpdates','nurseRegistrations','allNurses','users','nurseUsers'];
+    for(const p of paths){ try{ await db.ref(p+'/'+id).remove(); }catch(e){} }
+    try{ await dbFS.collection('nurses').doc(id).delete(); }catch(e){}
+    try{ await dbFS.collection('nurse_registrations').doc(id).delete(); }catch(e){}
+    try{ await dbFS.collection('users').doc(id).delete(); }catch(e){}
+    toast('✅ Nurse DELETED'); setTimeout(()=>loadAll(),1000);
+  }catch(e){ toast('Delete failed: '+e.message); }
+}
+function cancelDeleteNurse(id){ const w=document.getElementById('delWarn_'+id); if(w) w.classList.remove('active'); const i=document.getElementById('delInput_'+id); if(i) i.value=''; }
+function confirmDeleteNurse(id){ deleteNurse(id); }
+// CLIENT ACTIONS
+async function blockClient(id){
+  if(!confirm('BLOCK this client? They will NOT be able to login.')) return;
+  toast('Blocking client '+id+'...');
+  try{
+    const paths=['clients','client_registrations','clientUsers','users','googleClients'];
+    for(const p of paths){ try{ await db.ref(p+'/'+id).update({isBlocked:true, blocked:true, status:'blocked', blockedAt:Date.now()}); }catch(e){} }
+    try{ await dbFS.collection('clients').doc(id).set({isBlocked:true, blocked:true, status:'blocked', blockedAt: Date.now()},{merge:true}); }catch(e){}
+    try{ await dbFS.collection('client_registrations').doc(id).set({isBlocked:true, blocked:true, status:'blocked'},{merge:true}); }catch(e){}
+    toast('✅ Client BLOCKED'); setTimeout(()=>loadAll(),1200);
+  }catch(e){ toast('Block failed: '+e.message); }
+}
+async function unblockClient(id){
+  if(!confirm('UNBLOCK this client?')) return;
+  toast('Unblocking...');
+  try{
+    const paths=['clients','client_registrations','clientUsers','users','googleClients'];
+    for(const p of paths){ try{ await db.ref(p+'/'+id).update({isBlocked:false, blocked:false, status:'client', unblockedAt:Date.now()}); }catch(e){} }
+    try{ await dbFS.collection('clients').doc(id).set({isBlocked:false, blocked:false, status:'client'},{merge:true}); }catch(e){}
+    toast('✅ Client UNBLOCKED'); setTimeout(()=>loadAll(),1200);
+  }catch(e){ toast('Unblock failed: '+e.message); }
+}
+async function deleteClient(id){
+  const warn=document.getElementById('delWarn_'+id);
+  if(warn && !warn.classList.contains('active')){ warn.classList.add('active'); toast('Type DELETE to confirm'); return; }
+  const input=document.getElementById('delInput_'+id);
+  if(input && input.value!=='DELETE'){ toast('Type DELETE exactly'); return; }
+  if(!confirm('FINAL DELETE — Remove client '+id+' permanently?')) return;
+  toast('Deleting client '+id+'...');
+  try{
+    const paths=['clients','client_registrations','pendingClientRegistrations','clientUsers','clientRegistrations','users','googleClients'];
+    for(const p of paths){ try{ await db.ref(p+'/'+id).remove(); }catch(e){} }
+    try{ await dbFS.collection('clients').doc(id).delete(); }catch(e){}
+    try{ await dbFS.collection('client_registrations').doc(id).delete(); }catch(e){}
+    try{ await dbFS.collection('users').doc(id).delete(); }catch(e){}
+    toast('✅ Client DELETED'); setTimeout(()=>loadAll(),1000);
+  }catch(e){ toast('Delete failed: '+e.message); }
+}
+function cancelDeleteClient(id){ const w=document.getElementById('delWarn_'+id); if(w) w.classList.remove('active'); const i=document.getElementById('delInput_'+id); if(i) i.value=''; }
+function confirmDeleteClient(id){ deleteClient(id); }
+loadAll();
+</script>
+</body>
+</html>
