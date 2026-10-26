@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Force Wipe V2 — DB + Auth — 100% New Email</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>body{font-family:Inter,sans-serif;background:#0e0a1c;color:#fff;padding:20px} .card{background:#1a1633;border:1px solid rgba(239,68,68,.3);border-radius:18px;padding:20px;max-width:700px;margin:0 auto} input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(239,68,68,.4);background:rgba(14,10,28,.6);color:#fff;margin:10px 0} button{width:100%;padding:14px;border-radius:12px;border:none;font-weight:900;cursor:pointer;margin-top:10px} .delete{background:linear-gradient(135deg,#ef4444,#7f1d1d);color:#fff} .deleteAuth{background:linear-gradient(135deg,#000,#ef4444);color:#fff;border:1px solid #ef4444} .log{background:rgba(14,10,28,.8);border-radius:12px;padding:12px;margin-top:14px;max-height:500px;overflow:auto;font-size:11px;white-space:pre-wrap} a.link{color:#facc15;text-decoration:underline}</style>
+</head><body>
+<div class="card">
+<h2>🗑️ V2 Force Wipe — DB + Firestore + Auth — 100% NEW</h2>
+<p style="color:#fca5a5;font-size:12px;margin-top:8px">V1 only wiped DB → Auth still exists → Login without register. V2 also deletes Firebase Authentication → Must register as NEW!</p>
+<input id="email" placeholder="Enter email to make 100% NEW">
+<input id="password" type="password" placeholder="Enter that email's password (needed to delete Auth)">
+<button class="delete" onclick="forceWipeDB()">Step 1: WIPE DB + Firestore (All 25 paths)</button>
+<button class="deleteAuth" onclick="deleteAuthUser()">Step 2: DELETE FROM FIREBASE AUTH (Make 100% NEW)</button>
+<div style="background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.3);border-radius:12px;padding:12px;margin-top:12px">
+<p style="font-size:11px;color:#fde68a">If Step 2 fails (because you are not logged in as that email):</p>
+<p style="font-size:11px;color:#fff;margin-top:6px">Go to: <a class="link" href="https://console.firebase.google.com/project/web-care-618e8/authentication/users" target="_blank">Firebase Console → Auth → Users</a> → Find email → Delete</p>
+<p style="font-size:10px;color:#9a95b8;margin-top:6px">After both steps, email MUST register — Cannot login without register!</p>
+</div>
+<div id="log" class="log">Logs...</div>
+</div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database(); const fs=firebase.firestore(); const auth=firebase.auth();
+function log(m){ document.getElementById('log').textContent+=m+'\n'; console.log(m); }
+
+async function forceWipeDB(){
+  const emailRaw=document.getElementById('email').value.trim().toLowerCase();
+  if(!emailRaw) return alert('Enter email');
+  if(!confirm(`WIPE DB for ${emailRaw}?`)) return;
+  log(`Wiping DB for ${emailRaw}...`);
+  const rtPaths=['nurses','clients','users','googleClients','googleUsers','clientUsers','nurseUsers','client_registrations','nurse_registrations','clientRegistrations','nurseRegistrations','allClients','allNurses','pendingClientRegistrations','pendingNurseRegistrations','pendingNurses','pending_nurses','verifiedNurses','blockedClients','blockedNurses','blockedUsers','authUsers','clientsGoogle','googleLogins','clientGoogleLogins','staffAccounts','ceoAccounts'];
+  for(const p of rtPaths){
+    try{
+      const snap=await db.ref(p).once('value');
+      snap.forEach(ch=>{
+        const v=ch.val()||{}; const real=v.profile||v.data||v.clientData||v||{};
+        const em=(real.email||real.clientEmail||v.email||v.profile?.email||'').toLowerCase();
+        if(em===emailRaw || ch.key.toLowerCase()===emailRaw.replace(/[^a-z0-9]/g,'_')){
+          db.ref(p+'/'+ch.key).remove(); log(`Removed RT ${p}/${ch.key}`);
+        }
+      });
+    }catch(e){ log(`Error ${p}: ${e.message}`); }
+  }
+  for(const col of ['users','clients','nurses','googleClients','client_registrations','nurse_registrations']){
+    try{
+      const q=await fs.collection(col).where('email','==',emailRaw).get();
+      const batch=fs.batch(); q.forEach(d=>batch.delete(d.ref)); await batch.commit();
+      log(`Wiped Firestore ${col}: ${q.size}`);
+    }catch(e){ log(`FS ${col} error: ${e.message}`); }
+  }
+  localStorage.clear(); sessionStorage.clear();
+  log('✅ DB Wiped! Now Step 2: Delete Auth');
+}
+
+async function deleteAuthUser(){
+  const emailRaw=document.getElementById('email').value.trim().toLowerCase();
+  const pwd=document.getElementById('password').value;
+  if(!emailRaw) return alert('Enter email');
+  if(!pwd) {
+    alert('Enter password for that email to delete Auth. If you dont know password, use Firebase Console link below.');
+    window.open('https://console.firebase.google.com/project/web-care-618e8/authentication/users','_blank');
+    return;
+  }
+  try{
+    log(`Trying to login as ${emailRaw} to delete Auth...`);
+    await auth.signInWithEmailAndPassword(emailRaw, pwd);
+    log(`Logged in as ${emailRaw}, now deleting Auth user...`);
+    const user = auth.currentUser;
+    await user.delete();
+    log(`✅ AUTH DELETED! ${emailRaw} is now 100% NEW — Must register!`);
+    alert(`✅ ${emailRaw} DELETED FROM AUTH! Now 100% NEW email — Must register!`);
+    localStorage.clear(); sessionStorage.clear();
+    await auth.signOut();
+  }catch(e){
+    log(`Auth delete failed: ${e.message}`);
+    log(`Manual delete needed: Go to https://console.firebase.google.com/project/web-care-618e8/authentication/users`);
+    alert(`Failed: ${e.message}\n\nGo to Firebase Console → Auth → Users → Delete ${emailRaw} manually.\nLink opened.`);
+    window.open('https://console.firebase.google.com/project/web-care-618e8/authentication/users','_blank');
+  }
+}
+</script></body></html>
