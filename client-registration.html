@@ -37,50 +37,24 @@ input:focus,select:focus{border-color:#a855f7}
 <div class="card">
   <div class="logo">👤</div>
   <h2>Create Client Account</h2>
-  <p class="sub">Join LOVE CARE GLOBAL — CEO tracking requires Name+Phone+Photo+Email</p>
-  
+  <p class="sub">CEO tracking requires Name+Phone+Photo+Email</p>
   <div id="status" class="status"></div>
-
   <label>FULL NAME *</label>
   <input id="fullName" placeholder="Your full name">
-
   <div class="row">
-    <div>
-      <label>EMAIL *</label>
-      <input id="email" type="email" placeholder="your@email.com">
-    </div>
-    <div>
-      <label>PHONE *</label>
-      <input id="phone" type="tel" placeholder="+233XXXXXXXXX">
-    </div>
+    <div><label>EMAIL *</label><input id="email" type="email" placeholder="your@email.com"></div>
+    <div><label>PHONE *</label><input id="phone" type="tel" placeholder="+233XXXXXXXXX"></div>
   </div>
-
   <label>PASSWORD *</label>
-  <div class="passWrap">
-    <input id="password" type="password" placeholder="Min 6 characters">
-    <span class="eye" onclick="togglePass()">👁️</span>
-  </div>
-
+  <div class="passWrap"><input id="password" type="password" placeholder="Min 6 characters"><span class="eye" onclick="togglePass()">👁️</span></div>
   <label>COUNTRY *</label>
-  <select id="country">
-    <option value="Ghana" selected>Ghana</option>
-    <option value="Nigeria">Nigeria</option>
-    <option value="Kenya">Kenya</option>
-    <option value="South Africa">South Africa</option>
-    <option value="USA">USA</option>
-    <option value="UK">UK</option>
-    <option value="Other">Other</option>
-  </select>
-
-  <label>PROFILE PHOTO <span style="color:#8b7ab8">(Optional — Helps nurses recognize you)</span></label>
+  <select id="country"><option value="Ghana" selected>Ghana</option><option value="Nigeria">Nigeria</option><option value="Kenya">Kenya</option><option value="Other">Other</option></select>
+  <label>PROFILE PHOTO (Optional)</label>
   <div class="photoBox" onclick="document.getElementById('photoFile').click()">
-    <img id="photoPreview" class="photoPreview" src="">
-    <div id="photoPlaceholder" style="font-size:32px">👤</div>
+    <img id="photoPreview" class="photoPreview" src=""><div id="photoPlaceholder" style="font-size:32px">👤</div>
     <p style="font-size:11px;color:#a78bfa;margin-top:6px">📁 Tap to upload — Optional</p>
-    <p style="font-size:10px;color:#6b7280;margin-top:4px">JPG/PNG max 3MB</p>
   </div>
   <input type="file" id="photoFile" accept="image/*" style="display:none">
-
   <button class="btn btnReg" onclick="register()" id="regBtn">Create Account</button>
   <button class="btn btnGoogle" onclick="googleRegister()">Continue with Google</button>
   <a href="client-login.html" class="link">Already have account? Login</a>
@@ -116,80 +90,129 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(email) document.getElementById('email').value=email;
   if(name) document.getElementById('fullName').value=name;
   if(photo){ const img=document.getElementById('photoPreview'); img.src=photo; img.style.display='block'; document.getElementById('photoPlaceholder').style.display='none'; photoDataUrl=photo; }
-  if(params.get('from')){ showStatus('Previous incomplete registration detected - You can re-register now, old data will be overwritten','warn'); }
+  if(params.get('from')){ showStatus('Previous incomplete data detected — Will overwrite','warn'); }
 });
 
-async function checkAndCleanLeftover(email){
-  const eLower=email.toLowerCase().trim();
-  const key=sanitizeEmail(eLower);
-  let authExists=false;
-  try{ const methods=await auth.fetchSignInMethodsForEmail(eLower); if(methods && methods.length>0) authExists=true; }catch(e){}
-  let dbExists=false;
-  try{ const snap=await db.ref('allowedClients/'+key).once('value'); if(snap.exists()) dbExists=true; else { const snap2=await db.ref('clients').orderByChild('email').equalTo(eLower).once('value'); if(snap2.exists()) dbExists=true; } }catch(e){}
-  if(dbExists && !authExists){
-    showStatus('🧹 Cleaning old leftover data (Auth was deleted but DB remained) - Will overwrite now...','warn');
-    try{
-      await db.ref('allowedClients/'+key).remove();
-      await db.ref('clientRegistrations/'+key).remove();
-      const qSnap=await db.ref('clients').orderByChild('email').equalTo(eLower).once('value');
-      if(qSnap.exists()){ qSnap.forEach(ch=>{ db.ref('clients/'+ch.key).remove(); }); }
-    }catch(e){}
-    return {canRegister:true, cleaned:true};
-  }
-  if(dbExists && authExists){ return {canRegister:false, reason:'Email already registered — Please login'}; }
-  return {canRegister:true, cleaned:false};
-}
-
+// 🔥 NEW: AUTO-DELETE AUTH IF EXISTS
 async function register(){
   const fullName=document.getElementById('fullName').value.trim();
   const email=document.getElementById('email').value.trim().toLowerCase();
   const phone=document.getElementById('phone').value.trim();
   const password=document.getElementById('password').value.trim();
   const country=document.getElementById('country').value;
-  if(!fullName||!email||!phone||!password){ showStatus('All * fields required - CEO needs Name+Phone+Email for tracking','err'); return; }
-  if(phone.replace(/\D/g,'').length<9){ showStatus('Valid phone required - At least 9 digits','err'); return; }
+
+  if(!fullName||!email||!phone||!password){ showStatus('All * fields required — CEO needs Name+Phone+Email','err'); return; }
+  if(phone.replace(/\D/g,'').length<9){ showStatus('Phone needs at least 9 digits','err'); return; }
   if(password.length<6){ showStatus('Password min 6 chars','err'); return; }
+
   const btn=document.getElementById('regBtn'); btn.textContent='Checking...'; btn.disabled=true;
-  const check=await checkAndCleanLeftover(email);
-  if(!check.canRegister){ showStatus(check.reason,'err'); btn.textContent='Create Account'; btn.disabled=false; return; }
-  if(check.cleaned){ showStatus('✅ Old data cleaned - Creating new account...','ok'); await new Promise(r=>setTimeout(r,800)); }
-  showStatus('Creating account...','ok');
+
+  // Check if email exists in Auth
+  let authExists=false;
+  try{
+    const methods=await auth.fetchSignInMethodsForEmail(email);
+    if(methods && methods.length>0) authExists=true;
+  }catch(e){}
+
+  if(authExists){
+    showStatus('⚠️ Email exists in Auth — Trying auto-delete with your password...','warn');
+    try{
+      const cred=await auth.signInWithEmailAndPassword(email,password);
+      await cred.user.delete();
+      showStatus('✅ Old Auth deleted successfully — Creating fresh account now...','ok');
+      await new Promise(r=>setTimeout(r,1200));
+      authExists=false;
+    }catch(delErr){
+      console.log('Auto delete failed', delErr.code, delErr.message);
+      if(delErr.code==='auth/wrong-password'){
+        showStatus('❌ Auth exists but password wrong — Use correct old password to auto-delete, or go to Firebase Console > Authentication > Delete user, or click Login.','err');
+      }else if(delErr.code==='auth/too-many-requests'){
+        showStatus('Too many attempts — Wait 1 minute then try again with correct password','err');
+      }else{
+        showStatus('Email exists in Auth — Please login, or go to Firebase Console > Authentication > Search that email > Delete it. Then try again.','err');
+      }
+      btn.textContent='Create Account'; btn.disabled=false;
+      return;
+    }
+  }
+
+  // Clean DB leftover
+  const key=sanitizeEmail(email);
+  try{
+    await db.ref('allowedClients/'+key).remove();
+    await db.ref('clientRegistrations/'+key).remove();
+    const qSnap=await db.ref('clients').orderByChild('email').equalTo(email).once('value');
+    if(qSnap.exists()){ qSnap.forEach(ch=>{ db.ref('clients/'+ch.key).remove(); }); }
+  }catch(e){}
+
+  showStatus('Creating fresh account...','ok');
   try{
     const cred=await auth.createUserWithEmailAndPassword(email,password);
     const uid=cred.user.uid;
     let photoUrl=photoDataUrl || '';
     if(selectedFile){
-      try{ showStatus('Uploading photo...','ok'); const storageRef=storage.ref('clientAvatars/'+key+'/photo_'+Date.now()); const upload=await storageRef.put(selectedFile); photoUrl=await upload.ref.getDownloadURL(); }catch(e){}
+      try{
+        showStatus('Uploading photo...','ok');
+        const storageRef=storage.ref('clientAvatars/'+key+'/photo_'+Date.now());
+        const upload=await storageRef.put(selectedFile);
+        photoUrl=await upload.ref.getDownloadURL();
+      }catch(e){ console.log('Upload failed', e.message); }
     }
-    const key=sanitizeEmail(email);
-    const clientData={ email: email, fullName: fullName, name: fullName, clientName: fullName, phone: phone, clientPhone: phone, photoUrl: photoUrl, photo: photoUrl, clientPhotoUrl: photoUrl, clientEmail: email, country: country, uid: uid, createdAt: Date.now(), lastLoginAt: Date.now(), verifiedForDashboard: true, registrationComplete: true, registrationMethod: 'email' };
-    showStatus('Saving for CEO tracking...','ok');
+
+    const clientData={
+      email: email, fullName: fullName, name: fullName, clientName: fullName,
+      phone: phone, clientPhone: phone,
+      photoUrl: photoUrl, photo: photoUrl, clientPhotoUrl: photoUrl,
+      country: country, uid: uid,
+      createdAt: Date.now(), lastLoginAt: Date.now(),
+      verifiedForDashboard: true, registrationComplete: true, registrationMethod: 'email'
+    };
+
+    showStatus('Saving for CEO tracking (Name+Phone+Photo+Email)...','ok');
     await db.ref('allowedClients/'+key).set(clientData);
     await db.ref('clients/'+uid).set(clientData);
     await db.ref('clientRegistrations/'+key).set(clientData);
     await db.ref('ceoClientsTracking/'+uid).set(clientData);
     await db.ref('allClientsTracking/'+uid).set(clientData);
     try{ await dbFS.collection('clients').doc(uid).set(clientData); }catch(e){}
-    localStorage.setItem('clientLoggedIn','true'); localStorage.setItem('clientEmail', email); localStorage.setItem('clientName', fullName); localStorage.setItem('clientPhone', phone); localStorage.setItem('clientPhoto', photoUrl); localStorage.setItem('clientUid', uid);
-    localStorage.removeItem('pendingGoogleEmail'); localStorage.removeItem('pendingGoogleName'); localStorage.removeItem('pendingGooglePhoto');
-    showStatus('✅ Registered! Redirecting...','ok'); setTimeout(()=>{ location.replace('client-dashboard.html'); }, 1000);
+
+    localStorage.setItem('clientLoggedIn','true');
+    localStorage.setItem('clientEmail', email);
+    localStorage.setItem('clientName', fullName);
+    localStorage.setItem('clientPhone', phone);
+    localStorage.setItem('clientPhoto', photoUrl);
+    localStorage.setItem('clientUid', uid);
+    localStorage.removeItem('pendingGoogleEmail');
+    localStorage.removeItem('pendingGoogleName');
+    localStorage.removeItem('pendingGooglePhoto');
+
+    showStatus('✅ Registered! CEO tracking saved — Redirecting to dashboard...','ok');
+    setTimeout(()=>{ location.replace('client-dashboard.html'); }, 1000);
+
   }catch(e){
     console.error(e);
-    if(e.code==='auth/email-already-in-use'){ showStatus('Email exists in Auth — Please login or delete from Firebase Console > Authentication','err'); }
-    else { showStatus(e.message,'err'); }
-  }finally{ btn.textContent='Create Account'; btn.disabled=false; }
+    showStatus(e.message,'err');
+  }finally{
+    btn.textContent='Create Account'; btn.disabled=false;
+  }
 }
 
 async function googleRegister(){
   const provider=new firebase.auth.GoogleAuthProvider(); provider.setCustomParameters({prompt:'select_account'});
   try{
     const result=await auth.signInWithPopup(provider);
-    const user=result.user; const email=user.email.toLowerCase(); const name=user.displayName||''; const photo=user.photoURL||'';
-    document.getElementById('email').value=email; document.getElementById('fullName').value=name;
-    if(photo){ document.getElementById('photoPreview').src=photo; document.getElementById('photoPreview').style.display='block'; document.getElementById('photoPlaceholder').style.display='none'; photoDataUrl=photo; }
-    showStatus('Google linked — Add phone number (required for CEO tracking) and click Create Account','warn');
+    const user=result.user;
+    const email=user.email.toLowerCase();
+    const name=user.displayName||'';
+    const photo=user.photoURL||'';
+    document.getElementById('email').value=email;
+    document.getElementById('fullName').value=name;
+    if(photo){ const img=document.getElementById('photoPreview'); img.src=photo; img.style.display='block'; document.getElementById('photoPlaceholder').style.display='none'; photoDataUrl=photo; }
+    showStatus('Google linked — Add phone and click Create Account','warn');
     await auth.signOut();
-    localStorage.setItem('pendingGoogleEmail', email); localStorage.setItem('pendingGoogleName', name); localStorage.setItem('pendingGooglePhoto', photo);
+    localStorage.setItem('pendingGoogleEmail', email);
+    localStorage.setItem('pendingGoogleName', name);
+    localStorage.setItem('pendingGooglePhoto', photo);
   }catch(e){ showStatus('Google failed: '+e.message,'err'); }
 }
 </script>
