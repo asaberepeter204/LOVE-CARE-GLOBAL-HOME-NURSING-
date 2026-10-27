@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Refund Management - LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:30;background:#16102a;border-bottom:1px solid rgba(168,85,247,.15);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.brand{font-weight:900;font-size:16px;color:#f3e8ff;letter-spacing:.03em}
+.wrap{max-width:960px;margin:0 auto;padding:16px 14px 80px}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.12);border-radius:18px;padding:16px;margin:14px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;display:inline-block;margin:2px;letter-spacing:.02em}
+.badge-time{background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.3);color:#facc15}
+.badge-book{background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);color:#d8b4fe}
+.badge-pay{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#86efac}
+.badge-pending{background:rgba(250,204,21,.15);color:#fde68a;border:1px solid rgba(250,204,21,.3)}
+.badge-approved{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.badge-rejected{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.btn{padding:10px 16px;border-radius:10px;border:none;font-weight:800;cursor:pointer;margin:4px;font-size:12px;transition:.15s}
+.btn:active{transform:scale(.97)}
+.approve{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
+.reject{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.view{background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.25);color:#d8b4fe}
+.refresh{background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.2);color:#d8b4fe;padding:8px 14px;border-radius:99px;font-size:11px;font-weight:800;cursor:pointer}
+.detail{background:rgba(14,10,28,.7);padding:12px;border-radius:12px;margin-top:10px;font-size:11px;color:#c4b5fd;border:1px solid rgba(168,85,247,.1);white-space:pre-wrap;line-height:1.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.kv{font-size:11px;color:#9a95b8;margin:2px 0}.kv b{color:#e8e0ff}
+.counts{font-size:11px;color:#facc15;background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.15);padding:6px 12px;border-radius:99px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">💰 CEO Refund Management — LOVE CARE GLOBAL</div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <span id="counts" class="counts">Loading...</span>
+    <button class="refresh" onclick="loadRefunds()">🔄 Refresh</button>
+    <a href="ceo-dashboard.html" style="text-decoration:none;padding:8px 12px;border-radius:99px;background:rgba(255,255,255,.06);color:#9a95b8;font-size:11px;border:1px solid rgba(255,255,255,.1)">← CEO Dashboard</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="card" style="background:linear-gradient(135deg,rgba(45,28,78,.9),rgba(28,18,56,.9));border-color:rgba(250,204,21,.15)">
+    <div style="font-weight:900;font-size:14px;color:#f3e8ff">📋 Refund Requests — Time It Happened</div>
+    <div style="font-size:11px;color:#9a95b8;margin-top:4px">Shows booking time, payment time, request time with <b style="color:#facc15">🕒 Just now • 2m ago • Yesterday</b>. Approvals update all nodes.</div>
+  </div>
+  <div id="list">Loading refund requests from Firebase... Checking <b>ceoRefundManagement, refundRequests, allRefundRequests</b></div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const rtdb=firebase.database();
+const auth=firebase.auth();
+
+// 🕒 TIME IT HAPPENED — FINAL CEO TIME LOGIC
+function formatActionTime(ts){
+  if(!ts) return 'time unknown';
+  let date;
+  if(typeof ts==='number') date=new Date(ts);
+  else if(typeof ts==='string'){
+    date=new Date(ts);
+    if(isNaN(date.getTime())){
+      const n=parseInt(ts);
+      if(!isNaN(n)) date=new Date(n);
+    }
+  }else if(ts&&ts.seconds) date=new Date(ts.seconds*1000);
+  else return 'time unknown';
+  if(!date||isNaN(date.getTime())) return 'time unknown';
+  const now=new Date();
+  const diffMs=now-date;
+  const diffMins=Math.floor(diffMs/60000);
+  const diffHours=Math.floor(diffMins/60);
+  const diffDays=Math.floor(diffHours/24);
+  const timeStr=date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  const dateStr=date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const shortDate=date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const full=date.toLocaleString('en-GH');
+  if(diffMins<1) return `Just now • ${timeStr} • ${full}`;
+  if(diffMins<60) return `${diffMins}m ago • ${timeStr} today • ${full}`;
+  if(diffHours<24) return `${diffHours}h ago • ${timeStr} today • ${full}`;
+  if(diffDays===1) return `Yesterday • ${timeStr} • ${full}`;
+  if(diffDays<7) return `${diffDays}d ago • ${shortDate} ${timeStr} • ${full}`;
+  return `${dateStr} • ${timeStr} • ${full}`;
+}
+function formatTime(ts){ return formatActionTime(ts); }
+
+async function loadRefunds(){
+  const list=document.getElementById('list');
+  const counts=document.getElementById('counts');
+  list.innerHTML='<div class="card" style="text-align:center;color:#9a95b8">🔄 Loading refunds from 5 nodes...</div>';
+  try{
+    const nodes=['ceoRefundManagement','refundRequests','allRefundRequests','ceo-refund-management','refunds'];
+    let merged={};
+    for(const node of nodes){
+      try{
+        const snap=await rtdb.ref(node).once('value');
+        if(snap.exists()){
+          const val=snap.val();
+          Object.entries(val).forEach(([k,v])=>{
+            const ts=v.requestTime||v.timestamp||0;
+            if(!merged[k] || ts>(merged[k].requestTime||merged[k].timestamp||0)){
+              merged[k]=v;
+            }
+          });
+        }
+      }catch(e){ console.log('Error node '+node, e.message); }
+    }
+    const arr=Object.values(merged).sort((a,b)=>(b.requestTime||b.timestamp||0)-(a.requestTime||a.timestamp||0));
+    const pending=arr.filter(r=>(r.status||'pending')==='pending').length;
+    const approved=arr.filter(r=>r.status==='approved').length;
+    const rejected=arr.filter(r=>r.status==='rejected').length;
+    counts.textContent=`${arr.length} total • ${pending} pending • ${approved} approved • ${rejected} rejected`;
+    if(arr.length===0){
+      list.innerHTML='<div class="card" style="text-align:center;padding:30px"><div style="font-size:40px">💸</div><div style="font-weight:800;margin-top:8px">No refund requests yet</div><div style="font-size:11px;color:#9a95b8;margin-top:6px">When client submits from refund-query.html, it will appear here instantly with time.<br>Make sure client file saves to ceoRefundManagement + refundRequests</div></div>';
+      return;
+    }
+    list.innerHTML=arr.map(r=>{
+      const timeDisplay=r.requestTimeDisplay||formatActionTime(r.requestTime||r.timestamp);
+      const bookingTimeDisplay=r.bookingTimeDisplay||r.bookingTimeFormatted||formatActionTime(r.bookingTime||r.paymentTime);
+      const paymentTimeDisplay=r.paymentTimeDisplay||r.paymentTimeFormatted||formatActionTime(r.paymentTime||r.bookingTime);
+      const actionTimeDisplay=r.actionTimeDisplay|| (r.actionTime?formatActionTime(r.actionTime):'');
+      const status=r.status||'pending';
+      const statusClass=status==='pending'?'badge-pending':status==='approved'?'badge-approved':'badge-rejected';
+      const refundId=r.refundId||'REF-UNKNOWN';
+      return `<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+          <div><b style="font-size:13px;color:#f3e8ff">${refundId}</b> <span style="font-size:11px;color:#9a95b8">• Booking: <b style="color:#e8e0ff">${r.bookingId||'N/A'}</b></span></div>
+          <span class="badge ${statusClass}">${status.toUpperCase()} • ${(r.refundType||'').replace(/_/g,' ').toUpperCase()}</span>
+        </div>
+
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
+          <span class="badge badge-time">🕒 Request: ${timeDisplay}</span>
+          <span class="badge badge-book">📅 Booking: ${bookingTimeDisplay}</span>
+          <span class="badge badge-pay">💳 Payment: ${paymentTimeDisplay}</span>
+          ${actionTimeDisplay?`<span class="badge badge-time">✅ Action: ${actionTimeDisplay}</span>`:''}
+        </div>
+
+        <div class="grid2" style="margin-top:12px">
+          <div>
+            <div class="kv">👤 Client: <b>${r.clientName||'N/A'}</b></div>
+            <div class="kv">📧 Email: <b>${r.clientEmail||'N/A'}</b></div>
+            <div class="kv">📱 Phone: <b>${r.clientPhone||'N/A'}</b></div>
+            <div class="kv">🆔 Client UID: <b>${r.clientUid||'N/A'}</b></div>
+          </div>
+          <div>
+            <div class="kv">👩‍⚕️ Nurse: <b>${r.nurseName||r.nurseId||'N/A'}</b></div>
+            <div class="kv">📱 Nurse Phone: <b>${r.nursePhone||'N/A'}</b></div>
+            <div class="kv">🆔 Nurse ID: <b>${r.nurseId||'N/A'}</b></div>
+            <div class="kv">💰 Amount: <b style="color:#facc15">${r.currency||'GHS'} ${Number(r.amount||r.amountPaidNow||0).toFixed(2)}</b> ${r.amountCashLater?`(+ ${r.currency} ${r.amountCashLater} cash later)`:''}</div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px" class="grid2">
+          <div class="kv">💳 Method: <b>${r.paymentMethod||'N/A'}</b></div>
+          <div class="kv">🔖 Paystack Ref: <b style="color:#facc15">${r.paystackRef||'N/A'}</b></div>
+        </div>
+
+        <div class="detail">
+📝 <b>Reason for refund:</b> ${r.reason||'No reason provided'}
+———————————————
+📅 Booking ID: ${r.bookingId}
+🕒 Booking Time Raw: ${r.bookingTime||''} → ${bookingTimeDisplay}
+💳 Payment Time Raw: ${r.paymentTime||''} → ${paymentTimeDisplay}
+🕒 Request Time Raw: ${r.requestTime||r.timestamp||''} → ${timeDisplay}
+📧 Client Email: ${r.clientEmail}
+👩‍⚕️ Nurse: ${r.nurseName} (${r.nurseId})
+💰 Amount Paid: ${r.currency} ${r.amount||r.amountPaidNow}
+${r.ceoNote?`\n📝 CEO Note: ${r.ceoNote}\n✅ Action: ${actionTimeDisplay||r.actionTimeFormatted||''}`:''}
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          ${status==='pending'?`<button class="btn approve" onclick="updateStatus('${refundId}','approved')">✅ Approve Refund</button><button class="btn reject" onclick="updateStatus('${refundId}','rejected')">❌ Reject</button>`: `<span style="font-size:11px;color:#9a95b8">Already ${status} ${actionTimeDisplay?`— ${actionTimeDisplay}`:''}</span>`}
+          <button class="btn view" onclick="toggleDetail(this)">👁️ View Original Booking JSON</button>
+          <button class="btn view" onclick="copyId('${refundId}')">📋 Copy ID</button>
+        </div>
+        <div class="detail" style="display:none;margin-top:8px;max-height:240px;overflow:auto">${JSON.stringify(r.originalBooking||r,true).substring(0,5000)}</div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML='<div class="card" style="color:#fca5a5">Error loading refunds: '+e.message+'<br>Check Firebase rules for ceoRefundManagement, refundRequests</div>';
+  }
+}
+
+function toggleDetail(btn){
+  const d=btn.parentElement.nextElementSibling;
+  d.style.display=d.style.display==='none'?'block':'none';
+}
+function copyId(id){navigator.clipboard.writeText(id).then(()=>alert('Copied: '+id));}
+function updateStatus(refundId,status){
+  const note=prompt(`CEO Note for ${status.toUpperCase()} — Refund ${refundId}:\n\nEnter reason/note (optional but recommended):`);
+  if(note===null) return;
+  const now=Date.now();
+  const updates={
+    status,
+    ceoNote:note||'',
+    actionTime:now,
+    actionTimeFormatted:new Date().toLocaleString('en-GH'),
+    actionTimeDisplay:formatActionTime(now),
+    ceoActionBy:localStorage.getItem('ceoEmail')||'CEO'
+  };
+  const nodes=['ceoRefundManagement','refundRequests','allRefundRequests','refunds','ceo-refund-management'];
+  Promise.all(nodes.map(n=>rtdb.ref(n+'/'+refundId).update(updates).catch(()=>{}))).then(()=>{
+    alert(`✅ Refund ${refundId} marked as ${status.toUpperCase()}\nTime: ${formatActionTime(now)}`);
+    setTimeout(loadRefunds,800);
+  });
+  // Also update clientRefundRequests
+  rtdb.ref('clientRefundRequests').once('value').then(snap=>{
+    if(!snap.exists()) return;
+    snap.forEach(clientNode=>{
+      clientNode.forEach(ch=>{
+        if(ch.key===refundId) rtdb.ref('clientRefundRequests/'+clientNode.key+'/'+refundId).update(updates);
+      });
+    });
+  });
+}
+
+// Auth check + auto load
+auth.onAuthStateChanged(user=>{
+  if(!user){
+    const ceoEmail=localStorage.getItem('ceoEmail');
+    if(!ceoEmail){
+      // Allow anyway for CEO — remove redirect if you want public
+      // location.replace('ceo-login.html');
+    }
+  }
+  loadRefunds();
+});
+setInterval(loadRefunds,15000);
+window.addEventListener('DOMContentLoaded',loadRefunds);
+</script>
+</body>
+</html>
