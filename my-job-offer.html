@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Job Offer - FULL + LOCATION + NAV + COMPLAIN BUTTON — LOVE CARE GLOBAL</title>
+<title>My Job Offer - CLEAN WALLET — LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
@@ -42,7 +42,6 @@ import ReactDOM from "https://esm.sh/react-dom@18.2.0/client";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const rtdb=firebase.database();
-
 function getNurse(){
   const KEYS=['nurse','nurseData','currentUser','user','auth_user','nurse_profile'];
   for(const store of [localStorage, sessionStorage]){
@@ -62,14 +61,13 @@ function getNurse(){
   if(q) return {id:q.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''), fullName:q, firstName:q.split(' ')[0], location:'Accra', photo:null, phone:''};
   return {id:'asabere-peter', fullName:'Asabere Peter', firstName:'Asabere', location:'East Legon', photo:null, phone:''};
 }
-
 let nurseWatchId=null;let lastLat=null;let lastLng=null;let isTracking=false;let currentTrackingBookingId=null;
 function calcDistance(lat1,lon1,lat2,lon2){if(!lat1||!lon1||!lat2||!lon2) return 0;const R=6371;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));return R*c;}
 function shareNurseLocation(pos, bookingId, nurse, status){
   const lat=pos.coords.latitude;const lng=pos.coords.longitude;
   if(lastLat&&lastLng){const dist=calcDistance(lastLat,lastLng,lat,lng)*1000;if(dist<5) return;}
   lastLat=lat; lastLng=lng;
-  const locationData={lat, lng, nurseLat:lat, nurseLng:lng, latitude:lat, longitude:lng, currentLat:lat, currentLng:lng, liveLat:lat, liveLng:lng,status:status||'enRoute', trackingStatus:status||'enRoute',lastUpdate:Date.now(), updatedAt:Date.now(),nurseId:nurse.id, nurseName:nurse.fullName,bookingId, isLive:true};
+  const locationData={lat, lng, nurseLat:lat, nurseLng:lng, latitude:lat, longitude:lat, currentLat:lat, currentLng:lng, liveLat:lat, liveLng:lng,status:status||'enRoute', trackingStatus:status||'enRoute',lastUpdate:Date.now(), updatedAt:Date.now(),nurseId:nurse.id, nurseName:nurse.fullName,bookingId, isLive:true};
   const updates={};updates[`nurseLocations/${nurse.id}`]=locationData;updates[`liveNurseLocations/${bookingId}`]=locationData;updates[`nurseLiveLocations/${bookingId}`]=locationData;updates[`nurseTracking/${bookingId}`]=locationData;updates[`ceoBookings/${bookingId}/nurseLat`]=lat;updates[`ceoBookings/${bookingId}/nurseLng`]=lng;updates[`ceoBookings/${bookingId}/lastUpdate`]=Date.now();updates[`acceptedBookings/${bookingId}/nurseLat`]=lat;updates[`acceptedBookings/${bookingId}/nurseLng`]=lng;rtdb.ref().update(updates);
 }
 function startNurseGPSTracking(bookingId, nurse, status){
@@ -105,7 +103,6 @@ function openClientLocationOnMap(lat,lng){
   if(!lat||!lng) return;
   window.open(`https://www.google.com/maps?q=${lat},${lng}&z=15`, '_blank');
 }
-
 function App(){
   const [nurse]=useState(()=>getNurse());
   const [offers,setOffers]=useState([]);
@@ -115,7 +112,6 @@ function App(){
   const [selAccept,setSelAccept]=useState(null);
   const [gpsInfo,setGpsInfo]=useState({lat:null,lng:null,lastUpdate:null,status:'idle'});
   const gpsIntervalRef=useRef(null);
-
   useEffect(()=>{
     const nurseId=nurse.id;
     const offersRef=rtdb.ref('myJobOffers/'+nurseId);
@@ -130,7 +126,6 @@ function App(){
     gpsIntervalRef.current=setInterval(()=>{ if(lastLat&&lastLng){ setGpsInfo({lat:lastLat,lng:lastLng,lastUpdate:Date.now(),status:isTracking?'LIVE TRACKING — CEO monitoring you':'idle'}); } },2000);
     return ()=>{ offersRef.off(); if(gpsIntervalRef.current) clearInterval(gpsIntervalRef.current); };
   },[nurse.id]);
-
   const initials=nurse.fullName.split(' ').filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('')||'AP';
   const showToast=(m)=>{ setToast(m); setTimeout(()=>setToast(null),4000); };
   const complainAboutClient=(offer)=>{
@@ -145,7 +140,6 @@ function App(){
     });
     location.href=`nurse-complain.html?${params.toString()}`;
   };
-
   return React.createElement('div',null,
     React.createElement('header',null,
       React.createElement('div',{className:'wrap',style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'18px 20px'}},
@@ -157,7 +151,7 @@ function App(){
           React.createElement('div',null,
             React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center'}},
               React.createElement('h1',{style:{margin:0,fontFamily:'Fraunces',fontSize:22}},'My Job Offer'),
-              React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0',borderColor:'rgba(52,211,153,.2)'}},React.createElement('span',{className:'live-dot'}),' LIVE + GPS + LOCATION + COMPLAIN')
+              React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0',borderColor:'rgba(52,211,153,.2)'}},React.createElement('span',{className:'live-dot'}),' LIVE + GPS + LOCATION')
             ),
             React.createElement('div',{style:{fontSize:13.5,color:'var(--muted)',marginTop:4}},
               'Welcome ',React.createElement('span',{style:{color:'var(--text)',fontWeight:600}},nurse.firstName),' — ',nurse.fullName,' · ',nurse.location,
@@ -186,7 +180,7 @@ function App(){
         ),
         React.createElement('h2',{style:{fontFamily:'Fraunces',fontSize:18,margin:'0 0 14px',display:'flex',alignItems:'center',gap:8}},
           'Available Offers',
-          React.createElement('span',{className:'badge',style:{background:offers.length>0?'rgba(52,211,153,.12)':'rgba(255,255,255,.06)',color:offers.length>0?'#a7f3d0':'var(--muted)'}},offers.length+' • REAL + GPS + LOCATION + COMPLAIN'),
+          React.createElement('span',{className:'badge',style:{background:offers.length>0?'rgba(52,211,153,.12)':'rgba(255,255,255,.06)',color:offers.length>0?'#a7f3d0':'var(--muted)'}},offers.length+' • REAL + GPS + LOCATION'),
           React.createElement('span',{className:'live-dot'})
         ),
         loading?React.createElement('div',{className:'empty'},'Loading live data for '+nurse.fullName+'...'):
@@ -196,10 +190,8 @@ function App(){
             React.createElement('div',{style:{fontSize:18,fontWeight:700,marginTop:10}},'No job offers yet'),
             React.createElement('div',{style:{fontSize:14,color:'var(--muted)',marginTop:8,lineHeight:1.6}},
               'You are logged in as '+nurse.fullName+'.',React.createElement('br'),
-              'When a client books you, the offer will appear here instantly with Photo+Phone+Location.',React.createElement('br'),
-              React.createElement('span',{style:{fontSize:11,color:'var(--faint)'}},'Beginner: 0 jobs • 0 balance • GPS hidden from nurse • Nurse can complain via nurse-complain.html button')
-            ),
-            React.createElement('button',{className:'btn-purple',style:{marginTop:14,padding:'12px 20px'},onClick:()=>{const params=new URLSearchParams({bookingId:'LCG-DEMO-001',clientName:'Demo Client',clientId:'demo_client',nurseName:nurse.fullName,nurseId:nurse.id,service:'Elderly Care',amount:'500'});location.href=`nurse-complain.html?${params.toString()}`}},'⚠️ TEST Nurse Complain Button → nurse-complain.html — Text + Audio + Video + Photos')
+              'When a client books you, the offer will appear here instantly with Photo+Phone+Location.',React.createElement('br')
+            )
           )
         :
           offers.map(o=>{
@@ -212,7 +204,6 @@ function App(){
             const loc=getClientLocation(o);
             const clientLat=loc.lat; const clientLng=loc.lng;
             const distance=gpsInfo.lat&&clientLat?calcDistance(gpsInfo.lat,gpsInfo.lng,clientLat,clientLng).toFixed(1)+' km': (o.distance?o.distance+' km':'-- km');
-            
             return React.createElement('div',{key:o.id,className:'offer'},
               React.createElement('div',{style:{display:'flex',gap:14}},
                 React.createElement('img',{src:avatarUrl, className:'clientPhoto', alt:clientName, onError:(e)=>{e.target.src=`https://ui-avatars.com/api/?name=${encodeURIComponent(clientName)}&background=facc15&color=000`}}),
@@ -223,7 +214,6 @@ function App(){
                     (o.status==='ACCEPTED'||o.status==='ENROUTE'||o.status==='ARRIVED'||o.status==='INSERVICE')&&React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0'}},React.createElement('span',{className:'live-dot'}),' GPS LIVE')
                   ),
                   React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:6}},`${o.service||'Nursing Care'} • ${o.totalHours||o.hours||'8'}h • GH₵ ${o.amount||0} • Patient: ${patientName} • 📍 ${distance}`),
-                  
                   React.createElement('div',{className:'clientBox'},
                     React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#facc15',marginBottom:8,display:'flex',alignItems:'center',gap:6}},'👤 CLIENT DETAILS — From book-nurse.html Auto-fill'),
                     React.createElement('div',{style:{display:'grid',gap:6,fontSize:12}},
@@ -239,7 +229,6 @@ function App(){
                       clientEmail&&React.createElement('a',{href:`mailto:${clientEmail}?subject=Booking ${o.bookingId||o.id} - ${nurse.fullName}`,style:{flex:1,minWidth:80,padding:'8px 10px',borderRadius:999,background:'rgba(167,139,250,.2)',color:'#a78bfa',fontWeight:700,textDecoration:'none',fontSize:11,textAlign:'center',border:'1px solid rgba(167,139,250,.3)'}},'📧 Email')
                     )
                   ),
-
                   React.createElement('div',{className:'locationBox'},
                     React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#4285F4',marginBottom:8,display:'flex',alignItems:'center',gap:6}},'📍 CLIENT LOCATION — Auto Navigation'),
                     clientLat&&clientLng?React.createElement('div',{style:{display:'grid',gap:6,fontSize:12}},
@@ -251,7 +240,6 @@ function App(){
                       )
                     ):React.createElement('div',{style:{fontSize:11,color:'#fca5a5',background:'rgba(239,68,68,.08)',borderRadius:8,padding:8}},'⚠️ Client location not saved — Old booking — New bookings will include GPS')
                   ),
-
                   React.createElement('div',{style:{display:'flex',gap:8,marginTop:14,flexWrap:'wrap'}},
                     (o.status==='PENDING'||!o.status)&&React.createElement(React.Fragment,null,
                       React.createElement('button',{className:'btn-gold',onClick:()=>setSelAccept(o)},'✅ Accept + Auto Navigate'),
@@ -283,32 +271,7 @@ function App(){
           React.createElement('div',{style:{marginTop:12,background:'#0f0b22',padding:14,borderRadius:12,border:'1px solid var(--line)'}},
             React.createElement('div',{style:{fontSize:11,color:'var(--faint)'}},'Current Balance • LIVE REAL'),
             React.createElement('div',{style:{fontSize:26,fontWeight:700}},'GHS '+Math.round(stats.balanceGHS)),
-            
-            React.createElement('div',{style:{marginTop:12,padding:12,background:'rgba(66,133,244,.08)',borderRadius:12,border:'1px solid rgba(66,133,244,.15)'}},
-              React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'#4285F4'}},'📍 Client Location + Auto Navigation — NEW!'),
-              React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6,lineHeight:1.5}},
-                '• Client location saved from book-nurse.html',React.createElement('br'),
-                '• Distance + Navigate button in offer',React.createElement('br'),
-                '• Accept → GPS + Auto Google Maps navigation',React.createElement('br'),
-                '• CEO tracks nurse LIVE to client'
-              )
-            ),
-
-            // ✅ THIS IS THE BUTTON YOU CIRCLED — NOW RESTORED!
-            React.createElement('div',{style:{marginTop:12,padding:12,background:'rgba(167,139,250,.08)',borderRadius:12,border:'1px solid rgba(167,139,250,.15)'}},
-              React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'#c4b5fd'}},'👩‍⚕️ Nurse Complain — NEW!'),
-              React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6,lineHeight:1.5}},
-                'Nurse can now complain about client — Text + Audio + Video + Photos evidence — Click ⚠️ Complain About Client button on any booking — Goes to nurse-complain.html — CEO sees in ceo-complainant.html LIVE — Legal protection'
-              ),
-              React.createElement('a',{href:'nurse-complain.html',style:{display:'block',marginTop:8,padding:'10px 12px',borderRadius:999,background:'linear-gradient(135deg,#a78bfa,#8b5cf6)',color:'#fff',textDecoration:'none',fontSize:11,fontWeight:700,textAlign:'center',boxShadow:'0 4px 12px rgba(167,139,250,.3)'}},'⚠️ Nurse Complain → nurse-complain.html')
-            ),
-
-            React.createElement('div',{style:{marginTop:12,padding:12,background:'rgba(239,68,68,.08)',borderRadius:12,border:'1px solid rgba(239,68,68,.15)'}},
-              React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'#fca5a5'}},'🚫 NO CEO Tracking Button — As You Requested!'),
-              React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6,lineHeight:1.5}},
-                'CEO live tracking hidden from nurses — Nurses CANNOT see CEO tracking map — Only CEO sees nurse GPS LIVE — Privacy + Security — As you requested!'
-              )
-            )
+            React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6}},`≈ $${stats.balanceUSD.toFixed(2)} USD`)
           )
         )
       )
