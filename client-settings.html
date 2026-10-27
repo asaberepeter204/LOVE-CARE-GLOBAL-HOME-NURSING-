@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Client Settings - Love Care Global</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Settings - Love Care Global - Photo + Phone + Email Saved</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -21,15 +20,28 @@ input,select,textarea{width:100%;padding:13px 14px;border-radius:12px;border:1px
 .btn-primary{background:var(--primary-gradient);color:#1a1030}.btn-red{background:#2a1520;color:#ff6b6b;border:1px solid #5a2530}
 .small{font-size:11px;color:var(--text-dim);margin-top:8px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;display:none;z-index:999;font-weight:700;font-size:13px}
 .profile{display:flex;gap:14px;align-items:center}.profile img{width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid var(--primary)}
+.clientInfoBox{background:linear-gradient(135deg,rgba(201,156,255,.15),rgba(34,197,94,.08));border:1px solid rgba(201,156,255,.25);border-radius:12px;padding:10px;margin-bottom:10px;font-size:11px;color:#c4b5fd}
 </style>
 </head>
 <body>
-<div class="topbar"><a href="client-dashboard.html">← Dashboard</a><b>Client Settings</b><button class="sos">SOS</button></div>
+<div class="topbar"><a href="client-dashboard.html">← Dashboard</a><b>Client Settings — Photo + Phone + Email</b><button class="sos" onclick="location.href='emergency-sos.html'">SOS</button></div>
 <div class="container">
-<div class="card"><h3>Profile Photo</h3><div class="profile"><img id="previewPhoto" src="https://via.placeholder.com/100?text=A"><div style="flex:1"><input type="file" id="photoFile" accept=".jpg,.png,.jpeg"><div class="small">JPG/PNG, max 5MB</div></div></div><button class="btn btn-primary" onclick="updatePhoto()">Update Photo</button></div>
-<div class="card"><h3>Update Email</h3><label>Current Email</label><input id="currentEmail" type="email"><label>New Email</label><input id="newEmail" type="email"><button class="btn btn-primary" onclick="changeEmail()">Update Email</button></div>
-<div class="card"><h3>Update Phone & Name</h3><label>Full Name</label><input id="fullName"><label>Phone Number</label><div class="row"><span style="padding:13px;background:var(--card-light);border-radius:12px;border:1px solid var(--border);color:var(--text-dim)">+233</span><input id="phone" style="flex:1"></div><button class="btn btn-primary" onclick="updateProfile()">Update Profile</button></div>
+
+<div class="card">
+<h3>👤 Your Current Details — Saved Everywhere</h3>
+<div id="currentInfo" class="clientInfoBox">Loading your saved details...</div>
+<div class="profile"><img id="previewPhoto" src="https://via.placeholder.com/100?text=A"><div style="flex:1"><input type="file" id="photoFile" accept=".jpg,.png,.jpeg"><div class="small">JPG/PNG, max 5MB — Will be saved to all bookings, refund, rating</div></div></div>
+<button class="btn btn-primary" onclick="updatePhoto()">📸 Update Photo — Save to Firebase + Local</button>
+</div>
+
+<div class="card"><h3>Update Email — Saves Everywhere</h3><label>Current Email (auto-filled)</label><input id="currentEmail" type="email" readonly><label>New Email *</label><input id="newEmail" type="email" placeholder="Enter new email"><button class="btn btn-primary" onclick="changeEmail()">Update Email — Saves to CEO Center + LocalStorage</button></div>
+
+<div class="card"><h3>Update Phone & Name — Saves Everywhere</h3><label>Full Name * (Client Name)</label><input id="fullName" placeholder="e.g. Asabere Peter"><label>Phone Number *</label><div class="row"><span style="padding:13px;background:var(--card-light);border-radius:12px;border:1px solid var(--border);color:var(--text-dim)">+233</span><input id="phone" style="flex:1" placeholder="502957280"></div><button class="btn btn-primary" onclick="updateProfile()">💾 Update Profile — Saves Name + Phone + Photo + Email Everywhere</button>
+<div class="small">This saves to: clients/, allowedClients/, client_registrations/, ceoRegistrationCenter, localStorage — So refund-query + rating auto-fill will work!</div>
+</div>
+
 <div class="card"><h3>Change Password</h3><label>Current Password</label><input id="currentPass" type="password"><label>New Password</label><input id="newPass" type="password"><label>Confirm New Password</label><input id="confirmPass" type="password"><button class="btn btn-primary" onclick="changePassword()">Change Password</button></div>
+
 <div class="card danger"><h3 style="color:#ff6b6b">⚠️ Danger Zone</h3><label>REASON</label><select id="deleteReason"><option value="">Select</option><option value="Privacy concerns">Privacy concerns</option><option value="Other">Other</option></select><label>DETAILS</label><textarea id="deleteDetails" rows="3"></textarea><div id="deleteError" style="color:#ff6b6b;font-size:12px;margin-top:10px"></div><button class="btn btn-red" onclick="deleteAccount()">Permanently Delete My Account</button></div>
 </div>
 <div id="toast" class="toast"></div>
@@ -38,8 +50,24 @@ const firebaseConfig = {apiKey: "AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDo
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.database(),storage=firebase.storage();
 let currentUser=null,currentClientData=null;
-
-// === CEO REGISTRATION CENTER LIVE SYNC - ADDED BY CEO ===
+function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
+function toast(m){const t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',4000);}
+function saveToLocalStorage(data){
+  try{
+    if(data.name||data.fullName){ localStorage.setItem('clientName', data.fullName||data.name); localStorage.setItem('fullName', data.fullName||data.name); }
+    if(data.phone||data.phoneNumber){ const ph=data.phone||data.phoneNumber; localStorage.setItem('clientPhone', ph); localStorage.setItem('phone', ph); }
+    if(data.email){ localStorage.setItem('clientEmail', data.email); localStorage.setItem('email', data.email); }
+    if(data.photoURL||data.photo||data.photoUrl){ const ph=data.photoURL||data.photo||data.photoUrl; localStorage.setItem('clientPhotoUrl', ph); localStorage.setItem('clientPhoto', ph); localStorage.setItem('photoUrl', ph); localStorage.setItem('photo', ph); }
+    if(data.uid||data.clientUid){ localStorage.setItem('clientUid', data.uid||data.clientUid); localStorage.setItem('uid', data.uid||data.clientUid); }
+  }catch(e){}
+}
+function updateCurrentInfoBox(){
+  const name=localStorage.getItem('clientName')||document.getElementById('fullName').value||'';
+  const phone=localStorage.getItem('clientPhone')||document.getElementById('phone').value||'';
+  const email=localStorage.getItem('clientEmail')||document.getElementById('currentEmail').value||'';
+  const photo=localStorage.getItem('clientPhotoUrl')||'';
+  document.getElementById('currentInfo').innerHTML=`👤 Name: <b style="color:#fff">${name||'Not set'}</b> • 📞 Phone: <b style="color:#86efac">${phone||'Not set'}</b><br>📧 Email: <b style="color:#d8b4fe">${email||'Not set'}</b> • 📸 Photo: ${photo?'✅ YES':'❌ NO'}<br><small style="color:#a99ac4">Saved to localStorage + Firebase — refund-query + rating will auto-fill</small>`;
+}
 async function syncToCEO(uid, extraData){
   try{
     const base = extraData||{};
@@ -47,76 +75,139 @@ async function syncToCEO(uid, extraData){
     base.settingsUpdatedAt = Date.now();
     base.lastUpdate = Date.now();
     base.profileUpdatedAt = Date.now();
+    base.clientSettingsUpdatedAt = Date.now();
+    base.timeOfUpdate = new Date().toLocaleString('en-GH');
+    // Save to all client nodes
     await db.ref('clients/'+uid).update(base);
     await db.ref('client_registrations/'+uid).update(base);
-    await db.ref('client_registrations/'+(base.phone||'')).update(base).catch(()=>{});
     await db.ref('pendingClientRegistrations/'+uid).update(base);
-    await db.ref('clientUsers/'+uid).update(base).catch(()=>{});
-    await db.ref('clientUsers/'+(base.phone||'')).update(base).catch(()=>{});
     await db.ref('clientProfiles/'+uid).update(base).catch(()=>{});
-    await db.ref('ceoClientUpdates/'+uid).set({...base, updatedBy:'client-setting.html', uid:uid});
-    await db.ref('ceoRegistrationCenter/clients/'+uid).set(base);
-    await db.ref('ceoBookingReceiverClients/'+uid).set(base);
-    console.log('CEO client sync done', uid);
-  }catch(e){ console.log('CEO client sync failed', e.message); }
+    await db.ref('clientUsers/'+uid).update(base).catch(()=>{});
+    // allowedClients by email key — CRITICAL for refund-query + rating auto-fill
+    if(base.email){
+      const emailKey=sanitizeEmail(base.email);
+      await db.ref('allowedClients/'+emailKey).update(base);
+      await db.ref('allowedClients/'+emailKey+'/lastUpdate').set(Date.now());
+    }
+    if(base.phone){
+      const phoneKey=base.phone.replace(/[^0-9]/g,'');
+      await db.ref('client_registrations/'+phoneKey).update(base).catch(()=>{});
+      await db.ref('clientUsers/'+phoneKey).update(base).catch(()=>{});
+    }
+    await db.ref('ceoClientUpdates/'+uid).set({...base, updatedBy:'client-settings.html', uid:uid, time:Date.now()});
+    await db.ref('ceoRegistrationCenter/clients/'+uid).update(base);
+    await db.ref('ceoBookingReceiverClients/'+uid).update(base);
+    // Save to localStorage for instant auto-fill
+    saveToLocalStorage(base);
+    console.log('CEO sync done', uid, base);
+  }catch(e){ console.log('CEO sync failed', e.message); }
 }
-
-function toast(m){const t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
 auth.onAuthStateChanged(async (user)=>{
   if(!user){location.href='index.html';return;}
   currentUser=user;
-  document.getElementById('currentEmail').value=user.email||'';
+  document.getElementById('currentEmail').value=user.email||localStorage.getItem('clientEmail')||'';
   try{
     const snap=await db.ref('clients/'+user.uid).once('value');
     if(snap.exists()){
       currentClientData=snap.val();
-      document.getElementById('fullName').value=currentClientData.name||'';
-      document.getElementById('phone').value=(currentClientData.phone||'').replace('+233','').trim();
-      if(currentClientData.photoURL) document.getElementById('previewPhoto').src=currentClientData.photoURL;
+      document.getElementById('fullName').value=currentClientData.name||currentClientData.fullName||localStorage.getItem('clientName')||'';
+      document.getElementById('phone').value=(currentClientData.phone||currentClientData.phoneNumber||'').replace('+233','').trim();
+      if(currentClientData.photoURL||currentClientData.photo) document.getElementById('previewPhoto').src=currentClientData.photoURL||currentClientData.photo;
+      // Save to local immediately
+      saveToLocalStorage({name:currentClientData.name||currentClientData.fullName, fullName:currentClientData.fullName||currentClientData.name, phone:currentClientData.phone||currentClientData.phoneNumber, email:currentClientData.email||user.email, photoURL:currentClientData.photoURL||currentClientData.photo, uid:user.uid});
+    } else {
+      // Try allowedClients
+      if(user.email){
+        const emailKey=sanitizeEmail(user.email);
+        const snap2=await db.ref('allowedClients/'+emailKey).once('value');
+        if(snap2.exists()){
+          const v=snap2.val();
+          document.getElementById('fullName').value=v.fullName||v.name||'';
+          document.getElementById('phone').value=(v.phone||'').replace('+233','').trim();
+          if(v.photoUrl||v.photo) document.getElementById('previewPhoto').src=v.photoUrl||v.photo;
+        }
+      }
     }
   }catch(e){}
+  // Also load from localStorage as fallback
+  if(!document.getElementById('fullName').value) document.getElementById('fullName').value=localStorage.getItem('clientName')||'';
+  if(!document.getElementById('phone').value) document.getElementById('phone').value=(localStorage.getItem('clientPhone')||'').replace('+233','').trim();
+  const photoLS=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('photoUrl');
+  if(photoLS) document.getElementById('previewPhoto').src=photoLS;
+  updateCurrentInfoBox();
 });
 async function updatePhoto(){
-  const file=document.getElementById('photoFile').files[0]; if(!file)return toast('Select photo');
-  const ref=storage.ref('clients/'+currentUser.uid+'/photo'); await ref.put(file);
-  const url=await ref.getDownloadURL();
-  await db.ref('clients/'+currentUser.uid).update({photoURL:url, photo:url, photoUpdatedAt:Date.now()});
-  document.getElementById('previewPhoto').src=url;
-  await syncToCEO(currentUser.uid, {photoURL:url, photo:url, photoUpdatedAt:Date.now()});
-  toast('Photo updated ✅ — CEO Center live');
+  const file=document.getElementById('photoFile').files[0]; if(!file) return toast('Select photo first');
+  if(file.size>5*1024*1024) return toast('Max 5MB');
+  toast('Uploading photo...');
+  try{
+    const ref=storage.ref('clients/'+currentUser.uid+'/photo_'+Date.now());
+    await ref.put(file);
+    const url=await ref.getDownloadURL();
+    document.getElementById('previewPhoto').src=url;
+    const data={photoURL:url, photo:url, photoUrl:url, clientPhotoUrl:url, clientPhoto:url, clientAvatar:url, photoUpdatedAt:Date.now(), uid:currentUser.uid, email:currentUser.email||document.getElementById('currentEmail').value, name:document.getElementById('fullName').value, fullName:document.getElementById('fullName').value, phone:'+233 '+document.getElementById('phone').value.trim()};
+    await db.ref('clients/'+currentUser.uid).update(data);
+    await syncToCEO(currentUser.uid, data);
+    saveToLocalStorage(data);
+    updateCurrentInfoBox();
+    toast('📸 Photo updated ✅ — Saved to Firebase + Local — refund-query + rating will show photo!');
+  }catch(e){ toast('Failed: '+e.message); }
 }
 async function changeEmail(){
-  const newE=document.getElementById('newEmail').value.trim(); if(!newE)return toast('Enter new email');
+  const newE=document.getElementById('newEmail').value.trim(); if(!newE) return toast('Enter new email');
   try{
+    toast('Updating email...');
     await currentUser.updateEmail(newE);
-    await db.ref('clients/'+currentUser.uid).update({email:newE, emailUpdatedAt:Date.now()});
-    await syncToCEO(currentUser.uid, {email:newE, emailUpdatedAt:Date.now()});
-    toast('Email updated ✅ — CEO Center live');
-  }catch(e){toast(e.message);}
+    const data={email:newE, clientEmail:newE, emailUpdatedAt:Date.now(), uid:currentUser.uid, name:document.getElementById('fullName').value, fullName:document.getElementById('fullName').value, phone:'+233 '+document.getElementById('phone').value.trim()};
+    await db.ref('clients/'+currentUser.uid).update(data);
+    document.getElementById('currentEmail').value=newE;
+    await syncToCEO(currentUser.uid, data);
+    saveToLocalStorage(data);
+    updateCurrentInfoBox();
+    toast('📧 Email updated ✅ — CEO Center + Local saved!');
+  }catch(e){ toast(e.message); }
 }
 async function updateProfile(){
   const name=document.getElementById('fullName').value.trim();
-  const phone=document.getElementById('phone').value.trim();
+  const phoneRaw=document.getElementById('phone').value.trim();
+  if(!name) return toast('Enter full name');
+  if(!phoneRaw) return toast('Enter phone');
+  const fullPhone='+233 '+phoneRaw;
   try{
-    await db.ref('clients/'+currentUser.uid).update({name,fullName:name,phone:'+233 '+phone,phoneNumber:'+233 '+phone,nameUpdatedAt:Date.now()});
-    await syncToCEO(currentUser.uid, {name,fullName:name,phone:'+233 '+phone,phoneNumber:'+233 '+phone,nameUpdatedAt:Date.now()});
-    toast('Profile updated ✅ — CEO Center live');
-  }catch(e){toast(e.message);}
+    toast('Saving profile...');
+    const photo=document.getElementById('previewPhoto').src;
+    const isPlaceholder=photo.includes('via.placeholder');
+    const data={
+      name:name, fullName:name, clientName:name, displayName:name,
+      phone:fullPhone, phoneNumber:fullPhone, clientPhone:fullPhone, phoneNumberFormatted:fullPhone,
+      email:currentUser.email||document.getElementById('currentEmail').value,
+      clientEmail:currentUser.email||document.getElementById('currentEmail').value,
+      uid:currentUser.uid, clientUid:currentUser.uid,
+      nameUpdatedAt:Date.now(), phoneUpdatedAt:Date.now(), profileUpdatedAt:Date.now(),
+      clientSettingsUpdatedAt:Date.now(), lastUpdate:Date.now()
+    };
+    if(!isPlaceholder){ data.photoURL=photo; data.photo=photo; data.photoUrl=photo; data.clientPhotoUrl=photo; data.clientPhoto=photo; }
+    await db.ref('clients/'+currentUser.uid).update(data);
+    await syncToCEO(currentUser.uid, data);
+    saveToLocalStorage(data);
+    updateCurrentInfoBox();
+    toast('✅ Profile saved! Name: '+name+' • Phone: '+fullPhone+' • Photo: '+(isPlaceholder?'No':'Yes')+' • Email: '+data.email+' — Saved everywhere! refund-query + rating will auto-fill now!');
+  }catch(e){ toast(e.message); }
 }
 async function changePassword(){
   const cur=document.getElementById('currentPass').value, nw=document.getElementById('newPass').value, cf=document.getElementById('confirmPass').value;
-  if(nw.length<6)return toast('Min 6 chars'); if(nw!==cf)return toast('Mismatch');
+  if(nw.length<6) return toast('Min 6 chars'); if(nw!==cf) return toast('Mismatch');
   try{
     let effectiveEmail=currentUser.email||document.getElementById('currentEmail').value.trim();
     const cred=firebase.auth.EmailAuthProvider.credential(effectiveEmail,cur);
     await currentUser.reauthenticateWithCredential(cred);
     await currentUser.updatePassword(nw);
     await db.ref('clients/'+currentUser.uid).update({passwordUpdatedAt:Date.now()});
-    await syncToCEO(currentUser.uid, {passwordUpdatedAt:Date.now()});
-    toast('Password changed ✅ — CEO Center live');
-  }catch(e){toast(e.message);}
+    await syncToCEO(currentUser.uid, {passwordUpdatedAt:Date.now(), email:effectiveEmail});
+    toast('Password changed ✅');
+  }catch(e){ toast(e.message); }
 }
-async function deleteAccount(){ toast('Use original delete logic'); }
+async function deleteAccount(){ toast('Contact CEO to delete — Safety'); }
 </script>
 </body>
 </html>
