@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create Client Account - LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-storage-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+.card{width:100%;max-width:420px;background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.12);border-radius:24px;padding:24px 18px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.icon{width:64px;height:64px;background:linear-gradient(135deg,#d8b4fe,#a78bfa);border-radius:18px;display:grid;place-items:center;margin:0 auto 12px;font-size:28px;color:#1e0a3a}
+.title{font-weight:900;font-size:22px;text-align:center;color:#f3e8ff}
+.sub{font-size:11px;color:#9a95b8;text-align:center;margin-top:4px}
+label{font-size:10px;font-weight:800;margin:14px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase;letter-spacing:.06em}
+input,select{width:100%;padding:13px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;outline:none}
+input::placeholder{color:#6b6588}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;border:none;border-radius:14px;padding:15px;font-weight:900;cursor:pointer;margin-top:16px;font-size:14px}
+.btnPrimary{background:linear-gradient(135deg,#d8b4fe,#a78bfa);color:#1e0a3a}
+.btnSecondary{background:rgba(14,10,28,.7);border:1px solid rgba(168,85,247,.15);color:#d8b4fe}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.status{padding:10px;border-radius:12px;font-size:11px;text-align:center;display:none;margin-top:12px}
+.status.ok{display:block;background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.status.err{display:block;background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.photoBox{border:1.5px dashed rgba(168,85,247,.25);border-radius:14px;padding:14px;text-align:center;background:rgba(14,10,28,.4);cursor:pointer;margin-top:6px;position:relative;overflow:hidden}
+.photoBox img{width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto;display:block;border:2px solid rgba(216,180,254,.3)}
+.photoBox input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.small{font-size:10px;color:#9a95b8;margin-top:6px}
+.optional{font-size:9px;color:#6b6588;font-weight:600;margin-left:6px;text-transform:none}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="icon">👤</div>
+  <div class="title">Create Client Account</div>
+  <div class="sub">Join LOVE CARE GLOBAL — Nurses will see your profile photo if you add one (optional)</div>
+
+  <div id="statusBox" class="status"></div>
+
+  <label>Full Name *</label>
+  <input id="fullName" placeholder="e.g., Kwame Mensah">
+
+  <div class="row">
+    <div><label>Email *</label><input id="email" type="email" placeholder="client@email.com"></div>
+    <div><label>Phone *</label><input id="phone" type="tel" placeholder="055..."></div>
+  </div>
+
+  <label>Password *</label>
+  <div style="position:relative"><input id="password" type="password" placeholder="Password"><span onclick="togglePwd()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px">👁️</span></div>
+
+  <label>Country *</label>
+  <select id="country"><option value="Ghana" selected>Ghana</option><option value="Nigeria">Nigeria</option><option value="Kenya">Kenya</option><option value="South Africa">South Africa</option><option value="USA">USA</option><option value="UK">UK</option><option value="Other">Other</option></select>
+
+  <!-- OPTIONAL CLIENT PHOTO — NURSES WILL SEE -->
+  <label>Profile Photo <span class="optional">(Optional — Nurses will see you)</span></label>
+  <div class="photoBox" onclick="document.getElementById('photoInput').click()">
+    <img id="photoPreview" src="https://via.placeholder.com/80x80/2d1c4e/d8b4fe?text=No+Photo" alt="Preview">
+    <div style="margin-top:8px;font-size:11px;font-weight:800;color:#d8b4fe">📸 Tap to upload photo — Optional</div>
+    <div class="small">JPG/PNG, max 3MB. This helps nurses recognize you during home visit.</div>
+    <input id="photoInput" type="file" accept="image/*">
+  </div>
+  <div id="photoStatus" class="small" style="color:#86efac;display:none">✅ Photo ready — will be visible to nurses</div>
+  <button id="removePhotoBtn" class="btnSecondary" style="display:none;padding:8px;font-size:11px;margin-top:8px" onclick="removePhoto()">❌ Remove Photo</button>
+
+  <button class="btn btnPrimary" id="createBtn" onclick="createAccount()">Create Account</button>
+
+  <div class="btns">
+    <a href="client-login.html" style="text-decoration:none"><button class="btn btnSecondary" style="width:100%">Login</button></a>
+    <a href="index.html" style="text-decoration:none"><button class="btn btnSecondary" style="width:100%">Home</button></a>
+  </div>
+
+  <div style="font-size:10px;color:#6b6588;text-align:center;margin-top:12px">By creating account, you agree to our Terms. Your photo (if added) will be visible to assigned nurses only.</div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(); const rtdb=firebase.database(); const storage=firebase.storage();
+
+let photoBase64=''; let photoFile=null;
+
+function showStatus(msg,ok){
+  const el=document.getElementById('statusBox');
+  el.textContent=msg; el.className='status '+(ok?'ok':'err'); el.style.display='block';
+  if(ok) setTimeout(()=>el.style.display='none',4000);
+}
+function togglePwd(){ const p=document.getElementById('password'); p.type=p.type==='password'?'text':'password'; }
+
+document.getElementById('photoInput').addEventListener('change',function(e){
+  const file=e.target.files[0]; if(!file) return;
+  if(file.size>3*1024*1024){ showStatus('Photo too large — Max 3MB',false); return; }
+  if(!file.type.startsWith('image/')){ showStatus('Please select image file',false); return; }
+  photoFile=file;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    photoBase64=ev.target.result;
+    document.getElementById('photoPreview').src=photoBase64;
+    document.getElementById('photoStatus').style.display='block';
+    document.getElementById('removePhotoBtn').style.display='block';
+    showStatus('✅ Photo ready — Nurses will see this',true);
+  };
+  reader.readAsDataURL(file);
+});
+
+function removePhoto(){
+  photoBase64=''; photoFile=null;
+  document.getElementById('photoInput').value='';
+  document.getElementById('photoPreview').src='https://via.placeholder.com/80x80/2d1c4e/d8b4fe?text=No+Photo';
+  document.getElementById('photoStatus').style.display='none';
+  document.getElementById('removePhotoBtn').style.display='none';
+}
+
+async function uploadPhotoIfExists(uid, emailKey){
+  if(!photoFile && !photoBase64) return {url:'', base64:''};
+  try{
+    // Try storage first
+    const path=`clientPhotos/${uid||emailKey}/${Date.now()}_${photoFile?photoFile.name:'photo.jpg'}`;
+    if(photoFile){
+      const ref=storage.ref(path);
+      await ref.put(photoFile);
+      const url=await ref.getDownloadURL();
+      return {url, base64:''};
+    }
+  }catch(e){ console.log('Storage upload failed, using base64 fallback', e.message); }
+  // Fallback to base64 in RTDB (nurses can still see)
+  return {url:'', base64:photoBase64};
+}
+
+async function createAccount(){
+  const fullName=document.getElementById('fullName').value.trim();
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('password').value;
+  const country=document.getElementById('country').value;
+  if(!fullName||fullName.length<3){ showStatus('Enter full name (min 3 chars)',false); return; }
+  if(!email||!email.includes('@')){ showStatus('Enter valid email',false); return; }
+  if(!phone||phone.length<9){ showStatus('Enter valid phone',false); return; }
+  if(!password||password.length<6){ showStatus('Password min 6 chars',false); return; }
+
+  const btn=document.getElementById('createBtn'); btn.disabled=true; btn.textContent='Creating...';
+  try{
+    // Check duplicate email in RTDB
+    const dupSnap=await rtdb.ref('clients').orderByChild('email').equalTo(email).once('value');
+    if(dupSnap.exists()){ showStatus('Email already registered — Please login',false); btn.disabled=false; btn.textContent='Create Account'; return; }
+
+    // Create Firebase Auth user
+    const cred=await auth.createUserWithEmailAndPassword(email,password);
+    const uid=cred.user.uid;
+    await cred.user.updateProfile({displayName:fullName});
+
+    const emailKey=email.replace(/[.@]/g,'_');
+    const photoData=await uploadPhotoIfExists(uid,emailKey);
+    const now=Date.now();
+
+    const clientData={
+      uid, id:uid,
+      fullName, clientName:fullName, name:fullName,
+      email, clientEmail:email,
+      phone, clientPhone:phone,
+      country,
+      password:'', // never store plain password
+      role:'client',
+      isClient:true,
+      clientPhotoUrl:photoData.url||'',
+      clientPhotoBase64:photoData.base64?photoData.base64.substring(0,30000):'',
+      hasPhoto: !!(photoData.url||photoData.base64),
+      photoUploaded: !!(photoData.url||photoData.base64),
+      photoVisibleToNurses:true,
+      createdAt:now, timestamp:now, time:now,
+      lastLoginAt:now,
+      isGoogleLogin:false,
+      provider:'email',
+      status:'active',
+      isBlocked:false
+    };
+
+    // Save to multiple nodes — nurses can see from clients node
+    await rtdb.ref('clients/'+uid).set(clientData);
+    await rtdb.ref('clientUsers/'+uid).set(clientData);
+    await rtdb.ref('clientRegistrations/'+emailKey).set(clientData);
+    await rtdb.ref('client_registrations/'+emailKey).set(clientData);
+    await rtdb.ref('allClients/'+uid).set(clientData);
+    if(clientData.clientPhotoUrl||clientData.clientPhotoBase64){
+      await rtdb.ref('clientPhotos/'+uid).set({url:clientData.clientPhotoUrl, base64:clientData.clientPhotoBase64? 'base64 stored in clients node':'' , email, fullName, timestamp:now});
+    }
+
+    // Store locally for dashboard
+    localStorage.setItem('clientEmail',email);
+    localStorage.setItem('clientName',fullName);
+    localStorage.setItem('clientPhone',phone);
+    localStorage.setItem('clientUid',uid);
+    localStorage.setItem('clientLoggedIn','true');
+    if(clientData.clientPhotoUrl) localStorage.setItem('clientPhoto',clientData.clientPhotoUrl);
+
+    showStatus('✅ Account created! Redirecting...',true);
+    setTimeout(()=>location.replace('client-dashboard.html'),1200);
+  }catch(e){
+    let msg=e.message;
+    if(e.code==='auth/email-already-in-use') msg='Email already in use — Please login';
+    showStatus('Failed: '+msg,false);
+  }finally{
+    btn.disabled=false; btn.textContent='Create Account';
+  }
+}
+</script>
+</body>
+</html>
