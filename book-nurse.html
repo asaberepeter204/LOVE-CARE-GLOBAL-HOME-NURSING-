@@ -2,27 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Book Nurse — Full Payment — AUTO LOCATION</title>
+<title>Book Nurse — FULL PAYMENT — CLIENT + PATIENT LOCATION</title>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff}
 .topbar{position:sticky;top:0;z-index:9999;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.15);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
 .card{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;margin:12px 0}
 label{font-size:10px;font-weight:800;margin:10px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase}
 input,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px}
-input[readonly]{background:rgba(168,85,247,.15);border-color:#a855f7;color:#f3e8ff}
+input.auto-filled{background:rgba(168,85,247,.15);border-color:#a855f7}
 .btnSmall{border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;background:rgba(76,29,149,.15);border:1px solid rgba(168,85,247,.15);color:#d8b4fe;font-size:11px}
 .btnPay{width:100%;border:none;border-radius:14px;padding:18px;font-weight:900;cursor:pointer;margin-top:14px;font-size:15px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 10px 28px rgba(168,85,247,.3)}
 .mapWrap{width:100%;height:300px;border-radius:16px;border:1px solid rgba(168,85,247,.12);overflow:hidden;margin-top:10px}
 #map{width:100%;height:100%}
 .nurse-card{border:1px solid rgba(168,85,247,.12);border-radius:16px;padding:12px;background:rgba(14,10,28,.5);cursor:pointer;margin-bottom:10px}
-.nurse-card.selected{border-color:#a855f7;background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(76,29,149,.12))}
+.nurse-card.selected{border-color:#a855f7;background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(216,180,254,.12))}
 .timeBadge{background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(76,29,149,.15));border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:800;color:#d8b4fe;display:flex;align-items:center;justify-content:center;min-height:50px}
 .modalOverlay{position:fixed;inset:0;background:rgba(14,10,28,.85);backdrop-filter:blur(12px);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
 .modalOverlay.show{display:flex}
@@ -38,19 +37,20 @@ input[readonly]{background:rgba(168,85,247,.15);border-color:#a855f7;color:#f3e8
 .nurse-blink-pulse{position:absolute;top:50%;left:50%;width:14px;height:14px;background:rgba(168,85,247,.5);border-radius:50%;animation:pulse-blink 2s infinite}
 .nurse-blink-pulse2{position:absolute;top:50%;left:50%;width:14px;height:14px;background:rgba(168,85,247,.3);border-radius:50%;animation:pulse-blink 2s infinite 0.7s}
 .guide{font-size:11px;color:#a78bfa;background:rgba(14,10,28,.5);border-radius:10px;padding:10px;margin-top:8px}
-.calcBox{background:rgba(14,10,28,.7);border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:14px;margin-top:12px}
+.calcBox{background:rgba(14,10,28,.7);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:14px;margin-top:12px}
 .calcRow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed rgba(168,85,247,.12);font-size:11px}
 .calcRow.total{border-bottom:none;font-weight:900;color:#f3e8ff;font-size:13px;padding-top:10px;margin-top:4px;border-top:1px solid rgba(168,85,247,.25)}
 .clientCard{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(34,197,94,.1));border:1px solid rgba(168,85,247,.3);border-radius:16px;padding:12px;margin-bottom:12px}
 .clientAvatar{width:56px;height:56px;border-radius:50%;object-fit:cover;border:3px solid #a855f7;background:#1e1a3a}
-.locationBadge{background:linear-gradient(135deg,rgba(66,133,244,.15),rgba(52,211,153,.1));border:1px solid rgba(66,133,244,.3);border-radius:12px;padding:10px;margin-top:10px;font-size:11px;color:#93c5fd}
+.locationBadge{background:linear-gradient(135deg,rgba(66,133,244,.15),rgba(168,85,247,.1));border:1px solid rgba(66,133,244,.3);border-radius:12px;padding:10px;margin-top:10px;font-size:11px;color:#93c5fd}
+.patientSection{background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(66,133,244,.08));border:2px solid rgba(34,197,94,.25);border-radius:16px;padding:14px;margin-top:12px}
 </style>
 </head>
 <body>
 <div class="topbar">
-<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:12px;background:white;display:grid;place-items:center;font-size:20px">👩‍⚕️</div><div><b style="color:#f3e8ff;font-size:13px">BOOK NURSE — FULL PAYMENT</b><br><small style="color:#4ade80;font-size:10px">✅ Auto-fill + Auto Location + Nurse sees all at my-job-offer</small></div></div>
-<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-<a href="book-nurse-50-percent.html" style="padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a;font-weight:900;font-size:11px;text-decoration:none;">📦 50% Now</a>
+<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-size:20px">💳</div><div><b style="color:#f3e8ff;font-size:13px">BOOK NURSE — FULL PAYMENT — CLIENT + PATIENT</b><br><small style="color:#d8b4fe;font-size:10px">✅ Full Pay — Client pays — Nurse goes to Patient place</small></div></div>
+<div style="display:flex;gap:6px;align-items:center">
+<a href="book-nurse-50-percent.html" style="padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1e0a3a;font-weight:900;font-size:11px;text-decoration:none;">💰 50% Option</a>
 <a href="./index.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.12);color:#e9d5ff;text-decoration:none;font-weight:800;font-size:10px">Home</a>
 </div>
 </div>
@@ -58,22 +58,16 @@ input[readonly]{background:rgba(168,85,247,.15);border-color:#a855f7;color:#f3e8
 <div style="max-width:800px;margin:0 auto;padding:10px">
 
 <div class="card" id="clientInfoCard" style="display:none">
-<h3 style="font-size:12px;color:#86efac">👤 YOUR DETAILS (Auto-filled + Auto Location)</h3>
+<h3 style="font-size:12px;color:#d8b4fe">👤 CLIENT — Who pays (Auto-filled)</h3>
 <div class="clientCard">
 <img id="clientAvatarDisplay" class="clientAvatar" src="" alt="Client">
-<div style="flex:1">
-<b id="clientNameDisplay" style="font-size:14px;color:#f3e8ff">Loading...</b><br>
-<small id="clientPhoneDisplay" style="color:#a78bfa">...</small><br>
-<small id="clientEmailDisplay" style="color:#86efac;font-size:10px">...</small>
+<div style="flex:1"><b id="clientNameDisplay" style="font-size:14px;color:#f3e8ff">Loading...</b><br><small id="clientPhoneDisplay" style="color:#a78bfa">...</small><br><small id="clientEmailDisplay" style="color:#86efac;font-size:10px">...</small></div>
 </div>
-<div style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:999px;padding:4px 8px;font-size:9px;color:#86efac;font-weight:800">✅ Verified</div>
-</div>
-<div id="clientLocationDisplay" class="locationBadge">📍 Capturing your location automatically... Please allow location permission — This will be sent to nurse for navigation</div>
-<p style="font-size:10px;color:#8b7ab8;margin-top:8px">Name+Phone+Email+Photo+Location will be sent to nurse at <b>my-job-offer.html</b></p>
+<div id="clientLocationDisplay" class="locationBadge">📍 Capturing client location...</div>
 </div>
 
 <div class="card">
-<h3 style="font-size:13px;color:#f3e8ff">📍 Select Nurse — Blinking Map — Auto Location ON</h3>
+<h3 style="font-size:13px;color:#f3e8ff">📍 Select Nurse — Drag Map to PATIENT House</h3>
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
 <button type="button" class="btnSmall" onclick="useMyLocation()">📍 My Location</button>
 <button type="button" class="btnSmall" onclick="searchNearbyNurses()">🔍 Search</button>
@@ -81,11 +75,11 @@ input[readonly]{background:rgba(168,85,247,.15);border-color:#a855f7;color:#f3e8
 </div>
 <div class="mapWrap"><div id="map"></div></div>
 <div id="nurseGrid" style="margin-top:10px;display:grid;gap:10px">Loading nurses...</div>
-<div id="selectedNurseInfo" class="guide">📍 Auto-capturing your location... Allow permission — No need to click My Location — Will auto-update</div>
+<div id="selectedNurseInfo" class="guide">🗺️ Map center = Location — For family bookings, drag map to PATIENT's exact house — Nurse navigates there</div>
 </div>
 
 <div class="card">
-<h3 style="font-size:13px;color:#f3e8ff">⏱️ STEP 2: Booking — Auto-filled + Location</h3>
+<h3 style="font-size:13px;color:#f3e8ff">⏱️ Booking — FULL PAYMENT</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr 110px;gap:8px;margin-top:12px">
 <div><label>START TIME *</label><input id="startTime" type="time" value="08:00" onchange="calcTotal()"></div>
 <div><label>END TIME *</label><input id="endTime" type="time" value="17:00" onchange="calcTotal()"></div>
@@ -95,235 +89,189 @@ input[readonly]{background:rgba(168,85,247,.15);border-color:#a855f7;color:#f3e8
 <div><label>CARE MODE</label><select id="careMode" onchange="calcTotal()"><option value="Daily" selected>Daily</option><option value="Weekly">Weekly (x7)</option><option value="Monthly">Monthly (x30)</option></select></div>
 <div><label>QUANTITY</label><input id="quantity" type="number" value="1" min="1" onchange="calcTotal()"></div>
 </div>
-<div style="margin-top:10px"><label>COUNTRY — CURRENCY</label><select id="countrySelect" onchange="calcTotal()" style="border:2px solid #a855f7"><option value="GHS" selected>🇬🇭 Ghana — GHS</option><option value="USD">🇺🇸 USA — USD</option></select></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-<div><label>CLIENT NAME (Auto-filled)</label><input id="clientFullName" type="text" readonly placeholder="Auto-filling..."></div>
-<div><label>CLIENT PHONE * (Auto-filled)</label><input id="clientPhone" type="tel" readonly placeholder="Auto-filling..."></div>
+<div><label>COUNTRY — CURRENCY</label><select id="countrySelect" onchange="calcTotal()" style="border:2px solid #a855f7"><option value="GHS" selected>🇬🇭 Ghana — GHS</option><option value="USD">🇺🇸 USA — USD</option></select></div>
+<div><label>TRANSPORT</label><input id="transport" type="number" value="100" onchange="calcTotal()"></div>
 </div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-<div><label>CLIENT EMAIL (Auto-filled)</label><input id="clientEmail" type="email" readonly placeholder="Auto-filling..."></div>
-<div><label>PATIENT NAME *</label><input id="patientName" type="text" placeholder="Who needs care?"></div>
+
+<div style="margin-top:16px;padding:12px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:14px">
+<h4 style="font-size:11px;color:#d8b4fe;margin-bottom:8px">👤 CLIENT — Payer (Auto-filled)</h4>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div><label>CLIENT NAME *</label><input id="clientFullName" type="text" placeholder="Auto-filling..."></div>
+<div><label>CLIENT PHONE *</label><input id="clientPhone" type="tel" placeholder="Auto-filling..."></div>
 </div>
-<input id="clientOffer" type="hidden"><input id="clientPhotoUrl" type="hidden">
-<input id="clientLatInput" type="hidden"><input id="clientLngInput" type="hidden">
+<div style="margin-top:8px"><label>CLIENT EMAIL *</label><input id="clientEmail" type="email" placeholder="Auto-filling..."></div>
+<input id="clientPhotoUrl" type="hidden"><input id="clientLatInput" type="hidden"><input id="clientLngInput" type="hidden">
+<div id="clientLocBadge" class="locationBadge" style="margin-top:8px">📍 Client location: capturing...</div>
+</div>
+
+<div class="patientSection">
+<h4 style="font-size:12px;color:#86efac;margin-bottom:4px">🏥 PATIENT — Who needs care — Can be different place!</h4>
+<p style="font-size:10px;color:#a7f3d0;margin-bottom:10px">Client in Accra can book for mother in Kumasi — Nurse goes to PATIENT location</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div><label>PATIENT NAME *</label><input id="patientName" type="text" placeholder="e.g. My Mother, Father"></div>
+<div><label>PATIENT PHONE *</label><input id="patientPhone" type="tel" placeholder="Patient / Next of kin"></div>
+</div>
+<div style="margin-top:8px"><label>PATIENT ADDRESS *</label><input id="patientLocationText" type="text" placeholder="e.g. House 12, Kumasi near Kejetia"></div>
+<div style="display:flex;gap:6px;margin-top:10px;align-items:center;flex-wrap:wrap">
+<label style="margin:0;display:flex;align-items:center;gap:6px;font-size:11px;color:#86efac;text-transform:none"><input id="sameAsClientCheck" type="checkbox" checked onchange="toggleSameLocation()" style="width:16px"> Patient at same place as me?</label>
+<button type="button" class="btnSmall" onclick="setPatientLocationFromMap()" style="background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac">📍 Set Patient Location = Map Center</button>
+</div>
+<input id="patientLatInput" type="hidden"><input id="patientLngInput" type="hidden">
+<div id="patientLocationDisplay" class="locationBadge" style="background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(66,133,244,.12));border-color:rgba(34,197,94,.3);color:#a7f3d0;margin-top:8px">🏥 Patient location: Same as client — Will auto-copy — Nurse navigates here</div>
+<div style="margin-top:8px"><label>PATIENT RELATIONSHIP</label><select id="patientRelationship"><option value="Family">Family Member</option><option value="Mother">Mother</option><option value="Father">Father</option><option value="Grandmother">Grandmother</option><option value="Grandfather">Grandfather</option><option value="Child">Child</option><option value="Spouse">Spouse</option><option value="Self">Self</option><option value="Other">Other</option></select></div>
+</div>
+
 <div id="calcDisplay" class="calcBox">
-<div style="font-size:11px;font-weight:800;color:#f3e8ff;margin-bottom:8px">📊 CALCULATION</div>
+<div style="font-size:11px;font-weight:800;color:#f3e8ff;margin-bottom:8px">📊 CALCULATION — FULL PAYMENT — LIVE</div>
 <div id="calcBreakdown">
 <div class="calcRow"><span>Start → End:</span><span id="cbTime">08:00 → 17:00</span></div>
 <div class="calcRow"><span>Hours per day:</span><span id="cbHrsDay">9.0 hrs/day</span></div>
 <div class="calcRow"><span>Quantity × Mode:</span><span id="cbQty">1 × Daily</span></div>
 <div class="calcRow"><span>Total Hours:</span><span id="cbTotalHrs">9.0 hrs</span></div>
-<div class="calcRow"><span>CEO Hourly Rate:</span><span id="cbRate">GHS 15.00/hr</span></div>
-<div class="calcRow"><span>Base:</span><span id="cbBase">GHS 135.00</span></div>
-<div class="calcRow"><span>Transport:</span><span id="cbTransport">GHS 100.00</span></div>
-<div class="calcRow total"><span>TOTAL:</span><span id="cbTotal">GHS 235.00</span></div>
+<div class="calcRow"><span>CEO Rate:</span><span id="cbRate">GHS 17/hr — LIVE</span></div>
+<div class="calcRow"><span>Base:</span><span id="cbBase">GHS 153</span></div>
+<div class="calcRow"><span>Transport:</span><span id="cbTransport">GHS 100</span></div>
+<div class="calcRow total"><span>TOTAL FULL:</span><span id="cbTotal">GHS 253 — Full Payment Now</span></div>
 </div>
 </div>
-<div id="ceoRateInfo" style="display:none;padding:8px;background:rgba(34,197,94,.12);border-radius:8px;font-size:10px;color:#86efac;margin-top:8px;text-align:center"></div>
-<button id="paystackBtn" class="btnPay" type="button">💳 Pay with Paystack — GHS 0.00</button>
+<div id="ceoRateInfo" style="display:none;padding:8px;background:rgba(168,85,247,.12);border-radius:8px;font-size:10px;color:#d8b4fe;margin-top:8px;text-align:center;border:1px solid rgba(168,85,247,.2)"></div>
+<button id="paystackBtn" class="btnPay" type="button">💳 Pay FULL Now with Paystack — GHS 0.00</button>
 <div id="bookResult" style="margin-top:8px;font-size:10px;color:#a78bfa"></div>
 </div>
 </div>
 
-<div id="nursePreviewModal" class="nursePreviewOverlay"><div class="nursePreviewCard"><div class="previewMedia"><img id="previewPhoto" style="display:none"><video id="previewVideo" controls style="display:none"></video><div id="previewPhotoFallback" style="display:none;width:100%;height:100%;display:grid;place-items:center;font-size:48px">👩‍⚕️</div><div style="position:absolute;top:10px;right:10px"><button onclick="closeNursePreview()" style="background:rgba(0,0,0,.6);border:none;color:white;padding:6px 10px;border-radius:999px;cursor:pointer">✕</button></div></div><div style="padding:16px"><b id="previewName" style="font-size:15px;color:#f3e8ff">Nurse</b><p id="previewBio" style="font-size:11px;color:#c4b5fd;margin:6px 0">Bio</p><div id="previewMeta" style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#a78bfa"></div><div style="display:flex;gap:8px;margin-top:12px"><button onclick="closeNursePreview()" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(168,85,247,.15);cursor:pointer;font-size:12px">Close</button><button onclick="confirmNurseSelection()" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;cursor:pointer;border:none;font-size:12px">✅ Continue</button></div></div></div></div>
-<div id="successModal" class="modalOverlay"><div class="modal"><h2 style="color:#86efac;font-size:16px">✅ Booking Successful!</h2><div style="padding:10px;background:rgba(14,10,28,.5);border-radius:10px;font-size:11px;margin:10px 0"><div>ID: <b id="modalBookingId">LCG-...</b></div><div id="modalNurseInfo" style="margin-top:4px;color:#a78bfa"></div><div id="modalClientInfo" style="margin-top:6px;color:#86efac;font-size:10px"></div></div><div id="modalCalc" style="padding:10px;background:rgba(168,85,247,.08);border-radius:10px;font-size:10px;text-align:left;margin:10px 0;color:#c4b5fd"></div><div style="display:flex;gap:8px"><a href="./index.html" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;text-align:center;text-decoration:none;font-size:12px">Home</a><a href="ceo-booking-receiver.html" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;text-align:center;text-decoration:none;font-size:12px;font-weight:900">👑 CEO Receiver</a></div></div></div>
+<div id="nursePreviewModal" class="nursePreviewOverlay"><div class="nursePreviewCard"><div class="previewMedia"><img id="previewPhoto" style="display:none"><video id="previewVideo" controls style="display:none"></video><div id="previewPhotoFallback" style="display:none;width:100%;height:100%;display:grid;place-items:center;font-size:48px">👩‍⚕️</div><div style="position:absolute;top:10px;right:10px"><button onclick="closeNursePreview()" style="background:rgba(0,0,0,.6);border:none;color:white;padding:6px 10px;border-radius:999px;cursor:pointer">✕</button></div></div><div style="padding:16px"><b id="previewName" style="font-size:15px;color:#f3e8ff">Nurse</b><p id="previewBio" style="font-size:11px;color:#c4b5fd;margin:6px 0">Bio</p><div id="previewMeta" style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#a78bfa"></div><div style="display:flex;gap:8px;margin-top:12px"><button onclick="closeNursePreview()" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(168,85,247,.15);cursor:pointer;font-size:12px">Close</button><button onclick="confirmNurseSelection()" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;cursor:pointer;border:none;font-size:12px">✅ Continue — FULL</button></div></div></div></div>
+<div id="successModal" class="modalOverlay"><div class="modal"><h2 style="color:#86efac;font-size:16px">✅ Full Booking Successful!</h2><div style="padding:10px;background:rgba(14,10,28,.5);border-radius:10px;font-size:11px;margin:10px 0"><div>ID: <b id="modalBookingId">LCG-FULL-...</b></div><div id="modalNurseInfo" style="margin-top:4px;color:#a78bfa"></div><div id="modalClientInfo" style="margin-top:6px;color:#d8b4fe;font-size:10px"></div></div><div id="modalCalc" style="padding:10px;background:rgba(168,85,247,.08);border-radius:10px;font-size:10px;text-align:left;margin:10px 0;color:#c4b5fd"></div><div style="display:flex;gap:8px"><a href="./index.html" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;text-align:center;text-decoration:none;font-size:12px">Home</a><a href="ceo-booking-receiver.html" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;text-align:center;text-decoration:none;font-size:12px;font-weight:900">👑 CEO Receiver</a></div></div></div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig);
-const rtdb=firebase.database();
-const auth=firebase.auth();
-let ceoHourlyRateGHS=17,ceoHourlyRateUSD=8,ceoRatesLoaded=false,ceoRatesConfig={},currentHourlyRate=17;
-let selectedNurseId=null,selectedNurseName='',selectedNursePhone='',selectedNurseData=null,pendingNurse=null,allNurses=[],nurseMarkers=[],clientLatLng={lat:5.6037,lng:-0.1870},map=null;
+const rtdb=firebase.database();const auth=firebase.auth();
+let ceoHourlyRateGHS=17,ceoHourlyRateUSD=8,ceoRatesConfig={};
+let selectedNurseId=null,selectedNurseName='',selectedNursePhone='',pendingNurse=null,allNurses=[],nurseMarkers=[],clientLatLng={lat:5.6037,lng:-0.1870},patientLatLng={lat:5.6037,lng:-0.1870},map=null;
 const PAYSTACK_KEY='pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
-function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
-let currentClientData={ name:'', fullName:'', phone:'', email:'', photoUrl:'', uid:'', photo:'' };
+function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');}
+let currentClientData={name:'',phone:'',email:'',photoUrl:'',uid:''};
 
-// ✅ AUTO CAPTURE LOCATION — NEW!
 function autoCaptureClientLocation(){
-  if(!navigator.geolocation){
-    document.getElementById('clientLocationDisplay').innerHTML='⚠️ GPS not supported — Using map center — Drag map to your location';
-    return;
-  }
-  document.getElementById('clientLocationDisplay').innerHTML='📍 Requesting your location... Please allow permission in your browser';
+  if(!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(pos=>{
-    clientLatLng={lat:pos.coords.latitude, lng:pos.coords.longitude};
-    document.getElementById('clientLatInput').value=clientLatLng.lat;
-    document.getElementById('clientLngInput').value=clientLatLng.lng;
-    document.getElementById('clientLocationDisplay').innerHTML=`✅ Location captured: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b> — This will be sent to nurse for navigation — <a href="https://www.google.com/maps?q=${clientLatLng.lat},${clientLatLng.lng}" target="_blank" style="color:#60a5fa">View on Map</a>`;
-    document.getElementById('selectedNurseInfo').textContent=`✅ Your location: ${clientLatLng.lat.toFixed(4)}, ${clientLatLng.lng.toFixed(4)} — Nurses near you shown — Location will be sent to selected nurse`;
-    initMap(clientLatLng.lat, clientLatLng.lng);
-    searchNearbyNurses();
-    console.log('✅ Auto location captured', clientLatLng);
-  }, err=>{
-    document.getElementById('clientLocationDisplay').innerHTML=`⚠️ Location permission denied — Using map center — Please drag map to your exact location or click 📍 My Location button — Error: ${err.message}`;
-    document.getElementById('selectedNurseInfo').textContent='⚠️ Allow location permission — Or drag map to your location — Or click 📍 My Location';
-  }, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+    clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    patientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    document.getElementById('clientLatInput').value=clientLatLng.lat;document.getElementById('clientLngInput').value=clientLatLng.lng;
+    document.getElementById('patientLatInput').value=patientLatLng.lat;document.getElementById('patientLngInput').value=patientLatLng.lng;
+    document.getElementById('clientLocationDisplay').innerHTML=`✅ Client: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b>`;
+    document.getElementById('clientLocBadge').innerHTML=`📍 Client: ${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}`;
+    document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient (same): <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b> — Nurse goes here`;
+    initMap(clientLatLng.lat,clientLatLng.lng);searchNearbyNurses();
+  },{},{enableHighAccuracy:true,timeout:15000});
 }
-
+function toggleSameLocation(){
+  const checked=document.getElementById('sameAsClientCheck').checked;
+  if(checked){patientLatLng={...clientLatLng};document.getElementById('patientLatInput').value=patientLatLng.lat;document.getElementById('patientLngInput').value=patientLatLng.lng;document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient: Same as client — <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b>`;}
+  else{document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient: DIFFERENT — Drag map to patient house + Click Set Patient Location`;}
+}
+function setPatientLocationFromMap(){
+  if(!map) return;const c=map.getCenter();patientLatLng={lat:c.lat,lng:c.lng};document.getElementById('patientLatInput').value=c.lat;document.getElementById('patientLngInput').value=c.lng;document.getElementById('sameAsClientCheck').checked=false;document.getElementById('patientLocationDisplay').innerHTML=`✅ Patient SET: <b>${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}</b> — Nurse NAVIGATES HERE!`;document.getElementById('patientLocationText').value=document.getElementById('patientLocationText').value||`Lat ${c.lat.toFixed(5)}, Lng ${c.lng.toFixed(5)}`;
+}
 async function loadClientData(){
   try{
-    let email=localStorage.getItem('clientEmail')||localStorage.getItem('userEmail')||'';
-    let name=localStorage.getItem('clientName')||localStorage.getItem('clientFullName')||'';
-    let phone=localStorage.getItem('clientPhone')||'';
-    let photo=localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||'';
-    let uid=localStorage.getItem('clientUid')||'';
-    const user=auth.currentUser;
-    if(user){ if(!email) email=user.email||''; if(!name) name=user.displayName||''; if(!photo) photo=user.photoURL||''; if(!uid) uid=user.uid; }
-    if(email){
-      const key=sanitizeEmail(email);
-      try{
-        const snap=await rtdb.ref('allowedClients/'+key).once('value');
-        if(snap.exists()){
-          const v=snap.val();
-          name=v.fullName||v.name||name; phone=v.phone||phone; photo=v.photoUrl||v.photo||photo; uid=v.uid||uid; email=v.email||email;
-        }else if(uid){
-          const snap2=await rtdb.ref('clients/'+uid).once('value');
-          if(snap2.exists()){ const v=snap2.val(); name=v.fullName||v.name||name; phone=v.phone||phone; photo=v.photoUrl||photo; }
-        }
-      }catch(e){}
-    }
-    if(!email){ email=localStorage.getItem('pendingGoogleEmail')||''; name=localStorage.getItem('pendingGoogleName')||name; photo=localStorage.getItem('pendingGooglePhoto')||photo; }
-    currentClientData={ name:name, fullName:name, clientName:name, phone:phone, clientPhone:phone, email:email, clientEmail:email, photoUrl:photo, clientPhotoUrl:photo, photo:photo, clientPhoto:photo, uid:uid, clientUid:uid };
-    if(name){ document.getElementById('clientFullName').value=name; document.getElementById('clientNameDisplay').textContent=name; }
-    if(phone){ document.getElementById('clientPhone').value=phone; document.getElementById('clientPhoneDisplay').textContent=phone; }
-    if(email){ document.getElementById('clientEmail').value=email; document.getElementById('clientEmailDisplay').textContent=email; }
-    if(photo){ document.getElementById('clientPhotoUrl').value=photo; document.getElementById('clientAvatarDisplay').src=photo; }
-    else{ document.getElementById('clientAvatarDisplay').src='https://ui-avatars.com/api/?name='+encodeURIComponent(name||'Client')+'&background=a855f7&color=fff'; }
-    if(name||email||phone){ document.getElementById('clientInfoCard').style.display='block'; if(!document.getElementById('patientName').value){ document.getElementById('patientName').value=name||'Family Member'; } }
-  }catch(e){ console.log(e.message); }
+    const ls=localStorage;let email=ls.getItem('clientEmail')||ls.getItem('email')||'';let name=ls.getItem('clientName')||ls.getItem('fullName')||'';let phone=ls.getItem('clientPhone')||ls.getItem('phone')||'';let photo=ls.getItem('clientPhotoUrl')||ls.getItem('photoUrl')||'';let uid=ls.getItem('clientUid')||ls.getItem('uid')||'';
+    const user=auth.currentUser;if(user){if(!email)email=user.email||'';if(!name)name=user.displayName||name;if(!photo)photo=user.photoURL||photo;if(!uid)uid=user.uid;}
+    if(email){try{const snap=await rtdb.ref('allowedClients/'+sanitizeEmail(email)).once('value');if(snap.exists()){const v=snap.val();name=v.fullName||v.name||name;phone=v.phone||phone;photo=v.photoUrl||v.photo||photo;uid=v.uid||uid;}}catch(e){}}
+    currentClientData={name,phone,email,photoUrl:photo,uid};
+    if(name){document.getElementById('clientFullName').value=name;document.getElementById('clientFullName').classList.add('auto-filled');document.getElementById('clientNameDisplay').textContent=name;}
+    if(phone){document.getElementById('clientPhone').value=phone;document.getElementById('clientPhone').classList.add('auto-filled');document.getElementById('clientPhoneDisplay').textContent=phone;}
+    if(email){document.getElementById('clientEmail').value=email;document.getElementById('clientEmail').classList.add('auto-filled');document.getElementById('clientEmailDisplay').textContent=email;}
+    if(photo){document.getElementById('clientPhotoUrl').value=photo;document.getElementById('clientAvatarDisplay').src=photo;}else{document.getElementById('clientAvatarDisplay').src='https://ui-avatars.com/api/?name='+encodeURIComponent(name||'Client')+'&background=a855f7&color=fff';}
+    if(name||email||phone){document.getElementById('clientInfoCard').style.display='block';}
+  }catch(e){console.log(e);}
 }
-function loadCEORates(){
-  const paths=['config/rates','ceoPricing','pricing','publicPricing','settings/pricing','ceoSettings/pricing','appSettings/pricing','pricingConfig','loveCarePricing','ceoControlPricing'];
-  paths.forEach(path=>{
-    try{
-      rtdb.ref(path).on('value',snap=>{
-        if(snap.exists()){
-          const v=snap.val(); let ghs=0,usd=0;
-          if(path==='config/rates'){ if(v.GHS&&v.GHS.hourly) ghs=parseFloat(v.GHS.hourly)||0; if(v.USD&&v.USD.hourly) usd=parseFloat(v.USD.hourly)||0; }
-          else { ghs=v.cedis||v.cedisPerHour||v.ghs||v.GHS||0; usd=v.dollars||v.dollarsPerHour||v.usd||v.USD||0; if(ghs===0&&v.GHS&&v.GHS.hourly) ghs=parseFloat(v.GHS.hourly)||0; if(usd===0&&v.USD&&v.USD.hourly) usd=parseFloat(v.USD.hourly)||0; }
-          if(ghs>0){ceoHourlyRateGHS=ghs; currentHourlyRate=ghs;} if(usd>0){ceoHourlyRateUSD=usd;}
-          if(ghs>0||usd>0){ ceoRatesConfig=v; ceoRatesLoaded=true; const curr=getSelectedCurrency(); document.getElementById('ceoRateInfo').innerHTML=`CEO Live: GHS ${ceoHourlyRateGHS}/hr + USD ${ceoHourlyRateUSD}/hr — Current: ${curr.code} — LIVE`; document.getElementById('ceoRateInfo').style.display='block'; calcTotal(); }
-        }
-      });
-    }catch(e){}
-  });
-}
-function getSelectedCurrency(){const sel=document.getElementById('countrySelect');if(!sel) return {code:'GHS', rate: ceoHourlyRateGHS};const val=(sel.value||'').toUpperCase();if(val.includes('USD')) return {code:'USD', rate: ceoHourlyRateUSD};return {code:'GHS', rate: ceoHourlyRateGHS};}
-function calcHours(s,e){if(!s||!e) return 0;const [sh,sm]=s.split(':').map(Number);const [eh,em]=e.split(':').map(Number);let h=(eh+em/60)-(sh+sm/60);if(h<0) h+=24;return h;}
-function formatTimeBoth(t){if(!t) return '';const [h,m]=t.split(':').map(Number);const ampm=h>=12?'PM':'AM';const hh12=h%12||12;const hh24=String(h).padStart(2,'0');const mm=String(m).padStart(2,'0');return `${hh12}:${mm} ${ampm} / ${hh24}:${mm}`;}
+function loadCEORates(){['config/rates','ceoPricing','pricing'].forEach(path=>{rtdb.ref(path).on('value',snap=>{if(snap.exists()){const v=snap.val();let ghs=0,usd=0;if(v.GHS&&v.GHS.hourly)ghs=parseFloat(v.GHS.hourly)||0;if(v.USD&&v.USD.hourly)usd=parseFloat(v.USD.hourly)||0;else{ghs=v.cedis||v.ghs||v.GHS||0;usd=v.dollars||v.usd||0;}if(ghs>0)ceoHourlyRateGHS=ghs;if(usd>0)ceoHourlyRateUSD=usd;if(ghs>0||usd>0){ceoRatesConfig=v;document.getElementById('ceoRateInfo').innerHTML=`CEO Live: GHS ${ceoHourlyRateGHS}/hr — FULL PAY — LIVE`;document.getElementById('ceoRateInfo').style.display='block';calcTotal();}}});});}
+function getSelectedCurrency(){const sel=document.getElementById('countrySelect');if(!sel)return{code:'GHS',rate:ceoHourlyRateGHS};const val=(sel.value||'').toUpperCase();if(val.includes('USD'))return{code:'USD',rate:ceoHourlyRateUSD};return{code:'GHS',rate:ceoHourlyRateGHS};}
+function calcHours(s,e){if(!s||!e)return 0;const[sh,sm]=s.split(':').map(Number);const[eh,em]=e.split(':').map(Number);let h=(eh+em/60)-(sh+sm/60);if(h<0)h+=24;return h;}
+function formatTimeBoth(t){if(!t)return'';const[h,m]=t.split(':').map(Number);const ampm=h>=12?'PM':'AM';const hh12=h%12||12;return `${hh12}:${String(m).padStart(2,'0')} ${ampm} / ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;}
 function calcTotal(){
-  const start=document.getElementById('startTime').value; const end=document.getElementById('endTime').value;
-  const mode=document.getElementById('careMode').value; const qty=parseFloat(document.getElementById('quantity').value)||1; const transport=0;
-  const hrs=calcHours(start,end); document.getElementById('hoursPerDayDisplay').textContent=hrs>0?hrs.toFixed(1):'0'; if(hrs<=0){return {total:0,totalHours:0};}
-  let totHrs=hrs*qty;let modeMult=1; if(mode==='Weekly'){totHrs=hrs*7*qty;modeMult=7} if(mode==='Monthly'){totHrs=hrs*30*qty;modeMult=30}
-  const curr=getSelectedCurrency(); const curRate=curr.rate;const currCode=curr.code; const base=curRate*totHrs;const total=base;
-  const startBoth=formatTimeBoth(start);const endBoth=formatTimeBoth(end);
-  document.getElementById('cbTime').innerHTML=`${startBoth} → ${endBoth} <small>(${hrs.toFixed(1)}h/day)</small>`;
-  document.getElementById('cbHrsDay').textContent=hrs.toFixed(1)+' hrs/day'; document.getElementById('cbQty').textContent=qty+' × '+mode+' (x'+modeMult+')'; document.getElementById('cbTotalHrs').textContent=totHrs.toFixed(1)+' hrs total';
-  document.getElementById('cbRate').textContent=`${currCode} ${curRate.toFixed(2)}/hr`; document.getElementById('cbBase').textContent=`${currCode} ${curRate.toFixed(2)} × ${totHrs.toFixed(1)} = ${currCode} ${base.toFixed(2)}`; document.getElementById('cbTransport').textContent=`${currCode} 0.00`;
-  document.getElementById('cbTotal').textContent=`${currCode} ${total.toFixed(2)}`;
-  const btn=document.getElementById('paystackBtn');if(btn) btn.textContent=`💳 Pay with Paystack — ${currCode} ${total.toFixed(2)}`;
-  return {total,totalHours:totHrs,hrsPerDay:hrs,start,end,mode,qty,transport,curRate,base,modeMult,currCode};
+  const start=document.getElementById('startTime').value;const end=document.getElementById('endTime').value;const mode=document.getElementById('careMode').value;const qty=parseFloat(document.getElementById('quantity').value)||1;const transport=parseFloat(document.getElementById('transport').value)||0;
+  const hrs=calcHours(start,end);document.getElementById('hoursPerDayDisplay').textContent=hrs>0?hrs.toFixed(1):'0';if(hrs<=0)return{total:0};
+  let totHrs=hrs*qty;let modeMult=1;if(mode==='Weekly'){totHrs=hrs*7*qty;modeMult=7}if(mode==='Monthly'){totHrs=hrs*30*qty;modeMult=30}
+  const curr=getSelectedCurrency();const curRate=curr.rate;const currCode=curr.code;const base=curRate*totHrs;const total=base+transport;
+  document.getElementById('cbTime').innerHTML=`${formatTimeBoth(start)} → ${formatTimeBoth(end)}`;document.getElementById('cbHrsDay').textContent=hrs.toFixed(1)+' hrs/day';document.getElementById('cbQty').textContent=qty+' × '+mode;document.getElementById('cbTotalHrs').textContent=totHrs.toFixed(1)+' hrs';document.getElementById('cbRate').textContent=`${currCode} ${curRate}/hr`;document.getElementById('cbBase').textContent=`${currCode} ${base.toFixed(2)}`;document.getElementById('cbTransport').textContent=`${currCode} ${transport.toFixed(2)}`;document.getElementById('cbTotal').textContent=`${currCode} ${total.toFixed(2)} — FULL PAY NOW`;
+  const btn=document.getElementById('paystackBtn');if(btn)btn.textContent=`💳 Pay FULL Now — ${currCode} ${total.toFixed(2)}`;
+  return{total,totalHours:totHrs,hrsPerDay:hrs,start,end,mode,qty,transport,curRate,base,modeMult,currCode};
 }
 function initMap(lat=5.6037,lng=-0.1870){
-  if(map){map.setView([lat,lng],13); 
-    map.on('moveend', function(){ const c=map.getCenter(); clientLatLng={lat:c.lat, lng:c.lng}; document.getElementById('clientLatInput').value=c.lat; document.getElementById('clientLngInput').value=c.lng; document.getElementById('clientLocationDisplay').innerHTML=`✅ Location updated from map: <b>${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}</b> — Will be sent to nurse`; });
-    return;
-  }
+  if(map){map.setView([lat,lng],13);return;}
   map=L.map('map').setView([lat,lng],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(map);
-  const clientIcon=L.divIcon({className:'',html:'<div style="width:18px;height:18px;background:#22c55e;border:2px solid white;border-radius:50%"></div>',iconSize:[18,18],iconAnchor:[9,9]});
-  L.marker([lat,lng],{icon:clientIcon}).addTo(map);
-  map.on('moveend', function(){ const c=map.getCenter(); clientLatLng={lat:c.lat, lng:c.lng}; document.getElementById('clientLatInput').value=c.lat; document.getElementById('clientLngInput').value=c.lng; document.getElementById('clientLocationDisplay').innerHTML=`✅ Location updated from map: <b>${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}</b> — Will be sent to nurse`; });
+  map.on('moveend',function(){const c=map.getCenter();clientLatLng={lat:c.lat,lng:c.lng};document.getElementById('clientLatInput').value=c.lat;document.getElementById('clientLngInput').value=c.lng;document.getElementById('clientLocBadge').innerHTML=`📍 Client: ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;document.getElementById('clientLocationDisplay').innerHTML=`✅ Client: <b>${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}</b>`;if(document.getElementById('sameAsClientCheck').checked){patientLatLng={lat:c.lat,lng:c.lng};document.getElementById('patientLatInput').value=c.lat;document.getElementById('patientLngInput').value=c.lng;document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient (same): <b>${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}</b>`;}});
 }
 function addBlinkingNurseMarker(lat,lng,n){const html=`<div class="nurse-blink-marker"><div class="nurse-blink-pulse"></div><div class="nurse-blink-pulse2"></div><div class="nurse-blink-dot"></div></div>`;const icon=L.divIcon({className:'',html:html,iconSize:[30,30],iconAnchor:[15,15]});const m=L.marker([lat,lng],{icon:icon}).addTo(map);m.bindPopup(`<b>${n.fullName}</b>`);return m}
-function openNurseInGoogleMaps(uid){const n=allNurses.find(x=>x.uid===uid);if(n)window.open(`https://www.google.com/maps?q=${n.lat},${n.lng}`,'_blank')}
-function searchNearbyNurses(){const radius=parseFloat(document.getElementById('radiusSelect').value)||10;rtdb.ref('nurses').once('value').then(snap=>{let nurses=[];if(snap.exists()){snap.forEach(child=>{const v=child.val();if(!v.isApproved&&!v.fullName)return;const lat=v.lat||v.latitude||5.61;const lng=v.lng||v.longitude||-0.19;const dist=Math.sqrt(Math.pow((lat-clientLatLng.lat)*111,2)+Math.pow((lng-clientLatLng.lng)*111*Math.cos(clientLatLng.lat*Math.PI/180),2));if(dist<=radius){nurses.push({uid:child.key,fullName:v.fullName||v.name||'Nurse',photoURL:v.photoURL||v.photo||'',videoURL:v.videoURL||v.video||'',rating:v.rating||4.9,reviewCount:v.reviewCount||12,lat,lng,phone:v.phone||'',bio:v.bio||'Experienced nurse',services:v.services||['Elderly Care'],distance:dist})}})}if(!nurses.length){nurses=[{uid:'demo1',fullName:'Ama Osei',photoURL:'',videoURL:'',rating:4.9,reviewCount:32,lat:5.61,lng:-0.19,phone:'+233240000001',bio:'5 years elderly care',services:['Elderly Care'],distance:1.2}]}allNurses=nurses;nurseMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});nurseMarkers=[];nurses.forEach(n=>{const mk=addBlinkingNurseMarker(n.lat,n.lng,n);if(mk)nurseMarkers.push(mk)});renderNurses(nurses)})}
-let nurseRatingsCache={}, suspendedNursesCache={};
-async function loadNurseRatingsAndSuspended(){try{rtdb.ref('publicNurseRatings').once('value').then(snap=>{if(snap.exists()){snap.forEach(child=>{ nurseRatingsCache[child.key]=child.val(); });}renderNurses(allNurses);});rtdb.ref('suspendedNurses').once('value').then(snap=>{if(snap.exists()){snap.forEach(child=>{ suspendedNursesCache[child.key]=child.val(); });}renderNurses(allNurses);});}catch(e){}}
-function getNurseRatingDisplay(nurseId){const ratingData=nurseRatingsCache[nurseId];if(!ratingData){return {current:5.0, display:'⭐ 5.0/5.0', color:'#86efac'};}const current=ratingData.currentRating||5.0;return {current, display:`⭐ ${current.toFixed(1)}/5.0`, color:'#86efac'};}
-function renderNurses(list){const grid=document.getElementById('nurseGrid');if(!grid) return;const filteredList=list.filter(n=>!suspendedNursesCache[n.uid]);if(!filteredList.length){grid.innerHTML='No nurses — Try larger radius';return;}grid.innerHTML=filteredList.map(n=>{const isSel=selectedNurseId===n.uid;const ratingInfo=getNurseRatingDisplay(n.uid);return `<div class="nurse-card ${isSel?'selected':''}" onclick="previewNurse('${n.uid}')"><div style="display:flex;gap:10px"><div style="width:60px;height:60px;border-radius:10px;overflow:hidden;background:#a855f7;flex-shrink:0">${n.photoURL?`<img src="${n.photoURL}" style="width:100%;height:100%;object-fit:cover">`:`<div style="display:grid;place-items:center;width:100%;height:100%;color:white">${(n.fullName||'N')[0]}</div>`}</div><div style="flex:1"><b style="font-size:13px">${n.fullName}</b> ${isSel?'<span style="background:#a855f7;color:white;padding:2px 6px;border-radius:999px;font-size:9px">SELECTED</span>':''}<br><small style="color:${ratingInfo.color};font-size:11px">${ratingInfo.display} • ${n.distance.toFixed(1)}km</small></div></div><div style="display:flex;gap:6px;margin-top:8px"><button type="button" onclick="event.stopPropagation(); openNurseInGoogleMaps('${n.uid}')" style="flex:1;padding:8px;background:#4285F4;color:white;border:none;border-radius:8px;font-size:10px">🗺️ Maps</button><button type="button" onclick="event.stopPropagation(); previewNurse('${n.uid}')" style="flex:1;padding:8px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:10px">🎥 Video</button></div></div>`;}).join('');}
-function previewNurse(uid){const n=allNurses.find(x=>x.uid===uid);if(!n)return;pendingNurse=n;document.getElementById('previewName').textContent=n.fullName;document.getElementById('previewBio').textContent=n.bio;document.getElementById('previewMeta').innerHTML=`<span>⭐ ${n.rating}</span><span>📍 ${n.distance.toFixed(1)}km</span>`;const photo=document.getElementById('previewPhoto'),video=document.getElementById('previewVideo'),fallback=document.getElementById('previewPhotoFallback');photo.style.display='none';video.style.display='none';fallback.style.display='none';if(n.videoURL){video.src=n.videoURL;video.poster=n.photoURL||'';video.style.display='block';video.load();}else if(n.photoURL){photo.src=n.photoURL;photo.style.display='block'}else fallback.style.display='flex';document.getElementById('nursePreviewModal').classList.add('show')}
-function closeNursePreview(){document.getElementById('nursePreviewModal').classList.remove('show');const v=document.getElementById('previewVideo');if(v){v.pause();v.src=''}pendingNurse=null}
-function confirmNurseSelection(){if(!pendingNurse)return;const n=pendingNurse;selectedNurseId=n.uid;selectedNurseName=n.fullName;selectedNursePhone=n.phone;selectedNurseData=n;document.getElementById('selectedNurseInfo').textContent='✅ Selected: '+n.fullName+' • '+n.distance.toFixed(1)+'km — Location will be sent: '+clientLatLng.lat.toFixed(4)+', '+clientLatLng.lng.toFixed(4);renderNurses(allNurses);closeNursePreview();calcTotal()}
-function useMyLocation(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(pos=>{clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude}; document.getElementById('clientLatInput').value=clientLatLng.lat; document.getElementById('clientLngInput').value=clientLatLng.lng; document.getElementById('clientLocationDisplay').innerHTML=`✅ My Location: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b> — Will be sent to nurse`; initMap(pos.coords.latitude,pos.coords.longitude);searchNearbyNurses()},{enableHighAccuracy:true})}
+function searchNearbyNurses(){const radius=parseFloat(document.getElementById('radiusSelect').value)||10;rtdb.ref('nurses').once('value').then(snap=>{let nurses=[];if(snap.exists()){snap.forEach(child=>{const v=child.val();if(!v.isApproved&&!v.fullName)return;const lat=v.lat||v.latitude||5.61;const lng=v.lng||v.longitude||-0.19;const dist=Math.sqrt(Math.pow((lat-clientLatLng.lat)*111,2)+Math.pow((lng-clientLatLng.lng)*111*Math.cos(clientLatLng.lat*Math.PI/180),2));if(dist<=radius){nurses.push({uid:child.key,fullName:v.fullName||v.name||'Nurse',photoURL:v.photoURL||v.photo||'',rating:v.rating||4.9,lat,lng,phone:v.phone||'',bio:v.bio||'Experienced',distance:dist})}})}if(!nurses.length){nurses=[{uid:'demo1',fullName:'Ama Osei',photoURL:'',rating:4.9,lat:5.61,lng:-0.19,phone:'+233240000001',bio:'5 years elderly care',distance:1.2}]}allNurses=nurses;nurseMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});nurseMarkers=[];nurses.forEach(n=>{const mk=addBlinkingNurseMarker(n.lat,n.lng,n);if(mk)nurseMarkers.push(mk)});renderNurses(nurses)})}
+function renderNurses(list){const grid=document.getElementById('nurseGrid');if(!grid)return;grid.innerHTML=list.map(n=>{const isSel=selectedNurseId===n.uid;return `<div class="nurse-card ${isSel?'selected':''}" onclick="previewNurse('${n.uid}')"><div style="display:flex;gap:10px"><div style="width:60px;height:60px;border-radius:10px;overflow:hidden;background:#a855f7;flex-shrink:0">${n.photoURL?`<img src="${n.photoURL}" style="width:100%;height:100%;object-fit:cover">`:`<div style="display:grid;place-items:center;width:100%;height:100%;color:white">${(n.fullName||'N')[0]}</div>`}</div><div style="flex:1"><b style="font-size:13px">${n.fullName}</b> ${isSel?'<span style="background:#a855f7;color:#fff;padding:2px 6px;border-radius:999px;font-size:9px">SELECTED</span>':''}<br><small style="color:#86efac;font-size:11px">⭐ ${n.rating} • ${n.distance.toFixed(1)}km</small></div></div></div>`;}).join('');}
+function previewNurse(uid){const n=allNurses.find(x=>x.uid===uid);if(!n)return;pendingNurse=n;document.getElementById('previewName').textContent=n.fullName;document.getElementById('previewBio').textContent=n.bio;document.getElementById('nursePreviewModal').classList.add('show')}
+function closeNursePreview(){document.getElementById('nursePreviewModal').classList.remove('show');pendingNurse=null}
+function confirmNurseSelection(){if(!pendingNurse)return;const n=pendingNurse;selectedNurseId=n.uid;selectedNurseName=n.fullName;selectedNursePhone=n.phone;document.getElementById('selectedNurseInfo').textContent='✅ Selected: '+n.fullName+' — Patient: '+patientLatLng.lat.toFixed(4)+', '+patientLatLng.lng.toFixed(4)+' — Nurse navigates to PATIENT';renderNurses(allNurses);closeNursePreview();calcTotal()}
+function useMyLocation(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(pos=>{clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};patientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};document.getElementById('clientLatInput').value=clientLatLng.lat;document.getElementById('clientLngInput').value=clientLatLng.lng;document.getElementById('patientLatInput').value=patientLatLng.lat;document.getElementById('patientLngInput').value=patientLatLng.lng;document.getElementById('clientLocationDisplay').innerHTML=`✅ Client: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b>`;document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient: <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b> — Nurse goes here`;initMap(pos.coords.latitude,pos.coords.longitude);searchNearbyNurses()},{enableHighAccuracy:true})}
 
 function payWithPaystack(){
-  const patient=document.getElementById('patientName').value.trim();
-  const clientName=document.getElementById('clientFullName').value.trim()||currentClientData.fullName||'Client';
-  const phone=document.getElementById('clientPhone').value.trim()||currentClientData.phone||'';
+  const clientName=document.getElementById('clientFullName').value.trim()||currentClientData.name||'Client';
+  const clientPhone=document.getElementById('clientPhone').value.trim()||currentClientData.phone||'';
   const clientEmail=document.getElementById('clientEmail').value.trim()||currentClientData.email||'';
   const clientPhoto=document.getElementById('clientPhotoUrl').value.trim()||currentClientData.photoUrl||'';
-  // ✅ CLIENT LOCATION — AUTO CAPTURED
   const cLat=parseFloat(document.getElementById('clientLatInput').value)||clientLatLng.lat;
   const cLng=parseFloat(document.getElementById('clientLngInput').value)||clientLatLng.lng;
-  const calc=calcTotal(); const offer=parseFloat(calc.total||0); const currCode=calc.currCode||'GHS';
-  if(!selectedNurseId){document.getElementById('nurseGrid').scrollIntoView({behavior:'smooth'});alert('Select nurse first');return}
-  if(!clientName||!phone||!clientEmail){alert('Client details not loaded — Please login'); location.href='client-login.html'; return}
-  if(!patient){alert('Enter patient name');return}
+  const patientName=document.getElementById('patientName').value.trim();
+  const patientPhone=document.getElementById('patientPhone').value.trim();
+  const patientLocText=document.getElementById('patientLocationText').value.trim();
+  const patientRel=document.getElementById('patientRelationship').value;
+  const pLat=parseFloat(document.getElementById('patientLatInput').value)||patientLatLng.lat;
+  const pLng=parseFloat(document.getElementById('patientLngInput').value)||patientLatLng.lng;
+  const calc=calcTotal();const totalAmount=parseFloat(calc.total||0);const currCode=calc.currCode||'GHS';
+  if(!selectedNurseId){alert('Select nurse first');return}
+  if(!clientName||!clientPhone||!clientEmail){alert('Complete client details');return}
+  if(!patientName){alert('Enter patient name');return}
+  if(!patientPhone){alert('Enter patient phone');return}
+  if(!patientLocText){alert('Enter patient address');return}
+  if(!pLat||!pLng){alert('Set patient location — Drag map or click Set Patient Location');return}
   if(typeof PaystackPop==='undefined'){alert('Paystack not loaded');return}
-  const bookingId='LCG-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).substr(2,6).toUpperCase();
-  const payKobo=Math.round(offer*100);
+  const bookingId='LCG-FULL-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  const payKobo=Math.round(totalAmount*100);
   try{
     var handler=PaystackPop.setup({
-      key:PAYSTACK_KEY,email:clientEmail||'lovecareglobal@gmail.com',amount:payKobo,currency:currCode,ref:bookingId+'_'+Date.now(),
+      key:PAYSTACK_KEY,email:clientEmail,amount:payKobo,currency:currCode,ref:bookingId+'_'+Date.now(),
       callback:function(response){
         (async function(){
           const data={
             id:bookingId,bookingId:bookingId,
-            clientName:clientName, clientFullName:clientName, clientDisplayName:clientName,
-            phone:phone, clientPhone:phone, clientPhoneNumber:phone,
-            patientName:patient,
-            clientEmail:clientEmail, email:clientEmail,
-            clientPhotoUrl:clientPhoto, clientPhoto:clientPhoto, photoUrl:clientPhoto, clientAvatar:clientPhoto,
-            clientUid:currentClientData.uid||'', clientId:currentClientData.uid||'',
-            // ✅ CLIENT LOCATION — VERY IMPORTANT FOR NURSE NAVIGATION
-            clientLat:cLat, clientLng:cLng, clientLatLng:{lat:cLat,lng:cLng},
-            latitude:cLat, longitude:cLng, lat:cLat, lng:cLng,
-            clientLatitude:cLat, clientLongitude:cLng,
-            clientLocation:{lat:cLat,lng:cLng},
-            clientLocationCapturedAt:Date.now(),
-            clientLocationSource:'auto_geolocation_map',
+            clientName:clientName,clientFullName:clientName,phone:clientPhone,clientPhone:clientPhone,clientEmail:clientEmail,email:clientEmail,clientPhotoUrl:clientPhoto,clientPhoto:clientPhoto,photoUrl:clientPhoto,clientUid:currentClientData.uid||'',clientId:currentClientData.uid||'',
+            clientLat:cLat,clientLng:cLng,clientLatLng:{lat:cLat,lng:cLng},clientLatitude:cLat,clientLongitude:cLng,clientLocation:{lat:cLat,lng:cLng},
+            patientName:patientName,patientFullName:patientName,patientPhone:patientPhone,patientPhoneNumber:patientPhone,patientContact:patientPhone,
+            patientLocation:patientLocText,patientAddress:patientLocText,patientLocationText:patientLocText,
+            patientLat:pLat,patientLng:pLng,patientLatLng:{lat:pLat,lng:pLng},patientLatitude:pLat,patientLongitude:pLng,patientLocationLat:pLat,patientLocationLng:pLng,
+            patientRelationship:patientRel,patientLocationCapturedAt:Date.now(),
+            patientLocationSource:document.getElementById('sameAsClientCheck').checked?'same_as_client':'different_manual',
+            serviceLocation:{lat:pLat,lng:pLng},destination:{lat:pLat,lng:pLng},mainLat:pLat,mainLng:pLng,destLat:pLat,destLng:pLng,
+            lat:pLat,lng:pLng,latitude:pLat,longitude:pLng,
             nurseId:selectedNurseId,nurseName:selectedNurseName,nursePhone:selectedNursePhone,
-            amount:offer,amountPaidNow:offer,currency:currCode,paymentMethod:'paystack_full',paystackRef:response.reference,
-            status:'pending',time:Date.now(),createdAt:Date.now(),
-            totalHours:calc.totalHours||9,hrsPerDay:calc.hrsPerDay||9,startTime:calc.start||'08:00',endTime:calc.end||'17:00',
-            careMode:calc.mode||'Daily',quantity:calc.qty||1,transport:calc.transport||0,hourlyRateUsed:calc.curRate||currentHourlyRate,
-            ceoRates:ceoRatesConfig,clientLat: cLat, clientLng: cLng, service:calc.mode||'Elderly Care',
-            amountSplit:{nurse:offer*0.8,ceo:offer*0.2},
-            calcBreakdown:{start:calc.start,end:calc.end,hrsPerDay:calc.hrsPerDay,totalHours:calc.totalHours,mode:calc.mode,qty:calc.qty,rate:calc.curRate,base:calc.base,transport:calc.transport,total:calc.total,currCode:currCode}
+            amount:totalAmount,currency:currCode,paymentMethod:'paystack_full',paystackRef:response.reference,status:'pending_full_payment',time:Date.now(),createdAt:Date.now(),
+            totalHours:calc.totalHours||9,hrsPerDay:calc.hrsPerDay||9,startTime:calc.start||'08:00',endTime:calc.end||'17:00',careMode:calc.mode||'Daily',quantity:calc.qty||1,transport:calc.transport||0,
+            hourlyRateUsed:calc.curRate,service:calc.mode||'Elderly Care',amountSplit:{nurse:totalAmount*0.8,ceo:totalAmount*0.2}
           };
-          try{
-            await rtdb.ref('bookings/'+bookingId).set(data);
-            await rtdb.ref('nurseBookings/'+selectedNurseId+'/'+bookingId).set(data);
-            await rtdb.ref('jobOffers/'+bookingId).set(data);
-            await rtdb.ref('myJobOffers/'+selectedNurseId+'/'+bookingId).set(data);
-            await rtdb.ref('ceoBookings/'+bookingId).set(data);
-            await rtdb.ref('allBookings/'+bookingId).set(data);
-            await rtdb.ref('ceoBookingReceiver/'+bookingId).set(data);
-            if(currentClientData.uid){ await rtdb.ref('clientBookings/'+currentClientData.uid+'/'+bookingId).set(data); }
-          }catch(e){ console.log('Save failed', e.message); }
+          try{await rtdb.ref('bookings/'+bookingId).set(data);await rtdb.ref('myJobOffers/'+selectedNurseId+'/'+bookingId).set(data);await rtdb.ref('ceoBookings/'+bookingId).set(data);await rtdb.ref('allBookings/'+bookingId).set(data);await rtdb.ref('bookingsByFull/'+bookingId).set(data);if(currentClientData.uid){await rtdb.ref('clientBookings/'+currentClientData.uid+'/'+bookingId).set(data);}}catch(e){console.log(e);}
           document.getElementById('modalBookingId').textContent=bookingId;
-          document.getElementById('modalNurseInfo').textContent=`${selectedNurseName} • ${currCode} ${offer.toFixed(2)} — Location: ${cLat.toFixed(4)}, ${cLng.toFixed(4)}`;
-          document.getElementById('modalClientInfo').innerHTML=`👤 ${clientName}<br>📞 ${phone}<br>📧 ${clientEmail}<br>📍 Location: ${cLat.toFixed(5)}, ${cLng.toFixed(5)} — Sent to nurse<br>📸 Photo: ${clientPhoto?'Yes ✅':'No'}`;
-          document.getElementById('modalCalc').innerHTML=`<b>✅ Booking saved with location — Nurse will auto-navigate:</b><br>• Name: ${clientName}<br>• Phone: ${phone}<br>• Location: ${cLat.toFixed(5)}, ${cLng.toFixed(5)}<br>• <a href="https://www.google.com/maps?q=${cLat},${cLng}" target="_blank" style="color:#60a5fa">View Client Location on Map</a>`;
+          document.getElementById('modalNurseInfo').textContent=`${selectedNurseName} • ${currCode} ${totalAmount.toFixed(2)} — Patient: ${patientName}`;
+          document.getElementById('modalClientInfo').innerHTML=`👤 Client: ${clientName} — Pays FULL<br>🏥 Patient: ${patientName} — ${patientPhone}<br>📍 ${patientLocText}<br>📍 ${pLat.toFixed(5)}, ${pLng.toFixed(5)} — Nurse NAVIGATES HERE`;
           document.getElementById('successModal').classList.add('show')
         })()
       },
-      onClose:function(){}
-    });
-    handler.openIframe()
-  }catch(err){alert('Paystack error: '+err.message)}
+      onClose:function(){document.getElementById('bookResult').textContent='Payment cancelled'}
+    });handler.openIframe()}catch(err){alert('Paystack error: '+err.message)}
 }
-
 window.addEventListener('DOMContentLoaded',function(){
   initMap(5.6037,-0.1870);searchNearbyNurses();loadCEORates();calcTotal();
-  setTimeout(()=>{ loadNurseRatingsAndSuspended(); }, 1000);
   const btn=document.getElementById('paystackBtn');if(btn){btn.addEventListener('click',payWithPaystack)}
-  auth.onAuthStateChanged(async (user)=>{ await loadClientData(); });
-  loadClientData();
-  // ✅ AUTO CAPTURE LOCATION AFTER 1.5 sec
-  setTimeout(()=>{ autoCaptureClientLocation(); }, 1500);
+  auth.onAuthStateChanged(async(user)=>{await loadClientData();});loadClientData();setTimeout(()=>{autoCaptureClientLocation();},1500);
 });
 </script>
 </body>
