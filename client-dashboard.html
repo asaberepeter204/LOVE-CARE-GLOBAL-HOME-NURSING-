@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Dashboard - LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:20;background:#16102a;border-bottom:1px solid rgba(168,85,247,.12);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-weight:800;font-size:16px;letter-spacing:.04em;color:#f3e8ff}
+.sosBtn{background:#ef4444;color:white;padding:8px 20px;border-radius:999px;font-weight:800;font-size:13px;border:none;text-decoration:none}
+.wrap{max-width:520px;margin:0 auto;padding:18px 14px 80px}
+.welcomeCard{background:rgba(45,28,78,.85);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:22px 20px;margin-bottom:16px;display:flex;gap:14px;align-items:center}
+.avatarWrap{position:relative;flex-shrink:0}
+.avatarImg{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #facc15;background:#1e1a3a;display:grid;place-items:center;font-size:28px;font-weight:800;color:#facc15}
+.avatarEdit{position:absolute;bottom:-4px;right:-4px;width:28px;height:28px;background:#facc15;color:#000;border-radius:50%;display:grid;place-items:center;font-size:14px;cursor:pointer;border:2px solid #1e1a3a}
+.welcomeInfo{flex:1;min-width:0}
+.welcomeTitle{font-size:20px;font-weight:900;line-height:1.15;color:#f3e8ff;word-break:break-word}
+.welcomeEmail{font-size:12px;color:#8b7ab8;margin-top:6px;word-break:break-all}
+.welcomePhone{font-size:11px;color:#a78bfa;margin-top:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:16px 10px;border-radius:14px;border:none;font-weight:800;font-size:13px;cursor:pointer;text-decoration:none;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn-book{background:linear-gradient(135deg,#a855f7,#7c3aed);color:white}
+.btn-bookings{background:linear-gradient(135deg,#06b6d4,#3b82f6);color:white}
+.btn-settings{background:rgba(28,18,56,.95);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
+.btn-alert{background:linear-gradient(135deg,#f59e0b,#f97316);color:white}
+.btn-complaint{background:rgba(28,18,56,.95);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
+.btn-refund{background:rgba(28,18,56,.95);border:1px solid rgba(250,204,21,.2);color:#fde68a}
+.btn-rating{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
+.btn-sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.btn-logout{background:rgba(28,18,56,.95);border:1px solid rgba(255,255,255,.1);color:#9a95b8;grid-column:span 2}
+#blockModal{position:fixed;inset:0;z-index:99999;background:rgba(12,10,30,0.97);display:none;place-items:center;padding:20px}
+#blockModal.show{display:grid}
+.blockBox{max-width:420px;width:100%;background:#1e1a3a;padding:32px;border-radius:20px;border:1px solid rgba(255,255,255,.12);text-align:center}
+#editModal{position:fixed;inset:0;z-index:99998;background:rgba(12,10,30,0.92);display:none;place-items:center;padding:20px}
+#editModal.show{display:grid}
+.editBox{max-width:380px;width:100%;background:#1e1a3a;padding:24px;border-radius:20px;border:1px solid rgba(255,255,255,.12)}
+.editBox input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(12,10,30,.8);color:#ece8ff;margin:8px 0}
+</style>
+</head>
+<body>
+
+<div id="blockModal">
+  <div class="blockBox">
+    <div style="width:72px;height:72px;background:rgba(239,68,68,.15);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:36px">🔒</div>
+    <h2 style="color:#facc15;font-size:22px;font-weight:800;margin-bottom:12px">Security Check Failed!</h2>
+    <p style="font-size:14px;color:#e8e0ff;margin-bottom:8px">Your Gmail <b id="blockEmail" style="color:#facc15"></b> is not fully registered.</p>
+    <p id="countText" style="font-size:12px;color:#a78bfa;margin-bottom:18px">CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br>saved in Firebase for tracking.<br><br>Missing info - Redirecting in 5s...</p>
+    <button onclick="goRegister()" style="padding:14px 20px;background:#facc15;color:#000;border:none;border-radius:12px;font-weight:800;cursor:pointer;width:100%;font-size:15px;margin-bottom:10px">👉 Go to Registration</button>
+    <button onclick="goLogin()" style="padding:12px 20px;background:transparent;color:#9a95b8;border:1px solid rgba(255,255,255,.2);border-radius:12px;cursor:pointer;width:100%">Back to Login</button>
+  </div>
+</div>
+
+<div id="editModal">
+  <div class="editBox">
+    <h3 style="font-size:16px;font-weight:800;margin-bottom:12px">Edit Profile - Save Name & Picture</h3>
+    <div style="text-align:center;margin-bottom:12px">
+      <img id="editPreview" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #facc15;display:none;margin:0 auto">
+      <div id="editInitial" style="width:80px;height:80px;border-radius:50%;background:#1e1a3a;border:3px solid #facc15;display:grid;place-items:center;font-size:28px;margin:0 auto">A</div>
+    </div>
+    <label style="font-size:10px;color:#c4b5fd">Full Name</label>
+    <input id="editName" placeholder="Your full name">
+    <label style="font-size:10px;color:#c4b5fd">Phone</label>
+    <input id="editPhone" placeholder="Phone number">
+    <label style="font-size:10px;color:#c4b5fd">Profile Picture - Choose or keep Google photo</label>
+    <input type="file" id="editFile" accept="image/*">
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button onclick="closeEdit()" style="flex:1;padding:12px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#9a95b8;cursor:pointer">Cancel</button>
+      <button onclick="saveProfile()" id="saveBtn" style="flex:1;padding:12px;background:#facc15;color:#000;border:none;border-radius:12px;font-weight:800;cursor:pointer">Save</button>
+    </div>
+    <p id="editStatus" style="font-size:11px;text-align:center;margin-top:8px;display:none"></p>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="brand">LOVE CARE GLOBAL</div>
+  <a class="sosBtn" href="sos.html">SOS</a>
+</div>
+
+<div class="wrap">
+  <div class="welcomeCard">
+    <div class="avatarWrap" onclick="openEdit()">
+      <img id="clientAvatar" class="avatarImg" style="display:none" src="">
+      <div id="clientAvatarFallback" class="avatarImg">A</div>
+      <div class="avatarEdit">✏️</div>
+    </div>
+    <div class="welcomeInfo">
+      <div class="welcomeTitle">Welcome, <span id="clientName">Loading...</span> 👋</div>
+      <div class="welcomeEmail" id="clientEmailDisplay"></div>
+      <div class="welcomePhone" id="clientPhoneDisplay"></div>
+      <div style="margin-top:6px"><span onclick="openEdit()" style="font-size:10px;color:#facc15;cursor:pointer;text-decoration:underline">Edit name & picture</span> <span id="verifiedBadge" style="font-size:9px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac;padding:2px 6px;border-radius:99px;margin-left:6px">● Verified</span></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <a class="btn btn-book" href="book-nurse.html">🩺<span>Book Nurse</span></a>
+    <a class="btn btn-bookings" href="my-bookings.html">📅<span>My Bookings</span></a>
+    <a class="btn btn-settings" href="client-settings.html">⚙️<span>Client Settings</span></a>
+    <a class="btn btn-alert" href="alerts.html">🔔<span>Alerts</span></a>
+    <a class="btn btn-complaint" href="client-complaint.html">📝<span>Complaint</span></a>
+    <a class="btn btn-refund" href="refund.html">💰<span>Refund Query</span></a>
+    <a class="btn btn-rating" href="rating.html">⭐<span>Rating</span></a>
+    <a class="btn btn-sos" href="sos.html">🚨<span>Emergency SOS</span></a>
+    <a class="btn btn-logout" href="#" onclick="logout()">🚪<span>Logout</span></a>
+  </div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+const dbFS=firebase.firestore();
+const storage=firebase.storage();
+
+function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
+function logout(){localStorage.clear();sessionStorage.clear();auth.signOut().then(()=>{location.replace('client-login.html');});}
+window.goRegister=function(){const email=(localStorage.getItem('clientEmail')||document.getElementById('blockEmail').textContent||'').toLowerCase();localStorage.setItem('pendingGoogleEmail',email);auth.signOut().then(()=>{location.replace('client-registration.html?from=dashboard_block&email='+encodeURIComponent(email));});};
+window.goLogin=function(){localStorage.clear();sessionStorage.clear();auth.signOut().then(()=>{location.replace('client-login.html');});};
+
+function showBlockModal(email){
+  document.getElementById('blockEmail').textContent=email;
+  const countEl=document.getElementById('countText');
+  if(countEl){
+    countEl.innerHTML='CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br>saved in Firebase for tracking.<br><br>Missing info - Redirecting in 5s...';
+    countEl.style.color='#fca5a5';
+  }
+  document.getElementById('blockModal').classList.add('show');
+  let count=5;
+  const t=setInterval(()=>{
+    count--;
+    const el=document.getElementById('countText');
+    if(el && count>0){
+      el.innerHTML='CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br>in Firebase<br><br>Redirecting in '+count+'s...';
+    }
+    if(count<=0){ clearInterval(t); goRegister(); }
+  },1000);
+}
+
+function setAvatarUI(name, photoUrl){
+  const img=document.getElementById('clientAvatar');
+  const fallback=document.getElementById('clientAvatarFallback');
+  const initial=(name||'A').trim().charAt(0).toUpperCase();
+  fallback.textContent=initial;
+  if(photoUrl){
+    img.src=photoUrl;
+    img.style.display='block';
+    fallback.style.display='none';
+    img.onerror=()=>{ img.style.display='none'; fallback.style.display='grid'; };
+  }else{
+    img.style.display='none';
+    fallback.style.display='grid';
+  }
+  const editPrev=document.getElementById('editPreview');
+  const editInit=document.getElementById('editInitial');
+  if(photoUrl){
+    editPrev.src=photoUrl;
+    editPrev.style.display='block';
+    editInit.style.display='none';
+  }else{
+    editPrev.style.display='none';
+    editInit.style.display='grid';
+    editInit.textContent=initial;
+  }
+}
+
+async function loadAndSaveProfile(email, googleName, googlePhoto){
+  const key=sanitizeEmail(email);
+  let savedName=googleName||localStorage.getItem('clientName')||'';
+  let savedPhoto=googlePhoto||localStorage.getItem('clientPhoto')||'';
+  let savedPhone=localStorage.getItem('clientPhone')||'';
+
+  try{
+    const snap=await db.ref('allowedClients/'+key).once('value');
+    if(snap.exists()){
+      const v=snap.val();
+      if(v.name) savedName=v.name;
+      if(v.photoUrl||v.photo) savedPhoto=v.photoUrl||v.photo;
+      if(v.phone) savedPhone=v.phone;
+    }
+    const qSnap=await db.ref('clients').orderByChild('email').equalTo(email.toLowerCase()).once('value');
+    if(qSnap.exists()){
+      qSnap.forEach(ch=>{
+        const val=ch.val();
+        const real=val.profile||val;
+        if(real.name||real.fullName) savedName=real.name||real.fullName;
+        if(real.photoUrl||real.photo) savedPhoto=real.photoUrl||real.photo;
+        if(real.phone) savedPhone=real.phone;
+      });
+    }
+  }catch(e){}
+
+  if(googlePhoto && !savedPhoto){
+    savedPhoto=googlePhoto;
+  }
+
+  document.getElementById('clientName').textContent=savedName||'Client';
+  document.getElementById('clientEmailDisplay').textContent=email;
+  document.getElementById('clientPhoneDisplay').textContent=savedPhone||'';
+  setAvatarUI(savedName, savedPhoto);
+
+  localStorage.setItem('clientName', savedName);
+  localStorage.setItem('clientPhoto', savedPhoto);
+  if(savedPhone) localStorage.setItem('clientPhone', savedPhone);
+  localStorage.setItem('clientEmail', email);
+
+  try{
+    const updateData={
+      email: email.toLowerCase(),
+      name: savedName,
+      photoUrl: savedPhoto,
+      photo: savedPhoto,
+      phone: savedPhone,
+      lastLoginAt: Date.now(),
+      updatedAt: firebase.database.ServerValue.TIMESTAMP
+    };
+    await db.ref('allowedClients/'+key).update(updateData);
+    const qSnap=await db.ref('clients').orderByChild('email').equalTo(email.toLowerCase()).once('value');
+    if(qSnap.exists()){
+      qSnap.forEach(ch=>{
+        db.ref('clients/'+ch.key).update({name: savedName, photoUrl: savedPhoto, photo: savedPhoto, lastLoginAt: Date.now()});
+      });
+    }
+  }catch(e){}
+
+  return {name: savedName, photo: savedPhoto, phone: savedPhone};
+}
+
+window.openEdit=function(){
+  const name=document.getElementById('clientName').textContent;
+  const phone=document.getElementById('clientPhoneDisplay').textContent;
+  document.getElementById('editName').value=name;
+  document.getElementById('editPhone').value=phone;
+  document.getElementById('editModal').classList.add('show');
+}
+window.closeEdit=function(){ document.getElementById('editModal').classList.remove('show'); }
+
+let selectedFile=null;
+document.getElementById('editFile').addEventListener('change', function(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  selectedFile=file;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    document.getElementById('editPreview').src=ev.target.result;
+    document.getElementById('editPreview').style.display='block';
+    document.getElementById('editInitial').style.display='none';
+  };
+  reader.readAsDataURL(file);
+});
+
+window.saveProfile=async function(){
+  const btn=document.getElementById('saveBtn');
+  const statusEl=document.getElementById('editStatus');
+  const email=localStorage.getItem('clientEmail')||document.getElementById('clientEmailDisplay').textContent;
+  const newName=document.getElementById('editName').value.trim();
+  const newPhone=document.getElementById('editPhone').value.trim();
+  if(!newName){ statusEl.textContent='Name required'; statusEl.style.display='block'; statusEl.style.color='#fca5a5'; return; }
+  btn.textContent='Saving...'; btn.disabled=true;
+
+  let photoUrl=localStorage.getItem('clientPhoto')||'';
+
+  try{
+    if(selectedFile){
+      const key=sanitizeEmail(email);
+      const storageRef=storage.ref('clientAvatars/'+key+'/'+Date.now()+'_'+selectedFile.name);
+      const uploadTask=await storageRef.put(selectedFile);
+      photoUrl=await uploadTask.ref.getDownloadURL();
+    }
+  }catch(e){
+    if(selectedFile){
+      photoUrl=document.getElementById('editPreview').src;
+    }
+  }
+
+  try{
+    const key=sanitizeEmail(email);
+    const updateData={
+      email: email.toLowerCase(),
+      name: newName,
+      fullName: newName,
+      phone: newPhone,
+      photoUrl: photoUrl,
+      photo: photoUrl,
+      updatedAt: Date.now()
+    };
+    await db.ref('allowedClients/'+key).update(updateData);
+    const qSnap=await db.ref('clients').orderByChild('email').equalTo(email.toLowerCase()).once('value');
+    if(qSnap.exists()){
+      qSnap.forEach(ch=>{
+        db.ref('clients/'+ch.key).update({name: newName, fullName: newName, phone: newPhone, photoUrl: photoUrl, photo: photoUrl});
+      });
+    }
+    try{
+      const qSnap2=await db.ref('client_registrations').orderByChild('email').equalTo(email.toLowerCase()).once('value');
+      if(qSnap2.exists()){
+        qSnap2.forEach(ch=>{ db.ref('client_registrations/'+ch.key).update({name: newName, phone: newPhone, photoUrl: photoUrl}); });
+      }
+    }catch(e){}
+
+    localStorage.setItem('clientName', newName);
+    localStorage.setItem('clientPhone', newPhone);
+    localStorage.setItem('clientPhoto', photoUrl);
+
+    document.getElementById('clientName').textContent=newName;
+    document.getElementById('clientPhoneDisplay').textContent=newPhone;
+    setAvatarUI(newName, photoUrl);
+
+    statusEl.textContent='✅ Saved! Name & picture saved for all phones';
+    statusEl.style.display='block'; statusEl.style.color='#86efac';
+    setTimeout(()=>{ closeEdit(); statusEl.style.display='none'; },1200);
+  }catch(e){
+    statusEl.textContent='Failed: '+e.message;
+    statusEl.style.display='block'; statusEl.style.color='#fca5a5';
+  }finally{
+    btn.textContent='Save'; btn.disabled=false; selectedFile=null;
+  }
+}
+
+// ✅ CEO SECURITY - FULL REGISTRATION REQUIRED: name + phone + photo + email
+async function isFullyRegistered(email){
+  const key=sanitizeEmail(email);
+  try{ 
+    const s=await db.ref('allowedClients/'+key).once('value'); 
+    if(s.exists()){
+      const v=s.val();
+      if(v.email && (v.name||v.fullName) && v.phone && (v.photoUrl||v.photo)){
+        if(String(v.phone).replace(/\D/g,'').length>=9){
+          return {ok:true, data:v};
+        }
+      }
+    } 
+  }catch(e){}
+  try{ 
+    const s=await db.ref('clients').orderByChild('email').equalTo(email.toLowerCase()).once('value'); 
+    if(s.exists()){
+      let found=null;
+      s.forEach(ch=>{
+        const v=ch.val();
+        const real=v.profile||v;
+        if((real.email||v.email) && (real.name||real.fullName||v.name) && (real.phone||v.phone) && (real.photoUrl||real.photo||v.photoUrl)){
+          const phone=String(real.phone||v.phone||'').replace(/\D/g,'');
+          if(phone.length>=9){
+            found={ok:true, data:real};
+          }
+        }
+      });
+      if(found) return found;
+    }
+  }catch(e){}
+  try{
+    const s=await db.ref('clientRegistrations/'+key).once('value');
+    if(s.exists()){
+      const v=s.val();
+      if(v.email && (v.fullName||v.name) && v.phone && (v.clientPhotoUrl||v.photoUrl||v.photo)){
+        if(String(v.phone).replace(/\D/g,'').length>=9){
+          return {ok:true, data:v};
+        }
+      }
+    }
+  }catch(e){}
+  try{
+    const s=await db.ref('client_registrations').orderByChild('email').equalTo(email.toLowerCase()).once('value');
+    if(s.exists()){
+      let found=null;
+      s.forEach(ch=>{
+        const v=ch.val();
+        if(v.email && (v.name||v.fullName) && v.phone && (v.photoUrl||v.clientPhotoUrl)){
+          if(String(v.phone).replace(/\D/g,'').length>=9){
+            found={ok:true, data:v};
+          }
+        }
+      });
+      if(found) return found;
+    }
+  }catch(e){}
+  return {ok:false, data:null};
+}
+async function isRegistered(email){
+  const r=await isFullyRegistered(email);
+  return r.ok;
+}
+
+async function ultraStrictCheck(){
+  try{
+    const email=(localStorage.getItem('clientEmail')||'').toLowerCase().trim();
+    if(!email){
+      location.replace('client-login.html');
+      return;
+    }
+    const result=await isFullyRegistered(email);
+    if(!result.ok){ 
+      showBlockModal(email); 
+      return; 
+    }
+    try{
+      const uid=localStorage.getItem('clientUid')||'anon_'+email.replace(/[^a-z0-9]/g,'');
+      const trackData={
+        email: email,
+        fullName: result.data.name||result.data.fullName||localStorage.getItem('clientName')||'',
+        phone: result.data.phone||'',
+        photoUrl: result.data.photoUrl||result.data.photo||'',
+        lastSeenDashboard: Date.now(),
+        verified: true
+      };
+      await db.ref('ceoClientsTracking/'+uid).update(trackData);
+      await db.ref('allClientsTracking/'+uid).update(trackData);
+    }catch(e){}
+  }catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(ultraStrictCheck,600);
+});
+
+auth.onAuthStateChanged(async(user)=>{
+  if(!user){
+    const em=localStorage.getItem('clientEmail');
+    if(!em){ location.replace('client-login.html'); return; }
+    const result=await isFullyRegistered(em);
+    if(!result.ok){
+      showBlockModal(em);
+      return;
+    }
+    await loadAndSaveProfile(em, localStorage.getItem('clientName')||'', localStorage.getItem('clientPhoto')||'');
+    return;
+  }
+  const email=(user.email||localStorage.getItem('clientEmail')||'').toLowerCase();
+  const name=user.displayName||localStorage.getItem('clientName')||'Client';
+  const photo=user.photoURL||localStorage.getItem('clientPhoto')||'';
+  const result=await isFullyRegistered(email);
+  if(!result.ok){
+    showBlockModal(email);
+    return;
+  }
+  await loadAndSaveProfile(email, name, photo);
+});
+</script>
+</body>
+</html>
