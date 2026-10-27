@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Dashboard - LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:20;background:#16102a;border-bottom:1px solid rgba(168,85,247,.12);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-weight:800;font-size:16px;letter-spacing:.04em;color:#f3e8ff}
+.sosBtn{background:#ef4444;color:white;padding:8px 20px;border-radius:999px;font-weight:800;font-size:13px;border:none;text-decoration:none}
+.wrap{max-width:520px;margin:0 auto;padding:18px 14px 80px}
+.welcomeCard{background:rgba(45,28,78,.85);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:22px 20px;margin-bottom:16px}
+.welcomeTitle{font-size:26px;font-weight:900;line-height:1.15;color:#f3e8ff}
+.welcomeEmail{font-size:13px;color:#8b7ab8;margin-top:6px;word-break:break-all}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:16px 10px;border-radius:14px;border:none;font-weight:800;font-size:13px;cursor:pointer;text-decoration:none;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn-book{background:linear-gradient(135deg,#a855f7,#7c3aed);color:white}
+.btn-bookings{background:linear-gradient(135deg,#06b6d4,#3b82f6);color:white}
+.btn-settings{background:rgba(28,18,56,.95);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
+.btn-alert{background:linear-gradient(135deg,#f59e0b,#f97316);color:white}
+.btn-complaint{background:rgba(28,18,56,.95);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
+.btn-refund{background:rgba(28,18,56,.95);border:1px solid rgba(250,204,21,.2);color:#fde68a}
+.btn-rating{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
+.btn-consent{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
+.btn-sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+#blockModal{position:fixed;inset:0;z-index:99999;background:rgba(12,10,30,0.97);display:none;place-items:center;padding:20px}
+#blockModal.show{display:grid}
+.blockBox{max-width:420px;width:100%;background:#1e1a3a;padding:32px;border-radius:20px;border:1px solid rgba(255,255,255,.12);text-align:center}
+</style>
+</head>
+<body>
+
+<div id="blockModal">
+  <div class="blockBox">
+    <div style="width:72px;height:72px;background:rgba(239,68,68,.15);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:36px">🚫</div>
+    <h2 style="color:#fca5a5;font-size:22px;font-weight:800;margin-bottom:12px">Access Denied</h2>
+    <p style="font-size:14px;color:#e8e0ff;margin-bottom:8px">Your Google account <b id="blockEmail" style="color:#facc15"></b> is NOT registered as a client.</p>
+    <p style="font-size:14px;color:#facc15;font-weight:700;margin-bottom:16px">Please complete Client Registration first.</p>
+    <p id="countText" style="font-size:12px;color:#a78bfa;margin-bottom:18px">Redirecting to registration in 5 seconds...</p>
+    <button onclick="goRegister()" style="padding:14px 20px;background:#facc15;color:#000;border:none;border-radius:12px;font-weight:800;cursor:pointer;width:100%;font-size:15px;margin-bottom:10px">👉 Go to Client Registration</button>
+    <button onclick="goLogin()" style="padding:12px 20px;background:transparent;color:#9a95b8;border:1px solid rgba(255,255,255,.2);border-radius:12px;cursor:pointer;width:100%">Back to Login</button>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="brand">LOVE CARE GLOBAL</div>
+  <a class="sosBtn" href="sos.html">SOS</a>
+</div>
+
+<div class="wrap">
+  <div class="welcomeCard">
+    <div class="welcomeTitle">Welcome, <span id="clientName">Client</span> 👋</div>
+    <div class="welcomeEmail" id="clientEmailDisplay"></div>
+  </div>
+
+  <div class="grid">
+    <a class="btn btn-book" href="book-nurse.html">🩺<span>Book Nurse</span></a>
+    <a class="btn btn-bookings" href="my-bookings.html">📅<span>My Bookings</span></a>
+    <a class="btn btn-settings" href="client-settings.html">⚙️<span>Client Settings</span></a>
+    <a class="btn btn-alert" href="alert.html">🔔<span>Alerts</span></a>
+    <a class="btn btn-complaint" href="client-complaint.htm">📝<span>Complaint</span></a>
+    <a class="btn btn-refund" href="refund-query.html">💰<span>Refund Query</span></a>
+    <a class="btn btn-rating" href="rating.html">⭐<span>Rating</span></a>
+    <a class="btn btn-consent" href="consent.html">✅<span>Give Consent</span></a>
+    <a class="btn btn-sos" href="sos.html">🚨<span>Emergency SOS</span></a>
+    <a class="btn btn-settings" href="client-profile.html">👤<span>My Profile</span></a>
+    <a class="btn btn-settings" href="#" onclick="logout()" style="grid-column:span 2">🚪<span>Logout</span></a>
+  </div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+const dbFS=firebase.firestore();
+
+function logout(){localStorage.clear();sessionStorage.clear();auth.signOut().then(()=>{location.replace('client-login.html');});}
+
+window.goRegister=function(){
+  const email=(localStorage.getItem('clientEmail')||document.getElementById('blockEmail').textContent||'').toLowerCase().trim();
+  const name=localStorage.getItem('clientName')||'';
+  // Keep email for prefill, then clear auth
+  localStorage.setItem('pendingGoogleEmail',email);
+  localStorage.setItem('pendingGoogleName',name);
+  auth.signOut().then(()=>{
+    localStorage.clear();
+    sessionStorage.clear();
+    localStorage.setItem('pendingGoogleEmail',email);
+    localStorage.setItem('pendingGoogleName',name);
+    // FIXED: Use client-registration.html
+    location.replace('client-registration.html?from=dashboard_block&email='+encodeURIComponent(email)+'&name='+encodeURIComponent(name));
+  });
+};
+
+window.goLogin=function(){
+  localStorage.clear();sessionStorage.clear();
+  auth.signOut().then(()=>{ location.replace('client-login.html'); });
+};
+
+function showBlockModal(email){
+  document.getElementById('blockEmail').textContent=email;
+  document.getElementById('blockModal').classList.add('show');
+  let count=5;
+  const t=setInterval(()=>{
+    count--;
+    const el=document.getElementById('countText');
+    if(el) el.textContent='Redirecting to registration in '+count+' seconds...';
+    if(count<=0){clearInterval(t);goRegister();}
+  },1000);
+}
+
+// SAME STRICT CHECK AS LOGIN PAGE
+async function isClientRegistered(email){
+  const eLower=email.toLowerCase().trim();
+  if(!eLower) return false;
+  const paths=['clients','clientUsers','client_registrations','clientRegistrations','allClients'];
+  for(const p of paths){
+    try{
+      const snap=await db.ref(p).once('value');
+      if(snap.exists()){
+        let found=false;
+        snap.forEach(ch=>{
+          const v=ch.val()||{};
+          const real=v.profile||v.data||v.clientData||v;
+          const em=(real.email||real.clientEmail||v.email||'').toLowerCase().trim();
+          if(em===eLower) found=true;
+        });
+        if(found) return true;
+      }
+    }catch(e){}
+  }
+  try{
+    const fs1=await dbFS.collection('clients').where('email','==',eLower).get();
+    if(!fs1.empty) return true;
+    const fs2=await dbFS.collection('client_registrations').where('email','==',eLower).get();
+    if(!fs2.empty) return true;
+  }catch(e){}
+  return false;
+}
+
+async function ultraStrictCheck(){
+  try{
+    const email=(localStorage.getItem('clientEmail')||'').toLowerCase().trim();
+    if(!email){ location.replace('client-login.html'); return; }
+
+    const registered = await isClientRegistered(email);
+    if(!registered){
+      console.warn('BLOCKED: Not registered', email);
+      showBlockModal(email);
+      return; // stop further loading
+    }
+  }catch(e){ console.error(e); }
+}
+
+// Run check early
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(ultraStrictCheck, 500);
+  setTimeout(ultraStrictCheck, 1500);
+});
+
+// Auth state
+auth.onAuthStateChanged(async(user)=>{
+  if(!user){
+    const em=localStorage.getItem('clientEmail');
+    if(!em) location.replace('client-login.html');
+    return;
+  }
+  const email=(user.email||localStorage.getItem('clientEmail')||'').toLowerCase();
+  const name=user.displayName||localStorage.getItem('clientName')||'Client';
+  document.getElementById('clientName').textContent=name;
+  document.getElementById('clientEmailDisplay').textContent=email;
+  localStorage.setItem('clientEmail', email);
+  localStorage.setItem('clientName', name);
+
+  // Double-check on auth change
+  const ok = await isClientRegistered(email);
+  if(!ok) showBlockModal(email);
+});
+</script>
+</body>
+</html>
