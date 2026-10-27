@@ -51,7 +51,7 @@
     <div style="width:72px;height:72px;background:rgba(239,68,68,.15);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:36px">🔒</div>
     <h2 style="color:#facc15;font-size:22px;font-weight:800;margin-bottom:12px">Security Check Failed!</h2>
     <p style="font-size:14px;color:#e8e0ff;margin-bottom:8px">Your Gmail <b id="blockEmail" style="color:#facc15"></b> is not fully registered.</p>
-    <p id="countText" style="font-size:12px;color:#a78bfa;margin-bottom:18px">CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br>saved in Firebase for tracking.<br><br>Missing info - Redirecting in 5s...</p>
+    <p id="countText" style="font-size:12px;color:#a78bfa;margin-bottom:18px">CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br>saved in Firebase for tracking unlawful actions.<br><br>Deleting unregistered Auth entry...<br>Redirecting in 5s...</p>
     <button onclick="goRegister()" style="padding:14px 20px;background:#facc15;color:#000;border:none;border-radius:12px;font-weight:800;cursor:pointer;width:100%;font-size:15px;margin-bottom:10px">👉 Go to Registration</button>
     <button onclick="goLogin()" style="padding:12px 20px;background:transparent;color:#9a95b8;border:1px solid rgba(255,255,255,.2);border-radius:12px;cursor:pointer;width:100%">Back to Login</button>
   </div>
@@ -66,9 +66,9 @@
     </div>
     <label style="font-size:10px;color:#c4b5fd">Full Name</label>
     <input id="editName" placeholder="Your full name">
-    <label style="font-size:10px;color:#c4b5fd">Phone</label>
+    <label style="font-size:10px;color:#c4b5fd">Phone - Required for CEO tracking</label>
     <input id="editPhone" placeholder="Phone number">
-    <label style="font-size:10px;color:#c4b5fd">Profile Picture - Choose or keep Google photo</label>
+    <label style="font-size:10px;color:#c4b5fd">Profile Picture - Required</label>
     <input type="file" id="editFile" accept="image/*">
     <div style="display:flex;gap:8px;margin-top:14px">
       <button onclick="closeEdit()" style="flex:1;padding:12px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#9a95b8;cursor:pointer">Cancel</button>
@@ -121,23 +121,59 @@ const storage=firebase.storage();
 
 function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
 function logout(){localStorage.clear();sessionStorage.clear();auth.signOut().then(()=>{location.replace('client-login.html');});}
-window.goRegister=function(){const email=(localStorage.getItem('clientEmail')||document.getElementById('blockEmail').textContent||'').toLowerCase();localStorage.setItem('pendingGoogleEmail',email);auth.signOut().then(()=>{location.replace('client-registration.html?from=dashboard_block&email='+encodeURIComponent(email));});};
+window.goRegister=function(){
+  const email=(localStorage.getItem('clientEmail')||document.getElementById('blockEmail').textContent||'').toLowerCase();
+  localStorage.setItem('pendingGoogleEmail',email);
+  auth.signOut().then(()=>{
+    location.replace('client-registration.html?from=dashboard_block&email='+encodeURIComponent(email));
+  });
+};
 window.goLogin=function(){localStorage.clear();sessionStorage.clear();auth.signOut().then(()=>{location.replace('client-login.html');});};
 
-function showBlockModal(email){
+async function deleteUnregisteredAuthUser(email){
+  try{
+    const user=auth.currentUser;
+    if(user && (user.email||'').toLowerCase()===email.toLowerCase()){
+      console.log('🗑️ Deleting unregistered Auth user:', email);
+      await user.delete();
+      console.log('✅ Deleted from Firebase Auth');
+      return true;
+    }
+  }catch(e){
+    console.log('Delete failed:', e.code, e.message);
+    try{ await auth.signOut(); }catch(err){}
+  }
+  return false;
+}
+
+async function showBlockModal(email){
   document.getElementById('blockEmail').textContent=email;
   const countEl=document.getElementById('countText');
   if(countEl){
-    countEl.innerHTML='CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br>saved in Firebase for tracking.<br><br>Missing info - Redirecting in 5s...';
+    countEl.innerHTML='CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br>saved in Firebase for tracking unlawful actions.<br><br>Deleting unregistered Auth entry...<br>Redirecting in 5s...';
     countEl.style.color='#fca5a5';
   }
   document.getElementById('blockModal').classList.add('show');
+  
+  // 🔥 AUTO-DELETE FROM AUTH AFTER 0.5s
+  setTimeout(async()=>{
+    const result=await isFullyRegistered(email);
+    if(!result.ok){
+      await deleteUnregisteredAuthUser(email);
+      localStorage.clear();
+      sessionStorage.clear();
+      if(countEl){
+        countEl.innerHTML='CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br><br>✅ Auth entry deleted!<br>Redirecting to registration...';
+      }
+    }
+  },500);
+
   let count=5;
   const t=setInterval(()=>{
     count--;
     const el=document.getElementById('countText');
     if(el && count>0){
-      el.innerHTML='CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br>in Firebase<br><br>Redirecting in '+count+'s...';
+      el.innerHTML='CEO Security: Must have<br><b style="color:#facc15">Name + Phone + Photo + Email</b><br><br>Auth cleaned!<br>Redirecting in '+count+'s...';
     }
     if(count<=0){ clearInterval(t); goRegister(); }
   },1000);
@@ -221,12 +257,6 @@ async function loadAndSaveProfile(email, googleName, googlePhoto){
       updatedAt: firebase.database.ServerValue.TIMESTAMP
     };
     await db.ref('allowedClients/'+key).update(updateData);
-    const qSnap=await db.ref('clients').orderByChild('email').equalTo(email.toLowerCase()).once('value');
-    if(qSnap.exists()){
-      qSnap.forEach(ch=>{
-        db.ref('clients/'+ch.key).update({name: savedName, photoUrl: savedPhoto, photo: savedPhoto, lastLoginAt: Date.now()});
-      });
-    }
   }catch(e){}
 
   return {name: savedName, photo: savedPhoto, phone: savedPhone};
@@ -262,6 +292,7 @@ window.saveProfile=async function(){
   const newName=document.getElementById('editName').value.trim();
   const newPhone=document.getElementById('editPhone').value.trim();
   if(!newName){ statusEl.textContent='Name required'; statusEl.style.display='block'; statusEl.style.color='#fca5a5'; return; }
+  if(!newPhone || newPhone.replace(/\D/g,'').length<9){ statusEl.textContent='Valid phone required (CEO tracking)'; statusEl.style.display='block'; statusEl.style.color='#fca5a5'; return; }
   btn.textContent='Saving...'; btn.disabled=true;
 
   let photoUrl=localStorage.getItem('clientPhoto')||'';
@@ -288,21 +319,34 @@ window.saveProfile=async function(){
       phone: newPhone,
       photoUrl: photoUrl,
       photo: photoUrl,
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
+      verifiedForDashboard: true
     };
     await db.ref('allowedClients/'+key).update(updateData);
-    const qSnap=await db.ref('clients').orderByChild('email').equalTo(email.toLowerCase()).once('value');
-    if(qSnap.exists()){
-      qSnap.forEach(ch=>{
-        db.ref('clients/'+ch.key).update({name: newName, fullName: newName, phone: newPhone, photoUrl: photoUrl, photo: photoUrl});
-      });
-    }
-    try{
-      const qSnap2=await db.ref('client_registrations').orderByChild('email').equalTo(email.toLowerCase()).once('value');
-      if(qSnap2.exists()){
-        qSnap2.forEach(ch=>{ db.ref('client_registrations/'+ch.key).update({name: newName, phone: newPhone, photoUrl: photoUrl}); });
-      }
-    }catch(e){}
+    const uid=auth.currentUser?auth.currentUser.uid:localStorage.getItem('clientUid')||'uid_'+key;
+    await db.ref('clients/'+uid).update({
+      email: email.toLowerCase(),
+      name: newName,
+      fullName: newName,
+      phone: newPhone,
+      photoUrl: photoUrl,
+      photo: photoUrl,
+      clientEmail: email.toLowerCase(),
+      clientName: newName,
+      clientPhone: newPhone,
+      clientPhotoUrl: photoUrl,
+      verifiedForDashboard: true,
+      registrationComplete: true,
+      createdAt: Date.now()
+    });
+    await db.ref('ceoClientsTracking/'+uid).update({
+      email: email.toLowerCase(),
+      fullName: newName,
+      phone: newPhone,
+      photoUrl: photoUrl,
+      verified: true,
+      lastSeenDashboard: Date.now()
+    });
 
     localStorage.setItem('clientName', newName);
     localStorage.setItem('clientPhone', newPhone);
@@ -312,7 +356,7 @@ window.saveProfile=async function(){
     document.getElementById('clientPhoneDisplay').textContent=newPhone;
     setAvatarUI(newName, photoUrl);
 
-    statusEl.textContent='✅ Saved! Name & picture saved for all phones';
+    statusEl.textContent='✅ Saved! CEO tracking: Name+Phone+Photo+Email saved';
     statusEl.style.display='block'; statusEl.style.color='#86efac';
     setTimeout(()=>{ closeEdit(); statusEl.style.display='none'; },1200);
   }catch(e){
@@ -323,7 +367,7 @@ window.saveProfile=async function(){
   }
 }
 
-// ✅ CEO SECURITY - FULL REGISTRATION REQUIRED: name + phone + photo + email
+// ✅ CEO SECURITY - FULL REGISTRATION REQUIRED
 async function isFullyRegistered(email){
   const key=sanitizeEmail(email);
   try{ 
@@ -344,36 +388,10 @@ async function isFullyRegistered(email){
       s.forEach(ch=>{
         const v=ch.val();
         const real=v.profile||v;
-        if((real.email||v.email) && (real.name||real.fullName||v.name) && (real.phone||v.phone) && (real.photoUrl||real.photo||v.photoUrl)){
-          const phone=String(real.phone||v.phone||'').replace(/\D/g,'');
+        if((real.email||v.email||real.clientEmail) && (real.name||real.fullName||v.name||v.clientName) && (real.phone||v.phone||v.clientPhone) && (real.photoUrl||real.photo||v.photoUrl||v.clientPhotoUrl)){
+          const phone=String(real.phone||v.phone||v.clientPhone||'').replace(/\D/g,'');
           if(phone.length>=9){
             found={ok:true, data:real};
-          }
-        }
-      });
-      if(found) return found;
-    }
-  }catch(e){}
-  try{
-    const s=await db.ref('clientRegistrations/'+key).once('value');
-    if(s.exists()){
-      const v=s.val();
-      if(v.email && (v.fullName||v.name) && v.phone && (v.clientPhotoUrl||v.photoUrl||v.photo)){
-        if(String(v.phone).replace(/\D/g,'').length>=9){
-          return {ok:true, data:v};
-        }
-      }
-    }
-  }catch(e){}
-  try{
-    const s=await db.ref('client_registrations').orderByChild('email').equalTo(email.toLowerCase()).once('value');
-    if(s.exists()){
-      let found=null;
-      s.forEach(ch=>{
-        const v=ch.val();
-        if(v.email && (v.name||v.fullName) && v.phone && (v.photoUrl||v.clientPhotoUrl)){
-          if(String(v.phone).replace(/\D/g,'').length>=9){
-            found={ok:true, data:v};
           }
         }
       });
@@ -399,19 +417,6 @@ async function ultraStrictCheck(){
       showBlockModal(email); 
       return; 
     }
-    try{
-      const uid=localStorage.getItem('clientUid')||'anon_'+email.replace(/[^a-z0-9]/g,'');
-      const trackData={
-        email: email,
-        fullName: result.data.name||result.data.fullName||localStorage.getItem('clientName')||'',
-        phone: result.data.phone||'',
-        photoUrl: result.data.photoUrl||result.data.photo||'',
-        lastSeenDashboard: Date.now(),
-        verified: true
-      };
-      await db.ref('ceoClientsTracking/'+uid).update(trackData);
-      await db.ref('allClientsTracking/'+uid).update(trackData);
-    }catch(e){}
   }catch(e){}
 }
 
