@@ -1,40 +1,88 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CEO Refund Management</title>
+<title>CEO Refund Management - LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
-<style>body{font-family:Inter;background:#0e0a1c;color:#e8e0ff;padding:16px}
-.card{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.12);border-radius:16px;padding:16px;margin:12px 0}
-.badge{padding:4px 10px;border-radius:99px;font-size:10px;font-weight:800}
-.time{color:#facc15;background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.2)}
-.btn{padding:10px 14px;border-radius:10px;border:none;font-weight:800;cursor:pointer;margin:4px}
-.approve{background:#22c55e;color:white}.reject{background:#ef4444;color:white}</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:30;background:#16102a;border-bottom:1px solid rgba(168,85,247,.12);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+.card{background:rgba(28,18,56,.9);border:1px solid rgba(168,85,247,.12);border-radius:18px;padding:16px;margin:12px 0}
+.badge{padding:4px 10px;border-radius:99px;font-size:10px;font-weight:800;display:inline-block;margin:2px}
+.badge-time{background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.25);color:#facc15}
+.badge-pending{background:rgba(250,204,21,.15);color:#fde68a}.badge-approved{background:rgba(34,197,94,.15);color:#86efac}.badge-rejected{background:rgba(239,68,68,.15);color:#fca5a5}
+.btn{padding:10px 14px;border-radius:10px;border:none;font-weight:800;cursor:pointer;margin:4px;font-size:12px}
+.approve{background:#22c55e;color:white}.reject{background:#ef4444;color:white}.view{background:rgba(168,85,247,.2);color:#d8b4fe}
+.detail{background:rgba(14,10,28,.6);padding:10px;border-radius:10px;margin-top:8px;font-size:11px;color:#9a95b8;white-space:pre-wrap}
+</style>
 </head><body>
-<h2>💰 CEO Refund Management — With Time</h2>
-<div id="counts"></div><div id="list">Loading...</div>
+<div class="topbar"><div style="font-weight:800">💰 CEO Refund Management</div><div style="display:flex;gap:8px"><span id="counts" style="font-size:11px;color:#facc15">Loading...</span><button onclick="loadRefunds()" style="padding:8px 12px;border-radius:99px;border:1px solid rgba(168,85,247,.2);background:rgba(168,85,247,.12);color:#d8b4fe;font-size:11px">🔄 Refresh</button></div></div>
+<div class="wrap"><div id="list">Loading refund requests from Firebase...</div></div>
 <script>
-const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8"};firebase.initializeApp(firebaseConfig);const db=firebase.database();
-function formatTime(ts){if(!ts)return'N/A';const d=new Date(ts);const now=new Date();const diff=Math.floor((now-d)/60000);const t=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});const ds=d.toLocaleDateString();if(diff<1)return`Just now • ${t}`;if(diff<60)return`${diff}m ago • ${t} today`;if(diff<1440)return`${Math.floor(diff/60)}h ago • ${t} today`;return`${ds} • ${t}`;}
-function load(){
-  const nodes=['ceoRefundManagement','refundRequests','allRefundRequests','refunds','ceo-refund-management'];
-  let all={};
-  Promise.all(nodes.map(n=>db.ref(n).once('value').then(s=>{if(s.exists())Object.entries(s.val()).forEach(([k,v])=>{if(!all[k]|| (v.requestTime||0)>(all[k].requestTime||0)) all[k]=v;})}))).then(()=>{
-    const arr=Object.values(all).sort((a,b)=>(b.requestTime||0)-(a.requestTime||0));
-    document.getElementById('counts').innerHTML=`${arr.length} refund requests • ${arr.filter(r=>r.status==='pending').length} pending`;
-    document.getElementById('list').innerHTML=arr.map(r=>`
-      <div class="card">
-        <div style="display:flex;justify-content:space-between"><b>${r.refundId}</b><span class="badge time">🕒 ${r.requestTimeDisplay||formatTime(r.requestTime)} • Request: ${r.requestTimeFormatted}</span></div>
-        <div style="margin-top:8px;font-size:13px">📅 Booking: <b>${r.bookingId}</b> • Booked: ${r.bookingTimeFormatted||formatTime(r.bookingTime)} • Paid: ${r.paymentTimeFormatted||formatTime(r.paymentTime)}</div>
-        <div style="font-size:12px;color:#c4b5fd">👤 Client: ${r.clientName} • ${r.clientEmail} • ${r.clientPhone}</div>
-        <div style="font-size:12px;color:#93c5fd">👩‍⚕️ Nurse: ${r.nurseName} • ${r.nursePhone} • ID: ${r.nurseId}</div>
-        <div style="font-size:12px">💰 Amount: ${r.currency} ${r.amount} • Method: ${r.paymentMethod} • Ref: ${r.paystackRef} • Type: ${r.refundType}</div>
-        <div style="font-size:12px;margin-top:6px;background:rgba(14,10,28,.6);padding:8px;border-radius:8px">📝 Reason: ${r.reason}</div>
-        <div style="margin-top:10px"><span class="badge" style="background:${r.status==='pending'?'rgba(250,204,21,.15)':r.status==='approved'?'rgba(34,197,94,.15)':'rgba(239,68,68,.15)'};color:${r.status==='pending'?'#fde68a':r.status==='approved'?'#86efac':'#fca5a5'}">${r.status.toUpperCase()}</span>
-        ${r.status==='pending'?`<button class="btn approve" onclick="update('${r.refundId}','approved')">✅ Approve</button><button class="btn reject" onclick="update('${r.refundId}','rejected')">❌ Reject</button>`:''}</div>
-      </div>`).join('')||'<p>No refunds</p>';
-  });
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);const rtdb=firebase.database();
+
+// 🕒 TIME IT HAPPENED — FINAL FIX
+function formatActionTime(ts){
+  if(!ts) return 'time unknown';
+  let date; if(typeof ts==='number') date=new Date(ts); else if(typeof ts==='string'){ date=new Date(ts); if(isNaN(date.getTime())){ const n=parseInt(ts); if(!isNaN(n)) date=new Date(n); } } else if(ts&&ts.seconds) date=new Date(ts.seconds*1000); else return 'time unknown';
+  if(!date||isNaN(date.getTime())) return 'time unknown';
+  const now=new Date(); const diffMs=now-date; const diffMins=Math.floor(diffMs/60000); const diffHours=Math.floor(diffMins/60); const diffDays=Math.floor(diffHours/24);
+  const timeStr=date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); const dateStr=date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); const shortDate=date.toLocaleDateString('en-US',{month:'short',day:'numeric'}); const full=date.toLocaleString('en-GH');
+  if(diffMins<1) return `Just now • ${timeStr} • ${full}`; if(diffMins<60) return `${diffMins}m ago • ${timeStr} today • ${full}`; if(diffHours<24) return `${diffHours}h ago • ${timeStr} today • ${full}`; if(diffDays===1) return `Yesterday • ${timeStr} • ${full}`; if(diffDays<7) return `${diffDays}d ago • ${shortDate} ${timeStr}`; return `${dateStr} • ${timeStr} • ${full}`;
 }
-function update(id,status){if(!confirm(status+' refund '+id+'?'))return;db.ref('ceoRefundManagement/'+id+'/status').set(status);db.ref('refundRequests/'+id+'/status').set(status);db.ref('allRefundRequests/'+id+'/status').set(status);db.ref('refunds/'+id+'/status').set(status);setTimeout(load,800);}
-load();setInterval(load,10000);
-</script></body></html>
+
+async function loadRefunds(){
+  const list=document.getElementById('list');
+  try{
+    const nodes=['ceoRefundManagement','refundRequests','allRefundRequests','ceo-refund-management','refunds'];
+    let merged={};
+    for(const node of nodes){
+      try{
+        const snap=await rtdb.ref(node).once('value');
+        if(snap.exists()){
+          const val=snap.val();
+          Object.entries(val).forEach(([k,v])=>{
+            const ts=v.requestTime||v.timestamp||0;
+            if(!merged[k] || ts>(merged[k].requestTime||0)) merged[k]=v;
+          });
+        }
+      }catch(e){ console.log(node,e.message); }
+    }
+    const arr=Object.values(merged).sort((a,b)=>(b.requestTime||b.timestamp||0)-(a.requestTime||a.timestamp||0));
+    document.getElementById('counts').textContent=`${arr.length} total • ${arr.filter(r=>r.status==='pending').length} pending`;
+    if(arr.length===0){ list.innerHTML='<div class="card" style="text-align:center;color:#9a95b8">No refund requests yet. When client submits from refund-query.html, it will appear here with time.</div>'; return; }
+    list.innerHTML=arr.map(r=>{
+      const timeDisplay=r.requestTimeDisplay||formatActionTime(r.requestTime||r.timestamp);
+      const bookingTimeDisplay=r.bookingTimeFormatted||formatActionTime(r.bookingTime||r.paymentTime);
+      const paymentTimeDisplay=r.paymentTimeFormatted||formatActionTime(r.paymentTime);
+      const statusColor=r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected';
+      return `<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px"><b style="font-size:13px">${r.refundId||'REF-'} • ${r.bookingId}</b><span class="badge ${statusColor}">${(r.status||'pending').toUpperCase()} • ${r.refundType||''}</span></div>
+        <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px"><span class="badge badge-time">🕒 Request: ${timeDisplay}</span><span class="badge badge-time">📅 Booking Time: ${bookingTimeDisplay}</span><span class="badge badge-time">💳 Payment: ${paymentTimeDisplay}</span></div>
+        <div style="margin-top:10px;font-size:12px;color:#c4b5fd">👤 Client: <b>${r.clientName||'N/A'}</b> • ${r.clientEmail||''} • ${r.clientPhone||''}</div>
+        <div style="font-size:12px;color:#93c5fd">👩‍⚕️ Nurse: <b>${r.nurseName||r.nurseId||'N/A'}</b> • ${r.nursePhone||''} • ID: ${r.nurseId||''}</div>
+        <div style="font-size:12px;margin-top:4px">💰 Amount: <b>${r.currency||'GHS'} ${r.amount||r.amountPaidNow||0}</b> • Method: ${r.paymentMethod||''} • Paystack Ref: <b style="color:#facc15">${r.paystackRef||'N/A'}</b> ${r.amountCashLater?`• Cash Later: ${r.currency} ${r.amountCashLater}`:''}</div>
+        <div class="detail">📝 Reason: ${r.reason||'No reason'}\n🕒 Booking ID: ${r.bookingId}\n🕒 Booking Time: ${r.bookingTime||''} (${bookingTimeDisplay})\n🕒 Payment Time: ${r.paymentTime||''} (${paymentTimeDisplay})\n🕒 Request Time: ${r.requestTime||''} (${timeDisplay})\n📧 Client UID: ${r.clientUid||''}</div>
+        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+          ${r.status==='pending'?`<button class="btn approve" onclick="updateStatus('${r.refundId}','approved')">✅ Approve Refund</button><button class="btn reject" onclick="updateStatus('${r.refundId}','rejected')">❌ Reject</button>`:''}
+          <button class="btn view" onclick="toggleDetail(this)">👁️ View Original Booking JSON</button>
+        </div>
+        <div class="detail" style="display:none;margin-top:8px">${JSON.stringify(r.originalBooking||r,true).substring(0,2000)}</div>
+      </div>`;
+    }).join('');
+  }catch(e){ list.innerHTML='Error: '+e.message; }
+}
+function toggleDetail(btn){ const d=btn.parentElement.nextElementSibling; d.style.display=d.style.display==='none'?'block':'none'; }
+function updateStatus(refundId,status){
+  const note=prompt(`Enter note for ${status}:`); if(note===null) return;
+  const updates={status, ceoNote:note, actionTime:Date.now(), actionTimeFormatted:new Date().toLocaleString(), actionTimeDisplay:formatActionTime(Date.now())};
+  rtdb.ref('ceoRefundManagement/'+refundId).update(updates); rtdb.ref('refundRequests/'+refundId).update(updates); rtdb.ref('allRefundRequests/'+refundId).update(updates); rtdb.ref('refunds/'+refundId).update(updates); rtdb.ref('ceo-refund-management/'+refundId).update(updates);
+  alert(`✅ Refund ${refundId} marked as ${status}`); setTimeout(loadRefunds,800);
+}
+loadRefunds();
+</script>
+</body></html>
