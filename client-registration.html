@@ -4,206 +4,388 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Create Client Account - LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
-.card{width:100%;max-width:420px;background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.12);border-radius:24px;padding:24px 18px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
-.icon{width:64px;height:64px;background:linear-gradient(135deg,#d8b4fe,#a78bfa);border-radius:18px;display:grid;place-items:center;margin:0 auto 12px;font-size:28px;color:#1e0a3a}
-.title{font-weight:900;font-size:22px;text-align:center;color:#f3e8ff}
-.sub{font-size:11px;color:#9a95b8;text-align:center;margin-top:4px}
-label{font-size:10px;font-weight:800;margin:14px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase;letter-spacing:.06em}
-input,select{width:100%;padding:13px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;outline:none}
-input::placeholder{color:#6b6588}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{width:100%;max-width:420px;background:#1e1a3a;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px}
+.logo{width:64px;height:64px;background:linear-gradient(135deg,#a855f7,#7c3aed);border-radius:16px;display:grid;place-items:center;margin:0 auto;font-size:28px}
+h2{text-align:center;font-size:22px;font-weight:800;margin-top:8px}
+.sub{font-size:12px;color:#8b7ab8;text-align:center;margin-top:-4px}
+label{font-size:11px;color:#facc15;font-weight:700;letter-spacing:.04em;margin-top:4px}
+input,select{padding:13px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(12,10,30,.8);color:#ece8ff;width:100%;font-size:14px;outline:none}
+input:focus,select:focus{border-color:#a855f7}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn{width:100%;border:none;border-radius:14px;padding:15px;font-weight:900;cursor:pointer;margin-top:16px;font-size:14px}
-.btnPrimary{background:linear-gradient(135deg,#d8b4fe,#a78bfa);color:#1e0a3a}
-.btnSecondary{background:rgba(14,10,28,.7);border:1px solid rgba(168,85,247,.15);color:#d8b4fe}
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.status{padding:10px;border-radius:12px;font-size:11px;text-align:center;display:none;margin-top:12px}
-.status.ok{display:block;background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.3)}
-.status.err{display:block;background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
-.photoBox{border:1.5px dashed rgba(168,85,247,.25);border-radius:14px;padding:14px;text-align:center;background:rgba(14,10,28,.4);cursor:pointer;margin-top:6px;position:relative;overflow:hidden}
-.photoBox img{width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto;display:block;border:2px solid rgba(216,180,254,.3)}
-.photoBox input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.small{font-size:10px;color:#9a95b8;margin-top:6px}
-.optional{font-size:9px;color:#6b6588;font-weight:600;margin-left:6px;text-transform:none}
+.btn{padding:14px;border-radius:12px;border:none;font-weight:800;cursor:pointer;font-size:14px;text-align:center}
+.btnReg{background:#facc15;color:#000}
+.btnGoogle{background:#fff;color:#1f1f1f;border:1px solid #747775;display:flex;gap:10px;align-items:center;justify-content:center;font-weight:500}
+.status{padding:10px;border-radius:10px;font-size:11px;display:none;text-align:center}
+.status.ok{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.status.err{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.status.warn{background:rgba(250,204,21,.12);color:#fde68a;border:1px solid rgba(250,204,21,.3)}
+.photoBox{border:1px dashed rgba(168,85,247,.3);border-radius:16px;padding:16px;text-align:center;background:rgba(12,10,30,.4)}
+.photoPreview{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #facc15;margin:0 auto 10px;display:none}
+.link{font-size:12px;text-align:center;text-decoration:none;color:#a78bfa}
+.passWrap{position:relative}
+.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px}
 </style>
 </head>
 <body>
-
 <div class="card">
-  <div class="icon">👤</div>
-  <div class="title">Create Client Account</div>
-  <div class="sub">Join LOVE CARE GLOBAL — Nurses will see your profile photo if you add one (optional)</div>
+  <div class="logo">👤</div>
+  <h2>Create Client Account</h2>
+  <p class="sub">Join LOVE CARE GLOBAL — Nurses will see your profile photo if you add one (optional)</p>
+  
+  <div id="status" class="status"></div>
 
-  <div id="statusBox" class="status"></div>
-
-  <label>Full Name *</label>
-  <input id="fullName" placeholder="e.g., Kwame Mensah">
+  <label>FULL NAME *</label>
+  <input id="fullName" placeholder="ASABERE PETER">
 
   <div class="row">
-    <div><label>Email *</label><input id="email" type="email" placeholder="client@email.com"></div>
-    <div><label>Phone *</label><input id="phone" type="tel" placeholder="055..."></div>
+    <div>
+      <label>EMAIL *</label>
+      <input id="email" type="email" placeholder="lovecareglobal@gr">
+    </div>
+    <div>
+      <label>PHONE *</label>
+      <input id="phone" type="tel" placeholder="+233502957280">
+    </div>
   </div>
 
-  <label>Password *</label>
-  <div style="position:relative"><input id="password" type="password" placeholder="Password"><span onclick="togglePwd()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px">👁️</span></div>
-
-  <label>Country *</label>
-  <select id="country"><option value="Ghana" selected>Ghana</option><option value="Nigeria">Nigeria</option><option value="Kenya">Kenya</option><option value="South Africa">South Africa</option><option value="USA">USA</option><option value="UK">UK</option><option value="Other">Other</option></select>
-
-  <!-- OPTIONAL CLIENT PHOTO — NURSES WILL SEE -->
-  <label>Profile Photo <span class="optional">(Optional — Nurses will see you)</span></label>
-  <div class="photoBox" onclick="document.getElementById('photoInput').click()">
-    <img id="photoPreview" src="https://via.placeholder.com/80x80/2d1c4e/d8b4fe?text=No+Photo" alt="Preview">
-    <div style="margin-top:8px;font-size:11px;font-weight:800;color:#d8b4fe">📸 Tap to upload photo — Optional</div>
-    <div class="small">JPG/PNG, max 3MB. This helps nurses recognize you during home visit.</div>
-    <input id="photoInput" type="file" accept="image/*">
-  </div>
-  <div id="photoStatus" class="small" style="color:#86efac;display:none">✅ Photo ready — will be visible to nurses</div>
-  <button id="removePhotoBtn" class="btnSecondary" style="display:none;padding:8px;font-size:11px;margin-top:8px" onclick="removePhoto()">❌ Remove Photo</button>
-
-  <button class="btn btnPrimary" id="createBtn" onclick="createAccount()">Create Account</button>
-
-  <div class="btns">
-    <a href="client-login.html" style="text-decoration:none"><button class="btn btnSecondary" style="width:100%">Login</button></a>
-    <a href="index.html" style="text-decoration:none"><button class="btn btnSecondary" style="width:100%">Home</button></a>
+  <label>PASSWORD *</label>
+  <div class="passWrap">
+    <input id="password" type="password" placeholder="Peterasa80@you!">
+    <span class="eye" onclick="togglePass()">👁️</span>
   </div>
 
-  <div style="font-size:10px;color:#6b6588;text-align:center;margin-top:12px">By creating account, you agree to our Terms. Your photo (if added) will be visible to assigned nurses only.</div>
+  <label>COUNTRY *</label>
+  <select id="country">
+    <option value="Ghana" selected>Ghana</option>
+    <option value="Nigeria">Nigeria</option>
+    <option value="Kenya">Kenya</option>
+    <option value="South Africa">South Africa</option>
+    <option value="USA">USA</option>
+    <option value="UK">UK</option>
+    <option value="Other">Other</option>
+  </select>
+
+  <label>PROFILE PHOTO <span style="color:#8b7ab8">(Optional — Nurses will see you)</span></label>
+  <div class="photoBox" onclick="document.getElementById('photoFile').click()">
+    <img id="photoPreview" class="photoPreview" src="">
+    <div id="photoPlaceholder" style="font-size:32px">👤</div>
+    <p style="font-size:11px;color:#a78bfa;margin-top:6px">📁 Tap to upload photo — Optional</p>
+    <p style="font-size:10px;color:#6b7280;margin-top:4px">JPG/PNG, max 3MB. This helps nurses recognize you during home visit.</p>
+  </div>
+  <input type="file" id="photoFile" accept="image/*" style="display:none">
+
+  <button class="btn btnReg" onclick="register()" id="regBtn">Create Account</button>
+  
+  <button class="btn btnGoogle" onclick="googleRegister()">
+    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+    Continue with Google
+  </button>
+
+  <a href="client-login.html" class="link">Already have account? Login</a>
 </div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(); const rtdb=firebase.database(); const storage=firebase.storage();
+const auth=firebase.auth();
+const db=firebase.database();
+const storage=firebase.storage();
+const dbFS=firebase.firestore();
 
-let photoBase64=''; let photoFile=null;
-
-function showStatus(msg,ok){
-  const el=document.getElementById('statusBox');
-  el.textContent=msg; el.className='status '+(ok?'ok':'err'); el.style.display='block';
-  if(ok) setTimeout(()=>el.style.display='none',4000);
+function showStatus(m,type){
+  const el=document.getElementById('status');
+  el.textContent=m;
+  el.className='status '+type;
+  el.style.display='block';
 }
-function togglePwd(){ const p=document.getElementById('password'); p.type=p.type==='password'?'text':'password'; }
+function togglePass(){
+  const p=document.getElementById('password');
+  p.type = p.type==='password' ? 'text' : 'password';
+}
+function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
 
-document.getElementById('photoInput').addEventListener('change',function(e){
-  const file=e.target.files[0]; if(!file) return;
-  if(file.size>3*1024*1024){ showStatus('Photo too large — Max 3MB',false); return; }
-  if(!file.type.startsWith('image/')){ showStatus('Please select image file',false); return; }
-  photoFile=file;
+let selectedFile=null;
+let photoDataUrl='';
+
+document.getElementById('photoFile').addEventListener('change', function(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  if(file.size>3*1024*1024){ showStatus('Photo max 3MB', 'err'); return; }
+  selectedFile=file;
   const reader=new FileReader();
-  reader.onload=function(ev){
-    photoBase64=ev.target.result;
-    document.getElementById('photoPreview').src=photoBase64;
-    document.getElementById('photoStatus').style.display='block';
-    document.getElementById('removePhotoBtn').style.display='block';
-    showStatus('✅ Photo ready — Nurses will see this',true);
+  reader.onload=(ev)=>{
+    photoDataUrl=ev.target.result;
+    const img=document.getElementById('photoPreview');
+    img.src=photoDataUrl;
+    img.style.display='block';
+    document.getElementById('photoPlaceholder').style.display='none';
   };
   reader.readAsDataURL(file);
 });
 
-function removePhoto(){
-  photoBase64=''; photoFile=null;
-  document.getElementById('photoInput').value='';
-  document.getElementById('photoPreview').src='https://via.placeholder.com/80x80/2d1c4e/d8b4fe?text=No+Photo';
-  document.getElementById('photoStatus').style.display='none';
-  document.getElementById('removePhotoBtn').style.display='none';
-}
+// Prefill from Google block
+window.addEventListener('DOMContentLoaded',()=>{
+  const params=new URLSearchParams(location.search);
+  const email=params.get('email') || localStorage.getItem('pendingGoogleEmail') || '';
+  const name=params.get('name') || localStorage.getItem('pendingGoogleName') || '';
+  const photo=params.get('photo') || localStorage.getItem('pendingGooglePhoto') || '';
+  if(email) document.getElementById('email').value=email;
+  if(name) document.getElementById('fullName').value=name;
+  if(photo){
+    const img=document.getElementById('photoPreview');
+    img.src=photo;
+    img.style.display='block';
+    document.getElementById('photoPlaceholder').style.display='none';
+    photoDataUrl=photo;
+  }
+  // Check for from param
+  if(params.get('from')){
+    showStatus('🧹 Previous incomplete data detected - You can re-register now and it will overwrite old data', 'warn');
+  }
+});
 
-async function uploadPhotoIfExists(uid, emailKey){
-  if(!photoFile && !photoBase64) return {url:'', base64:''};
+// ✅ CEO SECURITY CHECK + AUTO-CLEAN LEFTOVER
+async function checkAndCleanLeftover(email){
+  const eLower=email.toLowerCase().trim();
+  const key=sanitizeEmail(eLower);
+  
+  // Check Auth
+  let authExists=false;
   try{
-    // Try storage first
-    const path=`clientPhotos/${uid||emailKey}/${Date.now()}_${photoFile?photoFile.name:'photo.jpg'}`;
-    if(photoFile){
-      const ref=storage.ref(path);
-      await ref.put(photoFile);
-      const url=await ref.getDownloadURL();
-      return {url, base64:''};
+    const methods=await auth.fetchSignInMethodsForEmail(eLower);
+    if(methods && methods.length>0) authExists=true;
+  }catch(e){}
+
+  // Check DB
+  let dbExists=false;
+  try{
+    const snap=await db.ref('allowedClients/'+key).once('value');
+    if(snap.exists()) dbExists=true;
+    else{
+      const snap2=await db.ref('clients').orderByChild('email').equalTo(eLower).once('value');
+      if(snap2.exists()) dbExists=true;
     }
-  }catch(e){ console.log('Storage upload failed, using base64 fallback', e.message); }
-  // Fallback to base64 in RTDB (nurses can still see)
-  return {url:'', base64:photoBase64};
+  }catch(e){}
+
+  // If DB exists but Auth doesn't -> Leftover from auto-delete -> Clean and allow
+  if(dbExists && !authExists){
+    showStatus('🧹 Cleaning old leftover data for '+eLower+' (Auth was deleted but DB remained) - Will overwrite now...', 'warn');
+    try{
+      await db.ref('allowedClients/'+key).remove();
+      await db.ref('clientRegistrations/'+key).remove();
+      await db.ref('clientRegistrations/'+eLower.replace(/[.]/g,'_')).remove();
+      const qSnap=await db.ref('clients').orderByChild('email').equalTo(eLower).once('value');
+      if(qSnap.exists()){
+        qSnap.forEach(ch=>{ db.ref('clients/'+ch.key).remove(); });
+      }
+      await db.ref('ceoClientsTracking').orderByChild('email').equalTo(eLower).once('value').then(s=>{
+        if(s.exists()){ s.forEach(ch=>{ db.ref('ceoClientsTracking/'+ch.key).remove(); }); }
+      });
+      console.log('✅ Old DB cleaned for', eLower);
+    }catch(e){ console.log('Cleanup error', e.message); }
+    return {canRegister:true, cleaned:true};
+  }
+
+  if(dbExists && authExists){
+    return {canRegister:false, reason:'Email already registered — Please login'};
+  }
+
+  return {canRegister:true, cleaned:false};
 }
 
-async function createAccount(){
+async function register(){
   const fullName=document.getElementById('fullName').value.trim();
   const email=document.getElementById('email').value.trim().toLowerCase();
   const phone=document.getElementById('phone').value.trim();
-  const password=document.getElementById('password').value;
+  const password=document.getElementById('password').value.trim();
   const country=document.getElementById('country').value;
-  if(!fullName||fullName.length<3){ showStatus('Enter full name (min 3 chars)',false); return; }
-  if(!email||!email.includes('@')){ showStatus('Enter valid email',false); return; }
-  if(!phone||phone.length<9){ showStatus('Enter valid phone',false); return; }
-  if(!password||password.length<6){ showStatus('Password min 6 chars',false); return; }
 
-  const btn=document.getElementById('createBtn'); btn.disabled=true; btn.textContent='Creating...';
+  if(!fullName||!email||!phone||!password){
+    showStatus('All * fields required - CEO needs Name+Phone+Email for tracking unlawful actions', 'err');
+    return;
+  }
+  if(phone.replace(/\D/g,'').length<9){
+    showStatus('Valid phone required - At least 9 digits for CEO tracking', 'err');
+    return;
+  }
+  if(password.length<6){
+    showStatus('Password min 6 chars', 'err');
+    return;
+  }
+
+  const btn=document.getElementById('regBtn');
+  btn.textContent='Checking...';
+  btn.disabled=true;
+
+  // ✅ Check and clean leftover
+  const check=await checkAndCleanLeftover(email);
+  if(!check.canRegister){
+    showStatus(check.reason, 'err');
+    btn.textContent='Create Account';
+    btn.disabled=false;
+    return;
+  }
+
+  if(check.cleaned){
+    showStatus('✅ Old data cleaned - Creating new account now...', 'ok');
+    await new Promise(r=>setTimeout(r,800));
+  }
+
+  showStatus('Creating account...', 'ok');
+  
   try{
-    // Check duplicate email in RTDB
-    const dupSnap=await rtdb.ref('clients').orderByChild('email').equalTo(email).once('value');
-    if(dupSnap.exists()){ showStatus('Email already registered — Please login',false); btn.disabled=false; btn.textContent='Create Account'; return; }
-
-    // Create Firebase Auth user
     const cred=await auth.createUserWithEmailAndPassword(email,password);
     const uid=cred.user.uid;
-    await cred.user.updateProfile({displayName:fullName});
-
-    const emailKey=email.replace(/[.@]/g,'_');
-    const photoData=await uploadPhotoIfExists(uid,emailKey);
-    const now=Date.now();
-
-    const clientData={
-      uid, id:uid,
-      fullName, clientName:fullName, name:fullName,
-      email, clientEmail:email,
-      phone, clientPhone:phone,
-      country,
-      password:'', // never store plain password
-      role:'client',
-      isClient:true,
-      clientPhotoUrl:photoData.url||'',
-      clientPhotoBase64:photoData.base64?photoData.base64.substring(0,30000):'',
-      hasPhoto: !!(photoData.url||photoData.base64),
-      photoUploaded: !!(photoData.url||photoData.base64),
-      photoVisibleToNurses:true,
-      createdAt:now, timestamp:now, time:now,
-      lastLoginAt:now,
-      isGoogleLogin:false,
-      provider:'email',
-      status:'active',
-      isBlocked:false
-    };
-
-    // Save to multiple nodes — nurses can see from clients node
-    await rtdb.ref('clients/'+uid).set(clientData);
-    await rtdb.ref('clientUsers/'+uid).set(clientData);
-    await rtdb.ref('clientRegistrations/'+emailKey).set(clientData);
-    await rtdb.ref('client_registrations/'+emailKey).set(clientData);
-    await rtdb.ref('allClients/'+uid).set(clientData);
-    if(clientData.clientPhotoUrl||clientData.clientPhotoBase64){
-      await rtdb.ref('clientPhotos/'+uid).set({url:clientData.clientPhotoUrl, base64:clientData.clientPhotoBase64? 'base64 stored in clients node':'' , email, fullName, timestamp:now});
+    
+    let photoUrl=photoDataUrl || '';
+    
+    // Upload photo if selected file
+    if(selectedFile){
+      try{
+        showStatus('Uploading photo...', 'ok');
+        const storageRef=storage.ref('clientAvatars/'+sanitizeEmail(email)+'/'+Date.now()+'_'+selectedFile.name);
+        const upload=await storageRef.put(selectedFile);
+        photoUrl=await upload.ref.getDownloadURL();
+      }catch(e){
+        console.log('Photo upload failed, using data URL', e.message);
+        // Keep data URL as fallback
+      }
     }
 
-    // Store locally for dashboard
-    localStorage.setItem('clientEmail',email);
-    localStorage.setItem('clientName',fullName);
-    localStorage.setItem('clientPhone',phone);
-    localStorage.setItem('clientUid',uid);
-    localStorage.setItem('clientLoggedIn','true');
-    if(clientData.clientPhotoUrl) localStorage.setItem('clientPhoto',clientData.clientPhotoUrl);
+    const key=sanitizeEmail(email);
+    const clientData={
+      email: email,
+      fullName: fullName,
+      name: fullName,
+      clientName: fullName,
+      phone: phone,
+      clientPhone: phone,
+      photoUrl: photoUrl,
+      photo: photoUrl,
+      clientPhotoUrl: photoUrl,
+      clientEmail: email,
+      country: country,
+      uid: uid,
+      createdAt: Date.now(),
+      lastLoginAt: Date.now(),
+      verifiedForDashboard: true,
+      registrationComplete: true,
+      registrationMethod: 'email',
+      ceoTracking: {
+        fullName: fullName,
+        phone: phone,
+        email: email,
+        photoUrl: photoUrl,
+        country: country,
+        registeredAt: Date.now(),
+        ip: 'web-registration'
+      }
+    };
 
-    showStatus('✅ Account created! Redirecting...',true);
-    setTimeout(()=>location.replace('client-dashboard.html'),1200);
+    showStatus('Saving to Firebase for CEO tracking...', 'ok');
+
+    // ✅ SAVE TO ALL CEO TRACKING NODES
+    await db.ref('allowedClients/'+key).set(clientData);
+    await db.ref('clients/'+uid).set(clientData);
+    await db.ref('clientRegistrations/'+key).set(clientData);
+    await db.ref('client_registrations/'+uid).set(clientData);
+    await db.ref('ceoClientsTracking/'+uid).set(clientData);
+    await db.ref('allClientsTracking/'+uid).set(clientData);
+
+    // Firestore also
+    try{
+      await dbFS.collection('clients').doc(uid).set(clientData);
+      await dbFS.collection('allowedClients').doc(key).set(clientData);
+    }catch(e){}
+
+    localStorage.setItem('clientLoggedIn','true');
+    localStorage.setItem('clientEmail', email);
+    localStorage.setItem('clientName', fullName);
+    localStorage.setItem('clientPhone', phone);
+    localStorage.setItem('clientPhoto', photoUrl);
+    localStorage.setItem('clientUid', uid);
+    localStorage.removeItem('pendingGoogleEmail');
+    localStorage.removeItem('pendingGoogleName');
+    localStorage.removeItem('pendingGooglePhoto');
+
+    showStatus('✅ Registered! Name+Phone+Photo+Email saved for CEO tracking - Redirecting...', 'ok');
+    setTimeout(()=>{ location.replace('client-dashboard.html'); }, 1000);
+
   }catch(e){
-    let msg=e.message;
-    if(e.code==='auth/email-already-in-use') msg='Email already in use — Please login';
-    showStatus('Failed: '+msg,false);
+    console.error(e);
+    if(e.code==='auth/email-already-in-use'){
+      // This happens if Auth exists but DB was cleaned - Try to delete Auth and retry
+      showStatus('Auth exists but DB was cleaned - Deleting Auth to allow fresh registration...', 'warn');
+      try{
+        // Try sign in then delete
+        const temp=await auth.signInWithEmailAndPassword(email,password).catch(()=>null);
+        if(temp && temp.user){
+          await temp.user.delete();
+          showStatus('✅ Old Auth deleted - Please click Create Account again', 'ok');
+        }else{
+          showStatus('Email already registered in Auth - Please use Login or use different email. Or go to Firebase Auth and delete '+email+' manually', 'err');
+        }
+      }catch(delErr){
+        showStatus('Email already in Auth - Please login or delete from Firebase Console > Authentication > Users > '+email, 'err');
+      }
+    }else{
+      showStatus(e.message, 'err');
+    }
   }finally{
-    btn.disabled=false; btn.textContent='Create Account';
+    btn.textContent='Create Account';
+    btn.disabled=false;
+  }
+}
+
+async function googleRegister(){
+  const provider=new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({prompt:'select_account'});
+  try{
+    const result=await auth.signInWithPopup(provider);
+    const user=result.user;
+    const email=user.email.toLowerCase();
+    const name=user.displayName||document.getElementById('fullName').value;
+    const photo=user.photoURL||'';
+    
+    // Check if fully registered
+    const key=sanitizeEmail(email);
+    const snap=await db.ref('allowedClients/'+key).once('value');
+    if(snap.exists()){
+      const v=snap.val();
+      if(v.phone && (v.name||v.fullName) && (v.photoUrl||v.photo)){
+        // Already registered
+        localStorage.setItem('clientEmail', email);
+        location.replace('client-dashboard.html');
+        return;
+      }
+    }
+    
+    // Not fully registered - Prefill form and let user complete phone
+    document.getElementById('email').value=email;
+    document.getElementById('fullName').value=name;
+    if(photo){
+      document.getElementById('photoPreview').src=photo;
+      document.getElementById('photoPreview').style.display='block';
+      document.getElementById('photoPlaceholder').style.display='none';
+      photoDataUrl=photo;
+    }
+    showStatus('Google account linked - Please add Phone Number (required for CEO tracking) and click Create Account. Your photo from Google is already added.', 'warn');
+    // Sign out Google temp user - Will create properly via email/pass or we will save directly
+    await auth.signOut();
+    localStorage.setItem('pendingGoogleEmail', email);
+    localStorage.setItem('pendingGoogleName', name);
+    localStorage.setItem('pendingGooglePhoto', photo);
+    localStorage.setItem('pendingGoogleUid', user.uid);
+    
+  }catch(e){
+    showStatus('Google failed: '+e.message, 'err');
   }
 }
 </script>
