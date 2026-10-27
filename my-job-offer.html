@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Job Offer - REAL + GPS + Nurse Complain — NO CEO Button — LOVE CARE GLOBAL</title>
+<title>My Job Offer - CLIENT LOCATION + AUTO NAV — LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
@@ -13,13 +13,14 @@ header{position:sticky;top:0;z-index:10;background:rgba(12,10,30,.92);backdrop-f
 .wrap{max-width:1240px;margin:0 auto;padding:0 20px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.offer{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px;position:relative}
+.offer{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
 .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;font-size:11px;border:1px solid var(--line)}
 .btn-gold{background:var(--gold);color:#000;font-weight:700;border-radius:999px;padding:10px 20px;border:0;cursor:pointer}
 .btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:10px 20px;cursor:pointer}
 .btn-green{background:var(--green);color:#000;font-weight:700;border-radius:999px;padding:10px 20px;border:0;cursor:pointer}
 .btn-red{background:var(--red);color:#fff;font-weight:700;border-radius:999px;padding:10px 20px;border:0;cursor:pointer;animation:blinkSOS 1.2s infinite}
 .btn-purple{background:linear-gradient(135deg,#a78bfa,#8b5cf6);color:#fff;font-weight:700;border-radius:999px;padding:10px 20px;border:0;cursor:pointer}
+.btn-nav{background:linear-gradient(135deg,#4285F4,#34A853);color:#fff;font-weight:800;border-radius:999px;padding:10px 20px;border:0;cursor:pointer;box-shadow:0 4px 12px rgba(66,133,244,.3)}
 @keyframes blinkSOS{0%,100%{opacity:1}50%{opacity:.7}}
 .empty{padding:70px 24px;text-align:center;border:1px dashed rgba(255,255,255,.12);border-radius:20px;background:rgba(26,22,51,.6)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 18px;border-radius:999px;font-size:13px;z-index:100}
@@ -28,6 +29,9 @@ header{position:sticky;top:0;z-index:10;background:rgba(12,10,30,.92);backdrop-f
 .gps-bar{position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(12,10,30,.98);backdrop-filter:blur(20px);border-top:1px solid rgba(52,211,153,.25);padding:12px 20px;display:none}
 .gps-bar.active{display:block}
 .gps-dot{width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.4s infinite;box-shadow:0 0 0 4px rgba(52,211,153,.25)}
+.clientPhoto{width:68px;height:68px;border-radius:16px;object-fit:cover;border:2px solid #facc15;background:#231e44;flex-shrink:0}
+.clientBox{background:rgba(14,10,28,.6);border:1px solid rgba(250,204,21,.2);border-radius:16px;padding:12px;margin-top:12px}
+.locationBox{background:linear-gradient(135deg,rgba(66,133,244,.12),rgba(52,211,153,.08));border:1px solid rgba(66,133,244,.25);border-radius:16px;padding:12px;margin-top:12px}
 </style>
 </head>
 <body>
@@ -49,13 +53,13 @@ function getNurse(){
         const d=JSON.parse(raw);
         const o=d.user||d.nurse||d.data||d;
         const full=o.fullName||o.name||o.displayName;
-        if(full) return {id:(o.id||o.nurseId||o.uid||full.toLowerCase().replace(/\\s+/g,'-')).toLowerCase().replace(/[^a-z0-9-]/g,''), fullName:full, firstName:o.firstName||full.split(' ')[0], location:o.location||'Accra', photo:o.photo||null, phone:o.phone||''};
+        if(full) return {id:(o.id||o.nurseId||o.uid||full.toLowerCase().replace(/\s+/g,'-')).toLowerCase().replace(/[^a-z0-9-]/g,''), fullName:full, firstName:o.firstName||full.split(' ')[0], location:o.location||'Accra', photo:o.photo||null, phone:o.phone||''};
       }catch{}
     }
   }
   const p=new URLSearchParams(location.search);
   const q=p.get('nurse')||p.get('name');
-  if(q) return {id:q.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,''), fullName:q, firstName:q.split(' ')[0], location:'Accra', photo:null, phone:''};
+  if(q) return {id:q.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''), fullName:q, firstName:q.split(' ')[0], location:'Accra', photo:null, phone:''};
   return {id:'asabere-peter', fullName:'Asabere Peter', firstName:'Asabere', location:'East Legon', photo:null, phone:''};
 }
 
@@ -65,7 +69,7 @@ function shareNurseLocation(pos, bookingId, nurse, status){
   const lat=pos.coords.latitude;const lng=pos.coords.longitude;
   if(lastLat&&lastLng){const dist=calcDistance(lastLat,lastLng,lat,lng)*1000;if(dist<5) return;}
   lastLat=lat; lastLng=lng;
-  const locationData={lat, lng, nurseLat:lat, nurseLng:lng, latitude:lat, longitude:lng, currentLat:lat, currentLng:lng, liveLat:lat, liveLng:lng,status:status||'enRoute', trackingStatus:status||'enRoute',lastUpdate:Date.now(), updatedAt:Date.now(),nurseId:nurse.id, nurseName:nurse.fullName,bookingId, isLive:true};
+  const locationData={lat, lng, nurseLat:lat, nurseLng:lng, latitude:lat, longitude:lat, currentLat:lat, currentLng:lng, liveLat:lat, liveLng:lng,status:status||'enRoute', trackingStatus:status||'enRoute',lastUpdate:Date.now(), updatedAt:Date.now(),nurseId:nurse.id, nurseName:nurse.fullName,bookingId, isLive:true};
   const updates={};updates[`nurseLocations/${nurse.id}`]=locationData;updates[`liveNurseLocations/${bookingId}`]=locationData;updates[`nurseLiveLocations/${bookingId}`]=locationData;updates[`nurseTracking/${bookingId}`]=locationData;updates[`ceoBookings/${bookingId}/nurseLat`]=lat;updates[`ceoBookings/${bookingId}/nurseLng`]=lng;updates[`ceoBookings/${bookingId}/lastUpdate`]=Date.now();updates[`acceptedBookings/${bookingId}/nurseLat`]=lat;updates[`acceptedBookings/${bookingId}/nurseLng`]=lng;rtdb.ref().update(updates);
 }
 function startNurseGPSTracking(bookingId, nurse, status){
@@ -84,6 +88,29 @@ function updateNurseStatus(bookingId, newStatus, nurse){
   const updates={status:newStatus,trackingStatus:newStatus,[`${newStatus}At`]:Date.now(),lastUpdate:Date.now(),updatedAt:Date.now()};
   rtdb.ref(`myJobOffers/${nurse.id}/${bookingId}`).update(updates);rtdb.ref(`bookings/${bookingId}`).update(updates);rtdb.ref(`acceptedBookings/${bookingId}`).update(updates);rtdb.ref(`ceoBookings/${bookingId}`).update(updates);rtdb.ref(`nurseTracking/${bookingId}`).update(updates);
   if(lastLat&&lastLng&&nurse){navigator.geolocation.getCurrentPosition((pos)=>shareNurseLocation(pos, bookingId, nurse, newStatus),()=>{},{enableHighAccuracy:true});}
+}
+
+// ✅ NEW: AUTO NAVIGATION FUNCTIONS
+function getClientLocation(o){
+  const lat=o.clientLat||o.clientLatitude||o.lat||o.latitude|| (o.clientLatLng&&o.clientLatLng.lat) || null;
+  const lng=o.clientLng||o.clientLongitude||o.lng||o.longitude|| (o.clientLatLng&&o.clientLatLng.lng) || null;
+  return {lat: parseFloat(lat)||null, lng: parseFloat(lng)||null};
+}
+function openGoogleMapsNavigation(clientLat, clientLng, nurseLat, nurseLng){
+  if(!clientLat||!clientLng){ alert('Client location not available — Ask client to enable location at booking'); return; }
+  let url='';
+  if(nurseLat&&nurseLng){
+    // Directions from nurse to client
+    url=`https://www.google.com/maps/dir/?api=1&origin=${nurseLat},${nurseLng}&destination=${clientLat},${clientLng}&travelmode=driving`;
+  }else{
+    // Just navigate to client
+    url=`https://www.google.com/maps/dir/?api=1&destination=${clientLat},${clientLng}&travelmode=driving`;
+  }
+  window.open(url, '_blank');
+}
+function openClientLocationOnMap(lat,lng){
+  if(!lat||!lng) return;
+  window.open(`https://www.google.com/maps?q=${lat},${lng}&z=15`, '_blank');
 }
 
 function App(){
@@ -112,13 +139,13 @@ function App(){
   },[nurse.id]);
 
   const initials=nurse.fullName.split(' ').filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('')||'AP';
-  const showToast=(m)=>{ setToast(m); setTimeout(()=>setToast(null),3000); };
+  const showToast=(m)=>{ setToast(m); setTimeout(()=>setToast(null),4000); };
 
   const complainAboutClient=(offer)=>{
     const params=new URLSearchParams({
       bookingId:offer.id,
-      clientName:offer.clientName||'Client',
-      clientId:offer.clientId||'',
+      clientName:offer.clientName||offer.clientFullName||'Client',
+      clientId:offer.clientId||offer.clientUid||'',
       nurseName:nurse.fullName,
       nurseId:nurse.id,
       service:offer.service||'Nursing Care',
@@ -138,7 +165,7 @@ function App(){
           React.createElement('div',null,
             React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center'}},
               React.createElement('h1',{style:{margin:0,fontFamily:'Fraunces',fontSize:22}},'My Job Offer'),
-              React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0',borderColor:'rgba(52,211,153,.2)'}},React.createElement('span',{className:'live-dot'}),' LIVE + GPS')
+              React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0',borderColor:'rgba(52,211,153,.2)'}},React.createElement('span',{className:'live-dot'}),' LIVE + LOCATION + NAV')
             ),
             React.createElement('div',{style:{fontSize:13.5,color:'var(--muted)',marginTop:4}},
               'Welcome ',React.createElement('span',{style:{color:'var(--text)',fontWeight:600}},nurse.firstName),' — ',nurse.fullName,' · ',nurse.location,
@@ -167,7 +194,7 @@ function App(){
         ),
         React.createElement('h2',{style:{fontFamily:'Fraunces',fontSize:18,margin:'0 0 14px',display:'flex',alignItems:'center',gap:8}},
           'Available Offers',
-          React.createElement('span',{className:'badge',style:{background:offers.length>0?'rgba(52,211,153,.12)':'rgba(255,255,255,.06)',color:offers.length>0?'#a7f3d0':'var(--muted)'}},offers.length+' • REAL + GPS + Complain'),
+          React.createElement('span',{className:'badge',style:{background:offers.length>0?'rgba(52,211,153,.12)':'rgba(255,255,255,.06)',color:offers.length>0?'#a7f3d0':'var(--muted)'}},offers.length+' • CLIENT LOCATION + NAV'),
           React.createElement('span',{className:'live-dot'})
         ),
         loading?React.createElement('div',{className:'empty'},'Loading live data for '+nurse.fullName+'...'):
@@ -177,60 +204,101 @@ function App(){
             React.createElement('div',{style:{fontSize:18,fontWeight:700,marginTop:10}},'No job offers yet'),
             React.createElement('div',{style:{fontSize:14,color:'var(--muted)',marginTop:8,lineHeight:1.6}},
               'You are logged in as '+nurse.fullName+'.',React.createElement('br'),
-              'When a client books you, the offer will appear here instantly.',React.createElement('br'),
-              React.createElement('span',{style:{fontSize:11,color:'var(--faint)'}},'Beginner: 0 jobs • 0 balance • GPS hidden from nurse • Nurse can complain via nurse-complain.html button')
-            ),
-            React.createElement('button',{className:'btn-purple',style:{marginTop:14,padding:'12px 20px'},onClick:()=>{const params=new URLSearchParams({bookingId:'LCG-DEMO-001',clientName:'Demo Client',clientId:'demo_client',nurseName:nurse.fullName,nurseId:nurse.id,service:'Elderly Care',amount:'500'});location.href=`nurse-complain.html?${params.toString()}`}},'⚠️ TEST Nurse Complain Button → nurse-complain.html — Text + Audio + Video + Photos')
+              'When a client books you, you will see his Photo + Location + Name + Phone here.',React.createElement('br')
+            )
           )
         :
-          offers.map(o=>React.createElement('div',{key:o.id,className:'offer'},
-            React.createElement('div',{style:{display:'flex',gap:14}},
-              React.createElement('div',{style:{width:56,height:56,borderRadius:999,background:'#231e44',display:'grid',placeItems:'center',fontWeight:700,color:'#5eead4'}}, (o.clientName||'C').split(' ').map(s=>s[0]).join('').slice(0,2)),
-              React.createElement('div',{style:{flex:1}},
-                React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}},
-                  React.createElement('h3',{style:{margin:0,fontSize:17}},o.clientName),
-                  React.createElement('span',{className:'badge',style:{marginLeft:'auto'}},o.status),
-                  (o.status==='ACCEPTED'||o.status==='ENROUTE'||o.status==='ARRIVED'||o.status==='INSERVICE')&&React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0'}},React.createElement('span',{className:'live-dot'}),' GPS LIVE')
-                ),
-                React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:6}},`${o.service||'Nursing Care'} • ${o.hours||'8'}h • GH₵ ${o.amount||0} • ${o.clientLocation||'Accra'}`),
-                React.createElement('div',{style:{display:'flex',gap:8,marginTop:14,flexWrap:'wrap'}},
-                  (o.status==='PENDING'||!o.status)&&React.createElement(React.Fragment,null,
-                    React.createElement('button',{className:'btn-gold',onClick:()=>setSelAccept(o)},'✅ Accept + Start GPS'),
-                    React.createElement('button',{className:'btn-ghost',onClick:()=>setSelReject(o)},'❌ Reject')
+          offers.map(o=>{
+            const clientName=o.clientName||o.clientFullName||o.clientDisplayName||'Client';
+            const clientPhone=o.clientPhone||o.phone||o.clientPhoneNumber||'';
+            const clientEmail=o.clientEmail||o.email||'';
+            const clientPhoto=o.clientPhotoUrl||o.clientPhoto||o.photoUrl||o.clientAvatar||o.clientProfilePhoto||'';
+            const patientName=o.patientName||'Patient';
+            const avatarUrl=clientPhoto||`https://ui-avatars.com/api/?name=${encodeURIComponent(clientName)}&background=facc15&color=000&size=200`;
+            const loc=getClientLocation(o);
+            const clientLat=loc.lat; const clientLng=loc.lng;
+            const distance=gpsInfo.lat&&clientLat?calcDistance(gpsInfo.lat,gpsInfo.lng,clientLat,clientLng).toFixed(1)+' km': (o.distance?o.distance+' km':'-- km');
+            
+            return React.createElement('div',{key:o.id,className:'offer'},
+              React.createElement('div',{style:{display:'flex',gap:14}},
+                React.createElement('img',{src:avatarUrl, className:'clientPhoto', alt:clientName, onError:(e)=>{e.target.src=`https://ui-avatars.com/api/?name=${encodeURIComponent(clientName)}&background=facc15&color=000`}}),
+                React.createElement('div',{style:{flex:1}},
+                  React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}},
+                    React.createElement('h3',{style:{margin:0,fontSize:17}},clientName),
+                    React.createElement('span',{className:'badge',style:{marginLeft:'auto',background:o.status==='PENDING'?'rgba(250,204,21,.15)':'rgba(52,211,153,.15)',color:o.status==='PENDING'?'#fde68a':'#a7f3d0'}},o.status||'PENDING'),
+                    (o.status==='ACCEPTED'||o.status==='ENROUTE'||o.status==='ARRIVED'||o.status==='INSERVICE')&&React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0'}},React.createElement('span',{className:'live-dot'}),' GPS LIVE')
                   ),
-                  (o.status==='ACCEPTED')&&React.createElement(React.Fragment,null,
-                    React.createElement('button',{className:'btn-gold',style:{background:'#facc15'},onClick:()=>{updateNurseStatus(o.id,'ENROUTE',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'ENROUTE'}:x)); showToast('🚗 En Route — GPS LIVE'); if(!isTracking) startNurseGPSTracking(o.id,nurse,'enRoute');}},'🚗 En Route'),
-                    React.createElement('button',{className:'btn-ghost',onClick:()=>setSelNav(o)},'🧭 Navigate'),
-                    React.createElement('a',{href:`sos.html?bookingId=${encodeURIComponent(o.id)}&nurseName=${encodeURIComponent(nurse.fullName)}`,className:'btn-red',style:{textDecoration:'none'}},'🚨 SOS → sos.html')
+                  React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:6}},`${o.service||'Nursing Care'} • ${o.totalHours||o.hours||'8'}h • GH₵ ${o.amount||0} • Patient: ${patientName} • 📍 ${distance}`),
+                  
+                  // CLIENT DETAILS BOX
+                  React.createElement('div',{className:'clientBox'},
+                    React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#facc15',marginBottom:8}},'👤 CLIENT DETAILS — From book-nurse.html Auto-fill'),
+                    React.createElement('div',{style:{display:'grid',gap:6,fontSize:12}},
+                      React.createElement('div',{style:{display:'flex',gap:8}}, React.createElement('span',{style:{color:'var(--faint)',minWidth:50}},'Name:'), React.createElement('b',{style:{color:'var(--text)'}},clientName)),
+                      React.createElement('div',{style:{display:'flex',gap:8}}, React.createElement('span',{style:{color:'var(--faint)',minWidth:50}},'Phone:'), React.createElement('a',{href:`tel:${clientPhone}`,style:{color:'#34d399',fontWeight:700,textDecoration:'none'}},clientPhone||'No phone')),
+                      React.createElement('div',{style:{display:'flex',gap:8}}, React.createElement('span',{style:{color:'var(--faint)',minWidth:50}},'Email:'), React.createElement('a',{href:`mailto:${clientEmail}`,style:{color:'#a78bfa',fontWeight:600,textDecoration:'none',fontSize:11}},clientEmail||'No email')),
+                      React.createElement('div',{style:{display:'flex',gap:8}}, React.createElement('span',{style:{color:'var(--faint)',minWidth:50}},'Patient:'), React.createElement('span',{style:{color:'var(--muted)'}},patientName))
+                    ),
+                    React.createElement('div',{style:{display:'flex',gap:6,marginTop:10,flexWrap:'wrap'}},
+                      clientPhone&&React.createElement('a',{href:`tel:${clientPhone}`,style:{flex:1,minWidth:70,padding:'8px 10px',borderRadius:999,background:'#34d399',color:'#000',fontWeight:700,textDecoration:'none',fontSize:11,textAlign:'center'}},'📞 Call'),
+                      clientPhone&&React.createElement('a',{href:`https://wa.me/${clientPhone.replace(/[^0-9]/g,'')}`,target:'_blank',style:{flex:1,minWidth:70,padding:'8px 10px',borderRadius:999,background:'#25D366',color:'#fff',fontWeight:700,textDecoration:'none',fontSize:11,textAlign:'center'}},'💬 WhatsApp')
+                    )
                   ),
-                  (o.status==='ENROUTE')&&React.createElement('button',{className:'btn-green',onClick:()=>{updateNurseStatus(o.id,'ARRIVED',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'ARRIVED'}:x)); showToast('📍 Arrived');}},'📍 Arrived'),
-                  (o.status==='ARRIVED')&&React.createElement('button',{className:'btn-green',onClick:()=>{updateNurseStatus(o.id,'INSERVICE',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'INSERVICE'}:x)); showToast('👩‍⚕️ In Service');}},'👩‍⚕️ Start Service'),
-                  (o.status==='INSERVICE')&&React.createElement('button',{className:'btn-green',onClick:()=>{updateNurseStatus(o.id,'COMPLETED',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'COMPLETED'}:x)); showToast('✅ Completed'); setTimeout(()=>stopNurseGPSTracking(),3000);}},'✅ Complete Service')
-                ),
-                React.createElement('div',{style:{display:'flex',gap:8,marginTop:10,flexWrap:'wrap'}},
-                  React.createElement('button',{className:'btn-purple',style:{flex:1,background:'linear-gradient(135deg,#a78bfa,#8b5cf6)',color:'#fff',fontWeight:700,borderRadius:999,padding:'10px 16px',border:0,cursor:'pointer'},onClick:()=>complainAboutClient(o)},'⚠️ Complain About Client — Text + Audio + Video + Photos — CEO sees LIVE')
+
+                  // ✅ CLIENT LOCATION BOX — VERY IMPORTANT
+                  React.createElement('div',{className:'locationBox'},
+                    React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#4285F4',marginBottom:8,display:'flex',alignItems:'center',gap:6}},'📍 CLIENT LOCATION — Auto Navigation'),
+                    clientLat&&clientLng?React.createElement('div',{style:{display:'grid',gap:6,fontSize:12}},
+                      React.createElement('div',{style:{display:'flex',gap:8}}, React.createElement('span',{style:{color:'var(--faint)',minWidth:60}},'Lat/Lng:'), React.createElement('b',{style:{color:'var(--text)',fontSize:11}},`${clientLat.toFixed(5)}, ${clientLng.toFixed(5)}`)),
+                      React.createElement('div',{style:{display:'flex',gap:8}}, React.createElement('span',{style:{color:'var(--faint)',minWidth:60}},'Distance:'), React.createElement('b',{style:{color:'#4285F4'}},distance)),
+                      React.createElement('div',{style:{fontSize:10,color:'var(--muted)',marginTop:2}},'Client location saved at booking — From book-nurse.html map + My Location button — GPS LIVE'),
+                      React.createElement('div',{style:{display:'flex',gap:6,marginTop:10,flexWrap:'wrap'}},
+                        React.createElement('button',{className:'btn-nav',style:{flex:1,minWidth:110},onClick:()=>openGoogleMapsNavigation(clientLat, clientLng, gpsInfo.lat, gpsInfo.lng)},'🧭 Navigate — Google Maps'),
+                        React.createElement('button',{className:'btn-ghost',style:{flex:1,minWidth:90},onClick:()=>openClientLocationOnMap(clientLat, clientLng)},'🗺️ View Map'),
+                        React.createElement('a',{href:`https://www.google.com/maps/dir/?api=1&destination=${clientLat},${clientLng}`,target:'_blank',style:{flex:1,minWidth:90,padding:'8px 12px',borderRadius:999,background:'rgba(66,133,244,.15)',color:'#4285F4',textDecoration:'none',fontSize:11,fontWeight:700,textAlign:'center',border:'1px solid rgba(66,133,244,.25)'}},'📍 Directions')
+                      )
+                    ):React.createElement('div',{style:{fontSize:11,color:'#fca5a5',background:'rgba(239,68,68,.08)',borderRadius:8,padding:8}},'⚠️ Client location not saved — Old booking from before location fix — New bookings from book-nurse.html will include GPS location automatically — Ask client to re-book with My Location button')
+                  ),
+
+                  React.createElement('div',{style:{display:'flex',gap:8,marginTop:14,flexWrap:'wrap'}},
+                    (o.status==='PENDING'||!o.status)&&React.createElement(React.Fragment,null,
+                      React.createElement('button',{className:'btn-gold',onClick:()=>setSelAccept(o)},'✅ Accept + Auto Navigate'),
+                      React.createElement('button',{className:'btn-ghost',onClick:()=>{ if(confirm('Reject this booking?')){ rtdb.ref('myJobOffers/'+nurse.id+'/'+o.id).update({status:'REJECTED'}); showToast('Rejected'); } }},'❌ Reject')
+                    ),
+                    (o.status==='ACCEPTED')&&React.createElement(React.Fragment,null,
+                      React.createElement('button',{className:'btn-nav',style:{flex:1},onClick:()=>openGoogleMapsNavigation(clientLat, clientLng, gpsInfo.lat, gpsInfo.lng)},'🧭 Navigate to Client'),
+                      React.createElement('button',{className:'btn-gold',style:{background:'#facc15'},onClick:()=>{updateNurseStatus(o.id,'ENROUTE',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'ENROUTE'}:x)); showToast('🚗 En Route — GPS LIVE + Navigating'); if(!isTracking) startNurseGPSTracking(o.id,nurse,'enRoute'); openGoogleMapsNavigation(clientLat, clientLng, gpsInfo.lat, gpsInfo.lng);}},'🚗 En Route + NAV'),
+                      React.createElement('a',{href:`sos.html?bookingId=${encodeURIComponent(o.id)}&nurseName=${encodeURIComponent(nurse.fullName)}`,className:'btn-red',style:{textDecoration:'none'}},'🚨 SOS')
+                    ),
+                    (o.status==='ENROUTE')&&React.createElement(React.Fragment,null,
+                      React.createElement('button',{className:'btn-nav',onClick:()=>openGoogleMapsNavigation(clientLat, clientLng, gpsInfo.lat, gpsInfo.lng)},'🧭 Continue Navigation'),
+                      React.createElement('button',{className:'btn-green',onClick:()=>{updateNurseStatus(o.id,'ARRIVED',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'ARRIVED'}:x)); showToast('📍 Arrived');}},'📍 Arrived')
+                    ),
+                    (o.status==='ARRIVED')&&React.createElement('button',{className:'btn-green',onClick:()=>{updateNurseStatus(o.id,'INSERVICE',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'INSERVICE'}:x)); showToast('👩‍⚕️ In Service');}},'👩‍⚕️ Start Service'),
+                    (o.status==='INSERVICE')&&React.createElement('button',{className:'btn-green',onClick:()=>{updateNurseStatus(o.id,'COMPLETED',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'COMPLETED'}:x)); showToast('✅ Completed'); setTimeout(()=>stopNurseGPSTracking(),3000);}},'✅ Complete Service')
+                  ),
+                  React.createElement('div',{style:{display:'flex',gap:8,marginTop:10}},
+                    React.createElement('button',{className:'btn-purple',style:{flex:1},onClick:()=>complainAboutClient(o)},'⚠️ Complain About Client')
+                  )
                 )
               )
             )
-          ))
+          })
       ),
       React.createElement('aside',null,
         React.createElement('div',{className:'card',style:{padding:20}},
           React.createElement('h3',{style:{margin:0,fontFamily:'Fraunces'}},'Wallet - '+nurse.fullName),
           React.createElement('div',{style:{marginTop:12,background:'#0f0b22',padding:14,borderRadius:12,border:'1px solid var(--line)'}},
-            React.createElement('div',{style:{fontSize:11,color:'var(--faint)'}},'Current Balance • LIVE REAL'),
+            React.createElement('div',{style:{fontSize:11,color:'var(--faint)'}},'Current Balance'),
             React.createElement('div',{style:{fontSize:26,fontWeight:700}},'GHS '+Math.round(stats.balanceGHS)),
-            React.createElement('div',{style:{marginTop:12,padding:12,background:'rgba(167,139,250,.08)',borderRadius:12,border:'1px solid rgba(167,139,250,.15)'}},
-              React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'#c4b5fd'}},'👩‍⚕️ Nurse Complain — NEW!'),
+            React.createElement('div',{style:{marginTop:12,padding:12,background:'rgba(66,133,244,.08)',borderRadius:12,border:'1px solid rgba(66,133,244,.15)'}},
+              React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'#4285F4'}},'📍 Client Location + Auto Navigation — NEW!'),
               React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6,lineHeight:1.5}},
-                'Nurse can now complain about client — Text + Audio + Video + Photos evidence — Click ⚠️ Complain About Client button on any booking — Goes to nurse-complain.html — CEO sees in ceo-complainant.html LIVE — Legal protection'
-              ),
-              React.createElement('a',{href:'nurse-complain.html',style:{display:'block',marginTop:8,padding:'8px 12px',borderRadius:999,background:'linear-gradient(135deg,#a78bfa,#8b5cf6)',color:'#fff',textDecoration:'none',fontSize:11,fontWeight:700,textAlign:'center'}},'👩‍⚕️ Nurse Complain → nurse-complain.html')
-            ),
-            React.createElement('div',{style:{marginTop:12,padding:12,background:'rgba(239,68,68,.08)',borderRadius:12,border:'1px solid rgba(239,68,68,.15)'}},
-              React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'#fca5a5'}},'🚫 NO CEO Tracking Button — As You Requested!'),
-              React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6,lineHeight:1.5}},
-                'CEO live tracking hidden from nurses — Nurses CANNOT see CEO tracking map — Only CEO sees nurse GPS LIVE — Privacy + Security — As you requested!'
+                '• Client location saved at booking from book-nurse.html (My Location button)',React.createElement('br'),
+                '• Nurse sees lat/lng + distance + Navigate button',React.createElement('br'),
+                '• On Accept → GPS STARTS + Google Maps auto-opens with directions to client',React.createElement('br'),
+                '• En Route → Continue Navigation button',React.createElement('br'),
+                '• CEO tracks nurse GPS LIVE to client location'
               )
             )
           )
@@ -238,22 +306,47 @@ function App(){
       )
     ),
     selAccept&&React.createElement('div',{style:{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',display:'grid',placeItems:'center',zIndex:50,padding:20}},
-      React.createElement('div',{className:'card',style:{padding:24,maxWidth:420,width:'100%'}},
-        React.createElement('h3',{style:{margin:0,fontFamily:'Fraunces'}},'✅ Accept Job + Start GPS?'),
-        React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:10,lineHeight:1.6}},
-          `Client: ${selAccept.clientName}`,React.createElement('br'),
-          `Amount: GH₵ ${selAccept.amount||0}`,React.createElement('br'),React.createElement('br'),
-          React.createElement('span',{style:{color:'#34d399',fontWeight:700}},'🛰️ GPS tracking will START in background — CEO will track you LIVE')
-        ),
+      React.createElement('div',{className:'card',style:{padding:24,maxWidth:460,width:'100%'}},
+        React.createElement('h3',{style:{margin:0,fontFamily:'Fraunces'}},'✅ Accept Job + Auto Navigate?'),
+        (()=>{
+          const loc=getClientLocation(selAccept);
+          return React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:10,lineHeight:1.6}},
+            `Client: ${selAccept.clientName||selAccept.clientFullName}`,React.createElement('br'),
+            `Phone: ${selAccept.clientPhone||selAccept.phone}`,React.createElement('br'),
+            `Email: ${selAccept.clientEmail||selAccept.email||'No email'}`,React.createElement('br'),
+            `Patient: ${selAccept.patientName||'Patient'}`,React.createElement('br'),
+            `Amount: GH₵ ${selAccept.amount||0}`,React.createElement('br'),
+            `Location: ${loc.lat?`${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}`:'Not saved (old booking)'}`,React.createElement('br'),React.createElement('br'),
+            React.createElement('div',{style:{background:'rgba(66,133,244,.12)',borderRadius:10,padding:10,border:'1px solid rgba(66,133,244,.2)'}},
+              React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#4285F4'}},'🧭 What happens on Accept:'),
+              React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:4,lineHeight:1.5}},
+                '1. ✅ Status → ACCEPTED',React.createElement('br'),
+                '2. 🛰️ GPS tracking STARTS — CEO monitors you LIVE',React.createElement('br'),
+                '3. 🗺️ Google Maps auto-opens with directions to client location',React.createElement('br'),
+                '4. 🚗 You navigate to client — Tap En Route + NAV'
+              )
+            )
+          );
+        })(),
         React.createElement('div',{style:{display:'flex',gap:10,marginTop:16}},
-          React.createElement('button',{className:'btn-gold',style:{flex:1},onClick:()=>{
+          React.createElement('button',{className:'btn-nav',style:{flex:1.5},onClick:()=>{
+            const loc=getClientLocation(selAccept);
             rtdb.ref('myJobOffers/'+nurse.id+'/'+selAccept.id).update({status:'ACCEPTED', acceptedAt:Date.now(), lastUpdate:Date.now()});
             rtdb.ref('bookings/'+selAccept.id).update({status:'accepted', nurseId:nurse.id, nurseName:nurse.fullName, acceptedAt:Date.now(), lastUpdate:Date.now()});
             rtdb.ref('acceptedBookings/'+selAccept.id).update({status:'accepted', nurseId:nurse.id, nurseName:nurse.fullName, clientName:selAccept.clientName, acceptedAt:Date.now(), lastUpdate:Date.now()});
             rtdb.ref('ceoBookings/'+selAccept.id).update({status:'accepted', nurseId:nurse.id, nurseName:nurse.fullName, clientName:selAccept.clientName, acceptedAt:Date.now(), lastUpdate:Date.now()});
             const arr=offers.map(o=>o.id===selAccept.id?{...o,status:'ACCEPTED'}:o);setOffers(arr);
-            showToast('✅ Accepted — GPS STARTED');startNurseGPSTracking(selAccept.id, nurse, 'accepted');setSelAccept(null);
-          }},'✅ Accept + Start GPS'),
+            showToast('✅ Accepted — GPS STARTED — Opening Navigation...');
+            startNurseGPSTracking(selAccept.id, nurse, 'accepted');
+            setTimeout(()=>{
+              if(loc.lat&&loc.lng){
+                openGoogleMapsNavigation(loc.lat, loc.lng, lastLat, lastLng);
+              }else{
+                showToast('⚠️ Client location not saved — Old booking');
+              }
+            },800);
+            setSelAccept(null);
+          }},'✅ Accept + Start GPS + Navigate'),
           React.createElement('button',{className:'btn-ghost',style:{flex:1},onClick:()=>setSelAccept(null)},'Cancel')
         )
       )
@@ -264,12 +357,12 @@ function App(){
         React.createElement('div',{style:{display:'flex',gap:10,alignItems:'center'}},
           React.createElement('span',{className:'gps-dot'}),
           React.createElement('div',null,
-            React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'#34d399'}},'🛰️ LIVE GPS Tracking — CEO Monitoring You'),
-            React.createElement('div',{id:'gpsBarText',style:{fontSize:11,color:'var(--muted)'}},gpsInfo.lat?`📍 ${gpsInfo.lat.toFixed(5)}, ${gpsInfo.lng.toFixed(5)} • Updates every 10s`:'Starting GPS...')
+            React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'#34d399'}},'🛰️ LIVE GPS Tracking — CEO Monitoring + Navigating to Client'),
+            React.createElement('div',{id:'gpsBarText',style:{fontSize:11,color:'var(--muted)'}},gpsInfo.lat?`📍 You: ${gpsInfo.lat.toFixed(5)}, ${gpsInfo.lng.toFixed(5)} • Updates every 10s • Tap Navigate to continue`:'Starting GPS...')
           )
         ),
         React.createElement('div',{style:{display:'flex',gap:6}},
-          React.createElement('a',{id:'gpsSosLink',href:`sos.html?bookingId=${currentTrackingBookingId||''}`,style:{padding:'6px 12px',borderRadius:999,background:'rgba(239,68,68,.15)',color:'#fca5a5',textDecoration:'none',fontSize:11,fontWeight:700,border:'1px solid rgba(239,68,68,.25)'}},'🚨 SOS → sos.html'),
+          React.createElement('a',{id:'gpsSosLink',href:`sos.html?bookingId=${currentTrackingBookingId||''}`,style:{padding:'6px 12px',borderRadius:999,background:'rgba(239,68,68,.15)',color:'#fca5a5',textDecoration:'none',fontSize:11,fontWeight:700,border:'1px solid rgba(239,68,68,.25)'}},'🚨 SOS'),
           React.createElement('button',{onClick:()=>stopNurseGPSTracking(),style:{padding:'6px 12px',borderRadius:999,background:'rgba(255,255,255,.06)',color:'var(--text)',fontSize:11,fontWeight:700,border:'1px solid var(--line)',cursor:'pointer'}},'⏹️ Stop GPS')
         )
       )
