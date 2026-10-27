@@ -2,15 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Rate Your Nurse — Secure Verified Rating | LOVE CARE GLOBAL</title>
+<title>Rate Your Nurse — Client Photo + Email Saved | LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="icon-transparent-512.png">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
 .bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
 .card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:16px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin:12px 0}
@@ -23,6 +22,8 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:10
 .stars:hover{transform:scale(1.2)}
 textarea,select,input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;outline:none;margin-top:6px}
 label{font-size:11px;font-weight:800;margin:10px 0 4px;display:block;color:#c4b5fd;letter-spacing:.05em;text-transform:uppercase}
+.clientCard{display:flex;gap:10px;align-items:center;background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.08));border:1px solid rgba(250,204,21,.2);border-radius:14px;padding:10px;margin-top:8px}
+.clientAvatar{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #facc15;background:#1e1a3a}
 </style>
 </head>
 <body>
@@ -30,7 +31,7 @@ label{font-size:11px;font-weight:800;margin:10px 0 4px;display:block;color:#c4b5
 <div class="topbar">
 <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none">
 <img src="icon-transparent-512.png" style="width:44px;height:44px;border-radius:12px;background:white;padding:4px;object-fit:contain" onerror="this.style.display='none'">
-<div><b style="color:#f3e8ff;font-size:14px">RATE YOUR NURSE</b><br><small style="color:#a78bfa">Secure — Only after work completed</small></div>
+<div><b style="color:#f3e8ff;font-size:14px">RATE YOUR NURSE</b><br><small style="color:#a78bfa">Photo + Email Saved — Shows on Homepage</small></div>
 </a>
 <div style="display:flex;gap:8px">
 <a href="client-dashboard.html" style="padding:8px 14px;border-radius:999px;background:rgba(76,29,149,.2);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;text-decoration:none;font-size:11px;font-weight:800">Dashboard</a>
@@ -41,9 +42,17 @@ label{font-size:11px;font-weight:800;margin:10px 0 4px;display:block;color:#c4b5
 <div style="max-width:600px;margin:0 auto;padding:16px 14px 90px">
 
 <div class="card" style="background:linear-gradient(90deg,rgba(76,29,149,.25),rgba(168,85,247,.15));border:1px solid rgba(168,85,247,.25)">
-<b style="color:#f3e8ff">🔒 Secure Verified Rating</b><br>
-<small style="color:#facc15;font-size:11px;line-height:1.5">Only client who booked this nurse and whose job is marked <b>COMPLETED</b> by CEO/Nurse can rate. One rating per booking. Your rating appears on homepage index for everyone to see. Prevents fake ratings.</small><br>
-<small style="color:#a78bfa;font-size:10px;margin-top:6px;display:block">Phone: <span id="clientPhoneDisplay" style="color:#86efac;font-weight:800"></span> | Name: <span id="clientNameDisplay" style="color:#f3e8ff"></span></small>
+<b style="color:#f3e8ff">🔒 Secure Verified Rating — With Client Photo + Email + Time</b><br>
+<small style="color:#facc15;font-size:11px;line-height:1.5">Only client who booked this nurse and whose job is marked <b>COMPLETED</b> can rate. Your rating + photo appears on homepage index for everyone.</small>
+<div id="clientInfoTop" class="clientCard">
+<img id="clientAvatarTop" class="clientAvatar" src="">
+<div style="flex:1">
+<b id="clientNameDisplay" style="font-size:13px;color:#f3e8ff">Client</b><br>
+<small id="clientPhoneDisplay" style="color:#86efac;font-size:11px"></small><br>
+<small id="clientEmailDisplay" style="color:#a78bfa;font-size:10px"></small>
+</div>
+<div style="font-size:9px;color:#fde68a;background:rgba(250,204,21,.15);border-radius:999px;padding:4px 8px">CLIENT</div>
+</div>
 </div>
 
 <div class="card">
@@ -53,7 +62,7 @@ label{font-size:11px;font-weight:800;margin:10px 0 4px;display:block;color:#c4b5
 
 <div id="ratingFormCard" class="card" style="display:none;border:2px solid rgba(250,204,21,.3);background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(28,18,56,.9))">
 <h3 style="color:#f3e8ff;font-size:15px">⭐ Rate <span id="ratingNurseNameDisplay">Nurse</span></h3>
-<small style="color:#a78bfa">Booking: <span id="ratingBookingIdDisplay" style="color:#facc15;font-weight:800"></span></small>
+<small style="color:#a78bfa">Booking: <span id="ratingBookingIdDisplay" style="color:#facc15;font-weight:800"></span> • Time: <span id="ratingTimeDisplay" style="color:#86efac"></span></small>
 
 <div style="text-align:center;margin:16px 0">
 <div style="font-size:11px;color:#a78bfa">Tap stars to rate (1=Poor, 5=Excellent)</div>
@@ -67,27 +76,32 @@ label{font-size:11px;font-weight:800;margin:10px 0 4px;display:block;color:#c4b5
 <div id="ratingText" style="font-size:13px;color:#facc15;font-weight:800;margin:6px 0">Select rating</div>
 </div>
 
-<label>Your experience (appears on homepage index)</label>
-<textarea id="ratingComment" rows="4" placeholder="How was the service? Was nurse caring, punctual, professional? Your comment will appear on homepage for others to see. Example: Stayed 12hrs, very caring, will book again!"></textarea>
+<label>Your experience (appears on homepage index with your photo)</label>
+<textarea id="ratingComment" rows="4" placeholder="How was the service? Was nurse caring, punctual, professional? Example: Stayed 12hrs, very caring, will book again!"></textarea>
 
-<label>Your name (public on index)</label>
-<input id="clientNameInput" placeholder="e.g., Nana Y., USA or Abena K., Accra">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+<div><label>Your name (public on index) *</label><input id="clientNameInput" placeholder="e.g., Nana Y., USA"></div>
+<div><label>Your phone (saved)</label><input id="clientPhoneInput" readonly placeholder="Auto-filled"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+<div><label>Your email (saved)</label><input id="clientEmailInput" readonly placeholder="Auto-filled"></div>
+<div><label>Your photo URL (saved)</label><input id="clientPhotoInput" readonly placeholder="Auto-filled"></div>
+</div>
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
 <button class="btn" style="background:rgba(255,255,255,.08);color:#a78bfa" onclick="cancelRating()">Cancel</button>
-<button id="submitBtn" class="btn btnYellow" onclick="submitRating()">⭐ Submit Rating to Homepage</button>
+<button id="submitBtn" class="btn btnYellow" onclick="submitRating()">⭐ Submit Rating — With Photo + Email</button>
 </div>
 <div id="ratingResult" style="margin-top:12px;font-size:11px"></div>
-<small style="font-size:9px;color:#6b7280;display:block;margin-top:8px;text-align:center">After submit, your rating appears on index homepage instantly via Firebase live listener.</small>
+<small style="font-size:9px;color:#6b7280;display:block;margin-top:8px;text-align:center">After submit, your rating + photo appears on index homepage instantly via Firebase live listener.</small>
 </div>
 
 <div class="card" style="border:1px dashed rgba(168,85,247,.25)">
 <b style="color:#d8b4fe;font-size:11px">How rating appears on index:</b><br>
 <small style="color:#a78bfa;font-size:10px;line-height:1.6">
-1. You rate here → Saves to <code>publicReviews/{bookingId}</code> + <code>homepageReviews/{bookingId}</code><br>
-2. Index homepage listens live via <code>onValue(homepageReviews)</code> → Shows your ⭐ + comment<br>
-3. Example on index: <b>"Stayed 12hrs, very caring..." — Nana Y., USA</b> with <b>4.9 AVG (38 reviews)</b><br>
-4. Nurse average recalculated and updated everywhere
+1. You rate here → Saves to <code>publicReviews</code> + <code>homepageReviews</code> with <b>client photo + email + time</b><br>
+2. Index listens live → Shows your ⭐ + comment + photo<br>
+3. Example: <b>"Very caring..." — Nana Y., USA</b> <img src="https://ui-avatars.com/api/?name=N&background=facc15&color=000" style="width:16px;height:16px;border-radius:50%;vertical-align:middle"> with <b>4.9 AVG (38 reviews)</b>
 </small>
 </div>
 
@@ -98,35 +112,36 @@ const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomai
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
-let clientPhone=null, clientName=null, myBookings=[], currentBooking=null, currentNurseId=null, currentRating=0;
+let clientPhone=null, clientName=null, clientEmail=null, clientPhoto=null, clientUid=null, myBookings=[], currentBooking=null, currentNurseId=null, currentRating=0;
 
 function getClientPhone(){
-  const src=[localStorage.getItem('clientPhone'),localStorage.getItem('lcg_client_phone'),localStorage.getItem('currentClientPhone'),localStorage.getItem('lcg_phone'),localStorage.getItem('phone')];
+  const src=[localStorage.getItem('clientPhone'),localStorage.getItem('phone'),localStorage.getItem('lcg_client_phone')];
   let p=src.find(v=>v && v.replace(/[^0-9]/g,'').length>=9);
-  if(!p){
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(k && k.toLowerCase().includes('phone')){
-        const v=localStorage.getItem(k);
-        if(v && v.replace(/[^0-9]/g,'').length>=9){ p=v; break; }
-      }
-    }
-  }
   return p;
 }
 
 function loadClient(){
   clientPhone=getClientPhone();
-  clientName=localStorage.getItem('clientName')||localStorage.getItem('lcg_client_name')||localStorage.getItem('currentClientName')||'Client';
-  document.getElementById('clientPhoneDisplay').textContent=clientPhone||'Not found - Book first';
+  clientName=localStorage.getItem('clientName')||localStorage.getItem('fullName')||localStorage.getItem('lcg_client_name')||'Client';
+  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||localStorage.getItem('userEmail')||'';
+  clientPhoto=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||localStorage.getItem('photo')||'';
+  clientUid=localStorage.getItem('clientUid')||localStorage.getItem('uid')||'';
+  document.getElementById('clientPhoneDisplay').textContent=clientPhone||'Not found';
   document.getElementById('clientNameDisplay').textContent=clientName||'Client';
+  document.getElementById('clientEmailDisplay').textContent=clientEmail||'No email';
   document.getElementById('clientNameInput').value=clientName||'';
+  document.getElementById('clientPhoneInput').value=clientPhone||'';
+  document.getElementById('clientEmailInput').value=clientEmail||'';
+  document.getElementById('clientPhotoInput').value=clientPhoto||'';
+  const av=document.getElementById('clientAvatarTop');
+  if(clientPhoto){ av.src=clientPhoto; }
+  else { av.src='https://ui-avatars.com/api/?name='+encodeURIComponent(clientName||'Client')+'&background=facc15&color=000'; }
   return !!clientPhone;
 }
 
 function loadBookingsToRate(){
   if(!loadClient()){
-    document.getElementById('bookingsToRate').innerHTML='<div style="padding:20px;text-align:center;color:#fca5a5">❌ No phone found.<br>Please book a nurse first via Book Nurse page.<br><a href="book-nurse.html" style="display:inline-block;margin-top:10px;padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;text-decoration:none">Book Nurse</a></div>';
+    document.getElementById('bookingsToRate').innerHTML='<div style="padding:20px;text-align:center;color:#fca5a5">❌ No phone found.<br>Please book first.<br><a href="book-nurse.html" style="display:inline-block;margin-top:10px;padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;text-decoration:none">Book Nurse</a></div>';
     return;
   }
   const el=document.getElementById('bookingsToRate');
@@ -134,38 +149,32 @@ function loadBookingsToRate(){
   const phoneKey=clientPhone.replace(/[^0-9]/g,'');
   db.ref('clientBookings/'+phoneKey).once('value').then(snap=>{
     let bookings=[];
-    if(snap.exists()){
-      snap.forEach(c=>bookings.push({id:c.key, ...c.val()}));
-    }
+    if(snap.exists()){ snap.forEach(c=>bookings.push({id:c.key, ...c.val()})); }
     return db.ref('bookings').once('value').then(snap2=>{
       if(snap2.exists()){
         snap2.forEach(c=>{
-          const v=c.val();
-          const bPhone=(v.clientPhone||v.phone||'').replace(/[^0-9]/g,'');
+          const v=c.val(); const bPhone=(v.clientPhone||v.phone||'').replace(/[^0-9]/g,'');
           if(bPhone===phoneKey || bPhone.endsWith(phoneKey.slice(-9))){
             if(!bookings.find(b=>b.id===c.key)) bookings.push({id:c.key, ...v});
           }
         });
       }
       myBookings=bookings;
-      const toRate=bookings.filter(b=>{
-        const s=(b.status||'').toLowerCase();
-        return (s==='completed' || s==='done' || b.completedAt) && !b.isRated;
-      });
+      const toRate=bookings.filter(b=>{ const s=(b.status||'').toLowerCase(); return (s==='completed' || s==='done' || b.completedAt) && !b.isRated; });
       const rated=bookings.filter(b=>b.isRated);
-      
       if(bookings.length===0){
-        el.innerHTML='<div style="padding:15px;color:#a78bfa;text-align:center">No bookings yet. Book a nurse first, then after CEO marks completed, rate button appears here.</div>';
+        el.innerHTML='<div style="padding:15px;color:#a78bfa;text-align:center">No bookings yet. Book first, then after CEO marks completed, rate here.</div>';
         return;
       }
       if(toRate.length===0){
-        el.innerHTML='<div style="padding:15px;color:#86efac;text-align:center">✅ All completed jobs rated! '+ (rated.length>0? rated.length+' ratings submitted — they appear on homepage index.' : '') +'</div>' + (rated.length>0? rated.map(b=>`<div style="border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:10px;margin:6px 0;background:rgba(16,101,57,.08)"><b>${b.id} — ${b.nurseName||''}</b> <span style="color:#facc15">${'⭐'.repeat(b.ratingValue||5)}</span><br><small>${b.ratingComment||''}</small></div>`).join('') : '');
+        el.innerHTML='<div style="padding:15px;color:#86efac;text-align:center">✅ All completed jobs rated! '+rated.length+' ratings — they appear on homepage.</div>' + rated.map(b=>`<div style="border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:10px;margin:6px 0;background:rgba(16,101,57,.08)"><b>${b.id} — ${b.nurseName||''}</b> <span style="color:#facc15">${'⭐'.repeat(b.ratingValue||5)}</span><br><small>${b.ratingComment||''}</small></div>`).join('');
         return;
       }
       el.innerHTML=toRate.map(b=>{
         const nurseName=b.nurseName||b.selectedNurseName||'Nurse';
+        const photo=b.clientPhotoUrl||b.clientPhoto||clientPhoto||'';
         return `<div style="border:1px solid rgba(250,204,21,.3);border-radius:16px;padding:14px;margin:10px 0;background:rgba(14,10,28,.6);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-          <div><b style="color:#f3e8ff">${b.id} — ${nurseName}</b> <span class="badge completed">COMPLETED</span><br><small style="color:#a78bfa">${b.service||''} • ${b.currency||'GHS'} ${b.total||''} • ${b.patientName||''}</small></div>
+          <div style="display:flex;gap:10px;align-items:center"><img src="${photo||'https://ui-avatars.com/api/?name='+encodeURIComponent(clientName)+'&background=facc15&color=000'}" style="width:36px;height:36px;border-radius:50%;border:1px solid #facc15"><div><b style="color:#f3e8ff">${b.id} — ${nurseName}</b> <span class="badge completed">COMPLETED</span><br><small style="color:#a78bfa">${b.service||''} • ${b.currency||'GHS'} ${b.total||b.amount||''} • Patient: ${b.patientName||''}</small></div></div>
           <button class="btn btnYellow" onclick="startRating('${b.id}')">⭐ Rate ${nurseName.split(' ')[0]} Now</button>
         </div>`;
       }).join('');
@@ -174,12 +183,11 @@ function loadBookingsToRate(){
 }
 
 function startRating(bookingId){
-  const b=myBookings.find(x=>x.id===bookingId);
-  if(!b){ alert('Booking not found'); return; }
-  currentBooking=bookingId;
-  currentNurseId=b.nurseId||b.selectedNurseId||'';
+  const b=myBookings.find(x=>x.id===bookingId); if(!b){ alert('Booking not found'); return; }
+  currentBooking=bookingId; currentNurseId=b.nurseId||b.selectedNurseId||'';
   document.getElementById('ratingNurseNameDisplay').textContent=b.nurseName||b.selectedNurseName||'Nurse';
   document.getElementById('ratingBookingIdDisplay').textContent=bookingId;
+  document.getElementById('ratingTimeDisplay').textContent=new Date().toLocaleString('en-GH');
   document.getElementById('ratingFormCard').style.display='block';
   document.getElementById('ratingFormCard').scrollIntoView({behavior:'smooth'});
   currentRating=0;
@@ -187,57 +195,53 @@ function startRating(bookingId){
   document.getElementById('ratingText').textContent='Select rating';
   document.getElementById('ratingResult').textContent='';
 }
-
-function cancelRating(){
-  document.getElementById('ratingFormCard').style.display='none';
-  currentBooking=null; currentNurseId=null; currentRating=0;
-}
-
+function cancelRating(){ document.getElementById('ratingFormCard').style.display='none'; currentBooking=null; currentNurseId=null; currentRating=0; }
 function setRating(val){
   currentRating=val;
   document.querySelectorAll('#starSelector .stars').forEach(s=>{
-    const n=parseInt(s.getAttribute('data-star'));
-    s.textContent=n<=val?'★':'☆';
-    s.style.color=n<=val?'#facc15':'#6b7280';
+    const n=parseInt(s.getAttribute('data-star')); s.textContent=n<=val?'★':'☆'; s.style.color=n<=val?'#facc15':'#6b7280';
   });
   const texts={1:'Poor - Needs improvement',2:'Fair - Okay',3:'Good - Satisfied',4:'Very Good - Happy',5:'Excellent - Outstanding!'};
   document.getElementById('ratingText').textContent=texts[val]||'';
 }
-
 async function submitRating(){
   if(!currentRating){ document.getElementById('ratingResult').innerHTML='<span style="color:#fca5a5">Please select 1-5 stars</span>'; return; }
   if(!currentBooking){ document.getElementById('ratingResult').innerHTML='<span style="color:#fca5a5">No booking selected</span>'; return; }
-  const btn=document.getElementById('submitBtn');
-  btn.textContent='⏳ Submitting...'; btn.disabled=true;
+  const btn=document.getElementById('submitBtn'); btn.textContent='⏳ Submitting...'; btn.disabled=true;
   const booking=myBookings.find(b=>b.id===currentBooking);
   const phoneKey=clientPhone.replace(/[^0-9]/g,'');
   const comment=document.getElementById('ratingComment').value.trim();
   const cName=document.getElementById('clientNameInput').value.trim()||clientName||'Client';
-  
-  if(!comment){ document.getElementById('ratingResult').innerHTML='<span style="color:#fca5a5">Please write your experience (comment)</span>'; btn.textContent='⭐ Submit Rating to Homepage'; btn.disabled=false; return; }
-  
+  const cPhone=document.getElementById('clientPhoneInput').value.trim()||clientPhone||'';
+  const cEmail=document.getElementById('clientEmailInput').value.trim()||clientEmail||'';
+  const cPhoto=document.getElementById('clientPhotoInput').value.trim()||clientPhoto||booking.clientPhotoUrl||booking.clientPhoto||'';
+  if(!comment){ document.getElementById('ratingResult').innerHTML='<span style="color:#fca5a5">Please write your experience (comment)</span>'; btn.textContent='⭐ Submit Rating — With Photo + Email'; btn.disabled=false; return; }
+  const now=Date.now();
   const ratingData={
     bookingId:currentBooking,
     nurseId:currentNurseId||booking.nurseId||'',
     nurseName:booking.nurseName||booking.selectedNurseName||'',
-    service:booking.service||booking.serviceType||'Home Nursing',
-    clientPhone:clientPhone,
-    clientPhoneKey:phoneKey,
-    clientName:cName,
-    client:cName,
-    ratingValue:currentRating,
-    rating:currentRating,
-    ratingComment:comment,
-    text:comment,
-    ratedAt:Date.now(),
-    ratedAtISO:new Date().toISOString(),
+    service:booking.service||'Home Nursing',
+    // CLIENT DETAILS — NAME PHONE PHOTO EMAIL + TIME — NEW!
+    clientPhone:cPhone, clientPhoneKey:phoneKey, phone:cPhone,
+    clientName:cName, client:cName, clientFullName:cName, clientDisplayName:cName,
+    clientEmail:cEmail, email:cEmail, clientMail:cEmail,
+    clientPhotoUrl:cPhoto, clientPhoto:cPhoto, photoUrl:cPhoto, clientAvatar:cPhoto, clientProfilePhoto:cPhoto, clientImage:cPhoto,
+    clientUid:clientUid||booking.clientUid||'',
+    // Patient
+    patientName:booking.patientName||'', patientPhone:booking.patientPhone||'', patientLocation:booking.patientLocation||'',
+    // Rating
+    ratingValue:currentRating, rating:currentRating, ratingComment:comment, text:comment,
+    ratedAt:now, ratedAtISO:new Date().toISOString(), ratingTime:now, ratingTimeFormatted:new Date().toLocaleString('en-GH',{dateStyle:'medium',timeStyle:'medium'}), ratingTimeDisplay:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
     date:new Date().toISOString().split('T')[0],
-    loc:'Ghana',
-    verifiedBooking:true,
-    showOnIndex:true,
-    source:'rating.html'
+    timestamp:now, timeOfRating:now,
+    // Time tracking
+    bookingTime:booking.time||booking.createdAt||now, bookingTimeFormatted:booking.time?new Date(booking.time).toLocaleString('en-GH'):'',
+    // Flags
+    loc:'Ghana', verifiedBooking:true, showOnIndex:true, source:'rating.html — with photo email',
+    // Original
+    originalBookingId:currentBooking
   };
-  
   try{
     const nid=currentNurseId||booking.nurseId||'unknown';
     await db.ref('ratings/'+nid+'/'+currentBooking).set(ratingData);
@@ -245,37 +249,24 @@ async function submitRating(){
     await db.ref('ratingsAll/'+currentBooking).set(ratingData);
     await db.ref('publicReviews/'+currentBooking).set(ratingData);
     await db.ref('homepageReviews/'+currentBooking).set(ratingData);
-    await db.ref('clientBookings/'+phoneKey+'/'+currentBooking).update({isRated:true, ratingValue:currentRating, ratingComment:comment, ratedAt:Date.now()});
-    await db.ref('bookings/'+currentBooking).update({isRated:true, ratingValue:currentRating, ratingComment:comment, ratedAt:Date.now()}).catch(()=>{});
-    
-    // Update nurse avg
+    await db.ref('clientReviews/'+(clientEmail?clientEmail.replace(/[.#$@\[\]]/g,'_'):phoneKey)+'/'+currentBooking).set(ratingData);
+    await db.ref('clientBookings/'+phoneKey+'/'+currentBooking).update({isRated:true, ratingValue:currentRating, ratingComment:comment, ratedAt:now, clientPhotoUrl:cPhoto, clientEmail:cEmail});
+    await db.ref('bookings/'+currentBooking).update({isRated:true, ratingValue:currentRating, ratingComment:comment, ratedAt:now, clientPhotoUrl:cPhoto, clientEmail:cEmail}).catch(()=>{});
     const snap=await db.ref('ratings/'+nid).once('value');
     if(snap.exists()){
-      let total=0,count=0;
-      snap.forEach(c=>{ total+=parseFloat(c.val().ratingValue||c.val().rating||0); count++; });
+      let total=0,count=0; snap.forEach(c=>{ total+=parseFloat(c.val().ratingValue||c.val().rating||0); count++; });
       const avg=count>0?(total/count):currentRating;
-      await db.ref('nurses/'+nid).update({rating:parseFloat(avg.toFixed(1)), reviewCount:count, lastRatedAt:Date.now()}).catch(()=>{});
+      await db.ref('nurses/'+nid).update({rating:parseFloat(avg.toFixed(1)), reviewCount:count, lastRatedAt:now}).catch(()=>{});
     }
-    
-    document.getElementById('ratingResult').innerHTML='<span style="color:#86efac">✅ Rating submitted! ⭐'+currentRating+' — "'+comment.slice(0,60)+'..." — Now appears on homepage index for everyone!<br><small>Redirecting to homepage...</small></span>';
+    document.getElementById('ratingResult').innerHTML='<span style="color:#86efac">✅ Rating submitted! ⭐'+currentRating+' — Client: '+cName+' • Phone: '+cPhone+' • Email: '+cEmail+' • Photo: '+(cPhoto?'YES':'NO')+' • Time: '+new Date().toLocaleString('en-GH')+'<br>\"'+comment.slice(0,60)+'...\" — Now appears on homepage with your photo!<br><small>Redirecting...</small></span>';
     btn.textContent='✅ Rated! Going to index...';
-    setTimeout(()=>{ location.href='index.html#reviews'; }, 2000);
+    setTimeout(()=>{ location.href='index.html#reviews'; }, 2500);
   }catch(e){
     document.getElementById('ratingResult').innerHTML='<span style="color:#fca5a5">Failed: '+e.message+'</span>';
-    btn.textContent='⭐ Submit Rating to Homepage'; btn.disabled=false;
+    btn.textContent='⭐ Submit Rating — With Photo + Email'; btn.disabled=false;
   }
 }
-
-document.addEventListener('DOMContentLoaded', ()=>{
-  loadClient();
-  setTimeout(loadBookingsToRate, 600);
-});
+document.addEventListener('DOMContentLoaded', ()=>{ loadClient(); setTimeout(loadBookingsToRate, 600); });
 </script>
-
-<div style="position:fixed;bottom:20px;right:20px;z-index:60;display:flex;flex-direction:column;gap:10px">
-<a href="https://wa.me/233544121814?text=Hello%20LOVE%20CARE%20GLOBAL" target="_blank" style="width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.4)">💬</a>
-<a href="tel:+233544121814" style="width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,#22c55e,#86efac);text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.4)">📞</a>
-</div>
-
 </body>
 </html>
