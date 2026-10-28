@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Alerts — Booking Accepted / Rejected — LOVE CARE GLOBAL — Photo Email Saved</title>
+<title>Alerts — NURSE Photo Phone for Client Contact — LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.15);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
 .card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:22px;padding:16px;margin:12px;animation:pop .3s}
 @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.acceptedCard{border:2px solid #22c55e;background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(16,101,57,.15),rgba(28,18,56,.9));box-shadow:0 0 0 4px rgba(34,197,94,.12)}
-.rejectedCard{border:2px solid #ef4444;background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(127,29,29,.15),rgba(28,18,56,.9));box-shadow:0 0 0 4px rgba(239,68,68,.1)}
+.acceptedCard{border:2px solid #22c55e;background:linear-gradient(135deg,rgba(34,197,94,.14),rgba(16,101,57,.18),rgba(28,18,56,.95));box-shadow:0 0 0 5px rgba(34,197,94,.15)}
+.rejectedCard{border:2px solid #ef4444;background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(127,29,29,.15),rgba(28,18,56,.9))}
 .badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
 .badge-new{background:#22c55e;color:#052e16}
-.btn{border:none;border-radius:14px;padding:13px 16px;font-weight:900;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;flex:1;min-height:48px}
+.btn{border:none;border-radius:14px;padding:14px 16px;font-weight:900;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;flex:1;min-height:50px}
 .btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
 .btnBlue{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white}
 .btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
 .btnOrange{background:linear-gradient(135deg,#fb923c,#f97316);color:white}
 .btnWhats{background:linear-gradient(135deg,#25D366,#128C7E);color:white}
 .btnGray{background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
-.clientAvatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #22c55e;background:#1e1a3a}
+.clientAvatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #facc15;background:#1e1a3a}
+.nurseBigAvatar{width:86px;height:86px;border-radius:50%;object-fit:cover;border:3px solid #22c55e;background:#1e1a3a;box-shadow:0 6px 20px rgba(34,197,94,.3)}
 .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:blink 1.5s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:10px 0;z-index:60}
@@ -26,25 +27,22 @@
 .btab.active{color:#22c55e;background:rgba(34,197,94,.12);border-radius:12px;margin:0 6px;border:1px solid rgba(34,197,94,.2)}
 </style></head><body>
 <div class="topbar">
-<div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:13px">LOVE CARE GLOBAL</b><br><small style="color:#22c55e;font-size:10px"><span class="dot"></span> ALERTS — ACCEPT / REJECT — PHOTO + EMAIL</small></div></div>
+<div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:13px">LOVE CARE GLOBAL</b><br><small style="color:#22c55e;font-size:10px"><span class="dot"></span> ALERTS — NURSE PHOTO + PHONE FOR CLIENT</small></div></div>
 <div style="display:flex;align-items:center;gap:8px"><img id="topClientAvatar" class="clientAvatar" style="display:none"><a href="emergency-sos.html" style="background:#ef4444;color:white;padding:7px 14px;border-radius:999px;font-weight:900;font-size:11px;text-decoration:none">SOS</a></div>
 </div>
 <div style="max-width:760px;margin:0 auto;padding:10px">
 <div class="card" style="padding:12px;background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)">
-<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-<b style="font-size:12px;color:#facc15">🔔 YOUR BOOKING ALERTS — Nurse Accepted / Rejected — Client Photo Name Phone Email Saved</b>
-<div style="display:flex;gap:6px"><button class="btn btnGray" style="padding:8px 12px;min-height:32px;font-size:10px" onclick="loadAlerts()">🔄 Refresh</button><button class="btn btnGray" style="padding:8px 12px;min-height:32px;font-size:10px" onclick="markAllRead()">✅ Read All</button></div>
-</div>
+<b style="font-size:12px;color:#facc15">🔔 YOUR BOOKING ALERTS — Nurse Accepted / Rejected — Shows NURSE Photo Phone for Client Contact</b>
 <div style="display:flex;gap:10px;align-items:center;margin-top:10px;background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.08));border:1px solid rgba(250,204,21,.2);border-radius:14px;padding:10px">
 <img id="clientAvatarTop" class="clientAvatar" src="">
-<div style="flex:1"><b id="clientNameTop" style="font-size:13px;color:#fff">Client</b><br><small id="clientPhoneTop" style="color:#86efac;font-size:11px"></small><br><small id="clientEmailTop" style="color:#a78bfa;font-size:10px"></small></div>
-<div style="font-size:9px;color:#fde68a;background:rgba(250,204,21,.15);border-radius:999px;padding:4px 8px">CLIENT — PHOTO + EMAIL + PHONE + NAME</div>
+<div style="flex:1"><b id="clientNameTop" style="font-size:13px;color:#fff">ASABERE PETER</b><br><small id="clientPhoneTop" style="color:#86efac;font-size:11px">+233502957280</small><br><small id="clientEmailTop" style="color:#a78bfa;font-size:10px">lovecareglobal@gmail.com</small></div>
+<div style="font-size:9px;color:#fde68a;background:rgba(250,204,21,.15);border-radius:999px;padding:4px 8px">YOU — CLIENT</div>
 </div>
-<div id="countInfo" style="font-size:10px;color:#6b7280;margin-top:8px">Loading your alerts with client photo name phone email + patient + nurse...</div>
+<div id="countInfo" style="font-size:10px;color:#6b7280;margin-top:8px">0 alerts — Client: ASABERE PETER • Real-time accept/reject — Nurse photo + phone will appear here</div>
 </div>
-<div id="alertsList" style="display:grid;gap:14px"></div>
-<div id="emptyAlerts" class="card" style="display:none;text-align:center;padding:30px">
-<div style="font-size:44px">🔔</div><b>No nurse response yet</b><br><small style="color:#a78bfa">After you book, when nurse taps Accept ✅ or Reject ❌, alert appears here with client photo + patient location + call + WhatsApp + auto navigation</small><br><br><a href="book-nurse.html" class="btn btnYellow" style="max-width:200px;margin:10px auto">➕ Book Nurse Now</a>
+<div id="alertsList" style="display:grid;gap:16px"></div>
+<div id="emptyAlerts" class="card" style="display:none;text-align:center;padding:28px;background:rgba(28,18,56,.6)">
+<div style="font-size:48px">🔔</div><b style="font-size:14px">No nurse response yet</b><br><small style="color:#a78bfa;font-size:11px;line-height:1.6">After you book, when nurse taps <b style="color:#22c55e">Accept ✅</b> or <b style="color:#ef4444">Reject ❌</b> in my-job-offer.html<br>When <b style="color:#22c55e">Accepted</b>, you will see here:<br><b style="color:#fff">👩‍⚕️ NURSE photo + phone + name + specialty</b><br>With buttons: 🧭 Auto Navigation to Patient + 📞 Call Nurse + 💬 WhatsApp Nurse + 🗺️ Live Tracking<br>When <b style="color:#ef4444">Rejected</b>: Book another nurse OR Increase payment rate</small><br><br><a href="book-nurse.html" class="btn btnYellow" style="max-width:220px;margin:10px auto">➕ Book Nurse Now</a>
 </div>
 </div>
 <div class="bottom-tabs">
@@ -61,8 +59,8 @@ const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=get
 let allAlerts=[],clientPhone=null,clientName=null,clientEmail=null,clientPhoto=null,previousStatuses={};
 function getClientInfo(){
   clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'+233502957280';
-  clientName=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'Client';
-  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'';
+  clientName=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'ASABERE PETER';
+  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'lovecareglobal@gmail.com';
   clientPhoto=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||'';
   document.getElementById('clientNameTop').textContent=clientName;
   document.getElementById('clientPhoneTop').textContent=clientPhone;
@@ -72,66 +70,119 @@ function getClientInfo(){
   return {clientPhone,clientName,clientEmail,clientPhoto};
 }
 async function ensureAuth(){return new Promise(res=>{const unsub=onAuthStateChanged(auth,async u=>{unsub();if(u)res(u);else{try{const c=await signInAnonymously(auth);res(c.user);}catch{res(null);}}});setTimeout(()=>res(null),2000);});}
-function addAlert(a){if(allAlerts.find(x=>x.id===a.id))return;allAlerts.unshift(a);try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){}if(navigator.vibrate)navigator.vibrate(a.type==='accepted'?[200,100,200,100,400]:[300,100,300]);try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=a.type==='accepted'?800:400;g.gain.value=.12;o.start();setTimeout(()=>{o.stop();ctx.close();},500);}catch(e){}renderAlerts();}
+
+async function fetchNurseFull(nurseId, booking){
+  let nurseData = {nurseId, nurseName: booking.nurseName||'Nurse', nursePhone: booking.nursePhone||'', nursePhotoUrl: booking.nursePhotoUrl||booking.nursePhoto||'', nurseEmail: '', specialty: booking.service||'Home Nursing', rating: '4.9'};
+  try{
+    if(nurseId){
+      const snap = await get(ref(db, 'nurses/'+nurseId));
+      if(snap.exists()){
+        const v=snap.val();
+        nurseData.nursePhotoUrl = v.photoUrl||v.photoURL||v.photo||v.avatar||nurseData.nursePhotoUrl;
+        nurseData.nursePhone = v.phone||v.phoneNumber||v.nursePhone||nurseData.nursePhone;
+        nurseData.nurseEmail = v.email||'';
+        nurseData.nurseName = v.fullName||v.name||nurseData.nurseName;
+        nurseData.specialty = v.specialty||v.serviceType||nurseData.specialty;
+        nurseData.rating = v.rating||v.avgRating||'4.9';
+      } else {
+        // Try by phone
+        const snap2 = await get(ref(db, 'nurses'));
+        if(snap2.exists()){
+          snap2.forEach(ch=>{
+            const v=ch.val();
+            if((v.phone||'')===booking.nursePhone || (v.fullName||'')===booking.nurseName){
+              nurseData.nursePhotoUrl = v.photoUrl||v.photoURL||v.photo||nurseData.nursePhotoUrl;
+              nurseData.nursePhone = v.phone||nurseData.nursePhone;
+              nurseData.nurseName = v.fullName||v.name||nurseData.nurseName;
+            }
+          });
+        }
+      }
+    }
+  }catch(e){}
+  return nurseData;
+}
+
+function addAlert(a){
+  if(allAlerts.find(x=>x.id===a.id))return;
+  allAlerts.unshift(a);
+  try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){}
+  if(navigator.vibrate)navigator.vibrate(a.type==='accepted'?[200,100,200,100,400]:[300,100,300]);
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=a.type==='accepted'?900:350;g.gain.value=.13;o.start();setTimeout(()=>{o.stop();ctx.close();},600);}catch(e){}
+  renderAlerts();
+}
+
 function renderAlerts(){
   const list=document.getElementById('alertsList');const countInfo=document.getElementById('countInfo');const empty=document.getElementById('emptyAlerts');const unread=allAlerts.filter(a=>!a.read).length;
-  countInfo.textContent=`${allAlerts.length} alerts — ${unread} NEW — Client: ${clientName} • Phone: ${clientPhone} • Email: ${clientEmail||'NO'} • Photo: ${clientPhoto?'YES':'NO'} • Real-time accept/reject`;
+  countInfo.textContent=`${allAlerts.length} alerts — ${unread} NEW — Client: ${clientName} • ${clientPhone} • Photo: ${clientPhoto?'YES':'NO'} • Real-time — Nurse photo + phone appears here for you to contact`;
   if(!allAlerts.length){list.innerHTML='';empty.style.display='block';return;}empty.style.display='none';
   list.innerHTML=allAlerts.map(a=>{
     const timeAgo=(()=>{const d=Date.now()-(a.time||Date.now());const m=Math.floor(d/60000);if(m<1)return 'Just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';})();
-    const clientAv=a.clientPhotoUrl?`<img src="${a.clientPhotoUrl}" class="clientAvatar">`:'';
-    const nurseAv=a.nursePhotoUrl?`<img src="${a.nursePhotoUrl}" style="width:56px;height:56px;border-radius:50%;border:2px solid #22c55e;object-fit:cover">`:`<div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;font-size:22px">👩‍⚕️</div>`;
-    const isAccepted=a.type==='accepted';const cardClass=isAccepted?'acceptedCard':'rejectedCard';
+    const isAccepted=a.type==='accepted';
+    const cardClass=isAccepted?'acceptedCard':'rejectedCard';
+    const destLat=a.patientLat||a.clientLat||5.6037;const destLng=a.patientLng||a.clientLng||-0.1870;
+    const navUrl=`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=driving`;
+    const nursePhoneClean=(a.nursePhone||'').replace(/[^0-9+]/g,'');
+    const nursePhoto = a.nursePhotoUrl||'https://ui-avatars.com/api/?name='+encodeURIComponent(a.nurseName||'Nurse')+'&background=22c55e&color=fff';
+
     if(isAccepted){
-      const destLat=a.patientLat||a.clientLat||5.6037;const destLng=a.patientLng||a.clientLng||-0.1870;
-      const navUrl=`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=driving`;
-      const nursePhoneClean=(a.nursePhone||'').replace(/[^0-9+]/g,'');
       return `<div class="card ${cardClass}">
-        <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
-          <div style="display:flex;gap:12px;align-items:center"><div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;font-size:26px">✅</div><div><b style="font-size:15px;color:#86efac">ACCEPTED! Nurse is coming!</b><br><b style="font-size:13px;color:#fff">${a.nurseName||'Nurse'} accepted ${a.bookingId}</b><br><small style="color:#a78bfa;font-size:10px">${timeAgo} • ${new Date(a.time).toLocaleString('en-GH')}</small></div></div><span class="badge badge-new">NEW — PHOTO SAVED</span>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="display:flex;gap:12px;align-items:center"><div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;font-size:28px">✅</div><div><b style="font-size:16px;color:#86efac">NURSE ACCEPTED YOUR BOOKING!</b><br><b style="font-size:13px;color:#fff">Your nurse is on the way!</b><br><small style="color:#a78bfa;font-size:10px">${timeAgo} • ${new Date(a.time).toLocaleString('en-GH')} • Booking: ${a.bookingId}</small></div></div><span class="badge badge-new">ACCEPTED</span>
         </div>
-        <div style="display:flex;gap:12px;align-items:center;margin-top:14px;background:rgba(14,10,28,.6);border-radius:14px;padding:12px">
-          ${nurseAv}<div style="flex:1"><b style="color:#fff;font-size:13px">👩‍⚕️ ${a.nurseName||'Nurse'}</b><br><small style="color:#86efac">📞 ${a.nursePhone||'No phone'}</small><br><small style="color:#a78bfa">Booking: ${a.bookingId} • ${a.currency||'GHS'} ${a.amount||''}</small></div><div style="display:flex;flex-direction:column;gap:4px">${clientAv}<small style="font-size:8px;color:#facc15">YOU — ${a.clientName||clientName}</small></div>
+
+        <!-- NURSE BIG CARD — PHOTO + PHONE + DETAILS — FOR CLIENT TO CONTACT -->
+        <div style="margin-top:16px;background:linear-gradient(135deg,rgba(14,10,28,.8),rgba(16,101,57,.2));border:2px solid rgba(34,197,94,.3);border-radius:18px;padding:16px;display:flex;gap:16px;align-items:center">
+          <img src="${nursePhoto}" class="nurseBigAvatar" onerror="this.src='https://ui-avatars.com/api/?name=Nurse&background=22c55e&color=fff'">
+          <div style="flex:1">
+            <b style="font-size:18px;color:#fff">👩‍⚕️ ${a.nurseName||'Nurse'}</b><br>
+            <small style="font-size:12px;color:#22c55e;font-weight:800">📞 ${a.nursePhone||'No phone yet'}</small><br>
+            <small style="font-size:11px;color:#a78bfa">⭐ ${a.rating||'4.9'} • 🩺 ${a.specialty||a.service||'Home Nursing'}</small><br>
+            <small style="font-size:10px;color:#6b7280">${a.nurseEmail||''} • ID: ${a.nurseId||''}</small><br>
+            <div style="margin-top:6px;background:#22c55e;color:#052e16;border-radius:999px;padding:4px 10px;font-size:10px;font-weight:900;display:inline-block">● COMING TO PATIENT — ${a.patientName||''}</div>
+          </div>
         </div>
-        <div style="margin-top:12px;background:rgba(14,10,28,.7);border-radius:12px;padding:10px;font-size:11px;color:#c4b5fd;line-height:1.6">
-          <b style="color:#22c55e">🎉 Good news ${a.clientName||clientName}!</b> Your selected nurse <b style="color:#fff">${a.nurseName}</b> has <b style="color:#22c55e">ACCEPTED</b> your booking ${a.bookingId}.<br>
-          <b style="color:#facc15">👤 Client Name:</b> ${a.clientName}<br><b style="color:#facc15">📞 Client Phone:</b> ${a.clientPhone}<br><b style="color:#facc15">📧 Client Email:</b> ${a.clientEmail}<br><b style="color:#facc15">📸 Client Photo:</b> ${a.clientPhotoUrl?'✅ YES — '+a.clientPhotoUrl.slice(0,50):'❌ NO'}<br>
-          <b style="color:#facc15">🏥 Patient:</b> ${a.patientName||'N/A'} • 📞 ${a.patientPhone||''} • 📍 ${a.patientLocation||''}<br>
-          ${a.patientLat?`<b style="color:#60a5fa">📍 Patient Location (Nurse will go here — PRIMARY):</b> ${a.patientLat.toFixed(5)}, ${a.patientLng.toFixed(5)}<br>`:''}
-          💰 Amount: ${a.currency||'GHS'} ${a.amount||''} • PayRef: ${a.paystackRef||''} • Time: ${new Date(a.time).toLocaleString('en-GH')}<br>
-          <span style="color:#22c55e">● Tracking ACTIVE — Auto navigation started</span>
+
+        <div style="margin-top:12px;background:rgba(14,10,28,.7);border-radius:12px;padding:12px;font-size:11px;color:#c4b5fd;line-height:1.7">
+          <b style="color:#22c55e">🎉 Congratulations ${a.clientName||clientName}!</b> <b style="color:#fff">${a.nurseName}</b> accepted your booking <b>${a.bookingId}</b>!<br>
+          <b style="color:#fff">📸 Nurse Photo:</b> Above ☝️ — This is who is coming!<br>
+          <b style="color:#fff">📞 Nurse Phone:</b> <a href="tel:${nursePhoneClean}" style="color:#22c55e;font-weight:800">${a.nursePhone||'Call via button below'}</a><br>
+          <b style="color:#fff">🏥 Patient:</b> ${a.patientName||'N/A'} • 📞 ${a.patientPhone||''} • 📍 ${a.patientLocation||''}<br>
+          <b style="color:#60a5fa">📍 Where nurse will go (Patient location):</b> ${a.patientLat? a.patientLat.toFixed(5)+', '+a.patientLng.toFixed(5)+' — '+a.patientLocation : 'Patient address'}<br>
+          <b style="color:#a78bfa">👤 Your details (Client):</b> ${a.clientName} • ${a.clientPhone} • ${a.clientEmail} • Photo: ${a.clientPhotoUrl?'YES':'NO'}<br>
+          💰 Paid: ${a.currency||'GHS'} ${a.amount||''} • PayRef: ${a.paystackRef||''}<br>
+          <span style="color:#22c55e">● NURSE IS COMING NOW — Contact nurse via Call / WhatsApp / Navigation below</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
-          <a href="${navUrl}" target="_blank" class="btn btnBlue">🧭 Auto Navigation — Patient</a>
-          <a href="client-dashboard.html" class="btn btnGreen">🗺️ Live Tracking + Map</a>
+
+        <!-- ACTION BUTTONS — CALL + WHATSAPP + NAVIGATION — NURSE CONTACT -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+          <a href="tel:${nursePhoneClean}" class="btn btnGreen" style="font-size:14px">📞 CALL NURSE — ${a.nursePhone? a.nursePhone.slice(-9) : 'Call Now'}</a>
+          <a href="https://wa.me/${nursePhoneClean.replace('+','')}?text=Hello%20${encodeURIComponent(a.nurseName||'Nurse')}%20you%20accepted%20my%20booking%20${encodeURIComponent(a.bookingId)}%20for%20patient%20${encodeURIComponent(a.patientName||'')}—%20I%20am%20${encodeURIComponent(a.clientName||clientName)}%20${encodeURIComponent(a.clientPhone||'')}" target="_blank" class="btn btnWhats" style="font-size:14px">💬 WhatsApp Nurse</a>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
-          <a href="tel:${nursePhoneClean}" class="btn btnGray">📞 Call Nurse</a>
-          <a href="https://wa.me/${nursePhoneClean.replace('+','')}?text=Hello%20${encodeURIComponent(a.nurseName||'Nurse')}%20you%20accepted%20my%20booking%20${encodeURIComponent(a.bookingId)}" target="_blank" class="btn btnWhats">💬 WhatsApp Nurse</a>
-          <button onclick="markRead('${a.id}')" class="btn btnGray">✅ Read</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+          <a href="${navUrl}" target="_blank" class="btn btnBlue">🧭 Auto Navigation — Go to PATIENT Location</a>
+          <a href="client-dashboard.html" class="btn btnGray" style="background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac">🗺️ Live Tracking — Follow Nurse</a>
         </div>
+        <div style="text-align:center;margin-top:8px"><button onclick="markRead('${a.id}')" class="btn btnGray" style="padding:8px 14px;min-height:36px;font-size:11px">✅ Mark as Read</button></div>
       </div>`;
     } else {
       return `<div class="card ${cardClass}">
         <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
-          <div style="display:flex;gap:12px;align-items:center"><div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#ef4444,#dc2626);display:grid;place-items:center;font-size:26px">❌</div><div><b style="font-size:15px;color:#fca5a5">REJECTED — Need Action!</b><br><b style="font-size:13px;color:#fff">${a.nurseName||'Nurse'} rejected ${a.bookingId}</b><br><small style="color:#a78bfa;font-size:10px">${timeAgo} • Reason: ${a.rejectReason||'Not available'}</small></div></div><span class="badge" style="background:#ef4444;color:white">ACTION</span>
-        </div>
-        <div style="display:flex;gap:12px;align-items:center;margin-top:14px;background:rgba(14,10,28,.6);border-radius:14px;padding:12px">
-          ${nurseAv}<div style="flex:1"><b style="color:#fff;font-size:13px">👩‍⚕️ ${a.nurseName||'Nurse'} — Rejected</b><br><small style="color:#fca5a5">Reason: ${a.rejectReason||'Low rate / Busy'}</small><br><small style="color:#a78bfa">Booking: ${a.bookingId} • Patient: ${a.patientName||''}</small></div>${clientAv}
+          <div style="display:flex;gap:12px;align-items:center"><div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#ef4444,#dc2626);display:grid;place-items:center;font-size:28px">❌</div><div><b style="font-size:15px;color:#fca5a5">REJECTED — ${a.nurseName||'Nurse'} Rejected</b><br><small style="color:#a78bfa;font-size:11px">${timeAgo} • Reason: ${a.rejectReason||'Not available — Low rate?'}</small><br><small style="color:#6b7280">Booking: ${a.bookingId} • Patient: ${a.patientName||''}</small></div></div><span class="badge" style="background:#ef4444;color:white">REJECTED</span>
         </div>
         <div style="margin-top:12px;background:rgba(14,10,28,.7);border-radius:12px;padding:10px;font-size:11px;color:#c4b5fd;line-height:1.6">
-          <b style="color:#ef4444">😔 Sorry ${a.clientName||clientName}!</b> Nurse <b>${a.nurseName||''}</b> rejected booking <b>${a.bookingId}</b>.<br>
-          <b style="color:#facc15">👤 Client Name:</b> ${a.clientName}<br><b style="color:#facc15">📞 Phone:</b> ${a.clientPhone}<br><b style="color:#facc15">📧 Email:</b> ${a.clientEmail}<br><b style="color:#facc15">📸 Photo:</b> ${a.clientPhotoUrl?'✅ YES':'❌ NO'}<br>
-          <b style="color:#facc15">🏥 Patient:</b> ${a.patientName||''} • ${a.patientPhone||''} • ${a.patientLocation||''}<br>
-          <b style="color:#f59e0b">💡 What to do?</b> Book another nurse OR Increase payment rate — Higher rate attracts nurses!
+          😔 Sorry ${a.clientName||clientName}! Nurse ${a.nurseName||''} rejected.<br>
+          <b style="color:#f59e0b">💡 Increase payment rate — Higher rate attracts nurses fast!</b><br>
+          Client: ${a.clientName} • ${a.clientPhone} • ${a.clientEmail} • Photo: ${a.clientPhotoUrl?'YES':'NO'}<br>
+          Patient: ${a.patientName||''} • ${a.patientPhone||''} • ${a.patientLocation||''}
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
           <a href="book-nurse.html" class="btn btnYellow">➕ Book Another Nurse</a>
           <a href="book-nurse.html?increaseRate=1&bookingId=${a.bookingId}" class="btn btnOrange">💰 Increase Payment Rate</a>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
           <a href="refund-query.html" class="btn btnGray">📝 Refund Query</a>
-          <a href="https://wa.me/233544121814?text=Hello%20CEO%20my%20booking%20${encodeURIComponent(a.bookingId)}%20was%20rejected" target="_blank" class="btn btnWhats">💬 CEO</a>
+          <a href="https://wa.me/233544121814?text=Hello%20CEO%20booking%20${a.bookingId}%20rejected" target="_blank" class="btn btnWhats">💬 CEO</a>
           <button onclick="markRead('${a.id}')" class="btn btnGray">✅ Read</button>
         </div>
       </div>`;
@@ -144,47 +195,51 @@ window.loadAlerts=async function(){
   try{
     const snap=await get(ref(db,'bookings'));const snap2=await get(ref(db,'allBookings')).catch(()=>null);
     let allBookings={};if(snap.exists())Object.assign(allBookings,snap.val());if(snap2&&snap2.exists())Object.assign(allBookings,snap2.val());
-    Object.keys(allBookings).forEach(id=>{
+    for(const id of Object.keys(allBookings)){
       const b=allBookings[id];
       const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,'');const myPhone=clientPhone.replace(/[^0-9]/g,'');
       const phoneMatch=bPhone&&myPhone&&(bPhone===myPhone||bPhone.slice(-9)===myPhone.slice(-9));
       const emailMatch=b.clientEmail&&clientEmail&&b.clientEmail.toLowerCase()===clientEmail.toLowerCase();
       const nameMatch=b.clientName&&clientName&&b.clientName.toLowerCase()===clientName.toLowerCase();
-      if(!phoneMatch&&!emailMatch&&!nameMatch)return;
+      if(!phoneMatch&&!emailMatch&&!nameMatch)continue;
       const status=(b.status||'pending').toLowerCase();const prev=previousStatuses[id];
       const pLat=b.patientLat||b.patientLatitude||b.mainLat||b.clientLat||null;const pLng=b.patientLng||b.patientLongitude||b.mainLng||b.clientLng||null;
       const cLat=b.clientLat||null;const cLng=b.clientLng||null;
-      const base={bookingId:b.bookingId||id,nurseName:b.nurseName||'Nurse',nursePhone:b.nursePhone||'',nursePhotoUrl:b.nursePhotoUrl||'',amount:b.amount||0,currency:b.currency||'GHS',paystackRef:b.paystackRef||'',clientName:b.clientName||clientName,clientPhone:b.clientPhone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||b.clientPhoto||clientPhoto,patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||'',patientLat:parseFloat(pLat)||null,patientLng:parseFloat(pLng)||null,clientLat:parseFloat(cLat)||null,clientLng:parseFloat(cLng)||null,rejectReason:b.rejectReason||''};
+      let nurseFull = await fetchNurseFull(b.nurseId||b.selectedNurseId||'', b);
+      const base={bookingId:b.bookingId||id,nurseId:b.nurseId||nurseFull.nurseId||'',nurseName:nurseFull.nurseName||b.nurseName||'Nurse',nursePhone:nurseFull.nursePhone||b.nursePhone||'',nursePhotoUrl:nurseFull.nursePhotoUrl||b.nursePhotoUrl||'',nurseEmail:nurseFull.nurseEmail||'',specialty:nurseFull.specialty||b.service||'Home Nursing',rating:nurseFull.rating||'4.9',amount:b.amount||b.amountPaidNow||0,currency:b.currency||'GHS',paystackRef:b.paystackRef||'',clientName:b.clientName||clientName,clientPhone:b.clientPhone||b.phone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||b.clientPhoto||clientPhoto,patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||b.patientAddress||'',patientLat:parseFloat(pLat)||null,patientLng:parseFloat(pLng)||null,clientLat:parseFloat(cLat)||null,clientLng:parseFloat(cLng)||null,rejectReason:b.rejectReason||b.rejectionReason||'',service:b.service||''};
       if(!prev){
         if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted',type:'accepted',time:b.acceptedAt||b.time||Date.now(),read:false,...base});}
-        else if(status==='rejected'||status==='declined'){addAlert({id:'alert_'+id+'_rejected',type:'rejected',time:b.rejectedAt||b.time||Date.now(),read:false,...base});}
+        else if(status==='rejected'||status==='declined'||status==='cancelled_by_nurse'){addAlert({id:'alert_'+id+'_rejected',type:'rejected',time:b.rejectedAt||b.time||Date.now(),read:false,...base});}
       }else if(prev!==status){
         if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted_'+Date.now(),type:'accepted',time:Date.now(),read:false,...base});}
-        if(status==='rejected'){addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base});}
+        if(status==='rejected'||status==='declined'){addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base});}
       }
       previousStatuses[id]=status;
-    });
+    }
   }catch(e){console.log(e.message);}
   renderAlerts();
 }
 function startRealtime(){
   const {clientPhone,clientEmail}=getClientInfo();
-  onValue(ref(db,'bookings'),snap=>{
+  onValue(ref(db,'bookings'),async snap=>{
     if(!snap.exists())return;
-    snap.forEach(child=>{
-      const b=child.val();const id=child.key;
+    let hasNew=false;
+    for(const child of snap.val() ? Object.entries(snap.val()) : []){
+      const id=child[0]; const b=child[1];
       const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,'');const myPhone=clientPhone.replace(/[^0-9]/g,'');
       const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);
       const emailMatch=b.clientEmail&&clientEmail&&b.clientEmail.toLowerCase()===clientEmail.toLowerCase();
-      if(!phoneMatch&&!emailMatch)return;
+      if(!phoneMatch&&!emailMatch)continue;
       const status=(b.status||'pending').toLowerCase();const prev=previousStatuses[id];
       if(prev&&prev!==status){
-        const base={bookingId:b.bookingId||id,nurseName:b.nurseName||'Nurse',nursePhone:b.nursePhone||'',nursePhotoUrl:b.nursePhotoUrl||'',amount:b.amount||0,currency:b.currency||'GHS',clientName:b.clientName||clientName,clientPhone:b.clientPhone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||clientPhoto,patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||'',patientLat:parseFloat(b.patientLat||b.clientLat)||null,patientLng:parseFloat(b.patientLng||b.clientLng)||null,clientLat:b.clientLat||null,clientLng:b.clientLng||null,rejectReason:b.rejectReason||''};
-        if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted_'+Date.now(),type:'accepted',time:Date.now(),read:false,...base});}
-        if(status==='rejected'){addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base});}
+        let nurseFull=await fetchNurseFull(b.nurseId||'',b);
+        const base={bookingId:b.bookingId||id,nurseId:b.nurseId||'',nurseName:nurseFull.nurseName||b.nurseName||'Nurse',nursePhone:nurseFull.nursePhone||b.nursePhone||'',nursePhotoUrl:nurseFull.nursePhotoUrl||b.nursePhotoUrl||'',nurseEmail:nurseFull.nurseEmail||'',specialty:nurseFull.specialty||b.service||'',rating:nurseFull.rating||'4.9',amount:b.amount||0,currency:b.currency||'GHS',clientName:b.clientName||clientName,clientPhone:b.clientPhone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||clientPhoto,patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||'',patientLat:parseFloat(b.patientLat||b.clientLat)||null,patientLng:parseFloat(b.patientLng||b.clientLng)||null,clientLat:b.clientLat||null,clientLng:b.clientLng||null,rejectReason:b.rejectReason||'',service:b.service||''};
+        if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted_'+Date.now(),type:'accepted',time:Date.now(),read:false,...base});hasNew=true;}
+        if(status==='rejected'){addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base});hasNew=true;}
         previousStatuses[id]=status;
       }else if(!prev){previousStatuses[id]=status;}
-    });
+    }
+    if(hasNew)renderAlerts();
   });
 }
 window.markRead=function(id){const i=allAlerts.findIndex(a=>a.id===id);if(i>-1){allAlerts[i].read=true;try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){}renderAlerts();}}
