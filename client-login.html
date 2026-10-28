@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Client Login</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,Roboto,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;display:grid;place-items:center;padding:16px}.card{width:100%;max-width:380px;background:#1e1a3a;border:1px solid rgba(255,255,255,.08);border-radius:0;padding:24px;display:flex;flex-direction:column;gap:14px}h2{text-align:center;font-size:24px;font-weight:800}input{padding:14px 16px;border-radius:0;border:1px solid rgba(255,255,255,.08);background:rgba(12,10,30,.8);color:#ece8ff;width:100%;font-size:14px;outline:none}.btn{padding:14px;border-radius:0;border:none;font-weight:800;cursor:pointer;font-size:14px}.btnLogin{background:#facc15;color:#000}.btnGoogle{background:#fff;color:#1f1f1f;border:1px solid #747775;display:flex;gap:12px;align-items:center;justify-content:center;font-weight:500}.google-icon{width:20px;height:20px}.divider{display:flex;align-items:center;gap:12px}.divider span{flex:1;height:1px;background:rgba(255,255,255,.08)}.status{padding:10px;border-radius:0;font-size:11px;display:none;text-align:center}.status.ok{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.3)}.status.err{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}.link{font-size:12px;text-align:center;text-decoration:none;color:#a78bfa}</style></head><body><div class="card"><h2>Client Login</h2><input id="email" type="email" placeholder="Enter email"><input id="pass" type="password" placeholder="Enter password"><div id="status" class="status"></div><button class="btn btnLogin" onclick="emailLogin()">Login</button><div class="divider"><span></span><b>OR</b><span></span></div><button class="btn btnGoogle" onclick="googleLogin()"><svg class="google-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</button><a href="client-registration.html" class="link">No account? Register</a></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+const dbFS=firebase.firestore();
+
+function showStatus(m,ok){
+  const el=document.getElementById('status');
+  el.textContent=m;
+  el.className='status '+(ok?'ok':'err');
+  el.style.display='block';
+}
+function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
+
+async function isFullyRegistered(email){
+  const eLower = email.toLowerCase().trim();
+  if(!eLower) return {ok:false};
+  const key=sanitizeEmail(eLower);
+  try{
+    const snap=await db.ref('allowedClients/'+key).once('value');
+    if(snap.exists()){
+      const v=snap.val();
+      if(v.email && (v.name||v.fullName) && v.phone && (v.photoUrl||v.photo)){
+        if(String(v.phone).replace(/\D/g,'').length>=9) return {ok:true, data:v};
+      }
+    }
+  }catch(e){}
+  try{
+    const snap=await db.ref('clients').orderByChild('email').equalTo(eLower).once('value');
+    if(snap.exists()){
+      let found=null;
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        const real=v.profile||v;
+        if((real.email||v.email||real.clientEmail||'').toLowerCase()===eLower && (real.name||real.fullName||v.name) && (real.phone||v.phone) && (real.photoUrl||real.photo||v.photoUrl)){
+          if(String(real.phone||v.phone||'').replace(/\D/g,'').length>=9) found={ok:true, data:real};
+        }
+      });
+      if(found) return found;
+    }
+  }catch(e){}
+  try{
+    const snap=await db.ref('clientRegistrations/'+key).once('value');
+    if(snap.exists()){
+      const v=snap.val();
+      if(v.email && (v.fullName||v.name) && v.phone && (v.clientPhotoUrl||v.photoUrl||v.photo)){
+        if(String(v.phone).replace(/\D/g,'').length>=9) return {ok:true, data:v};
+      }
+    }
+  }catch(e){}
+  return {ok:false, data:null};
+}
+
+// ===== NEW: ROLE ISOLATION - Check if email is a NURSE =====
+async function isNurseAccount(email, uid=null){
+  const eLower = email.toLowerCase().trim();
+  const key = sanitizeEmail(eLower);
+  // 1. Check Firestore nurses by uid
+  if(uid){
+    try{
+      const snap = await dbFS.collection('nurses').doc(uid).get();
+      if(snap.exists) return true;
+    }catch(e){}
+    try{
+      const snap = await db.ref('nurses/'+uid).once('value');
+      if(snap.exists()) return true;
+    }catch(e){}
+  }
+  // 2. Check Firestore nurses by email query
+  try{
+    const q = await dbFS.collection('nurses').where('email','==', eLower).limit(1).get();
+    if(!q.empty) return true;
+  }catch(e){}
+  try{
+    const q2 = await dbFS.collection('nurses').where('email','==', email.trim()).limit(1).get();
+    if(!q2.empty) return true;
+  }catch(e){}
+  // 3. Check RTDB nurses by email
+  try{
+    const snap = await db.ref('nurses').orderByChild('email').equalTo(eLower).once('value');
+    if(snap.exists()) return true;
+  }catch(e){}
+  // 4. Check allowedNurses / nurseRegistrations (if you use them)
+  try{
+    const snap = await db.ref('allowedNurses/'+key).once('value');
+    if(snap.exists()) return true;
+  }catch(e){}
+  try{
+    const snap = await db.ref('nurseRegistrations/'+key).once('value');
+    if(snap.exists()) return true;
+  }catch(e){}
+  // 5. Firestore allowedNurses
+  try{
+    const snap = await dbFS.collection('allowedNurses').doc(key).get();
+    if(snap.exists) return true;
+  }catch(e){}
+  return false;
+}
+
+async function deleteAuthUserIfNotRegistered(email){
+  try{
+    const user=auth.currentUser;
+    if(user && (user.email||'').toLowerCase()===email.toLowerCase()){
+      console.log('🗑️ Deleting unregistered user:', email);
+      await user.delete();
+      console.log('✅ Deleted from Auth');
+      return true;
+    }
+  }catch(e){
+    console.log('Delete failed:', e.code);
+    try{ await auth.signOut(); }catch(_){}
+  }
+  return false;
+}
+
+async function googleLogin(){
+  showStatus('Checking Google...', true);
+  try{
+    const provider=new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    const result=await auth.signInWithPopup(provider);
+    const user=result.user;
+    const email=(user.email||'').toLowerCase().trim();
+    const name=user.displayName||'';
+    const photo=user.photoURL||'';
+
+    // ROLE ISOLATION FIRST: block nurses trying to login as client
+    if(await isNurseAccount(email, user.uid)){
+      showStatus('❌ This email is registered as a NURSE. Please use Nurse Login page.', false);
+      await auth.signOut();
+      localStorage.clear();
+      sessionStorage.clear();
+      return;
+    }
+
+    const regCheck=await isFullyRegistered(email);
+    if(!regCheck.ok){
+      showStatus('❌ Not fully registered (CEO requires Name+Phone+Photo+Email). Deleting Auth & redirecting...', false);
+      await deleteAuthUserIfNotRegistered(email);
+      localStorage.clear();
+      sessionStorage.clear();
+      localStorage.setItem('pendingGoogleEmail', email);
+      localStorage.setItem('pendingGoogleName', name);
+      localStorage.setItem('pendingGooglePhoto', photo);
+      setTimeout(()=>{
+        location.href='client-registration.html?from=google_block&email='+encodeURIComponent(email)+'&name='+encodeURIComponent(name)+'&photo='+encodeURIComponent(photo)+'&needRegistration=true';
+      },1500);
+      return;
+    }
+    localStorage.setItem('clientLoggedIn','true');
+    localStorage.setItem('clientEmail', email);
+    localStorage.setItem('clientName', regCheck.data.name||regCheck.data.fullName||name);
+    localStorage.setItem('clientPhone', regCheck.data.phone||'');
+    localStorage.setItem('clientPhoto', regCheck.data.photoUrl||regCheck.data.photo||photo||'');
+    localStorage.setItem('clientUid', user.uid);
+    localStorage.setItem('loginMethod','google');
+    // clear any nurse session that might remain
+    localStorage.removeItem('lcg_nurse_uid'); localStorage.removeItem('nurseUid'); localStorage.removeItem('lcg_role');
+    showStatus('✅ Verified! Welcome '+name, true);
+    setTimeout(()=>{location.replace('client-dashboard.html');}, 800);
+  }catch(e){
+    console.error(e);
+    showStatus('Google login failed: '+e.message, false);
+    try{ await auth.signOut(); }catch(_){}
+    localStorage.clear();
+  }
+}
+
+async function emailLogin(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const pass=document.getElementById('pass').value.trim();
+  if(!email||!pass){showStatus('Enter email & password', false);return;}
+  showStatus('Checking registration...', true);
+
+  // ROLE ISOLATION FIRST
+  if(await isNurseAccount(email)){
+    showStatus('❌ This account is a NURSE account. Please login on the Nurse Login page.', false);
+    return;
+  }
+
+  const regCheck = await isFullyRegistered(email);
+  if(!regCheck.ok){
+    showStatus('❌ Not fully registered. CEO requires Name+Phone+Photo+Email. Deleting Auth if exists...', false);
+    try{
+      const temp=await auth.signInWithEmailAndPassword(email,pass).catch(()=>null);
+      if(temp && temp.user){ await temp.user.delete().catch(async()=>{ await auth.signOut(); }); }
+    }catch(e){}
+    setTimeout(()=>{
+      localStorage.setItem('pendingGoogleEmail', email);
+      location.href='client-registration.html?from=email_block&email='+encodeURIComponent(email)+'&needRegistration=true';
+    },1500);
+    return;
+  }
+  auth.signInWithEmailAndPassword(email,pass).then(async (cred)=>{
+    // double-check with uid after auth (in case email case mismatch)
+    if(await isNurseAccount(email, cred.user.uid)){
+      showStatus('❌ This account is a NURSE account. Access denied on Client Login.', false);
+      await auth.signOut();
+      return;
+    }
+    localStorage.setItem('clientLoggedIn','true');
+    localStorage.setItem('clientEmail',email);
+    localStorage.setItem('clientName', regCheck.data.name||regCheck.data.fullName||'');
+    localStorage.setItem('clientPhone', regCheck.data.phone||'');
+    localStorage.setItem('clientPhoto', regCheck.data.photoUrl||regCheck.data.photo||'');
+    localStorage.setItem('loginMethod','email');
+    localStorage.removeItem('lcg_nurse_uid'); localStorage.removeItem('nurseUid'); localStorage.removeItem('lcg_role');
+    showStatus('✅ Verified! Login success', true);
+    setTimeout(()=>{location.replace('client-dashboard.html');},500);
+  }).catch(e=>showStatus(e.message,false));
+}
+</script></body></html>
