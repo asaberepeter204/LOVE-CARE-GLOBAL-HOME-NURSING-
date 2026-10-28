@@ -1,163 +1,299 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Refund Query - LOVE CARE GLOBAL - CLIENT DETAILS + PHOTO + TIME</title>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Request Refund — LOVE CARE GLOBAL — Client Photo Email Saved</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
-.topbar{position:sticky;top:0;z-index:20;background:#16102a;border-bottom:1px solid rgba(168,85,247,.12);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-.wrap{max-width:720px;margin:0 auto;padding:18px 14px 80px}
-.card{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;margin:12px 0}
-.title{font-weight:900;font-size:16px;color:#f3e8ff}.sub{font-size:11px;color:#9a95b8;margin-top:4px}
-.bookingCard{border:1px solid rgba(168,85,247,.12);border-radius:16px;padding:14px;background:rgba(14,10,28,.5);margin:10px 0;cursor:pointer}
-.bookingCard.selected{border-color:#facc15;background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(245,158,11,.08))}
-.badge{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:800;display:inline-block}
-.badge-paid{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
-.badge-50{background:rgba(251,191,36,.15);color:#fde68a;border:1px solid rgba(251,191,36,.3)}
-.badge-refund{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
-label{font-size:10px;font-weight:800;margin:12px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase}
-input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;outline:none}
-textarea{min-height:90px} .btn{width:100%;border:none;border-radius:14px;padding:16px;font-weight:900;cursor:pointer;margin-top:14px}
-.btnPrimary{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
-.status{padding:10px;border-radius:12px;font-size:11px;text-align:center;display:none;margin:10px 0}
-.status.ok{display:block;background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.3)}
-.status.err{display:block;background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
-.clientCard{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.08));border:1px solid rgba(250,204,21,.25);border-radius:14px;padding:12px;margin:10px 0}
-.clientAvatar{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #facc15;background:#1e1a3a}
-</style>
-</head><body>
-<div class="topbar"><div style="display:flex;align-items:center;gap:10px"><a href="client-dashboard.html" style="text-decoration:none;color:#d8b4fe;font-size:12px">← Dashboard</a><b style="color:#f3e8ff">💰 Refund Query</b></div><div style="display:flex;align-items:center;gap:8px"><img id="topAvatar" style="width:28px;height:28px;border-radius:50%;border:1px solid #facc15;display:none"><div style="font-size:10px;color:#facc15" id="clientEmailTop"></div></div></div>
-<div class="wrap">
-<div class="card"><div class="title">Request Refund — Client Photo + Time Saved</div><div class="sub">We save client name, phone, email, photo, booking time, request time. CEO sees all in <b>ceo-refund-management.html</b> with exact time it happened.</div><div id="statusBox" class="status"></div>
-<div id="clientInfoCard" class="clientCard" style="display:none">
-<img id="clientAvatar" class="clientAvatar" src="">
-<div style="flex:1"><b id="clientNameCard" style="font-size:13px;color:#f3e8ff"></b><br><small id="clientPhoneCard" style="color:#a78bfa"></small><br><small id="clientEmailCard" style="color:#86efac;font-size:10px"></small></div>
-<div style="font-size:9px;color:#fde68a;background:rgba(250,204,21,.15);border:1px solid rgba(250,204,21,.25);border-radius:999px;padding:4px 8px">CLIENT</div>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.96);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:22px;padding:16px;margin:12px}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:#facc15;color:#1e0a3a}
+.btn{border:none;border-radius:14px;padding:14px 16px;font-weight:900;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;min-height:50px;width:100%}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
+.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white}
+.btnOrange{background:linear-gradient(135deg,#fb923c,#f97316);color:white}
+.btnWhats{background:linear-gradient(135deg,#25D366,#128C7E);color:white}
+.btnGray{background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
+.input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#e8e0ff;font-size:13px;margin-top:6px}
+.input:focus{outline:none;border-color:#facc15}
+.label{font-size:11px;font-weight:800;color:#facc15;margin-top:14px;display:block}
+.clientAvatar{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #facc15}
+.nurseAvatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #22c55e}
+.dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+</style></head><body>
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:13px">LOVE CARE GLOBAL</b><br><small style="color:#facc15;font-size:10px"><span class="dot"></span> REFUND REQUEST — REAL FORM</small></div></div>
+<a href="sos.html" style="background:#ef4444;color:white;padding:7px 14px;border-radius:999px;font-weight:900;font-size:11px;text-decoration:none">SOS</a>
+</div>
+
+<div style="max-width:760px;margin:0 auto;padding:10px">
+<!-- CLIENT CARD — PHOTO NAME PHONE EMAIL -->
+<div class="card" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)">
+<b style="font-size:13px;color:#facc15">💰 Request Refund — Client Photo Name Phone Email Saved</b>
+<div style="display:flex;gap:10px;align-items:center;margin-top:10px;background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.08));border:1px solid rgba(250,204,21,.2);border-radius:14px;padding:12px">
+<img id="clientAvatarTop" class="clientAvatar" src="">
+<div style="flex:1"><b id="clientNameTop" style="font-size:14px;color:#fff">ASABERE PETER</b><br><small id="clientPhoneTop" style="color:#86efac;font-size:11px">+233502957280</small><br><small id="clientEmailTop" style="color:#a78bfa;font-size:10px">lovecareglobal@gmail.com</small></div>
+<div style="font-size:9px;color:#fde68a;background:rgba(250,204,21,.15);border-radius:999px;padding:4px 8px">YOU</div>
+</div>
+<div id="countInfo" style="font-size:10px;color:#6b7280;margin-top:8px">Loading your bookings for refund...</div>
+</div>
+
+<!-- BOOKING SELECT FOR REFUND -->
+<div class="card">
+<b style="font-size:13px;color:#fff">📅 Select Booking to Refund</b><br>
+<small style="color:#a78bfa;font-size:11px">Choose booking that was rejected or nurse didn't show. Refund policy: 100% before accept, 50% within 24h after accept, 0% after service starts (100% if nurse no-show).</small>
+<label class="label">Your Bookings (Rejected / Accepted / Pending):</label>
+<select id="bookingSelect" class="input" onchange="onBookingSelect()">
+<option value="">— Loading bookings... —</option>
+</select>
+<div id="selectedBookingCard" style="display:none;margin-top:12px;background:rgba(14,10,28,.6);border-radius:14px;padding:12px;font-size:11px;color:#c4b5fd;line-height:1.7"></div>
+</div>
+
+<!-- REFUND FORM — REAL REQUEST -->
+<div class="card" style="border:2px solid #facc15;background:linear-gradient(135deg,rgba(250,204,21,.1),rgba(28,18,56,.95))">
+<b style="font-size:14px;color:#facc15">📝 Refund Request Form — Where Client Requests Refund</b><br>
+<small style="color:#a78bfa;font-size:11px">This is NOT history! This is where you REQUEST refund. Fill form + submit. CEO will see in CEO Dashboard + process via Paystack.</small>
+
+<label class="label">Refund Reason *</label>
+<select id="refundReason" class="input">
+<option value="">— Select Reason —</option>
+<option value="nurse_rejected">❌ Nurse Rejected My Booking — Need Refund</option>
+<option value="nurse_no_show">🚫 Nurse Did Not Show Up — No Service</option>
+<option value="cancel_before_accept">⏳ I Cancelled Before Nurse Accepted — 100% Refund</option>
+<option value="cancel_within_24h">⏰ Cancelled Within 24h After Acceptance — 50% Refund</option>
+<option value="double_payment">💳 Double Payment / Wrong Amount</option>
+<option value="increase_rate">💰 Want to Increase Rate — Refund old, book new</option>
+<option value="other">📝 Other Reason</option>
+</select>
+
+<label class="label">Explain Details *</label>
+<textarea id="refundDetails" class="input" rows="4" placeholder="E.g. Nurse Ama rejected booking LCG123 on 28 Oct, reason: low rate. I want refund to book another nurse with higher rate..."></textarea>
+
+<label class="label">Refund Amount Requested (GHS)</label>
+<input id="refundAmount" type="number" class="input" placeholder="E.g. 150 — Will verify from Paystack">
+
+<label class="label">Preferred Refund Method</label>
+<select id="refundMethod" class="input">
+<option value="momo">📱 MoMo — Ghana (MTN/Vodafone/Airtel)</option>
+<option value="card">💳 Card — Outside Ghana</option>
+<option value="paystack_original">↩️ Original Paystack Method</option>
+</select>
+
+<label class="label">MoMo Number / Card Details for Refund</label>
+<input id="refundDestination" class="input" placeholder="E.g. MTN MoMo: 024XXXXXXX or Card ending">
+
+<button class="btn btnYellow" style="margin-top:16px" onclick="submitRefund()">💰 Submit Refund Request — With Client Photo Name Phone Email</button>
+<div id="refundStatus" style="margin-top:10px;font-size:11px;color:#a78bfa"></div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+<a href="https://wa.me/233544121814?text=Hello%20CEO%20I%20want%20refund%20for%20booking" target="_blank" class="btn btnWhats">💬 WhatsApp CEO — Refund</a>
+<a href="client-alerts.html" class="btn btnGray">🔔 Go to Alerts — Nurse Accept/Reject</a>
 </div>
 </div>
-<div class="card"><div class="title" style="font-size:14px">📜 Your Payment History — With Time + Photo</div><div class="sub">Select a booking to request refund (only paid bookings)</div><div id="bookingsList" style="margin-top:12px">Loading your paid bookings...</div></div>
-<div class="card" id="formCard" style="display:none"><div class="title" style="font-size:14px">📝 Refund Request — Auto-filled with Client Details + Photo + Time</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>Booking ID</label><input id="fBookingId" readonly></div><div><label>Time of Request (NOW)</label><input id="fRequestTime" readonly></div></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>Booking Time / Payment Time</label><input id="fPayTime" readonly></div><div><label>Amount Paid</label><input id="fAmount" readonly></div></div>
-<div class="clientCard" style="margin-top:12px">
-<img id="fClientPhoto" class="clientAvatar" src="" style="width:48px;height:48px">
-<div style="flex:1"><label style="margin:0 0 4px">CLIENT DETAILS — Will be saved</label><small style="font-size:11px;color:#c4b5fd">Photo + Name + Phone + Email + Time</small></div>
+
+<!-- REFUND HISTORY -->
+<div class="card">
+<b style="font-size:13px;color:#fff">📜 Your Refund Requests History</b><br>
+<small style="color:#a78bfa;font-size:11px">Shows all refunds you requested with status: pending / approved / rejected / paid</small>
+<div id="refundHistory" style="display:grid;gap:10px;margin-top:12px"><small style="color:#6b7280">No refund requests yet — Submit form above</small></div>
 </div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>Client Name *</label><input id="fClientName" readonly></div><div><label>Client Phone *</label><input id="fClientPhone" readonly></div></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>Client Email *</label><input id="fClientEmail" readonly></div><div><label>Client Photo URL</label><input id="fClientPhotoUrl" readonly></div></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>Nurse Selected</label><input id="fNurseName" readonly></div><div><label>Nurse Phone</label><input id="fNursePhone" readonly></div></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>Patient Name</label><input id="fPatientName" readonly></div><div><label>Patient Phone</label><input id="fPatientPhone" readonly></div></div>
-<label>Payment Method</label><input id="fPayMethod" readonly>
-<label>Paystack Ref</label><input id="fPayRef" readonly>
-<label>Reason for Refund *</label><textarea id="fReason" placeholder="Explain why you need refund... e.g. Nurse didn't show up, service not completed, emergency cancelled, double payment..."></textarea>
-<label>Refund Type</label><select id="fRefundType"><option value="full_refund">Full Refund</option><option value="partial_refund">Partial Refund (50%)</option><option value="service_not_rendered">Service Not Rendered</option><option value="duplicate_payment">Duplicate Payment</option><option value="cancellation">Cancellation Before Service</option></select>
-<button class="btn btnPrimary" id="submitBtn" onclick="submitRefund()">📤 Submit Refund Request to CEO — With Photo + Time</button></div>
-<div class="card"><div class="title" style="font-size:14px">📋 My Refund History — With Time</div><div id="refundHistory">Loading...</div></div>
+
+<div class="card" style="background:rgba(14,10,28,.4);border:1px dashed rgba(168,85,247,.2)">
+<b style="font-size:11px;color:#22c55e">How Refund Request Works (Not History!):</b><br>
+<small style="font-size:10px;color:#a78bfa;line-height:1.7">
+1. Client selects booking (Rejected / No-show / Cancelled)<br>
+2. Client fills reason + amount + MoMo/card + details — This page is WHERE client makes request<br>
+3. Submit → Saves to Firebase: <b style="color:#facc15">refundRequests/{id}</b> + <b>bookings/{id}/refundRequested</b> with: Client Name, Phone, Photo, Email, Patient, Nurse, Booking ID, Amount, Reason, Time<br>
+4. CEO sees in CEO Dashboard → Processes via Paystack → Updates status: approved / paid<br>
+5. Client sees status here in history + gets alert in client-alerts.html<br>
+6. WhatsApp CEO button for quick follow-up<br>
+<b style="color:#facc15">This is NOT refund policy page — Policy page is refund.html — This is refund-query.html — Real request form!</b>
+</small>
 </div>
-<script>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, get, set, push, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig);const rtdb=firebase.database();const auth=firebase.auth();
-let allMyBookings=[];let selectedBooking=null;
-let clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'';
-let clientName=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'';
-let clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'';
-let clientPhoto=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('photoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photo')||'';
-let clientUid=localStorage.getItem('clientUid')||localStorage.getItem('uid')||'';
-document.getElementById('clientEmailTop').textContent=clientEmail;
-function showStatus(msg,ok){const el=document.getElementById('statusBox');el.textContent=msg;el.className='status '+(ok?'ok':'err');el.style.display='block';setTimeout(()=>el.style.display='none',6000);}
-function formatTime(ts){if(!ts)return'N/A';const d=new Date(typeof ts==='number'?ts:Number(ts));if(isNaN(d.getTime()))return ts;return d.toLocaleString('en-GH',{dateStyle:'medium',timeStyle:'short'});}
-function formatActionTime(ts){if(!ts)return'time unknown';let date;if(typeof ts==='number')date=new Date(ts);else if(typeof ts==='string'){date=new Date(ts);if(isNaN(date.getTime())){const n=parseInt(ts);if(!isNaN(n))date=new Date(n);}}else if(ts&&ts.seconds)date=new Date(ts.seconds*1000);else return'time unknown';if(!date||isNaN(date.getTime()))return'time unknown';const now=new Date();const diffMs=now-date;const diffMins=Math.floor(diffMs/60000);const diffHours=Math.floor(diffMins/60);const diffDays=Math.floor(diffHours/24);const timeStr=date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});const dateStr=date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});const shortDate=date.toLocaleDateString('en-US',{month:'short',day:'numeric'});if(diffMins<1)return`Just now • ${timeStr}`;if(diffMins<60)return`${diffMins}m ago • ${timeStr} today`;if(diffHours<24)return`${diffHours}h ago • ${timeStr} today`;if(diffDays===1)return`Yesterday • ${timeStr}`;if(diffDays<7)return`${diffDays}d ago • ${shortDate} ${timeStr}`;return`${dateStr} • ${timeStr}`;}
-function loadClientCard(){
-  if(clientName||clientEmail){
-    document.getElementById('clientInfoCard').style.display='flex';
-    document.getElementById('clientNameCard').textContent=clientName||'Client';
-    document.getElementById('clientPhoneCard').textContent=clientPhone||'No phone';
-    document.getElementById('clientEmailCard').textContent=clientEmail||'';
-    const av=document.getElementById('clientAvatar'); const topAv=document.getElementById('topAvatar');
-    if(clientPhoto){ av.src=clientPhoto; topAv.src=clientPhoto; av.style.display='block'; topAv.style.display='block'; }
-    else { av.src='https://ui-avatars.com/api/?name='+encodeURIComponent(clientName||'Client')+'&background=facc15&color=000'; topAv.style.display='none'; }
+const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
+let clientPhone=null,clientName=null,clientEmail=null,clientPhoto=null,allBookings={},selectedBooking=null;
+
+function getClientInfo(){
+  clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'+233502957280';
+  clientName=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'ASABERE PETER';
+  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'lovecareglobal@gmail.com';
+  clientPhoto=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||'';
+  document.getElementById('clientNameTop').textContent=clientName;
+  document.getElementById('clientPhoneTop').textContent=clientPhone;
+  document.getElementById('clientEmailTop').textContent=clientEmail;
+  const av=document.getElementById('clientAvatarTop'); if(clientPhoto) av.src=clientPhoto; else av.src='https://ui-avatars.com/api/?name='+encodeURIComponent(clientName)+'&background=facc15&color=000';
+  return {clientPhone,clientName,clientEmail,clientPhoto};
+}
+async function ensureAuth(){return new Promise(res=>{const unsub=onAuthStateChanged(auth,async u=>{unsub();if(u)res(u);else{try{const c=await signInAnonymously(auth);res(c.user);}catch{res(null);}}});setTimeout(()=>res(null),2000);});}
+
+async function loadBookings(){
+  await ensureAuth(); getClientInfo();
+  try{
+    const snap=await get(ref(db,'bookings')); const snap2=await get(ref(db,'allBookings')).catch(()=>null);
+    let bookings={}; if(snap.exists()) Object.assign(bookings,snap.val()); if(snap2&&snap2.exists()) Object.assign(bookings,snap2.val());
+    allBookings={};
+    Object.keys(bookings).forEach(id=>{
+      const b=bookings[id];
+      const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,''); const myPhone=clientPhone.replace(/[^0-9]/g,'');
+      const phoneMatch=bPhone&&myPhone&&(bPhone===myPhone||bPhone.slice(-9)===myPhone.slice(-9));
+      const emailMatch=b.clientEmail&&clientEmail&&b.clientEmail.toLowerCase()===clientEmail.toLowerCase();
+      if(phoneMatch||emailMatch) allBookings[id]=b;
+    });
+    const select=document.getElementById('bookingSelect');
+    const countInfo=document.getElementById('countInfo');
+    countInfo.textContent=`${Object.keys(allBookings).length} bookings found for ${clientName} • ${clientPhone} • Photo: ${clientPhoto?'YES':'NO'} — Select one to request refund`;
+    if(!Object.keys(allBookings).length){
+      select.innerHTML='<option value="">— No bookings found — Book a nurse first —</option>';
+      return;
+    }
+    select.innerHTML='<option value="">— Select Booking for Refund —</option>' + Object.keys(allBookings).map(id=>{
+      const b=allBookings[id];
+      return `<option value="${id}">${b.bookingId||id} • ${b.status||'pending'} • ${b.nurseName||'Nurse'} • ${b.currency||'GHS'} ${b.amount||0} • Patient: ${b.patientName||''} • ${new Date(b.time||Date.now()).toLocaleDateString('en-GH')}</option>`;
+    }).join('');
+  }catch(e){ console.log(e.message); document.getElementById('countInfo').textContent='Error loading bookings: '+e.message; }
+}
+
+window.onBookingSelect=function(){
+  const id=document.getElementById('bookingSelect').value;
+  const card=document.getElementById('selectedBookingCard');
+  if(!id){ card.style.display='none'; selectedBooking=null; return; }
+  const b=allBookings[id]; selectedBooking={id,...b};
+  const nursePhoto=b.nursePhotoUrl||'https://ui-avatars.com/api/?name='+encodeURIComponent(b.nurseName||'Nurse')+'&background=22c55e&color=fff';
+  card.style.display='block';
+  card.innerHTML=`
+    <div style="display:flex;gap:12px;align-items:center"><img src="${nursePhoto}" style="width:44px;height:44px;border-radius:50%;border:2px solid #22c55e"><div><b style="color:#fff">${b.bookingId||id} — ${b.status||''}</b><br><small style="color:#86efac">Nurse: ${b.nurseName||''} • ${b.nursePhone||''}</small><br><small style="color:#a78bfa">Patient: ${b.patientName||''} • ${b.patientLocation||''} • Amount: ${b.currency||'GHS'} ${b.amount||0}</small></div></div>
+    <div style="margin-top:8px;font-size:10px;color:#6b7280">PayRef: ${b.paystackRef||''} • Time: ${new Date(b.time||Date.now()).toLocaleString('en-GH')} • Client: ${b.clientName||clientName} • ${b.clientPhone||clientPhone} • ${b.clientEmail||clientEmail} • Photo: ${b.clientPhotoUrl?'YES':'NO'}</div>
+  `;
+  document.getElementById('refundAmount').value=b.amount||'';
+}
+
+window.submitRefund=async function(){
+  const bookingId = document.getElementById('bookingSelect').value;
+  const reason = document.getElementById('refundReason').value;
+  const details = document.getElementById('refundDetails').value.trim();
+  const amount = document.getElementById('refundAmount').value.trim();
+  const method = document.getElementById('refundMethod').value;
+  const destination = document.getElementById('refundDestination').value.trim();
+  const statusDiv=document.getElementById('refundStatus');
+
+  if(!bookingId){ statusDiv.innerHTML='<span style="color:#ef4444">❌ Select a booking first!</span>'; return; }
+  if(!reason){ statusDiv.innerHTML='<span style="color:#ef4444">❌ Select refund reason!</span>'; return; }
+  if(!details){ statusDiv.innerHTML='<span style="color:#ef4444">❌ Explain details!</span>'; return; }
+
+  statusDiv.innerHTML='⏳ Submitting refund request with client photo name phone email + patient + nurse...';
+
+  try{
+    const b=allBookings[bookingId];
+    const refundId='RFD_'+Date.now()+'_'+bookingId;
+    const refundData={
+      refundId,
+      bookingId: b.bookingId||bookingId,
+      bookingKey: bookingId,
+      status: 'pending',
+      reason,
+      details,
+      amount: parseFloat(amount)||b.amount||0,
+      currency: b.currency||'GHS',
+      method,
+      destination,
+      // CLIENT — PHOTO NAME PHONE EMAIL — SAVED
+      clientName: b.clientName||clientName,
+      clientPhone: b.clientPhone||b.phone||clientPhone,
+      clientEmail: b.clientEmail||clientEmail,
+      clientPhotoUrl: b.clientPhotoUrl||b.clientPhoto||clientPhoto,
+      clientPhoto: b.clientPhotoUrl||clientPhoto,
+      // PATIENT
+      patientName: b.patientName||'',
+      patientPhone: b.patientPhone||'',
+      patientLocation: b.patientLocation||'',
+      patientLat: b.patientLat||null,
+      patientLng: b.patientLng||null,
+      // NURSE
+      nurseName: b.nurseName||'',
+      nursePhone: b.nursePhone||'',
+      nursePhotoUrl: b.nursePhotoUrl||'',
+      nurseId: b.nurseId||'',
+      // BOOKING
+      paystackRef: b.paystackRef||'',
+      bookingStatus: b.status||'',
+      bookingTime: b.time||Date.now(),
+      // TIME
+      createdAt: Date.now(),
+      createdAtStr: new Date().toLocaleString('en-GH'),
+      clientLat: b.clientLat||null,
+      clientLng: b.clientLng||null
+    };
+
+    // Save to refundRequests
+    await set(ref(db, 'refundRequests/'+refundId), refundData);
+    // Also mark booking
+    await update(ref(db, 'bookings/'+bookingId), {refundRequested:true, refundId, refundReason: reason, refundStatus:'pending', refundRequestedAt: Date.now()});
+    // Save to allRefundRequests for CEO
+    await set(ref(db, 'allRefundRequests/'+refundId), refundData);
+
+    // Save to localStorage history
+    try{
+      const hist=JSON.parse(localStorage.getItem('lcg_refund_history')||'[]');
+      hist.unshift(refundData);
+      localStorage.setItem('lcg_refund_history', JSON.stringify(hist.slice(0,20)));
+    }catch(e){}
+
+    statusDiv.innerHTML=`<span style="color:#22c55e">✅ Refund request submitted! ID: ${refundId}<br>Client: ${clientName} • Phone: ${clientPhone} • Email: ${clientEmail} • Photo: ${clientPhoto?'YES':'NO'}<br>Booking: ${b.bookingId||bookingId} • Amount: GHS ${amount} • Reason: ${reason}<br>CEO will process via Paystack within 3-5 days. Check history below + alerts.</span>`;
+    loadRefundHistory();
+    // Clear form
+    document.getElementById('refundDetails').value='';
+  }catch(e){
+    statusDiv.innerHTML='<span style="color:#ef4444">❌ Error: '+e.message+'</span>';
   }
 }
-loadClientCard();
-async function loadMyBookings(){const listEl=document.getElementById('bookingsList');try{const emailLower=clientEmail.toLowerCase();const nameLower=clientName.toLowerCase();const nodes=['allBookings','bookings','ceoBookings','bookingsBy50Percent','bookingsByFull','bookingsByFullPayment','ceoBookingReceiver'];let combined={};for(const node of nodes){try{const snap=await rtdb.ref(node).once('value');if(snap.exists()){const val=snap.val();Object.keys(val).forEach(k=>{const bk=val[k];const id=bk.bookingId||k;if(!combined[id])combined[id]=bk;});}}catch(e){}}const bookings=Object.values(combined).filter(b=>{const bEmail=(b.clientEmail||b.email||'').toLowerCase();const bName=(b.clientName||'').toLowerCase();if(bEmail&&emailLower&&bEmail===emailLower)return true;if(nameLower&&bName&&bName===nameLower)return true;if(clientPhone&&b.clientPhone&&b.clientPhone.replace(/\D/g,'').slice(-9)===clientPhone.replace(/\D/g,'').slice(-9))return true;return false;});let finalBookings=bookings;if(finalBookings.length===0){finalBookings=Object.values(combined).filter(b=>(b.clientName||'').toLowerCase()===nameLower);}if(finalBookings.length===0){finalBookings=Object.values(combined).sort((a,b)=>(b.time||0)-(a.time||0)).slice(0,5);}allMyBookings=finalBookings.sort((a,b)=>(b.time||0)-(a.time||0));if(allMyBookings.length===0){listEl.innerHTML='<div style="padding:20px;text-align:center;color:#9a95b8">No paid bookings found for '+clientEmail+'.<br>Make a booking first with Paystack.</div>';return;}listEl.innerHTML=allMyBookings.map(b=>{const is50=(b.paymentMethod||'').includes('50')||b.amountCashLater;const amount=b.amountPaidNow||b.amount||0;const refundRequested=b.refundRequested?'<span class="badge badge-refund">Refund Requested</span>':'';const photo=b.clientPhotoUrl||b.clientPhoto||b.photoUrl||'';return `<div class="bookingCard" onclick="selectBooking('${b.bookingId||b.id}')"><div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;gap:8px;align-items:center"><img src="${photo||'https://ui-avatars.com/api/?name='+encodeURIComponent(b.clientName||'Client')+'&background=facc15&color=000'}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid #facc15"><b style="font-size:12px">${b.bookingId||b.id}</b></div><span class="${is50?'badge badge-50':'badge badge-paid'}">${is50?'50% PAID':'FULL PAID'} ${b.currency||'GHS'} ${Number(amount).toFixed(2)}</span></div><div style="font-size:11px;color:#c4b5fd;margin-top:6px">👤 ${b.clientName||''} • 📞 ${b.clientPhone||''} • 👩‍⚕️ ${b.nurseName||''} • 🕒 ${formatActionTime(b.time)} ${refundRequested}</div><div style="font-size:10px;color:#9a95b8">Patient: ${b.patientName||'N/A'} • ${b.patientPhone||''} • PayRef: ${b.paystackRef||'N/A'}</div></div>`;}).join('');}catch(e){listEl.innerHTML='Error loading: '+e.message;}}
-window.selectBooking=function(bookingId){
-  selectedBooking=allMyBookings.find(b=>(b.bookingId||b.id)===bookingId);if(!selectedBooking)return;
-  document.querySelectorAll('.bookingCard').forEach(el=>el.classList.remove('selected'));if(event.currentTarget)event.currentTarget.classList.add('selected');
-  document.getElementById('formCard').style.display='block';
-  const now=Date.now();
-  document.getElementById('fBookingId').value=selectedBooking.bookingId||selectedBooking.id||'';
-  document.getElementById('fRequestTime').value=formatActionTime(now)+' — '+formatTime(now)+' — NOW';
-  document.getElementById('fPayTime').value=formatActionTime(selectedBooking.time)+' — '+formatTime(selectedBooking.time)+' ('+(selectedBooking.time||'')+')';
-  document.getElementById('fAmount').value=(selectedBooking.currency||'GHS')+' '+(selectedBooking.amountPaidNow||selectedBooking.amount||0);
-  document.getElementById('fClientName').value=selectedBooking.clientName||clientName||'';
-  document.getElementById('fClientPhone').value=selectedBooking.clientPhone||selectedBooking.phone||clientPhone||'';
-  document.getElementById('fClientEmail').value=selectedBooking.clientEmail||clientEmail||'';
-  const photoUrl=selectedBooking.clientPhotoUrl||selectedBooking.clientPhoto||selectedBooking.photoUrl||clientPhoto||'';
-  document.getElementById('fClientPhotoUrl').value=photoUrl;
-  document.getElementById('fClientPhoto').src=photoUrl||'https://ui-avatars.com/api/?name='+encodeURIComponent(selectedBooking.clientName||'Client')+'&background=facc15&color=000';
-  document.getElementById('fNurseName').value=selectedBooking.nurseName||'';
-  document.getElementById('fNursePhone').value=selectedBooking.nursePhone||'';
-  document.getElementById('fPatientName').value=selectedBooking.patientName||'';
-  document.getElementById('fPatientPhone').value=selectedBooking.patientPhone||'';
-  document.getElementById('fPayMethod').value=selectedBooking.paymentMethod||'';
-  document.getElementById('fPayRef').value=selectedBooking.paystackRef||'';
-  document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
-}
-async function submitRefund(){
-  const reason=document.getElementById('fReason').value.trim();
-  const refundType=document.getElementById('fRefundType').value;
-  if(!selectedBooking){showStatus('Select a booking first',false);return;}
-  if(reason.length<10){showStatus('Please provide detailed reason (min 10 chars)',false);return;}
-  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Submitting...';
+
+function loadRefundHistory(){
+  const div=document.getElementById('refundHistory');
   try{
-    const bookingId=selectedBooking.bookingId||selectedBooking.id;
-    const refundId='REF-'+bookingId+'-'+Date.now().toString().slice(-6);
-    const now=Date.now();
-    // CLIENT DETAILS — SAVE ALL — NAME PHONE PHOTO EMAIL + TIME
-    const clientNameFinal=document.getElementById('fClientName').value||selectedBooking.clientName||clientName||'';
-    const clientPhoneFinal=document.getElementById('fClientPhone').value||selectedBooking.clientPhone||clientPhone||'';
-    const clientEmailFinal=document.getElementById('fClientEmail').value||selectedBooking.clientEmail||clientEmail||'';
-    const clientPhotoFinal=document.getElementById('fClientPhotoUrl').value||selectedBooking.clientPhotoUrl||selectedBooking.clientPhoto||clientPhoto||'';
-    const payload={
-      refundId,bookingId,
-      // TIME — EXACT TIME IT HAPPENED
-      bookingTime:selectedBooking.time||now,bookingTimeFormatted:formatTime(selectedBooking.time),bookingTimeDisplay:formatActionTime(selectedBooking.time),
-      paymentTime:selectedBooking.time,paymentTimeFormatted:formatTime(selectedBooking.time),paymentTimeDisplay:formatActionTime(selectedBooking.time),
-      requestTime:now,requestTimeFormatted:new Date().toLocaleString('en-GH',{dateStyle:'medium',timeStyle:'medium'}),requestTimeDisplay:formatActionTime(now),
-      timestamp:now,timeOfRequest:now,timeOfRequestFormatted:new Date().toLocaleString('en-GH'),timeOfRequestDisplay:formatActionTime(now),
-      // CLIENT — NAME PHONE EMAIL PHOTO — SAVE ALL
-      clientName:clientNameFinal,clientFullName:clientNameFinal,clientDisplayName:clientNameFinal,
-      clientPhone:clientPhoneFinal,clientPhoneNumber:clientPhoneFinal,phone:clientPhoneFinal,
-      clientEmail:clientEmailFinal,email:clientEmailFinal,clientMail:clientEmailFinal,
-      clientPhotoUrl:clientPhotoFinal,clientPhoto:clientPhotoFinal,photoUrl:clientPhotoFinal,clientAvatar:clientPhotoFinal,clientProfilePhoto:clientPhotoFinal,clientImage:clientPhotoFinal,
-      // PATIENT
-      patientName:selectedBooking.patientName||'',patientPhone:selectedBooking.patientPhone||'',patientLocation:selectedBooking.patientLocation||'',
-      patientLat:selectedBooking.patientLat||null,patientLng:selectedBooking.patientLng||null,
-      // NURSE + PAYMENT
-      nurseId:selectedBooking.nurseId||'',nurseName:selectedBooking.nurseName||'',nursePhone:selectedBooking.nursePhone||'',
-      paystackRef:selectedBooking.paystackRef||'',paymentMethod:selectedBooking.paymentMethod||'',
-      amount:selectedBooking.amount||selectedBooking.amountPaidNow||0,amountPaidNow:selectedBooking.amountPaidNow||selectedBooking.amount||0,amountCashLater:selectedBooking.amountCashLater||0,currency:selectedBooking.currency||'GHS',
-      reason,refundType,status:'pending',clientUid:clientUid||localStorage.getItem('clientUid')||'',originalBooking:selectedBooking
-    };
-    const dupSnap=await rtdb.ref('refundRequests').orderByChild('bookingId').equalTo(bookingId).once('value');
-    if(dupSnap.exists()){let hasPending=false;dupSnap.forEach(ch=>{if((ch.val().status||'')==='pending')hasPending=true;});if(hasPending){showStatus('❌ Refund already pending for this booking',false);btn.disabled=false;btn.textContent='📤 Submit Refund Request to CEO';return;}}
-    await rtdb.ref('refundRequests/'+refundId).set(payload);
-    await rtdb.ref('ceoRefundManagement/'+refundId).set(payload);
-    await rtdb.ref('ceo-refund-management/'+refundId).set(payload);
-    await rtdb.ref('allRefundRequests/'+refundId).set(payload);
-    await rtdb.ref('refunds/'+refundId).set(payload);
-    const emailKey=(clientEmailFinal||'anonymous').replace(/[.@#$\[\]]/g,'_');
-    await rtdb.ref('clientRefundRequests/'+emailKey+'/'+refundId).set(payload);
-    await rtdb.ref('allBookings/'+bookingId+'/refundRequested').set(true);
-    try{await rtdb.ref('bookings/'+bookingId+'/refundRequested').set(true);}catch(e){}
-    try{await rtdb.ref('ceoBookings/'+bookingId+'/refundRequested').set(true);}catch(e){}
-    showStatus('✅ Refund submitted! Client: '+clientNameFinal+' • Phone: '+clientPhoneFinal+' • Photo: '+(clientPhotoFinal?'YES':'NO')+' • Time: '+formatActionTime(now)+' • ID: '+refundId,true);
-    document.getElementById('fReason').value='';loadMyRefunds();setTimeout(()=>{document.getElementById('formCard').style.display='none';},1200);
-  }catch(e){showStatus('Failed: '+e.message,false);}finally{btn.disabled=false;btn.textContent='📤 Submit Refund Request to CEO — With Photo + Time';}
+    const hist=JSON.parse(localStorage.getItem('lcg_refund_history')||'[]');
+    // Also try Firebase
+    get(ref(db, 'refundRequests')).then(snap=>{
+      if(snap.exists()){
+        const all=snap.val();
+        const mine=Object.values(all).filter(r=>{
+          const bPhone=(r.clientPhone||'').replace(/[^0-9]/g,''); const myPhone=clientPhone.replace(/[^0-9]/g,'');
+          return bPhone.slice(-9)===myPhone.slice(-9);
+        }).sort((a,b)=>b.createdAt-a.createdAt);
+        if(mine.length){
+          div.innerHTML=mine.map(r=>`
+            <div style="background:rgba(14,10,28,.6);border-radius:14px;padding:12px;border:1px solid ${r.status==='approved'?'rgba(34,197,94,.3)':r.status==='rejected'?'rgba(239,68,68,.3)':'rgba(250,204,21,.2)'}">
+              <div style="display:flex;justify-content:space-between"><b style="color:#fff">${r.refundId} — ${r.bookingId}</b><span style="font-size:10px;background:${r.status==='pending'?'#facc15':r.status==='approved'?'#22c55e':'#ef4444'};color:${r.status==='pending'?'#1e0a3a':'white'};padding:3px 8px;border-radius:999px;font-weight:900">${r.status.toUpperCase()}</span></div>
+              <small style="color:#a78bfa;font-size:11px">Reason: ${r.reason} • Amount: ${r.currency} ${r.amount} • Method: ${r.method} • ${r.createdAtStr}<br>Client: ${r.clientName} • ${r.clientPhone} • ${r.clientEmail} • Photo: ${r.clientPhotoUrl?'YES':'NO'}<br>Patient: ${r.patientName||''} • Nurse: ${r.nurseName||''} • Details: ${r.details}</small>
+            </div>
+          `).join('');
+          return;
+        }
+      }
+      if(hist.length){
+        div.innerHTML=hist.map(r=>`<div style="background:rgba(14,10,28,.6);border-radius:14px;padding:10px"><b>${r.refundId} — ${r.bookingId}</b><br><small>${r.reason} • GHS ${r.amount} • ${r.status}</small></div>`).join('');
+      } else {
+        div.innerHTML='<small style="color:#6b7280">No refund requests yet — Submit form above to request refund (not history page!)</small>';
+      }
+    });
+  }catch(e){
+    div.innerHTML='<small style="color:#6b7280">No history yet</small>';
+  }
 }
-async function loadMyRefunds(){const el=document.getElementById('refundHistory');try{const snap=await rtdb.ref('refundRequests').once('value');if(!snap.exists()){el.innerHTML='<small style="color:#9a95b8">No refunds yet</small>';return;}const all=Object.values(snap.val());const mine=all.filter(r=>(r.clientEmail||'').toLowerCase()===(clientEmail||'').toLowerCase()||(r.clientName||'').toLowerCase()===(clientName||'').toLowerCase());if(mine.length===0){el.innerHTML='<small style="color:#9a95b8">No refunds yet</small>';return;}el.innerHTML=mine.sort((a,b)=>b.requestTime-a.requestTime).map(r=>{const color=r.status==='pending'?'#facc15':r.status==='approved'?'#22c55e':'#ef4444';const photo=r.clientPhotoUrl||r.clientPhoto||'';return `<div style="border-left:3px solid ${color};padding:10px 14px;background:rgba(14,10,28,.5);border-radius:0 12px 12px 0;margin:8px 0;display:flex;gap:10px"><img src="${photo||'https://ui-avatars.com/api/?name='+encodeURIComponent(r.clientName||'Client')+'&background=facc15&color=000'}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid #facc15;flex-shrink:0"><div style="flex:1"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">${r.refundId}</b><span style="font-size:10px;color:${color};font-weight:800">${r.status.toUpperCase()}</span></div><div style="font-size:11px;margin-top:4px">👤 ${r.clientName} • 📞 ${r.clientPhone} • ${r.nurseName} • ${r.currency} ${r.amount} • 🕒 ${r.requestTimeDisplay||formatActionTime(r.requestTime)}</div><div style="font-size:10px;color:#9a95b8;margin-top:2px">📧 ${r.clientEmail} • Reason: ${r.reason} • Booking: ${r.bookingTimeDisplay||''}</div><div style="font-size:9px;color:#facc15;margin-top:2px">Time of Request: ${r.timeOfRequestDisplay||r.requestTimeDisplay} • Booking Time: ${r.bookingTimeDisplay}</div></div></div>`;}).join('');}catch(e){el.innerHTML='Error: '+e.message;}}
-auth.onAuthStateChanged(user=>{if(!user&&!clientEmail){/* allow guest */}loadMyBookings();loadMyRefunds();});
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+  await ensureAuth();
+  getClientInfo();
+  loadBookings();
+  loadRefundHistory();
+  setTimeout(loadBookings,2000);
+});
 </script>
 </body></html>
