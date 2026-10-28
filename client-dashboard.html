@@ -1,147 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Dashboard — LOVE CARE GLOBAL — Refund Query Linked</title>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fraunces:wght@700&display=swap" rel="stylesheet">
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Dashboard — LOVE CARE GLOBAL — SOS Fixed</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
-.topbar{position:sticky;top:0;z-index:20;background:#16102a;border-bottom:1px solid rgba(168,85,247,.12);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-.wrap{max-width:480px;margin:0 auto;padding:14px 14px 90px}
-.profileCard{background:linear-gradient(135deg,#1e1640,#1a1633);border:1px solid rgba(168,85,247,.15);border-radius:24px;padding:18px;display:flex;gap:14px;align-items:center;margin-bottom:14px}
-.avatarWrap{position:relative;width:76px;height:76px;flex-shrink:0}
-.avatar{width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid #facc15;background:#231e44}
-.editBadge{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;background:#facc15;border-radius:50%;display:grid;place-items:center;font-size:14px;border:2px solid #1e1640;cursor:pointer}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cardBtn{border-radius:20px;padding:18px 12px;text-align:center;font-weight:800;font-size:13px;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:88px;transition:.2s;border:1px solid rgba(255,255,255,.06)}
-.cardBtn:active{transform:scale(.97)}
-.purple{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff}
-.blue{background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#fff}
-.dark{background:linear-gradient(135deg,#1e1a3a,#2a234a);color:#a78bfa;border:1px solid rgba(168,85,247,.15)}
-.orange{background:linear-gradient(135deg,#fb923c,#f97316);color:#fff}
-.pinkDark{background:linear-gradient(135deg,#2a1a3a,#1e1a3a);color:#f9a8d4;border:1px solid rgba(249,168,212,.15)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:20px}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px}
+.btn{border:none;border-radius:14px;padding:12px 16px;font-weight:900;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px}
+.grid .gcard{border-radius:20px;padding:18px;text-align:center;cursor:pointer;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:.2s}
+.grid .gcard:active{transform:scale(.97)}
+.purple{background:linear-gradient(135deg,#a855f7,#7c3aed);color:white}
+.blue{background:linear-gradient(135deg,#38bdf8,#2563eb);color:white}
+.dark{background:linear-gradient(135deg,#1e1b3a,#2a2250);color:#a78bfa;border:1px solid rgba(168,85,247,.15)}
+.orange{background:linear-gradient(135deg,#fb923c,#f97316);color:white}
+.pink{background:linear-gradient(135deg,#e879a0,#db2777);color:white}
 .yellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
-.red{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
-.sosTop{background:#ef4444;color:#fff;border:none;border-radius:999px;padding:8px 18px;font-weight:900;font-size:13px;cursor:pointer}
-.verified{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#86efac;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:800;display:inline-flex;align-items:center;gap:4px}
-.linkSmall{color:#facc15;font-size:11px;text-decoration:underline;cursor:pointer;margin-top:4px;display:inline-block}
-.logoutBtn{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px auto 0;padding:12px;color:#9a95b8;font-size:13px;cursor:pointer;width:120px}
-</style>
-</head>
-<body>
+.red{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:2px solid #facc15;box-shadow:0 0 0 4px rgba(250,204,21,.2)}
+.avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #facc15;background:#1e1a3a}
+.sosTop{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 18px;border-radius:999px;font-weight:900;font-size:12px;text-decoration:none;border:2px solid #facc15;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
+</style></head><body>
 <div class="topbar">
-<b style="font-family:Fraunces;font-size:16px;letter-spacing:.02em">LOVE CARE GLOBAL</b>
-<a href="emergency-sos.html" class="sosTop" style="text-decoration:none">SOS</a>
+<div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><b style="font-size:13px;font-family:Plus Jakarta Sans">LOVE CARE GLOBAL</b></div>
+<!-- FIXED 1: TOP SOS BUTTON -> sos.html -->
+<a href="sos.html" class="sosTop">SOS</a>
 </div>
 
-<div class="wrap">
-<!-- PROFILE CARD -->
-<div class="profileCard">
-<div class="avatarWrap">
-<img id="clientAvatar" class="avatar" src="https://ui-avatars.com/api/?name=ASABERE+PETER&background=facc15&color=000" alt="Client">
-<div class="editBadge" onclick="location.href='client-settings.html'">✏️</div>
-</div>
+<div style="max-width:760px;margin:0 auto;padding:10px">
+<!-- WELCOME CARD WITH PHOTO NAME EMAIL PHONE -->
+<div class="card" style="display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,rgba(28,18,56,.95),rgba(76,29,149,.2))">
+<img id="clientAvatar" class="avatar" src="https://ui-avatars.com/api/?name=ASABERE+PETER&background=facc15&color=000">
 <div style="flex:1">
-<div style="font-family:Fraunces;font-size:18px;font-weight:800;line-height:1.1">Welcome, <span id="clientNameDisplay">ASABERE PETER</span> 👋</div>
-<div id="clientEmailDisplay" style="font-size:11px;color:#a78bfa;margin-top:4px">lovecareglobal@gmail.com</div>
-<div id="clientPhoneDisplay" style="font-size:11px;color:#86efac">+233502957280</div>
-<div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-<a class="linkSmall" onclick="location.href='client-settings.html'">Edit name & picture</a>
-<span class="verified">● Verified</span>
-</div>
+<b style="font-size:18px;color:#fff">Welcome, <span id="clientName">ASABERE PETER</span> 👋</b><br>
+<small id="clientEmail" style="color:#a78bfa;font-size:12px">lovecareglobal@gmail.com</small><br>
+<small id="clientPhone" style="color:#86efac;font-size:12px">+233502957280</small><br>
+<a href="client-settings.html" style="font-size:11px;color:#facc15;text-decoration:underline">Edit name & picture</a> <span style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e;border-radius:999px;padding:2px 8px;font-size:10px;font-weight:900;margin-left:6px">● Verified</span>
 </div>
 </div>
 
 <!-- GRID BUTTONS -->
 <div class="grid">
-<a href="book-nurse.html" class="cardBtn purple">
-<span style="font-size:20px">🩺</span> Book Nurse
-</a>
+<a href="book-nurse.html" class="gcard purple"><div style="font-size:28px">🩺</div><b>Book Nurse</b></a>
+<a href="client-bookings.html" class="gcard blue"><div style="font-size:18px;background:white;color:#2563eb;border-radius:6px;padding:2px 6px;font-weight:900">JUL<br><b style="font-size:14px">17</b></div><small style="background:rgba(0,0,0,.2);border-radius:999px;padding:2px 8px;font-size:11px">17</small><b>My Bookings</b></a>
 
-<a href="client-bookings.html" class="cardBtn blue">
-<span style="font-size:18px">📅</span> <small style="background:rgba(0,0,0,.2);border-radius:6px;padding:2px 6px;font-size:10px">17</small>
-<span>My Bookings</span>
-</a>
+<a href="client-settings.html" class="gcard dark"><div style="font-size:24px">⚙️</div><b>Client Settings</b></a>
+<a href="client-alerts.html" class="gcard orange"><div style="font-size:24px">🔔</div><b>Alerts</b></a>
 
-<a href="client-settings.html" class="cardBtn dark">
-<span style="font-size:18px">⚙️</span> Client Settings
-</a>
+<a href="complaint.html" class="gcard dark"><div style="font-size:24px">📝</div><b>Complaint</b></a>
+<a href="refund-query.html" class="gcard dark" style="border:2px solid #facc15"><div style="font-size:22px">💰</div><b>Refund Query</b><br><small style="font-size:10px;color:#facc15">Photo + Time Saved</small></a>
 
-<a href="client-alerts.html" class="cardBtn orange">
-<span style="font-size:18px">🔔</span> Alerts
-</a>
-
-<a href="client-complaint.html" class="cardBtn pinkDark">
-<span style="font-size:18px">📝</span> <span style="color:#f9a8d4">Complaint</span>
-</a>
-
-<!-- ✅ REFUND QUERY — NOW POINTS TO refund-query.html — CIRCLED BUTTON FIXED! -->
-<a href="refund-query.html" class="cardBtn dark" style="border:2px solid #facc15;box-shadow:0 0 0 3px rgba(250,204,21,.15)">
-<span style="font-size:20px">💰</span>
-<span style="color:#fde68a">Refund Query</span>
-<small style="font-size:9px;color:#facc15;margin-top:2px">Photo + Time Saved</small>
-</a>
-
-<a href="client-rating.html" class="cardBtn yellow">
-<span style="font-size:18px">⭐</span> Rating
-</a>
-
-<a href="emergency-sos.html" class="cardBtn red">
-<span style="font-size:18px">🚨</span> Emergency SOS
-</a>
+<a href="rating.html" class="gcard yellow"><div style="font-size:22px">⭐</div><b>Rating</b></a>
+<!-- FIXED 2: BOTTOM EMERGENCY SOS BUTTON -> sos.html -->
+<a href="sos.html" class="gcard red"><div style="font-size:22px">🚨</div><b>Emergency SOS</b></a>
 </div>
 
-<div class="logoutBtn" onclick="doLogout()">
-<span>🚪</span> Logout
+<div style="text-align:center;padding:12px">
+<a href="#" onclick="localStorage.clear();location.href='index.html'" style="color:#a78bfa;font-size:13px;text-decoration:none">🚪 Logout</a><br>
+<small style="font-size:9px;color:#6b7280">Client Dashboard • Photo + Phone + Email + Time saved on Refund • SOS points to sos.html</small>
+</div>
 </div>
 
-<div style="text-align:center;margin-top:10px;font-size:9px;color:#6b6788">Client Dashboard • Photo + Phone + Email + Time saved on Refund</div>
-</div>
-
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(); const rtdb=firebase.database();
-let clientEmail=localStorage.getItem('clientEmail')||''; let clientName=localStorage.getItem('clientName')||'ASABERE PETER'; let clientPhone=localStorage.getItem('clientPhone')||'+233502957280'; let clientPhoto=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||'';
-
+const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
 function loadClient(){
-  document.getElementById('clientNameDisplay').textContent=(clientName||'ASABERE PETER').toUpperCase();
-  document.getElementById('clientEmailDisplay').textContent=clientEmail||'lovecareglobal@gmail.com';
-  document.getElementById('clientPhoneDisplay').textContent=clientPhone||'+233502957280';
-  const av=document.getElementById('clientAvatar');
-  if(clientPhoto){ av.src=clientPhoto; }
-  else { av.src='https://ui-avatars.com/api/?name='+encodeURIComponent(clientName||'ASABERE PETER')+'&background=facc15&color=000'; }
-  // Try load from Firebase allowedClients
-  if(clientEmail){
-    const key=clientEmail.toLowerCase().replace(/[.#$@\[\]]/g,'_');
-    rtdb.ref('allowedClients/'+key).once('value').then(snap=>{
-      if(snap.exists()){
-        const v=snap.val();
-        if(v.fullName){ clientName=v.fullName; document.getElementById('clientNameDisplay').textContent=clientName.toUpperCase(); localStorage.setItem('clientName',clientName); }
-        if(v.phone){ clientPhone=v.phone; document.getElementById('clientPhoneDisplay').textContent=clientPhone; localStorage.setItem('clientPhone',clientPhone); }
-        if(v.photoUrl||v.photo){ clientPhoto=v.photoUrl||v.photo; av.src=clientPhoto; localStorage.setItem('clientPhotoUrl',clientPhoto); }
-      }
-    });
-  }
+  const name=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'ASABERE PETER';
+  const email=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'lovecareglobal@gmail.com';
+  const phone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'+233502957280';
+  const photo=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||'';
+  document.getElementById('clientName').textContent=name;
+  document.getElementById('clientEmail').textContent=email;
+  document.getElementById('clientPhone').textContent=phone;
+  if(photo) document.getElementById('clientAvatar').src=photo;
 }
-function doLogout(){
-  if(confirm('Logout?')){
-    localStorage.clear(); sessionStorage.clear();
-    auth.signOut().then(()=>location.href='client-login.html');
-  }
-}
-auth.onAuthStateChanged(user=>{
-  if(user){
-    if(!clientEmail){ clientEmail=user.email||''; localStorage.setItem('clientEmail',clientEmail); document.getElementById('clientEmailDisplay').textContent=clientEmail; }
-    if(!clientPhoto && user.photoURL){ clientPhoto=user.photoURL; localStorage.setItem('clientPhotoUrl',clientPhoto); document.getElementById('clientAvatar').src=clientPhoto; }
-    if(!clientName && user.displayName){ clientName=user.displayName; localStorage.setItem('clientName',clientName); document.getElementById('clientNameDisplay').textContent=clientName.toUpperCase(); }
-  }
-  loadClient();
-});
-window.addEventListener('DOMContentLoaded', loadClient);
+loadClient();
 </script>
-</body>
-</html>
+</body></html>
