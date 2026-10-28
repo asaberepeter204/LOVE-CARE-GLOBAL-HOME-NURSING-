@@ -1,376 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Login — LOVE CARE GLOBAL</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-<script>
-// Auto-redirect if already logged in as nurse — Direct to nurses-dashboard.html
-(function(){
-  try{
-    const uid = localStorage.getItem('lcg_nurse_uid') || localStorage.getItem('nurseUid') || localStorage.getItem('currentNurseId');
-    const logged = localStorage.getItem('lcg_logged_in');
-    const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
-    const expiry = parseInt(localStorage.getItem('lcg_session_expiry')||'0');
-    const now = Date.now();
-    if(uid && (role==='nurse' || !localStorage.getItem('lcg_client_uid'))){
-      if(!expiry || now < expiry || logged==='true'){
-        window.location.replace('nurses-dashboard.html');
-        return;
-      }
-    }
-  }catch(e){}
-})();
-function toggleEye(id, btn){
-  const input=document.getElementById(id);
-  const open=btn.querySelector('.eye-open');
-  const closed=btn.querySelector('.eye-closed');
-  if(input.type==='password'){input.type='text'; open.style.display='none'; closed.style.display='block';}
-  else{input.type='password'; open.style.display='block'; closed.style.display='none';}
-}
-window.toggleEye=toggleEye;
-</script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),linear-gradient(180deg,#0e0a1c 0%, #120e26 100%)}
-.wrap{width:100%;max-width:440px}
-.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.18);border-radius:24px;padding:26px;box-shadow:0 20px 50px rgba(0,0,0,.6)}
-.logo{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;margin:0 auto 12px;font-size:28px}
-h1{text-align:center;font-weight:800;font-size:22px;color:#f3e8ff}
-.sub{text-align:center;font-size:11px;color:#a78bfa;margin:6px 0 18px;letter-spacing:.5px}
-label{font-size:11px;font-weight:800;margin:12px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase;letter-spacing:.8px}
-.inputWrap{position:relative;display:flex;align-items:center}
-.inputWrap input{width:100%;padding:13px 44px 13px 14px;border-radius:14px;border:1.5px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);color:#f3e8ff;font-size:13px;outline:none;transition:.2s}
-input{width:100%;padding:13px 14px;border-radius:14px;border:1.5px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);color:#f3e8ff;font-size:13px;outline:none;transition:.2s}
-input:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-shadow:0 0 0 3px rgba(168,85,247,.18)}
-.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(76,29,149,.25);border:1px solid rgba(168,85,247,.25);width:36px;height:36px;border-radius:10px;cursor:pointer;display:grid;place-items:center;z-index:10;pointer-events:auto!important}
-.eyeBtn:active{transform:translateY(-50%) scale(.92)}
-.btn{width:100%;padding:13px;border-radius:14px;font-weight:800;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:12px;text-decoration:none;transition:.2s;min-height:48px;pointer-events:auto!important}
-.btn:active{transform:scale(.97)}
-.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35);font-size:14px}
-.btnDark{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);color:#e9d5ff}
-.btnGoogle{
-  background:#FFFFFF;
-  color:#1F1F1F;
-  border:1px solid #747775;
-  border-radius:20px;
-  height:44px;
-  font-family:'Roboto',Inter,Arial,sans-serif;
-  font-size:14px;
-  font-weight:500;
-  letter-spacing:0.25px;
-  line-height:20px;
-  box-shadow:0 1px 2px rgba(0,0,0,0.08), 0 1px 3px 1px rgba(0,0,0,0.08);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  padding:0 16px;
-}
-.btnGoogle:hover{background:#F8FAFF;box-shadow:0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)}
-.btnGoogle:active{background:#F1F3F4;box-shadow:0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)}
-.google-icon-wrap{width:20px;height:20px;background:#FFFFFF;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
-.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:#6b5b8a;font-size:11px;font-weight:800;letter-spacing:1px}
-.divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(168,85,247,.15)}
-.alert{padding:11px;border-radius:10px;font-size:11px;font-weight:700;margin:10px 0;border:1px solid;display:none;line-height:1.4}
-.alert.show{display:block}
-.alert-error{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.3);color:#fca5a5}
-.alert-success{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.3);color:#86efac}
-.alert-info{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.3);color:#93c5fd}
-</style>
-</head>
-<body>
-<div class="bg"></div>
-<div class="wrap"><div class="card">
-<div class="logo">👩‍⚕️</div>
-<h1>Nurse Login</h1>
-<p class="sub">LOVE CARE GLOBAL HOME NURSING</p>
-
-<button class="btn btnGoogle" onclick="googleLogin()" type="button">
-  <span class="google-icon-wrap">
-    <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
-      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      <path fill="none" d="M0 0h48v48H0z"/>
-    </svg>
-  </span>
-  Continue with Google
-</button>
-
-<div class="divider">OR</div>
-
-<label>Email Address</label>
-<input id="email" type="email" placeholder="nurse@email.com" autocomplete="email">
-<label>Password</label>
-<div class="inputWrap">
-<input id="password" type="password" placeholder="Enter password" autocomplete="current-password">
-<button class="eyeBtn" type="button" onclick="toggleEye('password', this)">
-<span class="eye-open">👁️</span><span class="eye-closed" style="display:none">🙈</span>
-</button>
-</div>
-<div id="msg" class="alert"></div>
-<button class="btn btnPrimary" onclick="emailLogin()" type="button">Login as Nurse</button>
-<a href="nurse-registration.html" class="btn btnDark">No account? Register as Nurse</a>
-<a href="client-login.html" class="btn btnDark" style="margin-top:8px;font-size:11px">Are you a Client? Client Login</a>
-</div></div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
-
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nurse Login - GLOBAL FIX</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,Roboto,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;display:grid;place-items:center;padding:16px}.card{width:100%;max-width:380px;background:#1e1a3a;border:1px solid rgba(255,255,255,.08);border-radius:0;padding:24px;display:flex;flex-direction:column;gap:14px}h2{text-align:center;font-size:24px;font-weight:800}input{padding:14px 16px;border-radius:0;border:1px solid rgba(255,255,255,.08);background:rgba(12,10,30,.8);color:#ece8ff;width:100%;font-size:14px;outline:none}.btn{padding:14px;border-radius:0;border:none;font-weight:800;cursor:pointer;font-size:14px}.btnLogin{background:#a855f7;color:#fff}.btnGoogle{background:#fff;color:#1f1f1f;border:1px solid #747775;display:flex;gap:12px;align-items:center;justify-content:center;font-weight:500}.google-icon{width:20px;height:20px}.divider{display:flex;align-items:center;gap:12px}.divider span{flex:1;height:1px;background:rgba(255,255,255,.08)}.status{padding:10px;border-radius:0;font-size:11px;display:none;text-align:center}.status.ok{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.3)}.status.err{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}.link{font-size:12px;text-align:center;text-decoration:none;color:#a78bfa}</style></head><body><div class="card"><h2>Nurse Login</h2><input id="email" type="email" placeholder="Enter nurse email"><input id="pass" type="password" placeholder="Enter password"><div id="status" class="status"></div><button class="btn btnLogin" onclick="emailLogin()">Login</button><div class="divider"><span></span><b>OR</b><span></span></div><button class="btn btnGoogle" onclick="googleLogin()"><svg class="google-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</button><a href="nurse-registration.html" class="link">No account? Register as Nurse</a></div><script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-const rtdb=getDatabase(app);
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+const dbFS=firebase.firestore();
 
-function showMsg(text, type='alert-error'){
-  const el=document.getElementById('msg');
-  el.textContent=text;
-  el.className='alert show '+type;
-}
+function showStatus(m,ok){const el=document.getElementById('status');el.textContent=m;el.className='status '+(ok?'ok':'err');el.style.display='block';}
 function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
 
-// ===== NEW: ROLE ISOLATION - Check if email is a CLIENT =====
-async function isClientAccount(email){
-  const eLower = email.toLowerCase().trim();
-  const key = sanitizeEmail(eLower);
-  // RTDB checks
-  try{
-    const snap=await get(ref(rtdb,'allowedClients/'+key));
-    if(snap.exists()) return true;
-  }catch(e){}
-  try{
-    const snap=await get(ref(rtdb,'clientRegistrations/'+key));
-    if(snap.exists()) return true;
-  }catch(e){}
-  try{
-    const snap=await get(ref(rtdb,'clients'));
-    // expensive scan fallback - query by email instead
-  }catch(e){}
-  try{
-    // Firestore allowedClients / clientRegistrations if they exist as collections
-    const snap = await getDoc(doc(db,'allowedClients', key));
-    if(snap.exists()) return true;
-  }catch(e){}
-  // Most reliable: RTDB clients orderBy email
-  try{
-    const { get: rGet, ref: rRef, query: rQuery, orderByChild, equalTo } = await import("https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js");
-    // Use direct method we already imported get+ref, but orderByChild needs modular v9 compat - try simple query via get + manual scan
-    const snap = await get(ref(rtdb,'clients'));
-    if(snap.exists()){
-      let found=false;
-      snap.forEach(ch=>{
-        const v=ch.val()||{};
-        const real=v.profile||v;
-        const em=(real.email||v.email||real.clientEmail||'').toLowerCase().trim();
-        if(em===eLower) found=true;
-      });
-      if(found) return true;
-    }
-  }catch(e){}
-  // Firestore clients collection check by email (if used)
-  try{
-    const q = query(collection(db,'clients'), where('email','==', eLower), limit(1));
-    const qs = await getDocs(q);
-    if(!qs.empty) return true;
-  }catch(e){}
-  try{
-    const q = query(collection(db,'clientRegistrations'), where('email','==', eLower), limit(1));
-    const qs = await getDocs(q);
-    if(!qs.empty) return true;
-  }catch(e){}
-  try{
-    const q = query(collection(db,'allowedClients'), where('email','==', eLower), limit(1));
-    const qs = await getDocs(q);
-    if(!qs.empty) return true;
-  }catch(e){}
-  return false;
-}
+// GLOBAL FIX FOR NURSES: Check registration + CEO acceptance
+// Returns: {registered:false} | {registered:true, accepted:false} | {registered:true, accepted:true}
+async function checkNurseStatus(email){
+  const eLower=email.toLowerCase().trim();
+  if(!eLower) return {registered:false, accepted:false};
+  const key=sanitizeEmail(eLower);
 
-function saveNurseSession(user, displayNameOverride=null){
-  const displayName = displayNameOverride || user.displayName || user.email?.split('@')[0] || 'Nurse';
-  console.log('Saving nurse session:', {uid:user.uid, displayName, email:user.email});
-  localStorage.setItem('lcg_nurse_uid', user.uid);
-  localStorage.setItem('nurseUid', user.uid);
-  localStorage.setItem('currentNurseId', user.uid);
-  localStorage.setItem('nurseName', displayName);
-  localStorage.setItem('currentNurseName', displayName);
-  localStorage.setItem('lcg_nurse_name', displayName);
-  localStorage.setItem('fullName', displayName);
-  localStorage.setItem('lcg_nurse_email', user.email||'');
-  localStorage.setItem('currentNurseEmail', user.email||'');
-  localStorage.setItem('nurseEmail', user.email||'');
-  localStorage.setItem('nurseProfile', JSON.stringify({
-    uid:user.uid,
-    email:user.email||'',
-    fullName:displayName,
-    name:displayName,
-    displayName:displayName,
-    photoURL:user.photoURL||'',
-    phone:user.phoneNumber||''
-  }));
-  localStorage.setItem('lcg_logged_in','true');
-  localStorage.setItem('lcg_role','nurse');
-  localStorage.setItem('lcg_session_expiry', (Date.now()+30*60*1000).toString());
-  // Clear client data to prevent blocking
-  localStorage.removeItem('lcg_client_uid');
-  localStorage.removeItem('currentClientId');
-  localStorage.removeItem('client_uid');
-  localStorage.removeItem('clientLoggedIn');
-  localStorage.removeItem('clientEmail');
-}
-
-function redirectToNurseDashboard(){
-  showMsg('Success! Redirecting...','alert-success');
-  setTimeout(()=>{ window.location.replace('nurses-dashboard.html'); }, 800);
-}
-
-// Auto redirect if already logged in
-onAuthStateChanged(auth, async (user)=>{
-  if(user){
-    const role=(localStorage.getItem('lcg_role')||'').toLowerCase();
-    const hasNurseUid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid');
-    if(localStorage.getItem('lcg_client_uid')) return; // Don't redirect if client session
-    if(hasNurseUid || role==='nurse' || !localStorage.getItem('lcg_client_uid')){
-      try{
-        let name = localStorage.getItem('nurseName');
-        if(!name){
-          const snap = await getDoc(doc(db,'nurses', user.uid));
-          if(snap.exists()){
-            const data=snap.data();
-            name = data.fullName || data.name || data.displayName || user.displayName || user.email.split('@')[0];
-          } else {
-            name = user.displayName || user.email.split('@')[0];
-          }
-          if(name) saveNurseSession(user, name);
-        }
-      }catch(e){}
-      redirectToNurseDashboard();
-    }
-  }
-});
-
-window.emailLogin=async()=>{
-  const email=document.getElementById('email').value.trim();
-  const password=document.getElementById('password').value;
-  if(!email||!password){showMsg('Enter email and password','alert-error'); return;}
+  // 1. FASTEST: Check allowedNurses whitelist (CEO accepted nurses)
   try{
-    showMsg('Checking account...','alert-info');
+    const snap=await db.ref('allowedNurses/'+key).once('value');
+    if(snap.exists()) return {registered:true, accepted:true, data:snap.val()};
+  }catch(e){}
 
-    // ===== ROLE ISOLATION FIRST: block clients =====
-    if(await isClientAccount(email)){
-      showMsg('❌ This email is registered as a CLIENT. Please use Client Login page.','alert-error');
-      return;
-    }
-
-    const cred=await signInWithEmailAndPassword(auth, email, password);
-    const user=cred.user;
-
-    // Double check after login
-    if(await isClientAccount(user.email || email)){
-      showMsg('❌ This email belongs to a CLIENT account. Access denied on Nurse Login.','alert-error');
-      await signOut(auth);
-      return;
-    }
-
-    let displayName = user.displayName || email.split('@')[0];
+  // 2. Check verified nodes directly
+  const verifiedPaths=['verified_nurses','verifiedNurses'];
+  for(const p of verifiedPaths){
     try{
-      const snap = await getDoc(doc(db,'nurses', user.uid));
-      if(snap.exists()){
-        const data=snap.data();
-        displayName = data.fullName || data.name || data.displayName || displayName;
-        // Check if blocked/suspended
-        if(data.blocked){ showMsg('Account blocked by CEO — Contact support','alert-error'); await signOut(auth); return; }
-        if(data.suspended){ showMsg('Account suspended — Contact CEO','alert-error'); await signOut(auth); return; }
-      } else {
-        const rSnap = await get(ref(rtdb,'nurses/'+user.uid));
-        if(rSnap.exists()){
-          const data=rSnap.val();
-          displayName = data.fullName || data.name || displayName;
-        } else {
-          // Ensure nurse record exists - if not, this is not a nurse
-          showMsg('❌ No nurse profile found. Please register as nurse first.','alert-error');
-          await signOut(auth);
-          return;
-        }
-      }
-    }catch(e){ console.log('Name fetch error', e.message); }
-    saveNurseSession(user, displayName);
-    redirectToNurseDashboard();
-  }catch(e){ 
-    let msg=e.message;
-    if(msg.includes('invalid-credential')) msg='Wrong email or password';
-    if(msg.includes('user-not-found')) msg='Account not found — Create nurse account first';
-    showMsg('Login failed: '+msg,'alert-error'); 
-  }
-}
-
-window.googleLogin=async()=>{
-  try{
-    showMsg('Opening Google...','alert-info');
-    const provider=new GoogleAuthProvider();
-    const cred=await signInWithPopup(auth, provider);
-    const user=cred.user;
-
-    // ROLE ISOLATION FIRST
-    if(await isClientAccount(user.email)){
-      showMsg('❌ This email is registered as a CLIENT. Please use Client Login page.','alert-error');
-      await signOut(auth);
-      return;
-    }
-
-    const displayName = user.displayName || user.email.split('@')[0];
-
-    // Verify nurse exists OR create pending - but block if was client (already checked)
-    // For new google nurses, we allow creation but only if not client
-    try{
-      const snap = await getDoc(doc(db,'nurses', user.uid));
-      if(!snap.exists()){
-        // check if any nurse doc with same email exists
-        const q = query(collection(db,'nurses'), where('email','==', user.email.toLowerCase()), limit(1));
-        const qs = await getDocs(q);
-        if(qs.empty){
-          // First time google nurse - will be created as pending
-        }
-      }
+      const snap=await db.ref(p+'/'+key).once('value');
+      if(snap.exists()) return {registered:true, accepted:true, data:snap.val()};
+      const qSnap=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
+      if(qSnap.exists()) return {registered:true, accepted:true};
     }catch(e){}
+  }
 
-    saveNurseSession(user, displayName);
-    try{
-      await setDoc(doc(db,'nurses', user.uid), {
-        uid:user.uid,
-        email:user.email,
-        fullName:displayName,
-        name:displayName,
-        displayName:displayName,
-        photoURL:user.photoURL||'',
-        loginMethod:'google',
-        canLogin:true,
-        canWork:true,
-        status:'pending_approval',
-        updatedAt:serverTimestamp()
-      }, {merge:true});
-      await set(ref(rtdb,'nurses/'+user.uid), {
-        uid:user.uid,
-        email:user.email,
-        fullName:displayName,
-        name:displayName,
-        displayName:displayName,
-        photoURL:user.photoURL||'',
-        canWork:true,
-        canLogin:true
+  // 3. Check nurses node with status
+  try{
+    const snap=await db.ref('nurses/'+key).once('value');
+    if(snap.exists()){
+      const v=snap.val();
+      const status=(v.status||v.approvalStatus||'').toLowerCase();
+      if(status==='verified' || status==='approved' || status==='accepted' || v.isVerified===true || v.isApproved===true){
+        return {registered:true, accepted:true, data:v};
+      }else{
+        return {registered:true, accepted:false, data:v};
+      }
+    }
+    const qSnap=await db.ref('nurses').orderByChild('email').equalTo(eLower).once('value');
+    if(qSnap.exists()){
+      let accepted=false; let data=null;
+      qSnap.forEach(ch=>{
+        const v=ch.val();
+        const status=(v.status||'').toLowerCase();
+        if(status==='verified' || status==='approved' || status==='accepted' || v.isVerified===true) accepted=true;
+        data=v;
       });
-    }catch(e){ console.log('Save error', e.message); }
-    redirectToNurseDashboard();
-  }catch(e){ showMsg('Google login failed: '+e.message,'alert-error'); }
+      return {registered:true, accepted:accepted, data:data};
+    }
+  }catch(e){}
+
+  // 4. Check pending nodes - registered but not yet accepted
+  const pendingPaths=['pending_nurses','pendingNurses','nurseApplications','nurse_registrations','nurseRegistrations'];
+  for(const p of pendingPaths){
+    try{
+      const snap=await db.ref(p+'/'+key).once('value');
+      if(snap.exists()) return {registered:true, accepted:false, data:snap.val()};
+      const qSnap=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
+      if(qSnap.exists()) return {registered:true, accepted:false};
+      const qSnap2=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
+      if(qSnap2.exists()) return {registered:true, accepted:false};
+    }catch(e){}
+  }
+
+  // 5. Firestore fallback
+  try{
+    const fs1=await dbFS.collection('nurses').where('email','==',eLower).get();
+    if(!fs1.empty){
+      let accepted=false;
+      fs1.forEach(doc=>{
+        const v=doc.data();
+        if(v.status==='verified' || v.isVerified) accepted=true;
+      });
+      return {registered:true, accepted:accepted};
+    }
+    const fs2=await dbFS.collection('nurseApplications').where('email','==',eLower).get();
+    if(!fs2.empty) return {registered:true, accepted:false};
+  }catch(e){}
+
+  return {registered:false, accepted:false};
 }
-</script>
-<script src="patch-ceo-delete-block.js"></script>
-</body>
-</html>
+
+async function googleLogin(){
+  showStatus('Checking Google...', true);
+  try{
+    const provider=new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    const result=await auth.signInWithPopup(provider);
+    const user=result.user;
+    const email=(user.email||'').toLowerCase().trim();
+    const name=user.displayName||'';
+
+    const status=await checkNurseStatus(email);
+    
+    if(!status.registered){
+      showStatus('❌ Not registered as nurse. Redirecting...', false);
+      try{
+        await db.ref('blockedNurseLogins/'+sanitizeEmail(email)).set({
+          email:email, name:name, blockedAt:Date.now(), reason:'Google login without nurse registration', uid:user.uid
+        });
+      }catch(e){}
+      await auth.signOut();
+      localStorage.clear();
+      sessionStorage.clear();
+      localStorage.setItem('pendingNurseEmail', email);
+      localStorage.setItem('pendingNurseName', name);
+      setTimeout(()=>{
+        location.href='nurse-registration.html?from=google_block&email='+encodeURIComponent(email)+'&name='+encodeURIComponent(name);
+      },1500);
+      return;
+    }
+
+    if(!status.accepted){
+      showStatus('⏳ Registered but not yet accepted by CEO. Pending approval...', false);
+      await auth.signOut();
+      localStorage.clear();
+      setTimeout(()=>{
+        alert('⏳ Your nurse registration is pending CEO approval.\n\nEmail: '+email+'\n\nYou registered but CEO has not yet verified you.\nPlease wait for CEO acceptance. You will be notified.');
+        location.href='nurse-registration.html?from=pending&email='+encodeURIComponent(email);
+      },1500);
+      return;
+    }
+
+    // ALLOWED: Registered + Accepted
+    localStorage.setItem('nurseLoggedIn','true');
+    localStorage.setItem('nurseEmail', email);
+    localStorage.setItem('nurseName', status.data?.name || name);
+    localStorage.setItem('nurseUid', user.uid);
+    localStorage.setItem('loginMethod','google');
+
+    showStatus('Welcome '+name+' - Login success', true);
+    setTimeout(()=>{location.replace('nurse-dashboard.html');}, 800);
+
+  }catch(e){
+    console.error(e);
+    showStatus('Google login failed: '+e.message, false);
+    try{ await auth.signOut(); }catch(_){}
+  }
+}
+
+async function emailLogin(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const pass=document.getElementById('pass').value.trim();
+  if(!email||!pass){showStatus('Enter email & password', false);return;}
+  
+  showStatus('Checking...', true);
+  
+  const status=await checkNurseStatus(email);
+  if(!status.registered){
+    showStatus('❌ Email not registered as nurse. Please register first.', false);
+    setTimeout(()=>{
+      localStorage.setItem('pendingNurseEmail', email);
+      location.href='nurse-registration.html?from=email_block&email='+encodeURIComponent(email);
+    },1500);
+    return;
+  }
+  if(!status.accepted){
+    showStatus('⏳ Not yet accepted by CEO. Pending approval.', false);
+    setTimeout(()=>{
+      alert('⏳ Your application is pending CEO approval.\nEmail: '+email);
+    },800);
+    return;
+  }
+
+  auth.signInWithEmailAndPassword(email,pass).then(()=>{
+    localStorage.setItem('nurseLoggedIn','true');
+    localStorage.setItem('nurseEmail',email);
+    localStorage.setItem('loginMethod','email');
+    showStatus('Login success', true);
+    setTimeout(()=>{location.replace('nurse-dashboard.html');},500);
+  }).catch(e=>showStatus(e.message,false));
+}
+</script></body></html>
