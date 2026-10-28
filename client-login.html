@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nurse Login - ALL 4 REQUIRED</title>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Client Login - ALL 4 REQUIRED</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,Roboto,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;display:grid;place-items:center;padding:16px}.card{width:100%;max-width:380px;background:#1e1a3a;border:1px solid rgba(255,255,255,.08);border-radius:0;padding:24px;display:flex;flex-direction:column;gap:14px}h2{text-align:center;font-size:24px;font-weight:800}input{padding:14px 16px;border-radius:0;border:1px solid rgba(255,255,255,.08);background:rgba(12,10,30,.8);color:#ece8ff;width:100%;font-size:14px;outline:none}.btn{padding:14px;border-radius:0;border:none;font-weight:800;cursor:pointer;font-size:14px}.btnLogin{background:#a855f7;color:#fff}.btnGoogle{background:#fff;color:#1f1f1f;border:1px solid #747775;display:flex;gap:12px;align-items:center;justify-content:center;font-weight:500}.google-icon{width:20px;height:20px}.divider{display:flex;align-items:center;gap:12px}.divider span{flex:1;height:1px;background:rgba(255,255,255,.08)}.status{padding:10px;border-radius:0;font-size:11px;display:none;text-align:center}.status.ok{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.3)}.status.err{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}.link{font-size:12px;text-align:center;text-decoration:none;color:#a78bfa}</style></head><body><div class="card"><h2>Nurse Login</h2><input id="email" type="email" placeholder="Enter nurse email"><input id="pass" type="password" placeholder="Enter password"><div id="status" class="status"></div><button class="btn btnLogin" onclick="emailLogin()">Login</button><div class="divider"><span></span><b>OR</b><span></span></div><button class="btn btnGoogle" onclick="googleLogin()"><svg class="google-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</button><a href="nurse-registration.html" class="link">No account? Register as Nurse</a></div><script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,Roboto,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;display:grid;place-items:center;padding:16px}.card{width:100%;max-width:380px;background:#1e1a3a;border:1px solid rgba(255,255,255,.08);border-radius:0;padding:24px;display:flex;flex-direction:column;gap:14px}h2{text-align:center;font-size:24px;font-weight:800}input{padding:14px 16px;border-radius:0;border:1px solid rgba(255,255,255,.08);background:rgba(12,10,30,.8);color:#ece8ff;width:100%;font-size:14px;outline:none}.btn{padding:14px;border-radius:0;border:none;font-weight:800;cursor:pointer;font-size:14px}.btnLogin{background:#facc15;color:#000}.btnGoogle{background:#fff;color:#1f1f1f;border:1px solid #747775;display:flex;gap:12px;align-items:center;justify-content:center;font-weight:500}.google-icon{width:20px;height:20px}.divider{display:flex;align-items:center;gap:12px}.divider span{flex:1;height:1px;background:rgba(255,255,255,.08)}.status{padding:10px;border-radius:0;font-size:11px;display:none;text-align:center}.status.ok{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.3)}.status.err{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}.link{font-size:12px;text-align:center;text-decoration:none;color:#a78bfa}</style></head><body><div class="card"><h2>Client Login</h2><input id="email" type="email" placeholder="Enter email"><input id="pass" type="password" placeholder="Enter password"><div id="status" class="status"></div><button class="btn btnLogin" onclick="emailLogin()">Login</button><div class="divider"><span></span><b>OR</b><span></span></div><button class="btn btnGoogle" onclick="googleLogin()"><svg class="google-icon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</button><a href="client-registration.html" class="link">No account? Register</a></div><script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
@@ -13,88 +13,6 @@ const dbFS=firebase.firestore();
 
 function showStatus(m,ok){const el=document.getElementById('status');el.textContent=m;el.className='status '+(ok?'ok':'err');el.style.display='block';}
 function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');}
-
-// ALL 4 REQUIRED: name + email + phone + photo
-async function checkNurseFullStatus(email){
-  const eLower=email.toLowerCase().trim();
-  if(!eLower) return {registered:false, reason:'no email'};
-  const key=sanitizeEmail(eLower);
-
-  async function hasAll4(v){
-    if(!v) return {ok:false, missing:'no data'};
-    const name=(v.name||v.fullName||'').trim();
-    const emailField=(v.email||v.clientEmail||'').trim() || eLower;
-    const phone=(v.phone||'').trim();
-    const photo=v.photoUrl||v.photo||v.avatarUrl||v.imageUrl||'';
-    const missing=[];
-    if(name.length<2) missing.push('name');
-    if(!emailField.includes('@')) missing.push('email');
-    if(phone.length<7) missing.push('phone');
-    if(!photo || photo.length<10) missing.push('photo');
-    return {ok: missing.length===0, missing: missing.join(', '), name, email:emailField, phone, photo};
-  }
-
-  // 1. allowedNurses whitelist
-  try{
-    const snap=await db.ref('allowedNurses/'+key).once('value');
-    if(snap.exists()){
-      const check=await hasAll4(snap.val());
-      if(check.ok){
-        return {registered:true, accepted:true, hasAll4:true, data:snap.val()};
-      }else{
-        return {registered:true, accepted:true, hasAll4:false, missing:check.missing, data:snap.val()};
-      }
-    }
-  }catch(e){}
-
-  // 2. verified_nurses
-  for(const p of ['verified_nurses','verifiedNurses']){
-    try{
-      const snap=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
-      if(snap.exists()){
-        let result=null;
-        snap.forEach(ch=>{
-          const v=ch.val();
-          const c=hasAll4Sync(v);
-          if(c.ok) result={registered:true, accepted:true, hasAll4:true, data:v};
-          else if(!result) result={registered:true, accepted:true, hasAll4:false, missing:c.missing, data:v};
-        });
-        if(result) return result;
-      }
-    }catch(e){}
-  }
-
-  // 3. nurses
-  try{
-    const snap=await db.ref('nurses').orderByChild('email').equalTo(eLower).once('value');
-    if(snap.exists()){
-      let result=null;
-      snap.forEach(ch=>{
-        const v=ch.val();
-        const st=(v.status||'').toLowerCase();
-        const accepted=st==='verified'||st==='approved'||v.isVerified===true;
-        const c=hasAll4Sync(v);
-        if(!result) result={registered:true, accepted:accepted, hasAll4:c.ok, missing:c.missing, data:v};
-        else if(c.ok) result.hasAll4=true;
-      });
-      if(result) return result;
-    }
-  }catch(e){}
-
-  // 4. pending
-  for(const p of ['pending_nurses','pendingNurses','nurseApplications']){
-    try{
-      const snap=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
-      if(snap.exists()){
-        let hasAll=false; let miss='';
-        snap.forEach(ch=>{ const c=hasAll4Sync(ch.val()); if(c.ok) hasAll=true; else miss=c.missing; });
-        return {registered:true, accepted:false, hasAll4:hasAll, missing:miss};
-      }
-    }catch(e){}
-  }
-
-  return {registered:false, hasAll4:false, accepted:false};
-}
 
 function hasAll4Sync(v){
   const name=(v.name||v.fullName||'').trim();
@@ -109,9 +27,30 @@ function hasAll4Sync(v){
   return {ok: missing.length===0, missing: missing.join(', ')};
 }
 
+async function checkClientFullStatus(email){
+  const eLower=email.toLowerCase().trim();
+  const key=sanitizeEmail(eLower);
+  try{
+    const snap=await db.ref('allowedClients/'+key).once('value');
+    if(snap.exists()){
+      const c=hasAll4Sync(snap.val());
+      return {registered:true, hasAll4:c.ok, missing:c.missing, data:snap.val()};
+    }
+  }catch(e){}
+  try{
+    const snap=await db.ref('clients').orderByChild('email').equalTo(eLower).once('value');
+    if(snap.exists()){
+      let result={registered:true, hasAll4:false, missing:''};
+      snap.forEach(ch=>{ const c=hasAll4Sync(ch.val()); if(c.ok) result.hasAll4=true; else result.missing=c.missing; });
+      return result;
+    }
+  }catch(e){}
+  return {registered:false, hasAll4:false};
+}
+
 async function deleteAuthUserCompletely(user){
   if(!user) return;
-  try{ await user.delete(); console.log('✅ Nurse Auth DELETED from console'); }
+  try{ await user.delete(); console.log('✅ Client Auth DELETED'); }
   catch(e){ try{ await auth.signOut(); }catch(_){} }
 }
 
@@ -125,32 +64,24 @@ async function googleLogin(){
     const user=result.user; tempUser=user;
     const email=(user.email||'').toLowerCase().trim();
     const name=user.displayName||'';
-    const status=await checkNurseFullStatus(email);
-    
+    const status=await checkClientFullStatus(email);
     if(!status.registered){
-      showStatus('❌ Not registered as nurse. Deleting Auth & redirecting...', false);
+      showStatus('❌ Not registered. Deleting Auth...', false);
       await deleteAuthUserCompletely(user);
-      localStorage.clear(); localStorage.setItem('pendingNurseEmail', email); localStorage.setItem('pendingNurseName', name);
-      setTimeout(()=>{ location.href='nurse-registration.html?from=no_reg&email='+encodeURIComponent(email)+'&name='+encodeURIComponent(name); },1500);
+      localStorage.clear(); localStorage.setItem('pendingGoogleEmail', email); localStorage.setItem('pendingGoogleName', name);
+      setTimeout(()=>{ location.href='client-registration.html?from=no_reg&email='+encodeURIComponent(email); },1500);
       return;
     }
     if(!status.hasAll4){
-      showStatus('❌ Incomplete: missing '+status.missing+'. Redirecting to complete registration...', false);
+      showStatus('❌ Missing: '+status.missing+'. Complete registration...', false);
       await deleteAuthUserCompletely(user);
-      localStorage.clear(); localStorage.setItem('pendingNurseEmail', email);
-      setTimeout(()=>{ location.href='nurse-registration.html?from=missing_'+status.missing+'&email='+encodeURIComponent(email)+'&name='+encodeURIComponent(name); },1500);
+      localStorage.clear(); localStorage.setItem('pendingGoogleEmail', email);
+      setTimeout(()=>{ location.href='client-registration.html?from=missing_'+status.missing+'&email='+encodeURIComponent(email); },1500);
       return;
     }
-    if(!status.accepted){
-      showStatus('⏳ Pending CEO approval. Removing Auth...', false);
-      await deleteAuthUserCompletely(user);
-      localStorage.clear();
-      setTimeout(()=>{ alert('⏳ Pending CEO approval.\nEmail: '+email+'\nYou have all 4 fields but CEO not yet verified you.'); location.href='nurse-registration.html?from=pending&email='+encodeURIComponent(email); },1500);
-      return;
-    }
-    localStorage.setItem('nurseLoggedIn','true'); localStorage.setItem('nurseEmail', email); localStorage.setItem('nurseName', status.data?.name || name); localStorage.setItem('nurseUid', user.uid);
+    localStorage.setItem('clientLoggedIn','true'); localStorage.setItem('clientEmail', email); localStorage.setItem('clientName', name);
     showStatus('Welcome '+name, true);
-    setTimeout(()=>{location.replace('nurse-dashboard.html');},800);
+    setTimeout(()=>{location.replace('client-dashboard.html');},800);
   }catch(e){
     showStatus('Google login failed: '+e.message, false);
     if(tempUser) try{ await deleteAuthUserCompletely(tempUser); }catch(_){}
@@ -162,10 +93,13 @@ async function emailLogin(){
   const pass=document.getElementById('pass').value.trim();
   if(!email||!pass){showStatus('Enter email & password', false);return;}
   showStatus('Checking...', true);
-  const status=await checkNurseFullStatus(email);
-  if(!status.registered){ showStatus('❌ Not registered as nurse.', false); setTimeout(()=>{location.href='nurse-registration.html?from=email_no_reg&email='+encodeURIComponent(email);},1500); return; }
-  if(!status.hasAll4){ showStatus('❌ Missing: '+status.missing+'. Complete registration.', false); setTimeout(()=>{location.href='nurse-registration.html?from=missing_'+status.missing+'&email='+encodeURIComponent(email);},1500); return; }
-  if(!status.accepted){ showStatus('⏳ Not yet accepted by CEO.', false); return; }
-  auth.signInWithEmailAndPassword(email,pass).then(()=>{ localStorage.setItem('nurseLoggedIn','true'); localStorage.setItem('nurseEmail',email); showStatus('Login success', true); setTimeout(()=>{location.replace('nurse-dashboard.html');},500); }).catch(e=>showStatus(e.message,false));
+  const status=await checkClientFullStatus(email);
+  if(!status.registered){ showStatus('❌ Not registered.', false); setTimeout(()=>{location.href='client-registration.html?from=no_reg&email='+encodeURIComponent(email);},1500); return; }
+  if(!status.hasAll4){ showStatus('❌ Missing: '+status.missing+'. Complete registration.', false); setTimeout(()=>{location.href='client-registration.html?from=missing_'+status.missing+'&email='+encodeURIComponent(email);},1500); return; }
+  auth.signInWithEmailAndPassword(email,pass).then(()=>{
+    localStorage.setItem('clientLoggedIn','true'); localStorage.setItem('clientEmail',email);
+    showStatus('Login success', true);
+    setTimeout(()=>{location.replace('client-dashboard.html');},500);
+  }).catch(e=>showStatus(e.message,false));
 }
 </script></body></html>
