@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Alerts + Custom Tone Picker — LOVE CARE GLOBAL — Client Selects Song From Phone</title>
+<title>Alerts + Custom Tone + SMS — LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
@@ -9,15 +9,11 @@
 @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .acceptedCard{border:2px solid #22c55e;background:linear-gradient(135deg,rgba(34,197,94,.14),rgba(16,101,57,.18),rgba(28,18,56,.95));box-shadow:0 0 0 5px rgba(34,197,94,.15)}
 .rejectedCard{border:2px solid #ef4444;background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(127,29,29,.15),rgba(28,18,56,.9))}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
-.badge-new{background:#22c55e;color:#052e16}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}.badge-new{background:#22c55e;color:#052e16}
 .btn{border:none;border-radius:14px;padding:14px 16px;font-weight:900;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;flex:1;min-height:50px}
-.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
-.btnBlue{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white}
-.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
-.btnOrange{background:linear-gradient(135deg,#fb923c,#f97316);color:white}
-.btnWhats{background:linear-gradient(135deg,#25D366,#128C7E);color:white}
-.btnGray{background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.btnBlue{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white}
+.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}.btnOrange{background:linear-gradient(135deg,#fb923c,#f97316);color:white}
+.btnWhats{background:linear-gradient(135deg,#25D366,#128C7E);color:white}.btnGray{background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
 .btnPurple{background:linear-gradient(135deg,#a855f7,#7c3aed);color:white}
 .clientAvatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #facc15;background:#1e1a3a}
 .nurseBigAvatar{width:86px;height:86px;border-radius:50%;object-fit:cover;border:3px solid #22c55e;background:#1e1a3a;box-shadow:0 6px 20px rgba(34,197,94,.3)}
@@ -31,73 +27,58 @@
 .input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#e8e0ff;font-size:13px;margin-top:6px}
 </style></head><body>
 <div class="topbar">
-<div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:13px">LOVE CARE GLOBAL</b><br><small style="color:#22c55e;font-size:10px"><span class="dot"></span> ALERTS + CUSTOM TONE FROM PHONE</small></div></div>
+<div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:13px">LOVE CARE GLOBAL</b><br><small style="color:#22c55e;font-size:10px"><span class="dot"></span> ALERTS — TONE + SMS</small></div></div>
 <div style="display:flex;align-items:center;gap:8px"><img id="topClientAvatar" class="clientAvatar" style="display:none"><a href="sos.html" style="background:#ef4444;color:white;padding:7px 14px;border-radius:999px;font-weight:900;font-size:11px;text-decoration:none">SOS</a></div>
 </div>
 <div style="max-width:760px;margin:0 auto;padding:10px">
-
-<!-- CLIENT CARD -->
 <div class="card" style="padding:12px;background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)">
-<b style="font-size:12px;color:#facc15">🔔 YOUR BOOKING ALERTS — Nurse Photo Phone + Custom Tone</b>
+<b style="font-size:12px;color:#facc15">🔔 YOUR BOOKING ALERTS — Nurse Photo Phone + Custom Tone + SMS</b>
 <div style="display:flex;gap:10px;align-items:center;margin-top:10px;background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.08));border:1px solid rgba(250,204,21,.2);border-radius:14px;padding:10px">
-<img id="clientAvatarTop" class="clientAvatar" src="">
-<div style="flex:1"><b id="clientNameTop" style="font-size:13px;color:#fff">ASABERE PETER</b><br><small id="clientPhoneTop" style="color:#86efac;font-size:11px">+233502957280</small><br><small id="clientEmailTop" style="color:#a78bfa;font-size:10px">lovecareglobal@gmail.com</small></div>
-<div style="font-size:9px;color:#fde68a;background:rgba(250,204,21,.15);border-radius:999px;padding:4px 8px">YOU — CLIENT</div>
-</div>
-<div id="countInfo" style="font-size:10px;color:#6b7280;margin-top:8px">0 alerts — Real-time — Custom tone rings when nurse reacts</div>
+<img id="clientAvatarTop" class="clientAvatar" src=""><div style="flex:1"><b id="clientNameTop" style="font-size:13px;color:#fff">ASABERE PETER</b><br><small id="clientPhoneTop" style="color:#86efac;font-size:11px">+233502957280</small><br><small id="clientEmailTop" style="color:#a78bfa;font-size:10px">lovecareglobal@gmail.com</small></div>
+<div style="font-size:9px;color:#fde68a;background:rgba(250,204,21,.15);border-radius:999px;padding:4px 8px">YOU</div></div>
+<div id="countInfo" style="font-size:10px;color:#6b7280;margin-top:8px">0 alerts — Custom tone + SMS</div>
 </div>
 
-<!-- NEW: CUSTOM TONE PICKER — CLIENT SELECTS SONG FROM PHONE -->
 <div class="card" style="border:2px solid #facc15;background:linear-gradient(135deg,rgba(250,204,21,.1),rgba(28,18,56,.95))">
-<b style="font-size:14px;color:#facc15">🎵 Select Alert Tone / Song From Your Phone — Rings When Nurse Responds</b><br>
-<small style="color:#a78bfa;font-size:11px;line-height:1.5">Pick a tone or upload your own song from phone. When selected nurse taps Accept ✅ or Reject ❌ in my-job-offer.html, this tone will RING + VIBRATE + SHOW NOTIFICATION on your phone so you know instantly! Saves with Client Photo Name Phone Email + Time.</small>
-
-<div style="margin-top:12px">
-<b style="font-size:11px;color:#fff">1. Choose Preset Tone:</b>
+<b style="font-size:14px;color:#facc15">🎵 Select Alert Tone / Song From Your Phone + SMS — Rings When Nurse Responds</b><br>
+<small style="color:#a78bfa;font-size:11px">Pick tone or upload song. When nurse Accept ✅ / Reject ❌, your tone RINGS + VIBRATES + NOTIFICATION + SMS! Saves with Photo Name Phone Email + Time.</small>
+<div style="margin-top:12px"><b style="font-size:11px;color:#fff">1. Preset Tones:</b>
 <div id="presetTones">
-<div class="toneOption" onclick="selectPreset('default_beep','Default Beep — Ding Ding')"><div><b style="font-size:12px">🔔 Default Beep — Ding Ding</b><br><small style="color:#a78bfa">Classic notification</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('default_beep')">▶️ Preview</button></div>
-<div class="toneOption" onclick="selectPreset('success_melody','Success Melody — Happy Tune')"><div><b style="font-size:12px">🎉 Success Melody — Happy Tune</b><br><small style="color:#a78bfa">For Accepted bookings</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('success_melody')">▶️ Preview</button></div>
-<div class="toneOption" onclick="selectPreset('urgent_alarm','Urgent Alarm — Loud Ring')"><div><b style="font-size:12px">🚨 Urgent Alarm — Loud Ring</b><br><small style="color:#a78bfa">Loud, can't miss</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('urgent_alarm')">▶️ Preview</button></div>
-<div class="toneOption" onclick="selectPreset('gentle_chime','Gentle Chime — Soft Bell')"><div><b style="font-size:12px">🔔 Gentle Chime — Soft Bell</b><br><small style="color:#a78bfa">Soft, not loud</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('gentle_chime')">▶️ Preview</button></div>
-<div class="toneOption" onclick="selectPreset('afrobeat','Afrobeat — Ghana Vibe')"><div><b style="font-size:12px">🥁 Afrobeat — Ghana Vibe</b><br><small style="color:#a78bfa">Ghana style beat</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('afrobeat')">▶️ Preview</button></div>
+<div class="toneOption" onclick="selectPreset('default_beep','Default Beep — Ding Ding')"><div><b style="font-size:12px">🔔 Default Beep</b><br><small style="color:#a78bfa">Classic</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('default_beep')">▶️</button></div>
+<div class="toneOption" onclick="selectPreset('success_melody','Success Melody — Happy')"><div><b style="font-size:12px">🎉 Success Melody</b><br><small style="color:#a78bfa">For Accepted</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('success_melody')">▶️</button></div>
+<div class="toneOption" onclick="selectPreset('urgent_alarm','Urgent Alarm — Loud')"><div><b style="font-size:12px">🚨 Urgent Alarm</b><br><small style="color:#a78bfa">Loud</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('urgent_alarm')">▶️</button></div>
+<div class="toneOption" onclick="selectPreset('gentle_chime','Gentle Chime')"><div><b style="font-size:12px">🔔 Gentle Chime</b><br><small style="color:#a78bfa">Soft</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('gentle_chime')">▶️</button></div>
+<div class="toneOption" onclick="selectPreset('afrobeat','Afrobeat — Ghana Vibe')"><div><b style="font-size:12px">🥁 Afrobeat Ghana</b><br><small style="color:#a78bfa">Ghana beat</small></div><button class="btn btnGray" style="min-height:32px;padding:6px 10px;flex:none" onclick="event.stopPropagation();previewTone('afrobeat')">▶️</button></div>
 </div>
-
-<b style="font-size:11px;color:#fff;display:block;margin-top:16px">2. Or Upload Your Own Song From Phone (MP3, M4A, WAV, OGG):</b>
+<b style="font-size:11px;color:#fff;display:block;margin-top:16px">2. Upload Your Own Song From Phone (MP3, M4A, WAV):</b>
 <input type="file" id="customToneFile" accept="audio/*" class="input" onchange="handleCustomTone(this.files)">
-<small style="font-size:10px;color:#6b7280">Select any song/tone from your phone storage — Max 10MB — Will ring when nurse responds. Example: Your favorite gospel song, Afrobeat, alarm tone etc.</small>
-
+<small style="font-size:10px;color:#6b7280">Max 10MB — Will ring when nurse responds</small>
 <div id="selectedToneCard" style="display:none;margin-top:12px;background:rgba(14,10,28,.7);border:1px solid rgba(250,204,21,.3);border-radius:12px;padding:12px">
-<div style="display:flex;justify-content:space-between;align-items:center"><div><b style="color:#facc15;font-size:12px">✅ Selected Tone:</b><br><span id="selectedToneName" style="color:#fff;font-size:13px">None</span><br><small id="selectedToneInfo" style="color:#a78bfa;font-size:10px">Will ring on nurse response</small></div><button class="btn btnPurple" style="flex:none;min-height:40px;padding:8px 14px" onclick="previewSelectedTone()">▶️ Play Selected Tone</button></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><div><b style="color:#facc15;font-size:12px">✅ Selected:</b><br><span id="selectedToneName" style="color:#fff;font-size:13px">None</span><br><small id="selectedToneInfo" style="color:#a78bfa;font-size:10px">Will ring</small></div><button class="btn btnPurple" style="flex:none;min-height:40px;padding:8px 14px" onclick="previewSelectedTone()">▶️ Play</button></div>
 <audio id="tonePreviewPlayer" controls style="width:100%;margin-top:10px;display:none"></audio>
 </div>
-
+<div style="margin-top:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:10px">
+<label style="display:flex;gap:8px;align-items:center;font-size:12px;font-weight:700"><input type="checkbox" id="smsEnabled" checked> 💬 Also send SMS (works even if phone silent / data off) — FAST!</label>
+<small style="font-size:10px;color:#a78bfa">When nurse responds, you get SMS too: "Nurse accepted your booking..." — Works with Hubtel SMS Ghana. Saves in smsLogs with Photo Name Phone Email + Time</small>
+</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
-<button class="btn btnYellow" onclick="saveTone()">💾 Save Tone — Photo Name Phone Email + Time Saved</button>
-<button class="btn btnGreen" onclick="testAlert()">🧪 Test — Ring Now (Accept)</button>
+<button class="btn btnYellow" onclick="saveTone()">💾 Save Tone + SMS Setting</button>
+<button class="btn btnGreen" onclick="testAlert()">🧪 Test Ring + SMS</button>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-<button class="btn btnBlue" onclick="enableNotifications()">🔔 Enable Notifications + Vibration</button>
-<button class="btn btnGray" onclick="clearTone()">🗑️ Clear Custom Tone</button>
+<button class="btn btnBlue" onclick="enableNotifications()">🔔 Enable Notifications</button>
+<button class="btn btnGray" onclick="clearTone()">🗑️ Clear</button>
 </div>
-<div id="toneStatus" style="margin-top:10px;font-size:11px;color:#a78bfa">No custom tone saved yet — Select preset or upload song from phone — Then Save</div>
+<div id="toneStatus" style="margin-top:10px;font-size:11px;color:#a78bfa">No tone saved yet — Select and Save</div>
 </div>
 </div>
-
 <div id="alertsList" style="display:grid;gap:16px"></div>
 <div id="emptyAlerts" class="card" style="display:none;text-align:center;padding:28px;background:rgba(28,18,56,.6)">
-<div style="font-size:48px">🔔</div><b style="font-size:14px">No nurse response yet</b><br><small style="color:#a78bfa;font-size:11px;line-height:1.6">When nurse taps Accept ✅ or Reject ❌, your selected tone will RING here!<br><b style="color:#facc15">🎵 Selected Tone:</b> <span id="emptyToneName">Default Beep</span><br>Make sure Notifications + Sound are enabled + Phone not on silent</small><br><br><a href="book-nurse.html" class="btn btnYellow" style="max-width:220px;margin:10px auto">➕ Book Nurse Now</a>
+<div style="font-size:48px">🔔</div><b style="font-size:14px">No nurse response yet</b><br><small style="color:#a78bfa;font-size:11px">When nurse taps Accept/Reject, your selected tone will RING + SMS!<br><b style="color:#facc15">🎵 Tone:</b> <span id="emptyToneName">Default Beep</span></small><br><br><a href="book-nurse.html" class="btn btnYellow" style="max-width:220px;margin:10px auto">➕ Book Nurse Now</a>
 </div>
 </div>
-<div class="bottom-tabs">
-<div class="btab" onclick="location.href='client-dashboard.html'">📅 Dashboard</div>
-<div class="btab" onclick="location.href='book-nurse.html'">➕ Book Nurse</div>
-<div class="btab active">🔔 Alerts + Tone</div>
-</div>
-
-<!-- Hidden audio players for ringing -->
+<div class="bottom-tabs"><div class="btab" onclick="location.href='client-dashboard.html'">📅 Dashboard</div><div class="btab" onclick="location.href='book-nurse.html'">➕ Book</div><div class="btab active">🔔 Alerts + Tone + SMS</div></div>
 <audio id="customTonePlayer" preload="auto" style="display:none"></audio>
-<audio id="fallbackPlayer" preload="auto" style="display:none"></audio>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -107,301 +88,100 @@ const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=get
 let allAlerts=[],clientPhone=null,clientName=null,clientEmail=null,clientPhoto=null,previousStatuses={};
 let selectedTone={type:'preset',id:'default_beep',name:'Default Beep — Ding Ding',url:'',base64:''};
 
-// CLIENT INFO
+// SMS CONFIG — EDIT HERE — Hubtel Ghana
+const SMS_CONFIG={
+  enabled:true,
+  useCloudFunction:true, // true = secure via Cloud Function (recommended)
+  cloudFunctionUrl:'https://us-central1-web-care-618e8.cloudfunctions.net/sendSMS', // Change to your URL
+  senderId:'LOVECARE'
+};
+async function sendSMS(toPhone,message,bookingData){
+  if(!SMS_CONFIG.enabled) return;
+  if(!document.getElementById('smsEnabled')?.checked) { console.log('SMS disabled by user'); return; }
+  let phone=toPhone.replace(/[^0-9+]/g,''); if(phone.startsWith('0')) phone='+233'+phone.slice(1); if(!phone.startsWith('+')) phone='+'+phone;
+  try{
+    if(SMS_CONFIG.useCloudFunction){
+      const res=await fetch(SMS_CONFIG.cloudFunctionUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:phone,message,clientName,clientPhone,clientPhotoUrl:clientPhoto,clientEmail,bookingId:bookingData?.bookingId||'',nurseName:bookingData?.nurseName||'',time:Date.now(),timeStr:new Date().toLocaleString('en-GH')})});
+      console.log('SMS sent via Cloud Function',await res.json());
+    }
+  }catch(e){ console.error('SMS failed',e); }
+}
+
 function getClientInfo(){
   clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'+233502957280';
   clientName=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'ASABERE PETER';
   clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'lovecareglobal@gmail.com';
-  clientPhoto=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||'';
+  clientPhoto=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||'';
   document.getElementById('clientNameTop').textContent=clientName;
   document.getElementById('clientPhoneTop').textContent=clientPhone;
   document.getElementById('clientEmailTop').textContent=clientEmail;
   const av=document.getElementById('clientAvatarTop');const topAv=document.getElementById('topClientAvatar');
   if(clientPhoto){av.src=clientPhoto;topAv.src=clientPhoto;topAv.style.display='block';}else{av.src='https://ui-avatars.com/api/?name='+encodeURIComponent(clientName)+'&background=facc15&color=000';}
-  loadSavedTone();
-  return {clientPhone,clientName,clientEmail,clientPhoto};
+  loadSavedTone(); return {clientPhone,clientName,clientEmail,clientPhoto};
 }
 async function ensureAuth(){return new Promise(res=>{const unsub=onAuthStateChanged(auth,async u=>{unsub();if(u)res(u);else{try{const c=await signInAnonymously(auth);res(c.user);}catch{res(null);}}});setTimeout(()=>res(null),2000);});}
-
-// TONE LOGIC — PRESET SOUNDS USING WEB AUDIO
-function playPresetTone(presetId){
+function playPresetTone(id){
   try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
-    if(presetId==='default_beep'){o.frequency.value=900;g.gain.value=.15;o.start();setTimeout(()=>{o.frequency.value=1200;},150);setTimeout(()=>{o.stop();ctx.close();},500);}
-    else if(presetId==='success_melody'){o.frequency.value=523;g.gain.value=.15;o.start();setTimeout(()=>{o.frequency.value=659;},200);setTimeout(()=>{o.frequency.value=784;},400);setTimeout(()=>{o.stop();ctx.close();},800);}
-    else if(presetId==='urgent_alarm'){o.frequency.value=800;g.gain.value=.2;o.type='sawtooth';o.start();let c=0;const int=setInterval(()=>{o.frequency.value=c%2?800:1200;c++;if(c>8){clearInterval(int);o.stop();ctx.close();}},150);}
-    else if(presetId==='gentle_chime'){o.frequency.value=1200;g.gain.value=.1;o.type='sine';o.start();g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+1.2);setTimeout(()=>{o.stop();ctx.close();},1200);}
-    else if(presetId==='afrobeat'){o.frequency.value=200;g.gain.value=.18;o.start();setTimeout(()=>{o.frequency.value=300;},100);setTimeout(()=>{o.frequency.value=200;},200);setTimeout(()=>{o.frequency.value=400;},300);setTimeout(()=>{o.stop();ctx.close();},600);}
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
+    if(id==='default_beep'){o.frequency.value=900;g.gain.value=.15;o.start();setTimeout(()=>{o.frequency.value=1200;},150);setTimeout(()=>{o.stop();ctx.close();},500);}
+    else if(id==='success_melody'){o.frequency.value=523;g.gain.value=.15;o.start();setTimeout(()=>{o.frequency.value=659;},200);setTimeout(()=>{o.frequency.value=784;},400);setTimeout(()=>{o.stop();ctx.close();},800);}
+    else if(id==='urgent_alarm'){o.frequency.value=800;g.gain.value=.2;o.type='sawtooth';o.start();let c=0;const int=setInterval(()=>{o.frequency.value=c%2?800:1200;c++;if(c>8){clearInterval(int);o.stop();ctx.close();}},150);}
+    else if(id==='gentle_chime'){o.frequency.value=1200;g.gain.value=.1;o.type='sine';o.start();g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+1.2);setTimeout(()=>{o.stop();ctx.close();},1200);}
+    else if(id==='afrobeat'){o.frequency.value=200;g.gain.value=.18;o.start();setTimeout(()=>{o.frequency.value=300;},100);setTimeout(()=>{o.frequency.value=200;},200);setTimeout(()=>{o.frequency.value=400;},300);setTimeout(()=>{o.stop();ctx.close();},600);}
     else {o.frequency.value=900;g.gain.value=.13;o.start();setTimeout(()=>{o.stop();ctx.close();},600);}
-  }catch(e){console.log(e);}
+  }catch(e){}
 }
-
-window.selectPreset=function(id,name){
-  selectedTone={type:'preset',id,name,url:'',base64:''};
-  document.querySelectorAll('.toneOption').forEach(el=>el.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
-  document.getElementById('selectedToneCard').style.display='block';
-  document.getElementById('selectedToneName').textContent=name;
-  document.getElementById('selectedToneInfo').textContent='Preset tone — Will ring when nurse accepts/rejects — Tap Save to save with photo name phone email + time';
-  document.getElementById('tonePreviewPlayer').style.display='none';
-  playPresetTone(id);
-}
-
+window.selectPreset=function(id,name){ selectedTone={type:'preset',id,name,url:'',base64:''}; document.querySelectorAll('.toneOption').forEach(el=>el.classList.remove('selected')); event.currentTarget.classList.add('selected'); document.getElementById('selectedToneCard').style.display='block'; document.getElementById('selectedToneName').textContent=name; document.getElementById('selectedToneInfo').textContent='Preset — Will ring + SMS when nurse responds'; document.getElementById('tonePreviewPlayer').style.display='none'; playPresetTone(id); }
 window.previewTone=function(id){ playPresetTone(id); }
-
 window.handleCustomTone=function(files){
-  if(!files||!files.length) return;
-  const file=files[0];
-  if(file.size>10*1024*1024){ alert('❌ File too big — Max 10MB — Choose smaller song/tone'); return; }
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const base64=e.target.result;
-    selectedTone={type:'custom',id:'custom_'+Date.now(),name:file.name,url:base64,base64:base64,size:file.size};
-    document.getElementById('selectedToneCard').style.display='block';
-    document.getElementById('selectedToneName').textContent='🎵 '+file.name+' ('+(file.size/1024/1024).toFixed(2)+' MB)';
-    document.getElementById('selectedToneInfo').textContent='Custom song from your phone — Will ring when nurse responds — Tap Save';
-    const player=document.getElementById('tonePreviewPlayer');
-    player.src=base64;
-    player.style.display='block';
-    player.play().catch(()=>{});
-    document.querySelectorAll('.toneOption').forEach(el=>el.classList.remove('selected'));
-    document.getElementById('toneStatus').textContent='✅ Custom song loaded: '+file.name+' — Tap Save to save with client photo name phone email + time';
-  };
-  reader.readAsDataURL(file);
+  if(!files||!files.length) return; const file=files[0]; if(file.size>10*1024*1024){ alert('Max 10MB'); return; }
+  const reader=new FileReader(); reader.onload=e=>{ const base64=e.target.result; selectedTone={type:'custom',id:'custom_'+Date.now(),name:file.name,url:base64,base64:base64,size:file.size}; document.getElementById('selectedToneCard').style.display='block'; document.getElementById('selectedToneName').textContent='🎵 '+file.name+' ('+(file.size/1024/1024).toFixed(2)+' MB)'; document.getElementById('selectedToneInfo').textContent='Custom song — Will ring + SMS when nurse responds'; const player=document.getElementById('tonePreviewPlayer'); player.src=base64; player.style.display='block'; player.play().catch(()=>{}); document.querySelectorAll('.toneOption').forEach(el=>el.classList.remove('selected')); }; reader.readAsDataURL(file);
 }
-
-window.previewSelectedTone=function(){
-  if(selectedTone.type==='custom' && selectedTone.url){
-    const player=document.getElementById('tonePreviewPlayer');
-    player.src=selectedTone.url;
-    player.style.display='block';
-    player.play();
-  }else{
-    playPresetTone(selectedTone.id);
-  }
-}
-
+window.previewSelectedTone=function(){ if(selectedTone.type==='custom' && selectedTone.url){ const player=document.getElementById('tonePreviewPlayer'); player.src=selectedTone.url; player.style.display='block'; player.play(); }else{ playPresetTone(selectedTone.id); } }
 window.saveTone=function(){
   try{
-    if(selectedTone.type==='custom'){
-      localStorage.setItem('lcg_custom_tone_base64', selectedTone.base64);
-      localStorage.setItem('lcg_custom_tone_name', selectedTone.name);
-      localStorage.setItem('lcg_custom_tone_type', 'custom');
-      localStorage.setItem('lcg_custom_tone_time', new Date().toLocaleString('en-GH'));
-    }else{
-      localStorage.setItem('lcg_custom_tone_name', selectedTone.name);
-      localStorage.setItem('lcg_custom_tone_id', selectedTone.id);
-      localStorage.setItem('lcg_custom_tone_type', 'preset');
-      localStorage.setItem('lcg_custom_tone_time', new Date().toLocaleString('en-GH'));
-      localStorage.removeItem('lcg_custom_tone_base64');
-    }
-    // Also save client photo name phone email + time
-    localStorage.setItem('clientPhotoUrl', clientPhoto||'');
-    localStorage.setItem('clientName', clientName);
-    localStorage.setItem('clientPhone', clientPhone);
-    localStorage.setItem('clientEmail', clientEmail);
-    document.getElementById('toneStatus').innerHTML=`<span style="color:#22c55e">✅ Tone Saved! ${selectedTone.name}<br>Client: ${clientName} • ${clientPhone} • ${clientEmail} • Photo: ${clientPhoto?'YES':'NO'} • Time: ${new Date().toLocaleString('en-GH')}<br>When nurse accepts/rejects, this tone will RING + VIBRATE + NOTIFICATION!</span>`;
-    document.getElementById('emptyToneName').textContent=selectedTone.name;
-    // Save to Firebase for CEO visibility (optional)
-    get(ref(db,'clients')).then(()=>{}).catch(()=>{});
-    alert(`✅ Tone Saved!\n\n${selectedTone.name}\n\nWhen nurse responds to your booking, this tone will ring on your phone! Make sure sound is ON and notifications enabled.`);
-  }catch(e){
-    if(e.name==='QuotaExceededError'){
-      alert('❌ Song too large for storage — Choose smaller file (<3MB) or use preset tone. Browser storage limited.');
-    }else{
-      alert('Error: '+e.message);
-    }
-  }
+    if(selectedTone.type==='custom'){ localStorage.setItem('lcg_custom_tone_base64', selectedTone.base64); localStorage.setItem('lcg_custom_tone_name', selectedTone.name); localStorage.setItem('lcg_custom_tone_type', 'custom'); }
+    else{ localStorage.setItem('lcg_custom_tone_name', selectedTone.name); localStorage.setItem('lcg_custom_tone_id', selectedTone.id); localStorage.setItem('lcg_custom_tone_type', 'preset'); localStorage.removeItem('lcg_custom_tone_base64'); }
+    localStorage.setItem('lcg_custom_tone_time', new Date().toLocaleString('en-GH')); localStorage.setItem('lcg_sms_enabled', document.getElementById('smsEnabled').checked?'true':'false');
+    document.getElementById('toneStatus').innerHTML=`<span style="color:#22c55e">✅ Saved! ${selectedTone.name} + SMS ${document.getElementById('smsEnabled').checked?'Enabled':'Disabled'}<br>Client: ${clientName} • ${clientPhone} • ${clientEmail} • Time: ${new Date().toLocaleString('en-GH')}</span>`;
+    document.getElementById('emptyToneName').textContent=selectedTone.name; alert(`✅ Saved!\n\n${selectedTone.name}\nSMS: ${document.getElementById('smsEnabled').checked?'ON':'OFF'}\n\nWhen nurse responds, tone RINGS + VIBRATES + NOTIFICATION + SMS!`);
+  }catch(e){ if(e.name==='QuotaExceededError') alert('File too large — Use <3MB or preset'); else alert(e.message); }
 }
-
 function loadSavedTone(){
-  const type=localStorage.getItem('lcg_custom_tone_type');
-  const name=localStorage.getItem('lcg_custom_tone_name');
-  const base64=localStorage.getItem('lcg_custom_tone_base64');
-  const id=localStorage.getItem('lcg_custom_tone_id');
-  const time=localStorage.getItem('lcg_custom_tone_time');
-  if(name){
-    selectedTone={type:type||'preset',id:id||'default_beep',name,url:base64||'',base64:base64||''};
-    document.getElementById('selectedToneCard').style.display='block';
-    document.getElementById('selectedToneName').textContent=name+(type==='custom'?' (Custom Song)':' (Preset)');
-    document.getElementById('selectedToneInfo').textContent='Saved on '+time+' — Will ring on nurse response — Client: '+clientName;
-    document.getElementById('toneStatus').textContent='✅ Saved Tone: '+name+' — Saved at '+time+' — Will ring when nurse accepts/rejects';
-    document.getElementById('emptyToneName').textContent=name;
-    // Highlight preset
-    if(type==='preset'&&id){
-      document.querySelectorAll('.toneOption').forEach(el=>{
-        if(el.textContent.includes(name.split('—')[0].trim())) el.classList.add('selected');
-      });
-    }
+  const type=localStorage.getItem('lcg_custom_tone_type'); const name=localStorage.getItem('lcg_custom_tone_name'); const base64=localStorage.getItem('lcg_custom_tone_base64'); const id=localStorage.getItem('lcg_custom_tone_id'); const time=localStorage.getItem('lcg_custom_tone_time'); const smsEn=localStorage.getItem('lcg_sms_enabled');
+  if(smsEn) document.getElementById('smsEnabled').checked = smsEn==='true';
+  if(name){ selectedTone={type:type||'preset',id:id||'default_beep',name,url:base64||'',base64:base64||''}; document.getElementById('selectedToneCard').style.display='block'; document.getElementById('selectedToneName').textContent=name; document.getElementById('selectedToneInfo').textContent='Saved at '+time; document.getElementById('toneStatus').textContent='✅ Saved: '+name+' at '+time; document.getElementById('emptyToneName').textContent=name; }
+}
+window.clearTone=function(){ if(!confirm('Clear tone?')) return; localStorage.removeItem('lcg_custom_tone_base64'); localStorage.removeItem('lcg_custom_tone_name'); localStorage.removeItem('lcg_custom_tone_id'); localStorage.removeItem('lcg_custom_tone_type'); selectedTone={type:'preset',id:'default_beep',name:'Default Beep — Ding Ding',url:'',base64:''}; document.getElementById('selectedToneCard').style.display='none'; document.getElementById('toneStatus').textContent='Cleared — Default beep'; }
+window.enableNotifications=function(){ if(Notification){ Notification.requestPermission().then(p=>{ if(p==='granted'){ document.getElementById('toneStatus').innerHTML='<span style="color:#22c55e">✅ Notifications Enabled! Tone + Vibration + SMS will work</span>'; if(navigator.vibrate) navigator.vibrate([200,100,200]); new Notification('LOVE CARE GLOBAL',{body:'Tone '+selectedTone.name+' enabled — SMS enabled: '+document.getElementById('smsEnabled').checked}); } }); } }
+window.testAlert=function(){ addAlert({id:'test_'+Date.now(),type:'accepted',time:Date.now(),read:false,bookingId:'TEST-LCG',nurseId:'nurse_test',nurseName:'Ama Serwaa (Test)',nursePhone:'+233244123456',nursePhotoUrl:'https://ui-avatars.com/api/?name=Ama&background=22c55e&color=fff',specialty:'Home Nursing',rating:'4.9',amount:150,currency:'GHS',clientName,clientPhone,clientEmail,clientPhotoUrl:clientPhoto,patientName:'Test Patient',patientLocation:'Accra'}); }
+function ringCustomTone(type,booking){
+  const savedType=localStorage.getItem('lcg_custom_tone_type')||'preset'; const savedId=localStorage.getItem('lcg_custom_tone_id')||'default_beep'; const savedBase64=localStorage.getItem('lcg_custom_tone_base64'); const savedName=localStorage.getItem('lcg_custom_tone_name')||'Default Beep';
+  if(navigator.vibrate){ if(type==='accepted') navigator.vibrate([200,100,200,100,400,100,400]); else navigator.vibrate([300,100,300,100,300]); }
+  if(savedType==='custom' && savedBase64){ try{ const player=document.getElementById('customTonePlayer'); player.src=savedBase64; player.volume=1.0; player.play().catch(()=>playPresetTone(savedId)); }catch(e){ playPresetTone(savedId); } }else{ playPresetTone(savedId); }
+  if(booking && document.getElementById('smsEnabled').checked){
+    const msg = type==='accepted' ? `✅ LOVE CARE GLOBAL: Nurse ${booking.nurseName||'Nurse'} ACCEPTED your booking ${booking.bookingId}! GHS ${booking.amount||0}. Call: ${booking.nursePhone||''}. Tone ${savedName} rang!` : `❌ LOVE CARE GLOBAL: Nurse rejected ${booking.bookingId}. Reason: ${booking.rejectReason||'Not available'}. Book another or increase rate. Tone ${savedName} rang!`;
+    sendSMS(clientPhone, msg, booking);
   }
+  if(Notification && Notification.permission==='granted'){ new Notification(type==='accepted'?'✅ Nurse Accepted!':'❌ Nurse Rejected',{body:`Tone: ${savedName} rang! ${document.getElementById('smsEnabled').checked?'+ SMS sent!':''}`}); }
 }
-
-window.clearTone=function(){
-  if(!confirm('Clear custom tone? Will revert to default beep')) return;
-  localStorage.removeItem('lcg_custom_tone_base64');
-  localStorage.removeItem('lcg_custom_tone_name');
-  localStorage.removeItem('lcg_custom_tone_id');
-  localStorage.removeItem('lcg_custom_tone_type');
-  localStorage.removeItem('lcg_custom_tone_time');
-  selectedTone={type:'preset',id:'default_beep',name:'Default Beep — Ding Ding',url:'',base64:''};
-  document.getElementById('selectedToneCard').style.display='none';
-  document.getElementById('toneStatus').textContent='🗑️ Custom tone cleared — Reverted to default beep';
-  document.getElementById('emptyToneName').textContent='Default Beep';
-  document.querySelectorAll('.toneOption').forEach(el=>el.classList.remove('selected'));
-}
-
-window.enableNotifications=function(){
-  if(Notification){
-    Notification.requestPermission().then(p=>{
-      if(p==='granted'){
-        document.getElementById('toneStatus').innerHTML='<span style="color:#22c55e">✅ Notifications Enabled! + Vibration enabled. Tone will ring + vibrate when nurse responds.</span>';
-        if(navigator.vibrate) navigator.vibrate([200,100,200]);
-        new Notification('LOVE CARE GLOBAL — Tone Enabled',{body:'When nurse accepts/rejects your booking, your selected tone '+selectedTone.name+' will ring!',icon:'icon-transparent-512.png'});
-      }else{
-        document.getElementById('toneStatus').textContent='⚠️ Notification permission denied — Tone will still ring but no popup notification';
-      }
-    });
-  }else{
-    document.getElementById('toneStatus').textContent='Notifications not supported — Tone + vibration will still work';
-  }
-}
-
-window.testAlert=function(){
-  addAlert({id:'test_'+Date.now(),type:'accepted',time:Date.now(),read:false,bookingId:'TEST-LCG-'+Date.now().toString().slice(-5),nurseId:'nurse_test',nurseName:'Ama Serwaa (Test)',nursePhone:'+233244123456',nursePhotoUrl:'https://ui-avatars.com/api/?name=Ama&background=22c55e&color=fff',nurseEmail:'',specialty:'Home Nursing',rating:'4.9',amount:150,currency:'GHS',paystackRef:'TEST-PAY',clientName,clientPhone,clientEmail,clientPhotoUrl:clientPhoto,patientName:'Test Patient',patientPhone:'0244000000',patientLocation:'Test Location, Accra',patientLat:5.6037,patientLng:-0.1870,clientLat:5.6037,clientLng:-0.1870,rejectReason:'',service:'Test Service'});
-}
-
-// RING CUSTOM TONE — WHEN NURSE ACCEPTS/REJECTS
-function ringCustomTone(type){
-  const savedType=localStorage.getItem('lcg_custom_tone_type')||'preset';
-  const savedId=localStorage.getItem('lcg_custom_tone_id')||'default_beep';
-  const savedBase64=localStorage.getItem('lcg_custom_tone_base64');
-  const savedName=localStorage.getItem('lcg_custom_tone_name')||'Default Beep';
-
-  // Vibrate
-  if(navigator.vibrate){
-    if(type==='accepted') navigator.vibrate([200,100,200,100,400,100,400]);
-    else navigator.vibrate([300,100,300,100,300]);
-  }
-
-  // Play custom song if exists
-  if(savedType==='custom' && savedBase64){
-    try{
-      const player=document.getElementById('customTonePlayer');
-      player.src=savedBase64;
-      player.volume=1.0;
-      player.play().then(()=>{
-        console.log('Custom tone ringing: '+savedName);
-      }).catch(e=>{
-        console.log('Autoplay blocked, playing preset beep',e);
-        playPresetTone(savedId);
-      });
-      // Also show notification with sound
-      if(Notification && Notification.permission==='granted'){
-        new Notification(type==='accepted'?'✅ Nurse Accepted Your Booking!':'❌ Nurse Rejected',{body:`Nurse responded! Tone: ${savedName} — Booking: Client ${clientName} — Tap to view`,icon:'icon-transparent-512.png'});
-      }
-      return;
-    }catch(e){
-      console.log(e);
-    }
-  }
-  // Play preset tone
-  playPresetTone(savedId);
-  if(Notification && Notification.permission==='granted'){
-    new Notification(type==='accepted'?'✅ Nurse Accepted!':'❌ Nurse Rejected',{body:`Nurse ${type==='accepted'?'accepted':'rejected'} your booking — Tone: ${savedName}`,icon:'icon-transparent-512.png'});
-  }
-}
-
-async function fetchNurseFull(nurseId, booking){
-  let nurseData = {nurseId, nurseName: booking.nurseName||'Nurse', nursePhone: booking.nursePhone||'', nursePhotoUrl: booking.nursePhotoUrl||booking.nursePhoto||'', nurseEmail: '', specialty: booking.service||'Home Nursing', rating: '4.9'};
-  try{
-    if(nurseId){
-      const snap = await get(ref(db, 'nurses/'+nurseId));
-      if(snap.exists()){
-        const v=snap.val();
-        nurseData.nursePhotoUrl = v.photoUrl||v.photoURL||v.photo||v.avatar||nurseData.nursePhotoUrl;
-        nurseData.nursePhone = v.phone||v.phoneNumber||v.nursePhone||nurseData.nursePhone;
-        nurseData.nurseEmail = v.email||'';
-        nurseData.nurseName = v.fullName||v.name||nurseData.nurseName;
-        nurseData.specialty = v.specialty||v.serviceType||nurseData.specialty;
-        nurseData.rating = v.rating||v.avgRating||'4.9';
-      }
-    }
-  }catch(e){}
-  return nurseData;
-}
-
-function addAlert(a){
-  if(allAlerts.find(x=>x.id===a.id))return;
-  allAlerts.unshift(a);
-  try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){}
-  // RING CUSTOM TONE FROM PHONE
-  ringCustomTone(a.type);
-  renderAlerts();
-}
-
+async function fetchNurseFull(nurseId, booking){ let d={nurseId, nurseName: booking.nurseName||'Nurse', nursePhone: booking.nursePhone||'', nursePhotoUrl: booking.nursePhotoUrl||'', specialty: booking.service||'Home Nursing', rating:'4.9'}; try{ if(nurseId){ const snap=await get(ref(db,'nurses/'+nurseId)); if(snap.exists()){ const v=snap.val(); d.nursePhotoUrl=v.photoUrl||v.photo||d.nursePhotoUrl; d.nursePhone=v.phone||d.nursePhone; d.nurseName=v.fullName||d.nurseName; } } }catch(e){} return d; }
+function addAlert(a){ if(allAlerts.find(x=>x.id===a.id))return; allAlerts.unshift(a); try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){} ringCustomTone(a.type,a); renderAlerts(); }
 function renderAlerts(){
-  const list=document.getElementById('alertsList');const countInfo=document.getElementById('countInfo');const empty=document.getElementById('emptyAlerts');const unread=allAlerts.filter(a=>!a.read).length;
-  const savedName=localStorage.getItem('lcg_custom_tone_name')||'Default Beep';
-  countInfo.textContent=`${allAlerts.length} alerts — ${unread} NEW — Client: ${clientName} • ${clientPhone} • Tone: ${savedName} • Real-time — Nurse photo + phone + custom tone rings`;
+  const list=document.getElementById('alertsList');const countInfo=document.getElementById('countInfo');const empty=document.getElementById('emptyAlerts');const savedName=localStorage.getItem('lcg_custom_tone_name')||'Default Beep';
+  const unread=allAlerts.filter(a=>!a.read).length; countInfo.textContent=`${allAlerts.length} alerts — ${unread} NEW — Tone: ${savedName} — SMS: ${document.getElementById('smsEnabled').checked?'ON':'OFF'}`;
   if(!allAlerts.length){list.innerHTML='';empty.style.display='block';return;}empty.style.display='none';
   list.innerHTML=allAlerts.map(a=>{
     const timeAgo=(()=>{const d=Date.now()-(a.time||Date.now());const m=Math.floor(d/60000);if(m<1)return 'Just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';})();
-    const isAccepted=a.type==='accepted';
-    const cardClass=isAccepted?'acceptedCard':'rejectedCard';
-    const destLat=a.patientLat||a.clientLat||5.6037;const destLng=a.patientLng||a.clientLng||-0.1870;
-    const navUrl=`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=driving`;
-    const nursePhoneClean=(a.nursePhone||'').replace(/[^0-9+]/g,'');
-    const nursePhoto = a.nursePhotoUrl||'https://ui-avatars.com/api/?name='+encodeURIComponent(a.nurseName||'Nurse')+'&background=22c55e&color=fff';
+    const isAccepted=a.type==='accepted';const cardClass=isAccepted?'acceptedCard':'rejectedCard';const destLat=a.patientLat||a.clientLat||5.6037;const destLng=a.patientLng||a.clientLng||-0.1870;
+    const navUrl=`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=driving`;const nursePhoneClean=(a.nursePhone||'').replace(/[^0-9+]/g,'');const nursePhoto=a.nursePhotoUrl||'https://ui-avatars.com/api/?name='+encodeURIComponent(a.nurseName||'Nurse')+'&background=22c55e&color=fff';
     if(isAccepted){
-      return `<div class="card ${cardClass}">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="display:flex;gap:12px;align-items:center"><div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;font-size:28px">✅</div><div><b style="font-size:16px;color:#86efac">NURSE ACCEPTED! Your Tone Rang! 🎵 ${savedName}</b><br><b style="font-size:13px;color:#fff">Your nurse is on the way!</b><br><small style="color:#a78bfa;font-size:10px">${timeAgo} • ${new Date(a.time).toLocaleString('en-GH')} • Booking: ${a.bookingId} • Tone: ${savedName}</small></div></div><span class="badge badge-new">ACCEPTED</span>
-        </div>
-        <div style="margin-top:16px;background:linear-gradient(135deg,rgba(14,10,28,.8),rgba(16,101,57,.2));border:2px solid rgba(34,197,94,.3);border-radius:18px;padding:16px;display:flex;gap:16px;align-items:center">
-          <img src="${nursePhoto}" class="nurseBigAvatar" onerror="this.src='https://ui-avatars.com/api/?name=Nurse&background=22c55e&color=fff'">
-          <div style="flex:1">
-            <b style="font-size:18px;color:#fff">👩‍⚕️ ${a.nurseName||'Nurse'}</b><br>
-            <small style="font-size:12px;color:#22c55e;font-weight:800">📞 ${a.nursePhone||'No phone yet'}</small><br>
-            <small style="font-size:11px;color:#a78bfa">⭐ ${a.rating||'4.9'} • 🩺 ${a.specialty||a.service||'Home Nursing'} • 🎵 Tone: ${savedName} rang!</small><br>
-            <small style="font-size:10px;color:#6b7280">${a.nurseEmail||''} • ID: ${a.nurseId||''}</small>
-          </div>
-        </div>
-        <div style="margin-top:12px;background:rgba(14,10,28,.7);border-radius:12px;padding:12px;font-size:11px;color:#c4b5fd;line-height:1.7">
-          <b style="color:#22c55e">🎉 Congratulations ${a.clientName||clientName}!</b> Your selected tone <b style="color:#facc15">🎵 ${savedName}</b> rang when <b style="color:#fff">${a.nurseName}</b> accepted!<br>
-          <b style="color:#fff">📸 Nurse Photo:</b> Above ☝️<br>
-          <b style="color:#fff">📞 Nurse Phone:</b> <a href="tel:${nursePhoneClean}" style="color:#22c55e;font-weight:800">${a.nursePhone||''}</a><br>
-          <b style="color:#fff">🏥 Patient:</b> ${a.patientName||'N/A'} • 📍 ${a.patientLocation||''}<br>
-          <b style="color:#a78bfa">👤 Client: ${a.clientName} • ${a.clientPhone} • ${a.clientEmail} • Photo: ${a.clientPhotoUrl?'YES':'NO'} • Time: ${new Date(a.time).toLocaleString('en-GH')}</b>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
-          <a href="tel:${nursePhoneClean}" class="btn btnGreen" style="font-size:14px">📞 CALL NURSE</a>
-          <a href="https://wa.me/${nursePhoneClean.replace('+','')}?text=Hello%20${encodeURIComponent(a.nurseName||'Nurse')}%20you%20accepted%20my%20booking%20${encodeURIComponent(a.bookingId)}" target="_blank" class="btn btnWhats" style="font-size:14px">💬 WhatsApp Nurse</a>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
-          <a href="${navUrl}" target="_blank" class="btn btnBlue">🧭 Auto Navigation — Patient Location</a>
-          <button class="btn btnPurple" onclick="previewSelectedTone()">🎵 Play My Tone Again — ${savedName}</button>
-        </div>
-      </div>`;
-    } else {
-      return `<div class="card ${cardClass}">
-        <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
-          <div style="display:flex;gap:12px;align-items:center"><div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#ef4444,#dc2626);display:grid;place-items:center;font-size:28px">❌</div><div><b style="font-size:15px;color:#fca5a5">REJECTED — Tone Rang! 🎵 ${savedName}</b><br><small style="color:#a78bfa;font-size:11px">${timeAgo} • Reason: ${a.rejectReason||'Not available'} • Tone: ${savedName} rang!</small><br><small style="color:#6b7280">Booking: ${a.bookingId} • Patient: ${a.patientName||''}</small></div></div><span class="badge" style="background:#ef4444;color:white">REJECTED</span>
-        </div>
-        <div style="margin-top:12px;background:rgba(14,10,28,.7);border-radius:12px;padding:10px;font-size:11px;color:#c4b5fd;line-height:1.6">
-          😔 Sorry ${a.clientName||clientName}! Your tone <b style="color:#facc15">${savedName}</b> rang when nurse rejected.<br>
-          <b style="color:#f59e0b">💡 Increase payment rate — Higher rate attracts nurses fast!</b>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-          <a href="book-nurse.html" class="btn btnYellow">➕ Book Another Nurse</a>
-          <a href="book-nurse.html?increaseRate=1&bookingId=${a.bookingId}" class="btn btnOrange">💰 Increase Payment Rate</a>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
-          <a href="refund-query.html" class="btn btnGray">📝 Refund Query</a>
-          <button class="btn btnPurple" onclick="previewSelectedTone()">🎵 Play Tone Again</button>
-          <button onclick="markRead('${a.id}')" class="btn btnGray">✅ Read</button>
-        </div>
-      </div>`;
+      return `<div class="card ${cardClass}"><div style="display:flex;justify-content:space-between"><div style="display:flex;gap:12px;align-items:center"><div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;font-size:28px">✅</div><div><b style="font-size:16px;color:#86efac">NURSE ACCEPTED! Tone + SMS! 🎵📱 ${savedName}</b><br><b style="font-size:13px;color:#fff">Your nurse is on the way!</b><br><small style="color:#a78bfa;font-size:10px">${timeAgo} • ${new Date(a.time).toLocaleString('en-GH')} • Booking: ${a.bookingId} • Tone: ${savedName} + SMS</small></div></div><span class="badge badge-new">ACCEPTED</span></div>
+        <div style="margin-top:16px;background:linear-gradient(135deg,rgba(14,10,28,.8),rgba(16,101,57,.2));border:2px solid rgba(34,197,94,.3);border-radius:18px;padding:16px;display:flex;gap:16px;align-items:center"><img src="${nursePhoto}" class="nurseBigAvatar"><div style="flex:1"><b style="font-size:18px;color:#fff">👩‍⚕️ ${a.nurseName||'Nurse'}</b><br><small style="font-size:12px;color:#22c55e">📞 ${a.nursePhone||''}</small><br><small style="font-size:11px;color:#a78bfa">⭐ ${a.rating||'4.9'} • 🩺 ${a.specialty||''} • 🎵 ${savedName} rang! + SMS sent!</small></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px"><a href="tel:${nursePhoneClean}" class="btn btnGreen">📞 CALL NURSE</a><a href="https://wa.me/${nursePhoneClean.replace('+','')}?text=Hello%20${encodeURIComponent(a.nurseName||'Nurse')}" target="_blank" class="btn btnWhats">💬 WhatsApp</a></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><a href="${navUrl}" target="_blank" class="btn btnBlue">🧭 Navigation</a><button class="btn btnPurple" onclick="previewSelectedTone()">🎵 Play Tone Again</button></div></div>`;
+    }else{
+      return `<div class="card ${cardClass}"><div style="display:flex;gap:12px;align-items:center"><div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#ef4444,#dc2626);display:grid;place-items:center;font-size:28px">❌</div><div><b style="font-size:15px;color:#fca5a5">REJECTED — Tone + SMS! ${savedName}</b><br><small style="color:#a78bfa;font-size:11px">${timeAgo} • ${a.rejectReason||'Not available'} • Tone + SMS</small></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px"><a href="book-nurse.html" class="btn btnYellow">➕ Book Another</a><a href="book-nurse.html?increaseRate=1" class="btn btnOrange">💰 Increase Rate</a></div></div>`;
     }
   }).join('');
 }
@@ -409,56 +189,19 @@ window.loadAlerts=async function(){
   await ensureAuth();const {clientPhone,clientName,clientEmail,clientPhoto}=getClientInfo();
   try{const saved=JSON.parse(localStorage.getItem('lcg_alerts')||'[]');if(saved.length){allAlerts=saved;renderAlerts();}}catch(e){}
   try{
-    const snap=await get(ref(db,'bookings'));const snap2=await get(ref(db,'allBookings')).catch(()=>null);
-    let allBookings={};if(snap.exists())Object.assign(allBookings,snap.val());if(snap2&&snap2.exists())Object.assign(allBookings,snap2.val());
-    for(const id of Object.keys(allBookings)){
-      const b=allBookings[id];
-      const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,'');const myPhone=clientPhone.replace(/[^0-9]/g,'');
-      const phoneMatch=bPhone&&myPhone&&(bPhone===myPhone||bPhone.slice(-9)===myPhone.slice(-9));
-      const emailMatch=b.clientEmail&&clientEmail&&b.clientEmail.toLowerCase()===clientEmail.toLowerCase();
-      const nameMatch=b.clientName&&clientName&&b.clientName.toLowerCase()===clientName.toLowerCase();
-      if(!phoneMatch&&!emailMatch&&!nameMatch)continue;
-      const status=(b.status||'pending').toLowerCase();const prev=previousStatuses[id];
-      const pLat=b.patientLat||b.patientLatitude||b.mainLat||b.clientLat||null;const pLng=b.patientLng||b.patientLongitude||b.mainLng||b.clientLng||null;
-      const cLat=b.clientLat||null;const cLng=b.clientLng||null;
-      let nurseFull = await fetchNurseFull(b.nurseId||b.selectedNurseId||'', b);
-      const base={bookingId:b.bookingId||id,nurseId:b.nurseId||nurseFull.nurseId||'',nurseName:nurseFull.nurseName||b.nurseName||'Nurse',nursePhone:nurseFull.nursePhone||b.nursePhone||'',nursePhotoUrl:nurseFull.nursePhotoUrl||b.nursePhotoUrl||'',nurseEmail:nurseFull.nurseEmail||'',specialty:nurseFull.specialty||b.service||'Home Nursing',rating:nurseFull.rating||'4.9',amount:b.amount||b.amountPaidNow||0,currency:b.currency||'GHS',paystackRef:b.paystackRef||'',clientName:b.clientName||clientName,clientPhone:b.clientPhone||b.phone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||b.clientPhoto||clientPhoto,patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||b.patientAddress||'',patientLat:parseFloat(pLat)||null,patientLng:parseFloat(pLng)||null,clientLat:parseFloat(cLat)||null,clientLng:parseFloat(cLng)||null,rejectReason:b.rejectReason||b.rejectionReason||'',service:b.service||''};
-      if(!prev){
-        if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted',type:'accepted',time:b.acceptedAt||b.time||Date.now(),read:false,...base});}
-        else if(status==='rejected'||status==='declined'||status==='cancelled_by_nurse'){addAlert({id:'alert_'+id+'_rejected',type:'rejected',time:b.rejectedAt||b.time||Date.now(),read:false,...base});}
-      }else if(prev!==status){
-        if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted_'+Date.now(),type:'accepted',time:Date.now(),read:false,...base});}
-        if(status==='rejected'||status==='declined'){addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base});}
-      }
+    const snap=await get(ref(db,'bookings'));let allB={};if(snap.exists())Object.assign(allB,snap.val());
+    for(const id of Object.keys(allB)){
+      const b=allB[id];const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,'');const myPhone=clientPhone.replace(/[^0-9]/g,'');const phoneMatch=bPhone&&myPhone&&(bPhone===myPhone||bPhone.slice(-9)===myPhone.slice(-9));const emailMatch=b.clientEmail&&clientEmail&&b.clientEmail.toLowerCase()===clientEmail.toLowerCase();
+      if(!phoneMatch&&!emailMatch)continue;const status=(b.status||'pending').toLowerCase();const prev=previousStatuses[id];let nurseFull=await fetchNurseFull(b.nurseId||'',b);
+      const base={bookingId:b.bookingId||id,nurseId:b.nurseId||'',nurseName:nurseFull.nurseName||b.nurseName||'Nurse',nursePhone:nurseFull.nursePhone||b.nursePhone||'',nursePhotoUrl:nurseFull.nursePhotoUrl||b.nursePhotoUrl||'',specialty:b.service||'Home Nursing',rating:'4.9',amount:b.amount||0,currency:b.currency||'GHS',clientName:b.clientName||clientName,clientPhone:b.clientPhone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||clientPhoto,patientName:b.patientName||'',patientLocation:b.patientLocation||'',patientLat:parseFloat(b.patientLat||b.clientLat)||null,patientLng:parseFloat(b.patientLng||b.clientLng)||null,clientLat:parseFloat(b.clientLat)||null,clientLng:parseFloat(b.clientLng)||null,rejectReason:b.rejectReason||'',service:b.service||''};
+      if(!prev){ if(status==='accepted') addAlert({id:'alert_'+id+'_accepted',type:'accepted',time:b.acceptedAt||b.time||Date.now(),read:false,...base}); else if(status==='rejected') addAlert({id:'alert_'+id+'_rejected',type:'rejected',time:b.rejectedAt||b.time||Date.now(),read:false,...base}); }
+      else if(prev!==status){ if(status==='accepted') addAlert({id:'alert_'+id+'_accepted_'+Date.now(),type:'accepted',time:Date.now(),read:false,...base}); if(status==='rejected') addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base}); }
       previousStatuses[id]=status;
     }
-  }catch(e){console.log(e.message);}
-  renderAlerts();
+  }catch(e){} renderAlerts();
 }
-function startRealtime(){
-  const {clientPhone,clientEmail}=getClientInfo();
-  onValue(ref(db,'bookings'),async snap=>{
-    if(!snap.exists())return;
-    let hasNew=false;
-    for(const child of snap.val() ? Object.entries(snap.val()) : []){
-      const id=child[0]; const b=child[1];
-      const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,'');const myPhone=clientPhone.replace(/[^0-9]/g,'');
-      const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);
-      const emailMatch=b.clientEmail&&clientEmail&&b.clientEmail.toLowerCase()===clientEmail.toLowerCase();
-      if(!phoneMatch&&!emailMatch)continue;
-      const status=(b.status||'pending').toLowerCase();const prev=previousStatuses[id];
-      if(prev&&prev!==status){
-        let nurseFull=await fetchNurseFull(b.nurseId||'',b);
-        const base={bookingId:b.bookingId||id,nurseId:b.nurseId||'',nurseName:nurseFull.nurseName||b.nurseName||'Nurse',nursePhone:nurseFull.nursePhone||b.nursePhone||'',nursePhotoUrl:nurseFull.nursePhotoUrl||b.nursePhotoUrl||'',nurseEmail:nurseFull.nurseEmail||'',specialty:nurseFull.specialty||b.service||'',rating:nurseFull.rating||'4.9',amount:b.amount||0,currency:b.currency||'GHS',clientName:b.clientName||clientName,clientPhone:b.clientPhone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||clientPhoto,patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||'',patientLat:parseFloat(b.patientLat||b.clientLat)||null,patientLng:parseFloat(b.patientLng||b.clientLng)||null,clientLat:b.clientLat||null,clientLng:b.clientLng||null,rejectReason:b.rejectReason||'',service:b.service||''};
-        if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted_'+Date.now(),type:'accepted',time:Date.now(),read:false,...base});hasNew=true;}
-        if(status==='rejected'){addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base});hasNew=true;}
-        previousStatuses[id]=status;
-      }else if(!prev){previousStatuses[id]=status;}
-    }
-    if(hasNew)renderAlerts();
-  });
-}
-window.markRead=function(id){const i=allAlerts.findIndex(a=>a.id===id);if(i>-1){allAlerts[i].read=true;try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){}renderAlerts();}}
-window.addEventListener('DOMContentLoaded',async()=>{await ensureAuth();getClientInfo();if(Notification&&Notification.permission==='default')Notification.requestPermission();loadAlerts();startRealtime();setTimeout(loadAlerts,2000);setInterval(loadAlerts,20000);});
+function startRealtime(){ const {clientPhone,clientEmail}=getClientInfo(); onValue(ref(db,'bookings'),async snap=>{ if(!snap.exists())return; for(const id of Object.keys(snap.val()||{})){ const b=snap.val()[id]; const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,'');const myPhone=clientPhone.replace(/[^0-9]/g,'');const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);const emailMatch=b.clientEmail&&clientEmail&&b.clientEmail.toLowerCase()===clientEmail.toLowerCase(); if(!phoneMatch&&!emailMatch)continue; const status=(b.status||'pending').toLowerCase();const prev=previousStatuses[id]; if(prev&&prev!==status){ let nurseFull=await fetchNurseFull(b.nurseId||'',b); const base={bookingId:b.bookingId||id,nurseId:b.nurseId||'',nurseName:nurseFull.nurseName||b.nurseName||'Nurse',nursePhone:nurseFull.nursePhone||b.nursePhone||'',nursePhotoUrl:nurseFull.nursePhotoUrl||b.nursePhotoUrl||'',specialty:b.service||'',rating:'4.9',amount:b.amount||0,currency:b.currency||'GHS',clientName:b.clientName||clientName,clientPhone:b.clientPhone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||clientPhoto,patientName:b.patientName||'',patientLocation:b.patientLocation||'',patientLat:parseFloat(b.patientLat||b.clientLat)||null,patientLng:parseFloat(b.patientLng||b.clientLng)||null,clientLat:b.clientLat||null,clientLng:b.clientLng||null,rejectReason:b.rejectReason||'',service:b.service||''}; if(status==='accepted') addAlert({id:'alert_'+id+'_accepted_'+Date.now(),type:'accepted',time:Date.now(),read:false,...base}); if(status==='rejected') addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base}); previousStatuses[id]=status; } } }); }
+window.markRead=function(id){ const i=allAlerts.findIndex(a=>a.id===id); if(i>-1){ allAlerts[i].read=true; try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){} renderAlerts(); } }
+window.addEventListener('DOMContentLoaded',async()=>{ await ensureAuth(); getClientInfo(); if(Notification&&Notification.permission==='default') Notification.requestPermission(); loadAlerts(); startRealtime(); setTimeout(loadAlerts,2000); });
 </script>
 </body></html>
