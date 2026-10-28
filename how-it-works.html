@@ -1,128 +1,313 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>How It Works - LOVE CARE GLOBAL HOME NURSING</title>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How It Works — LOVE CARE GLOBAL HOME NURSING</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.left{display:flex;align-items:center;gap:12px}
-.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
-.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}
-.hamburger span+span{margin-top:4px}
-.logoBox{display:flex;align-items:center;gap:10px}
-.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
-.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
-.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
-#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
-#overlay.show{display:block}
-#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
-#drawer.open{transform:translateX(0)}
-.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
-.item.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;line-height:1.7}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.15);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
 .wrap{max-width:900px;margin:0 auto;padding:20px 14px 80px}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:18px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:14px}
-h1{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:24px;color:#f3e8ff;margin-bottom:6px}
-h2{font-size:16px;color:#f3e8ff;margin:18px 0 8px}
-p,li{font-size:13px;color:#c4b5fd;line-height:1.7}
-ul,ol{margin:8px 0 12px 18px}
-.badge{display:inline-flex;background:rgba(168,85,247,.18);color:#d8b4fe;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid rgba(168,85,247,.18)}
-.step{border:1px solid rgba(168,85,247,.18);border-radius:16px;padding:14px;margin:10px 0;background:rgba(14,10,28,.6);display:flex;gap:12px}
-.stepNum{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;display:grid;place-items:center;flex-shrink:0}
-</style>
-</head>
-<body>
-<div class="bg"></div>
+.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:22px;margin:14px 0}
+h1{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:26px;color:#f3e8ff}
+h2{font-family:Plus Jakarta Sans,sans-serif;font-weight:700;font-size:18px;color:#d8b4fe;margin:18px 0 10px}
+h3{font-size:14px;color:#facc15;margin:12px 0 6px}
+p,li{font-size:13px;color:#c4b5fd}
+ul,ol{margin:8px 0 8px 20px}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900}
+.green{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25)}
+.yellow{background:rgba(251,191,36,.12);color:#fde68a;border:1px solid rgba(251,191,36,.25)}
+.purple{background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.2)}
+.step{border-left:3px solid rgba(168,85,247,.3);padding-left:14px;margin:12px 0}
+.step.green{border-left-color:#22c55e}
+.step.yellow{border-left-color:#fbbf24}
+.step.blue{border-left-color:#4285F4}
+</style></head><body>
 <div class="topbar">
-<div class="left">
-<button class="hamburger" onclick="openD()"><span></span><span></span><span></span></button>
-<div class="logoBox"><img src="icon-transparent-512.png" alt="Logo" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING</div></div>
-</div>
-<a href="sos.html" class="sosBtn">SOS</a>
-</div>
-<div id="overlay" onclick="closeD()"></div>
-<div id="drawer">
-<div style="padding:18px;border-bottom:1px solid rgba(168,85,247,.10);display:flex;gap:12px;align-items:center">
-<img src="icon-transparent-512.png" alt="Logo" style="width:44px;height:44px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:12px;color:#f3e8ff">LOVE CARE GLOBAL<br>HOME NURSING</b></div>
-</div>
-<div style="padding:12px;display:grid;gap:8px;flex:1;overflow:auto">
-<a class="item" href="index.html">Home</a>
-<a class="item" href="about.html">About</a>
-<a class="item" href="services.html">Services</a>
-<a class="item active" href="how-it-works.html">How It Works</a>
-<a class="item" href="contact.html">Contact</a>
-<a class="item" href="consent-form.html">Consent Form</a>
-<a class="item" href="privacy.html">Privacy</a>
-<a class="item" href="terms.html">Terms</a>
-<a class="item" href="refund.html">Refund</a>
-<a class="item" href="delete-account.html" class="item delete">🗑️ Delete Account</a>
-<a class="item" href="sos.html" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;justify-content:center">SOS</a>
-</div>
-<div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
+<div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:13px;color:#f3e8ff">LOVE CARE GLOBAL</b><br><small style="color:#a78bfa;font-size:10px">How It Works — Updated Oct 28, 2026 — ONLINE Nurses Only</small></div></div>
+<div style="display:flex;gap:6px"><a href="book-nurse.html" style="padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;text-decoration:none;font-weight:800;font-size:11px">🟢 Book ONLINE Nurse</a><a href="./index.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.12);color:#e9d5ff;text-decoration:none;font-weight:800;font-size:11px">Home</a></div>
 </div>
 
 <div class="wrap">
-<span class="badge">How It Works - 7 Simple Steps</span>
-<h1>How It Works</h1>
-<p style="color:#a78bfa;font-size:12px;margin-bottom:14px">Book a verified nurse in 5 minutes. From search to care at your doorstep.</p>
-
-<div class="card" style="background:linear-gradient(90deg,rgba(76,29,149,.25),rgba(168,85,247,.12))">
-<b style="color:#f3e8ff">For Clients (Patients & Families)</b>
-<p style="font-size:11px;color:#a78bfa;margin-top:4px">No app needed - works on phone browser at peter204.github.io</p>
-</div>
-
-<div class="step"><div class="stepNum">1</div><div><b style="color:#f3e8ff">Search Nearby Nurses on Map</b><br><p>Go to <a href="book-nurse-START-END-HOURS.html" style="color:#d8b4fe">Book Nurse</a> page. Click Use My Location. Map shows nurses within 2km, 5km, 10km, 20km, or All Ghana. Each nurse card shows photo, qualification, experience, status (online), distance.</p></div></div>
-
-<div class="step"><div class="stepNum">2</div><div><b style="color:#f3e8ff">Select Nurse & Enter Details</b><br><p>Tap a nurse card to select. Fill: Your Name (auto from login), Phone with country code (+233 for Ghana, +234 Nigeria, +1 USA, etc.) - this phone is sent to nurse, Patient Name, Age, Service Type (general, elderly, post-surgery, baby care, 24h live-in), Country, Start Time & End Time (e.g., 08:00 to 17:00 = 9 hrs/day), Quantity (how many days/weeks/months), Transport cost.</p></div></div>
-
-<div class="step"><div class="stepNum">3</div><div><b style="color:#f3e8ff">Automatic Price Calculation</b><br><p>System calculates: Hourly Rate x Hours Per Day x Quantity + Transport. Example: 50 GHS/hour x 9 hrs/day (08:00-17:00) x 3 days = 1350 GHS + transport. Hourly rate set by CEO at ceo-dashboard.html → Pricing. You see minimum, you can offer above minimum to attract nurse faster. GHS for Ghana, USD for outside.</p></div></div>
-
-<div class="step"><div class="stepNum">4</div><div><b style="color:#f3e8ff">Pay Securely with Paystack</b><br><p>Click Book Selected Nurse → Paystack popup → Pay with Mobile Money, Card, Bank. Currencies: GHS, NGN, ZAR, USD, GBP. On success, system generates unique Booking ID like LCG-20261009-AB12CD. You see success modal with Booking ID and nurse info. Booking ID is your proof of payment.</p></div></div>
-
-<div class="step"><div class="stepNum">5</div><div><b style="color:#f3e8ff">Nurse Receives Job Offer Instantly</b><br><p>Booking saved to 5 places in Firebase Realtime Database (to fix permission_denied, rules now allow auth != null):<br>
-- bookings/{id}<br>
-- nurseBookings/{nurseId}/{id}<br>
-- myJobOffers/{nurseId}/{id} ← nurse sees this<br>
-- jobOffers/{id}<br>
-- clientBookings/{phone}/{id}<br>
-Nurse logs into nurses-dashboard.html → My Job Offers (my-job-offer.html) → Sees your job with Booking ID, your phone with country code, patient details, amount, address, GPS. Nurse can Call Client, Copy ID, Accept Job, View Details.</p></div></div>
-
-<div class="step"><div class="stepNum">6</div><div><b style="color:#f3e8ff">Nurse Accepts & Care Begins</b><br><p>Nurse clicks Accept Job → Status changes to accepted (local + Firebase). Nurse contacts you via phone. You both confirm Start Date/Time. Nurse arrives, provides care as per service booked. For live-in, provide accommodation. Use Consent Form (consent-form.html) before care.</p></div></div>
-
-<div class="step"><div class="stepNum">7</div><div><b style="color:#f3e8ff">Completion, Rating & Support</b><br><p>After service, rate nurse (ratings collection). For issues: Contact page, SOS page (sos.html) for emergencies - CEO notified via sosAlerts. CEO monitors nurses_group_chat (clean chat, no spam, master delete & block manager at CEO Dashboard only). Refund as per refund.html policy.</p></div></div>
-
-<div class="card" style="margin-top:18px">
-<h2>For Nurses</h2>
-<ol>
-<li>Register at nurse registration page → Upload Photo, National ID, Licence, Certificate, CV, Intro Video, GPS, Phone, Email, Qualification, Experience</li>
-<li>Data goes to pendingNurses (RTDB) + nurses (Firestore) → Status pending</li>
-<li>CEO (lovecareglobal@gmail.com) reviews at ceo-dashboard.html → PAGE 1 Pending Registrations → View All Particulars → Approve/Reject</li>
-<li>Once approved, you can login at nurse-login.html (no CEO button) → Auto-login to nurses-dashboard.html, my-job-offer.html, nurse-group-chat.html (no second login)</li>
-<li>Receive job offers in My Job Offers → Accept → Contact client → Provide care → Get paid via payoutRequests → CEO approves payout at CEO Dashboard</li>
-<li>Chat with other nurses & CEO in Nurses Group Chat (nurse-group-chat.html) - clean chat, no inscriptions, CEO can block misbehaving nurses at CEO Dashboard</li>
-</ol>
+<div class="card">
+<h1>📋 How It Works — LOVE CARE GLOBAL HOME NURSING</h1>
+<p style="margin-top:10px">Simple 4-step system: <b>Client books → ONLINE Nurse selected → Nurse accepts → Nurse navigates to PATIENT (not just client) → Care starts</b>. Works for family bookings across cities (Accra client booking for mother in Kumasi).</p>
+<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge green">🟢 ONLY ONLINE Nurses Show</span><span class="badge yellow">💰 Full & 50% Payment</span><span class="badge purple">🎵 Custom Tone + SMS Alerts</span><span class="badge" style="background:rgba(66,133,244,.12);color:#93c5fd;border:1px solid rgba(66,133,244,.25)">🧭 Navigate to PATIENT</span></div>
 </div>
 
 <div class="card">
-<h2>For CEO (lovecareglobal@gmail.com)</h2>
+<h2>👩‍⚕️ FOR NURSES — How to Appear & Get Bookings</h2>
+
+<div class="step green">
+<h3>Step 1: Register & Save Your Details — Name Photo Email Phone + Time</h3>
+<p>Go to <b>nurse-register.html → nurse-login.html → nurses-dashboard.html</b></p>
 <ul>
-<li>Login at ceo-login-FIXED.html (fixed toLowerCase bug, fixed Chinese mojibake, anonymous auth enabled)</li>
-<li>CEO Dashboard has 4 pages: Pending, Approved, Bookings/Payouts, Pricing/Map/Group Chat Master Controls</li>
-<li>PAGE 1: Pending registrations straight from Firebase - Approve/Reject - nurses can't login until approved</li>
-<li>Group Chat Master Controls (moved from chat to CEO Dashboard as you requested): Master Delete (type WIPE) + Block/Unblock Manager showing ALL registered nurses from Firestore + RTDB, search, block reason</li>
-<li>Pricing: Set GHS hourly and USD hourly - clients see daily = hourly x 8, weekly x 40, monthly x 160, 24h daily x 24 etc.</li>
-<li>Firebase Rules: Both Realtime Database and Firestore must allow auth != null + Anonymous enabled - files provided: firebase-rules-COMPLETE-ALL-OLD-PLUS-NEW.json and firestore.rules</li>
+<li>Enter: Full Name, Phone (+233...), Email, Photo URL, Specialty (Elderly Care, ICU, etc.)</li>
+<li>Tap <b>💾 Save Name Photo Email Phone + Time</b> — Saves to <b>Firestore nurses/{uid} + Realtime nurses/{uid} + nursesByPhone + localStorage</b> with time (e.g. Oct 28, 2026 10:30 AM GMT) + your current lat/lng</li>
+<li>Your photo shows as avatar with green dot when online</li>
 </ul>
 </div>
 
+<div class="step green">
+<h3>Step 2: Go ONLINE — This Makes You Visible in book-nurse.html</h3>
+<p><b>CRITICAL — Only ONLINE nurses show for clients!</b> Offline nurses are hidden and won't pop up.</p>
+<ul>
+<li>In <b>nurses-dashboard.html</b>, you see toggle: <b>🟢 Go Online / Offline — Controls Client View</b></li>
+<li>Tap <b>🟢 Go ONLINE Now — Appear for Clients</b></li>
+<li>What happens behind:</li>
+<ul>
+<li>Writes <b>nurses/{uid}</b>: isOnline:true, online:true, status:'online', lastSeen:Date.now(), lastActive, lat, lng, fullName, photoURL, email, phone, specialty</li>
+<li>Writes <b>onlineNurses/{uid}</b>: {isOnline:true, lastSeen, fullName, phone, email, photoURL, lat, lng} — <b>book-nurse.html checks this list!</b></li>
+<li>Writes <b>nursePresence/{uid}</b>: {status:'online', isOnline:true, lastSeen}</li>
+<li>Writes <b>nurseLocations/{uid}</b>: {lat, lng, lastUpdate, nurseId, nurseName, isLive:true} — For blinking green marker on client map</li>
+<li>Updates every 2 minutes automatically to stay ONLINE (within 10-min threshold)</li>
+</ul>
+<li>Badge changes to <b>🟢 ONLINE — Visible to clients</b> + green dot pulsing. Status display: "You now appear in book-nurse.html and book-nurse-50-percent.html!"</li>
+<li>If you close tab, you stay online for 10 mins (threshold logic). To hide instantly, tap <b>🔴 Go OFFLINE — Hide</b> — Removes from onlineNurses, nurseLocations, sets status offline — Clients cannot see you.</li>
+</ul>
 </div>
-<script>
-function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
-function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
-</script>
-</body>
-</html>
+
+<div class="step green">
+<h3>Step 3: Set Custom Tone + SMS — Rings When Client Books You</h3>
+<ul>
+<li>Go to <b>my-job-offer.html or nurse-settings.html</b> — Top card: <b>🎵 NURSE Custom Tone — Select Song From Phone</b></li>
+<li>Presets: New Booking Beep, Urgent Alarm (loud), Cash Cha-Ching, Gentle Bell, Afrobeat Ghana Vibe — Tap ▶️ to preview</li>
+<li>Or <b>Upload Your Own Song From Phone (MP3, M4A, WAV)</b> — File input → Converts to base64 → Saved locally (nurse_tone_base64) + time</li>
+<li>Checkbox: <b>💬 Also send SMS to me (works even if phone silent/data off) — FAST!</b> — Checked = You get SMS: "🔔 NEW BOOKING! Client ASABERE PETER booked you! GHS 150..." + tone rings!</li>
+<li>Tap <b>💾 Save Nurse Tone + SMS</b> — Saves name, type, base64, time, smsEnabled</li>
+<li>Test: <b>🧪 Test Ring + SMS Now</b> — Tone rings + SMS sent to your phone</li>
+<li>Enable Notifications: Tap <b>🔔 Enable Notifications + Vibration</b> — Allows notification + vibration when booked</li>
+</ul>
+</div>
+
+<div class="step green">
+<h3>Step 4: Receive Booking — Tone + Vibration + Notification + SMS</h3>
+<ul>
+<li>Client books you in <b>book-nurse.html</b> (Full Pay) or <b>book-nurse-50-percent.html</b> (Pay 50% now)</li>
+<li>Your <b>my-job-offer.html</b> detects NEW booking ID (prevIds check) → <b>Rings custom tone + Vibrates [300,100,300,100,500] + Notification "🔔 NEW BOOKING! Client Booked You!" + SMS via Hubtel</b> — 4 alerts at once!</li>
+<li>SMS saved in <b>smsLogs</b> with photo name phone email + time for CEO audit</li>
+<li>You see: Client card (who pays) + Patient card (who needs care) — Patient may be different city!</li>
+<li>Cards show: Client Name Phone Email Photo, Patient Name Phone Address Lat/Lng, Total Amount GHS, Payment method</li>
+</ul>
+</div>
+
+<div class="step green">
+<h3>Step 5: Accept & Navigate to PATIENT — Not Just Client</h3>
+<ul>
+<li>Tap <b>✅ Accept + Navigate</b> → Updates status to ACCEPTED in myJobOffers/{yourId}/{bookingId}, bookings/{bookingId}, ceoBookings</li>
+<li>Starts <b>GPS Live Tracking</b>: watchPosition highAccuracy → Shares to nurseLocations/{id}, liveNurseLocations/{bookingId}, ceoBookings nurseLat/nurseLng, lastUpdate every few seconds</li>
+<li>Bottom bar appears: <b>🛰️ GPS LIVE — lat,lng — Getting location...</b> with Stop GPS button</li>
+<li>Auto opens <b>Google Maps navigation</b>: https://www.google.com/maps/dir/?api=1&origin=yourLat,yourLng&destination=patientLat,patientLng&travelmode=driving — Nurse navigates to PATIENT house (critical for family bookings!)</li>
+<li>If patient phone available, tap <b>📞 Call Patient</b> or <b>📞 Call Client</b> (who pays)</li>
+<li>Buttons: 🧭 Navigate to PATIENT, 🗺️ View Map, 💬 WhatsApp, 📞 Call</li>
+<li>Status updates: ACCEPTED → ENROUTE → ARRIVED → INSERVICE → COMPLETED via updateNurseStatus()</li>
+<li>Client in <b>client-alerts.html</b> sees you accepted with your photo phone — His custom tone rings + SMS!</li>
+</ul>
+</div>
+</div>
+
+<div class="card">
+<h2>👤 FOR CLIENTS — How to Book ONLINE Nurse</h2>
+
+<div class="step blue">
+<h3>Step 1: Client Auto-Login — Name Photo Email Phone + Location Captured</h3>
+<ul>
+<li>Login via Google or email → Saves to localStorage clientName, clientEmail, clientPhone, clientPhotoUrl, clientUid</li>
+<li>Open <b>book-nurse.html</b> → Top shows <b>CLIENT — Who pays (Auto-filled)</b> card with your photo, name, phone, email</li>
+<li>Browser asks for location permission → If allowed, captures client lat/lng → Shows <b>✅ Client: lat,lng</b> + fills clientLatInput, clientLngInput, clientLocationDisplay badge</li>
+<li>If denied, drag map to set location manually — Map center = client location</li>
+</ul>
+</div>
+
+<div class="step blue">
+<h3>Step 2: See ONLY ONLINE Nurses — Offline Hidden</h3>
+<ul>
+<li>Map shows <b>Leaflet OSM tiles</b> + Blinking green markers for ONLINE nurses only — Each marker has pulse animation + dot</li>
+<li>Top: <b>🟢 ONLINE NURSES ONLY — Select Nurse — Drag Map to PATIENT House</b></li>
+<li>Buttons: 📍 My Location, 🔍 Search ONLINE Only, Radius Select (5/10/20/50 km), Badge: <b>🟢 X ONLINE nurses within 10km — Only online show</b></li>
+<li><b>Search logic (searchNearbyNurses):</b></li>
+<ul>
+<li>Fetches nurses + onlineNurses + nursePresence + nurseLocations in parallel</li>
+<li>Builds onlineIds Set from onlineNurses and nursePresence where status=online</li>
+<li>For each nurse, checks <b>isNurseOnline(v)</b>: isOnline true OR online true OR status online OR lastSeen/lastActive within 10 mins OR in onlineIds OR has recent nurseLocations lastUpdate</li>
+<li>If OFFLINE → Skip — Don't show! — Hidden, won't pop up for selection</li>
+<li>If ONLINE + within radius (Haversine distance) → Push to list with distance, isOnline:true, lastSeen, specialty</li>
+<li>Clears old markers, adds blinking markers for online nurses only</li>
+<li>If none: Shows 😴 "No ONLINE nurses within X km — All offline — Nurses must go online in nurse-dashboard.html"</li>
+</ul>
+<li>Each card shows: Photo with green dot (online indicator), Name, ⭐ Rating, 📍 distance km, 🟢 ONLINE badge, Last seen time, Specialty, Can be booked now — Custom tone + SMS will ring for nurse</li>
+<li>Tap card → Preview modal: Photo, Bio, Rating, distance, Last seen, 🟢 ONLINE — Can be booked, Buttons: Close, ✅ Continue — ONLINE Nurse</li>
+<li>Select → Shows <b>✅ Selected: 🟢 Nurse Name — ONLINE — Patient lat,lng — Nurse is ONLINE and will get tone + SMS!</b></li>
+<li>Real-time: Refreshes every 15 seconds + Listens to nursePresence, onlineNurses, nurseLocations onValue → If nurse goes online/offline, list updates instantly!</li>
+</ul>
+</div>
+
+<div class="step blue">
+<h3>Step 3: Enter Patient Details — Can Be Different Place!</h3>
+<ul>
+<li><b>CLIENT DETAILS (Payer):</b> Auto-filled from login — Name, Phone, Email, PhotoUrl, lat/lng hidden inputs, location badge</li>
+<li><b>PATIENT DETAILS (Who needs care):</b></li>
+<ul>
+<li>Patient Name (e.g. My Mother, Father), Patient Phone, Patient Address / Location Description (e.g. House No 12, Kumasi near Kejetia), Relationship (Mother, Father, Child, Self, etc.)</li>
+<li>Checkbox: <b>Patient at same place as me?</b> — Checked = Patient lat/lng auto-copied from client — Display: "🏥 Patient: Same as client — Nurse navigates here"</li>
+<li>Uncheck if different city: "🏥 Patient: DIFFERENT — Drag map to patient house + Click Set Patient Location"</li>
+<li>Button: <b>📍 Set Patient Location = Map Center</b> — Gets map center lat/lng → Sets patientLatInput, patientLngInput, unchecks sameAsClient, updates display "✅ Patient SET: lat,lng — Nurse NAVIGATES HERE!" + fills patientLocationText with lat,lng if empty</li>
+<li>This is critical: Client in Accra can book for mother in Kumasi — Nurse goes to PATIENT location, not client!</li>
+</ul>
+</ul>
+</div>
+
+<div class="step yellow">
+<h3>Step 4: Calculate — Full or 50% Payment — Paystack</h3>
+<ul>
+<li><b>Booking Details:</b> Start Time (08:00), End Time (17:00), Hours/Day Auto (9.0 hrs), Care Mode Daily/Weekly (×7)/Monthly (×30), Quantity, Country Currency GHS (GHS 17/hr) or USD (USD 8/hr) LIVE from config/rates, ceoPricing, pricing — Transport GHS 100</li>
+<li><b>calcTotal():</b> Hours = end - start (handles overnight), TotalHours = hrs × qty × modeMult, Base = rate × totalHours, Total = base + transport</li>
+<li><b>Full Pay (book-nurse.html):</b> Pay FULL Now — GHS 253 — Creates booking with status pending_full_payment, amount total, amountSplit nurse 80% CEO 20%</li>
+<li><b>50% Pay (book-nurse-50-percent.html):</b> Total GHS 253 → Pay Now (50%) GHS 126.50, Pay Later (50%) GHS 126.50 — Paystack charges only 50% now (payKobo = payNow×100), status pending_50_percent, amount total, amountPaidNow payNow, amountBalance payNow</li>
+<li>Calculation box shows: Start→End formatted both 12h/24h, Hours per day, Quantity×Mode, Total Hours, CEO Rate LIVE, Base, Transport, TOTAL, PAY NOW, PAY LATER</li>
+</ul>
+</div>
+
+<div class="step yellow">
+<h3>Step 5: Pay with Paystack — Booking Saved Everywhere</h3>
+<ul>
+<li>Validations: Select ONLINE nurse first (checks if selected nurse still isOnline in allNurses — If offline, alert "Selected nurse went offline — Select another"), Complete client details, Patient name phone address, Patient lat/lng set</li>
+<li>If valid: Generates bookingId LCG-FULL-YYYYMMDD-RANDOM or LCG-50-YYYYMMDD-RANDOM, payKobo = total×100 or payNow×100</li>
+<li>PaystackPop.setup({key: pk_live_f17ae..., email, amount: payKobo, currency: GHS/USD, ref: bookingId+Date.now(), callback, onClose}) → handler.openIframe()</li>
+<li>On callback success: Creates data object with EVERYTHING: id, bookingId, clientName, clientFullName, phone, clientPhone, clientEmail, email, clientPhotoUrl, clientPhoto, photoUrl, clientUid, clientId, clientLat, clientLng, clientLatLng, clientLatitude, clientLongitude, patientName, patientFullName, patientPhone, patientPhoneNumber, patientContact, patientLocation, patientAddress, patientLocationText, patientLat, patientLng, patientLatLng, patientLatitude, patientLongitude, patientRelationship, patientLocationCapturedAt, patientLocationSource, serviceLocation {lat:pLat,lng:pLng}, destination {lat:pLat,lng:pLng}, mainLat, mainLng, destLat, destLng, lat, lng, nurseId, nurseName, nursePhone, nurseWasOnline:true, nurseOnlineAt, amount, amountPaidNow, amountBalance, payNow, payLater, currency, paymentMethod, paymentType, paystackRef, status, time, createdAt, totalHours, hrsPerDay, startTime, endTime, careMode, quantity, transport, hourlyRateUsed, service, amountSplit</li>
+<li>Saves to: bookings/{bookingId}, myJobOffers/{nurseId}/{bookingId}, ceoBookings/{bookingId}, allBookings/{bookingId}, bookingsByFull or By50Percent, bookingsByFullPayment or By50Percent, clientBookings/{uid}/{bookingId}, bookingsByFull</li>
+<li>Shows success modal: ✅ Full Booking Successful! ID, Nurse, Client, Patient, Amount, Location, Calculation breakdown — Buttons: Home, 👑 CEO Receiver (ceo-booking-receiver.html)</li>
+<li>Double-check: Before payment, checks selected nurse still ONLINE — If offline, refresh list</li>
+</ul>
+</div>
+
+<div class="step blue">
+<h3>Step 6: Client Alerts — Custom Tone + SMS When Nurse Responds</h3>
+<ul>
+<li>After booking, client goes to <b>client-alerts.html</b></li>
+<li>Top: Your booking alerts — Shows client card (you) with photo name phone email</li>
+<li><b>Custom Tone Picker:</b> Preset tones (Default Beep, Success Melody, Urgent Alarm, Gentle Chime, Afrobeat Ghana) + Upload Your Own Song From Phone MP3/M4A/WAV (max 10MB, base64) — Preview ▶️ — Selected card shows ✅ Selected + Play button + audio player</li>
+<li>Checkbox: <b>💬 Also send SMS (works even if phone silent/data off) — FAST!</b> — Checked = When nurse accepts/rejects, you get SMS + tone rings</li>
+<li>Save Tone + SMS Setting → Saves to localStorage lcg_custom_tone_type, id, name, base64, time, lcg_sms_enabled</li>
+<li>Buttons: 💾 Save Tone + SMS Setting, 🧪 Test Ring + SMS, 🔔 Enable Notifications, 🗑️ Clear</li>
+<li>Status: "✅ Saved! Tone Name + SMS Enabled — When nurse responds, tone RINGS + VIBRATES + NOTIFICATION + SMS!"</li>
+<li>Empty state: "No nurse response yet — When nurse taps Accept/Reject, your selected tone will RING + SMS! Tone: Default Beep"</li>
+<li><b>Realtime alerts:</b> Listens to bookings node onValue — For each booking matching your phone/email, checks status — If accepted/rejected and previous status different, creates alert {id, type accepted/rejected, time, read:false, bookingId, nurseId, nurseName, nursePhone, nursePhotoUrl, specialty, rating, amount, currency, clientName, clientPhone, clientEmail, clientPhotoUrl, patientName, patientLocation, patientLat, patientLng, rejectReason}</li>
+<li>Calls <b>ringCustomTone(type, booking)</b>: Gets saved tone (custom base64 or preset), vibrates [200,100,200,100,400...] if accepted, plays tone via audio or Web Audio preset, sends SMS via Cloud Function sendSMS to clientPhone: "✅ LOVE CARE GLOBAL: Nurse Ama ACCEPTED your booking LCG-...! GHS 150. Call: +233... Tone X rang!" — Saves to smsLogs</li>
+<li>Shows notification if permission granted</li>
+<li>List renders: ACCEPTED card green border with ✅ NURSE ACCEPTED! Tone + SMS! + Nurse photo big avatar + Name Phone Specialty Rating + Buttons 📞 CALL NURSE, 💬 WhatsApp, 🧭 Navigation (Google Maps dir to patient lat/lng), 🎵 Play Tone Again — REJECTED card red border with reason + Book Another, Increase Rate</li>
+<li>Count info: "X alerts — Y NEW — Tone: Name — SMS: ON/OFF"</li>
+<li>Bottom tabs: Dashboard, Book, Alerts + Tone + SMS (active)</li>
+</ul>
+</div>
+</div>
+
+<div class="card">
+<h2>🔄 Full Flow Diagram — With Patient Location & ONLINE Filter</h2>
+<pre style="background:rgba(14,10,28,.8);padding:14px;border-radius:12px;font-size:11px;color:#a78bfa;overflow:auto">
+CLIENT (Accra)                          NURSE (Kumasi)
+    |                                        |
+    | 1. Auto-capture client lat/lng         | 1. Register + Save Name Photo Email Phone
+    |    via geolocation + map drag          |    + Time + Location
+    |                                        | 2. Tap 🟢 Go ONLINE → Writes to
+    |                                        |    onlineNurses, nursePresence,
+    |                                        |    nurseLocations (lat/lng)
+    |                                        |
+    | 2. Search ONLINE Only (radius 10km)    |
+    |    Fetches nurses + onlineNurses +     |
+    |    nursePresence + nurseLocations       |
+    |    Filters isNurseOnline() true only   |
+    |    → Only ONLINE nurses show           |
+    |    Offline hidden, won't pop up        |
+    |                                        |
+    | 3. Select nurse → Preview 🟢 ONLINE     |
+    |                                        |
+    | 4. Enter PATIENT details               |
+    |    Same as client? Checked = same lat  |
+    |    Different? Drag map to Kumasi house |
+    |    + Set Patient Location = Map Center |
+    |    → patientLat, patientLng = Kumasi  |
+    |                                        |
+    | 5. Calc total: GHS 17/hr × 9hrs + 100  |
+    |    Full: Pay GHS 253 now               |
+    |    50%: Pay GHS 126.50 now, 126.50 later|
+    |                                        |
+    | 6. Pay via Paystack → bookingId        |
+    |    Saves to bookings, myJobOffers/{nurseId},
+    |    ceoBookings, allBookings              |
+    |                                        |
+    |--------------------------------------->|
+    |              Booking created           |  my-job-offer.html detects NEW ID
+    |                                        |  → ringNurseTone() → Custom song
+    |                                        |  + Vibrate + Notification + SMS:
+    |                                        |  "NEW BOOKING! Client booked you!
+    |                                        |   GHS 150, Patient Ama at Kumasi"
+    |                                        |
+    |                                        | 7. Accept → Updates status ACCEPTED
+    |                                        |  Starts GPS watchPosition
+    |                                        |  Shares to nurseLocations,
+    |                                        |  liveNurseLocations, ceoBookings
+    |                                        |  Auto opens Google Maps:
+    |                                        |  dir/?api=1&origin=nurseLat,lng
+    |                                        |  &destination=patientLat,lng
+    |                                        |  → Navigates to PATIENT house in
+    |                                        |  Kumasi (not client Accra!)
+    |                                        |
+    |<---------------------------------------|
+    |    Nurse accepted + on the way         |  Calls patient + client
+    |    client-alerts.html:                 |
+    |    ringCustomTone accepted →           |
+    |    Your custom song rings + Vibrate    |
+    |    + Notification + SMS:               |
+    |    "Nurse Ama ACCEPTED LCG-FULL-...    |
+    |     GHS 150. Call: +233..."            |
+    |    Shows nurse photo phone +           |
+    |    Buttons: Call, WhatsApp, Navigate   |
+    |    to PATIENT, Play Tone Again         |
+    |                                        |
+    | 8. Nurse arrives → ARRIVED → INSERVICE |
+    |    Tracking continues                  |
+    |                                        |
+    | 9. Job completed → COMPLETED           |
+    |    Payout 80% nurse 20% CEO            |
+    |    Ratings + Reviews                   |
+</pre>
+</div>
+
+<div class="card">
+<h2>🛠️ Firebase Rules Updates Needed</h2>
+<p>Current rules miss new nodes for ONLINE filter + SMS + Tone. Add:</p>
+<ul>
+<li><b>onlineNurses:</b> .read/.write true, indexOn isOnline, lastSeen, nurseId — Stores which nurses are ONLINE for book-nurse.html to filter</li>
+<li><b>nursePresence:</b> .read/.write true, indexOn status, isOnline, lastSeen — Real-time online/offline presence</li>
+<li><b>nurseLocations:</b> Already exists but add indexOn nurseId, lastUpdate, isLive — For blinking markers + distance calculation</li>
+<li><b>liveNurseLocations:</b> .read/.write true, indexOn nurseId, bookingId, lastUpdate — Live GPS during job</li>
+<li><b>smsLogs:</b> .read/.write true, indexOn to, time, status, bookingId — Saves SMS with Photo Name Phone Email + Time</li>
+<li><b>nurses:</b> Add indexOn isOnline, online, isAvailable, lastSeen, lastActive, lastOnline — For isNurseOnline() filtering</li>
+<li><b>nursesByPhone, nurseTones, clientTones:</b> .read/.write true</li>
+</ul>
+<p>Without these, clients see "Permission denied" and ONLINE filter fails. Publish updated rules in Firebase Console → Realtime Database → Rules.</p>
+</div>
+
+<div class="card">
+<h2>💡 Tips & Best Practices</h2>
+<ul>
+<li><b>Nurses:</b> Always go ONLINE before expecting bookings — Keep app open or allow background location — Updates every 2 mins to stay online — If you go offline, you disappear from client view — Set custom Afrobeat tone + SMS ON to never miss booking — Works even if phone silent!</li>
+<li><b>Clients:</b> Allow location permission for accurate nearby ONLINE nurses — Drag map to PATIENT exact house for accurate navigation — Use "Set Patient Location = Map Center" for family in different city — Select radius 50km if no ONLINE nurses in 5km — Check onlineCountBadge — If 0 online, try later or increase radius — Choose Full Pay for faster acceptance or 50% to pay half now</li>
+<li><b>Family Booking Example:</b> You in Accra (client lat/lng 5.60,-0.18) booking for mother in Kumasi (patient lat/lng 6.69,-1.62) — Set patient location to Kumasi via map drag → Nurse in Kumasi who is ONLINE will see booking → Navigates to Kumasi house → You pay, mother receives care</li>
+<li><b>Custom Tone:</b> Use <3MB MP3 for best localStorage quota — Preview before save — Test Ring + SMS button to confirm — Enable Notifications for extra alert</li>
+<li><b>SMS:</b> Requires Hubtel Ghana account + Cloud Function sendSMS — Set SMS_CONFIG.cloudFunctionUrl to your function URL — Sender ID LOVECARE must be registered with Hubtel — SMS works even if data off, critical for Ghana</li>
+<li><b>CEO:</b> Monitor ceo-booking-receiver.html for all bookings with client photo name phone email + time + patient location + nurse online status — Check smsLogs for SMS proof — Check nurseLocations for live tracking</li>
+</ul>
+</div>
+
+<div class="card" style="text-align:center">
+<h2>Ready to Book?</h2>
+<p style="margin-top:8px">Only ONLINE nurses can be booked — They have green dot + blinking on map + 🟢 ONLINE badge</p>
+<div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+<a href="book-nurse.html" style="padding:12px 20px;border-radius:999px;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;text-decoration:none;font-weight:900;font-size:13px">🟢 Book ONLINE Nurse — Full Pay</a>
+<a href="book-nurse-50-percent.html" style="padding:12px 20px;border-radius:999px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1e0a3a;text-decoration:none;font-weight:900;font-size:13px">💰 Book ONLINE Nurse — 50% Now</a>
+<a href="nurses-dashboard.html" style="padding:12px 20px;border-radius:999px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;text-decoration:none;font-weight:900;font-size:13px">👩‍⚕️ Nurses — Go ONLINE Now</a>
+</div>
+</div>
+
+</div>
+</body></html>
