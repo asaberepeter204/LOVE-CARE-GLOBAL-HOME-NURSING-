@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DELETE NURSE — ALL 3 PATHS — Email Phone UID — LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;padding:16px}
+.card{background:rgba(28,18,56,.95);border:1px solid rgba(239,68,68,.35);border-radius:20px;padding:20px;margin:14px auto;max-width:760px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(168,85,247,.18);background:rgba(14,10,28,.85);color:#fff;font-size:14px;margin-top:8px}
+.label{font-size:11px;font-weight:800;margin-top:12px;display:block;text-transform:uppercase}
+.btn{width:100%;padding:16px;border-radius:14px;border:none;font-weight:900;font-size:14px;cursor:pointer;margin-top:10px;transition:.2s}
+.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.btnDark{background:rgba(255,255,255,.06);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
+.link{color:#93c5fd;text-decoration:underline;font-size:12px;word-break:break-all;display:block;margin-top:6px}
+</style></head><body>
+<div class="card">
+<h1 style="color:#fca5a5;font-size:22px">🗑️ DELETE NURSE — ALL 3 PATHS — 1 CLICK</h1>
+<p style="font-size:12px;color:#a78bfa;margin-top:6px">Boss new upgrade! Delete using UID OR Email OR Phone — No need UID! Type any one and click Delete.</p>
+<div style="margin-top:12px;padding:10px;background:rgba(239,68,68,.08);border-radius:12px;font-size:11px;line-height:1.6">
+<b>What gets deleted (so nurse won't appear in book-nurse.html):</b><br>
+Firestore nurses/{uid}, nurseRegistrations, allNurses<br>
+Realtime nurses/{uid}, onlineNurses/{uid} (ONLINE), nursePresence/{uid}, nurseLocations/{uid} (blinking), liveNurseLocations/{uid}, myJobOffers/{uid}, nurseTones/{uid}<br>
+Auth must delete manually via link — Stops login
+</div>
+
+<label class="label" style="color:#fde68a">NURSE UID (optional)</label>
+<input id="uid" class="input" placeholder="e.g. abc123XYZ">
+<label class="label" style="color:#86efac">NURSE EMAIL * (Best — Auto finds UID)</label>
+<input id="email" class="input" placeholder="e.g. ama.nurse@gmail.com">
+<label class="label" style="color:#93c5fd">NURSE PHONE * (e.g. +233244123456)</label>
+<input id="phone" class="input" placeholder="+233... — Auto finds UID">
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+<button class="btn btnDark" onclick="searchNurse()">🔍 SEARCH FIRST — See Details</button>
+<button class="btn btnGreen" onclick="autoFindUid()">🪄 FIND UID from Email/Phone</button>
+</div>
+<button class="btn btnRed" onclick="deleteAll()">🔴 DELETE ALL 3 PATHS NOW — HIDE FROM CLIENTS!</button>
+
+<pre id="result" style="margin-top:14px;font-size:11px;color:#c4b5fd;background:rgba(14,10,28,.7);padding:14px;border-radius:12px;min-height:80px;white-space:pre-wrap;overflow:auto;border:1px solid rgba(168,85,247,.12)">Type Email or Phone then click FIND UID → Then SEARCH → Then DELETE</pre>
+
+<div style="margin-top:16px;padding:12px;background:rgba(14,10,28,.6);border-radius:12px">
+<h3 style="font-size:12px;color:#f3e8ff">🔗 DIRECT LINKS — Go straight to Firebase:</h3>
+<a class="link" href="https://console.firebase.google.com/project/web-care-618e8/authentication/users" target="_blank">1️⃣ AUTHENTICATION → Users → Delete login</a>
+<a class="link" href="https://console.firebase.google.com/project/web-care-618e8/firestore/databases/-default-/data/~2Fnurses" target="_blank">2️⃣ FIRESTORE → nurses → Delete profile</a>
+<a class="link" href="https://console.firebase.google.com/project/web-care-618e8/database/web-care-618e8-default-rtdb/data" target="_blank">3️⃣ REALTIME DB → Data → Delete ONLINE nodes</a>
+</div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const rtdb=firebase.database(); const fdb=firebase.firestore();
+let foundUid=null;
+async function autoFindUid(){
+  const uidIn=document.getElementById('uid').value.trim();
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const phone=document.getElementById('phone').value.trim();
+  const res=document.getElementById('result');
+  if(uidIn){foundUid=uidIn;res.textContent='✅ Using UID: '+uidIn;return uidIn;}
+  res.textContent='🔍 Finding UID from email/phone...';
+  try{
+    if(email){
+      let snap=await fdb.collection('nurses').where('email','==',email).limit(1).get();
+      if(!snap.empty){foundUid=snap.docs[0].id;document.getElementById('uid').value=foundUid;res.textContent='✅ Found UID by Email in Firestore: '+foundUid+'\nData: '+JSON.stringify(snap.docs[0].data(),null,2);return foundUid;}
+      let rSnap=await rtdb.ref('nurses').orderByChild('email').equalTo(email).once('value');
+      if(rSnap.exists()){const v=rSnap.val();const k=Object.keys(v)[0];foundUid=k;document.getElementById('uid').value=k;res.textContent='✅ Found UID by Email in RTDB: '+k+'\n'+JSON.stringify(v[k],null,2);return k;}
+    }
+    if(phone){
+      const phoneKey=phone.replace(/[^0-9]/g,'').slice(-9);
+      let pb=await rtdb.ref('nursesByPhone/'+phoneKey).once('value');
+      if(pb.exists()){const d=pb.val();foundUid=d.uid||d.id||d.nurseId||phoneKey;document.getElementById('uid').value=foundUid;res.textContent='✅ Found by Phone in nursesByPhone: UID='+foundUid+'\n'+JSON.stringify(d,null,2);return foundUid;}
+      let all=await rtdb.ref('nurses').once('value');
+      if(all.exists()){
+        let found=null;
+        all.forEach(ch=>{const d=ch.val(); if(d.phone&&d.phone.includes(phoneKey)){found=ch.key;}});
+        if(found){foundUid=found;document.getElementById('uid').value=found;res.textContent='✅ Found UID by Phone scan: '+found;return found;}
+      }
+    }
+    res.textContent='❌ UID not found. Enter UID directly.';
+    return null;
+  }catch(e){res.textContent='Error: '+e.message;return null;}
+}
+async function searchNurse(){
+  const res=document.getElementById('result');
+  let uid=document.getElementById('uid').value.trim();
+  if(!uid){uid=await autoFindUid(); if(!uid){res.textContent='Enter UID or Email or Phone first';return;}}
+  res.textContent='Searching details for UID: '+uid+'...';
+  try{
+    const [fs,rt,on,pres,loc]=await Promise.all([
+      fdb.collection('nurses').doc(uid).get().catch(()=>null),
+      rtdb.ref('nurses/'+uid).once('value').catch(()=>null),
+      rtdb.ref('onlineNurses/'+uid).once('value').catch(()=>null),
+      rtdb.ref('nursePresence/'+uid).once('value').catch(()=>null),
+      rtdb.ref('nurseLocations/'+uid).once('value').catch(()=>null)
+    ]);
+    let txt=`🔍 DETAILS FOR UID: ${uid}\n━━━━━━━━━━━━━━━━━━━━\nFirestore nurses/${uid}: ${fs&&fs.exists?'✅ EXISTS\n'+JSON.stringify(fs.data(),null,2):'❌ NOT FOUND'}\n\nRTDB nurses/${uid}: ${rt&&rt.exists()?'✅ EXISTS — Shows in book-nurse.html!\n'+JSON.stringify(rt.val(),null,2).slice(0,800):'❌ NOT FOUND'}\n\nonlineNurses/${uid}: ${on&&on.exists()?'🟢 ONLINE! Shows as ONLINE!\n'+JSON.stringify(on.val(),null,2):'🔴 OFFLINE — Hidden'}\n\nnursePresence: ${pres&&pres.exists()?JSON.stringify(pres.val(),null,2):'NOT FOUND'}\n\nnurseLocations: ${loc&&loc.exists()?'📍 Has location — Blinking marker!\n'+JSON.stringify(loc.val(),null,2):'NOT FOUND'}\n\nReady to delete? Click DELETE button`;
+    res.textContent=txt;
+  }catch(e){res.textContent='Error: '+e.message;}
+}
+async function deleteAll(){
+  let uid=document.getElementById('uid').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const res=document.getElementById('result');
+  if(!uid){uid=await autoFindUid(); if(!uid){alert('Enter UID or Email or Phone!');return;}}
+  if(!confirm(`🔴 DELETE NURSE ${uid}?\nEmail: ${email}\nPhone: ${phone}\n\nHidden from book-nurse.html! Proceed?`))return;
+  res.textContent='🗑️ Deleting...';
+  let logs=[];
+  try{
+    try{await fdb.collection('nurses').doc(uid).delete();logs.push('✅ Firestore nurses/'+uid+' DELETED');}catch(e){logs.push('⚠️ Firestore: '+e.message);}
+    try{await fdb.collection('nurseRegistrations').doc(uid).delete();logs.push('✅ nurseRegistrations/'+uid);}catch(e){}
+    try{await fdb.collection('allNurses').doc(uid).delete();logs.push('✅ allNurses/'+uid);}catch(e){}
+    const paths=['nurses/'+uid,'onlineNurses/'+uid,'nursePresence/'+uid,'nurseLocations/'+uid,'liveNurseLocations/'+uid,'myJobOffers/'+uid,'nurseTones/'+uid,'liveNurses/'+uid,'nurseLiveTracking/'+uid];
+    for(const p of paths){try{await rtdb.ref(p).remove();logs.push('✅ RTDB '+p+' DELETED');}catch(e){logs.push('❌ RTDB '+p+' : '+e.message);}}
+    if(phone){const key=phone.replace(/[^0-9]/g,'').slice(-9);try{await rtdb.ref('nursesByPhone/'+key).remove();logs.push('✅ nursesByPhone/'+key+' DELETED');}catch(e){}}
+    try{
+      const allPhone=await rtdb.ref('nursesByPhone').once('value');
+      if(allPhone.exists()){
+        allPhone.forEach(ch=>{const v=ch.val(); if(v.uid==uid||v.id==uid){rtdb.ref('nursesByPhone/'+ch.key).remove(); logs.push('✅ Found & deleted nursesByPhone/'+ch.key);}});
+      }
+    }catch(e){}
+    logs.push('\n━━━━━━━━━━━━━━━━━━━━');
+    logs.push('🔗 NOW DELETE LOGIN (Auth): https://console.firebase.google.com/project/web-care-618e8/authentication/users');
+    logs.push('Search: '+(email||uid));
+    logs.push('✅ DONE! Hidden from book-nurse.html & book-nurse-50-percent.html!');
+    res.textContent=logs.join('\n');
+    alert('✅ DELETED! Hidden from clients! Now delete login in Auth');
+  }catch(e){res.textContent='Error: '+e.message+'\n'+logs.join('\n');}
+}
+</script>
+</body></html>
