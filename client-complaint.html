@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Complaint — Complain on Booked Nurse Only — LOVE CARE GLOBAL</title>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Complaint — Saves Photo Name Phone Email + Time — LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -14,14 +12,18 @@ header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-f
 .btn{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
 .btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:800;border:0}
 .btnBlue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;font-weight:800;border:0}
+.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a;font-weight:900;border:0}
 .wrap{max-width:720px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
 .cardTitle{font-family:Fraunces,serif;font-size:16px;font-weight:700;margin-bottom:12px}
-.textarea,.select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:13px;font-family:Instrument Sans}
+.textarea,.select,.input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:13px;font-family:Instrument Sans}
 .textarea{min-height:110px;resize:vertical}
-.label{font-size:11px;color:var(--faint);text-transform:uppercase;font-weight:700;margin-bottom:6px;display:block}
+.label{font-size:11px;color:var(--faint);text-transform:uppercase;font-weight:700;margin-bottom:6px;display:block;margin-top:12px}
 .badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid;display:inline-flex;align-items:center;gap:4px}
 .badgeRed{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.25)}
+.badgeGold{background:rgba(250,204,21,.12);color:#facc15;border-color:rgba(250,204,21,.25)}
+.avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #facc15;background:#1e1a3a}
+.nurseAvatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #22c55e}
 .uploadZone{border:2px dashed rgba(255,255,255,.12);border-radius:14px;padding:18px;text-align:center;background:rgba(12,10,30,.4);cursor:pointer}
 .filePreview{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .fileItem{background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px}
@@ -29,22 +31,37 @@ header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-f
 .recordingBox.active{display:block}
 .recDot{width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;font-weight:700;display:none}
-</style>
-</head>
-<body>
+.toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;font-weight:700;display:none;max-width:320px}
+</style></head><body>
 <header>
-<div class="brand">⚠️ Client Complaint — Complain on Booked Nurse Only</div>
-<div style="display:flex;gap:8px"><a href="my-bookings.html" class="btn">📅 My Bookings</a><a href="index.html" class="btn">🏠 Home</a></div>
+<div class="brand">⚠️ Client Complaint — Saves Photo Email Phone + Time</div>
+<div style="display:flex;gap:8px"><a href="my-bookings.html" class="btn">📅 My Bookings</a><a href="client-dashboard.html" class="btn">🏠 Dashboard</a><a href="sos.html" class="btn btnRed">SOS</a></div>
 </header>
 <div class="wrap">
+
+<!-- CLIENT CARD — PHOTO NAME PHONE EMAIL — SAVED -->
+<div class="card" style="background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.08));border:2px solid rgba(250,204,21,.25)">
+<div class="cardTitle" style="color:#facc15">👤 Your Details — Photo + Name + Phone + Email Saved on Complaint</div>
+<div style="display:flex;gap:12px;align-items:center">
+<img id="clientAvatarTop" class="avatar" src="">
+<div style="flex:1"><b id="clientNameTop" style="font-size:14px;color:#fff">ASABERE PETER</b><br><small id="clientPhoneTop" style="color:#34d399;font-size:11px">+233502957280</small><br><small id="clientEmailTop" style="color:#a78bfa;font-size:11px">lovecareglobal@gmail.com</small><br><small style="font-size:9px;color:#facc15;background:rgba(250,204,21,.15);border-radius:999px;padding:2px 6px">CLIENT — PHOTO + EMAIL + PHONE + NAME + TIME SAVED</small></div>
+<div style="font-size:10px;color:#a78bfa"><span id="complaintDateTop">-</span></div>
+</div>
+<div style="margin-top:10px;font-size:10px;color:#6b6788" id="clientExtraTop">Loading client photo name phone email...</div>
+</div>
+
 <div class="card" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)">
-<div class="cardTitle">👤 Complaining About Booked Nurse Only — <span id="nurseNameDisplay" style="color:#fca5a5">Loading...</span></div>
+<div class="cardTitle">👩‍⚕️ Complaining About Booked Nurse Only — <span id="nurseNameDisplay" style="color:#fca5a5">Loading...</span></div>
+<div style="display:flex;gap:12px;align-items:center;margin-top:10px">
+<img id="nurseAvatarDisplay" class="nurseAvatar" src="">
 <div style="font-size:12px;color:var(--muted);line-height:1.5">
-Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700">-</span> • Client: <span id="clientNameDisplay">-</span> • Service: <span id="serviceDisplay">-</span> • Amount: <span id="amountDisplay">-</span><br>
-<span class="badge badgeRed">⚠️ ONLY this booked nurse — Reflects on CEO ceo-complainant.html LIVE</span>
+Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700">-</span> • Service: <span id="serviceDisplay">-</span> • Amount: <span id="amountDisplay">-</span><br>
+Patient: <span id="patientDisplay" style="color:#facc15">-</span> • Nurse Phone: <span id="nursePhoneDisplay">-</span><br>
+<span class="badge badgeRed">⚠️ ONLY this booked nurse — Reflects on CEO ceo-complainant.html LIVE with Client Photo Email</span>
 </div>
 </div>
+</div>
+
 <div class="card">
 <div class="cardTitle">📝 Complaint Type + Text</div>
 <label class="label">Complaint Type</label>
@@ -61,9 +78,10 @@ Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700
 <option value="overcharge">💳 Overcharge</option>
 <option value="other">📝 Other</option>
 </select>
-<label class="label" style="margin-top:12px">📝 Complaint Text — Detailed</label>
-<textarea id="complaintText" class="textarea" placeholder="Type your complaint in detail... Example: Nurse came 2 hours late, was rude, left after 4 hours not 8 hours. I paid GHS 1,200 but she only did 4 hours..."></textarea>
+<label class="label">📝 Complaint Text — Detailed</label>
+<textarea id="complaintText" class="textarea" placeholder="Type detailed complaint... Example: Nurse came 2 hours late, was rude, left after 4 hours not 8 hours. I paid GHS 1,200 but she only did 4 hours..."></textarea>
 </div>
+
 <div class="card">
 <div class="cardTitle">🎤 Audio Complaint — Record your voice</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -75,6 +93,7 @@ Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700
 <div id="audioRecordingBox" class="recordingBox"><span class="recDot"></span> Recording Audio... <span id="audioTimer">00:00</span></div>
 <div id="audioPreview" style="margin-top:10px;display:none"><audio id="audioPlayback" controls style="width:100%"></audio></div>
 </div>
+
 <div class="card">
 <div class="cardTitle">🎥 Video Evidence — Record video or upload</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -86,6 +105,7 @@ Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700
 <div id="videoRecordingBox" class="recordingBox"><span class="recDot"></span> Recording Video... <span id="videoTimer">00:00</span><video id="videoPreviewLive" autoplay muted style="width:100%;height:200px;background:#000;border-radius:10px;margin-top:10px"></video></div>
 <div id="videoPreview" style="margin-top:10px;display:none"><video id="videoPlayback" controls style="width:100%;height:220px;background:#000;border-radius:10px"></video></div>
 </div>
+
 <div class="card">
 <div class="cardTitle">📎 Evidence Files — Photos, Videos, Documents</div>
 <label class="label">Upload Photos, Videos, Documents — Evidence for CEO</label>
@@ -95,10 +115,20 @@ Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700
 </div>
 <div id="filePreview" class="filePreview"></div>
 </div>
-<div class="card">
-<div class="cardTitle">✅ Submit Complaint — Reflects on CEO LIVE</div>
-<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-<button class="btn btnRed" style="flex:1;padding:14px;font-size:13px;font-weight:900" onclick="submitComplaint()">⚠️ Submit Complaint About This Nurse</button>
+
+<div class="card" style="border:2px solid #facc15;background:linear-gradient(135deg,rgba(250,204,21,.08),rgba(26,22,51,.9))">
+<div class="cardTitle" style="color:#facc15">✅ Submit Complaint — Saves Client Photo Name Phone Email + Time</div>
+<div style="background:rgba(14,10,28,.6);border-radius:12px;padding:10px;font-size:11px;color:#c4b5fd;line-height:1.6;margin-bottom:12px">
+<b style="color:#fff">Will save on Firebase with:</b><br>
+👤 Client: Photo URL + Name + Phone + Email + ID + LatLng + Time<br>
+🏥 Patient: Name + Phone + Location + LatLng<br>
+👩‍⚕️ Nurse: Name + Phone + Photo + ID<br>
+📅 Booking: ID + Service + Amount + Paystack Ref + Status + Time<br>
+⚠️ Complaint: Type + Text + Audio + Video + Files + Status<br>
+<span style="color:#facc15">● Reflects on CEO ceo-complainant.html LIVE + CEO can call client via saved phone</span>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button class="btn btnYellow" style="flex:1;padding:14px;font-size:13px;font-weight:900" onclick="submitComplaint()">⚠️ Submit Complaint — With Photo Email Phone</button>
 <button class="btn" style="flex:1;padding:14px" onclick="location.href='my-bookings.html'">Cancel</button>
 </div>
 </div>
@@ -107,16 +137,67 @@ Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig);const db=firebase.database();
-let bookingId, nurseName, nurseId, clientName, clientId, clientPhone, service, amount;
+let bookingId, nurseName, nurseId, nursePhone, nursePhotoUrl, clientName, clientId, clientPhone, clientEmail, clientPhotoUrl, clientLat, clientLng, service, amount, patientName, patientPhone, patientLocation, patientLat, patientLng, paystackRef;
 let audioRecorder, audioChunks=[], audioBlob=null, audioUrl=null, audioTimerInterval=null, audioSeconds=0;
 let videoRecorder, videoChunks=[], videoBlob=null, videoUrl=null, videoTimerInterval=null, videoSeconds=0, videoStream=null;
 let uploadedFiles=[];
+
+function getClientInfo(){
+  clientName=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'ASABERE PETER';
+  clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'+233502957280';
+  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'lovecareglobal@gmail.com';
+  clientPhotoUrl=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||'';
+  clientId=localStorage.getItem('clientId')||localStorage.getItem('uid')||'client_demo';
+  clientLat=localStorage.getItem('clientLat')||localStorage.getItem('lat')||'';
+  clientLng=localStorage.getItem('clientLng')||localStorage.getItem('lng')||'';
+  document.getElementById('clientNameTop').textContent=clientName;
+  document.getElementById('clientPhoneTop').textContent=clientPhone;
+  document.getElementById('clientEmailTop').textContent=clientEmail;
+  const av=document.getElementById('clientAvatarTop');
+  if(clientPhotoUrl) av.src=clientPhotoUrl; else av.src='https://ui-avatars.com/api/?name='+encodeURIComponent(clientName)+'&background=facc15&color=000';
+  document.getElementById('complaintDateTop').textContent=new Date().toLocaleString('en-GH');
+  document.getElementById('clientExtraTop').textContent=`Photo: ${clientPhotoUrl?'YES — '+clientPhotoUrl.slice(0,40)+'...':'NO'} • Lat: ${clientLat||'N/A'} Lng: ${clientLng||'N/A'} • ID: ${clientId}`;
+  return {clientName,clientPhone,clientEmail,clientPhotoUrl,clientId,clientLat,clientLng};
+}
+
 function getParams(){
   const p=new URLSearchParams(location.search);
-  bookingId=p.get('bookingId')||'LCG-DEMO';nurseName=p.get('nurseName')||'Nurse';nurseId=p.get('nurseId')||'nurse_demo';clientName=p.get('clientName')||'Client';clientId=p.get('clientId')||'client_demo';clientPhone=p.get('clientPhone')||'';service=p.get('service')||'Nursing Care';amount=p.get('amount')||'0';
-  document.getElementById('bookingIdDisplay').textContent=bookingId;document.getElementById('nurseNameDisplay').textContent=nurseName;document.getElementById('clientNameDisplay').textContent=clientName;document.getElementById('serviceDisplay').textContent=service;document.getElementById('amountDisplay').textContent='GHS '+amount;
+  bookingId=p.get('bookingId')||localStorage.getItem('lastBookingId')||'LCG-DEMO';
+  nurseName=p.get('nurseName')||'Nurse';
+  nurseId=p.get('nurseId')||'nurse_demo';
+  nursePhone=p.get('nursePhone')||'';
+  nursePhotoUrl=p.get('nursePhotoUrl')||p.get('nursePhoto')||'';
+  service=p.get('service')||'Nursing Care';
+  amount=p.get('amount')||'0';
+  patientName=p.get('patientName')||'';
+  patientPhone=p.get('patientPhone')||'';
+  patientLocation=p.get('patientLocation')||'';
+  patientLat=p.get('patientLat')||'';
+  patientLng=p.get('patientLng')||'';
+  paystackRef=p.get('paystackRef')||'';
+  document.getElementById('bookingIdDisplay').textContent=bookingId;
+  document.getElementById('nurseNameDisplay').textContent=nurseName;
+  document.getElementById('serviceDisplay').textContent=service;
+  document.getElementById('amountDisplay').textContent='GHS '+amount;
+  document.getElementById('patientDisplay').textContent=patientName||'N/A';
+  document.getElementById('nursePhoneDisplay').textContent=nursePhone||'N/A';
+  const nurseAv=document.getElementById('nurseAvatarDisplay');
+  nurseAv.src=nursePhotoUrl||'https://ui-avatars.com/api/?name='+encodeURIComponent(nurseName)+'&background=22c55e&color=fff';
+  // Try load from Firebase bookings if bookingId exists
+  if(bookingId && bookingId!=='LCG-DEMO'){
+    db.ref('bookings/'+bookingId).once('value').then(snap=>{
+      if(snap.exists()){
+        const b=snap.val();
+        if(b.nurseName) document.getElementById('nurseNameDisplay').textContent=b.nurseName;
+        if(b.nursePhotoUrl) nurseAv.src=b.nursePhotoUrl;
+        if(b.patientName) document.getElementById('patientDisplay').textContent=b.patientName;
+        nurseName=b.nurseName||nurseName; nursePhone=b.nursePhone||nursePhone; nursePhotoUrl=b.nursePhotoUrl||nursePhotoUrl;
+        patientName=b.patientName||patientName; patientPhone=b.patientPhone||patientPhone; patientLocation=b.patientLocation||patientLocation;
+      }
+    });
+  }
 }
-function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
 async function startAudioRecording(){
   try{
     const stream=await navigator.mediaDevices.getUserMedia({audio:true});
@@ -150,18 +231,41 @@ function removeFile(idx){uploadedFiles.splice(idx,1);renderFilePreview();}
 async function submitComplaint(){
   const type=document.getElementById('complaintType').value;const text=document.getElementById('complaintText').value.trim();
   if(!type){toast('Select complaint type');return;}if(!text||text.length<20){toast('Type complaint text — At least 20 chars');return;}
-  if(!confirm(`Submit complaint about ${nurseName}?`)) return;toast('Submitting...');
+  const ci=getClientInfo();
+  if(!confirm(`Submit complaint about ${nurseName}?`)) return;toast('Submitting with client photo name phone email + time...');
   try{
     const now=Date.now();const complaintId='CLIENT-COMP-'+bookingId+'-'+now;const evidenceUrls=[];
     uploadedFiles.forEach((f,idx)=>{evidenceUrls.push({id:`FILE-${idx}`,name:f.name,type:f.type,size:f.size,url:f.data});});
-    if(audioBlob) evidenceUrls.push({id:'AUDIO-1',name:`audio_${complaintId}.webm`,type:'audio/webm',url:audioUrl});
-    if(videoBlob) evidenceUrls.push({id:'VIDEO-1',name:`video_${complaintId}.webm`,type:'video/webm',url:videoUrl});
-    const complaintData={complaintId, bookingId, nurseId, nurseName, clientId, clientName, clientPhone, service, amount, complaintType:type, complaintText:text, status:'pending', createdAt:now, time:now, evidenceCount:evidenceUrls.length, evidenceFiles:evidenceUrls, hasAudio:!!audioBlob, hasVideo:!!videoBlob, type:'client_complaint', from:'client', to:'nurse', reflectsOnCEO:true};
-    await db.ref('clientComplaints/'+complaintId).set(complaintData);await db.ref('allComplaints/'+complaintId).set(complaintData);await db.ref('ceoComplaints/'+complaintId).set(complaintData);await db.ref('complaintsByBooking/'+bookingId+'/'+complaintId).set(complaintData);
-    toast(`✅ Complaint Submitted!`);alert(`✅ COMPLAINT SUBMITTED!\n\nID: ${complaintId}\nNurse: ${nurseName}\n\nCEO sees it in ceo-complainant.html LIVE`);setTimeout(()=>{location.href='my-bookings.html';},1500);
+    if(audioBlob) evidenceUrls.push({id:'AUDIO-1',name:`audio_${complaintId}.webm`,type:'audio/webm',url:audioUrl, blobSize: audioBlob.size});
+    if(videoBlob) evidenceUrls.push({id:'VIDEO-1',name:`video_${complaintId}.webm`,type:'video/webm',url:videoUrl, blobSize: videoBlob.size});
+    const complaintData={
+      complaintId, bookingId, 
+      nurseId, nurseName, nursePhone, nursePhotoUrl,
+      // CLIENT — PHOTO NAME PHONE EMAIL SAVED + TIME
+      clientId: ci.clientId, clientName: ci.clientName, clientPhone: ci.clientPhone, clientEmail: ci.clientEmail, clientPhotoUrl: ci.clientPhotoUrl, clientPhoto: ci.clientPhotoUrl, clientLat: ci.clientLat, clientLng: ci.clientLng,
+      // PATIENT
+      patientName, patientPhone, patientLocation, patientLat, patientLng,
+      // BOOKING
+      service, amount, paystackRef, bookingStatus: 'completed',
+      // COMPLAINT
+      complaintType:type, complaintText:text, status:'pending', createdAt:now, createdAtStr: new Date().toLocaleString('en-GH'), time:now,
+      evidenceCount:evidenceUrls.length, evidenceFiles:evidenceUrls, hasAudio:!!audioBlob, hasVideo:!!videoBlob,
+      type:'client_complaint', from:'client', to:'nurse', reflectsOnCEO:true
+    };
+    await db.ref('clientComplaints/'+complaintId).set(complaintData);
+    await db.ref('allComplaints/'+complaintId).set(complaintData);
+    await db.ref('ceoComplaints/'+complaintId).set(complaintData);
+    await db.ref('complaintsByBooking/'+bookingId+'/'+complaintId).set(complaintData);
+    await db.ref('complaints/'+complaintId).set(complaintData);
+    try{
+      const hist=JSON.parse(localStorage.getItem('lcg_complaints')||'[]');
+      hist.unshift(complaintData);
+      localStorage.setItem('lcg_complaints', JSON.stringify(hist.slice(0,20)));
+    }catch(e){}
+    toast(`✅ Complaint Submitted with photo email!`);alert(`✅ COMPLAINT SUBMITTED!\n\nID: ${complaintId}\nNurse: ${nurseName}\nClient: ${ci.clientName} • ${ci.clientPhone} • ${ci.clientEmail}\nPhoto: ${ci.clientPhotoUrl?'YES':'NO'} • Time: ${new Date(now).toLocaleString('en-GH')}\n\nCEO sees it in ceo-complainant.html LIVE with your photo + email + phone`);
+    setTimeout(()=>{location.href='my-bookings.html';},1500);
   }catch(e){toast('Error: '+e.message);}
 }
-window.onload=()=>{getParams();};
+window.onload=()=>{getClientInfo();getParams();};
 </script>
-</body>
-</html>
+</body></html>
