@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nurse Login - GLOBAL FIX</title>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nurse Login - ALL 4 REQUIRED</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -12,143 +12,148 @@ const db=firebase.database();
 const dbFS=firebase.firestore();
 
 function showStatus(m,ok){const el=document.getElementById('status');el.textContent=m;el.className='status '+(ok?'ok':'err');el.style.display='block';}
-function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
+function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');}
 
-// GLOBAL FIX FOR NURSES: Check registration + CEO acceptance
-// Returns: {registered:false} | {registered:true, accepted:false} | {registered:true, accepted:true}
-async function checkNurseStatus(email){
+// ALL 4 REQUIRED: name + email + phone + photo
+async function checkNurseFullStatus(email){
   const eLower=email.toLowerCase().trim();
-  if(!eLower) return {registered:false, accepted:false};
+  if(!eLower) return {registered:false, reason:'no email'};
   const key=sanitizeEmail(eLower);
 
-  // 1. FASTEST: Check allowedNurses whitelist (CEO accepted nurses)
+  async function hasAll4(v){
+    if(!v) return {ok:false, missing:'no data'};
+    const name=(v.name||v.fullName||'').trim();
+    const emailField=(v.email||v.clientEmail||'').trim() || eLower;
+    const phone=(v.phone||'').trim();
+    const photo=v.photoUrl||v.photo||v.avatarUrl||v.imageUrl||'';
+    const missing=[];
+    if(name.length<2) missing.push('name');
+    if(!emailField.includes('@')) missing.push('email');
+    if(phone.length<7) missing.push('phone');
+    if(!photo || photo.length<10) missing.push('photo');
+    return {ok: missing.length===0, missing: missing.join(', '), name, email:emailField, phone, photo};
+  }
+
+  // 1. allowedNurses whitelist
   try{
     const snap=await db.ref('allowedNurses/'+key).once('value');
-    if(snap.exists()) return {registered:true, accepted:true, data:snap.val()};
-  }catch(e){}
-
-  // 2. Check verified nodes directly
-  const verifiedPaths=['verified_nurses','verifiedNurses'];
-  for(const p of verifiedPaths){
-    try{
-      const snap=await db.ref(p+'/'+key).once('value');
-      if(snap.exists()) return {registered:true, accepted:true, data:snap.val()};
-      const qSnap=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
-      if(qSnap.exists()) return {registered:true, accepted:true};
-    }catch(e){}
-  }
-
-  // 3. Check nurses node with status
-  try{
-    const snap=await db.ref('nurses/'+key).once('value');
     if(snap.exists()){
-      const v=snap.val();
-      const status=(v.status||v.approvalStatus||'').toLowerCase();
-      if(status==='verified' || status==='approved' || status==='accepted' || v.isVerified===true || v.isApproved===true){
-        return {registered:true, accepted:true, data:v};
+      const check=await hasAll4(snap.val());
+      if(check.ok){
+        return {registered:true, accepted:true, hasAll4:true, data:snap.val()};
       }else{
-        return {registered:true, accepted:false, data:v};
+        return {registered:true, accepted:true, hasAll4:false, missing:check.missing, data:snap.val()};
       }
     }
-    const qSnap=await db.ref('nurses').orderByChild('email').equalTo(eLower).once('value');
-    if(qSnap.exists()){
-      let accepted=false; let data=null;
-      qSnap.forEach(ch=>{
-        const v=ch.val();
-        const status=(v.status||'').toLowerCase();
-        if(status==='verified' || status==='approved' || status==='accepted' || v.isVerified===true) accepted=true;
-        data=v;
-      });
-      return {registered:true, accepted:accepted, data:data};
-    }
   }catch(e){}
 
-  // 4. Check pending nodes - registered but not yet accepted
-  const pendingPaths=['pending_nurses','pendingNurses','nurseApplications','nurse_registrations','nurseRegistrations'];
-  for(const p of pendingPaths){
+  // 2. verified_nurses
+  for(const p of ['verified_nurses','verifiedNurses']){
     try{
-      const snap=await db.ref(p+'/'+key).once('value');
-      if(snap.exists()) return {registered:true, accepted:false, data:snap.val()};
-      const qSnap=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
-      if(qSnap.exists()) return {registered:true, accepted:false};
-      const qSnap2=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
-      if(qSnap2.exists()) return {registered:true, accepted:false};
+      const snap=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
+      if(snap.exists()){
+        let result=null;
+        snap.forEach(ch=>{
+          const v=ch.val();
+          const c=hasAll4Sync(v);
+          if(c.ok) result={registered:true, accepted:true, hasAll4:true, data:v};
+          else if(!result) result={registered:true, accepted:true, hasAll4:false, missing:c.missing, data:v};
+        });
+        if(result) return result;
+      }
     }catch(e){}
   }
 
-  // 5. Firestore fallback
+  // 3. nurses
   try{
-    const fs1=await dbFS.collection('nurses').where('email','==',eLower).get();
-    if(!fs1.empty){
-      let accepted=false;
-      fs1.forEach(doc=>{
-        const v=doc.data();
-        if(v.status==='verified' || v.isVerified) accepted=true;
+    const snap=await db.ref('nurses').orderByChild('email').equalTo(eLower).once('value');
+    if(snap.exists()){
+      let result=null;
+      snap.forEach(ch=>{
+        const v=ch.val();
+        const st=(v.status||'').toLowerCase();
+        const accepted=st==='verified'||st==='approved'||v.isVerified===true;
+        const c=hasAll4Sync(v);
+        if(!result) result={registered:true, accepted:accepted, hasAll4:c.ok, missing:c.missing, data:v};
+        else if(c.ok) result.hasAll4=true;
       });
-      return {registered:true, accepted:accepted};
+      if(result) return result;
     }
-    const fs2=await dbFS.collection('nurseApplications').where('email','==',eLower).get();
-    if(!fs2.empty) return {registered:true, accepted:false};
   }catch(e){}
 
-  return {registered:false, accepted:false};
+  // 4. pending
+  for(const p of ['pending_nurses','pendingNurses','nurseApplications']){
+    try{
+      const snap=await db.ref(p).orderByChild('email').equalTo(eLower).once('value');
+      if(snap.exists()){
+        let hasAll=false; let miss='';
+        snap.forEach(ch=>{ const c=hasAll4Sync(ch.val()); if(c.ok) hasAll=true; else miss=c.missing; });
+        return {registered:true, accepted:false, hasAll4:hasAll, missing:miss};
+      }
+    }catch(e){}
+  }
+
+  return {registered:false, hasAll4:false, accepted:false};
+}
+
+function hasAll4Sync(v){
+  const name=(v.name||v.fullName||'').trim();
+  const email=(v.email||'').trim();
+  const phone=(v.phone||'').trim();
+  const photo=v.photoUrl||v.photo||v.avatarUrl||v.imageUrl||'';
+  const missing=[];
+  if(name.length<2) missing.push('name');
+  if(!email.includes('@')) missing.push('email');
+  if(phone.length<7) missing.push('phone');
+  if(!photo || photo.length<10) missing.push('photo');
+  return {ok: missing.length===0, missing: missing.join(', ')};
+}
+
+async function deleteAuthUserCompletely(user){
+  if(!user) return;
+  try{ await user.delete(); console.log('✅ Nurse Auth DELETED from console'); }
+  catch(e){ try{ await auth.signOut(); }catch(_){} }
 }
 
 async function googleLogin(){
   showStatus('Checking Google...', true);
+  let tempUser=null;
   try{
     const provider=new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({prompt:'select_account'});
     const result=await auth.signInWithPopup(provider);
-    const user=result.user;
+    const user=result.user; tempUser=user;
     const email=(user.email||'').toLowerCase().trim();
     const name=user.displayName||'';
-
-    const status=await checkNurseStatus(email);
+    const status=await checkNurseFullStatus(email);
     
     if(!status.registered){
-      showStatus('❌ Not registered as nurse. Redirecting...', false);
-      try{
-        await db.ref('blockedNurseLogins/'+sanitizeEmail(email)).set({
-          email:email, name:name, blockedAt:Date.now(), reason:'Google login without nurse registration', uid:user.uid
-        });
-      }catch(e){}
-      await auth.signOut();
-      localStorage.clear();
-      sessionStorage.clear();
-      localStorage.setItem('pendingNurseEmail', email);
-      localStorage.setItem('pendingNurseName', name);
-      setTimeout(()=>{
-        location.href='nurse-registration.html?from=google_block&email='+encodeURIComponent(email)+'&name='+encodeURIComponent(name);
-      },1500);
+      showStatus('❌ Not registered as nurse. Deleting Auth & redirecting...', false);
+      await deleteAuthUserCompletely(user);
+      localStorage.clear(); localStorage.setItem('pendingNurseEmail', email); localStorage.setItem('pendingNurseName', name);
+      setTimeout(()=>{ location.href='nurse-registration.html?from=no_reg&email='+encodeURIComponent(email)+'&name='+encodeURIComponent(name); },1500);
       return;
     }
-
+    if(!status.hasAll4){
+      showStatus('❌ Incomplete: missing '+status.missing+'. Redirecting to complete registration...', false);
+      await deleteAuthUserCompletely(user);
+      localStorage.clear(); localStorage.setItem('pendingNurseEmail', email);
+      setTimeout(()=>{ location.href='nurse-registration.html?from=missing_'+status.missing+'&email='+encodeURIComponent(email)+'&name='+encodeURIComponent(name); },1500);
+      return;
+    }
     if(!status.accepted){
-      showStatus('⏳ Registered but not yet accepted by CEO. Pending approval...', false);
-      await auth.signOut();
+      showStatus('⏳ Pending CEO approval. Removing Auth...', false);
+      await deleteAuthUserCompletely(user);
       localStorage.clear();
-      setTimeout(()=>{
-        alert('⏳ Your nurse registration is pending CEO approval.\n\nEmail: '+email+'\n\nYou registered but CEO has not yet verified you.\nPlease wait for CEO acceptance. You will be notified.');
-        location.href='nurse-registration.html?from=pending&email='+encodeURIComponent(email);
-      },1500);
+      setTimeout(()=>{ alert('⏳ Pending CEO approval.\nEmail: '+email+'\nYou have all 4 fields but CEO not yet verified you.'); location.href='nurse-registration.html?from=pending&email='+encodeURIComponent(email); },1500);
       return;
     }
-
-    // ALLOWED: Registered + Accepted
-    localStorage.setItem('nurseLoggedIn','true');
-    localStorage.setItem('nurseEmail', email);
-    localStorage.setItem('nurseName', status.data?.name || name);
-    localStorage.setItem('nurseUid', user.uid);
-    localStorage.setItem('loginMethod','google');
-
-    showStatus('Welcome '+name+' - Login success', true);
-    setTimeout(()=>{location.replace('nurse-dashboard.html');}, 800);
-
+    localStorage.setItem('nurseLoggedIn','true'); localStorage.setItem('nurseEmail', email); localStorage.setItem('nurseName', status.data?.name || name); localStorage.setItem('nurseUid', user.uid);
+    showStatus('Welcome '+name, true);
+    setTimeout(()=>{location.replace('nurse-dashboard.html');},800);
   }catch(e){
-    console.error(e);
     showStatus('Google login failed: '+e.message, false);
-    try{ await auth.signOut(); }catch(_){}
+    if(tempUser) try{ await deleteAuthUserCompletely(tempUser); }catch(_){}
   }
 }
 
@@ -156,32 +161,11 @@ async function emailLogin(){
   const email=document.getElementById('email').value.trim().toLowerCase();
   const pass=document.getElementById('pass').value.trim();
   if(!email||!pass){showStatus('Enter email & password', false);return;}
-  
   showStatus('Checking...', true);
-  
-  const status=await checkNurseStatus(email);
-  if(!status.registered){
-    showStatus('❌ Email not registered as nurse. Please register first.', false);
-    setTimeout(()=>{
-      localStorage.setItem('pendingNurseEmail', email);
-      location.href='nurse-registration.html?from=email_block&email='+encodeURIComponent(email);
-    },1500);
-    return;
-  }
-  if(!status.accepted){
-    showStatus('⏳ Not yet accepted by CEO. Pending approval.', false);
-    setTimeout(()=>{
-      alert('⏳ Your application is pending CEO approval.\nEmail: '+email);
-    },800);
-    return;
-  }
-
-  auth.signInWithEmailAndPassword(email,pass).then(()=>{
-    localStorage.setItem('nurseLoggedIn','true');
-    localStorage.setItem('nurseEmail',email);
-    localStorage.setItem('loginMethod','email');
-    showStatus('Login success', true);
-    setTimeout(()=>{location.replace('nurse-dashboard.html');},500);
-  }).catch(e=>showStatus(e.message,false));
+  const status=await checkNurseFullStatus(email);
+  if(!status.registered){ showStatus('❌ Not registered as nurse.', false); setTimeout(()=>{location.href='nurse-registration.html?from=email_no_reg&email='+encodeURIComponent(email);},1500); return; }
+  if(!status.hasAll4){ showStatus('❌ Missing: '+status.missing+'. Complete registration.', false); setTimeout(()=>{location.href='nurse-registration.html?from=missing_'+status.missing+'&email='+encodeURIComponent(email);},1500); return; }
+  if(!status.accepted){ showStatus('⏳ Not yet accepted by CEO.', false); return; }
+  auth.signInWithEmailAndPassword(email,pass).then(()=>{ localStorage.setItem('nurseLoggedIn','true'); localStorage.setItem('nurseEmail',email); showStatus('Login success', true); setTimeout(()=>{location.replace('nurse-dashboard.html');},500); }).catch(e=>showStatus(e.message,false));
 }
 </script></body></html>
