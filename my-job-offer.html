@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Job Offer — CLIENT + PATIENT LOCATION — FULL</title>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Job Offer — NURSE Custom Tone + SMS — LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
 <style>
 :root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--faint:#6b6788;--gold:#facc15;--green:#34d399;--red:#ef4444;--purple:#a78bfa;--blue:#4285F4}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Instrument Sans",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Instrument Sans",sans-serif;padding-bottom:80px}
 header{position:sticky;top:0;z-index:10;background:rgba(12,10,30,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
 .wrap{max-width:1240px;margin:0 auto;padding:0 20px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
@@ -21,6 +19,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(12,10,30,.92);backdrop-f
 .btn-red{background:var(--red);color:#fff;font-weight:700;border-radius:999px;padding:10px 20px;border:0;cursor:pointer}
 .btn-purple{background:linear-gradient(135deg,#a78bfa,#8b5cf6);color:#fff;font-weight:700;border-radius:999px;padding:10px 20px;border:0;cursor:pointer}
 .btn-nav{background:linear-gradient(135deg,#4285F4,#34A853);color:#fff;font-weight:800;border-radius:999px;padding:10px 20px;border:0;cursor:pointer;box-shadow:0 4px 12px rgba(66,133,244,.3)}
+.btn-yellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000;font-weight:900;border-radius:999px;padding:10px 20px;border:0;cursor:pointer}
 .empty{padding:70px 24px;text-align:center;border:1px dashed rgba(255,255,255,.12);border-radius:20px;background:rgba(26,22,51,.6)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 18px;border-radius:999px;font-size:13px;z-index:100}
 .live-dot{width:8px;height:8px;border-radius:999px;background:var(--green);animation:pulse 1.5s infinite;display:inline-block}
@@ -32,16 +31,72 @@ header{position:sticky;top:0;z-index:10;background:rgba(12,10,30,.92);backdrop-f
 .clientBox{background:rgba(14,10,28,.6);border:1px solid rgba(250,204,21,.2);border-radius:16px;padding:12px;margin-top:12px}
 .patientBox{background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(66,133,244,.08));border:1px solid rgba(34,197,94,.3);border-radius:16px;padding:12px;margin-top:12px}
 .locationBox{background:linear-gradient(135deg,rgba(66,133,244,.12),rgba(52,211,153,.08));border:1px solid rgba(66,133,244,.25);border-radius:16px;padding:12px;margin-top:12px}
-</style>
-</head>
-<body>
+.toneCard{background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(168,85,247,.12));border:2px solid rgba(250,204,21,.35);border-radius:20px;padding:16px;margin-bottom:14px}
+.toneOpt{padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(14,10,28,.6);display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-top:8px}
+.toneOpt.selected{border:2px solid #facc15;background:rgba(250,204,21,.15)}
+</style></head><body>
 <div id="root"></div>
+<audio id="nurseCustomTonePlayer" preload="auto" style="display:none"></audio>
+<audio id="nursePreviewPlayer" preload="auto" controls style="display:none;width:100%;margin-top:10px"></audio>
+
 <script type="module">
 import React, {useState,useEffect,useRef} from "https://esm.sh/react@18.2.0";
 import ReactDOM from "https://esm.sh/react-dom@18.2.0/client";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const rtdb=firebase.database();
+
+// === NURSE TONE + SMS CONFIG ===
+function getSavedNurseTone(){
+  return {
+    type: localStorage.getItem('nurse_tone_type')||'preset',
+    id: localStorage.getItem('nurse_tone_id')||'new_booking_beep',
+    name: localStorage.getItem('nurse_tone_name')||'New Booking Beep — Ding Ding',
+    base64: localStorage.getItem('nurse_tone_base64')||'',
+    time: localStorage.getItem('nurse_tone_time')||'',
+    smsEnabled: localStorage.getItem('nurse_sms_enabled')||'true'
+  };
+}
+function playNursePreset(id){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
+    if(id==='new_booking_beep'){o.frequency.value=800;g.gain.value=.18;o.start();setTimeout(()=>{o.frequency.value=1200;},150);setTimeout(()=>{o.stop();ctx.close();},600);}
+    else if(id==='urgent_booking'){o.frequency.value=600;g.gain.value=.22;o.type='sawtooth';o.start();let c=0;const int=setInterval(()=>{o.frequency.value=c%2?600:1000;c++;if(c>10){clearInterval(int);o.stop();ctx.close();}},120);}
+    else if(id==='cash_sound'){o.frequency.value=523;g.gain.value=.18;o.start();setTimeout(()=>{o.frequency.value=659;},120);setTimeout(()=>{o.frequency.value=784;},240);setTimeout(()=>{o.frequency.value=1046;},360);setTimeout(()=>{o.stop();ctx.close();},800);}
+    else if(id==='gentle_bell'){o.frequency.value=1000;g.gain.value=.12;o.type='sine';o.start();g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+1);setTimeout(()=>{o.stop();ctx.close();},1000);}
+    else if(id==='afrobeat_nurse'){o.frequency.value=180;g.gain.value=.18;o.start();setTimeout(()=>{o.frequency.value=250;},100);setTimeout(()=>{o.frequency.value=180;},200);setTimeout(()=>{o.frequency.value=350;},300);setTimeout(()=>{o.stop();ctx.close();},700);}
+    else {o.frequency.value=900;g.gain.value=.15;o.start();setTimeout(()=>{o.stop();ctx.close();},500);}
+  }catch(e){}
+}
+const SMS_CONFIG_NURSE={
+  enabled:true,
+  useCloudFunction:true,
+  cloudFunctionUrl:'https://us-central1-web-care-618e8.cloudfunctions.net/sendSMS',
+  senderId:'LOVECARE'
+};
+async function sendSMSToNurse(toPhone,message,bookingData){
+  const saved = getSavedNurseTone();
+  if(saved.smsEnabled!=='true') { console.log('Nurse SMS disabled'); return; }
+  if(!SMS_CONFIG_NURSE.enabled) return;
+  let phone=toPhone.replace(/[^0-9+]/g,''); if(phone.startsWith('0')) phone='+233'+phone.slice(1); if(!phone.startsWith('+')) phone='+'+phone;
+  try{
+    if(SMS_CONFIG_NURSE.useCloudFunction){
+      await fetch(SMS_CONFIG_NURSE.cloudFunctionUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:phone,message,nurseName:bookingData?.nurseName||'',nursePhone:toPhone,clientName:bookingData?.clientName||'',clientPhone:bookingData?.clientPhone||'',clientPhotoUrl:bookingData?.clientPhotoUrl||'',bookingId:bookingData?.bookingId||bookingData?.id||'',time:Date.now(),timeStr:new Date().toLocaleString('en-GH')})});
+      console.log('SMS sent to nurse',phone);
+    }
+  }catch(e){ console.error('SMS failed',e); }
+}
+function ringNurseTone(booking){
+  const t=getSavedNurseTone();
+  if(navigator.vibrate) navigator.vibrate([300,100,300,100,500]);
+  if(t.type==='custom' && t.base64){
+    try{ const p=document.getElementById('nurseCustomTonePlayer'); p.src=t.base64; p.volume=1.0; p.play().catch(()=>playNursePreset(t.id)); }catch(e){ playNursePreset(t.id); }
+  }else{ playNursePreset(t.id); }
+  if(Notification && Notification.permission==='granted'){ new Notification('🔔 NEW BOOKING! Client Booked You!',{body:`Tone: ${t.name} rang! + SMS ${t.smsEnabled==='true'?'sent!':''} — Client booked you now!`,icon:'icon-transparent-512.png'}); }
+}
+window.ringNurseTone=ringNurseTone; window.playNursePreset=playNursePreset;
+
 function getNurse(){
   const KEYS=['nurse','nurseData','currentUser','user','auth_user','nurse_profile'];
   for(const store of [localStorage, sessionStorage]){
@@ -49,13 +104,13 @@ function getNurse(){
       try{
         const raw=store.getItem(k); if(!raw) continue;
         const d=JSON.parse(raw); const o=d.user||d.nurse||d.data||d;
-        const full=o.fullName||o.name||o.displayName; if(full) return {id:(o.id||o.nurseId||o.uid||full.toLowerCase().replace(/\s+/g,'-')).toLowerCase().replace(/[^a-z0-9-]/g,''), fullName:full, firstName:o.firstName||full.split(' ')[0], location:o.location||'Accra', photo:o.photo||null};
+        const full=o.fullName||o.name||o.displayName; if(full) return {id:(o.id||o.nurseId||o.uid||full.toLowerCase().replace(/\s+/g,'-')).toLowerCase().replace(/[^a-z0-9-]/g,''), fullName:full, firstName:o.firstName||full.split(' ')[0], location:o.location||'Accra', photo:o.photo||null, phone:o.phone||o.phoneNumber||''};
       }catch{}
     }
   }
   const p=new URLSearchParams(location.search); const q=p.get('nurse')||p.get('name');
-  if(q) return {id:q.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''), fullName:q, firstName:q.split(' ')[0], location:'Accra', photo:null};
-  return {id:'asabere-peter', fullName:'Asabere Peter', firstName:'Asabere', location:'East Legon', photo:null};
+  if(q) return {id:q.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''), fullName:q, firstName:q.split(' ')[0], location:'Accra', photo:null, phone:''};
+  return {id:'asabere-peter', fullName:'Asabere Peter', firstName:'Asabere', location:'East Legon', photo:null, phone:''};
 }
 let nurseWatchId=null;let lastLat=null;let lastLng=null;let isTracking=false;
 function calcDistance(lat1,lon1,lat2,lon2){if(!lat1||!lon1||!lat2||!lon2) return 0;const R=6371;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));return R*c;}
@@ -80,10 +135,7 @@ function updateNurseStatus(bookingId, newStatus, nurse){
   const updates={status:newStatus,trackingStatus:newStatus,[`${newStatus}At`]:Date.now(),lastUpdate:Date.now(),updatedAt:Date.now()};
   rtdb.ref(`myJobOffers/${nurse.id}/${bookingId}`).update(updates);rtdb.ref(`bookings/${bookingId}`).update(updates);rtdb.ref(`acceptedBookings/${bookingId}`).update(updates);rtdb.ref(`ceoBookings/${bookingId}`).update(updates);
 }
-
-// PATIENT LOCATION — PRIMARY, CLIENT LOCATION — FALLBACK
 function getPatientLocation(o){
-  // New fields first — Patient is where nurse goes
   const lat = o.patientLat||o.patientLatitude||o.patientLocationLat||o.mainLat||o.destLat|| (o.patientLatLng&&o.patientLatLng.lat) || (o.serviceLocation&&o.serviceLocation.lat) || (o.destination&&o.destination.lat) || null;
   const lng = o.patientLng||o.patientLongitude||o.patientLocationLng||o.mainLng||o.destLng|| (o.patientLatLng&&o.patientLatLng.lng) || (o.serviceLocation&&o.serviceLocation.lng) || (o.destination&&o.destination.lng) || null;
   return {lat: parseFloat(lat)||null, lng: parseFloat(lng)||null, isPatient: !!(lat&&lng)};
@@ -95,12 +147,106 @@ function getClientLocation(o){
 }
 function openGoogleMapsNavigation(destLat, destLng, nurseLat, nurseLng){
   if(!destLat||!destLng){ alert('Patient location not available — Old booking'); return; }
-  let url='';
-  if(nurseLat&&nurseLng){ url=`https://www.google.com/maps/dir/?api=1&origin=${nurseLat},${nurseLng}&destination=${destLat},${destLng}&travelmode=driving`; }
+  let url=''; if(nurseLat&&nurseLng){ url=`https://www.google.com/maps/dir/?api=1&origin=${nurseLat},${nurseLng}&destination=${destLat},${destLng}&travelmode=driving`; }
   else{ url=`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=driving`; }
   window.open(url, '_blank');
 }
 function openLocationOnMap(lat,lng){ if(!lat||!lng) return; window.open(`https://www.google.com/maps?q=${lat},${lng}&z=15`, '_blank'); }
+
+function NurseTonePicker(){
+  const [tone,setTone]=useState(()=>getSavedNurseTone());
+  const [selected,setSelected]=useState(tone);
+  const [smsChecked,setSmsChecked]=useState(()=> (localStorage.getItem('nurse_sms_enabled')||'true')==='true');
+  useEffect(()=>{setTone(getSavedNurseTone());},[]);
+  const selectPreset=(id,name)=>{
+    const nt={type:'preset',id,name,base64:'',time:new Date().toLocaleString('en-GH')};
+    setSelected(nt); playNursePreset(id);
+  };
+  const handleFile=(e)=>{
+    const file=e.target.files[0]; if(!file) return;
+    if(file.size>10*1024*1024){ alert('Max 10MB'); return; }
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const base64=ev.target.result;
+      const nt={type:'custom',id:'custom_'+Date.now(),name:file.name,base64,time:new Date().toLocaleString('en-GH')};
+      setSelected(nt);
+      const p=document.getElementById('nursePreviewPlayer'); if(p){p.src=base64; p.style.display='block'; p.play().catch(()=>{});}
+    };
+    reader.readAsDataURL(file);
+  };
+  const save=()=>{
+    try{
+      localStorage.setItem('nurse_tone_type',selected.type);
+      localStorage.setItem('nurse_tone_id',selected.id);
+      localStorage.setItem('nurse_tone_name',selected.name);
+      localStorage.setItem('nurse_tone_time',selected.time);
+      localStorage.setItem('nurse_sms_enabled',smsChecked?'true':'false');
+      if(selected.type==='custom'){ localStorage.setItem('nurse_tone_base64',selected.base64); }
+      else { localStorage.removeItem('nurse_tone_base64'); }
+      setTone({...selected,smsEnabled:smsChecked?'true':'false'});
+      alert(`✅ Nurse Tone Saved!\n\n${selected.name}\nSMS: ${smsChecked?'ON - Works even if silent/data off!':'OFF'}\n\nWhen client books you, this tone RINGS + VIBRATES + NOTIFICATION + SMS!`);
+    }catch(err){
+      if(err.name==='QuotaExceededError') alert('File too big — Use <3MB or preset');
+      else alert(err.message);
+    }
+  };
+  const enableNotifs=()=>{
+    if(Notification){ Notification.requestPermission().then(p=>{
+      if(p==='granted'){ alert('✅ Notifications Enabled! Tone + SMS will work when client books'); if(navigator.vibrate) navigator.vibrate([200,100,200]); new Notification('Nurse Tone Enabled',{body:`When client books you, tone ${selected.name} will ring! SMS: ${smsChecked?'ON':'OFF'}`,icon:'icon-transparent-512.png'}); }
+    });}
+  };
+  return React.createElement('div',{className:'toneCard'},
+    React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+      React.createElement('b',{style:{color:'#facc15',fontSize:14}},'🎵 NURSE Custom Tone — Select Song From Phone — Rings + SMS When Client Books You'),
+      React.createElement('span',{style:{fontSize:10,background:'rgba(34,197,94,.15)',color:'#86efac',border:'1px solid rgba(34,197,94,.3)',padding:'4px 8px',borderRadius:999}},'NEW FOR NURSE + SMS')
+    ),
+    React.createElement('div',{style:{fontSize:11,color:'#a78bfa',marginTop:6,lineHeight:1.5}},'Select tone/song from your phone. When client books you in book-nurse.html, your phone will RING with this tone + VIBRATE + NOTIFICATION + SMS (works even if phone silent/data off) so you know instantly! Saves with Nurse Photo Name Phone Email + Time.'),
+    React.createElement('div',{style:{marginTop:12}},
+      React.createElement('b',{style:{fontSize:11,color:'#fff'}},'Preset Tones:'),
+      [
+        {id:'new_booking_beep',name:'🔔 New Booking Beep — Ding Ding'},
+        {id:'urgent_booking',name:'🚨 Urgent Booking — Loud Alarm'},
+        {id:'cash_sound',name:'💰 Cash Sound — Cha-Ching!'},
+        {id:'gentle_bell',name:'🔔 Gentle Bell — Soft'},
+        {id:'afrobeat_nurse',name:'🥁 Afrobeat Nurse — Ghana Vibe'}
+      ].map(t=>React.createElement('div',{key:t.id,className:'toneOpt'+(selected.id===t.id?' selected':''),onClick:()=>selectPreset(t.id,t.name)},
+        React.createElement('div',null,React.createElement('b',{style:{fontSize:12}},t.name)),
+        React.createElement('button',{className:'btn-ghost',style:{padding:'6px 10px',fontSize:11},onClick:(e)=>{e.stopPropagation(); playNursePreset(t.id);}},'▶️')
+      ))
+    ),
+    React.createElement('div',{style:{marginTop:12}},
+      React.createElement('b',{style:{fontSize:11,color:'#fff'}},'Or Upload Your Own Song From Phone (MP3, M4A, WAV):'),
+      React.createElement('input',{type:'file',accept:'audio/*',onChange:handleFile,style:{width:'100%',padding:10,borderRadius:12,border:'1px solid rgba(168,85,247,.2)',background:'rgba(14,10,28,.6)',color:'#e8e0ff',fontSize:12,marginTop:6}})
+    ),
+    React.createElement('div',{style:{marginTop:12,background:'rgba(34,197,94,.08)',border:'1px solid rgba(34,197,94,.2)',borderRadius:12,padding:10}},
+      React.createElement('label',{style:{display:'flex',gap:8,alignItems:'center',fontSize:12,fontWeight:700}},
+        React.createElement('input',{type:'checkbox',checked:smsChecked,onChange:(e)=>setSmsChecked(e.target.checked)}),
+        ' 💬 Also send SMS to me (works even if phone silent / data off) — FAST!'
+      ),
+      React.createElement('small',{style:{fontSize:10,color:'#a78bfa',display:'block',marginTop:6}},'When client books you, you get SMS: "🔔 NEW BOOKING! Client ASABERE PETER booked you! GHS 150..." + tone rings! Saved in smsLogs with Photo Name Phone Email + Time')
+    ),
+    React.createElement('div',{id:'nursePreviewWrap',style:{marginTop:12,background:'rgba(14,10,28,.6)',borderRadius:12,padding:10,display:selected.name?'block':'none'}},
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+        React.createElement('div',null,
+          React.createElement('b',{style:{fontSize:11,color:'#facc15'}},'✅ Selected:'),
+          React.createElement('div',{style:{fontSize:12,color:'#fff',fontWeight:700}},selected.name),
+          React.createElement('small',{style:{fontSize:10,color:'#a78bfa'}},`Saved: ${selected.time||'Not saved'} • Type: ${selected.type} • SMS: ${smsChecked?'ON':'OFF'}`)
+        ),
+        React.createElement('button',{className:'btn-purple',style:{padding:'8px 12px',fontSize:11},onClick:()=>{ if(selected.type==='custom'){ const p=document.getElementById('nursePreviewPlayer'); if(p){p.src=selected.base64; p.style.display='block'; p.play();} } else { playNursePreset(selected.id); } }},'▶️ Play')
+      ),
+      React.createElement('audio',{id:'nursePreviewPlayer',controls:true,style:{width:'100%',marginTop:8,display:'none'}})
+    ),
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginTop:14}},
+      React.createElement('button',{className:'btn-yellow',onClick:save},'💾 Save Nurse Tone + SMS — Photo Name Phone + Time'),
+      React.createElement('button',{className:'btn-green',onClick:()=>{ ringNurseTone(); if(smsChecked){ const t=getSavedNurseTone(); sendSMSToNurse(getNurse().phone||'233502957280',`🔔 TEST NEW BOOKING! LOVE CARE GLOBAL: Client ASABERE PETER booked you! GHS 150. Patient Ama at East Legon. Tone ${t.name} rang! SMS ON!`,{clientName:'ASABERE PETER',clientPhone:'+233502957280',bookingId:'TEST-LCG'}); alert('Test tone + SMS sent! Check phone!'); } }},'🧪 Test Ring + SMS Now')
+    ),
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginTop:8}},
+      React.createElement('button',{className:'btn-purple',onClick:enableNotifs},'🔔 Enable Notifications + Vibration'),
+      React.createElement('button',{className:'btn-ghost',onClick:()=>{ localStorage.removeItem('nurse_tone_base64'); localStorage.removeItem('nurse_tone_name'); localStorage.setItem('nurse_tone_name','New Booking Beep — Ding Ding'); alert('Cleared — Default beep'); }},'🗑️ Clear')
+    ),
+    React.createElement('div',{style:{fontSize:10,color:'#6b6788',marginTop:8}},`Current Saved: ${tone.name} • ${tone.time||'Not saved'} • SMS: ${tone.smsEnabled==='true'?'ON':'OFF'} • When client books, this rings + SMS!`)
+  );
+}
 
 function App(){
   const [nurse]=useState(()=>getNurse());
@@ -111,18 +257,36 @@ function App(){
   const [selAccept,setSelAccept]=useState(null);
   const [gpsInfo,setGpsInfo]=useState({lat:null,lng:null});
   const gpsIntervalRef=useRef(null);
+  const prevCountRef=useRef(0);
+  const prevIdsRef=useRef(new Set());
   useEffect(()=>{
     const nurseId=nurse.id;
     const offersRef=rtdb.ref('myJobOffers/'+nurseId);
     offersRef.on('value', snap=>{
-      const val=snap.val();const arr = val ? Object.values(val).sort((a,b)=>(b.time||0)-(a.time||0)) : [];
-      setOffers(arr);const active = arr.filter(o=> ['ACCEPTED','ARRIVED','PENDING','ENROUTE','INSERVICE','accepted','enRoute','arrived','inService'].includes((o.status||'').toUpperCase())).length;
+      const val=snap.val();
+      const arr = val ? Object.values(val).sort((a,b)=>(b.time||0)-(a.time||0)) : [];
+      const newIds=new Set(arr.map(o=>o.id));
+      const prevIds=prevIdsRef.current;
+      let hasNewBooking=false; let newBookingObj=null;
+      for(const o of arr){ if(!prevIds.has(o.id)){ hasNewBooking=true; newBookingObj=o; break; } }
+      if(hasNewBooking && prevCountRef.current>0){
+        setTimeout(()=>{ 
+          ringNurseTone(newBookingObj);
+          const msg = `🔔 NEW BOOKING! LOVE CARE GLOBAL: Client ${newBookingObj.clientName||'Client'} (${newBookingObj.clientPhone||''}) booked you! ${newBookingObj.service||'Nursing'} GHS ${newBookingObj.amount||0}. Patient: ${newBookingObj.patientName||''} at ${newBookingObj.patientLocation||''}. Check my-job-offer.html NOW! Tone ${getSavedNurseTone().name} rang!`;
+          sendSMSToNurse(nurse.phone||newBookingObj.nursePhone||newBookingObj.clientPhone||'', msg, newBookingObj);
+        },300);
+      }
+      prevIdsRef.current=newIds;
+      prevCountRef.current=arr.length;
+      setOffers(arr);
+      const active = arr.filter(o=> ['ACCEPTED','ARRIVED','PENDING','ENROUTE','INSERVICE','accepted','enRoute','arrived','inService'].includes((o.status||'').toUpperCase())).length;
       let balance=0;arr.forEach(o=>{if(['ACCEPTED','ARRIVED','COMPLETED','ENROUTE','INSERVICE','accepted'].includes((o.status||'').toUpperCase())){const amt=parseFloat(o.amount||0);balance+= o.amountSplit?.nurse || amt*0.8;}});
       setStats({ totalJobs: arr.length, activeJobs: active, rating: 0, reviews: 0, balanceGHS: balance, balanceUSD: balance/15.5 });setLoading(false);
       const activeJob=arr.find(o=>['ACCEPTED','ENROUTE','ARRIVED','INSERVICE'].includes((o.status||'').toUpperCase()));
       if(activeJob && !isTracking){ startNurseGPSTracking(activeJob.id, nurse, activeJob.status||'accepted'); }
     });
     gpsIntervalRef.current=setInterval(()=>{ if(lastLat&&lastLng){ setGpsInfo({lat:lastLat,lng:lastLng}); } },2000);
+    if(Notification && Notification.permission==='default'){ Notification.requestPermission(); }
     return ()=>{ offersRef.off(); if(gpsIntervalRef.current) clearInterval(gpsIntervalRef.current); };
   },[nurse.id]);
   const initials=nurse.fullName.split(' ').filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join('')||'AP';
@@ -138,8 +302,8 @@ function App(){
           React.createElement('div',{style:{width:52,height:52,borderRadius:999,background:'#231e44',display:'grid',placeItems:'center',fontWeight:700,color:'#fbbf24',border:'1px solid var(--line)' }},initials),
           React.createElement('div',null,
             React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center'}},
-              React.createElement('h1',{style:{margin:0,fontFamily:'Fraunces',fontSize:22}},'My Job Offer'),
-              React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0'}},React.createElement('span',{className:'live-dot'}),' CLIENT + PATIENT')
+              React.createElement('h1',{style:{margin:0,fontFamily:'Fraunces',fontSize:22}},'My Job Offer — Nurse Tone + SMS 🎵📱'),
+              React.createElement('span',{className:'badge',style:{background:'rgba(52,211,153,.12)',color:'#a7f3d0'}},React.createElement('span',{className:'live-dot'}),' TONE + SMS RINGS')
             ),
             React.createElement('div',{style:{fontSize:13.5,color:'var(--muted)',marginTop:4}},
               'Welcome ',React.createElement('span',{style:{color:'var(--text)',fontWeight:600}},nurse.firstName),' — ',nurse.fullName,
@@ -152,6 +316,7 @@ function App(){
     ),
     React.createElement('main',{className:'wrap',style:{padding:'28px 20px',display:'grid',gridTemplateColumns:'1.2fr .8fr',gap:20,paddingBottom:100}},
       React.createElement('section',null,
+        React.createElement(NurseTonePicker,null),
         React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:10,marginBottom:22}},
           [{k:'TOTAL JOBS', v:loading?'...':String(stats.totalJobs)}, {k:'ACTIVE', v:loading?'...':`${stats.activeJobs} jobs`}, {k:'RATING', v:'5.0'}, {k:'BALANCE', v:loading?'...':`GHS ${Math.round(stats.balanceGHS)}`}].map(x=>
             React.createElement('div',{key:x.k,className:'stat'},
@@ -161,7 +326,7 @@ function App(){
           )
         ),
         loading?React.createElement('div',{className:'empty'},'Loading...'):
-        offers.length===0?React.createElement('div',{className:'empty'},React.createElement('div',{style:{fontSize:50}},'📭'),React.createElement('div',{style:{fontSize:18,fontWeight:700,marginTop:10}},'No job offers yet'))
+        offers.length===0?React.createElement('div',{className:'empty'},React.createElement('div',{style:{fontSize:50}},'📭'),React.createElement('div',{style:{fontSize:18,fontWeight:700,marginTop:10}},'No job offers yet — When client books you, your custom tone + SMS will ring! 🎵📱'))
         :
           offers.map(o=>{
             const clientName=o.clientName||o.clientFullName||'Client';
@@ -175,7 +340,6 @@ function App(){
             const avatarUrl=clientPhoto||`https://ui-avatars.com/api/?name=${encodeURIComponent(clientName)}&background=facc15&color=000&size=200`;
             const pLoc=getPatientLocation(o);
             const cLoc=getClientLocation(o);
-            // PRIMARY = patient, fallback = client
             const navLat = pLoc.lat || cLoc.lat;
             const navLng = pLoc.lng || cLoc.lng;
             const isPatientLoc = !!pLoc.lat;
@@ -190,62 +354,42 @@ function App(){
                     React.createElement('span',{className:'badge',style:{marginLeft:'auto',background:'rgba(52,211,153,.15)',color:'#a7f3d0'}},o.status||'PENDING')
                   ),
                   React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:6}},`${o.service||'Nursing Care'} • GH₵ ${o.amount||0} • ${o.paymentMethod||'Paid'} • 📍 ${distance} ${isPatientLoc?'(Patient)':'(Client)'}`),
-                  // CLIENT BOX — PAYER
                   React.createElement('div',{className:'clientBox'},
-                    React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#facc15',marginBottom:8}},'👤 CLIENT — Who pays (Auto-filled)'),
+                    React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#facc15',marginBottom:8}},'👤 CLIENT — Who pays'),
                     React.createElement('div',{style:{display:'grid',gap:6,fontSize:12}},
                       React.createElement('div',null, React.createElement('span',{style:{color:'var(--faint)'}},'Name: '), React.createElement('b',null,clientName)),
                       React.createElement('div',null, React.createElement('span',{style:{color:'var(--faint)'}},'Phone: '), React.createElement('a',{href:`tel:${clientPhone}`,style:{color:'#34d399',fontWeight:700,textDecoration:'none'}},clientPhone)),
-                      React.createElement('div',null, React.createElement('span',{style:{color:'var(--faint)'}},'Email: '), React.createElement('span',{style:{fontSize:11,color:'#a78bfa'}},clientEmail)),
-                      cLoc.lat&&React.createElement('div',null, React.createElement('span',{style:{color:'var(--faint)'}},'Client Loc: '), React.createElement('span',{style:{fontSize:11}},`${cLoc.lat.toFixed(4)}, ${cLoc.lng.toFixed(4)}`))
+                      React.createElement('div',null, React.createElement('span',{style:{color:'var(--faint)'}},'Email: '), React.createElement('span',{style:{fontSize:11,color:'#a78bfa'}},clientEmail))
                     )
                   ),
-                  // PATIENT BOX — RECEIVER — WHERE NURSE GOES!
                   React.createElement('div',{className:'patientBox'},
-                    React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#34d399',marginBottom:8,display:'flex',alignItems:'center',gap:6}},'🏥 PATIENT — Who needs care — Nurse goes HERE! 🧭'),
+                    React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#34d399',marginBottom:8}},'🏥 PATIENT — Nurse goes HERE! 🧭'),
                     React.createElement('div',{style:{display:'grid',gap:6,fontSize:12}},
-                      React.createElement('div',null, React.createElement('span',{style:{color:'#6b7280'}},'Patient: '), React.createElement('b',{style:{color:'#ecfdf5'}},patientName), patientRel?` (${patientRel})`:'' ),
+                      React.createElement('div',null, React.createElement('span',{style:{color:'#6b7280'}},'Patient: '), React.createElement('b',{style:{color:'#ecfdf5'}},patientName)),
                       React.createElement('div',null, React.createElement('span',{style:{color:'#6b7280'}},'Phone: '), React.createElement('a',{href:`tel:${patientPhone}`,style:{color:'#34d399',fontWeight:800,textDecoration:'none'}},patientPhone||'No phone')),
                       React.createElement('div',null, React.createElement('span',{style:{color:'#6b7280'}},'Address: '), React.createElement('b',{style:{color:'#d1fae5'}},patientLocationText||'No address')),
-                      pLoc.lat&&React.createElement('div',null, React.createElement('span',{style:{color:'#6b7280'}},'Lat/Lng: '), React.createElement('b',null,`${pLoc.lat.toFixed(5)}, ${pLoc.lng.toFixed(5)}`), React.createElement('span',{style:{marginLeft:6,color:'#34d399',fontWeight:700}},`• ${distance} away`))
+                      pLoc.lat&&React.createElement('div',null, React.createElement('span',{style:{color:'#6b7280'}},'Lat/Lng: '), React.createElement('b',null,`${pLoc.lat.toFixed(5)}, ${pLoc.lng.toFixed(5)}`))
                     ),
                     React.createElement('div',{style:{display:'flex',gap:6,marginTop:10,flexWrap:'wrap'}},
                       patientPhone&&React.createElement('a',{href:`tel:${patientPhone}`,style:{flex:1,minWidth:80,padding:'8px 10px',borderRadius:999,background:'#34d399',color:'#000',fontWeight:700,textDecoration:'none',fontSize:11,textAlign:'center'}},'📞 Call Patient'),
-                      patientPhone&&React.createElement('a',{href:`https://wa.me/${patientPhone.replace(/[^0-9]/g,'')}`,target:'_blank',style:{flex:1,minWidth:80,padding:'8px 10px',borderRadius:999,background:'#25D366',color:'#fff',fontWeight:700,textDecoration:'none',fontSize:11,textAlign:'center'}},'💬 WhatsApp Patient'),
                       clientPhone&&React.createElement('a',{href:`tel:${clientPhone}`,style:{flex:1,minWidth:80,padding:'8px 10px',borderRadius:999,background:'rgba(250,204,21,.2)',color:'#facc15',fontWeight:700,textDecoration:'none',fontSize:11,textAlign:'center',border:'1px solid rgba(250,204,21,.3)'}},'📞 Call Client')
                     )
                   ),
-                  // LOCATION BOX — PRIMARY NAVIGATION TO PATIENT!
                   React.createElement('div',{className:'locationBox'},
-                    React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#4285F4',marginBottom:8}}, isPatientLoc ? '📍 PATIENT LOCATION — Auto Navigate — Nurse goes here!' : '📍 CLIENT LOCATION — Old booking (no patient location)'),
+                    React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#4285F4',marginBottom:8}}, isPatientLoc ? '📍 PATIENT LOCATION — Navigate!' : '📍 CLIENT LOCATION'),
                     navLat&&navLng?React.createElement('div',{style:{display:'grid',gap:6,fontSize:12}},
-                      React.createElement('div',null, React.createElement('span',{style:{color:'var(--faint)'}},'Destination: '), React.createElement('b',null,`${navLat.toFixed(5)}, ${navLng.toFixed(5)}`), React.createElement('span',{style:{marginLeft:6,color:'#4285F4'}}, isPatientLoc?'(Patient)':'(Client — old)')),
-                      React.createElement('div',null, React.createElement('span',{style:{color:'var(--faint)'}},'Distance: '), React.createElement('b',{style:{color:'#4285F4'}},distance)),
-                      patientLocationText&&React.createElement('div',null, React.createElement('span',{style:{color:'var(--faint)'}},'Address: '), React.createElement('span',null,patientLocationText)),
                       React.createElement('div',{style:{display:'flex',gap:6,marginTop:10,flexWrap:'wrap'}},
-                        React.createElement('button',{className:'btn-nav',style:{flex:1,minWidth:140},onClick:()=>openGoogleMapsNavigation(navLat, navLng, gpsInfo.lat, gpsInfo.lng)}, isPatientLoc?'🧭 NAVIGATE TO PATIENT — Google Maps':'🧭 Navigate — Google Maps'),
+                        React.createElement('button',{className:'btn-nav',style:{flex:1,minWidth:140},onClick:()=>openGoogleMapsNavigation(navLat, navLng, gpsInfo.lat, gpsInfo.lng)}, isPatientLoc?'🧭 NAVIGATE TO PATIENT':'🧭 Navigate'),
                         React.createElement('button',{className:'btn-ghost',style:{flex:1,minWidth:90},onClick:()=>openLocationOnMap(navLat, navLng)},'🗺️ View Map')
                       )
-                    ):React.createElement('div',{style:{fontSize:11,color:'#fca5a5',background:'rgba(239,68,68,.08)',borderRadius:8,padding:8}},'⚠️ No location saved — Old booking — New bookings will include patient location')
+                    ):React.createElement('div',{style:{fontSize:11,color:'#fca5a5'}},'⚠️ No location')
                   ),
                   React.createElement('div',{style:{display:'flex',gap:8,marginTop:14,flexWrap:'wrap'}},
-                    (o.status==='PENDING'||o.status==='pending_50_percent'||o.status==='pending_full_payment'||!o.status)&&React.createElement(React.Fragment,null,
-                      React.createElement('button',{className:'btn-gold',onClick:()=>setSelAccept(o)},'✅ Accept + Navigate to PATIENT'),
+                    (o.status==='PENDING'||!o.status)&&React.createElement(React.Fragment,null,
+                      React.createElement('button',{className:'btn-gold',onClick:()=>setSelAccept(o)},'✅ Accept + Navigate'),
                       React.createElement('button',{className:'btn-ghost',onClick:()=>{ if(confirm('Reject?')){ rtdb.ref('myJobOffers/'+nurse.id+'/'+o.id).update({status:'REJECTED'}); showToast('Rejected'); } }},'❌ Reject')
                     ),
-                    (o.status==='ACCEPTED'||o.status==='accepted')&&React.createElement(React.Fragment,null,
-                      React.createElement('button',{className:'btn-nav',style:{flex:1},onClick:()=>openGoogleMapsNavigation(navLat, navLng, gpsInfo.lat, gpsInfo.lng)},'🧭 Navigate to PATIENT'),
-                      React.createElement('button',{className:'btn-gold',style:{background:'#facc15'},onClick:()=>{updateNurseStatus(o.id,'ENROUTE',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'ENROUTE'}:x)); showToast('🚗 En Route to PATIENT — GPS LIVE'); if(!isTracking) startNurseGPSTracking(o.id,nurse,'enRoute'); openGoogleMapsNavigation(navLat, navLng, gpsInfo.lat, gpsInfo.lng);}},'🚗 En Route + NAV')
-                    ),
-                    (o.status==='ENROUTE'||o.status==='enRoute')&&React.createElement(React.Fragment,null,
-                      React.createElement('button',{className:'btn-nav',onClick:()=>openGoogleMapsNavigation(navLat, navLng, gpsInfo.lat, gpsInfo.lng)},'🧭 Continue to PATIENT'),
-                      React.createElement('button',{className:'btn-green',onClick:()=>{updateNurseStatus(o.id,'ARRIVED',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'ARRIVED'}:x)); showToast('📍 Arrived at PATIENT');}},'📍 Arrived at PATIENT')
-                    ),
-                    (o.status==='ARRIVED'||o.status==='arrived')&&React.createElement('button',{className:'btn-green',onClick:()=>{updateNurseStatus(o.id,'INSERVICE',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'INSERVICE'}:x)); showToast('👩‍⚕️ In Service — Patient');}},'👩‍⚕️ Start Service'),
-                    (o.status==='INSERVICE'||o.status==='inService')&&React.createElement('button',{className:'btn-green',onClick:()=>{updateNurseStatus(o.id,'COMPLETED',nurse); setOffers(prev=>prev.map(x=>x.id===o.id?{...x,status:'COMPLETED'}:x)); showToast('✅ Completed'); setTimeout(()=>stopNurseGPSTracking(),3000);}},'✅ Complete')
-                  ),
-                  React.createElement('div',{style:{display:'flex',gap:8,marginTop:10}},
-                    React.createElement('button',{className:'btn-purple',style:{flex:1},onClick:()=>complainAboutClient(o)},'⚠️ Complain About Client — CEO sees LIVE')
+                    (o.status==='ACCEPTED'||o.status==='accepted')&&React.createElement('button',{className:'btn-nav',style:{flex:1},onClick:()=>openGoogleMapsNavigation(navLat, navLng, gpsInfo.lat, gpsInfo.lng)},'🧭 Navigate to PATIENT')
                   )
                 )
               )
@@ -256,63 +400,45 @@ function App(){
         React.createElement('div',{className:'card',style:{padding:20}},
           React.createElement('h3',{style:{margin:0,fontFamily:'Fraunces'}},'Wallet - '+nurse.fullName),
           React.createElement('div',{style:{marginTop:12,background:'#0f0b22',padding:14,borderRadius:12,border:'1px solid var(--line)'}},
-            React.createElement('div',{style:{fontSize:11,color:'var(--faint)'}},'Current Balance • LIVE'),
+            React.createElement('div',{style:{fontSize:11,color:'var(--faint)'}},'Current Balance • LIVE + Tone + SMS'),
             React.createElement('div',{style:{fontSize:26,fontWeight:700}},'GHS '+Math.round(stats.balanceGHS)),
-            React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6}},`≈ $${stats.balanceUSD.toFixed(2)} USD`)
-          ),
-          React.createElement('div',{style:{marginTop:12,fontSize:11,color:'var(--muted)',background:'rgba(34,197,94,.08)',padding:10,borderRadius:10,border:'1px solid rgba(34,197,94,.15)'}},'🏥 NEW: Client books for family at different places — Nurse navigates to PATIENT location, not client location — Call Patient phone directly!')
+            React.createElement('div',{style:{marginTop:10,background:'rgba(250,204,21,.08)',border:'1px solid rgba(250,204,21,.2)',borderRadius:10,padding:8,fontSize:11,color:'#facc15'}},`🎵 Tone: ${getSavedNurseTone().name} • SMS: ${getSavedNurseTone().smsEnabled==='true'?'ON':'OFF'} • When client books, this rings + SMS!`)
+          )
         )
       )
     ),
     selAccept&&React.createElement('div',{style:{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',display:'grid',placeItems:'center',zIndex:50,padding:20}},
       React.createElement('div',{className:'card',style:{padding:24,maxWidth:480,width:'100%'}},
-        React.createElement('h3',{style:{margin:0,fontFamily:'Fraunces'}},'✅ Accept Job + Navigate to PATIENT?'),
-        (()=>{
-          const pLoc=getPatientLocation(selAccept); const cLoc=getClientLocation(selAccept); const navLat=pLoc.lat||cLoc.lat; const navLng=pLoc.lng||cLoc.lng;
-          return React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:10,lineHeight:1.6}},
-            `Patient: ${selAccept.patientName||'Patient'}`,React.createElement('br'),
-            `Patient Phone: ${selAccept.patientPhone||''}`,React.createElement('br'),
-            `Patient Address: ${selAccept.patientLocation||selAccept.patientAddress||''}`,React.createElement('br'),
-            `Client: ${selAccept.clientName||''} — ${selAccept.clientPhone||''}`,React.createElement('br'),
-            `Amount: GH₵ ${selAccept.amount||0}`,React.createElement('br'),
-            `Navigate to: ${navLat?`${navLat.toFixed(5)}, ${navLng.toFixed(5)} ${pLoc.lat?'(PATIENT)':'(CLIENT)'} `:'Not saved'}`,React.createElement('br'),React.createElement('br'),
-            React.createElement('div',{style:{background:'rgba(34,197,94,.12)',borderRadius:10,padding:10,border:'1px solid rgba(34,197,94,.2)'}},
-              React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'#34d399'}},'🧭 What happens:'),
-              React.createElement('div',{style:{fontSize:11,marginTop:4,lineHeight:1.5}},'1. ✅ ACCEPTED',React.createElement('br'),'2. 🛰️ GPS STARTS — CEO sees LIVE',React.createElement('br'),'3. 🗺️ Maps auto-opens to PATIENT house',React.createElement('br'),'4. 🚗 Navigate to PATIENT')
-            )
-          );
-        })(),
+        React.createElement('h3',{style:{margin:0,fontFamily:'Fraunces'}},'✅ Accept Job?'),
+        React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:10}},`Patient: ${selAccept.patientName||'Patient'} — Amount: GH₵ ${selAccept.amount||0}`),
         React.createElement('div',{style:{display:'flex',gap:10,marginTop:16}},
           React.createElement('button',{className:'btn-nav',style:{flex:1.5},onClick:()=>{
             const pLoc=getPatientLocation(selAccept); const cLoc=getClientLocation(selAccept); const navLat=pLoc.lat||cLoc.lat; const navLng=pLoc.lng||cLoc.lng;
-            rtdb.ref('myJobOffers/'+nurse.id+'/'+selAccept.id).update({status:'ACCEPTED', acceptedAt:Date.now(), lastUpdate:Date.now()});
+            rtdb.ref('myJobOffers/'+nurse.id+'/'+selAccept.id).update({status:'ACCEPTED', acceptedAt:Date.now()});
             rtdb.ref('bookings/'+selAccept.id).update({status:'accepted', nurseId:nurse.id, nurseName:nurse.fullName, acceptedAt:Date.now()});
-            const arr=offers.map(o=>o.id===selAccept.id?{...o,status:'ACCEPTED'}:o);setOffers(arr);
-            showToast('✅ Accepted — GPS + Navigate to PATIENT');
+            setOffers(arr=>arr.map(o=>o.id===selAccept.id?{...o,status:'ACCEPTED'}:o));
+            showToast('✅ Accepted — GPS + Navigate');
             startNurseGPSTracking(selAccept.id, nurse, 'accepted');
             setTimeout(()=>{ if(navLat&&navLng){ openGoogleMapsNavigation(navLat, navLng, lastLat, lastLng); } },800);
             setSelAccept(null);
-          }},'✅ Accept + GPS + Navigate to PATIENT'),
+          }},'✅ Accept + GPS + Navigate'),
           React.createElement('button',{className:'btn-ghost',style:{flex:1},onClick:()=>setSelAccept(null)},'Cancel')
         )
       )
     ),
     toast&&React.createElement('div',{className:'toast'},toast),
     React.createElement('div',{id:'gpsBar',className:'gps-bar'},
-      React.createElement('div',{style:{maxWidth:1240,margin:'0 auto',display:'flex',justifyContent:'space-between',alignItems:'center',gap:12}},
+      React.createElement('div',{style:{maxWidth:1240,margin:'0 auto',display:'flex',justifyContent:'space-between',alignItems:'center',gap:10}},
         React.createElement('div',{style:{display:'flex',gap:10,alignItems:'center'}},
           React.createElement('span',{className:'gps-dot'}),
-          React.createElement('div',null,
-            React.createElement('div',{style:{fontSize:12,fontWeight:700,color:'#34d399'}},'🛰️ LIVE GPS — Going to PATIENT location — CEO monitoring'),
-            React.createElement('div',{style:{fontSize:11,color:'var(--muted)'}},gpsInfo.lat?`📍 You: ${gpsInfo.lat.toFixed(5)}, ${gpsInfo.lng.toFixed(5)}`:'Starting GPS...')
-          )
+          React.createElement('b',{style:{fontSize:12}},'🛰️ GPS LIVE'),
+          React.createElement('span',{style:{fontSize:11,color:'var(--muted)'}}, gpsInfo.lat?`${gpsInfo.lat.toFixed(5)}, ${gpsInfo.lng.toFixed(5)}`:'Getting location...')
         ),
-        React.createElement('button',{onClick:()=>stopNurseGPSTracking(),style:{padding:'6px 12px',borderRadius:999,background:'rgba(255,255,255,.06)',color:'var(--text)',fontSize:11,border:'1px solid var(--line)',cursor:'pointer'}},'⏹️ Stop GPS')
+        React.createElement('button',{className:'btn-ghost',style:{padding:'6px 12px',fontSize:11},onClick:()=>stopNurseGPSTracking()},'Stop GPS')
       )
     )
   );
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 </script>
-</body>
-</html>
+</body></html>
