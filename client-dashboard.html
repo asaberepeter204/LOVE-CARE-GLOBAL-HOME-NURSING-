@@ -1,36 +1,33 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Dashboard — LOVE CARE GLOBAL — SOS Fixed</title>
+<title>Client Dashboard — My Bookings Real Date + Complaint Fixed</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:20px}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
 .card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px}
-.btn{border:none;border-radius:14px;padding:12px 16px;font-weight:900;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px}
-.grid .gcard{border-radius:20px;padding:18px;text-align:center;cursor:pointer;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:.2s}
-.grid .gcard:active{transform:scale(.97)}
+.gcard{border-radius:20px;padding:18px;text-align:center;cursor:pointer;min-height:115px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:.2s;border:none}
+.gcard:active{transform:scale(.97)}
 .purple{background:linear-gradient(135deg,#a855f7,#7c3aed);color:white}
 .blue{background:linear-gradient(135deg,#38bdf8,#2563eb);color:white}
 .dark{background:linear-gradient(135deg,#1e1b3a,#2a2250);color:#a78bfa;border:1px solid rgba(168,85,247,.15)}
 .orange{background:linear-gradient(135deg,#fb923c,#f97316);color:white}
-.pink{background:linear-gradient(135deg,#e879a0,#db2777);color:white}
 .yellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
 .red{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:2px solid #facc15;box-shadow:0 0 0 4px rgba(250,204,21,.2)}
 .avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #facc15;background:#1e1a3a}
 .sosTop{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 18px;border-radius:999px;font-weight:900;font-size:12px;text-decoration:none;border:2px solid #facc15;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
+.dateBox{background:white;color:#2563eb;border-radius:8px;padding:4px 10px;font-weight:900;line-height:1.1;min-width:52px;text-align:center}
 </style></head><body>
 <div class="topbar">
 <div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><b style="font-size:13px;font-family:Plus Jakarta Sans">LOVE CARE GLOBAL</b></div>
-<!-- FIXED 1: TOP SOS BUTTON -> sos.html -->
 <a href="sos.html" class="sosTop">SOS</a>
 </div>
 
 <div style="max-width:760px;margin:0 auto;padding:10px">
-<!-- WELCOME CARD WITH PHOTO NAME EMAIL PHONE -->
 <div class="card" style="display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,rgba(28,18,56,.95),rgba(76,29,149,.2))">
-<img id="clientAvatar" class="avatar" src="https://ui-avatars.com/api/?name=ASABERE+PETER&background=facc15&color=000">
+<img id="clientAvatar" class="avatar" src="">
 <div style="flex:1">
 <b style="font-size:18px;color:#fff">Welcome, <span id="clientName">ASABERE PETER</span> 👋</b><br>
 <small id="clientEmail" style="color:#a78bfa;font-size:12px">lovecareglobal@gmail.com</small><br>
@@ -39,34 +36,42 @@
 </div>
 </div>
 
-<!-- GRID BUTTONS -->
 <div class="grid">
 <a href="book-nurse.html" class="gcard purple"><div style="font-size:28px">🩺</div><b>Book Nurse</b></a>
-<a href="client-bookings.html" class="gcard blue"><div style="font-size:18px;background:white;color:#2563eb;border-radius:6px;padding:2px 6px;font-weight:900">JUL<br><b style="font-size:14px">17</b></div><small style="background:rgba(0,0,0,.2);border-radius:999px;padding:2px 8px;font-size:11px">17</small><b>My Bookings</b></a>
+
+<!-- FIXED 1: MY BOOKINGS -> my-bookings.html + REAL DATE -->
+<a href="my-bookings.html" class="gcard blue">
+<div class="dateBox"><div id="myBookingMonth" style="font-size:14px">MAY</div><div id="myBookingDay" style="font-size:18px">13</div></div>
+<small id="myBookingCount" style="background:rgba(0,0,0,.2);border-radius:999px;padding:2px 8px;font-size:11px">0</small>
+<b>My Bookings</b>
+<small style="font-size:9px;opacity:.8">Real date</small>
+</a>
 
 <a href="client-settings.html" class="gcard dark"><div style="font-size:24px">⚙️</div><b>Client Settings</b></a>
 <a href="client-alerts.html" class="gcard orange"><div style="font-size:24px">🔔</div><b>Alerts</b></a>
 
-<a href="complaint.html" class="gcard dark"><div style="font-size:24px">📝</div><b>Complaint</b></a>
+<!-- FIXED 2: COMPLAINT -> client-complaint.html -->
+<a href="client-complaint.html" class="gcard dark"><div style="font-size:24px">📝</div><b>Complaint</b></a>
+
 <a href="refund-query.html" class="gcard dark" style="border:2px solid #facc15"><div style="font-size:22px">💰</div><b>Refund Query</b><br><small style="font-size:10px;color:#facc15">Photo + Time Saved</small></a>
 
 <a href="rating.html" class="gcard yellow"><div style="font-size:22px">⭐</div><b>Rating</b></a>
-<!-- FIXED 2: BOTTOM EMERGENCY SOS BUTTON -> sos.html -->
-<a href="sos.html" class="gcard red"><div style="font-size:22px">🚨</div><b>Emergency SOS</b></a>
+<a href="sos.html" class="gcard red"><div style="font-size:22px">🚨</div><b>Emergency<br>SOS</b></a>
 </div>
 
 <div style="text-align:center;padding:12px">
 <a href="#" onclick="localStorage.clear();location.href='index.html'" style="color:#a78bfa;font-size:13px;text-decoration:none">🚪 Logout</a><br>
-<small style="font-size:9px;color:#6b7280">Client Dashboard • Photo + Phone + Email + Time saved on Refund • SOS points to sos.html</small>
+<small style="font-size:9px;color:#6b7280">My Bookings = my-bookings.html • Complaint = client-complaint.html • SOS = sos.html • Date = Real today</small>
 </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
+
 function loadClient(){
   const name=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'ASABERE PETER';
   const email=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'lovecareglobal@gmail.com';
@@ -75,8 +80,69 @@ function loadClient(){
   document.getElementById('clientName').textContent=name;
   document.getElementById('clientEmail').textContent=email;
   document.getElementById('clientPhone').textContent=phone;
-  if(photo) document.getElementById('clientAvatar').src=photo;
+  document.getElementById('clientAvatar').src=photo||'https://ui-avatars.com/api/?name='+encodeURIComponent(name)+'&background=facc15&color=000';
 }
-loadClient();
+
+// FIXED: REAL DATE — Follows real dates
+function setRealDate(){
+  const now=new Date();
+  const months=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  const month=months[now.getMonth()];
+  const day=now.getDate();
+  document.getElementById('myBookingMonth').textContent=month;
+  document.getElementById('myBookingDay').textContent=day;
+  // Also update count from localStorage bookings
+  try{
+    const bookings=JSON.parse(localStorage.getItem('lcg_bookings')||localStorage.getItem('bookings')||'[]');
+    document.getElementById('myBookingCount').textContent=bookings.length||0;
+  }catch(e){ document.getElementById('myBookingCount').textContent='0'; }
+}
+
+async function loadBookingsCount(){
+  const phone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'';
+  const email=localStorage.getItem('clientEmail')||'';
+  try{
+    const snap=await get(ref(db,'bookings'));
+    if(!snap.exists()) return;
+    let count=0;
+    snap.forEach(child=>{
+      const b=child.val();
+      const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,''); const myPhone=phone.replace(/[^0-9]/g,'');
+      const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);
+      const emailMatch=b.clientEmail&&email&&b.clientEmail.toLowerCase()===email.toLowerCase();
+      if(phoneMatch||emailMatch) count++;
+    });
+    document.getElementById('myBookingCount').textContent=count;
+    localStorage.setItem('lcg_bookings_count', count);
+  }catch(e){}
+}
+
+async function ensureAuth(){return new Promise(res=>{const unsub=onAuthStateChanged(auth,async u=>{unsub();if(u)res(u);else{try{const c=await signInAnonymously(auth);res(c.user);}catch{res(null);}}});setTimeout(()=>res(null),2000);});}
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+  loadClient();
+  setRealDate();
+  await ensureAuth();
+  loadBookingsCount();
+  // Update date every minute — follows real date live
+  setInterval(setRealDate, 60000);
+  // Real-time count
+  try{
+    const phone=localStorage.getItem('clientPhone')||'';
+    const email=localStorage.getItem('clientEmail')||'';
+    onValue(ref(db,'bookings'), snap=>{
+      if(!snap.exists()) return;
+      let count=0;
+      snap.forEach(child=>{
+        const b=child.val();
+        const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,''); const myPhone=phone.replace(/[^0-9]/g,'');
+        const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);
+        const emailMatch=b.clientEmail&&email&&b.clientEmail.toLowerCase()===email.toLowerCase();
+        if(phoneMatch||emailMatch) count++;
+      });
+      document.getElementById('myBookingCount').textContent=count;
+    });
+  }catch(e){}
+});
 </script>
 </body></html>
