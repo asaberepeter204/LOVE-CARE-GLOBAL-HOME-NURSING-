@@ -1,302 +1,194 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Alerts — LOVE CARE GLOBAL</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="icon-transparent-512.png">
+<title>Alerts — Booking Accepted / Rejected — LOVE CARE GLOBAL — Photo Email Saved</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.logoBox{display:flex;align-items:center;gap:10px}.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
-.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
-.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;text-decoration:none}
-.card{background:rgba(28,18,56,.88);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px;backdrop-filter:blur(14px);animation:fadeIn .3s}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.badge{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:900;display:inline-block}
-.badge-new{background:rgba(34,197,94,.2);color:#86efac;border:1px solid rgba(34,197,94,.3)}
-.badge-read{background:rgba(255,255,255,.08);color:#a78bfa;border:1px solid rgba(168,85,247,.15)}
-.btn{border:none;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;font-size:11px;pointer-events:auto;touch-action:manipulation;min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.btnGreen{background:linear-gradient(135deg,#22c55e,#86efac);color:#0a1a0f}
-.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
-.btnYellow{background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a}
-.btnGray{background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.15);color:#d8b4fe}
-.bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0;z-index:60}
-.btab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#a78bfa;cursor:pointer;padding:6px}
-.btab.active{color:#d8b4fe;background:rgba(245,158,11,.15);border-radius:12px;margin:0 4px;border:1px solid rgba(245,158,11,.2)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.15);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:22px;padding:16px;margin:12px;animation:pop .3s}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.acceptedCard{border:2px solid #22c55e;background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(16,101,57,.15),rgba(28,18,56,.9));box-shadow:0 0 0 4px rgba(34,197,94,.12)}
+.rejectedCard{border:2px solid #ef4444;background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(127,29,29,.15),rgba(28,18,56,.9));box-shadow:0 0 0 4px rgba(239,68,68,.1)}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
+.badge-new{background:#22c55e;color:#052e16}
+.btn{border:none;border-radius:14px;padding:13px 16px;font-weight:900;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;flex:1;min-height:48px}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white}
+.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
+.btnOrange{background:linear-gradient(135deg,#fb923c,#f97316);color:white}
+.btnWhats{background:linear-gradient(135deg,#25D366,#128C7E);color:white}
+.btnGray{background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe}
+.clientAvatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #22c55e;background:#1e1a3a}
 .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:blink 1.5s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.alertIcon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
-.alertIcon.accepted{background:linear-gradient(135deg,#22c55e,#16a34a);box-shadow:0 4px 12px rgba(34,197,94,.3)}
-.alertIcon.rejected{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 4px 12px rgba(239,68,68,.3)}
-.alertIcon.pending{background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 12px rgba(245,158,11,.3)}
-.alertIcon.tracking{background:linear-gradient(135deg,#2563eb,#1d4ed8);box-shadow:0 4px 12px rgba(37,99,235,.3)}
-.alertIcon.system{background:rgba(76,29,149,.3);border:1px solid rgba(168,85,247,.2)}
-</style></head><body><div class="bg"></div>
-
-<div class="topbar"><div class="logoBox"><img src="icon-transparent-512.png" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING<br><span style="font-size:9px;color:#facc15"><span class="dot"></span> ALERTS — LIVE</span></div></div><a href="sos.html" class="sosBtn">SOS</a></div>
-
-<div style="max-width:820px;margin:0 auto;padding:10px">
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:10px 0;z-index:60}
+.btab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#a78bfa;cursor:pointer;padding:6px}
+.btab.active{color:#22c55e;background:rgba(34,197,94,.12);border-radius:12px;margin:0 6px;border:1px solid rgba(34,197,94,.2)}
+</style></head><body>
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><div><b style="font-size:13px">LOVE CARE GLOBAL</b><br><small style="color:#22c55e;font-size:10px"><span class="dot"></span> ALERTS — ACCEPT / REJECT — PHOTO + EMAIL</small></div></div>
+<div style="display:flex;align-items:center;gap:8px"><img id="topClientAvatar" class="clientAvatar" style="display:none"><a href="emergency-sos.html" style="background:#ef4444;color:white;padding:7px 14px;border-radius:999px;font-weight:900;font-size:11px;text-decoration:none">SOS</a></div>
+</div>
+<div style="max-width:760px;margin:0 auto;padding:10px">
 <div class="card" style="padding:12px;background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-<b style="font-size:12px;color:#facc15">🔔 ALERTS — Nurse Accept / Reject / Tracking Notifications</b>
-<div style="display:flex;gap:6px">
-<button type="button" class="btn btnGray" style="padding:8px 12px;font-size:10px" onclick="loadAlerts()">🔄 Refresh</button>
-<button type="button" class="btn btnGray" style="padding:8px 12px;font-size:10px" onclick="markAllRead()">✅ Mark All Read</button>
-<button type="button" class="btn btnGray" style="padding:8px 12px;font-size:10px" onclick="clearAlerts()">🗑️ Clear</button>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+<b style="font-size:12px;color:#facc15">🔔 YOUR BOOKING ALERTS — Nurse Accepted / Rejected — Client Photo Name Phone Email Saved</b>
+<div style="display:flex;gap:6px"><button class="btn btnGray" style="padding:8px 12px;min-height:32px;font-size:10px" onclick="loadAlerts()">🔄 Refresh</button><button class="btn btnGray" style="padding:8px 12px;min-height:32px;font-size:10px" onclick="markAllRead()">✅ Read All</button></div>
 </div>
+<div style="display:flex;gap:10px;align-items:center;margin-top:10px;background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.08));border:1px solid rgba(250,204,21,.2);border-radius:14px;padding:10px">
+<img id="clientAvatarTop" class="clientAvatar" src="">
+<div style="flex:1"><b id="clientNameTop" style="font-size:13px;color:#fff">Client</b><br><small id="clientPhoneTop" style="color:#86efac;font-size:11px"></small><br><small id="clientEmailTop" style="color:#a78bfa;font-size:10px"></small></div>
+<div style="font-size:9px;color:#fde68a;background:rgba(250,204,21,.15);border-radius:999px;padding:4px 8px">CLIENT — PHOTO + EMAIL + PHONE + NAME</div>
 </div>
-<div id="countInfo" style="font-size:10px;color:#6b7280;margin-top:6px">Loading alerts...</div>
-<div id="liveInfo" style="font-size:9px;color:#22c55e;margin-top:4px"><span class="dot"></span> Real-time — When nurse accepts/rejects, alert appears here + vibration + sound — Auto-refresh on</div>
+<div id="countInfo" style="font-size:10px;color:#6b7280;margin-top:8px">Loading your alerts with client photo name phone email + patient + nurse...</div>
 </div>
-
-<div id="alertsList" style="display:grid;gap:10px"></div>
-
+<div id="alertsList" style="display:grid;gap:14px"></div>
 <div id="emptyAlerts" class="card" style="display:none;text-align:center;padding:30px">
-<div style="font-size:40px">🔔</div><b>No alerts yet</b><br><small style="color:#a78bfa">When nurse accepts or rejects your booking, alert appears here<br>Book a nurse to get alerts</small><br><br><a href="book-nurse.html" class="btn btnYellow">➕ Book Nurse</a> <a href="my-bookings.html" class="btn btnBlue">📅 My Bookings</a>
-</div>
-
-<div class="card" style="background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.2)">
-<b style="font-size:11px;color:#86efac">💡 How Alerts Work:</b><br>
-<small style="font-size:10px;color:#a78bfa;line-height:1.6">
-1. Client books nurse → book-nurse.html → Paystack → Booking saved<br>
-2. Nurse gets notification in my-job-offer.html → Taps ✅ Accept or ❌ Reject<br>
-3. <b>Instantly:</b><br>
-&nbsp;&nbsp;• Client gets notification in my-bookings.html (auto Google Maps opens if accepted)<br>
-&nbsp;&nbsp;• Client gets alert here in alerts.html with vibration<br>
-&nbsp;&nbsp;• CEO Dashboard also updates<br>
-4. If Accepted: Alerts show "Nurse coming — Track live" + Google Maps tracking<br>
-5. If Rejected: Alerts show "Book another nurse" + Refund info
-</small>
+<div style="font-size:44px">🔔</div><b>No nurse response yet</b><br><small style="color:#a78bfa">After you book, when nurse taps Accept ✅ or Reject ❌, alert appears here with client photo + patient location + call + WhatsApp + auto navigation</small><br><br><a href="book-nurse.html" class="btn btnYellow" style="max-width:200px;margin:10px auto">➕ Book Nurse Now</a>
 </div>
 </div>
-
 <div class="bottom-tabs">
-<div class="btab" onclick="location.href='my-bookings.html'">📅 My<br>Bookings</div>
-<div class="btab" onclick="location.href='book-nurse.html'">➕ Book</div>
+<div class="btab" onclick="location.href='client-dashboard.html'">📅 Dashboard</div>
+<div class="btab" onclick="location.href='book-nurse.html'">➕ Book Nurse</div>
 <div class="btab active">🔔 Alerts</div>
 </div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
-const auth=getAuth(app);
-
-let allAlerts = [];
-let clientPhone = null;
-let clientId = null;
-let previousStatuses = {};
-let alertSound = null;
-
+const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
+let allAlerts=[],clientPhone=null,clientName=null,clientEmail=null,clientPhoto=null,previousStatuses={};
 function getClientInfo(){
-  clientId = localStorage.getItem('lcg_client_uid') || localStorage.getItem('currentClientId') || localStorage.getItem('lcg_uid') || null;
-  clientPhone = localStorage.getItem('lcg_client_phone') || localStorage.getItem('clientPhone') || localStorage.getItem('phone') || localStorage.getItem('client_phone') || '+233544121814';
-  return {clientId, clientPhone};
+  clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'+233502957280';
+  clientName=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'Client';
+  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'';
+  clientPhoto=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||'';
+  document.getElementById('clientNameTop').textContent=clientName;
+  document.getElementById('clientPhoneTop').textContent=clientPhone;
+  document.getElementById('clientEmailTop').textContent=clientEmail;
+  const av=document.getElementById('clientAvatarTop');const topAv=document.getElementById('topClientAvatar');
+  if(clientPhoto){av.src=clientPhoto;topAv.src=clientPhoto;topAv.style.display='block';}else{av.src='https://ui-avatars.com/api/?name='+encodeURIComponent(clientName)+'&background=facc15&color=000';}
+  return {clientPhone,clientName,clientEmail,clientPhoto};
 }
-
-async function ensureAuth(){
-  return new Promise(res=>{
-    const unsub=onAuthStateChanged(auth, async user=>{
-      unsub();
-      if(user) res(user);
-      else {
-        try{ const cred=await signInAnonymously(auth); res(cred.user); }catch{ res(null); }
-      }
-    });
-    setTimeout(()=>res(null), 2500);
-  });
-}
-
-function playAlertSound(type){
-  try{
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if(!AudioContext) return;
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = type==='accepted'? 800 : type==='rejected'? 300 : 600;
-    gain.gain.value = 0.1;
-    osc.start();
-    setTimeout(()=>{ osc.stop(); ctx.close(); }, 400);
-  }catch(e){}
-}
-
-function addAlert(alert){
-  // Check duplicate
-  const exists = allAlerts.find(a=>a.id===alert.id && a.type===alert.type && a.bookingId===alert.bookingId);
-  if(exists) return;
-  
-  allAlerts.unshift(alert);
-  // Save to localStorage
-  try{ localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50))); }catch(e){}
-  
-  // Vibration + Sound
-  if(navigator.vibrate) navigator.vibrate(type=>{ if(alert.type==='accepted') return [200,100,200,100,400]; if(alert.type==='rejected') return [400,100,400]; return [200]; }(alert.type));
-  playAlertSound(alert.type);
-  
-  // Notification API if permitted
-  if(window.Notification && Notification.permission==='granted'){
-    new Notification(alert.title, {body: alert.message, icon:'icon-transparent-512.png'});
-  }
-  
-  renderAlerts();
-}
-
+async function ensureAuth(){return new Promise(res=>{const unsub=onAuthStateChanged(auth,async u=>{unsub();if(u)res(u);else{try{const c=await signInAnonymously(auth);res(c.user);}catch{res(null);}}});setTimeout(()=>res(null),2000);});}
+function addAlert(a){if(allAlerts.find(x=>x.id===a.id))return;allAlerts.unshift(a);try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){}if(navigator.vibrate)navigator.vibrate(a.type==='accepted'?[200,100,200,100,400]:[300,100,300]);try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=a.type==='accepted'?800:400;g.gain.value=.12;o.start();setTimeout(()=>{o.stop();ctx.close();},500);}catch(e){}renderAlerts();}
 function renderAlerts(){
-  const list=document.getElementById('alertsList');
-  const countInfo=document.getElementById('countInfo');
-  const empty=document.getElementById('emptyAlerts');
-  const unread = allAlerts.filter(a=>!a.read).length;
-  
-  countInfo.textContent = `${allAlerts.length} alerts — ${unread} unread — Tap to view booking / track nurse — Real-time`;
-  
-  if(!allAlerts.length){
-    list.innerHTML='';
-    empty.style.display='block';
-    return;
-  }
-  empty.style.display='none';
-  
-  list.innerHTML = allAlerts.map(a=>{
-    const iconClass = a.type==='accepted'?'accepted':a.type==='rejected'?'rejected':a.type==='tracking'?'tracking':a.type==='pending'?'pending':'system';
-    const iconEmoji = a.type==='accepted'?'✅':a.type==='rejected'?'❌':a.type==='tracking'?'📍':a.type==='pending'?'⏳':'🔔';
-    const timeAgo = (()=>{ const diff=Date.now()-(a.time||Date.now()); const mins=Math.floor(diff/60000); if(mins<1) return 'Just now'; if(mins<60) return mins+'m ago'; const hrs=Math.floor(mins/60); if(hrs<24) return hrs+'h ago'; return Math.floor(hrs/24)+'d ago'; })();
-    return `<div class="card" style="border-color:${a.type==='accepted'?'rgba(34,197,94,.3)':a.type==='rejected'?'rgba(239,68,68,.25)':a.type==='tracking'?'rgba(37,99,235,.3)':'rgba(168,85,247,.15)'};${!a.read?'background:rgba(34,197,94,.06);border-width:2px':''}">
-      <div style="display:flex;gap:12px;align-items:start">
-        <div class="alertIcon ${iconClass}">${iconEmoji}</div>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;justify-content:space-between;gap:8px;align-items:start">
-            <b style="font-size:13px;color:#f3e8ff;word-break:break-word">${a.title}</b>
-            <div style="display:flex;gap:4px;align-items:center;flex-shrink:0"><span class="badge ${!a.read?'badge-new':'badge-read'}">${!a.read?'NEW':'READ'}</span><small style="font-size:9px;color:#6b7280;white-space:nowrap">${timeAgo}</small></div>
-          </div>
-          <div style="font-size:11px;color:#c4b5fd;margin-top:4px;word-break:break-word">${a.message}</div>
-          ${a.bookingId?`<div style="font-size:9px;color:#6b7280;margin-top:6px">Booking: ${a.bookingId} • ${a.currency||'GHS'} ${a.amount||''} • ${a.nurseName||''}</div>`:''}
-          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-            ${a.type==='accepted'?`<a href="my-bookings.html" class="btn btnGreen" style="flex:1;text-decoration:none">🗺️ Track Nurse Live</a><a href="https://www.google.com/maps?q=${a.clientLat||5.6037},${a.clientLng||-0.1870}" target="_blank" class="btn btnBlue" style="flex:1;text-decoration:none">📍 Google Maps</a>`:
-              a.type==='rejected'?`<a href="book-nurse.html" class="btn btnYellow" style="flex:1;text-decoration:none">➕ Book Another Nurse</a><a href="my-bookings.html" class="btn btnGray" style="flex:1;text-decoration:none">📅 My Bookings</a>`:
-              a.type==='tracking'?`<a href="my-bookings.html" class="btn btnBlue" style="flex:1;text-decoration:none">📍 Live Tracking</a>`:
-              `<a href="my-bookings.html" class="btn btnGray" style="flex:1;text-decoration:none">📅 View Bookings</a>`}
-            <button type="button" class="btn btnGray" style="padding:8px 12px" onclick="markRead('${a.id}')">✅ Read</button>
-          </div>
+  const list=document.getElementById('alertsList');const countInfo=document.getElementById('countInfo');const empty=document.getElementById('emptyAlerts');const unread=allAlerts.filter(a=>!a.read).length;
+  countInfo.textContent=`${allAlerts.length} alerts — ${unread} NEW — Client: ${clientName} • Phone: ${clientPhone} • Email: ${clientEmail||'NO'} • Photo: ${clientPhoto?'YES':'NO'} • Real-time accept/reject`;
+  if(!allAlerts.length){list.innerHTML='';empty.style.display='block';return;}empty.style.display='none';
+  list.innerHTML=allAlerts.map(a=>{
+    const timeAgo=(()=>{const d=Date.now()-(a.time||Date.now());const m=Math.floor(d/60000);if(m<1)return 'Just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';})();
+    const clientAv=a.clientPhotoUrl?`<img src="${a.clientPhotoUrl}" class="clientAvatar">`:'';
+    const nurseAv=a.nursePhotoUrl?`<img src="${a.nursePhotoUrl}" style="width:56px;height:56px;border-radius:50%;border:2px solid #22c55e;object-fit:cover">`:`<div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;font-size:22px">👩‍⚕️</div>`;
+    const isAccepted=a.type==='accepted';const cardClass=isAccepted?'acceptedCard':'rejectedCard';
+    if(isAccepted){
+      const destLat=a.patientLat||a.clientLat||5.6037;const destLng=a.patientLng||a.clientLng||-0.1870;
+      const navUrl=`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=driving`;
+      const nursePhoneClean=(a.nursePhone||'').replace(/[^0-9+]/g,'');
+      return `<div class="card ${cardClass}">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
+          <div style="display:flex;gap:12px;align-items:center"><div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;font-size:26px">✅</div><div><b style="font-size:15px;color:#86efac">ACCEPTED! Nurse is coming!</b><br><b style="font-size:13px;color:#fff">${a.nurseName||'Nurse'} accepted ${a.bookingId}</b><br><small style="color:#a78bfa;font-size:10px">${timeAgo} • ${new Date(a.time).toLocaleString('en-GH')}</small></div></div><span class="badge badge-new">NEW — PHOTO SAVED</span>
         </div>
-      </div>
-    </div>`;
+        <div style="display:flex;gap:12px;align-items:center;margin-top:14px;background:rgba(14,10,28,.6);border-radius:14px;padding:12px">
+          ${nurseAv}<div style="flex:1"><b style="color:#fff;font-size:13px">👩‍⚕️ ${a.nurseName||'Nurse'}</b><br><small style="color:#86efac">📞 ${a.nursePhone||'No phone'}</small><br><small style="color:#a78bfa">Booking: ${a.bookingId} • ${a.currency||'GHS'} ${a.amount||''}</small></div><div style="display:flex;flex-direction:column;gap:4px">${clientAv}<small style="font-size:8px;color:#facc15">YOU — ${a.clientName||clientName}</small></div>
+        </div>
+        <div style="margin-top:12px;background:rgba(14,10,28,.7);border-radius:12px;padding:10px;font-size:11px;color:#c4b5fd;line-height:1.6">
+          <b style="color:#22c55e">🎉 Good news ${a.clientName||clientName}!</b> Your selected nurse <b style="color:#fff">${a.nurseName}</b> has <b style="color:#22c55e">ACCEPTED</b> your booking ${a.bookingId}.<br>
+          <b style="color:#facc15">👤 Client Name:</b> ${a.clientName}<br><b style="color:#facc15">📞 Client Phone:</b> ${a.clientPhone}<br><b style="color:#facc15">📧 Client Email:</b> ${a.clientEmail}<br><b style="color:#facc15">📸 Client Photo:</b> ${a.clientPhotoUrl?'✅ YES — '+a.clientPhotoUrl.slice(0,50):'❌ NO'}<br>
+          <b style="color:#facc15">🏥 Patient:</b> ${a.patientName||'N/A'} • 📞 ${a.patientPhone||''} • 📍 ${a.patientLocation||''}<br>
+          ${a.patientLat?`<b style="color:#60a5fa">📍 Patient Location (Nurse will go here — PRIMARY):</b> ${a.patientLat.toFixed(5)}, ${a.patientLng.toFixed(5)}<br>`:''}
+          💰 Amount: ${a.currency||'GHS'} ${a.amount||''} • PayRef: ${a.paystackRef||''} • Time: ${new Date(a.time).toLocaleString('en-GH')}<br>
+          <span style="color:#22c55e">● Tracking ACTIVE — Auto navigation started</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+          <a href="${navUrl}" target="_blank" class="btn btnBlue">🧭 Auto Navigation — Patient</a>
+          <a href="client-dashboard.html" class="btn btnGreen">🗺️ Live Tracking + Map</a>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+          <a href="tel:${nursePhoneClean}" class="btn btnGray">📞 Call Nurse</a>
+          <a href="https://wa.me/${nursePhoneClean.replace('+','')}?text=Hello%20${encodeURIComponent(a.nurseName||'Nurse')}%20you%20accepted%20my%20booking%20${encodeURIComponent(a.bookingId)}" target="_blank" class="btn btnWhats">💬 WhatsApp Nurse</a>
+          <button onclick="markRead('${a.id}')" class="btn btnGray">✅ Read</button>
+        </div>
+      </div>`;
+    } else {
+      return `<div class="card ${cardClass}">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
+          <div style="display:flex;gap:12px;align-items:center"><div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#ef4444,#dc2626);display:grid;place-items:center;font-size:26px">❌</div><div><b style="font-size:15px;color:#fca5a5">REJECTED — Need Action!</b><br><b style="font-size:13px;color:#fff">${a.nurseName||'Nurse'} rejected ${a.bookingId}</b><br><small style="color:#a78bfa;font-size:10px">${timeAgo} • Reason: ${a.rejectReason||'Not available'}</small></div></div><span class="badge" style="background:#ef4444;color:white">ACTION</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:14px;background:rgba(14,10,28,.6);border-radius:14px;padding:12px">
+          ${nurseAv}<div style="flex:1"><b style="color:#fff;font-size:13px">👩‍⚕️ ${a.nurseName||'Nurse'} — Rejected</b><br><small style="color:#fca5a5">Reason: ${a.rejectReason||'Low rate / Busy'}</small><br><small style="color:#a78bfa">Booking: ${a.bookingId} • Patient: ${a.patientName||''}</small></div>${clientAv}
+        </div>
+        <div style="margin-top:12px;background:rgba(14,10,28,.7);border-radius:12px;padding:10px;font-size:11px;color:#c4b5fd;line-height:1.6">
+          <b style="color:#ef4444">😔 Sorry ${a.clientName||clientName}!</b> Nurse <b>${a.nurseName||''}</b> rejected booking <b>${a.bookingId}</b>.<br>
+          <b style="color:#facc15">👤 Client Name:</b> ${a.clientName}<br><b style="color:#facc15">📞 Phone:</b> ${a.clientPhone}<br><b style="color:#facc15">📧 Email:</b> ${a.clientEmail}<br><b style="color:#facc15">📸 Photo:</b> ${a.clientPhotoUrl?'✅ YES':'❌ NO'}<br>
+          <b style="color:#facc15">🏥 Patient:</b> ${a.patientName||''} • ${a.patientPhone||''} • ${a.patientLocation||''}<br>
+          <b style="color:#f59e0b">💡 What to do?</b> Book another nurse OR Increase payment rate — Higher rate attracts nurses!
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+          <a href="book-nurse.html" class="btn btnYellow">➕ Book Another Nurse</a>
+          <a href="book-nurse.html?increaseRate=1&bookingId=${a.bookingId}" class="btn btnOrange">💰 Increase Payment Rate</a>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+          <a href="refund-query.html" class="btn btnGray">📝 Refund Query</a>
+          <a href="https://wa.me/233544121814?text=Hello%20CEO%20my%20booking%20${encodeURIComponent(a.bookingId)}%20was%20rejected" target="_blank" class="btn btnWhats">💬 CEO</a>
+          <button onclick="markRead('${a.id}')" class="btn btnGray">✅ Read</button>
+        </div>
+      </div>`;
+    }
   }).join('');
 }
-
-window.loadAlerts = async function(){
-  await ensureAuth();
-  const {clientPhone} = getClientInfo();
-  
-  // Load from localStorage first
+window.loadAlerts=async function(){
+  await ensureAuth();const {clientPhone,clientName,clientEmail,clientPhoto}=getClientInfo();
+  try{const saved=JSON.parse(localStorage.getItem('lcg_alerts')||'[]');if(saved.length){allAlerts=saved;renderAlerts();}}catch(e){}
   try{
-    const saved = JSON.parse(localStorage.getItem('lcg_alerts')||'[]');
-    if(saved.length){ allAlerts = saved; renderAlerts(); }
-  }catch(e){}
-  
-  // Load bookings and generate alerts from status
-  try{
-    const snap = await get(ref(db, 'bookings'));
-    if(snap.exists()){
-      snap.forEach(child=>{
-        const b = child.val();
-        const id = child.key;
-        const phoneMatch = b.phone && clientPhone && b.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
-        if(!phoneMatch && !id.startsWith('LCG')) return;
-        
-        const status = (b.status||'pending').toLowerCase();
-        const prev = previousStatuses[id];
-        
-        if(!prev){
-          // First load, create alert based on status
-          if(status==='accepted'){
-            addAlert({id:'alert_'+id+'_accepted_'+Date.now(), bookingId:b.bookingId||id, type:'accepted', title:`✅ ${b.nurseName||'Nurse'} Accepted — ${b.bookingId||id}`, message:`${b.nurseName||'Nurse'} accepted your booking. Nurse is coming — Track live below + Google Maps auto opens. Client: ${b.clientLat?.toFixed(4)||''}, ${b.clientLng?.toFixed(4)||''} | Nurse: ${b.nurseName||''} is on the way. ETA: Calculating... Distance: Auto. Paystack Ref: ${b.paystackRef||''} | ${b.currency||'GHS'} — CEO + Nurse + Client all have this booking`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', clientLat:b.clientLat, clientLng:b.clientLng, time:b.acceptedAt||b.time||Date.now(), read:false});
-          } else if(status==='rejected'){
-            addAlert({id:'alert_'+id+'_rejected_'+Date.now(), bookingId:b.bookingId||id, type:'rejected', title:`❌ Booking Rejected — ${b.bookingId||id}`, message:`${b.nurseName||'Nurse'} rejected ${b.bookingId||id}. Reason: ${b.rejectReason||'Not available'}. You can book another nurse. Refund per policy.`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', time:b.rejectedAt||b.time||Date.now(), read:false});
-          } else if(status==='pending'){
-            addAlert({id:'alert_'+id+'_pending_'+Date.now(), bookingId:b.bookingId||id, type:'pending', title:`⏳ Pending — Waiting for nurse — ${b.bookingId||id}`, message:`Booking ${b.bookingId||id} is pending. Waiting for ${b.nurseName||'nurse'} to accept/reject. You will get instant notification here. Amount: ${b.currency||'GHS'} ${b.amount||0} | Patient: ${b.patientName||''}`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', time:b.time||Date.now(), read:true});
-          }
-        } else if(prev!==status){
-          // Status changed
-          if(status==='accepted'){
-            addAlert({id:'alert_'+id+'_accepted_'+Date.now(), bookingId:b.bookingId||id, type:'accepted', title:`✅ ACCEPTED — Nurse accepted! Nurse is coming — Track live below + Google Maps auto opens`, message:`Client: ${b.clientLat?.toFixed(4)||'undefined'}, ${b.clientLng?.toFixed(4)||'undefined'} | Nurse: ${b.nurseName||'undefined'} is on the way<br>ETA: Calculating... | Distance: Auto<br>Paystack Ref: ${b.paystackRef||''} | ${b.currency||'GHS'} | CEO + Nurse + Client all have this booking — LIVE TRACKING MAP BELOW`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', clientLat:b.clientLat, clientLng:b.clientLng, time:Date.now(), read:false});
-          } else if(status==='rejected'){
-            addAlert({id:'alert_'+id+'_rejected_'+Date.now(), bookingId:b.bookingId||id, type:'rejected', title:`❌ Rejected — ${b.nurseName||'Nurse'} rejected`, message:`Booking ${b.bookingId||id} rejected. ${b.rejectReason||''}. Book another nurse.`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', time:Date.now(), read:false});
-          }
-        }
-        previousStatuses[id]=status;
-      });
-    }
-  }catch(e){ console.log('Load alerts error', e.message); }
-  
+    const snap=await get(ref(db,'bookings'));const snap2=await get(ref(db,'allBookings')).catch(()=>null);
+    let allBookings={};if(snap.exists())Object.assign(allBookings,snap.val());if(snap2&&snap2.exists())Object.assign(allBookings,snap2.val());
+    Object.keys(allBookings).forEach(id=>{
+      const b=allBookings[id];
+      const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,'');const myPhone=clientPhone.replace(/[^0-9]/g,'');
+      const phoneMatch=bPhone&&myPhone&&(bPhone===myPhone||bPhone.slice(-9)===myPhone.slice(-9));
+      const emailMatch=b.clientEmail&&clientEmail&&b.clientEmail.toLowerCase()===clientEmail.toLowerCase();
+      const nameMatch=b.clientName&&clientName&&b.clientName.toLowerCase()===clientName.toLowerCase();
+      if(!phoneMatch&&!emailMatch&&!nameMatch)return;
+      const status=(b.status||'pending').toLowerCase();const prev=previousStatuses[id];
+      const pLat=b.patientLat||b.patientLatitude||b.mainLat||b.clientLat||null;const pLng=b.patientLng||b.patientLongitude||b.mainLng||b.clientLng||null;
+      const cLat=b.clientLat||null;const cLng=b.clientLng||null;
+      const base={bookingId:b.bookingId||id,nurseName:b.nurseName||'Nurse',nursePhone:b.nursePhone||'',nursePhotoUrl:b.nursePhotoUrl||'',amount:b.amount||0,currency:b.currency||'GHS',paystackRef:b.paystackRef||'',clientName:b.clientName||clientName,clientPhone:b.clientPhone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||b.clientPhoto||clientPhoto,patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||'',patientLat:parseFloat(pLat)||null,patientLng:parseFloat(pLng)||null,clientLat:parseFloat(cLat)||null,clientLng:parseFloat(cLng)||null,rejectReason:b.rejectReason||''};
+      if(!prev){
+        if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted',type:'accepted',time:b.acceptedAt||b.time||Date.now(),read:false,...base});}
+        else if(status==='rejected'||status==='declined'){addAlert({id:'alert_'+id+'_rejected',type:'rejected',time:b.rejectedAt||b.time||Date.now(),read:false,...base});}
+      }else if(prev!==status){
+        if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted_'+Date.now(),type:'accepted',time:Date.now(),read:false,...base});}
+        if(status==='rejected'){addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base});}
+      }
+      previousStatuses[id]=status;
+    });
+  }catch(e){console.log(e.message);}
   renderAlerts();
 }
-
-function startRealtimeAlerts(){
-  const {clientPhone} = getClientInfo();
-  onValue(ref(db, 'bookings'), (snap)=>{
-    if(!snap.exists()) return;
-    let hasNew = false;
+function startRealtime(){
+  const {clientPhone,clientEmail}=getClientInfo();
+  onValue(ref(db,'bookings'),snap=>{
+    if(!snap.exists())return;
     snap.forEach(child=>{
-      const b = child.val();
-      const id = child.key;
-      const phoneMatch = b.phone && clientPhone && b.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
-      if(!phoneMatch && !id.startsWith('LCG')) return;
-      const status = (b.status||'pending').toLowerCase();
-      const prev = previousStatuses[id];
-      if(prev && prev!==status){
-        if(status==='accepted'){
-          addAlert({id:'alert_'+id+'_accepted_'+Date.now(), bookingId:b.bookingId||id, type:'accepted', title:`✅ ACCEPTED — Nurse accepted! Nurse is coming — Track live below + Google Maps auto opens`, message:`Client: ${b.clientLat||5.6037}, ${b.clientLng||-0.1870} | Nurse: ${b.nurseName||''} is on the way — ETA: Calculating... | Distance: Auto — Paystack Ref: ${b.paystackRef||''} | ${b.currency||'GHS'} | CEO + Nurse + Client all have this booking`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', clientLat:b.clientLat, clientLng:b.clientLng, time:Date.now(), read:false});
-          hasNew=true;
-        } else if(status==='rejected'){
-          addAlert({id:'alert_'+id+'_rejected_'+Date.now(), bookingId:b.bookingId||id, type:'rejected', title:`❌ Booking Rejected — ${b.bookingId||id}`, message:`${b.nurseName||'Nurse'} rejected. Reason: ${b.rejectReason||'Not available'}. Book another nurse.`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', time:Date.now(), read:false});
-          hasNew=true;
-        }
+      const b=child.val();const id=child.key;
+      const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,'');const myPhone=clientPhone.replace(/[^0-9]/g,'');
+      const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);
+      const emailMatch=b.clientEmail&&clientEmail&&b.clientEmail.toLowerCase()===clientEmail.toLowerCase();
+      if(!phoneMatch&&!emailMatch)return;
+      const status=(b.status||'pending').toLowerCase();const prev=previousStatuses[id];
+      if(prev&&prev!==status){
+        const base={bookingId:b.bookingId||id,nurseName:b.nurseName||'Nurse',nursePhone:b.nursePhone||'',nursePhotoUrl:b.nursePhotoUrl||'',amount:b.amount||0,currency:b.currency||'GHS',clientName:b.clientName||clientName,clientPhone:b.clientPhone||clientPhone,clientEmail:b.clientEmail||clientEmail,clientPhotoUrl:b.clientPhotoUrl||clientPhoto,patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||'',patientLat:parseFloat(b.patientLat||b.clientLat)||null,patientLng:parseFloat(b.patientLng||b.clientLng)||null,clientLat:b.clientLat||null,clientLng:b.clientLng||null,rejectReason:b.rejectReason||''};
+        if(status==='accepted'){addAlert({id:'alert_'+id+'_accepted_'+Date.now(),type:'accepted',time:Date.now(),read:false,...base});}
+        if(status==='rejected'){addAlert({id:'alert_'+id+'_rejected_'+Date.now(),type:'rejected',time:Date.now(),read:false,...base});}
         previousStatuses[id]=status;
-      } else if(!prev){
-        previousStatuses[id]=status;
-      }
+      }else if(!prev){previousStatuses[id]=status;}
     });
-    if(hasNew) renderAlerts();
   });
 }
-
-window.markRead = function(alertId){
-  const idx = allAlerts.findIndex(a=>a.id===alertId);
-  if(idx!==-1){ allAlerts[idx].read=true; try{ localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50))); }catch(e){} renderAlerts(); }
-}
-window.markAllRead = function(){
-  allAlerts.forEach(a=>a.read=true);
-  try{ localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50))); }catch(e){}
-  renderAlerts();
-}
-window.clearAlerts = function(){
-  if(!confirm('Clear all alerts?')) return;
-  allAlerts=[];
-  try{ localStorage.removeItem('lcg_alerts'); }catch(e){}
-  previousStatuses={};
-  renderAlerts();
-  document.getElementById('alertsList').innerHTML='';
-  document.getElementById('emptyAlerts').style.display='block';
-}
-
-window.addEventListener('DOMContentLoaded', async ()=>{
-  await ensureAuth();
-  getClientInfo();
-  // Request notification permission
-  if(window.Notification && Notification.permission==='default'){
-    Notification.requestPermission();
-  }
-  loadAlerts();
-  startRealtimeAlerts();
-  setInterval(()=>loadAlerts(), 20000);
-  // Fix: Handle undefined showing in alerts
-  setTimeout(()=>loadAlerts(), 2000);
-});
+window.markRead=function(id){const i=allAlerts.findIndex(a=>a.id===id);if(i>-1){allAlerts[i].read=true;try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){}renderAlerts();}}
+window.markAllRead=function(){allAlerts.forEach(a=>a.read=true);try{localStorage.setItem('lcg_alerts',JSON.stringify(allAlerts.slice(0,60)));}catch(e){}renderAlerts();}
+window.addEventListener('DOMContentLoaded',async()=>{await ensureAuth();getClientInfo();if(Notification&&Notification.permission==='default')Notification.requestPermission();loadAlerts();startRealtime();setTimeout(loadAlerts,2000);setInterval(loadAlerts,20000);});
 </script>
 </body></html>
