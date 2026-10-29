@@ -2,62 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Login - ALL 5 + CEO APPROVAL → nurses-dashboard.html</title>
+<title>Nurse Login → nurses-dashboard.html</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:grid;place-items:center;padding:16px}
-.card{background:rgba(28,18,56,.95);border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:28px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.logo{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-size:28px;margin:0 auto 12px}
-h2{font-weight:900;font-size:22px}
-.sub{font-size:11px;color:#a78bfa;margin:8px 0 16px}
-.inputWrap{position:relative;margin:10px 0}
-input{width:100%;padding:14px 44px 14px 14px;border-radius:12px;border:1.5px solid rgba(168,85,247,.22);background:rgba(14,10,28,.7);color:#f3e8ff;font-size:14px;outline:none}
-input:focus{border-color:#a855f7}
-.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:10px;border:1px solid rgba(168,85,247,.3);background:rgba(168,85,247,.2);cursor:pointer;display:grid;place-items:center}
-.btn{width:100%;padding:14px;border-radius:12px;border:none;font-weight:900;cursor:pointer;font-size:14px;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px}
-.btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}
-.btnGoogle{background:#fff;color:#000}
-.btnLight{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.22);color:#e9d5ff}
-.alert{padding:12px;border-radius:12px;font-size:12px;font-weight:700;margin:12px 0;border:1px solid;text-align:left}
-.alert-error{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5}
-.alert-success{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac}
-.alert-info{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93c5fd}
-.divider{height:1px;background:rgba(168,85,247,.15);margin:16px 0;position:relative}
-.divider span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(28,18,56,.95);padding:0 10px;font-size:10px;color:#6b7280}
-.blockingModal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;place-items:center;z-index:9999;padding:20px}
-.blockingCard{background:rgba(28,18,56,.98);border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center}
-.checkList{font-size:11px;text-align:left;margin:10px 0;padding:10px;background:rgba(0,0,0,.3);border-radius:10px}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:grid;place-items:center;padding:16px}.card{background:rgba(28,18,56,.95);border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:28px;max-width:420px;width:100%;text-align:center}.btn{width:100%;padding:14px;border-radius:12px;border:none;font-weight:900;cursor:pointer;margin-top:12px}.btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}.btnGoogle{background:#fff;color:#000}.btnLight{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.22);color:#e9d5ff}.alert{padding:12px;border-radius:12px;font-size:12px;font-weight:700;margin:12px 0;border:1px solid;text-align:left}.alert-error{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5}.alert-success{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac}.alert-info{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93c5fd}.blockingModal{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;place-items:center;z-index:9999;padding:20px}.blockingCard{background:rgba(28,18,56,.98);border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center}.checkList{font-size:11px;text-align:left;margin:10px 0;padding:10px;background:rgba(0,0,0,.3);border-radius:10px}
 </style>
 </head>
 <body>
 <div class="card">
-<div class="logo">👩‍⚕️</div>
+<div style="width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-size:28px;margin:0 auto 12px">👩‍⚕️</div>
 <h2>Nurse Login</h2>
-<p class="sub">CEO approval + ALL 5 required → nurses-dashboard.html</p>
+<p style="font-size:11px;color:#a78bfa;margin:8px 0 16px">CEO approval + ALL 5 → nurses-dashboard.html</p>
 <div id="msg"></div>
-<div class="inputWrap"><input id="email" type="email" placeholder="Email"></div>
-<div class="inputWrap"><input id="password" type="password" placeholder="Password"><button class="eyeBtn" type="button" onclick="togglePass()">👁️</button></div>
+<input id="email" type="email" placeholder="Email" style="width:100%;padding:14px;border-radius:12px;border:1.5px solid rgba(168,85,247,.22);background:rgba(14,10,28,.7);color:#f3e8ff;margin:10px 0">
+<div style="position:relative"><input id="password" type="password" placeholder="Password" style="width:100%;padding:14px;border-radius:12px;border:1.5px solid rgba(168,85,247,.22);background:rgba(14,10,28,.7);color:#f3e8ff"><button type="button" onclick="document.getElementById('password').type=document.getElementById('password').type==='password'?'text':'password'" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:10px;border:1px solid rgba(168,85,247,.3);background:rgba(168,85,247,.2);cursor:pointer">👁️</button></div>
 <button class="btn btnPurple" id="loginBtn" onclick="loginWithEmail()">Login → nurses-dashboard.html</button>
-<div class="divider"><span>OR</span></div>
+<div style="height:1px;background:rgba(168,85,247,.15);margin:16px 0"></div>
 <button class="btn btnGoogle" id="googleBtn" onclick="loginWithGoogle()">🔍 Continue with Google</button>
-<a href="nurses-registration.html" class="btn btnLight" style="text-decoration:none">📝 Create Nurse Account</a>
-<div style="margin-top:12px;font-size:10px;color:#6b7280">🔒 ALL 5 required: Email, Name, Photo, Phone, Video<br>🔒 CEO must approve in ceo-registration-center.html<br>✅ Success → nurses-dashboard.html</div>
+<a href="nurses-registration.html" class="btn btnLight" style="text-decoration:none;display:flex;align-items:center;justify-content:center">📝 Create Nurse Account</a>
+<div style="margin-top:12px;font-size:10px;color:#6b7280">🔒 ALL 5 required: Email, Name, Photo, Phone, Video<br>✅ Success → nurses-dashboard.html</div>
 </div>
 
-<div class="blockingModal" id="blockingModal">
-<div class="blockingCard">
-<div style="font-size:40px" id="blockIcon">⏳</div>
-<h3 style="margin:12px 0;color:#fca5a5" id="blockTitle">Access Denied</h3>
-<p style="font-size:12px;color:#c4b5fd;line-height:1.5" id="blockMessage"></p>
-<div id="blockChecks" class="checkList" style="display:none"></div>
-<div style="margin-top:16px"><a id="blockAction" href="nurses-registration.html" class="btn btnPurple" style="text-decoration:none">Go to Registration</a></div>
-<div style="margin-top:8px"><button onclick="document.getElementById('blockingModal').style.display='none'" class="btn btnLight" style="width:100%">Close</button></div>
-</div>
-</div>
+<div class="blockingModal" id="blockingModal"><div class="blockingCard"><div style="font-size:40px" id="blockIcon">⏳</div><h3 style="margin:12px 0;color:#fca5a5" id="blockTitle">Access Denied</h3><p style="font-size:12px;color:#c4b5fd;line-height:1.5" id="blockMessage"></p><div id="blockChecks" class="checkList" style="display:none"></div><div style="margin-top:16px"><a id="blockAction" href="nurses-registration.html" class="btn btnPurple" style="text-decoration:none;display:flex;justify-content:center">Go to Registration</a></div><div style="margin-top:8px"><button onclick="document.getElementById('blockingModal').style.display='none'" class="btn btnLight" style="width:100%">Close</button></div></div></div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
@@ -66,7 +35,6 @@ const auth=firebase.auth();
 const db=firebase.database();
 function showMsg(t,type){document.getElementById('msg').innerHTML=`<div class="alert alert-${type}">${t}</div>`;}
 function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\\]]/g,'_');}
-function togglePass(){const el=document.getElementById('password');el.type=el.type==='password'?'text':'password';}
 function showBlocking(icon,title,message,checksHtml,actionText,actionHref){
   document.getElementById('blockIcon').textContent=icon;
   document.getElementById('blockTitle').textContent=title;
@@ -96,172 +64,90 @@ function checkAll5Required(authUser,dbData){
   const hasPhone=!!(phone&&phone.length>=7);
   const hasPhoto=!!(photo&&photo.length>10);
   const hasVideo=!!(video&&video.length>10);
-  const missing=[];if(!hasEmail)missing.push('Email');if(!hasName)missing.push('Name');if(!hasPhone)missing.push('Phone Number');if(!hasPhoto)missing.push('Photo');if(!hasVideo)missing.push('Intro Video');
-  const checksHtml=`${hasEmail?'✅':'❌'} Email: ${hasEmail?'OK':'MISSING'}<br>${hasName?'✅':'❌'} Name: ${hasName?'OK ('+name+')':'MISSING'}<br>${hasPhone?'✅':'❌'} Phone: ${hasPhone?'OK ('+phone+')':'MISSING'}<br>${hasPhoto?'✅':'❌'} Photo: ${hasPhoto?'OK':'MISSING'}<br>${hasVideo?'✅':'❌'} Intro Video: ${hasVideo?'OK':'MISSING'}`;
-  return{hasAll:hasEmail&&hasName&&hasPhone&&hasPhoto&&hasVideo,hasEmail,hasName,hasPhone,hasPhoto,hasVideo,missing,checksHtml,details:{email,name,phone,photo,video}};
+  const missing=[];if(!hasEmail)missing.push('Email');if(!hasName)missing.push('Name');if(!hasPhone)missing.push('Phone');if(!hasPhoto)missing.push('Photo');if(!hasVideo)missing.push('Video');
+  const checksHtml=`${hasEmail?'✅':'❌'} Email<br>${hasName?'✅':'❌'} Name<br>${hasPhone?'✅':'❌'} Phone<br>${hasPhoto?'✅':'❌'} Photo<br>${hasVideo?'✅':'❌'} Video`;
+  return{hasAll:hasEmail&&hasName&&hasPhone&&hasPhoto&&hasVideo,missing,checksHtml,details:{email,name,phone,photo,video}};
 }
 function checkCEOApproved(dbData){
   if(!dbData)return{approved:false,reason:'not registered'};
-  if(dbData.isApproved===true||dbData.approved===true||dbData.status==='approved'||dbData.canLogin===true||dbData.isVerified===true){return{approved:true,reason:'approved',data:dbData};}
-  if(dbData.status==='pending'||dbData.isApproved===false){return{approved:false,reason:'pending CEO approval',data:dbData};}
-  return{approved:false,reason:'pending CEO approval - no approval flag',data:dbData};
+  if(dbData.isApproved===true||dbData.approved===true||dbData.status==='approved'||dbData.canLogin===true||dbData.isVerified===true){return{approved:true};}
+  if(dbData.status==='pending'||dbData.isApproved===false){return{approved:false,reason:'pending'};}
+  return{approved:false,reason:'pending'};
 }
 async function loginWithEmail(){
   const email=document.getElementById('email').value.trim().toLowerCase();
   const password=document.getElementById('password').value.trim();
   const btn=document.getElementById('loginBtn');
   if(!email||!password){showMsg('❌ Enter email and password','error');return;}
-  if(!email.includes('@')){showMsg('❌ Valid email required','error');return;}
-  btn.textContent='Checking CEO approval + ALL 5...';btn.disabled=true;
-  showMsg('🔍 Checking CEO approval + ALL 5 → nurses-dashboard.html','info');
+  btn.textContent='Checking...';btn.disabled=true;
+  showMsg('🔍 Checking → nurses-dashboard.html','info');
   try{
     const cred=await auth.signInWithEmailAndPassword(email,password);
     const user=cred.user;const uid=user.uid;
     const{data:dbData,source}=await fetchNurseFullData(email,uid);
-    // 🔴 CEO DELETE CHECK — Deleted via delete-nurse-all-paths.html → BLOCK — Cannot login straight!
-    if(dbData){
-      if(dbData.deleted===true || dbData.isDeleted===true || dbData.deletedBy==='CEO' || dbData.blocked===true || dbData.isBlocked===true || dbData.blockedBy==='CEO'){
+    // 🔴 FIXED: Only block if REALLY deleted — check deletedNurses collection
+    try{
+      const delSnap=await db.ref('deletedNurses/'+uid).once('value');
+      const delEmailSnap=await db.ref('deletedNurses/'+sanitizeEmail(email)).once('value');
+      if(delSnap.exists() || delEmailSnap.exists()){
         await auth.signOut(); localStorage.clear();
-        showBlocking('❌ DELETED/BLOCKED by CEO', `Account <b>${email}</b> DELETED by CEO via delete-nurse-all-paths.html — Hidden from book-nurse.html — Cannot login straight!`, '', 'Contact CEO', 'contact.html');
-        showMsg('❌ DELETED/BLOCKED by CEO — Cannot login straight!','error');
+        showBlocking('❌ DELETED by CEO',`Account in <b>deletedNurses</b> — Deleted via delete-nurse-all-paths.html<br><br>Hidden from book-nurse.html — Cannot login!`, '', 'Contact CEO', 'contact.html');
+        showMsg('❌ DELETED by CEO — In deletedNurses list!','error');
         btn.textContent='Login → nurses-dashboard.html';btn.disabled=false;return;
       }
-      try{
-        const delSnap=await db.ref('deletedNurses/'+uid).once('value');
-        if(delSnap.exists()){ await auth.signOut(); localStorage.clear(); showMsg('❌ DELETED by CEO — In deletedNurses!','error'); btn.disabled=false; return; }
-      }catch(e){}
-    } else {
-      try{
-        const nSnap=await db.ref('nurses/'+uid).once('value');
-        const delSnap=await db.ref('deletedNurses/'+uid).once('value');
-        if(!nSnap.exists() || delSnap.exists()){ await auth.signOut(); localStorage.clear(); showBlocking('❌ DELETED by CEO', `No profile — Deleted by CEO via delete-nurse-all-paths.html — Hidden from book-nurse.html — Cannot login!`, '', 'Contact CEO', 'contact.html'); showMsg('❌ DELETED by CEO — No profile — Cannot login straight!','error'); btn.disabled=false; return; }
-      }catch(e){}
-    }
+      if(dbData && (dbData.deleted===true || dbData.isDeleted===true || dbData.blocked===true || dbData.isBlocked===true)){
+        await auth.signOut(); localStorage.clear();
+        showBlocking('❌ BLOCKED by CEO',`Account marked as deleted/blocked by CEO`, '', 'Contact CEO', 'contact.html');
+        showMsg('❌ BLOCKED by CEO','error');
+        btn.textContent='Login → nurses-dashboard.html';btn.disabled=false;return;
+      }
+    }catch(e){}
     const all5=checkAll5Required(user,dbData);
     if(!all5.hasAll){
       await auth.signOut();
-      showBlocking('❌ Missing ALL 5 Required',`Cannot login — missing: <b>${all5.missing.join(', ')}</b><br><br>ALL 5 mandatory: Email, Name, Photo, Phone, Video`,all5.checksHtml,'Complete Registration',`nurses-registration.html?email=${encodeURIComponent(email)}&from=missing_all5`);
-      showMsg(`❌ BLOCKED: Missing ${all5.missing.join(', ')} — ALL 5 required`,'error');
+      showBlocking('❌ Missing ALL 5',`Missing: <b>${all5.missing.join(', ')}</b><br><br>ALL 5 mandatory: Email, Name, Photo, Phone, Video`,all5.checksHtml,'Complete Registration',`nurses-registration.html?email=${encodeURIComponent(email)}`);
+      showMsg(`❌ Missing ${all5.missing.join(', ')}`,'error');
       btn.textContent='Login → nurses-dashboard.html';btn.disabled=false;return;
     }
     const approval=checkCEOApproved(dbData);
     if(!approval.approved){
       await auth.signOut();
       if(approval.reason==='not registered'){
-        showBlocking('❌ Not Registered',`No nurse account found for <b>${email}</b>.<br><br>Please register — will go to CEO for approval.`,'','Register Now','nurses-registration.html');
-        showMsg('❌ Not registered. Please register — goes to CEO approval.','error');
+        showBlocking('❌ Not Registered',`No nurse account for <b>${email}</b><br>Source checked: ${source||'none'}<br><br>Please register — goes to CEO.`, '', 'Register Now', 'nurses-registration.html');
+        showMsg('❌ Not registered — Please register','error');
       }else{
-        showBlocking('⏳ Pending CEO Approval',`Your account <b>${email}</b> has ALL 5 ✅ but is <b>waiting for CEO approval</b> in ceo-registration-center.html<br><br>Source: ${source}<br><br>You cannot login until CEO approves you.`,all5.checksHtml,'Wait for Approval','nurses-registration.html');
-        showMsg('⏳ PENDING CEO APPROVAL — cannot login until CEO approves','error');
+        showBlocking('⏳ Pending CEO Approval',`Account <b>${email}</b> has ALL 5 ✅ but pending CEO approval<br><br>Source: ${source}`,all5.checksHtml,'Wait for Approval','nurses-registration.html');
+        showMsg('⏳ Pending CEO Approval','error');
       }
       btn.textContent='Login → nurses-dashboard.html';btn.disabled=false;return;
     }
-    localStorage.setItem('nurseLoggedIn','true');
-    localStorage.setItem('nurseEmail',email);
-    localStorage.setItem('nurseUid',uid);
-    localStorage.setItem('lcg_nurse_uid',uid);
-    localStorage.setItem('uid',uid);
-    localStorage.setItem('nurseName',all5.details.name);
-    localStorage.setItem('nursePhone',all5.details.phone);
-    localStorage.setItem('nursePhoto',all5.details.photo);
-    localStorage.setItem('nursePhotoURL',all5.details.photo);
-    localStorage.setItem('nurseVideo',all5.details.video);
-    localStorage.setItem('nurseApproved','true');
-    localStorage.setItem('lcg_logged_in','true');
-    localStorage.setItem('lcg_role','nurse');
-    localStorage.setItem('lcg_session_expiry', (Date.now()+ 30*60*1000).toString());
-    showMsg('✅ ALL 5 OK + CEO Approved! Redirecting to nurses-dashboard.html...','success');
+    localStorage.setItem('nurseLoggedIn','true');localStorage.setItem('nurseEmail',email);localStorage.setItem('nurseUid',uid);localStorage.setItem('lcg_nurse_uid',uid);localStorage.setItem('uid',uid);localStorage.setItem('nurseName',all5.details.name);localStorage.setItem('nursePhone',all5.details.phone);localStorage.setItem('nursePhoto',all5.details.photo);localStorage.setItem('nursePhotoURL',all5.details.photo);localStorage.setItem('lcg_logged_in','true');localStorage.setItem('lcg_role','nurse');localStorage.setItem('lcg_session_expiry',(Date.now()+1800000).toString());
+    showMsg('✅ OK! Redirecting to nurses-dashboard.html...','success');
     setTimeout(()=>{location.replace('nurses-dashboard.html');},1000);
-  }catch(e){
-    console.error(e);
-    let msg=e.message;
-    if(e.code==='auth/user-not-found'||e.code==='auth/wrong-password'||e.code==='auth/invalid-credential')msg='Invalid email/password. If registered, wait for CEO approval + ensure ALL 5 fields.';
-    showMsg('❌ '+msg,'error');
-    btn.textContent='Login → nurses-dashboard.html';btn.disabled=false;
-  }
+  }catch(e){showMsg('❌ '+e.message,'error');btn.textContent='Login → nurses-dashboard.html';btn.disabled=false;}
 }
 async function loginWithGoogle(){
-  const btn=document.getElementById('googleBtn');
-  btn.textContent='Checking...';btn.disabled=true;
-  showMsg('🔍 Google login — checking CEO approval + ALL 5 → nurses-dashboard.html','info');
+  const btn=document.getElementById('googleBtn');btn.textContent='Checking...';btn.disabled=true;
+  showMsg('🔍 Google login → nurses-dashboard.html','info');
   try{
     const provider=new firebase.auth.GoogleAuthProvider();
     const result=await auth.signInWithPopup(provider);
-    const user=result.user;const email=user.email.toLowerCase();const uid=user.uid;const emailKey=sanitizeEmail(email);
+    const user=result.user;const email=user.email.toLowerCase();const uid=user.uid;
     const{data:dbData,source}=await fetchNurseFullData(email,uid);
-    // 🔴 CEO DELETE CHECK — Deleted via delete-nurse-all-paths.html → BLOCK — Cannot login straight!
-    if(dbData){
-      if(dbData.deleted===true || dbData.isDeleted===true || dbData.deletedBy==='CEO' || dbData.blocked===true || dbData.isBlocked===true || dbData.blockedBy==='CEO'){
-        await auth.signOut(); localStorage.clear();
-        showBlocking('❌ DELETED/BLOCKED by CEO', `Account <b>${email}</b> DELETED by CEO via delete-nurse-all-paths.html — Hidden from book-nurse.html — Cannot login straight!`, '', 'Contact CEO', 'contact.html');
-        showMsg('❌ DELETED/BLOCKED by CEO — Cannot login straight!','error');
-        btn.textContent='Login → nurses-dashboard.html';btn.disabled=false;return;
-      }
-      try{
-        const delSnap=await db.ref('deletedNurses/'+uid).once('value');
-        if(delSnap.exists()){ await auth.signOut(); localStorage.clear(); showMsg('❌ DELETED by CEO — In deletedNurses!','error'); btn.disabled=false; return; }
-      }catch(e){}
-    } else {
-      try{
-        const nSnap=await db.ref('nurses/'+uid).once('value');
-        const delSnap=await db.ref('deletedNurses/'+uid).once('value');
-        if(!nSnap.exists() || delSnap.exists()){ await auth.signOut(); localStorage.clear(); showBlocking('❌ DELETED by CEO', `No profile — Deleted by CEO via delete-nurse-all-paths.html — Hidden from book-nurse.html — Cannot login!`, '', 'Contact CEO', 'contact.html'); showMsg('❌ DELETED by CEO — No profile — Cannot login straight!','error'); btn.disabled=false; return; }
-      }catch(e){}
-    }
+    try{
+      const delSnap=await db.ref('deletedNurses/'+uid).once('value');
+      if(delSnap.exists()){await auth.signOut();localStorage.clear();showMsg('❌ DELETED by CEO — In deletedNurses!','error');btn.textContent='🔍 Continue with Google';btn.disabled=false;return;}
+      if(dbData && (dbData.deleted===true || dbData.blocked===true)){await auth.signOut();localStorage.clear();showMsg('❌ BLOCKED by CEO','error');btn.disabled=false;return;}
+    }catch(e){}
     const all5=checkAll5Required(user,dbData);
-    if(!all5.hasAll){
-      try{await user.delete();}catch(delErr){try{await auth.signOut();}catch(e){}}
-      localStorage.setItem('pendingNurseEmail',email);
-      localStorage.setItem('pendingNurseName',user.displayName||'');
-      showBlocking('❌ Incomplete — ALL 5 Required',`Your Google account missing: <b>${all5.missing.join(', ')}</b><br><br>ALL 5 mandatory: Email, Name, Photo, Phone, Video<br><br>Auth trace deleted. Please complete registration.`,all5.checksHtml,'Complete Registration',`nurses-registration.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(user.displayName||'')}&from=missing_all5`);
-      showMsg(`❌ BLOCKED: Missing ${all5.missing.join(', ')} — Auth deleted. Redirecting...`,'error');
-      setTimeout(()=>{location.href=`nurses-registration.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(user.displayName||'')}&from=missing_all5`;},3000);
-      btn.textContent='🔍 Continue with Google';btn.disabled=false;return;
-    }
+    if(!all5.hasAll){try{await user.delete();}catch(e){}await auth.signOut();showBlocking('❌ Missing ALL 5',`Missing: ${all5.missing.join(', ')}`,all5.checksHtml,'Complete Registration',`nurses-registration.html?email=${encodeURIComponent(email)}`);showMsg(`❌ Missing ${all5.missing.join(', ')}`,'error');btn.textContent='🔍 Continue with Google';btn.disabled=false;return;}
     const approval=checkCEOApproved(dbData);
-    if(!approval.approved){
-      await auth.signOut();
-      if(approval.reason==='not registered'){
-        try{await user.delete();}catch(e){}
-        showBlocking('❌ Not Registered',`Google account <b>${email}</b> has ALL 5 but not registered as nurse.<br><br>Auth trace deleted. Please register — goes to CEO center.`,all5.checksHtml,'Register Now',`nurses-registration.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(user.displayName||'')}`);
-        showMsg('❌ Not registered — Auth deleted. Register to go to CEO approval.','error');
-        setTimeout(()=>{location.href=`nurses-registration.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(user.displayName||'')}`;},2500);
-      }else{
-        showBlocking('⏳ Pending CEO Approval',`Google account <b>${email}</b> has ALL 5 ✅ but is <b>pending CEO approval</b> in ceo-registration-center.html<br><br>Source: ${source}<br><br>Cannot login until CEO approves.`,all5.checksHtml,'Wait for Approval','nurses-registration.html');
-        showMsg('⏳ PENDING CEO APPROVAL — ALL 5 OK but cannot login until CEO approves.','error');
-      }
-      btn.textContent='🔍 Continue with Google';btn.disabled=false;return;
-    }
-    localStorage.setItem('nurseLoggedIn','true');
-    localStorage.setItem('nurseEmail',email);
-    localStorage.setItem('nurseUid',uid);
-    localStorage.setItem('lcg_nurse_uid',uid);
-    localStorage.setItem('uid',uid);
-    localStorage.setItem('nurseName',all5.details.name);
-    localStorage.setItem('nursePhone',all5.details.phone);
-    localStorage.setItem('nursePhoto',all5.details.photo);
-    localStorage.setItem('nursePhotoURL',all5.details.photo);
-    localStorage.setItem('nurseVideo',all5.details.video);
-    localStorage.setItem('nurseApproved','true');
-    localStorage.setItem('lcg_logged_in','true');
-    localStorage.setItem('lcg_role','nurse');
-    localStorage.setItem('lcg_session_expiry', (Date.now()+ 30*60*1000).toString());
-    showMsg('✅ ALL 5 OK + CEO Approved! Redirecting to nurses-dashboard.html...','success');
-    setTimeout(()=>{location.replace('nurses-dashboard.html');},1000);
-  }catch(e){
-    console.error(e);
-    showMsg('❌ Google login failed: '+e.message,'error');
-    btn.textContent='🔍 Continue with Google';btn.disabled=false;
-  }
+    if(!approval.approved){await auth.signOut();showBlocking(approval.reason==='not registered'?'❌ Not Registered':'⏳ Pending CEO',approval.reason==='not registered'?`No account for ${email}`:`Pending CEO approval<br>Source: ${source}`,all5.checksHtml,'Register','nurses-registration.html');showMsg('❌ Not registered / Pending','error');btn.textContent='🔍 Continue with Google';btn.disabled=false;return;}
+    localStorage.setItem('nurseLoggedIn','true');localStorage.setItem('nurseEmail',email);localStorage.setItem('nurseUid',uid);localStorage.setItem('lcg_nurse_uid',uid);localStorage.setItem('uid',uid);localStorage.setItem('nurseName',all5.details.name);localStorage.setItem('nursePhone',all5.details.phone);localStorage.setItem('nursePhoto',all5.details.photo);localStorage.setItem('nursePhotoURL',all5.details.photo);localStorage.setItem('lcg_logged_in','true');localStorage.setItem('lcg_role','nurse');localStorage.setItem('lcg_session_expiry',(Date.now()+1800000).toString());
+    showMsg('✅ OK! Redirecting to nurses-dashboard.html...','success');setTimeout(()=>{location.replace('nurses-dashboard.html');},1000);
+  }catch(e){showMsg('❌ '+e.message,'error');btn.textContent='🔍 Continue with Google';btn.disabled=false;}
 }
-(function(){
-  const params=new URLSearchParams(location.search);
-  const from=params.get('from');
-  if(from==='registered_pending')showMsg('✅ Registered! Now waiting for CEO approval. Cannot login until approved, even with ALL 5.','info');
-  if(from==='missing_all5')showMsg('❌ ALL 5 required: Email, Name, Photo, Phone, Video. Please complete registration.','error');
-  const email=params.get('email');
-  if(email)document.getElementById('email').value=email;
-})();
+(function(){const p=new URLSearchParams(location.search);const e=p.get('email');if(e)document.getElementById('email').value=e;})();
 </script>
 </body>
 </html>
