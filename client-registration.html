@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Registration - Full Name + Username + Phone</title>
+<title>Client Registration - SMS Verification REAL Person</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -8,9 +8,9 @@
 <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;display:grid;place-items:center;padding:16px}
 .card{width:100%;max-width:520px;background:#1e1a3a;border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:10px}
 h2{text-align:center} input,select{padding:13px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(12,10,30,.8);color:white;width:100%}
-.phoneRow{display:flex;gap:8px} .phoneRow .codeBox{width:120px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
-.phoneRow .codeBox input{font-weight:700;background:#2a2250;text-align:center}
-.phoneRow .numBox{flex:1}
+.phoneRow{display:flex;gap:8px} .codeBox{width:120px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+.codeBox input{font-weight:700;background:#2a2250;text-align:center}
+.numBox{flex:1}
 .btn{padding:14px;border-radius:12px;border:none;font-weight:900;cursor:pointer}
 .btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}
 .btnDark{background:#2a2250;color:#a78bfa}
@@ -26,97 +26,73 @@ h2{text-align:center} input,select{padding:13px;border-radius:12px;border:1px so
 .strength.strong{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
 .modalOverlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .modalOverlay.show{display:flex}
-.modal{background:#1e1a3a;border:2px solid #facc15;border-radius:16px;padding:20px;max-width:360px;width:100%;text-align:center}
-.modal h3{color:#facc15;margin-bottom:10px}
-.modal ul{list-style:none;text-align:left;font-size:12px;line-height:1.8;color:#a78bfa;background:rgba(14,10,28,.6);border-radius:10px;padding:10px 14px;margin:10px 0}
-.modal ul li.ok{color:#86efac} .modal ul li.no{color:#fca5a5}
+.modal{background:#1e1a3a;border:2px solid #facc15;border-radius:16px;padding:20px;max-width:380px;width:100%;text-align:center}
 .listBox{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:#2a2250;color:white;font-size:13px}
 </style>
 </head><body>
 <div class="card">
-<h2>Client Registration</h2>
+<h2>Client Registration - REAL Phone Verification</h2>
+<p class="small" style="text-align:center;color:#facc15">SMS proves real person - For safety & traceability</p>
 <img id="preview" class="avatar" src="" style="display:none">
 
-<input id="fullName" placeholder="Full Name (Required) e.g. Michael Allotey">
-<input id="username" placeholder="Username for login (e.g. michael1005)" oninput="this.value=this.value.toLowerCase().replace(/\s/g,'')">
+<input id="fullName" placeholder="Full Name (Required) e.g. KUSI PETER">
+<input id="username" placeholder="Username for login e.g. kusipeter" oninput="this.value=this.value.toLowerCase().replace(/\s/g,'')">
 
 <label class="small">Select Country - List Box (or type code manually)</label>
 <select id="countryListBox" class="listBox" onchange="onCountrySelect(this.value)">
-<option value="">-- Select Country from List --</option>
-<option value="+233">🇬🇭 Ghana +233</option>
+<option value="">-- Select Country --</option>
+<option value="+233" selected>🇬🇭 Ghana +233</option>
 <option value="+234">🇳🇬 Nigeria +234</option>
 <option value="+225">🇨🇮 Ivory Coast +225</option>
 <option value="+221">🇸🇳 Senegal +221</option>
-<option value="+220">🇬🇲 Gambia +220</option>
-<option value="+232">🇸🇱 Sierra Leone +232</option>
-<option value="+231">🇱🇷 Liberia +231</option>
-<option value="+228">🇹🇬 Togo +228</option>
-<option value="+229">🇧🇯 Benin +229</option>
 <option value="+27">🇿🇦 South Africa +27</option>
 <option value="+254">🇰🇪 Kenya +254</option>
-<option value="+256">🇺🇬 Uganda +256</option>
-<option value="+20">🇪🇬 Egypt +20</option>
 <option value="+1">🇺🇸 USA +1</option>
 <option value="+44">🇬🇧 UK +44</option>
 <option value="+33">🇫🇷 France +33</option>
 <option value="+49">🇩🇪 Germany +49</option>
-<option value="+39">🇮🇹 Italy +39</option>
-<option value="+34">🇪🇸 Spain +34</option>
-<option value="+91">🇮🇳 India +91</option>
 <option value="+971">🇦🇪 UAE +971</option>
-<option value="+966">🇸🇦 Saudi Arabia +966</option>
-<option value="+81">🇯🇵 Japan +81</option>
-<option value="+61">🇦🇺 Australia +61</option>
 <option value="OTHER">✏️ Other - Type Code Manually</option>
 </select>
 
-<label class="small">Country Code + Phone</label>
+<label class="small">Country Code + Phone - Must be REAL number</label>
 <div class="phoneRow">
 <div class="codeBox">
 <input id="countryCode" type="text" value="+233" placeholder="+233" oninput="updateFullPhone()">
 <small class="small" style="text-align:center">Code (Editable)</small>
 </div>
 <div class="numBox">
-<input id="phone" type="tel" placeholder="596032132" oninput="updateFullPhone()">
-<small class="small" id="fullPhoneDisplay">Full: +233596032132</small>
+<input id="phone" type="tel" placeholder="502957280" oninput="updateFullPhone()">
+<small class="small" id="fullPhoneDisplay">Full: +233502957280</small>
 </div>
 </div>
 
-<input id="pass" type="password" placeholder="Password e.g. Michael@2026" oninput="onPassInput(this.value)">
+<input id="pass" type="password" placeholder="Password e.g. Kusi@2026" oninput="onPassInput(this.value)">
 <div id="strengthBox" class="strength"></div>
 <input id="confirmPass" type="password" placeholder="Confirm Password">
 
-<label class="small">Upload Photo (Required)</label>
+<label class="small">Upload Photo (Required) - Real face</label>
 <input id="photo" type="file" accept="image/*">
 
 <div id="recaptcha-container"></div>
 <div id="status" class="status"></div>
-<button class="btn btnYellow" onclick="startRegistration()">1. Send Code to Phone</button>
+<button class="btn btnYellow" onclick="startRegistration()">1. Send SMS Code to REAL Phone</button>
 
 <div id="otpBox" class="otpBox">
-<b style="text-align:center;color:#facc15">Code sent to <span id="phoneDisplay"></span></b>
+<b style="text-align:center;color:#facc15">Code sent to REAL number <span id="phoneDisplay"></span></b>
+<small class="small" style="text-align:center">This proves you are real person. Fake numbers cannot receive code.</small>
 <input id="otp" type="text" placeholder="6-digit code" maxlength="6" style="text-align:center;font-size:18px;letter-spacing:4px">
-<button class="btn btnYellow" onclick="verifyOTP()">2. Verify & Create Account</button>
+<button class="btn btnYellow" onclick="verifyOTP()">2. Verify REAL Phone & Create Account</button>
 <button class="btn btnDark" onclick="resendOTP()">Resend Code</button>
 </div>
 
-<a href="client-login.html" style="text-align:center;color:#a78bfa;font-size:12px;text-decoration:none">Already have account? Login with Username</a>
+<a href="client-login.html" style="text-align:center;color:#a78bfa;font-size:12px;text-decoration:none">Already have account? Login</a>
+<div style="background:rgba(14,10,28,.6);border-radius:10px;padding:10px;font-size:10px;color:#a78bfa"><b style="color:#facc15">Why SMS?</b><br>• Proves phone is REAL, not fake<br>• Can trace person if bad action<br>• CEO receives Full Name + Username + Country Code + REAL Phone + Photo<br>• Fake numbers cannot get SMS code, so blocked automatically</div>
 </div>
 
-<div id="weakModal" class="modalOverlay" onclick="if(event.target===this) closeModal()">
-<div class="modal">
-<h3>Weak Password!</h3>
-<ul id="modalReqList">
-<li id="mLen" class="no">❌ 8+ characters</li>
-<li id="mSmall" class="no">❌ 1 small letter (a-z)</li>
-<li id="mBig" class="no">❌ 1 BIG letter (A-Z)</li>
-<li id="mNum" class="no">❌ 1 number (0-9)</li>
-<li id="mSpecial" class="no">❌ 1 special (@ & + # $ - etc)</li>
-</ul>
-<p style="font-size:10px;color:#a78bfa">Example: <b style="color:#facc15">Michael@2026</b></p>
-<button class="btn btnYellow" style="margin-top:10px" onclick="closeModal()">OK, I will fix it</button>
-</div>
-</div>
+<div id="weakModal" class="modalOverlay" onclick="if(event.target===this) closeModal()"><div class="modal"><h3 style="color:#facc15">Weak Password!</h3><ul style="list-style:none;text-align:left;font-size:12px;line-height:1.8;color:#a78bfa;background:rgba(14,10,28,.6);border-radius:10px;padding:10px 14px;margin:10px 0"><li id="mLen">❌ 8+ chars</li><li id="mSmall">❌ small (a-z)</li><li id="mBig">❌ BIG (A-Z)</li><li id="mNum">❌ number (0-9)</li><li id="mSpecial">❌ special (@ & + # $ - etc)</li></ul><button class="btn btnYellow" onclick="closeModal()">OK, I will fix</button></div></div>
+
+<div id="errorModal" class="modalOverlay" onclick="if(event.target===this) closeErrorModal()"><div class="modal" style="border-color:#ef4444"><h3 style="color:#fca5a5">SMS Failed - How to Enable Ghana</h3><div style="text-align:left;font-size:11px;line-height:1.6;color:#e8e0ff;background:rgba(14,10,28,.8);border-radius:10px;padding:12px;margin:10px 0"><b>Firebase blocks Ghana by default. Fix:</b><br><br>1. Go to <b>Firebase Console</b><br>https://console.firebase.google.com/project/web-care-618e8/authentication/settings<br><br>2. Scroll to <b>SMS Region Policy</b> → <b>Allowlist</b> → Add <b>Ghana +233</b> → Save<br><br>3. Go to <b>Sign-in method</b> → Enable <b>Phone</b><br><br>4. Enable <b>Billing (Blaze)</b> - Phone needs it<br><br>5. Add Test Number for now:<br>+233502957280 → 123456<br><br><b>For KUSI PETER, use test code 123456 to test now</b></div><button class="btn btnYellow" onclick="closeErrorModal()">I will enable now</button></div></div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
@@ -127,23 +103,17 @@ const storage=firebase.storage();
 let confirmationResult=null, photoBase64='', recaptchaVerifier=null;
 
 function showStatus(m,ok){ const el=document.getElementById('status'); el.textContent=m; el.className='status '+(ok?'ok':'err'); el.style.display='block'; }
-function onCountrySelect(val){
-  if(!val) return;
-  if(val==='OTHER'){ document.getElementById('countryCode').value='+'; document.getElementById('countryCode').focus(); showStatus('Type code manually e.g. +49, +33', true); return; }
-  if(val==='+1-CA') val='+1';
-  document.getElementById('countryCode').value=val; updateFullPhone(); showStatus('Selected '+val, true);
-}
-function getFullPhone(){
-  let code=document.getElementById('countryCode').value.trim(); if(!code.startsWith('+')) code='+'+code; code=code.replace(/[^+0-9]/g,''); if(!code.startsWith('+')) code='+'+code;
-  let num=document.getElementById('phone').value.trim().replace(/\s/g,'').replace(/^0+/,'').replace(/\D/g,''); const codeDigits=code.replace(/\D/g,''); if(num.startsWith(codeDigits)) num=num.substring(codeDigits.length); return code+num;
-}
+function onCountrySelect(val){ if(!val) return; if(val==='OTHER'){ document.getElementById('countryCode').value='+'; document.getElementById('countryCode').focus(); return; } document.getElementById('countryCode').value=val; updateFullPhone(); }
+function getFullPhone(){ let code=document.getElementById('countryCode').value.trim(); if(!code.startsWith('+')) code='+'+code; code=code.replace(/[^+0-9]/g,''); if(!code.startsWith('+')) code='+'+code; let num=document.getElementById('phone').value.trim().replace(/\s/g,'').replace(/^0+/,'').replace(/\D/g,''); const codeDigits=code.replace(/\D/g,''); if(num.startsWith(codeDigits)) num=num.substring(codeDigits.length); return code+num; }
 function updateFullPhone(){ document.getElementById('fullPhoneDisplay').textContent='Full: '+(getFullPhone().length>3?getFullPhone():'+233...'); }
 function isStrongPassword(p){ return { hasLen: p.length>=8, hasSmall: /[a-z]/.test(p), hasBig: /[A-Z]/.test(p), hasNum: /[0-9]/.test(p), hasSpecial: /[@&+#$\-"!%*?_^=<>~`':;|\\\/\(\)\[\]\{\}]/.test(p), get ok(){ return this.hasLen && this.hasSmall && this.hasBig && this.hasNum && this.hasSpecial; } }; }
-function onPassInput(p){ const r=isStrongPassword(p); const box=document.getElementById('strengthBox'); if(!p){ box.style.display='none'; return; } box.style.display='block'; if(r.ok){ box.className='strength strong'; box.textContent='✅ Strong - Good!'; } else{ box.className='strength weak'; box.textContent='⚠️ Weak - will show popup'; } }
-function showWeakPopup(p){ const r=isStrongPassword(p); document.getElementById('mLen').className=r.hasLen?'ok':'no'; document.getElementById('mLen').textContent=(r.hasLen?'✅ ':'❌ ')+'8+ chars'; document.getElementById('mSmall').className=r.hasSmall?'ok':'no'; document.getElementById('mSmall').textContent=(r.hasSmall?'✅ ':'❌ ')+'small (a-z)'; document.getElementById('mBig').className=r.hasBig?'ok':'no'; document.getElementById('mBig').textContent=(r.hasBig?'✅ ':'❌ ')+'BIG (A-Z)'; document.getElementById('mNum').className=r.hasNum?'ok':'no'; document.getElementById('mNum').textContent=(r.hasNum?'✅ ':'❌ ')+'number (0-9)'; document.getElementById('mSpecial').className=r.hasSpecial?'ok':'no'; document.getElementById('mSpecial').textContent=(r.hasSpecial?'✅ ':'❌ ')+'special (@ & + # $ - etc)'; document.getElementById('weakModal').classList.add('show'); }
+function onPassInput(p){ const r=isStrongPassword(p); const box=document.getElementById('strengthBox'); if(!p){ box.style.display='none'; return; } box.style.display='block'; if(r.ok){ box.className='strength strong'; box.textContent='✅ Strong - Good! REAL person needs strong pass'; } else{ box.className='strength weak'; box.textContent='⚠️ Weak - popup will show'; } }
+function showWeakPopup(p){ const r=isStrongPassword(p); document.getElementById('mLen').textContent=(r.hasLen?'✅ ':'❌ ')+'8+ chars'; document.getElementById('mSmall').textContent=(r.hasSmall?'✅ ':'❌ ')+'small (a-z)'; document.getElementById('mBig').textContent=(r.hasBig?'✅ ':'❌ ')+'BIG (A-Z)'; document.getElementById('mNum').textContent=(r.hasNum?'✅ ':'❌ ')+'number'; document.getElementById('mSpecial').textContent=(r.hasSpecial?'✅ ':'❌ ')+'special'; document.getElementById('weakModal').classList.add('show'); }
 function closeModal(){ document.getElementById('weakModal').classList.remove('show'); }
+function closeErrorModal(){ document.getElementById('errorModal').classList.remove('show'); }
 window.onload=()=>{
-  recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {size:'normal'}); recaptchaVerifier.render();
+  recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {size:'normal'});
+  recaptchaVerifier.render();
   document.getElementById('photo').addEventListener('change', (e)=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=()=>{ photoBase64=reader.result; const p=document.getElementById('preview'); p.src=photoBase64; p.style.display='block'; }; reader.readAsDataURL(file); });
   updateFullPhone();
 };
@@ -157,43 +127,49 @@ async function startRegistration(){
   const phone=getFullPhone();
   const countryCode=document.getElementById('countryCode').value.trim();
 
-  if(!fullName){ showStatus('Full Name is required', false); return; }
-  if(!username||!phone||!pass){ showStatus('Fill Username, Phone, Password', false); return; }
-  if(fullName.length<3){ showStatus('Full Name min 3 chars', false); return; }
+  if(!fullName){ showStatus('Full Name is required - for traceability', false); return; }
+  if(!username||!phone||!pass){ showStatus('Fill Full Name, Username, Phone, Password', false); return; }
   if(username.length<3){ showStatus('Username min 3 chars', false); return; }
   if(!/^[a-z0-9_]+$/.test(username)){ showStatus('Username only letters, numbers, _', false); return; }
-
   const strength=isStrongPassword(pass);
   if(!strength.ok){ showWeakPopup(pass); showStatus('Weak password - check popup', false); return; }
   if(pass!==confirmPass){ showStatus('Passwords mismatch', false); return; }
-  if(!photoBase64){ showStatus('Upload photo', false); return; }
-  if(phone.replace(/\D/g,'').length<10){ showStatus('Invalid phone: '+phone, false); return; }
+  if(!photoBase64){ showStatus('Upload photo - real face required', false); return; }
+  if(phone.replace(/\D/g,'').length<10){ showStatus('Invalid phone: '+phone+' - Must be REAL number', false); return; }
 
-  showStatus('Checking username...', true);
+  showStatus('Checking username & REAL phone...', true);
   try{
     const snap=await db.ref('allowedClients/'+username).once('value');
-    if(snap.exists()){ showStatus('Username taken', false); return; }
+    if(snap.exists()){ showStatus('Username taken - choose another', false); return; }
     const phoneSnap=await db.ref('allowedClients').orderByChild('phone').equalTo(phone).once('value');
-    if(phoneSnap.exists()){ showStatus('Phone already registered', false); return; }
+    if(phoneSnap.exists()){ showStatus('This REAL phone already registered - cannot fake', false); return; }
 
-    showStatus('Sending SMS to '+phone+'...', true);
+    showStatus('Sending SMS to REAL number '+phone+'...', true);
     confirmationResult = await auth.signInWithPhoneNumber(phone, recaptchaVerifier);
     document.getElementById('phoneDisplay').textContent=phone;
     document.getElementById('otpBox').style.display='flex';
-    showStatus('SMS sent to '+phone+' - Full Name: '+fullName, true);
+    showStatus('✅ SMS sent to REAL phone '+phone+' - If you fake number, you cannot receive code!', true);
     localStorage.setItem('tempReg', JSON.stringify({fullName,username,phone,countryCode,pass:hashPassword(pass),photoBase64}));
-  }catch(e){ showStatus('SMS failed: '+e.message, false); }
+  }catch(e){
+    console.error(e);
+    if(e.message.includes('region')||e.code==='auth/operation-not-allowed'||e.message.includes('not-allowed')){
+      document.getElementById('errorModal').classList.add('show');
+      showStatus('SMS failed: Ghana +233 not enabled. Enable in Firebase Console → Auth → SMS Region Policy → Allow +233. See popup.', false);
+    } else {
+      showStatus('SMS failed: '+e.message+' - Ensure phone is REAL and has signal', false);
+    }
+  }
 }
 
 async function verifyOTP(){
   const code=document.getElementById('otp').value.trim();
-  if(code.length!==6){ showStatus('6-digit code', false); return; }
-  showStatus('Verifying...', true);
+  if(code.length!==6){ showStatus('Enter 6-digit REAL SMS code', false); return; }
+  showStatus('Verifying REAL person...', true);
   try{
     const result=await confirmationResult.confirm(code);
     const temp=JSON.parse(localStorage.getItem('tempReg')||'{}');
     if(!temp.username){ showStatus('Data lost', false); return; }
-    showStatus('Phone verified! Creating...', true);
+    showStatus('✅ Phone verified - REAL person confirmed! Creating...', true);
     let photoUrl=temp.photoBase64;
     try{ const ref=storage.ref('clientPhotos/'+temp.username+'.jpg'); await ref.putString(photoBase64, 'data_url'); photoUrl=await ref.getDownloadURL(); }catch(e){}
     const clientData={
@@ -203,6 +179,7 @@ async function verifyOTP(){
       phone: temp.phone,
       countryCode: temp.countryCode,
       phoneVerified: true,
+      phoneVerifiedReal: true,
       phoneUid: result.user.uid,
       photoUrl: photoUrl,
       photo: photoUrl,
@@ -211,43 +188,32 @@ async function verifyOTP(){
       hasAll4: true,
       isApproved: true,
       isBlocked: false,
+      isRealPerson: true,
+      verificationMethod: 'SMS_OTP_REAL',
       createdAt: Date.now(),
-      registrationMethod: 'fullName+username+countryCode+phoneOTP',
-      // For CEO center
-      ceoData: {
-        fullName: temp.fullName,
-        username: temp.username,
-        phone: temp.phone,
-        countryCode: temp.countryCode,
-        photoUrl: photoUrl,
-        hasAll4: true,
-        isApproved: true,
-        registrationTime: new Date().toISOString()
-      }
+      registrationMethod: 'fullName+username+countryCode+REAL_PHONE_SMS'
     };
-    // Save under username key
     await db.ref('allowedClients/'+temp.username).set(clientData);
-    // Also save under clients by username for CEO dashboard to receive all
     await db.ref('clients/'+temp.username).set(clientData);
-    // Also save to ceo-registration-center path
     await db.ref('ceoRegistrations/clients/'+temp.username).set(clientData);
-    // For CEO to see all clients list
     await db.ref('clientRegistrations/'+temp.username).set(clientData);
+    // Also trace by phone for CEO
+    await db.ref('verifiedPhones/'+temp.phone.replace(/[^0-9]/g,'')).set({username: temp.username, fullName: temp.fullName, phone: temp.phone, countryCode: temp.countryCode, verifiedAt: Date.now(), isReal: true});
 
-    showStatus('SUCCESS! Full Name: '+temp.fullName+' Username: '+temp.username+' created', true);
+    showStatus('SUCCESS! REAL person '+temp.fullName+' ('+temp.username+') verified - CEO can trace via phone '+temp.phone, true);
     localStorage.removeItem('tempReg');
     await auth.signOut();
     setTimeout(()=>location.href='client-login.html?registered=true&username='+encodeURIComponent(temp.username),1500);
   }catch(e){
-    if(e.code==='auth/invalid-verification-code') showStatus('Wrong code', false);
+    if(e.code==='auth/invalid-verification-code') showStatus('Wrong code - Only REAL owner of phone can get correct code', false);
     else showStatus('Failed: '+e.message, false);
   }
 }
 async function resendOTP(){
   const temp=JSON.parse(localStorage.getItem('tempReg')||'{}');
   if(!temp.phone){ showStatus('Start again', false); return; }
-  showStatus('Resending...', true);
-  try{ confirmationResult=await auth.signInWithPhoneNumber(temp.phone, recaptchaVerifier); showStatus('New code sent', true); }
+  showStatus('Resending to REAL phone...', true);
+  try{ confirmationResult=await auth.signInWithPhoneNumber(temp.phone, recaptchaVerifier); showStatus('New code sent to REAL phone '+temp.phone, true); }
   catch(e){ showStatus('Resend failed: '+e.message, false); }
 }
 </script>
