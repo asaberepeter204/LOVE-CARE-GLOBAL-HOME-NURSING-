@@ -62,7 +62,7 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:10
 </div>
 
 <div class="searchRow">
-<input id="search" class="input" placeholder="Search name, email, phone..." oninput="render()">
+<input id="search" class="input" placeholder="Search Full Name, Username, Email, Phone, Country Code..." oninput="render()">
 <select id="filterDoc" class="input" style="max-width:180px" onchange="render()">
 <option value="all">All Documents</option>
 <option value="missing">Missing ALL 5</option>
@@ -114,10 +114,14 @@ function sanitizeEmail(e){ return (e||'').toLowerCase().replace(/[.#$@\[\]]/g,'_
 
 function normalizeRecord(id, raw, type){
   const v=raw.profile||raw.data||raw||{};
+  // OLD: email system, NEW: username system
   const email=(v.email||v.clientEmail||'').toLowerCase();
-  const name=v.fullName||v.name||v.displayName||v.clientName||(email?email.split('@')[0]:'Unnamed');
-  const phone=v.phone||v.phoneNumber||v.clientPhone||'';
-  const photo=v.photoURL||v.photo||v.photoUrl||v.avatar||'';
+  const username=v.username||v.userName||id||'';
+  const fullName=v.fullName||v.name||v.displayName||v.clientName||username||(email?email.split('@')[0]:'Unnamed');
+  const name=fullName; // for display
+  const phone=v.phone||v.phoneNumber||v.clientPhone||v.phoneNumberFull||'';
+  const countryCode=v.countryCode||''; // NEW
+  const photo=v.photoURL||v.photo||v.photoUrl||v.avatar||v.avatarUrl||'';
   const idURL=v.idURL||v.idUrl||v.nationalIdUrl||'';
   const licenceURL=v.licenceURL||v.licenseUrl||v.licence||v.licenceUrl||'';
   const videoURL=v.videoURL||v.videoUrl||'';
@@ -126,15 +130,19 @@ function normalizeRecord(id, raw, type){
   const lng=v.lng||v.longitude||null;
   const gpsName=v.gpsActualName||v.gpsName||'';
   // Check approval from ANY flag
-  const isApproved = v.isApproved===true || v.approved===true || v.status==='approved' || v.canLogin===true || v.isVerified===true || v.status==='Approved';
-  const hasAll5=!!(email && name && photo && phone && (type==='client' || videoURL));
+  const isApproved = v.isApproved===true || v.approved===true || v.status==='approved' || v.canLogin===true || v.isVerified===true || v.status==='Approved' || v.hasAll4===true;
+  // NEW: client hasAll5 = fullName + username + photo + phone (no email needed)
+  const hasAll5=type==='client' ? !!(fullName && username && photo && phone) : !!(fullName && photo && phone && videoURL);
+  const hasAll4=!!(fullName && username && photo && phone);
   return {
-    id: id, uid: v.uid||id, type: type, name: name.substring(0,40), email: email, phone: phone,
+    id: id, uid: v.uid||id, type: type, 
+    fullName: fullName.substring(0,50), name: name.substring(0,40), username: username, email: email, phone: phone, countryCode: countryCode,
     photo: photo, idURL: idURL, licenceURL: licenceURL, videoURL: videoURL, certURL: certURL,
-    lat: lat, lng: lng, gpsName: gpsName, isApproved: isApproved, hasAll5: hasAll5,
+    lat: lat, lng: lng, gpsName: gpsName, isApproved: isApproved, hasAll5: hasAll5, hasAll4: hasAll4,
     hasPhoto: !!photo, hasVideo: !!videoURL, hasId: !!idURL, hasLicence: !!licenceURL, hasCert: !!certURL,
     raw: v, createdAt: v.createdAt||v.timestamp||Date.now(), qualification: v.qualification||'', services: v.services||v.specialty||'',
-    referenceName: v.referenceName||'', referencePhone: v.referencePhone||''
+    referenceName: v.referenceName||'', referencePhone: v.referencePhone||'',
+    passwordHash: v.passwordHash||''
   };
 }
 
@@ -222,7 +230,7 @@ function render(){
   const docFilter=document.getElementById('filterDoc').value;
   let list=allData[currentTab]||[];
 
-  if(search) list=list.filter(r=> (r.name+' '+r.email+' '+r.phone).toLowerCase().includes(search));
+  if(search) list=list.filter(r=> (r.fullName+' '+r.name+' '+r.username+' '+r.email+' '+r.phone+' '+(r.countryCode||'')+' '+r.phone).toLowerCase().includes(search));
   if(docFilter==='missing') list=list.filter(r=>!r.hasAll5);
   else if(docFilter==='hasVideo') list=list.filter(r=>r.hasVideo);
   else if(docFilter==='hasPhoto') list=list.filter(r=>r.hasPhoto);
@@ -239,15 +247,19 @@ function render(){
   list.forEach(rec=>{
     const card=document.createElement('div');
     card.className='card '+(rec.isApproved?'approved':'pending');
+    const displayName = rec.fullName||rec.name;
+    const usernameShow = rec.username||rec.email||rec.id;
+    const phoneShow = rec.countryCode ? `${rec.countryCode} ${rec.phone.replace(rec.countryCode,'')}` : rec.phone;
+    const fullPhoneShow = rec.phone;
     card.innerHTML=`
       <div class="cardHeader">
-        <div class="avatar">${rec.photo?`<img src="${rec.photo}" onerror="this.parentElement.textContent='${rec.name.charAt(0).toUpperCase()}'">`:rec.name.charAt(0).toUpperCase()}</div>
+        <div class="avatar">${rec.photo?`<img src="${rec.photo}" onerror="this.parentElement.textContent='${displayName.charAt(0).toUpperCase()}'">`:displayName.charAt(0).toUpperCase()}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
-            <div style="font-weight:900;font-size:13px">${rec.name} ${rec.type==='nurse'?'👩‍⚕️':'👤'}</div>
+            <div style="font-weight:900;font-size:13px">${displayName} ${rec.type==='nurse'?'👩‍⚕️':'👤'}<br><small style="color:#a78bfa;font-size:10px">Username: ${usernameShow}</small></div>
             <div>
               <span class="badge ${rec.isApproved?'badgeApproved':'badgePending'}">${rec.isApproved?'✅ APPROVED':'⏳ PENDING'}</span>
-              <span class="badge ${rec.hasAll5?'badgeAll5':'badgeMissing'}">${rec.hasAll5?'✅ ALL 5':'❌ Missing'}</span>
+              <span class="badge ${rec.hasAll5||rec.hasAll4?'badgeAll5':'badgeMissing'}">${rec.hasAll5||rec.hasAll4?'✅ ALL 4':'❌ Missing'}</span>
             </div>
           </div>
           <div class="info">
@@ -324,8 +336,8 @@ function viewAllDocs(uid){
   const rec=allData.all.find(r=>r.uid===uid);
   if(!rec) return;
   const modal=document.getElementById('modal');
-  document.getElementById('modalTitle').textContent=`All Uploads — ${rec.name}`;
-  document.getElementById('modalBody').innerHTML=`<div style="text-align:left;font-size:11px"><b>${rec.name}</b><br>${rec.email}<br>Approved: ${rec.isApproved?'YES ✅':'NO ⏳'}<br>Photo: ${rec.photo?`<a href="${rec.photo}" target="_blank">View</a>`:'Missing'}<br>ID: ${rec.idURL?`<a href="${rec.idURL}" target="_blank">View</a>`:'Missing'}<br>Licence: ${rec.licenceURL?`<a href="${rec.licenceURL}" target="_blank">View</a>`:'Missing'}<br>Video: ${rec.videoURL?`<a href="${rec.videoURL}" target="_blank">View</a>`:'Missing'}<br>Cert: ${rec.certURL?`<a href="${rec.certURL}" target="_blank">View</a>`:'Optional'}</div>`;
+  document.getElementById('modalTitle').textContent=`All Uploads — ${rec.fullName||rec.name}`;
+  document.getElementById('modalBody').innerHTML=`<div style="text-align:left;font-size:11px"><b>Full Name: ${rec.fullName||rec.name}</b><br>Username (Login): <b>${rec.username||rec.id}</b><br>Email: ${rec.email||'N/A (Username System)'}<br>Country Code: ${rec.countryCode||'N/A'}<br>Phone: ${rec.phone}<br>Full Phone: ${rec.countryCode||''} ${rec.phone}<br>Approved: ${rec.isApproved?'YES ✅':'NO ⏳'}<br>HasAll4: ${rec.hasAll4?'YES ✅':'NO'}<br>Photo: ${rec.photo?`<a href="${rec.photo}" target="_blank">View</a>`:'Missing'}<br>ID: ${rec.idURL?`<a href="${rec.idURL}" target="_blank">View</a>`:'Missing'}<br>Licence: ${rec.licenceURL?`<a href="${rec.licenceURL}" target="_blank">View</a>`:'Missing'}<br>Video: ${rec.videoURL?`<a href="${rec.videoURL}" target="_blank">View</a>`:'Missing'}<br>Cert: ${rec.certURL?`<a href="${rec.certURL}" target="_blank">View</a>`:'Optional'}</div>`;
   modal.style.display='grid';
 }
 function closeModal(){ document.getElementById('modal').style.display='none'; }
