@@ -44,6 +44,11 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:10
 .modalContent img, .modalContent video{max-width:100%;max-height:70vh;border-radius:12px}
 .toast{position:fixed;right:14px;bottom:14px;z-index:200;background:#1e0a3a;border:1px solid rgba(168,85,247,.3);color:#fff;padding:12px 16px;border-radius:12px;font-size:12px;display:none;max-width:90vw}
 .progressLog{background:rgba(0,0,0,.4);border:1px solid rgba(168,85,247,.15);border-radius:8px;padding:8px;margin-top:8px;font-size:10px;color:#a78bfa;max-height:100px;overflow-y:auto;display:none}
+
+.videoInline{position:relative;background:#000;border-radius:8px;overflow:hidden}
+.videoInline video{width:100%;height:100px;object-fit:cover;background:#000}
+.soundTag{position:absolute;top:4px;right:4px;font-size:8px;padding:2px 6px;border-radius:999px;background:rgba(34,197,94,.9);color:#000;font-weight:900}
+
 </style>
 </head>
 <body>
@@ -269,7 +274,7 @@ function render(){
           <div class="docLabel">📜 Licence ${rec.hasLicence?'✅':'❌'}</div>
         </div>
         <div class="docBox ${rec.hasVideo?'':'docMissing'}" onclick="viewDoc('${rec.videoURL}','Video - ${rec.name}','video')">
-          ${rec.videoURL?`<video src="${rec.videoURL}" style="height:80px"></video>`:`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Video</div>`}
+          ${rec.videoURL?`<video src="${rec.videoURL}" muted playsinline preload="metadata" style="height:80px;pointer-events:none"></video>`:`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Video</div>`}
           <div class="docLabel">🎥 Video ${rec.hasVideo?'✅':'❌ REQ'}</div>
         </div>
         <div class="docBox ${rec.hasCert?'':'docMissing'}" onclick="viewDoc('${rec.certURL}','Certificate - ${rec.name}','image')" style="grid-column:span 2">
@@ -291,10 +296,27 @@ function render(){
 function viewDoc(url, title, type){
   if(!url){ toast('No file'); return; }
   const modal=document.getElementById('modal');
-  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalTitle').textContent=title + ' — 🔊 Sound Fixed';
   const body=document.getElementById('modalBody');
   if(url.includes('.pdf')) body.innerHTML=`<a href="${url}" target="_blank" style="color:#93c5fd">📄 Open PDF</a><br><br><iframe src="${url}" style="width:100%;height:60vh"></iframe>`;
-  else if(type==='video') body.innerHTML=`<video src="${url}" controls autoplay style="max-width:100%;max-height:70vh"></video><br><a href="${url}" target="_blank" style="color:#93c5fd">🔗 Open video</a>`;
+  else if(type==='video') {
+    body.innerHTML=`
+      <div style="background:#000;border-radius:12px;overflow:hidden;border:2px solid rgba(168,85,247,.3)">
+        <video id="modalVideoPlayer" src="${url}" controls playsinline preload="metadata" style="width:100%;max-height:70vh;background:#000" onloadeddata="this.volume=1.0; this.muted=false; document.getElementById('soundStatus')&&(document.getElementById('soundStatus').textContent='🔊 Sound ON — Ready to play');" onplay="this.muted=false; this.volume=1.0; let s=document.getElementById('soundStatus'); if(s) s.textContent='🔊 Playing with sound — Volume '+(this.volume*100).toFixed(0)+'%'"></video>
+        <div style="display:flex;gap:8px;padding:10px;background:rgba(14,10,28,.95);justify-content:space-between;align-items:center;flex-wrap:wrap">
+          <span id="soundStatus" style="font-size:10px;padding:5px 10px;border-radius:999px;background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)">🔊 Sound ON — Volume 100%</span>
+          <div style="display:flex;gap:6px">
+            <button onclick="let v=document.getElementById('modalVideoPlayer'); v.muted=false; v.volume=1.0; v.play().then(()=>{document.getElementById('soundStatus').textContent='🔊 Playing with sound';}).catch(()=>{document.getElementById('soundStatus').textContent='▶️ Tap video play button';});" style="padding:7px 12px;border-radius:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-weight:800;border:none;font-size:10px;cursor:pointer">▶️ Play with Sound</button>
+            <button onclick="let v=document.getElementById('modalVideoPlayer'); v.muted=!v.muted; document.getElementById('soundStatus').textContent=v.muted?'🔇 Muted — Tap to unmute':'🔊 Sound ON'; document.getElementById('soundStatus').style.background=v.muted?'rgba(239,68,68,.15)':'rgba(34,197,94,.15)'; document.getElementById('soundStatus').style.color=v.muted?'#fca5a5':'#86efac';" style="padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);font-size:10px;cursor:pointer">🔊 Toggle Mute</button>
+            <button onclick="let v=document.getElementById('modalVideoPlayer'); v.volume=1.0; v.muted=false; document.getElementById('soundStatus').textContent='🔊 Max Volume 100%';" style="padding:6px 10px;border-radius:8px;background:rgba(168,85,247,.2);color:#d8b4fe;border:1px solid rgba(168,85,247,.3);font-size:10px;cursor:pointer">🔊 Max Vol</button>
+          </div>
+        </div>
+      </div>
+      <br><a href="${url}" target="_blank" style="color:#93c5fd;font-size:11px">🔗 Open video in new tab</a>
+      <div style="font-size:10px;color:#facc15;margin-top:8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);padding:8px;border-radius:8px">💡 If no sound: 1) Tap ▶️ Play with Sound button 2) Tap 🔊 speaker icon inside video 3) Drag volume slider to max. Browser blocks autoplay with sound until you tap — this is fixed by tapping play.</div>
+    `;
+    setTimeout(()=>{ let v=document.getElementById('modalVideoPlayer'); if(v){ v.volume=1.0; v.muted=false; v.play().catch(()=>{ let s=document.getElementById('soundStatus'); if(s) s.textContent='▶️ Tap Play with Sound button 🔊 — Browser blocked autoplay'; }); } }, 400);
+  }
   else body.innerHTML=`<img src="${url}" style="max-width:100%;max-height:70vh"><br><a href="${url}" target="_blank" style="color:#93c5fd">🔗 Open image</a>`;
   modal.style.display='grid';
 }
