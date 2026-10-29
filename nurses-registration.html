@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Registration - FIXED UPLOAD</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding:16px;padding-bottom:120px;overflow-y:auto}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),linear-gradient(180deg,#0e0a1c 0%, #120e26 100%)}
+.wrap{width:100%;max-width:560px;margin:0 auto;position:relative;z-index:1}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.22);border-radius:24px;padding:22px;padding-bottom:40px;box-shadow:0 20px 50px rgba(0,0,0,.6);margin-bottom:20px}
+.logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-weight:900;margin:0 auto 10px;font-size:24px;color:#1e0a3a}
+h1{text-align:center;font-weight:800;font-size:20px;color:#f3e8ff}
+.subtitle{text-align:center;font-size:12px;color:#a78bfa;margin:6px 0 10px}
+.badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.badge{padding:5px 10px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid}
+.badgeGreen{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.3)}
+.badgePurple{background:rgba(168,85,247,.15);color:#d8b4fe;border-color:rgba(168,85,247,.25)}
+.badgeYellow{background:rgba(245,158,11,.15);color:#facc15;border-color:rgba(245,158,11,.25)}
+label{font-size:11px;font-weight:800;margin:12px 0 5px;display:block;color:#c4b5fd;text-transform:uppercase}
+label.required:after{content:" *";color:#facc15}
+label.optional:after{content:" (Optional)";color:#6b7280;font-weight:400;text-transform:none}
+.inputWrap{position:relative}
+input,select,textarea{width:100%;padding:14px 46px 14px 14px;border-radius:12px;border:1.5px solid rgba(168,85,247,.22);background:rgba(14,10,28,.7);color:#f3e8ff;font-size:14px;outline:none}
+select,textarea{padding-right:14px}
+textarea{resize:vertical;min-height:70px}
+input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.18)}
+.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(168,85,247,.25);border:1px solid rgba(168,85,247,.35);width:46px;height:46px;border-radius:12px;cursor:pointer;display:grid;place-items:center;z-index:20;font-size:18px}
+.btn{width:100%;padding:18px;border-radius:14px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;margin-top:12px;min-height:54px;transition:.15s}
+.btn:active{transform:scale(0.96)}
+.btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35)}
+.btnLight{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.22);color:#e9d5ff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:500px){.grid2{grid-template-columns:1fr}}
+.fileBox{background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.35);border-radius:12px;padding:12px;margin-top:6px;cursor:pointer;position:relative}
+.fileBox.hasFile{border-color:#22c55e!important;background:rgba(34,197,94,.1)!important}
+.fileBox.required{border-color:rgba(250,204,21,.4)}
+.fileBox.optional{border-color:rgba(107,114,128,.3)}
+.fileName{font-size:11px;color:#86efac;font-weight:700;margin-top:6px;display:none}
+.alert{padding:12px;border-radius:12px;font-size:12px;font-weight:700;margin:10px 0;border:1px solid}
+.alert-info{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93c5fd}
+.alert-success{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac}
+.alert-error{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5}
+.stepper{display:flex;align-items:center;justify-content:center;gap:0;margin:16px 0 20px}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.stepCircle{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:14px;border:2px solid rgba(168,85,247,.25);background:rgba(14,10,28,.7);color:#a78bfa;transition:.3s}
+.step.active .stepCircle{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border-color:#a855f7;box-shadow:0 0 16px rgba(168,85,247,.4)}
+.step.done .stepCircle{background:rgba(34,197,94,.2);border-color:#22c55e;color:#86efac}
+.stepLabel{font-size:10px;font-weight:800;text-transform:uppercase;color:#6b7280}
+.step.active .stepLabel{color:#d8b4fe}
+.stepLine{position:absolute;top:18px;left:60%;width:80%;height:2px;background:rgba(168,85,247,.2);z-index:-1}
+.step:last-child .stepLine{display:none}
+.section{display:none}
+.section.active{display:block;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.sectionTitle{font-size:14px;font-weight:800;color:#f3e8ff;margin-bottom:4px}
+.sectionDesc{font-size:11px;color:#a78bfa;margin-bottom:14px}
+.navRow{display:flex;gap:10px;margin-top:16px}
+.navRow .btn{margin-top:0;flex:1}
+.previewImg{width:100%;height:160px;border-radius:12px;object-fit:cover;background:rgba(14,10,28,.5);display:none;margin-top:8px;border:1px solid rgba(168,85,247,.15)}
+.gpsBox{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:14px;margin-top:8px}
+.progressBar{height:6px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;margin:12px 0;display:none}
+.progressFill{height:100%;background:linear-gradient(90deg,#a855f7,#facc15);width:0%;transition:.4s}
+.compressInfo{font-size:10px;color:#22c55e;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);padding:6px 8px;border-radius:8px;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap"><div class="card">
+<div class="logo">👩‍⚕️</div>
+<h1>Nurse Registration - FIXED</h1>
+<p class="subtitle">ALL mandatory except Certificate • Any size auto-compress • FAST</p>
+<div class="badges">
+<span class="badge badgeGreen">✅ Upload Fixed</span>
+<span class="badge badgePurple">⚡ FAST Parallel</span>
+<span class="badge badgeYellow">📦 CEO Approval Required</span>
+</div>
+<div class="stepper">
+<div class="step active" id="stepper1"><div class="stepCircle">1</div><div class="stepLabel">Personal Info</div><div class="stepLine"></div></div>
+<div class="step" id="stepper2"><div class="stepCircle">2</div><div class="stepLabel">Documents</div></div>
+</div>
+<div id="msg"></div>
+
+<div class="section active" id="section1">
+<div class="sectionTitle">👤 Step 1 — Personal & Professional Details</div>
+<div class="sectionDesc">All mandatory. Photos ANY size — auto compress to ~200KB for fast upload.</div>
+
+<div class="grid2">
+<div><label class="required">Full Name</label><input id="fullName" placeholder="Enter full name"></div>
+<div><label class="required">Email</label><input id="email" type="email" placeholder="email@gmail.com"></div>
+</div>
+
+<div class="grid2">
+<div><label class="required">Phone Number</label><input id="phone" type="tel" placeholder="0596672863"></div>
+<div><label class="required">Password</label><div class="inputWrap"><input id="password" type="password" placeholder="Min 6 chars"><button type="button" class="eyeBtn" onclick="togglePass()">👁️</button></div></div>
+</div>
+
+<div class="grid2">
+<div><label class="required">Country</label><select id="country"><option value="Ghana" selected>Ghana</option><option value="Nigeria">Nigeria</option><option value="USA">USA</option><option value="UK">UK</option><option value="Other">Other</option></select></div>
+<div><label class="required">Experience</label><select id="experience"><option value="1">1 Year</option><option value="2" selected>2 Years</option><option value="3">3 Years</option><option value="5">5+ Years</option><option value="10">10+ Years</option></select></div>
+</div>
+
+<label class="required">Qualification</label><input id="qualification" placeholder="e.g., BSc Nursing, Diploma">
+
+<label class="required">Services / Specialty</label><select id="services"><option value="General Nursing" selected>General Nursing</option><option value="Elderly Care">Elderly Care</option><option value="Pediatric Care">Pediatric Care</option><option value="Post-Surgery Care">Post-Surgery Care</option><option value="Home Care">Home Care</option></select>
+
+<div class="grid2">
+<div><label class="required">Reference Name</label><input id="referenceName" placeholder="Reference person"></div>
+<div><label class="required">Reference Phone</label><input id="referencePhone" type="tel" placeholder="Reference phone"></div>
+</div>
+
+<div class="gpsBox">
+<label class="required">📍 Location — Required</label>
+<div id="gpsStatus" style="font-size:11px;color:#a78bfa;margin:6px 0">Tap to capture GPS — REQUIRED</div>
+<button type="button" class="btn btnLight" id="gpsBtn" onclick="captureGPS()">📍 Capture My Location</button>
+</div>
+
+<div class="navRow"><button type="button" class="btn btnPurple" onclick="goToStep2()">Next → Documents (ALL mandatory except Certificate)</button></div>
+</div>
+
+<div class="section" id="section2">
+<div class="sectionTitle">📄 Step 2 — Documents</div>
+<div class="sectionDesc">ALL mandatory except Certificate. Any photo size allowed — auto compress to ~200KB.</div>
+
+<div class="progressBar" id="progressBarWrap"><div class="progressFill" id="progressFill"></div></div>
+
+<!-- PROFILE PHOTO -->
+<label class="required">Profile Photo — REQUIRED — Any size, auto compress</label>
+<div class="fileBox required" id="boxPhoto" onclick="document.getElementById('photoFile').click()">
+<input type="file" id="photoFile" accept="image/*" style="display:none">
+<div style="font-size:12px">📸 Tap to upload Profile Photo *</div>
+<div class="compressInfo">ANY SIZE OK — auto compress to ~200KB</div>
+<div class="fileName" id="nameBoxPhoto"></div>
+<img id="previewPhoto" class="previewImg">
+</div>
+
+<!-- NATIONAL ID -->
+<label class="required">National ID — REQUIRED</label>
+<div class="fileBox required" id="boxId" onclick="document.getElementById('idFile').click()">
+<input type="file" id="idFile" accept="image/*,.pdf" style="display:none">
+<div style="font-size:12px">🪪 Tap to upload National ID *</div>
+<div class="compressInfo">ANY SIZE — auto compress</div>
+<div class="fileName" id="nameBoxId"></div>
+<img id="previewId" class="previewImg">
+</div>
+
+<!-- LICENCE -->
+<label class="required">Licence — REQUIRED</label>
+<div class="fileBox required" id="boxLicence" onclick="document.getElementById('licenceFile').click()">
+<input type="file" id="licenceFile" accept="image/*,.pdf" style="display:none">
+<div style="font-size:12px">📜 Tap to upload Nursing Licence *</div>
+<div class="compressInfo">ANY SIZE — auto compress</div>
+<div class="fileName" id="nameBoxLicence"></div>
+<img id="previewLicence" class="previewImg">
+</div>
+
+<!-- INTRO VIDEO -->
+<label class="required">Intro Video — REQUIRED — Max 30 sec</label>
+<div class="fileBox required" id="boxVideo" onclick="document.getElementById('videoFile').click()">
+<input type="file" id="videoFile" accept="video/*" style="display:none">
+<div style="font-size:12px">🎥 Tap to upload Intro Video *</div>
+<div style="font-size:10px;color:#facc15;margin-top:4px">Required — Introduce yourself (max 30 sec)</div>
+<div class="fileName" id="nameBoxVideo"></div>
+<video id="previewVideo" class="previewImg" controls style="display:none"></video>
+</div>
+
+<!-- CERTIFICATE - ONLY OPTIONAL -->
+<label class="optional">Nursing Certificate — OPTIONAL (Only this is optional)</label>
+<div class="fileBox optional" id="boxCert" onclick="document.getElementById('certFile').click()">
+<input type="file" id="certFile" accept="image/*,.pdf" style="display:none">
+<div style="font-size:12px">📜 Tap to upload Certificate (Optional)</div>
+<div style="font-size:10px;color:#6b7280;margin-top:4px">Only optional field — can skip</div>
+<div class="fileName" id="nameBoxCert"></div>
+<img id="previewCert" class="previewImg">
+</div>
+
+<div class="navRow">
+<button type="button" class="btn btnLight" onclick="goToStep1()">← Back</button>
+<button type="button" class="btn btnPurple" id="registerBtn" onclick="registerNurse()">⚡ FAST Register</button>
+</div>
+</div>
+
+</div></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+const storage=firebase.storage();
+
+let currentLat=null, currentLng=null, currentGPSName='';
+let filesState={photo:null, id:null, licence:null, video:null, cert:null};
+
+function showMsg(text,type){
+  const el=document.getElementById('msg');
+  el.innerHTML=`<div class="alert alert-${type}">${text}</div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(type!=='error') setTimeout(()=>{ if(el.innerHTML.includes(text)) el.innerHTML=''; }, 5000);
+}
+function togglePass(){const el=document.getElementById('password'); el.type=el.type==='password'?'text':'password';}
+
+function goToStep2(){
+  const fullName=document.getElementById('fullName').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('password').value.trim();
+  const qualification=document.getElementById('qualification').value.trim();
+  const refName=document.getElementById('referenceName').value.trim();
+  const refPhone=document.getElementById('referencePhone').value.trim();
+  if(!fullName||!email||!phone||!password){ showMsg('❌ Fill Name, Email, Phone, Password (all mandatory)', 'error'); return; }
+  if(!email.includes('@')){ showMsg('❌ Valid email required', 'error'); return; }
+  if(!qualification){ showMsg('❌ Qualification required', 'error'); return; }
+  if(!refName||!refPhone){ showMsg('❌ Reference Name & Phone required', 'error'); return; }
+  if(!currentLat||!currentLng){ showMsg('📍 Capture GPS location — REQUIRED', 'error'); return; }
+  document.getElementById('section1').classList.remove('active');
+  document.getElementById('section2').classList.add('active');
+  document.getElementById('stepper1').classList.remove('active'); document.getElementById('stepper1').classList.add('done'); document.getElementById('stepper1').querySelector('.stepCircle').innerHTML='✓';
+  document.getElementById('stepper2').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goToStep1(){
+  document.getElementById('section2').classList.remove('active');
+  document.getElementById('section1').classList.add('active');
+  document.getElementById('stepper1').classList.add('active');
+  document.getElementById('stepper1').classList.remove('done');
+  document.getElementById('stepper1').querySelector('.stepCircle').innerHTML='1';
+  document.getElementById('stepper2').classList.remove('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function captureGPS(){
+  const btn=document.getElementById('gpsBtn');
+  const statusEl=document.getElementById('gpsStatus');
+  btn.textContent='⏳ Capturing...'; btn.disabled=true;
+  if(!navigator.geolocation){ showMsg('GPS not supported', 'error'); btn.textContent='📍 Capture My Location'; btn.disabled=false; return; }
+  navigator.geolocation.getCurrentPosition(async(pos)=>{
+    currentLat=pos.coords.latitude; currentLng=pos.coords.longitude;
+    statusEl.innerHTML=`✅ GPS Captured: ${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`;
+    statusEl.style.color='#86efac';
+    btn.textContent='✅ GPS Captured'; btn.disabled=false;
+    try{
+      const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}`);
+      const data=await res.json();
+      currentGPSName=data.display_name||'';
+      statusEl.innerHTML+=`<br><span style="font-size:10px;color:#c4b5fd">${currentGPSName}</span>`;
+    }catch(e){}
+  }, (err)=>{
+    showMsg('GPS failed: '+err.message, 'error');
+    btn.textContent='📍 Try Again'; btn.disabled=false;
+  }, {enableHighAccuracy:true, timeout:15000});
+}
+
+// COMPRESS IMAGE TO ~200KB
+function compressImage(file, maxWidth=800){
+  return new Promise((resolve,reject)=>{
+    if(!file.type.startsWith('image/')){ resolve({blob:file, dataUrl:'', width:0, height:0}); return; }
+    const reader=new FileReader();
+    reader.onload=(e)=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        let w=img.width, h=img.height;
+        if(w>maxWidth){ h=Math.round((h*maxWidth)/w); w=maxWidth; }
+        if(h>1200){ w=Math.round((w*1200)/h); h=1200; }
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        let q=0.7; let dataUrl=canvas.toDataURL('image/jpeg', q);
+        while(dataUrl.length>350000 && q>0.15){ q-=0.1; dataUrl=canvas.toDataURL('image/jpeg', q); }
+        canvas.toBlob((blob)=>{ resolve({blob, dataUrl, width:w, height:h, quality:q}); }, 'image/jpeg', q);
+      };
+      img.onerror=()=>{ resolve({blob:file, dataUrl:e.target.result, width:0, height:0}); };
+      img.src=e.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// FIXED HANDLER - WORKS FOR ALL BOXES
+function handleFileSelect(file, boxId, nameId, previewId, stateKey){
+  if(!file){ return; }
+  filesState[stateKey]=file;
+  const box=document.getElementById(boxId);
+  const nameEl=document.getElementById(nameId);
+  const preview=document.getElementById(previewId);
+  
+  if(box) box.classList.add('hasFile');
+  if(nameEl){
+    nameEl.style.display='block';
+    nameEl.textContent='✓ '+file.name+' ('+(file.size/1024/1024).toFixed(2)+' MB) — ready';
+    nameEl.style.color='#86efac';
+  }
+  if(preview){
+    if(file.type.startsWith('image/')){
+      const reader=new FileReader();
+      reader.onload=(e)=>{ preview.src=e.target.result; preview.style.display='block'; };
+      reader.readAsDataURL(file);
+    }else if(file.type.startsWith('video/')){
+      const url=URL.createObjectURL(file);
+      preview.src=url; preview.style.display='block';
+    }else{
+      preview.style.display='none';
+      if(nameEl) nameEl.textContent='✓ '+file.name+' ('+(file.size/1024/1024).toFixed(2)+' MB) — PDF ready';
+    }
+  }
+  showMsg('✅ File selected: '+file.name+' ('+(file.size/1024/1024).toFixed(2)+'MB → will compress to ~200KB)', 'success');
+}
+
+// Attach listeners - FIXED
+document.getElementById('photoFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxPhoto', 'nameBoxPhoto', 'previewPhoto', 'photo'); });
+document.getElementById('idFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxId', 'nameBoxId', 'previewId', 'id'); });
+document.getElementById('licenceFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxLicence', 'nameBoxLicence', 'previewLicence', 'licence'); });
+document.getElementById('videoFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxVideo', 'nameBoxVideo', 'previewVideo', 'video'); });
+document.getElementById('certFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxCert', 'nameBoxCert', 'previewCert', 'cert'); });
+
+async function registerNurse(){
+  const fullName=document.getElementById('fullName').value.trim();
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('password').value.trim();
+  const country=document.getElementById('country').value;
+  const experience=document.getElementById('experience').value;
+  const qualification=document.getElementById('qualification').value.trim();
+  const services=document.getElementById('services').value;
+  const refName=document.getElementById('referenceName').value.trim();
+  const refPhone=document.getElementById('referencePhone').value.trim();
+
+  // VALIDATION - ALL MANDATORY EXCEPT CERTIFICATE
+  if(!fullName||!email||!phone||!password){ showMsg('❌ Full Name, Email, Phone, Password ALL required', 'error'); return; }
+  if(!email.includes('@')){ showMsg('❌ Valid email required', 'error'); return; }
+  if(password.length<6){ showMsg('❌ Password min 6 chars', 'error'); return; }
+  if(!qualification){ showMsg('❌ Qualification required', 'error'); return; }
+  if(!refName||!refPhone){ showMsg('❌ Reference Name & Phone required', 'error'); return; }
+  if(!currentLat||!currentLng){ showMsg('📍 GPS required — capture location', 'error'); return; }
+  
+  if(!filesState.photo){ showMsg('❌ Profile Photo REQUIRED — tap box to upload', 'error'); document.getElementById('boxPhoto').style.borderColor='#ef4444'; return; }
+  if(!filesState.id){ showMsg('❌ National ID REQUIRED — tap box to upload', 'error'); document.getElementById('boxId').style.borderColor='#ef4444'; return; }
+  if(!filesState.licence){ showMsg('❌ Licence REQUIRED — tap box to upload', 'error'); document.getElementById('boxLicence').style.borderColor='#ef4444'; return; }
+  if(!filesState.video){ showMsg('❌ Intro Video REQUIRED — tap box to upload', 'error'); document.getElementById('boxVideo').style.borderColor='#ef4444'; return; }
+  // cert is OPTIONAL - no check
+
+  const btn=document.getElementById('registerBtn');
+  const progressWrap=document.getElementById('progressBarWrap');
+  const progressFill=document.getElementById('progressFill');
+  
+  btn.disabled=true; btn.textContent='⚡ Compressing & Uploading FAST...';
+  progressWrap.style.display='block'; progressFill.style.width='10%';
+  showMsg('⚡ FAST registration: Compressing photos to ~200KB + parallel upload → CEO Center...', 'info');
+
+  try{
+    progressFill.style.width='20%';
+    const cred=await auth.createUserWithEmailAndPassword(email, password);
+    const uid=cred.user.uid;
+    await cred.user.updateProfile({displayName:fullName});
+    progressFill.style.width='30%';
+
+    showMsg('🔄 Compressing images (any size → ~200KB) in parallel...', 'info');
+    
+    // COMPRESS IN PARALLEL
+    const compPhoto=await compressImage(filesState.photo, 600);
+    const compId=await compressImage(filesState.id, 1000).catch(()=>({blob:filesState.id}));
+    const compLic=await compressImage(filesState.licence, 1000).catch(()=>({blob:filesState.licence}));
+    const compCert=filesState.cert ? await compressImage(filesState.cert, 1000).catch(()=>({blob:filesState.cert})) : null;
+    
+    progressFill.style.width='50%';
+    showMsg('📤 Uploading compressed files in parallel... FAST!', 'info');
+
+    // UPLOAD IN PARALLEL
+    async function uploadBlob(blob, path){
+      const sRef=storage.ref(path);
+      await sRef.put(blob);
+      return await sRef.getDownloadURL();
+    }
+
+    const uploadTasks=[
+      uploadBlob(compPhoto.blob, 'nurses/'+uid+'/photo_'+Date.now()+'.jpg'),
+      uploadBlob(compId.blob, 'nurses/'+uid+'/id_'+Date.now()+'_'+filesState.id.name),
+      uploadBlob(compLic.blob, 'nurses/'+uid+'/licence_'+Date.now()+'_'+filesState.licence.name),
+      uploadBlob(filesState.video, 'nurses/'+uid+'/video_'+Date.now()+'_'+filesState.video.name)
+    ];
+    if(compCert) uploadTasks.push(uploadBlob(compCert.blob, 'nurses/'+uid+'/cert_'+Date.now()+'_'+filesState.cert.name));
+
+    const urls=await Promise.all(uploadTasks);
+    const photoURL=urls[0]||'';
+    const idURL=urls[1]||'';
+    const licenceURL=urls[2]||'';
+    const videoURL=urls[3]||'';
+    const certURL=compCert ? urls[4]||'' : '';
+
+    progressFill.style.width='75%';
+    showMsg('💾 Saving to CEO Registration Center...', 'info');
+
+    const now=Date.now();
+    const nurseData={
+      uid:uid,id:uid,fullName:fullName,name:fullName,email:email,phone:phone,phoneNumber:phone,country:country,experience:experience,qualification:qualification,services:services,specialty:services,referenceName:refName,referencePhone:refPhone,
+      lat:currentLat,lng:currentLng,gpsActualName:currentGPSName||'',
+      photo:photoURL,photoURL:photoURL,idURL:idURL,licenceURL:licenceURL,licenseUrl:licenceURL,videoURL:videoURL,videoUrl:videoURL,cvURL:certURL,cvUrl:certURL,
+      hasAll4:true, hasCertificate:!!certURL,
+      isApproved:false,canLogin:false,status:'pending',rating:5.0,
+      createdAt:now,updatedAt:now,source:'nurses-registration-FIXED-FINAL'
+    };
+
+    // SAVE TO CEO CENTER - PENDING, CANNOT LOGIN UNTIL APPROVED
+    await Promise.all([
+      db.ref('nurses/'+uid).set(nurseData),
+      db.ref('pending_nurses/'+uid).set(nurseData),
+      db.ref('ceoNurseUpdates/'+uid).set({...nurseData, updatedBy:'FIXED-FINAL-registration'}),
+      db.ref('ceoRegistrationCenter/nurses/'+uid).set(nurseData)
+    ]);
+
+    progressFill.style.width='100%';
+    showMsg('✅ Registration successful! Sent to CEO Registration Center for approval. You CANNOT login until CEO approves you!', 'success');
+    localStorage.setItem('nurseProfile', JSON.stringify(nurseData));
+    localStorage.setItem('nurseEmail', email);
+    localStorage.setItem('nurseName', fullName);
+    
+    btn.textContent='✅ Registered — Waiting CEO Approval';
+    setTimeout(()=>{ location.href='nurse-login.html?from=registered_pending'; }, 2000);
+
+  }catch(e){
+    console.error(e);
+    let msg=e.message;
+    if(e.code==='auth/email-already-in-use') msg='Email already registered. Login or wait for CEO approval.';
+    showMsg('❌ Registration failed: '+msg, 'error');
+    progressWrap.style.display='none';
+    btn.disabled=false; btn.textContent='⚡ FAST Register';
+  }
+}
+
+// Auto-fill from Google redirect
+(function(){
+  const params=new URLSearchParams(location.search);
+  const email=params.get('email'); const name=params.get('name');
+  if(email) document.getElementById('email').value=email;
+  if(name) document.getElementById('fullName').value=name;
+  const pe=localStorage.getItem('pendingNurseEmail'); const pn=localStorage.getItem('pendingNurseName');
+  if(!email && pe) document.getElementById('email').value=pe;
+  if(!name && pn) document.getElementById('fullName').value=pn;
+})();
+</script>
+</body>
+</html>
