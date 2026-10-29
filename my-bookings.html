@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Bookings â€” REAL DATE Follows Device â€” LOVE CARE GLOBAL</title>
+<title>My Bookings - REAL DATE Follows Device - LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -13,16 +13,16 @@
 .dateBoxBig{background:white;color:#2563eb;border-radius:12px;padding:8px 14px;font-weight:900;line-height:1.1;min-width:72px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
 .badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}.badge-pending{background:rgba(245,158,11,.15);color:#fde68a;border:1px solid rgba(245,158,11,.3)}.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}.badge-rejected{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
 .btn{border:none;border-radius:14px;padding:14px 12px;font-weight:900;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;min-height:48px;flex:1}.btn:active{transform:scale(.97)}.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
-.mapWrap{width:100%;height:300px;border-radius:14px;overflow:hidden;border:2px solid rgba(34,197,94,.3);margin-top:12px;position:relative}.mapWrap::before{content:'ðŸ”´ LIVE TRACKING';position:absolute;top:8px;left:8px;z-index:500;background:rgba(34,197,94,.9);color:white;font-size:9px;font-weight:900;padding:4px 8px;border-radius:99px}
+.mapWrap{width:100%;height:300px;border-radius:14px;overflow:hidden;border:2px solid rgba(34,197,94,.3);margin-top:12px;position:relative}.mapWrap::before{content:'[RED] LIVE TRACKING';position:absolute;top:8px;left:8px;z-index:500;background:rgba(34,197,94,.9);color:white;font-size:9px;font-weight:900;padding:4px 8px;border-radius:99px}
 .followBox{padding:12px;border-radius:12px;margin-top:12px;font-size:11px;line-height:1.6}.followPending{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}.followAccepted{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:#86efac}.followRejected{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
 .bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0;z-index:60}.btab{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:800;color:#a78bfa;cursor:pointer;padding:6px}.btab.active{color:#d8b4fe;background:rgba(168,85,247,.12);border-radius:12px;margin:0 4px}
 .notification{position:fixed;top:70px;left:12px;right:12px;z-index:1000;padding:16px;border-radius:16px;display:none}.notification.show{display:block}.notifAccept{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.notifReject{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
 </style></head><body><div class="bg"></div>
 
 <script>
-// === IMMEDIATE SYNC â€” Shows photo + date even before Firebase loads ===
+// === IMMEDIATE SYNC - Shows photo + date even before Firebase loads ===
 (function(){
-  // 1. REAL DATE IMMEDIATE â€” works offline
+  // 1. REAL DATE IMMEDIATE - works offline
   function setRealDateNow(){
     try{
       const now = new Date();
@@ -45,8 +45,8 @@
       const elD=document.getElementById('realDay'); if(elD) elD.textContent=d;
       const elY=document.getElementById('realYear'); if(elY) elY.textContent=y;
       const elW=document.getElementById('realWeekday'); if(elW) elW.textContent=wd;
-      const elF=document.getElementById('realFullDate'); if(elF) elF.textContent=shortDate+' â€” Real Ghana Date (Auto-updates daily)';
-      const elT=document.getElementById('realTime'); if(elT) elT.textContent=time+' â€” Live';
+      const elF=document.getElementById('realFullDate'); if(elF) elF.textContent=shortDate+' - Real Ghana Date (Auto-updates daily)';
+      const elT=document.getElementById('realTime'); if(elT) elT.textContent=time+' - Live';
       const emptyEl=document.getElementById('emptyRealDate'); if(emptyEl) emptyEl.textContent=full;
     }catch(e){
       console.log('date error',e);
@@ -57,14 +57,14 @@
       const elY=document.getElementById('realYear'); if(elY) elY.textContent=now.getFullYear();
       const elW=document.getElementById('realWeekday'); if(elW) elW.textContent=now.toLocaleString('en-US',{weekday:'long'}).toUpperCase();
       const elF=document.getElementById('realFullDate'); if(elF) elF.textContent=now.toLocaleDateString('en-GH');
-      const elT=document.getElementById('realTime'); if(elT) elT.textContent=now.toLocaleTimeString('en-GH')+' â€” Live';
+      const elT=document.getElementById('realTime'); if(elT) elT.textContent=now.toLocaleTimeString('en-GH')+' - Live';
     }
   }
   setRealDateNow();
   setInterval(setRealDateNow,1000);
   window.setRealDateNow = setRealDateNow;
 
-  // 2. CLIENT PHOTO IMMEDIATE â€” from localStorage without waiting for Firebase
+  // 2. CLIENT PHOTO IMMEDIATE - from localStorage without waiting for Firebase
   function loadClientImmediate(){
     try{
       let cName='Client', cEmail='', cPhone='', cPhoto='';
@@ -86,8 +86,8 @@
       if(emailEl) emailEl.textContent=cEmail||'Email not set';
       if(phoneEl) phoneEl.textContent=cPhone||'Phone not set';
       if(badgeEl){
-        if(cEmail){ badgeEl.textContent='â— '+cName+' â€” '+cEmail.split('@')[0]; badgeEl.style.background='rgba(34,197,94,.15)'; badgeEl.style.color='#86efac'; }
-        else { badgeEl.textContent='â— Loading...'; }
+        if(cEmail){ badgeEl.textContent='* '+cName+' - '+cEmail.split('@')[0]; badgeEl.style.background='rgba(34,197,94,.15)'; badgeEl.style.color='#86efac'; }
+        else { badgeEl.textContent='* Loading...'; }
       }
       if(photoEl){
         if(cPhoto){
@@ -113,15 +113,15 @@
 </script>
 
 
-<div class="topbar"><div><b style="font-size:13px">ðŸ“… My Bookings â€” REAL DATE ðŸ“…</b><br><small style="font-size:9px;color:#facc15">â— REAL DATE â€” Follows Device Date</small></div><a href="client-dashboard.html" style="text-decoration:none;padding:8px 12px;border-radius:99px;background:rgba(255,255,255,.06);color:#9a95b8;font-size:11px;border:1px solid rgba(255,255,255,.1)">â† Dashboard</a></div>
+<div class="topbar"><div><b style="font-size:13px">[DATE] My Bookings - REAL DATE [DATE]</b><br><small style="font-size:9px;color:#facc15">* REAL DATE - Follows Device Date</small></div><a href="client-dashboard.html" style="text-decoration:none;padding:8px 12px;border-radius:99px;background:rgba(255,255,255,.06);color:#9a95b8;font-size:11px;border:1px solid rgba(255,255,255,.1)"><- Dashboard</a></div>
 
-<!-- REAL DATE HEADER â€” AUTO UPDATES EVERY DAY -->
+<!-- REAL DATE HEADER - AUTO UPDATES EVERY DAY -->
 <div class="realDateCard">
 <div style="display:flex;gap:12px;align-items:center">
 <div class="dateBoxBig"><div id="realMonth" style="font-size:14px">---</div><div id="realDay" style="font-size:22px">--</div><div id="realYear" style="font-size:10px;color:#6b7280">----</div></div>
 <div><b id="realWeekday" style="font-size:14px;color:#fff">LOADING...</b><br><small id="realFullDate" style="font-size:11px;color:#facc15">Loading real date...</small><br><small id="realTime" style="font-size:10px;color:#a78bfa">--:-- -- Live</small></div>
 </div>
-<div style="text-align:right"><span style="font-size:9px;background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);padding:4px 8px;border-radius:99px">ðŸ“… REAL DATE</span><br><small style="font-size:9px;color:#6b7280" id="countInfo">0 bookings</small></div>
+<div style="text-align:right"><span style="font-size:9px;background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);padding:4px 8px;border-radius:99px">[DATE] REAL DATE</span><br><small style="font-size:9px;color:#6b7280" id="countInfo">0 bookings</small></div>
 </div>
 
 <div class="clientHeader" id="clientHeader">
@@ -131,33 +131,33 @@
     <small id="clientEmailBig" style="font-size:10px;color:#a78bfa;word-break:break-all">...</small><br>
     <small id="clientPhoneBig" style="font-size:10px;color:#86efac">...</small>
     <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
-      <span id="clientStatusBadge" style="font-size:9px;padding:4px 10px;border-radius:99px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac">â— Loading Client...</span>
+      <span id="clientStatusBadge" style="font-size:9px;padding:4px 10px;border-radius:99px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac">* Loading Client...</span>
     </div>
     <div id="emailInputBox" style="display:none;margin-top:10px">
-      <div style="font-size:10px;color:#fca5a5;margin-bottom:4px">âš ï¸ Enter client email to load bookings:</div>
+      <div style="font-size:10px;color:#fca5a5;margin-bottom:4px">! Enter client email to load bookings:</div>
       <div style="display:flex;gap:6px">
         <input id="manualEmailInput" type="email" placeholder="Enter client email" style="flex:1;padding:10px;border-radius:10px;background:#0e0a1c;border:1px solid rgba(168,85,247,.3);color:white;font-size:11px">
         <button onclick="loadClientByEmail()" style="padding:10px 14px;border-radius:10px;background:#d8b4fe;color:#1e0a3a;border:none;font-weight:900;font-size:11px">Load</button>
       </div>
     </div>
   </div>
-  <button onclick="loadBookings()" style="padding:10px 14px;border-radius:99px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:12px">ðŸ”„</button>
+  <button onclick="loadBookings()" style="padding:10px 14px;border-radius:99px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:12px">RELOAD</button>
 </div>
 
-<div id="notifAccept" class="notification notifAccept"><div style="display:flex;justify-content:space-between;gap:10px"><div><b id="notifTitleA">âœ… Nurse Accepted!</b><br><small id="notifMsgA">Navigation opened</small></div><button onclick="document.getElementById('notifAccept').classList.remove('show')" style="background:rgba(255,255,255,.2);border:none;color:white;padding:4px 8px;border-radius:8px">X</button></div><div style="margin-top:10px"><a id="notifNavA" href="#" target="_blank" class="btn" style="background:white;color:#16a34a;width:100%">ðŸ—ºï¸ Open Google Maps â€” Track Nurse</a></div></div>
-<div id="notifReject" class="notification notifReject"><div style="display:flex;justify-content:space-between;gap:10px"><div><b>âŒ Nurse Rejected</b><br><small id="notifMsgR">Book another or increase rate</small></div><button onclick="document.getElementById('notifReject').classList.remove('show')" style="background:rgba(255,255,255,.2);border:none;color:white;padding:4px 8px;border-radius:8px">X</button></div><div style="margin-top:10px;display:flex;gap:8px"><a href="book-nurse.html" class="btn" style="background:white;color:#dc2626">âž• Book Another</a><a href="book-nurse.html?increaseRate=true" class="btn" style="background:#facc15;color:#1e0a3a">ðŸ’° Increase Rate</a></div></div>
+<div id="notifAccept" class="notification notifAccept"><div style="display:flex;justify-content:space-between;gap:10px"><div><b id="notifTitleA">[OK] Nurse Accepted!</b><br><small id="notifMsgA">Navigation opened</small></div><button onclick="document.getElementById('notifAccept').classList.remove('show')" style="background:rgba(255,255,255,.2);border:none;color:white;padding:4px 8px;border-radius:8px">X</button></div><div style="margin-top:10px"><a id="notifNavA" href="#" target="_blank" class="btn" style="background:white;color:#16a34a;width:100%">MAP Open Google Maps - Track Nurse</a></div></div>
+<div id="notifReject" class="notification notifReject"><div style="display:flex;justify-content:space-between;gap:10px"><div><b>[X] Nurse Rejected</b><br><small id="notifMsgR">Book another or increase rate</small></div><button onclick="document.getElementById('notifReject').classList.remove('show')" style="background:rgba(255,255,255,.2);border:none;color:white;padding:4px 8px;border-radius:8px">X</button></div><div style="margin-top:10px;display:flex;gap:8px"><a href="book-nurse.html" class="btn" style="background:white;color:#dc2626">+ Book Another</a><a href="book-nurse.html?increaseRate=true" class="btn" style="background:#facc15;color:#1e0a3a"> Increase Rate</a></div></div>
 
 <div style="padding:0 14px">
 <div class="card" style="margin:0 0 12px 0;background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25)">
-  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b style="font-size:11px;color:#86efac">ðŸ”´ LIVE â€” Real Date Follows Device â€” Client Photo Saved</b></div>
-  <div style="font-size:9px;color:#9a95b8;margin-top:6px">â€¢ Top date auto-updates daily â€¢ Client photo from registration â€¢ Booking dates show real booking time</div>
-  <select id="filterStatus" onchange="render()" style="margin-top:8px;padding:10px;border-radius:10px;background:#0e0a1c;color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:11px;width:100%"><option value="all">All â€” Live â€” Real Date</option><option value="pending" selected>Pending â€” Live</option><option value="accepted">Accepted â€” Live Tracking</option><option value="rejected">Rejected â€” Live</option></select>
+  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b style="font-size:11px;color:#86efac">[RED] LIVE - Real Date Follows Device - Client Photo Saved</b></div>
+  <div style="font-size:9px;color:#9a95b8;margin-top:6px">- Top date auto-updates daily - Client photo from registration - Booking dates show real booking time</div>
+  <select id="filterStatus" onchange="render()" style="margin-top:8px;padding:10px;border-radius:10px;background:#0e0a1c;color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:11px;width:100%"><option value="all">All - Live - Real Date</option><option value="pending" selected>Pending - Live</option><option value="accepted">Accepted - Live Tracking</option><option value="rejected">Rejected - Live</option></select>
 </div>
 <div id="list"></div>
-<div id="emptyState" class="card" style="display:none;text-align:center;padding:24px"><div style="font-size:36px">ðŸ“…</div><b>No live bookings yet</b><br><small style="color:#9a95b8">Real Date: <span id="emptyRealDate">-</span> â€¢ Only real bookings â€” No demo<br>Your profile is shown above âœ…</small><br><br><a href="book-nurse.html" class="btn btnYellow" style="flex:none;padding:14px 24px">âž• Book Nurse Now â€” Real Date</a></div>
+<div id="emptyState" class="card" style="display:none;text-align:center;padding:24px"><div style="font-size:36px">[DATE]</div><b>No live bookings yet</b><br><small style="color:#9a95b8">Real Date: <span id="emptyRealDate">-</span> - Only real bookings - No demo<br>Your profile is shown above [OK]</small><br><br><a href="book-nurse.html" class="btn btnYellow" style="flex:none;padding:14px 24px">+ Book Nurse Now - Real Date</a></div>
 </div>
 
-<div class="bottom-tabs"><div class="btab active">ðŸ“… My Bookings<br><small style="font-size:8px;color:#22c55e">REAL DATE</small></div><div class="btab" onclick="location.href='book-nurse.html'">âž• Book</div><div class="btab" onclick="location.href='client-alerts.html'">ðŸ”” Alerts</div></div>
+<div class="bottom-tabs"><div class="btab active">[DATE] My Bookings<br><small style="font-size:8px;color:#22c55e">REAL DATE</small></div><div class="btab" onclick="location.href='book-nurse.html'">+ Book</div><div class="btab" onclick="location.href='client-alerts.html'"> Alerts</div></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -169,7 +169,7 @@ const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=get
 let all=[];let prev={};let maps={};let markers={};
 let clientEmail='';let clientPhone='';let clientName='Client';let clientUid='';let clientPhoto='';
 
-// ===== REAL DATE â€” FOLLOWS REAL CALENDAR (GHANA TIME) =====
+// ===== REAL DATE - FOLLOWS REAL CALENDAR (GHANA TIME) =====
 function setRealDate(){ if(window.setRealDateNow){ window.setRealDateNow(); return; }
   // Use Ghana timezone so date is correct in Accra
   const now = new Date();
@@ -198,8 +198,8 @@ function setRealDate(){ if(window.setRealDateNow){ window.setRealDateNow(); retu
   if(elD) elD.textContent=day;
   if(elY) elY.textContent=year;
   if(elW) elW.textContent=weekday;
-  if(elF) elF.textContent=shortDate + ' â€” Real Ghana Date';
-  if(elT) elT.textContent=time + ' â€” Live';
+  if(elF) elF.textContent=shortDate + ' - Real Ghana Date';
+  if(elT) elT.textContent=time + ' - Live';
 
   const emptyEl=document.getElementById('emptyRealDate'); if(emptyEl) emptyEl.textContent=fullDate;
 }
@@ -319,7 +319,7 @@ window.loadClientByEmail=async function(){
   document.getElementById('clientEmailBig').textContent='Loading '+email+'...';
   const ok=await fetchClientFromFirebase();
   renderClientHeader();
-  if(ok){ alert('âœ… Loaded: '+clientName); loadBookings(); }else{ alert('âŒ Not found in database, but email saved. Try booking.'); }
+  if(ok){ alert('[OK] Loaded: '+clientName); loadBookings(); }else{ alert('[X] Not found in database, but email saved. Try booking.'); }
 }
 
 function renderClientHeader(){
@@ -332,12 +332,12 @@ function renderClientHeader(){
   nameEl.textContent=clientName||'Client';
   if(clientEmail){
     emailEl.textContent=clientEmail;
-    statusEl.textContent='â— Verified â€” Photo Email Phone Saved â€” '+clientEmail.split('@')[0];
+    statusEl.textContent='* Verified - Photo Email Phone Saved - '+clientEmail.split('@')[0];
     statusEl.style.background='rgba(34,197,94,.15)';statusEl.style.color='#86efac';
     inputBox.style.display='none';
   }else{
     emailEl.textContent='Email not set';
-    statusEl.textContent='â— Enter email below';
+    statusEl.textContent='* Enter email below';
     statusEl.style.background='rgba(239,68,68,.15)';statusEl.style.color='#fca5a5';
     inputBox.style.display='block';
   }
@@ -345,7 +345,7 @@ function renderClientHeader(){
   if(clientPhoto && (clientPhoto.startsWith('http')||clientPhoto.startsWith('data:'))){
     photoEl.src=clientPhoto;
   }else{
-    // Always show something â€” local avatar
+    // Always show something - local avatar
     photoEl.src=makeInitialAvatar(clientName);
   }
   // If image fails to load, fallback to initials
@@ -354,21 +354,21 @@ function renderClientHeader(){
 
 async function ensureAuth(){return new Promise(r=>{const u=onAuthStateChanged(auth,async usr=>{u();if(usr){r(usr);}else{try{const c=await signInAnonymously(auth);r(c.user);}catch{r(null);}}});setTimeout(()=>r(null),3000);});}
 function getNavUrl(b,nLat,nLng){const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;return `https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;}
-function showAccept(b,gmaps){const n=document.getElementById('notifAccept');document.getElementById('notifTitleA').textContent=`âœ… ${b.nurseName||'Nurse'} Accepted! Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifMsgA').textContent=`${b.nurseName||'Nurse'} accepted ${b.bookingId||b.id} on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifNavA').href=gmaps;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),15000);}
+function showAccept(b,gmaps){const n=document.getElementById('notifAccept');document.getElementById('notifTitleA').textContent=`[OK] ${b.nurseName||'Nurse'} Accepted! Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifMsgA').textContent=`${b.nurseName||'Nurse'} accepted ${b.bookingId||b.id} on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifNavA').href=gmaps;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),15000);}
 function showReject(b){const n=document.getElementById('notifReject');document.getElementById('notifMsgR').textContent=`Booking ${b.bookingId||b.id} rejected on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}. Reason: ${b.rejectReason||'Not available'}. Book another or increase rate.`;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),15000);}
 function initMapLive(id,booking){
   const el=document.getElementById('mapInner_'+id);if(!el)return;if(maps[id]){try{maps[id].remove();}catch(e){}}
   const cLat=booking.clientLat||5.6037;const cLng=booking.clientLng||-0.1870;
   const map=L.map('mapInner_'+id,{zoomControl:true}).setView([cLat,cLng],14);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'Â© OSM'}).addTo(map);maps[id]=map;
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:' OSM'}).addTo(map);maps[id]=map;
   const cIcon=L.divIcon({className:'',html:'<div style="width:20px;height:20px;background:#2563eb;border:3px solid white;border-radius:50%"></div>',iconSize:[20,20],iconAnchor:[10,10]});
-  L.marker([cLat,cLng],{icon:cIcon}).addTo(map).bindPopup(`ðŸ“ ${booking.clientName||clientName} â€” Your Location â€” Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}`).openPopup();
+  L.marker([cLat,cLng],{icon:cIcon}).addTo(map).bindPopup(` ${booking.clientName||clientName} - Your Location - Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}`).openPopup();
   const nurseId=booking.nurseId;
   const updateNurse=(nLat,nLng,isLive)=>{
     if(markers[id]){try{map.removeLayer(markers[id]);}catch(e){}}
     const html=isLive?`<div style="position:relative;width:30px;height:30px"><div style="position:absolute;top:50%;left:50%;width:30px;height:30px;background:rgba(34,197,94,.3);border-radius:50%;transform:translate(-50%,-50%)"></div><div style="position:absolute;top:50%;left:50%;width:16px;height:16px;background:#22c55e;border:2px solid white;border-radius:50%;transform:translate(-50%,-50%)"></div></div>`:`<div style="width:16px;height:16px;background:#22c55e;border:2px solid white;border-radius:50%"></div>`;
     const icon=L.divIcon({className:'',html,iconSize:[30,30],iconAnchor:[15,15]});
-    markers[id]=L.marker([nLat,nLng],{icon}).addTo(map).bindPopup(`ðŸ‘©â€âš•ï¸ ${booking.nurseName||'Nurse'} ${isLive?'â€” LIVE â€” '+new Date().toLocaleTimeString('en-GH',{timeZone:'Africa/Accra'}):''}`);
+    markers[id]=L.marker([nLat,nLng],{icon}).addTo(map).bindPopup(`Nurse ${booking.nurseName||'Nurse'} ${isLive?'- LIVE - '+new Date().toLocaleTimeString('en-GH',{timeZone:'Africa/Accra'}):''}`);
     try{map.fitBounds([[nLat,nLng],[cLat,cLng]],{padding:[40,40]});}catch(e){}
   };
   get(ref(db,'nurses/'+nurseId)).then(s=>{if(s.exists()){const v=s.val();if(v.lat&&v.lng) updateNurse(v.lat,v.lng,false);else if(v.latitude&&v.longitude) updateNurse(v.latitude,v.longitude,false);}});
@@ -378,12 +378,12 @@ function initMapLive(id,booking){
 window.loadBookings=async function(){
   getAllClientKeys();renderClientHeader();setRealDate();
   await ensureAuth();getAllClientKeys();await fetchClientFromFirebase();renderClientHeader();
-  const list=document.getElementById('list');list.innerHTML='<div class="card" style="text-align:center;color:#a78bfa">ðŸ”´ Loading LIVE bookings for '+(clientName||'Client')+' on '+new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})+'...<br><small>'+(clientEmail||'No email')+'</small></div>';
+  const list=document.getElementById('list');list.innerHTML='<div class="card" style="text-align:center;color:#a78bfa">[RED] Loading LIVE bookings for '+(clientName||'Client')+' on '+new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})+'...<br><small>'+(clientEmail||'No email')+'</small></div>';
   let map={};const paths=['bookings','ceoBookings','allBookings'];
   for(const p of paths){try{const snap=await get(ref(db,p));if(snap.exists()){snap.forEach(ch=>{const v=ch.val();const id=ch.key;if(id==='LCG-20251016-ABC123'||v.bookingId==='LCG-20251016-ABC123'||v.paystackRef==='DEMO-REF') return;const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);const emailMatch=(v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase())||(v.clientEmail&&clientEmail&&v.clientEmail.toLowerCase()===clientEmail.toLowerCase());const uidMatch=v.clientId&&clientUid&&v.clientId===clientUid;if(phoneMatch||emailMatch||uidMatch){if(!map[id]||(v.time||0)>(map[id].time||0)) map[id]={...v,id};}});}}catch(e){}
   let arr=Object.values(map);
   if(arr.length===0){all=[];render();return;}
-  arr.forEach(b=>{const curr=(b.status||'pending').toLowerCase();const previous=prev[b.id];if(previous&&previous!==curr){const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;if(curr==='accepted'){get(ref(db,'nurses/'+b.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const v=s.val();nLat=v.lat||v.latitude||nLat;nLng=v.lng||v.longitude||nLng;}const gmaps=getNavUrl(b,nLat,nLng);showAccept(b,gmaps);if(confirm(`âœ… ${b.nurseName||'Nurse'} ACCEPTED ${b.bookingId||b.id}! Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nOpen Google Maps now?`)){window.open(gmaps,'_blank');}});}else if(curr==='rejected'){showReject(b);}}prev[b.id]=curr;});
+  arr.forEach(b=>{const curr=(b.status||'pending').toLowerCase();const previous=prev[b.id];if(previous&&previous!==curr){const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;if(curr==='accepted'){get(ref(db,'nurses/'+b.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const v=s.val();nLat=v.lat||v.latitude||nLat;nLng=v.lng||v.longitude||nLng;}const gmaps=getNavUrl(b,nLat,nLng);showAccept(b,gmaps);if(confirm(`[OK] ${b.nurseName||'Nurse'} ACCEPTED ${b.bookingId||b.id}! Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nOpen Google Maps now?`)){window.open(gmaps,'_blank');}});}else if(curr==='rejected'){showReject(b);}}prev[b.id]=curr;});
   if(all.length===0) arr.forEach(b=>prev[b.id]=(b.status||'pending').toLowerCase());
   all=arr.sort((a,b)=>(b.time||0)-(a.time||0));
   // Save client photo into booking so nurse can see it
@@ -396,14 +396,14 @@ function render(){
   const list=document.getElementById('list');const count=document.getElementById('countInfo');const empty=document.getElementById('emptyState');
   let filtered=all;if(filter!=='all') filtered=all.filter(b=>(b.status||'pending').toLowerCase()===filter);
   const todayStr=new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'});
-  count.textContent=`${filtered.length} ${filter} â€” LIVE â€” ${todayStr} â€” ${clientName}`;
+  count.textContent=`${filtered.length} ${filter} - LIVE - ${todayStr} - ${clientName}`;
   if(!filtered.length){list.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
   list.innerHTML=filtered.map(b=>{
     const status=(b.status||'pending').toLowerCase();const isAccepted=status==='accepted';const isRejected=status==='rejected';
     const badgeClass=isAccepted?'badge-accepted':isRejected?'badge-rejected':'badge-pending';
     const curr=b.currency||'GHS';
-    // Client photo â€” priority: booking photo > global clientPhoto > initials
+    // Client photo - priority: booking photo > global clientPhoto > initials
     const rawPhoto=b.clientPhotoUrl||b.clientPhoto||clientPhoto||'';
     const cPhoto=rawPhoto||makeInitialAvatar(b.clientName||clientName);
     const cName=b.clientName||clientName||'Client';
@@ -412,20 +412,20 @@ function render(){
     const bookingRealTime=new Date(b.time||Date.now()).toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Africa/Accra'});
     const gmapsUrl=`https://www.google.com/maps/dir/?api=1&origin=${cLat+0.01},${cLng+0.01}&destination=${cLat},${cLng}&travelmode=driving`;
     const clientGmaps=`https://www.google.com/maps?q=${cLat},${cLng}`;
-    const follow=isAccepted?`<div class="followBox followAccepted">âœ… LIVE Accepted â€” ${b.nurseName||'Nurse'} is coming â€” Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}<br>ðŸ‘¤ Client: ${cName} â€” Photo saved âœ…</div>`:isRejected?`<div class="followBox followRejected">âŒ Rejected on ${bookingRealDate} â€” Reason: ${b.rejectReason||'Not available'} â€” Try increase rate</div>`:`<div class="followBox followPending">â³ Pending â€” Waiting for nurse â€” Real Date: ${todayStr} â€” Client photo visible to nurse: ${rawPhoto?'âœ… Yes':'âŒ No'}</div>`;
+    const follow=isAccepted?`<div class="followBox followAccepted">[OK] LIVE Accepted - ${b.nurseName||'Nurse'} is coming - Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}<br> Client: ${cName} - Photo saved [OK]</div>`:isRejected?`<div class="followBox followRejected">[X] Rejected on ${bookingRealDate} - Reason: ${b.rejectReason||'Not available'} - Try increase rate</div>`:`<div class="followBox followPending"> Pending - Waiting for nurse - Real Date: ${todayStr} - Client photo visible to nurse: ${rawPhoto?'[OK] Yes':'[X] No'}</div>`;
     return `<div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
         <div style="display:flex;gap:10px;align-items:center">
           <img src="${cPhoto}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(168,85,247,.3)" onerror="this.src='${makeInitialAvatar(cName)}'">
-          <div><b style="font-size:13px">${b.bookingId||b.id} <span style="font-size:8px;color:#22c55e">LIVE REAL DATE</span></b><br><span class="badge ${badgeClass}">${status.toUpperCase()} â€¢ ${bookingRealDate}</span><br><span style="font-size:10px;color:#a78bfa">ðŸ‘¤ ${cName} â€¢ ${bookingRealTime} â€” Real Time</span></div>
+          <div><b style="font-size:13px">${b.bookingId||b.id} <span style="font-size:8px;color:#22c55e">LIVE REAL DATE</span></b><br><span class="badge ${badgeClass}">${status.toUpperCase()} - ${bookingRealDate}</span><br><span style="font-size:10px;color:#a78bfa"> ${cName} - ${bookingRealTime} - Real Time</span></div>
         </div>
-        <div style="text-align:right"><small style="color:#86efac;font-weight:900">${curr} ${b.amount||0}</small><br><small style="font-size:8px;color:#facc15">ðŸ“… ${bookingRealDate}</small><br><small style="font-size:8px;color:#6b7280">${bookingRealTime}</small></div>
+        <div style="text-align:right"><small style="color:#86efac;font-weight:900">${curr} ${b.amount||0}</small><br><small style="font-size:8px;color:#facc15">[DATE] ${bookingRealDate}</small><br><small style="font-size:8px;color:#6b7280">${bookingRealTime}</small></div>
       </div>
       ${follow}
       <div id="map_${b.id}" class="mapWrap" style="display:${isAccepted?'block':'none'}"><div id="mapInner_${b.id}" style="width:100%;height:100%"></div></div>
-      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px"><a href="${gmapsUrl}" target="_blank" class="btn btnGreen">ðŸ—ºï¸ Open Maps â€” Track Nurse</a><button class="btn btnBlue" onclick="initMapLive('${b.id}',all.find(x=>x.id==='${b.id}'))">ðŸ”„ Refresh Live</button><a href="tel:${b.nursePhone||''}" class="btn" style="background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe">ðŸ“ž Call Nurse</a><a href="${clientGmaps}" target="_blank" class="btn btnBlue" style="background:#3b82f6">ðŸ—ºï¸ Client Location</a></div>
-      <div style="margin-top:10px;display:grid;gap:10px"><button class="btn btnYellow" onclick="confirmFinished('${b.id}')">âœ… Confirm Nurse Finished â€” Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}</button><button class="btn btnRed" onclick="complainNurse('${b.id}')">âš ï¸ Complain About ONLY This Nurse ${b.nurseName||'Nurse'} â†’ client-complaint.html â€” Saves Photo Email Phone + Time</button></div>
-      ${isRejected?`<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><a href="book-nurse.html" class="btn btnYellow">âž• Book Another</a><a href="book-nurse.html?increaseRate=true" class="btn btnGreen">ðŸ’° Increase Rate & Book Again â€” Real Date</a><a href="refund-query.html?bookingId=${b.id}" class="btn" style="background:rgba(250,204,21,.15);color:#facc15;border:1px solid rgba(250,204,21,.3)">ðŸ’° Refund Query â€” Photo Saved</a></div>`:''}
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px"><a href="${gmapsUrl}" target="_blank" class="btn btnGreen">MAP Open Maps - Track Nurse</a><button class="btn btnBlue" onclick="initMapLive('${b.id}',all.find(x=>x.id==='${b.id}'))">RELOAD Refresh Live</button><a href="tel:${b.nursePhone||''}" class="btn" style="background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe"> Call Nurse</a><a href="${clientGmaps}" target="_blank" class="btn btnBlue" style="background:#3b82f6">MAP Client Location</a></div>
+      <div style="margin-top:10px;display:grid;gap:10px"><button class="btn btnYellow" onclick="confirmFinished('${b.id}')">[OK] Confirm Nurse Finished - Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}</button><button class="btn btnRed" onclick="complainNurse('${b.id}')">! Complain About ONLY This Nurse ${b.nurseName||'Nurse'} -> client-complaint.html - Saves Photo Email Phone + Time</button></div>
+      ${isRejected?`<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><a href="book-nurse.html" class="btn btnYellow">+ Book Another</a><a href="book-nurse.html?increaseRate=true" class="btn btnGreen"> Increase Rate & Book Again - Real Date</a><a href="refund-query.html?bookingId=${b.id}" class="btn" style="background:rgba(250,204,21,.15);color:#facc15;border:1px solid rgba(250,204,21,.3)"> Refund Query - Photo Saved</a></div>`:''}
     </div>`;
   }).join('');
   setTimeout(()=>{filtered.filter(b=>(b.status||'').toLowerCase()==='accepted').forEach(b=>initMapLive(b.id,b));},500);
@@ -436,12 +436,12 @@ window.confirmFinished=async function(id){
   if(b.clientConfirmed){alert('Already confirmed on '+new Date(b.clientConfirmedAt||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'}));return;}
   if(!confirm(`CONFIRM FINISHED? Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nNurse: ${b.nurseName}\nAmount: ${b.currency||'GHS'} ${b.amount}\nClient: ${b.clientName||clientName}\nBooking Date: ${new Date(b.time||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'})}`))return;
   const c=prompt('Type CONFIRM to release payment:');if(c!=='CONFIRM'&&c!=='confirm'){alert('Cancelled');return;}
-  try{const now=Date.now();const payType=b.paymentType||(b.paymentMethod&&b.paymentMethod.includes('50')?'50_percent':'full');const lively=payType.includes('50')?parseFloat(b.amount||0)*0.3:parseFloat(b.amount||0)*0.8;const upd={clientConfirmed:true,clientConfirmedAt:now,clientConfirmedAtStr:new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'}),status:'client_confirmed_finished',finished:true,livelyAmount:lively};await update(ref(db,'bookings/'+id),upd);try{await update(ref(db,'ceoBookings/'+id),upd);}catch(e){}alert(`âœ… LIVE Confirmed on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}! ${b.currency||'GHS'} ${lively.toFixed(2)} released to ${b.nurseName}`);loadBookings();}catch(e){alert('Error: '+e.message);}
+  try{const now=Date.now();const payType=b.paymentType||(b.paymentMethod&&b.paymentMethod.includes('50')?'50_percent':'full');const lively=payType.includes('50')?parseFloat(b.amount||0)*0.3:parseFloat(b.amount||0)*0.8;const upd={clientConfirmed:true,clientConfirmedAt:now,clientConfirmedAtStr:new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'}),status:'client_confirmed_finished',finished:true,livelyAmount:lively};await update(ref(db,'bookings/'+id),upd);try{await update(ref(db,'ceoBookings/'+id),upd);}catch(e){}alert(`[OK] LIVE Confirmed on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}! ${b.currency||'GHS'} ${lively.toFixed(2)} released to ${b.nurseName}`);loadBookings();}catch(e){alert('Error: '+e.message);}
 };
 window.complainNurse=function(id){
   const b=all.find(x=>x.id===id);if(!b){alert('Booking not found');return;}
   const p=new URLSearchParams({bookingId:b.id,bookingIdFull:b.bookingId||b.id,nurseName:b.nurseName||'Nurse',nurseId:b.nurseId||'',nursePhone:b.nursePhone||'',nursePhotoUrl:b.nursePhotoUrl||'',clientName:b.clientName||clientName||'Client',clientId:b.clientId||clientUid||'',clientPhone:b.phone||clientPhone||'',clientEmail:b.clientEmail||clientEmail||'',clientPhotoUrl:b.clientPhotoUrl||clientPhoto||'',amount:b.amount||0,currency:b.currency||'GHS',patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||'',paystackRef:b.paystackRef||'',bookingTime:b.time||Date.now(),realDate:new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})});
-  if(confirm(`Complain about ${b.nurseName}? Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})} â€” Go to client-complaint.html LIVE with Photo Email Phone + Time?`)){location.href=`client-complaint.html?${p.toString()}`;}
+  if(confirm(`Complain about ${b.nurseName}? Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})} - Go to client-complaint.html LIVE with Photo Email Phone + Time?`)){location.href=`client-complaint.html?${p.toString()}`;}
 };
 function startRealtimeLive(){
   onValue(ref(db,'bookings'),(snap)=>{
@@ -455,7 +455,7 @@ function startRealtimeLive(){
         if(prevStatus&&prevStatus!==curr){
           const cLat=v.clientLat||5.6037;const cLng=v.clientLng||-0.1870;
           if(curr==='accepted'){
-            get(ref(db,'nurses/'+v.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const vv=s.val();nLat=vv.lat||vv.latitude||nLat;nLng=vv.lng||vv.longitude||nLng;}const gmaps=getNavUrl(v,nLat,nLng);showAccept({...v,id},gmaps);if(confirm(`âœ… ${v.nurseName||'Nurse'} ACCEPTED on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}!\n\nOpen Google Maps now?`)){window.open(gmaps,'_blank');}});
+            get(ref(db,'nurses/'+v.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const vv=s.val();nLat=vv.lat||vv.latitude||nLat;nLng=vv.lng||vv.longitude||nLng;}const gmaps=getNavUrl(v,nLat,nLng);showAccept({...v,id},gmaps);if(confirm(`[OK] ${v.nurseName||'Nurse'} ACCEPTED on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}!\n\nOpen Google Maps now?`)){window.open(gmaps,'_blank');}});
           }else if(curr==='rejected'){showReject({...v,id});}
         }
         prev[id]=curr;const idx=all.findIndex(x=>x.id===id);if(idx===-1){all.unshift({...v,id});changed=true;}else{all[idx]={...v,id};changed=true;}
