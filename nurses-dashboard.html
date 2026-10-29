@@ -40,6 +40,7 @@
 <a class="item nurse" href="my-job-offer.html">My Job Offers — Tone + SMS</a>
 <a class="item nurse" href="nurse-group-chat.html">Nurse Group Chat</a>
 <a class="item nurse" href="nurse-settings.html">Nurse Settings</a>
+<a class="item nurse" href="nurse-complaint.html">Nurse Complaints / Report</a>
 <a class="item" href="about.html">About</a>
 <a class="item" href="services.html">Services</a>
 <a class="item" href="contact.html">Contact</a>
@@ -63,7 +64,7 @@
     <div id="nurseEmail" style="font-size:11px;color:#7c6da6;margin-top:6px;word-break:break-all"></div>
     <div id="nursePhone" style="font-size:11px;color:#86efac;margin-top:2px"></div>
   </div>
-  <div id="sessionTimer" style="font-size:10px;color:#a78bfa;background:rgba(168,85,247,.12);padding:6px 10px;border-radius:999px;border:1px solid rgba(168,85,247,.15)">30m left</div>
+  <div id="sessionTimer" style="font-size:10px;color:#86efac;background:rgba(34,197,94,.12);padding:6px 10px;border-radius:999px;border:1px solid rgba(34,197,94,.2)">♾️ Long session</div>
 </div>
 
 <!-- EDIT DETAILS — PHOTO FROM FIREBASE STORAGE -->
@@ -100,40 +101,37 @@
 <div class="card">
   <a href="my-job-offer.html" class="btnBig"><div class="icon">💼</div><div>My Job Offers<div style="font-size:11px;color:#a78bfa">Tone + SMS when client books you</div></div></a>
   <a href="nurse-group-chat.html" class="btnBig"><div class="icon">💬</div><div>Nurse Group Chat</div></a>
+  <a href="nurse-settings.html" class="btnBig" style="border-color:rgba(168,85,247,.35)"><div class="icon">⚙️</div><div>Nurse Settings<div style="font-size:11px;color:#a78bfa">Profile, preferences & account</div></div></a>
+  <a href="nurse-complaint.html" class="btnBig" style="border-color:rgba(251,191,36,.25)"><div class="icon">📝</div><div>Nurse Complaints<div style="font-size:11px;color:#a78bfa">Report issues & feedback</div></div></a>
 </div>
 
 </div>
 
-<div id="sessionBar"><span id="sessionBarTime">30:00</span><span>LOVE CARE GLOBAL — Nurse Session</span></div>
+<div id="sessionBar"><span id="sessionBarTime">Unlimited</span><span>LOVE CARE GLOBAL — Nurse Session • Long Stay</span></div>
 
 <script>
+// LONG SESSION - No 30min expiry
 (function(){
   try{
     const logged=localStorage.getItem('lcg_logged_in');
     const role=(localStorage.getItem('lcg_role')||'').toLowerCase();
-    const expiry=parseInt(localStorage.getItem('lcg_session_expiry')||'0');
     const client=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
+    // Block clients trying to access nurse dashboard
     if(client || role==='client'){
       document.getElementById('blockScreen').classList.add('show');
       return;
     }
-    if(!logged || logged!=='true' || !expiry || Date.now() > expiry){
+    // Only check if logged in, NO expiry check = long session
+    if(!logged || logged!=='true'){
       localStorage.clear();
       window.location.replace('nurse-login.html');
       return;
     }
-    function updateTimer(){
-      const remaining = expiry - Date.now();
-      if(remaining <= 0){ localStorage.clear(); window.location.replace('nurse-login.html'); return; }
-      const mins = Math.floor(remaining/60000);
-      const secs = Math.floor((remaining%60000)/1000);
-      const txt = mins+':'+secs.toString().padStart(2,'0');
-      const el1=document.getElementById('sessionTimer');
-      const el2=document.getElementById('sessionBarTime');
-      if(el1) el1.textContent = mins>0? mins+'m left' : secs+'s left';
-      if(el2) el2.textContent = txt;
-    }
-    updateTimer(); setInterval(updateTimer, 1000);
+    // Show long session indicator
+    const el1=document.getElementById('sessionTimer');
+    const el2=document.getElementById('sessionBarTime');
+    if(el1) el1.textContent = '♾️ Long session';
+    if(el2) el2.textContent = 'Unlimited';
   }catch(e){}
 })();
 </script>
