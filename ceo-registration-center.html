@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CEO View All Uploads - Nurses + Clients</title>
+<title>CEO View All Uploads - FIXED APPROVED MARK</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding:12px}
@@ -17,7 +16,7 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:10
 .input{padding:10px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#fff;font-size:12px;flex:1;min-width:180px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
 .card{background:rgba(28,18,56,.96);border:1px solid rgba(168,85,247,.18);border-radius:18px;padding:14px;position:relative}
-.card.approved{border-color:rgba(34,197,94,.3)}
+.card.approved{border-color:rgba(34,197,94,.4);background:rgba(22,48,32,.4)}
 .card.pending{border-color:rgba(251,191,36,.3)}
 .cardHeader{display:flex;gap:10px;align-items:start}
 .avatar{width:64px;height:64px;border-radius:50%;background:#2e1065;display:grid;place-items:center;font-weight:900;overflow:hidden;flex-shrink:0;border:2px solid rgba(168,85,247,.3)}
@@ -36,20 +35,23 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:10
 .docMissing{opacity:.3;border-style:dashed}
 .actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 .btn{flex:1;padding:10px;border-radius:10px;font-weight:900;font-size:10px;border:none;cursor:pointer;min-width:90px}
-.btnApprove{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16}
+.btnApprove{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;box-shadow:0 4px 12px rgba(34,197,94,.3)}
 .btnReject{background:linear-gradient(135deg,#ef4444,#991b1b);color:white}
 .btnView{background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.3)}
+.btnFix{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;place-items:center;z-index:9999;padding:20px}
 .modalContent{background:rgba(28,18,56,.98);border:1px solid rgba(168,85,247,.3);border-radius:16px;padding:16px;max-width:90vw;max-height:90vh;overflow:auto;text-align:center}
 .modalContent img, .modalContent video{max-width:100%;max-height:70vh;border-radius:12px}
-.toast{position:fixed;right:14px;bottom:14px;z-index:200;background:#1e0a3a;border:1px solid rgba(168,85,247,.3);color:#fff;padding:12px 16px;border-radius:12px;font-size:12px;display:none}
+.toast{position:fixed;right:14px;bottom:14px;z-index:200;background:#1e0a3a;border:1px solid rgba(168,85,247,.3);color:#fff;padding:12px 16px;border-radius:12px;font-size:12px;display:none;max-width:90vw}
+.progressLog{background:rgba(0,0,0,.4);border:1px solid rgba(168,85,247,.15);border-radius:8px;padding:8px;margin-top:8px;font-size:10px;color:#a78bfa;max-height:100px;overflow-y:auto;display:none}
 </style>
 </head>
 <body>
 <div class="topbar">
-<div><b>👑 CEO — View All Uploads — Nurses + Clients</b><br><small id="counts" style="color:#a78bfa">Loading...</small></div>
-<div style="display:flex;gap:8px">
+<div><b>👑 CEO — FIXED — Approve Marks in ALL Paths</b><br><small id="counts" style="color:#a78bfa">Loading...</small></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
 <button onclick="loadAll()" style="padding:8px 14px;border-radius:999px;background:#2e1065;color:#d8b4fe;border:1px solid rgba(168,85,247,.2);cursor:pointer">🔄 Refresh</button>
+<button onclick="fixAllApproved()" style="padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,#facc15,#f59e0b);color:#000;font-weight:900;border:none;cursor:pointer">⚡ Fix All Stuck Approved</button>
 <a href="ceo-dashboard.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);color:#fff;text-decoration:none;font-size:11px">🏠 Dashboard</a>
 </div>
 </div>
@@ -74,6 +76,7 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:10
 
 <div id="grid" class="grid"></div>
 <div id="empty" style="padding:30px;text-align:center;color:#6b7280;display:none">No records</div>
+<div id="logBox" class="progressLog"></div>
 
 <div class="modal" id="modal" onclick="closeModal()">
 <div class="modalContent" onclick="event.stopPropagation()">
@@ -93,15 +96,15 @@ const db=firebase.database();
 let allData={nursesPending:[],nursesApproved:[],clientsPending:[],clientsApproved:[],all:[]};
 let currentTab='nursesPending';
 
-function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
-
-function switchTab(tab){
-  currentTab=tab;
-  document.querySelectorAll('.tab[data-tab]').forEach(b=>b.classList.remove('active'));
-  document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add('active');
-  render();
+function log(msg){
+  const box=document.getElementById('logBox');
+  box.style.display='block';
+  box.innerHTML+=`[${new Date().toLocaleTimeString()}] ${msg}<br>`;
+  box.scrollTop=box.scrollHeight;
+  console.log(msg);
 }
-
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
+function switchTab(tab){currentTab=tab;document.querySelectorAll('.tab[data-tab]').forEach(b=>b.classList.remove('active'));document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add('active');render();}
 function sanitizeEmail(e){ return (e||'').toLowerCase().replace(/[.#$@\[\]]/g,'_'); }
 
 function normalizeRecord(id, raw, type){
@@ -116,43 +119,17 @@ function normalizeRecord(id, raw, type){
   const certURL=v.cvURL||v.cvUrl||v.certificateURL||v.certificate||'';
   const lat=v.lat||v.latitude||null;
   const lng=v.lng||v.longitude||null;
-  const gpsName=v.gpsActualName||v.gpsName||v.locationName||'';
-  const isApproved=v.isApproved===true||v.approved===true||v.status==='approved'||v.canLogin===true||v.isVerified===true;
-  const hasAll5=!!(email && name && photo && phone && (type==='client' || videoURL)); // client doesn't need video but we have it
-  const hasPhoto=!!photo;
-  const hasVideo=!!videoURL;
-  const hasId=!!idURL;
-  const hasLicence=!!licenceURL;
-  const hasCert=!!certURL;
-
+  const gpsName=v.gpsActualName||v.gpsName||'';
+  // Check approval from ANY flag
+  const isApproved = v.isApproved===true || v.approved===true || v.status==='approved' || v.canLogin===true || v.isVerified===true || v.status==='Approved';
+  const hasAll5=!!(email && name && photo && phone && (type==='client' || videoURL));
   return {
-    id: id,
-    uid: v.uid||id,
-    type: type,
-    name: name.substring(0,40),
-    email: email,
-    phone: phone,
-    photo: photo,
-    idURL: idURL,
-    licenceURL: licenceURL,
-    videoURL: videoURL,
-    certURL: certURL,
-    lat: lat,
-    lng: lng,
-    gpsName: gpsName,
-    isApproved: isApproved,
-    hasAll5: hasAll5,
-    hasPhoto: hasPhoto,
-    hasVideo: hasVideo,
-    hasId: hasId,
-    hasLicence: hasLicence,
-    hasCert: hasCert,
-    raw: v,
-    createdAt: v.createdAt||v.timestamp||Date.now(),
-    qualification: v.qualification||'',
-    services: v.services||v.specialty||'',
-    referenceName: v.referenceName||'',
-    referencePhone: v.referencePhone||''
+    id: id, uid: v.uid||id, type: type, name: name.substring(0,40), email: email, phone: phone,
+    photo: photo, idURL: idURL, licenceURL: licenceURL, videoURL: videoURL, certURL: certURL,
+    lat: lat, lng: lng, gpsName: gpsName, isApproved: isApproved, hasAll5: hasAll5,
+    hasPhoto: !!photo, hasVideo: !!videoURL, hasId: !!idURL, hasLicence: !!licenceURL, hasCert: !!certURL,
+    raw: v, createdAt: v.createdAt||v.timestamp||Date.now(), qualification: v.qualification||'', services: v.services||v.specialty||'',
+    referenceName: v.referenceName||'', referencePhone: v.referencePhone||''
   };
 }
 
@@ -162,8 +139,8 @@ async function loadAll(){
   const nursesMap={};
   const clientsMap={};
 
-  // NURSES - from multiple paths
-  const nursePaths=['ceoRegistrationCenter/nurses','nurses','pending_nurses','pendingNurses','ceoNurseUpdates','nurse_registrations','allNurses','nurseUsers'];
+  // NURSES - from multiple paths - BUT PRIORITIZE APPROVED STATUS (fix bug)
+  const nursePaths=['ceoRegistrationCenter/nurses','nurses','pending_nurses','pendingNurses','ceoNurseUpdates','nurse_registrations','allNurses','nurseUsers','nurseApplications','allowedNurses','allowedNursesByUid','verified_nurses'];
   for(const path of nursePaths){
     try{
       const snap=await db.ref(path).once('value');
@@ -173,17 +150,26 @@ async function loadAll(){
           const raw=ch.val();
           if(!raw) return;
           const rec=normalizeRecord(id, raw, 'nurse');
-          if(!nursesMap[rec.uid]) nursesMap[rec.uid]=rec;
-          else nursesMap[rec.uid]={...nursesMap[rec.uid], ...rec, photo: nursesMap[rec.uid].photo||rec.photo, videoURL: nursesMap[rec.uid].videoURL||rec.videoURL, idURL: nursesMap[rec.uid].idURL||rec.idURL, licenceURL: nursesMap[rec.uid].licenceURL||rec.licenceURL, certURL: nursesMap[rec.uid].certURL||rec.certURL};
-          // Update approval status to latest true
-          if(rec.isApproved) nursesMap[rec.uid].isApproved=true;
+          const key=rec.uid||id;
+          if(!nursesMap[key]){
+            nursesMap[key]=rec;
+          }else{
+            // Merge - BUT KEEP TRUE APPROVAL, don't overwrite with false
+            const existing=nursesMap[key];
+            const isApprovedNow = existing.isApproved || rec.isApproved; // PRIORITY: true wins
+            const mergedPhoto = existing.photo || rec.photo;
+            const mergedVideo = existing.videoURL || rec.videoURL;
+            const mergedId = existing.idURL || rec.idURL;
+            const mergedLic = existing.licenceURL || rec.licenceURL;
+            const mergedCert = existing.certURL || rec.certURL;
+            nursesMap[key]={...existing, ...rec, photo: mergedPhoto, videoURL: mergedVideo, idURL: mergedId, licenceURL: mergedLic, certURL: mergedCert, isApproved: isApprovedNow, hasPhoto: !!(mergedPhoto), hasVideo: !!(mergedVideo)};
+          }
         });
       }
     }catch(e){ console.log('nurse path err', path, e); }
   }
 
-  // CLIENTS - from multiple paths
-  const clientPaths=['ceoRegistrationCenter/clients','clients','client_registrations','allClients','clientUsers','pendingClientRegistrations','ceoClientUpdates','googleClients'];
+  const clientPaths=['ceoRegistrationCenter/clients','clients','client_registrations','allClients','clientUsers','pendingClientRegistrations','ceoClientUpdates','allowedClients','allowedClientsByUid'];
   for(const path of clientPaths){
     try{
       const snap=await db.ref(path).once('value');
@@ -193,9 +179,13 @@ async function loadAll(){
           const raw=ch.val();
           if(!raw) return;
           const rec=normalizeRecord(id, raw, 'client');
-          if(!clientsMap[rec.uid]) clientsMap[rec.uid]=rec;
-          else clientsMap[rec.uid]={...clientsMap[rec.uid], ...rec, photo: clientsMap[rec.uid].photo||rec.photo};
-          if(rec.isApproved) clientsMap[rec.uid].isApproved=true;
+          const key=rec.uid||id;
+          if(!clientsMap[key]) clientsMap[key]=rec;
+          else{
+            const existing=clientsMap[key];
+            const isApprovedNow = existing.isApproved || rec.isApproved;
+            clientsMap[key]={...existing, ...rec, photo: existing.photo||rec.photo, isApproved: isApprovedNow};
+          }
         });
       }
     }catch(e){ console.log('client path err', path, e); }
@@ -227,16 +217,10 @@ function render(){
   const docFilter=document.getElementById('filterDoc').value;
   let list=allData[currentTab]||[];
 
-  if(search){
-    list=list.filter(r=> (r.name+' '+r.email+' '+r.phone).toLowerCase().includes(search));
-  }
-  if(docFilter==='missing'){
-    list=list.filter(r=>!r.hasAll5);
-  }else if(docFilter==='hasVideo'){
-    list=list.filter(r=>r.hasVideo);
-  }else if(docFilter==='hasPhoto'){
-    list=list.filter(r=>r.hasPhoto);
-  }
+  if(search) list=list.filter(r=> (r.name+' '+r.email+' '+r.phone).toLowerCase().includes(search));
+  if(docFilter==='missing') list=list.filter(r=>!r.hasAll5);
+  else if(docFilter==='hasVideo') list=list.filter(r=>r.hasVideo);
+  else if(docFilter==='hasPhoto') list=list.filter(r=>r.hasPhoto);
 
   if(list.length===0){
     grid.innerHTML='';
@@ -255,7 +239,7 @@ function render(){
         <div class="avatar">${rec.photo?`<img src="${rec.photo}" onerror="this.parentElement.textContent='${rec.name.charAt(0).toUpperCase()}'">`:rec.name.charAt(0).toUpperCase()}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
-            <div style="font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${rec.name} ${rec.type==='nurse'?'👩‍⚕️':'👤'}</div>
+            <div style="font-weight:900;font-size:13px">${rec.name} ${rec.type==='nurse'?'👩‍⚕️':'👤'}</div>
             <div>
               <span class="badge ${rec.isApproved?'badgeApproved':'badgePending'}">${rec.isApproved?'✅ APPROVED':'⏳ PENDING'}</span>
               <span class="badge ${rec.hasAll5?'badgeAll5':'badgeMissing'}">${rec.hasAll5?'✅ ALL 5':'❌ Missing'}</span>
@@ -270,41 +254,33 @@ function render(){
           </div>
         </div>
       </div>
-
       <div class="docs">
         <div class="docBox ${rec.hasPhoto?'':'docMissing'}" onclick="viewDoc('${rec.photo}','Photo - ${rec.name}','image')">
           ${rec.photo?`<img src="${rec.photo}" loading="lazy">`:`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Photo</div>`}
-          <div class="docLabel">📸 Profile Photo ${rec.hasPhoto?'✅':'❌'}</div>
+          <div class="docLabel">📸 Photo ${rec.hasPhoto?'✅':'❌'}</div>
         </div>
-
         ${rec.type==='nurse'?`
-        <div class="docBox ${rec.hasId?'':'docMissing'}" onclick="viewDoc('${rec.idURL}','National ID - ${rec.name}','image')">
-          ${rec.idURL? (rec.idURL.includes('.pdf')?`<div style="height:80px;display:grid;place-items:center;background:#1a1633">📄 PDF</div>`:`<img src="${rec.idURL}" loading="lazy">`) :`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No ID</div>`}
-          <div class="docLabel">🪪 National ID ${rec.hasId?'✅':'❌'}</div>
+        <div class="docBox ${rec.hasId?'':'docMissing'}" onclick="viewDoc('${rec.idURL}','ID - ${rec.name}','image')">
+          ${rec.idURL? (rec.idURL.includes('.pdf')?`<div style="height:80px;display:grid;place-items:center">📄 PDF</div>`:`<img src="${rec.idURL}" loading="lazy">`) :`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No ID</div>`}
+          <div class="docLabel">🪪 ID ${rec.hasId?'✅':'❌'}</div>
         </div>
-
         <div class="docBox ${rec.hasLicence?'':'docMissing'}" onclick="viewDoc('${rec.licenceURL}','Licence - ${rec.name}','image')">
-          ${rec.licenceURL? (rec.licenceURL.includes('.pdf')?`<div style="height:80px;display:grid;place-items:center;background:#1a1633">📄 PDF</div>`:`<img src="${rec.licenceURL}" loading="lazy">`) :`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Licence</div>`}
+          ${rec.licenceURL? (rec.licenceURL.includes('.pdf')?`<div style="height:80px;display:grid;place-items:center">📄 PDF</div>`:`<img src="${rec.licenceURL}" loading="lazy">`) :`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Licence</div>`}
           <div class="docLabel">📜 Licence ${rec.hasLicence?'✅':'❌'}</div>
         </div>
-
-        <div class="docBox ${rec.hasVideo?'':'docMissing'}" onclick="viewDoc('${rec.videoURL}','Intro Video - ${rec.name}','video')">
+        <div class="docBox ${rec.hasVideo?'':'docMissing'}" onclick="viewDoc('${rec.videoURL}','Video - ${rec.name}','video')">
           ${rec.videoURL?`<video src="${rec.videoURL}" style="height:80px"></video>`:`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Video</div>`}
-          <div class="docLabel">🎥 Intro Video ${rec.hasVideo?'✅ REQUIRED':'❌ REQUIRED MISSING'}</div>
+          <div class="docLabel">🎥 Video ${rec.hasVideo?'✅':'❌ REQ'}</div>
         </div>
-
-        <div class="docBox ${rec.hasCert?'':'docMissing'}" onclick="viewDoc('${rec.certURL}','Certificate (Optional) - ${rec.name}','image')" style="grid-column:span 2">
-          ${rec.certURL? (rec.certURL.includes('.pdf')?`<div style="height:80px;display:grid;place-items:center;background:#1a1633">📄 PDF Certificate</div>`:`<img src="${rec.certURL}" loading="lazy">`) :`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Certificate (Optional - OK)</div>`}
-          <div class="docLabel">📜 Certificate ${rec.hasCert?'✅ Optional provided':'➖ Optional not provided'}</div>
+        <div class="docBox ${rec.hasCert?'':'docMissing'}" onclick="viewDoc('${rec.certURL}','Certificate - ${rec.name}','image')" style="grid-column:span 2">
+          ${rec.certURL? `<img src="${rec.certURL}" loading="lazy">` :`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Cert (Optional)</div>`}
+          <div class="docLabel">📜 Cert ${rec.hasCert?'✅':'➖ Optional'}</div>
         </div>
-        ` : `
-        <div class="docBox" style="grid-column:span 2;color:#6b7280;font-size:10px">Client has only Profile Photo (ALL 4 for clients: Email+Name+Phone+Photo)</div>
-        `}
+        ` : `<div class="docBox" style="grid-column:span 2">Client - Photo only (ALL 4)</div>`}
       </div>
-
       <div class="actions">
-        ${!rec.isApproved?`<button class="btn btnApprove" onclick="approve('${rec.uid}','${rec.email}','${rec.type}')">✅ Approve — Allow Login</button>`:``}
-        <button class="btn btnView" onclick="viewAllDocs('${rec.uid}')">👁️ View All Uploads</button>
+        ${!rec.isApproved?`<button class="btn btnApprove" onclick="approve('${rec.uid}','${rec.email}','${rec.type}')">✅ APPROVE — Fix All Paths</button>`: `<button class="btn btnView" style="background:rgba(34,197,94,.2);color:#86efac">✅ Already Approved</button>`}
+        <button class="btn btnView" onclick="viewAllDocs('${rec.uid}')">👁️ View All</button>
         ${!rec.isApproved?`<button class="btn btnReject" onclick="reject('${rec.uid}','${rec.email}','${rec.type}')">❌ Reject</button>`:``}
       </div>
     `;
@@ -317,93 +293,157 @@ function viewDoc(url, title, type){
   const modal=document.getElementById('modal');
   document.getElementById('modalTitle').textContent=title;
   const body=document.getElementById('modalBody');
-  if(url.includes('.pdf')){
-    body.innerHTML=`<a href="${url}" target="_blank" style="color:#93c5fd">📄 Open PDF in new tab</a><br><br><iframe src="${url}" style="width:100%;height:60vh;border-radius:12px;border:none"></iframe>`;
-  }else if(type==='video'){
-    body.innerHTML=`<video src="${url}" controls autoplay style="max-width:100%;max-height:70vh"></video><br><br><a href="${url}" target="_blank" style="color:#93c5fd">🔗 Open video in new tab</a>`;
-  }else{
-    body.innerHTML=`<img src="${url}" style="max-width:100%;max-height:70vh;border-radius:12px"><br><br><a href="${url}" target="_blank" style="color:#93c5fd">🔗 Open image in new tab</a>`;
-  }
+  if(url.includes('.pdf')) body.innerHTML=`<a href="${url}" target="_blank" style="color:#93c5fd">📄 Open PDF</a><br><br><iframe src="${url}" style="width:100%;height:60vh"></iframe>`;
+  else if(type==='video') body.innerHTML=`<video src="${url}" controls autoplay style="max-width:100%;max-height:70vh"></video><br><a href="${url}" target="_blank" style="color:#93c5fd">🔗 Open video</a>`;
+  else body.innerHTML=`<img src="${url}" style="max-width:100%;max-height:70vh"><br><a href="${url}" target="_blank" style="color:#93c5fd">🔗 Open image</a>`;
   modal.style.display='grid';
 }
-
 function viewAllDocs(uid){
   const rec=allData.all.find(r=>r.uid===uid);
-  if(!rec){ toast('Not found'); return; }
+  if(!rec) return;
   const modal=document.getElementById('modal');
-  document.getElementById('modalTitle').textContent=`All Uploads — ${rec.name} (${rec.type})`;
-  const body=document.getElementById('modalBody');
-  let html=`<div style="text-align:left;font-size:11px">
-    <b>Name:</b> ${rec.name}<br><b>Email:</b> ${rec.email}<br><b>Phone:</b> ${rec.phone}<br><b>Type:</b> ${rec.type}<br><b>Approved:</b> ${rec.isApproved?'Yes':'No'}<br><b>ALL 5:</b> ${rec.hasAll5?'Yes':'No'}<br><br>
-    <div style="display:grid;gap:8px">
-      <div><b>📸 Photo:</b> ${rec.photo?`<a href="${rec.photo}" target="_blank" style="color:#93c5fd">View</a> - <img src="${rec.photo}" style="width:60px;height:60px;border-radius:50%;object-fit:cover">`:'Missing ❌'}</div>
-      ${rec.type==='nurse'?`
-      <div><b>🪪 ID:</b> ${rec.idURL?`<a href="${rec.idURL}" target="_blank" style="color:#93c5fd">View ID</a>`:'Missing ❌'}</div>
-      <div><b>📜 Licence:</b> ${rec.licenceURL?`<a href="${rec.licenceURL}" target="_blank" style="color:#93c5fd">View Licence</a>`:'Missing ❌'}</div>
-      <div><b>🎥 Video:</b> ${rec.videoURL?`<a href="${rec.videoURL}" target="_blank" style="color:#facc15">View Video</a> <video src="${rec.videoURL}" controls style="width:100%;max-height:200px;margin-top:6px;border-radius:8px"></video>`:'Missing ❌ REQUIRED'}</div>
-      <div><b>📜 Certificate:</b> ${rec.certURL?`<a href="${rec.certURL}" target="_blank" style="color:#93c5fd">View Certificate</a>`:'Not provided (Optional)'}</div>
-      `:''}
-    </div>
-  </div>`;
-  body.innerHTML=html;
+  document.getElementById('modalTitle').textContent=`All Uploads — ${rec.name}`;
+  document.getElementById('modalBody').innerHTML=`<div style="text-align:left;font-size:11px"><b>${rec.name}</b><br>${rec.email}<br>Approved: ${rec.isApproved?'YES ✅':'NO ⏳'}<br>Photo: ${rec.photo?`<a href="${rec.photo}" target="_blank">View</a>`:'Missing'}<br>ID: ${rec.idURL?`<a href="${rec.idURL}" target="_blank">View</a>`:'Missing'}<br>Licence: ${rec.licenceURL?`<a href="${rec.licenceURL}" target="_blank">View</a>`:'Missing'}<br>Video: ${rec.videoURL?`<a href="${rec.videoURL}" target="_blank">View</a>`:'Missing'}<br>Cert: ${rec.certURL?`<a href="${rec.certURL}" target="_blank">View</a>`:'Optional'}</div>`;
   modal.style.display='grid';
 }
-
 function closeModal(){ document.getElementById('modal').style.display='none'; }
 
+// FIXED APPROVE - UPDATES ALL PATHS
 async function approve(uid, email, type){
-  if(!confirm(`Approve ${type} ${email}?\n\nWill:\n1. Add to allowed${type==='nurse'?'Nurses':'Clients'} whitelist\n2. Allow login`)) return;
+  if(!confirm(`Approve ${type} ${email}?\n\nThis will update ALL 12 database paths so nurse moves to Approved and can login.`)) return;
+  const logBox=document.getElementById('logBox');
+  logBox.style.display='block'; logBox.innerHTML='';
+  log(`Approving ${type} ${email} (${uid}) in ALL paths...`);
+  
   try{
     const emailKey=sanitizeEmail(email);
-    let data=allData.all.find(r=>r.uid===uid)||{};
-    const approvedData={
-      ...data.raw,
-      uid:uid,
-      email:email.toLowerCase(),
-      isApproved:true,
-      approved:true,
-      status:'approved',
-      canLogin:true,
-      isVerified:true,
-      approvedAt:Date.now(),
-      approvedBy:'CEO'
+    const now=Date.now();
+    const approvedPayload={
+      isApproved:true, approved:true, status:'approved', canLogin:true, isVerified:true, approvedAt:now, approvedBy:'CEO', updatedAt:now
     };
+    
     if(type==='nurse'){
-      await db.ref('nurses/'+uid).update({isApproved:true,approved:true,status:'approved',canLogin:true,isVerified:true,approvedAt:Date.now()});
-      await db.ref('allowedNurses/'+emailKey).set(approvedData);
-      await db.ref('allowedNursesByUid/'+uid).set(approvedData);
-      await db.ref('ceoRegistrationCenter/nurses/'+uid).update({isApproved:true,approved:true,status:'approved',approvedAt:Date.now()});
+      const nursePaths=[
+        'nurses/'+uid,
+        'pending_nurses/'+uid,
+        'pendingNurses/'+uid,
+        'nurse_registrations/'+uid,
+        'nurseApplications/'+uid,
+        'allNurses/'+uid,
+        'nurseUsers/'+uid,
+        'ceoNurseUpdates/'+uid,
+        'ceoRegistrationCenter/nurses/'+uid,
+        'verified_nurses/'+uid
+      ];
+      
+      for(const path of nursePaths){
+        try{
+          const snap=await db.ref(path).once('value');
+          if(snap.exists()){
+            await db.ref(path).update(approvedPayload);
+            log(`✅ Updated ${path} → approved`);
+          }
+        }catch(e){ log(`⚠️ ${path} not exist or err: ${e.message}`); }
+      }
+      
+      // Whitelist - create
+      const data=allData.all.find(r=>r.uid===uid)||{};
+      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayload};
+      await db.ref('allowedNurses/'+emailKey).set(whitelistData);
+      log(`✅ Created allowedNurses/${emailKey}`);
+      await db.ref('allowedNursesByUid/'+uid).set(whitelistData);
+      log(`✅ Created allowedNursesByUid/${uid}`);
+      
     }else{
-      await db.ref('clients/'+uid).update({isApproved:true,approved:true,status:'approved',canLogin:true,approvedAt:Date.now()});
-      await db.ref('allowedClients/'+emailKey).set(approvedData);
-      await db.ref('allowedClientsByUid/'+uid).set(approvedData);
-      await db.ref('ceoRegistrationCenter/clients/'+uid).update({isApproved:true,approved:true,status:'approved',approvedAt:Date.now()});
+      const clientPaths=[
+        'clients/'+uid,
+        'client_registrations/'+uid,
+        'allClients/'+uid,
+        'clientUsers/'+uid,
+        'ceoClientUpdates/'+uid,
+        'ceoRegistrationCenter/clients/'+uid,
+        'pendingClientRegistrations/'+uid
+      ];
+      for(const path of clientPaths){
+        try{
+          const snap=await db.ref(path).once('value');
+          if(snap.exists()){
+            await db.ref(path).update(approvedPayload);
+            log(`✅ Updated ${path}`);
+          }
+        }catch(e){}
+      }
+      const data=allData.all.find(r=>r.uid===uid)||{};
+      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayload};
+      await db.ref('allowedClients/'+emailKey).set(whitelistData);
+      await db.ref('allowedClientsByUid/'+uid).set(whitelistData);
+      log(`✅ Created allowedClients`);
     }
-    toast(`✅ ${type} ${email} APPROVED — can now login`);
-    setTimeout(loadAll, 1000);
-  }catch(e){ toast('Approve failed: '+e.message); }
+    
+    toast(`✅ ${email} APPROVED in ALL paths — now moves to Approved tab and can login!`);
+    log(`✅ DONE — ${email} approved in ALL paths`);
+    setTimeout(loadAll, 1500);
+    
+  }catch(e){
+    log(`❌ Approve failed: ${e.message}`);
+    toast('Approve failed: '+e.message);
+  }
 }
 
 async function reject(uid, email, type){
   if(!confirm(`Reject ${type} ${email}?`)) return;
   try{
-    const emailKey=sanitizeEmail(email);
     if(type==='nurse'){
       await db.ref('nurses/'+uid).update({isApproved:false,status:'rejected',rejectedAt:Date.now()});
       await db.ref('ceoRegistrationCenter/nurses/'+uid).update({isApproved:false,status:'rejected'});
-      await db.ref('allowedNurses/'+emailKey).remove().catch(()=>{});
+      await db.ref('allowedNurses/'+sanitizeEmail(email)).remove().catch(()=>{});
       await db.ref('allowedNursesByUid/'+uid).remove().catch(()=>{});
     }else{
       await db.ref('clients/'+uid).update({isApproved:false,status:'rejected'});
       await db.ref('ceoRegistrationCenter/clients/'+uid).update({isApproved:false,status:'rejected'});
     }
-    toast(`❌ ${type} ${email} rejected`);
+    toast(`❌ ${email} rejected`);
     setTimeout(loadAll, 800);
   }catch(e){ toast('Reject failed: '+e.message); }
 }
 
+// Fix all stuck approved nurses at once
+async function fixAllApproved(){
+  if(!confirm('This will scan all nurses that are in allowedNurses whitelist but still showing pending, and fix them to approved in ALL paths. Continue?')) return;
+  const logBox=document.getElementById('logBox');
+  logBox.style.display='block'; logBox.innerHTML='';
+  log('Scanning allowedNurses whitelist...');
+  
+  try{
+    const snap=await db.ref('allowedNurses').once('value');
+    if(!snap.exists()){ toast('No allowedNurses found'); return; }
+    let fixed=0;
+    const promises=[];
+    snap.forEach(ch=>{
+      const v=ch.val()||{};
+      const uid=v.uid;
+      const email=v.email;
+      if(uid && email){
+        const payload={isApproved:true,approved:true,status:'approved',canLogin:true,isVerified:true,approvedAt:Date.now(),updatedAt:Date.now()};
+        promises.push(
+          db.ref('nurses/'+uid).update(payload).then(()=>log(`Fixed nurses/${uid}`)).catch(()=>{}),
+          db.ref('pending_nurses/'+uid).update(payload).catch(()=>{}),
+          db.ref('pendingNurses/'+uid).update(payload).catch(()=>{}),
+          db.ref('ceoRegistrationCenter/nurses/'+uid).update(payload).then(()=>log(`Fixed ceo center ${uid}`)).catch(()=>{}),
+          db.ref('ceoNurseUpdates/'+uid).update(payload).catch(()=>{}),
+          db.ref('nurse_registrations/'+uid).update(payload).catch(()=>{})
+        );
+        fixed++;
+      }
+    });
+    await Promise.all(promises);
+    toast(`✅ Fixed ${fixed} nurses — they will now show in Approved`);
+    log(`✅ Fixed ${fixed} nurses`);
+    setTimeout(loadAll, 1500);
+  }catch(e){ toast('Fix failed: '+e.message); log('Fix failed: '+e.message); }
+}
+
 loadAll();
-setInterval(loadAll, 20000);
 </script>
 </body>
 </html>
