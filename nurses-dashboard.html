@@ -178,14 +178,20 @@ async function loadNurse(){
     const cleanName=(localName||'Nurse').trim();
     document.getElementById('nurseName').textContent='Welcome, '+cleanName;
     const h=new Date().getHours();
-    document.getElementById('nurseWelcome').textContent=h<12?'Good morning! Ready for your shifts?':h<18?'Good afternoon! Hope your day is going well':'Good evening! Thank you for your hard work today';
-    document.getElementById('nurseEmail').textContent=email||'';
-    document.getElementById('nursePhone').textContent=phone||'';
-    document.getElementById('editName').value=cleanName;
-    document.getElementById('editPhone').value=phone;
-    document.getElementById('editEmail').value=email;
-    document.getElementById('editPhoto').value=photoURL;
-    document.getElementById('editSpecialty').value=specialty;
+    const welcomeEl = document.getElementById('nurseWelcome');
+    if(welcomeEl) welcomeEl.textContent=h<12?'Good morning! Ready for your shifts?':h<18?'Good afternoon! Hope your day is going well':'Good evening! Thank you for your hard work today';
+    const emailEl = document.getElementById('nurseEmail');
+    if(emailEl) emailEl.textContent=email||'';
+    const phoneEl = document.getElementById('nursePhone');
+    if(phoneEl) phoneEl.textContent=phone||'';
+    // Guard - these inputs were removed (now in nurse-settings.html)
+    try{
+      const e1=document.getElementById('editName'); if(e1) e1.value=cleanName;
+      const e2=document.getElementById('editPhone'); if(e2) e2.value=phone;
+      const e3=document.getElementById('editEmail'); if(e3) e3.value=email;
+      const e4=document.getElementById('editPhoto'); if(e4) e4.value=photoURL;
+      const e5=document.getElementById('editSpecialty'); if(e5) e5.value=specialty;
+    }catch(e){}
 
     const imgEl=document.getElementById('nursePhoto');
     const initEl=document.getElementById('nursePhotoInitial');
@@ -283,7 +289,7 @@ async function saveNurseToRTDB(uid, data){
       const phoneKey=data.phone.replace(/[^0-9]/g,'').slice(-9);
       await rtdb.ref('nursesByPhone/'+phoneKey).set(payload).catch(()=>{});
     }
-    document.getElementById('saveInfo').textContent=`Saved: ${payload.fullName}, ${payload.phone}, ${payload.email}, Photo ${payload.photoURL?'YES':'NO'}, Time ${timeStr}, Location ${currentLocation.lat.toFixed(4)},${currentLocation.lng.toFixed(4)}`;
+    const si=document.getElementById('saveInfo'); if(si) si.textContent=`Saved: ${payload.fullName}, ${payload.phone}, ${payload.email}, Photo ${payload.photoURL?'YES':'NO'}, Time ${timeStr}, Location ${currentLocation.lat.toFixed(4)},${currentLocation.lng.toFixed(4)}`;
   }catch(e){console.log('save RTDB error',e);}
 }
 
@@ -327,29 +333,33 @@ function updateOnlineUI(isOnline){
   const badge=document.getElementById('onlineBadge');
   const sessionText=document.getElementById('onlineSession');
   const display=document.getElementById('onlineDisplay');
+  const toggle=document.getElementById('onlineToggle');
   if(isOnline){
-    dot.classList.add('online');
-    badge.textContent='🟢 ONLINE — Visible to clients';
-    badge.className='badge badgeOnline';
-    sessionText.textContent='ONLINE';
-    sessionText.style.color='#86efac';
-    display.innerHTML=`<b style="color:#86efac">🟢 You are ONLINE</b><br>Clients can see you in book-nurse.html and book you!<br><small style="color:#6b7280">Last update: ${new Date().toLocaleString('en-GH')} — Updating every 2 mins</small>`;
+    if(dot) dot.classList.add('online');
+    if(badge){ badge.textContent='🟢 ONLINE — Visible to clients'; badge.className='badge badgeOnline'; }
+    if(sessionText){ sessionText.textContent='ONLINE'; sessionText.style.color='#86efac'; }
+    if(display) display.innerHTML=`<b style="color:#86efac">🟢 You are ONLINE</b><br>Clients can see you in book-nurse.html and book you!<br><small style="color:#6b7280">Last update: ${new Date().toLocaleString('en-GH')} — Updating every 2 mins</small>`;
+    if(toggle) toggle.checked=true;
   }else{
-    dot.classList.remove('online');
-    badge.textContent='🔴 OFFLINE — Hidden from clients';
-    badge.className='badge badgeOffline';
-    sessionText.textContent='OFFLINE';
-    sessionText.style.color='#fca5a5';
-    display.innerHTML=`<b style="color:#fca5a5">🔴 You are OFFLINE</b><br>Clients CANNOT see you in book-nurse.html.<br>Turn ON to appear for bookings.`;
+    if(dot) dot.classList.remove('online');
+    if(badge){ badge.textContent='🔴 OFFLINE — Hidden from clients'; badge.className='badge badgeOffline'; }
+    if(sessionText){ sessionText.textContent='OFFLINE'; sessionText.style.color='#fca5a5'; }
+    if(display) display.innerHTML=`<b style="color:#fca5a5">🔴 You are OFFLINE</b><br>Clients CANNOT see you in book-nurse.html.<br>Turn ON to appear for bookings.`;
+    if(toggle) toggle.checked=false;
   }
 }
 async function setOnlineNow(){
-  const uid=currentNurseId||localStorage.getItem('lcg_nurse_uid')||'demo-nurse';
-  const name=document.getElementById('editName').value.trim()||document.getElementById('nurseName').textContent.replace('Welcome, ','')||'Nurse';
-  const phone=document.getElementById('editPhone').value.trim()||document.getElementById('nursePhone').textContent||'';
-  const email=document.getElementById('editEmail').value.trim()||document.getElementById('nurseEmail').textContent||'';
-  const photo=document.getElementById('editPhoto').value.trim()||document.getElementById('nursePhoto').src||'';
-  const specialty=document.getElementById('editSpecialty').value.trim()||'Home Nursing';
+  const uid=currentNurseId||localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('uid')||'demo-nurse';
+  // Read from profile card / localStorage (edit fields no longer in dashboard)
+  const nurseNameEl = document.getElementById('nurseName');
+  const name=(nurseNameEl? nurseNameEl.textContent.replace('Welcome, ','').trim() : '') || localStorage.getItem('nurseName') || localStorage.getItem('fullName') || 'Nurse';
+  const phone=localStorage.getItem('nursePhone') || document.getElementById('nursePhone')?.textContent || '';
+  const email=localStorage.getItem('nurseEmail') || document.getElementById('nurseEmail')?.textContent || '';
+  const photo=localStorage.getItem('nursePhotoURL') || document.getElementById('nursePhoto')?.src || '';
+  const specialty=localStorage.getItem('nurseSpecialty') || 'General Nursing';
+  // Optimistic UI - show ONLINE immediately
+  updateOnlineUI(true);
+  const toggle=document.getElementById('onlineToggle'); if(toggle) toggle.checked=true;
   const now=Date.now();
   const timeStr=new Date().toLocaleString('en-GH');
   if(navigator.geolocation){
