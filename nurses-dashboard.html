@@ -6,51 +6,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-storage-compat.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.left{display:flex;align-items:center;gap:12px}
-.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}
-.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}.hamburger span+span{margin-top:4px}
-.logoBox{display:flex;align-items:center;gap:10px}
-.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
-.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
-.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}
-#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}
-#overlay.show{display:block}
-#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}
-#drawer.open{transform:translateX(0)}
-.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}
-.item.nurse{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}
-.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}
-.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}
-.wrap{max-width:480px;margin:0 auto;padding:24px 14px 80px}
-.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:20px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:16px}
-.btnBig{width:100%;padding:18px;border-radius:16px;border:1px solid rgba(168,85,247,.18);background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.18));color:#f3e8ff;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;transition:.2s;margin-bottom:12px;text-decoration:none}
-.btnBig:hover{transform:translateY(-2px);border-color:#a855f7}
-.btnBig .icon{width:48px;height:48px;border-radius:50%;background:rgba(168,85,247,.22);display:grid;place-items:center;border:1px solid rgba(168,85,247,.18);flex-shrink:0}
-.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none}
-.photoWrap{position:relative;width:74px;height:74px;flex-shrink:0}
-#nursePhoto{width:74px;height:74px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:2px solid rgba(168,85,247,.35);box-shadow:0 0 0 4px rgba(168,85,247,.12), 0 8px 20px rgba(0,0,0,.4);display:block}
-#nursePhotoInitial{position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;font-size:28px;color:white}
-.onlineDot{position:absolute;right:2px;bottom:2px;width:16px;height:16px;border-radius:50%;background:#6b7280;border:3px solid #1c1238;transition:.3s}
-.onlineDot.online{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.25);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.22);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}
-.badgeOnline{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.3)}
-.badgeOffline{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.2)}
-#blockScreen{position:fixed;inset:0;z-index:200;background:rgba(14,10,28,.96);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:20px}
-#blockScreen.show{display:flex}
-#sessionBar{position:fixed;bottom:0;left:0;right:0;background:rgba(28,18,56,.92);border-top:1px solid rgba(168,85,247,.15);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#a78bfa;z-index:40;backdrop-filter:blur(12px)}
-.switch{position:relative;display:inline-block;width:64px;height:32px}
-.switch input{opacity:0;width:0;height:0}
-.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#374151;transition:.3s;border-radius:999px;border:1px solid rgba(255,255,255,.1)}
-.slider:before{position:absolute;content:"";height:24px;width:24px;left:4px;bottom:3px;background:white;transition:.3s;border-radius:50%}
-input:checked + .slider{background:linear-gradient(135deg,#22c55e,#16a34a)}
-input:checked + .slider:before{transform:translateX(30px)}
-.input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;margin-top:6px}
-.label{font-size:10px;font-weight:800;margin:12px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}.left{display:flex;align-items:center;gap:12px}.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}.hamburger span+span{margin-top:4px}.logoBox{display:flex;align-items:center;gap:10px}.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}#overlay.show{display:block}#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}#drawer.open{transform:translateX(0)}.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}.item.nurse{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}.wrap{max-width:480px;margin:0 auto;padding:24px 14px 80px}.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:20px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:16px}.btnBig{width:100%;padding:18px;border-radius:16px;border:1px solid rgba(168,85,247,.18);background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.18));color:#f3e8ff;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;transition:.2s;margin-bottom:12px;text-decoration:none}.btnBig:hover{transform:translateY(-2px);border-color:#a855f7}.btnBig .icon{width:48px;height:48px;border-radius:50%;background:rgba(168,85,247,.22);display:grid;place-items:center;border:1px solid rgba(168,85,247,.18);flex-shrink:0}.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none}.photoWrap{position:relative;width:74px;height:74px;flex-shrink:0}#nursePhoto{width:74px;height:74px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:2px solid rgba(168,85,247,.35);box-shadow:0 0 0 4px rgba(168,85,247,.12), 0 8px 20px rgba(0,0,0,.4);display:block}#nursePhotoInitial{position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;font-size:28px;color:white}.onlineDot{position:absolute;right:2px;bottom:2px;width:16px;height:16px;border-radius:50%;background:#6b7280;border:3px solid #1c1238;transition:.3s}.onlineDot.online{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.25);animation:pulse 1.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.22);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}.badgeOnline{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.3)}.badgeOffline{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.2)}#blockScreen{position:fixed;inset:0;z-index:200;background:rgba(14,10,28,.96);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:20px}#blockScreen.show{display:flex}#sessionBar{position:fixed;bottom:0;left:0;right:0;background:rgba(28,18,56,.92);border-top:1px solid rgba(168,85,247,.15);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#a78bfa;z-index:40;backdrop-filter:blur(12px)}.switch{position:relative;display:inline-block;width:64px;height:32px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#374151;transition:.3s;border-radius:999px;border:1px solid rgba(255,255,255,.1)}.slider:before{position:absolute;content:"";height:24px;width:24px;left:4px;bottom:3px;background:white;transition:.3s;border-radius:50%}input:checked + .slider{background:linear-gradient(135deg,#22c55e,#16a34a)}input:checked + .slider:before{transform:translateX(30px)}.input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;margin-top:6px}.label{font-size:10px;font-weight:800;margin:12px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase}
 </style></head><body>
 <div class="bg"></div>
 <div id="blockScreen">
@@ -104,83 +62,58 @@ input:checked + .slider:before{transform:translateX(30px)}
     <div id="nurseWelcome" style="font-size:13px;color:#c4b5fd;margin-top:4px">Welcome back</div>
     <div id="nurseEmail" style="font-size:11px;color:#7c6da6;margin-top:6px;word-break:break-all"></div>
     <div id="nursePhone" style="font-size:11px;color:#86efac;margin-top:2px"></div>
-    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-      <span id="onlineBadge" class="badge badgeOffline">OFFLINE — Hidden from clients</span>
-      <span class="badge" id="sessionTimer">30m left</span>
-    </div>
   </div>
+  <div id="sessionTimer" style="font-size:10px;color:#a78bfa;background:rgba(168,85,247,.12);padding:6px 10px;border-radius:999px;border:1px solid rgba(168,85,247,.15)">30m left</div>
 </div>
 
-<!-- ONLINE TOGGLE — CONTROLS VISIBILITY IN BOOK-NURSE.HTML -->
-<div class="card" style="border:2px solid rgba(34,197,94,.25);background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(28,18,56,.9))">
+<!-- EDIT DETAILS — PHOTO FROM FIREBASE STORAGE -->
+<div class="card">
+  <h3 style="font-weight:800;color:#f3e8ff;margin-bottom:12px">Edit Profile — Photo from Storage</h3>
+  <label class="label">Full Name</label><input id="editName" class="input" placeholder="Full name">
+  <label class="label">Phone (+233)</label><input id="editPhone" class="input" placeholder="+233...">
+  <label class="label">Email</label><input id="editEmail" class="input" placeholder="Email">
+  <label class="label">Photo URL (https:// or gs:// or leave empty to auto-fetch from Storage)</label><input id="editPhoto" class="input" placeholder="https://... or gs://... or leave empty for Storage photo">
+  <label class="label">Specialty</label><input id="editSpecialty" class="input" placeholder="Home Nursing">
+  <button onclick="saveNurseDetails()" style="width:100%;margin-top:14px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;cursor:pointer">Save — Name Photo Email Phone + Time + Location</button>
+  <div id="saveStatus" style="font-size:11px;color:#a78bfa;margin-top:8px"></div>
+  <div id="saveInfo" style="font-size:10px;color:#6b7280;margin-top:6px"></div>
+</div>
+
+<!-- ONLINE TOGGLE -->
+<div class="card">
   <div style="display:flex;justify-content:space-between;align-items:center">
-    <div><b style="font-size:14px;color:#86efac">🟢 Go Online / Offline — Controls Client View</b><br><small style="font-size:11px;color:#a78bfa">When ONLINE, you appear in book-nurse.html and book-nurse-50-percent.html for clients to book you. When OFFLINE, you are hidden and won't pop up.</small></div>
+    <div><b style="color:#f3e8ff">ONLINE Status</b><div style="font-size:11px;color:#a78bfa;margin-top:2px">Turn ON to appear in book-nurse.html</div></div>
     <label class="switch"><input type="checkbox" id="onlineToggle" onchange="toggleOnline()"><span class="slider"></span></label>
   </div>
-  <div id="onlineStatusDisplay" style="margin-top:12px;padding:10px;border-radius:12px;background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.12);font-size:11px;line-height:1.6;color:#c4b5fd">
-    <b style="color:#fca5a5">🔴 You are OFFLINE</b><br>Clients CANNOT see you in book-nurse.html. You are hidden. Turn ON to appear for bookings. Your name, photo, email, phone saved with time.
+  <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+    <div id="onlineBadge" class="badge badgeOffline">🔴 OFFLINE — Hidden from clients</div>
+    <div id="onlineSession" style="font-size:11px;color:#fca5a5">OFFLINE</div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-    <button class="btnBig btnPrimary" style="padding:14px;font-size:13px;justify-content:center;margin:0" onclick="setOnlineNow()">🟢 Go ONLINE Now — Appear for Clients</button>
-    <button class="btnBig" style="padding:14px;font-size:13px;justify-content:center;margin:0" onclick="setOfflineNow()">🔴 Go OFFLINE — Hide</button>
+  <div id="onlineDisplay" style="margin-top:12px;font-size:12px;color:#d8b4fe;line-height:1.5"></div>
+  <div style="margin-top:12px;display:grid;gap:8px">
+    <button onclick="setOnlineNow()" style="padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;font-weight:900;cursor:pointer">🟢 Go ONLINE Now — Appear in book-nurse.html</button>
+    <button onclick="setOfflineNow()" style="padding:12px;border-radius:12px;border:1px solid rgba(239,68,68,.2);background:rgba(239,68,68,.12);color:#fca5a5;font-weight:800;cursor:pointer">🔴 Go OFFLINE — Hide from clients</button>
   </div>
-  <div style="margin-top:10px;font-size:10px;color:#6b7280">Saves: <span id="saveInfo">Name, Photo, Email, Phone + Time + Location + Online status</span></div>
 </div>
 
-<!-- NURSE DETAILS EDIT — SAVE NAME PHOTO EMAIL PHONE -->
+<!-- Other cards... -->
 <div class="card">
-  <b style="font-size:13px;color:#f3e8ff">👩‍⚕️ Your Details — Saved — Name Photo Email Phone</b><br><small style="font-size:11px;color:#a78bfa">These are saved and shown to client when you are ONLINE and client books you. Edit and save.</small>
-  <label class="label">Full Name *</label><input id="editName" class="input" placeholder="e.g. Ama Serwaa">
-  <label class="label">Phone Number * (with +233)</label><input id="editPhone" class="input" type="tel" placeholder="+233244123456">
-  <label class="label">Email *</label><input id="editEmail" class="input" type="email" placeholder="nurse@email.com">
-  <label class="label">Photo URL (or upload)</label><input id="editPhoto" class="input" placeholder="https://... or leave — will use profile photo">
-  <label class="label">Specialty</label><input id="editSpecialty" class="input" placeholder="e.g. Elderly Care, ICU">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-    <button class="btnBig btnPrimary" style="justify-content:center;margin:0;padding:14px;font-size:13px" onclick="saveNurseDetails()">💾 Save Name Photo Email Phone + Time</button>
-    <button class="btnBig" style="justify-content:center;margin:0;padding:14px;font-size:13px" onclick="loadNurse()">🔄 Reload</button>
-  </div>
-  <div id="saveStatus" style="margin-top:8px;font-size:11px;color:#86efac"></div>
+  <a href="my-job-offer.html" class="btnBig"><div class="icon">💼</div><div>My Job Offers<div style="font-size:11px;color:#a78bfa">Tone + SMS when client books you</div></div></a>
+  <a href="nurse-group-chat.html" class="btnBig"><div class="icon">💬</div><div>Nurse Group Chat</div></a>
 </div>
 
-<div class="card">
-<h2 style="font-family:Plus Jakarta Sans,sans-serif;font-size:16px;font-weight:800;color:#f3e8ff;margin-bottom:14px">Nurses Dashboard</h2>
-
-<a class="btnBig btnPrimary" href="my-job-offer.html">
-  <span class="icon" style="background:rgba(0,0,0,.15)">💼</span>
-  <span><b>My Job Offer — Tone + SMS Rings</b><br><small>View bookings — Custom tone rings when client books you + SMS</small></span>
-</a>
-
-<a class="btnBig" href="nurse-group-chat.html">
-  <span class="icon">💬</span>
-  <span><b>Nurse Group Chat</b><br><small style="font-weight:600;color:#a78bfa">Chat with CEO and other nurses</small></span>
-</a>
-
-<a class="btnBig" href="nurse-settings.html">
-  <span class="icon">⚙️</span>
-  <span><b>Nurse Settings — Tone Picker</b><br><small style="font-weight:600;color:#a78bfa">Select custom song from phone that rings when booked + SMS</small></span>
-</a>
-
-<div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<a class="btnBig" style="justify-content:center" href="index.html">🏠 Home</a>
-<button class="btnBig" style="justify-content:center" onclick="logout()">🚪 Logout</button>
-</div>
-</div>
 </div>
 
-<div id="sessionBar">
-  <span>Session: <b id="sessionBarTime" style="color:#d8b4fe">30:00</b> left — <span id="sessionOnlineText">OFFLINE</span></span>
-  <span style="font-size:10px">Auto logout after 30 min — Online status saved with time</span>
-</div>
+<div id="sessionBar"><span id="sessionBarTime">30:00</span><span>LOVE CARE GLOBAL — Nurse Session</span></div>
 
 <script>
-// SESSION GUARD
 (function(){
   try{
-    const logged = localStorage.getItem('lcg_logged_in');
-    const role = (localStorage.getItem('lcg_role')||'').toLowerCase();
-    const expiry = parseInt(localStorage.getItem('lcg_session_expiry')||'0');
-    const isClient = localStorage.getItem('lcg_client_uid') && !localStorage.getItem('lcg_nurse_uid');
-    if(isClient || role==='client'){
+    const logged=localStorage.getItem('lcg_logged_in');
+    const role=(localStorage.getItem('lcg_role')||'').toLowerCase();
+    const expiry=parseInt(localStorage.getItem('lcg_session_expiry')||'0');
+    const client=localStorage.getItem('lcg_client_uid')||localStorage.getItem('currentClientId');
+    if(client || role==='client'){
       document.getElementById('blockScreen').classList.add('show');
       return;
     }
@@ -210,6 +143,8 @@ const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomai
 firebase.initializeApp(firebaseConfig);
 const rtdb=firebase.database();
 const fdb=firebase.firestore();
+const storage=firebase.storage();
+console.log("🔥 Firebase Storage initialized for nurse photos!");
 let currentNurseId=null;
 let currentLocation={lat:5.6037,lng:-0.1870};
 let onlineInterval=null;
@@ -267,9 +202,52 @@ async function loadNurse(){
 
     const imgEl=document.getElementById('nursePhoto');
     const initEl=document.getElementById('nursePhotoInitial');
-    if(photoURL && (photoURL.startsWith('http') || photoURL.startsWith('data:'))){
+    async function fetchPhotoFromStorage(uid){
+      if(photoURL && photoURL.startsWith('http')) return photoURL;
+      const storagePaths=[
+        `nurses/${uid}/profile.jpg`,
+        `nurses/${uid}/photo.jpg`,
+        `nurses/${uid}/avatar.jpg`,
+        `nurses/${uid}/profile.png`,
+        `nurses/${uid}/photo.png`,
+        `nurses/${uid}`,
+        `nursePhotos/${uid}`,
+        `profilePhotos/${uid}/photo.jpg`,
+        `nurses/${uid}/profile`,
+        `nursesPhotos/${uid}.jpg`
+      ];
+      if(photoURL && photoURL.startsWith('gs://')){
+        try{
+          const gsRef=storage.refFromURL(photoURL);
+          const url=await gsRef.getDownloadURL();
+          return url;
+        }catch(e){}
+      }
+      for(let p of storagePaths){
+        try{
+          const ref=storage.ref(p);
+          const url=await ref.getDownloadURL();
+          localStorage.setItem('nursePhotoURL', url);
+          try{ await fdb.collection('nurses').doc(uid).set({photoURL:url, photo:url}, {merge:true}); }catch(e){}
+          try{ await rtdb.ref('nurses/'+uid).update({photoURL:url, photo:url}); }catch(e){}
+          return url;
+        }catch(e){}
+      }
+      return photoURL;
+    }
+    try{
+      const storagePhoto=await fetchPhotoFromStorage(uid);
+      if(storagePhoto) photoURL=storagePhoto;
+    }catch(e){}
+    if(photoURL && (photoURL.startsWith('http') || photoURL.startsWith('data:') || photoURL.includes('firebasestorage.googleapis.com'))){
       imgEl.src=photoURL; imgEl.style.display='block'; initEl.style.display='none';
-      imgEl.onerror=function(){imgEl.style.display='none'; initEl.textContent=cleanName.charAt(0).toUpperCase(); initEl.style.display='grid';};
+      imgEl.onerror=function(){
+        storage.ref(`nurses/${uid}/profile.jpg`).getDownloadURL().then(url=>{
+          imgEl.src=url; imgEl.style.display='block'; initEl.style.display='none';
+        }).catch(()=>{
+          imgEl.style.display='none'; initEl.textContent=cleanName.charAt(0).toUpperCase(); initEl.style.display='grid';
+        });
+      };
     }else{imgEl.style.display='none'; initEl.textContent=cleanName.charAt(0).toUpperCase(); initEl.style.display='grid';}
 
     // Check current online status
@@ -314,7 +292,6 @@ async function saveNurseToRTDB(uid, data){
   };
   try{
     await rtdb.ref('nurses/'+uid).update(payload);
-    // Also save to nursesByPhone if phone exists
     if(data.phone){
       const phoneKey=data.phone.replace(/[^0-9]/g,'').slice(-9);
       await rtdb.ref('nursesByPhone/'+phoneKey).set(payload).catch(()=>{});
@@ -336,19 +313,16 @@ async function saveNurseDetails(){
   const now=Date.now();
   const timeStr=new Date().toLocaleString('en-GH');
   const payload={fullName:name,name,phone,email,photoURL:photo,photo,specialty,uid,updatedAt:now,lastSeen:now,timeStr,lat:currentLocation.lat,lng:currentLocation.lng};
-  // Save to localStorage
   localStorage.setItem('nurseName',name);
   localStorage.setItem('nursePhone',phone);
   localStorage.setItem('nurseEmail',email);
   localStorage.setItem('nursePhotoURL',photo);
   localStorage.setItem('nurseSpecialty',specialty);
   try{const prof=JSON.parse(localStorage.getItem('nurseProfile')||'{}'); localStorage.setItem('nurseProfile',JSON.stringify({...prof,...payload}));}catch(e){localStorage.setItem('nurseProfile',JSON.stringify(payload));}
-  // Save to Firestore
   try{ await fdb.collection('nurses').doc(uid).set(payload,{merge:true}); }catch(e){console.log(e);}
-  // Save to RTDB
   await saveNurseToRTDB(uid,payload);
   document.getElementById('saveStatus').textContent=`✅ Saved! Name: ${name}, Phone: ${phone}, Email: ${email}, Photo: ${photo?'YES':'NO'}, Time: ${timeStr} — Will appear in book-nurse.html when ONLINE`;
-  alert(`✅ Saved!\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nPhoto: ${photo?'YES':'NO'}\nTime: ${timeStr}\n\nSaved with time — When you go ONLINE, you will appear in book-nurse.html and book-nurse-50-percent.html for clients to book!`);
+  alert(`✅ Saved!\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nPhoto: ${photo?'YES':'NO'}\nTime: ${timeStr}\n\nSaved with time — When you go ONLINE, you will appear in book-nurse.html`);
   loadNurse();
 }
 
@@ -356,35 +330,32 @@ async function checkOnlineStatus(uid){
   try{
     const snap=await rtdb.ref('onlineNurses/'+uid).once('value');
     const snap2=await rtdb.ref('nursePresence/'+uid).once('value');
-    const isOnline = (snap.exists() && snap.val().isOnline) || (snap2.exists() && (snap2.val().status==='online' || snap2.val().isOnline));
+    const isOnline = (snap.exists() && snap.val().isOnline) || (snap2.exists() && snap2.val().isOnline) || false;
     updateOnlineUI(isOnline);
-  }catch(e){ updateOnlineUI(false); }
+    document.getElementById('onlineToggle').checked=isOnline;
+  }catch(e){}
 }
-
 function updateOnlineUI(isOnline){
-  const toggle=document.getElementById('onlineToggle');
   const dot=document.getElementById('onlineDot');
   const badge=document.getElementById('onlineBadge');
-  const display=document.getElementById('onlineStatusDisplay');
-  const sessionText=document.getElementById('sessionOnlineText');
-  toggle.checked=isOnline;
+  const sessionText=document.getElementById('onlineSession');
+  const display=document.getElementById('onlineDisplay');
   if(isOnline){
     dot.classList.add('online');
     badge.textContent='🟢 ONLINE — Visible to clients';
     badge.className='badge badgeOnline';
     sessionText.textContent='ONLINE';
     sessionText.style.color='#86efac';
-    display.innerHTML=`<b style="color:#86efac">🟢 You are ONLINE</b><br>Clients CAN see you in <b>book-nurse.html</b> and <b>book-nurse-50-percent.html</b> within radius.<br>Your details saved: Name, Photo, Email, Phone + Time + Location.<br>Your custom tone + SMS will ring when client books you!<br><small style="color:#6b7280">Last update: ${new Date().toLocaleString('en-GH')} — Updating every 2 mins to stay online</small>`;
+    display.innerHTML=`<b style="color:#86efac">🟢 You are ONLINE</b><br>Clients can see you in book-nurse.html and book you!<br><small style="color:#6b7280">Last update: ${new Date().toLocaleString('en-GH')} — Updating every 2 mins</small>`;
   }else{
     dot.classList.remove('online');
     badge.textContent='🔴 OFFLINE — Hidden from clients';
     badge.className='badge badgeOffline';
     sessionText.textContent='OFFLINE';
     sessionText.style.color='#fca5a5';
-    display.innerHTML=`<b style="color:#fca5a5">🔴 You are OFFLINE</b><br>Clients CANNOT see you in book-nurse.html. You are hidden and won't pop up for selection.<br>Turn ON to appear for bookings. Your name, photo, email, phone saved with time: ${new Date().toLocaleString('en-GH')}`;
+    display.innerHTML=`<b style="color:#fca5a5">🔴 You are OFFLINE</b><br>Clients CANNOT see you in book-nurse.html.<br>Turn ON to appear for bookings.`;
   }
 }
-
 async function setOnlineNow(){
   const uid=currentNurseId||localStorage.getItem('lcg_nurse_uid')||'demo-nurse';
   const name=document.getElementById('editName').value.trim()||document.getElementById('nurseName').textContent.replace('Welcome, ','')||'Nurse';
@@ -394,97 +365,57 @@ async function setOnlineNow(){
   const specialty=document.getElementById('editSpecialty').value.trim()||'Home Nursing';
   const now=Date.now();
   const timeStr=new Date().toLocaleString('en-GH');
-  
-  // Get fresh location
   if(navigator.geolocation){
     try{
       const pos=await new Promise((res,rej)=>{ navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:10000}); });
       currentLocation={lat:pos.coords.latitude,lng:pos.coords.longitude};
     }catch(e){}
   }
-
   const payload={
     isOnline:true, online:true, isAvailable:true, available:true, status:'online', presence:'online',
     lastSeen:now, lastActive:now, lastOnline:now, onlineAt:now, updatedAt:now, lastUpdate:now,
     timeStr:timeStr,
     fullName:name, name:name, photoURL:photo, photo:photo, email:email, phone:phone, specialty:specialty,
     lat:currentLocation.lat, lng:currentLocation.lng, latitude:currentLocation.lat, longitude:currentLocation.lng,
-    nurseLat:currentLocation.lat, nurseLng:currentLocation.lng,
     uid:uid, id:uid, isApproved:true
   };
-
   try{
     await rtdb.ref('nurses/'+uid).update(payload);
     await rtdb.ref('onlineNurses/'+uid).set({isOnline:true, online:true, lastSeen:now, timeStr, nurseId:uid, fullName:name, phone:phone, email:email, photoURL:photo, lat:currentLocation.lat, lng:currentLocation.lng});
     await rtdb.ref('nursePresence/'+uid).set({status:'online', isOnline:true, lastSeen:now, timeStr, nurseId:uid});
-    await rtdb.ref('nurseLocations/'+uid).set({lat:currentLocation.lat, lng:currentLocation.lng, nurseLat:currentLocation.lat, nurseLng:currentLocation.lng, lastUpdate:now, updatedAt:now, nurseId:uid, nurseName:name, isLive:true, status:'online'});
+    await rtdb.ref('nurseLocations/'+uid).set({lat:currentLocation.lat, lng:currentLocation.lng, lastUpdate:now, updatedAt:now, nurseId:uid, nurseName:name, isLive:true, status:'online'});
     await rtdb.ref('liveNurseLocations/'+uid).set({lat:currentLocation.lat, lng:currentLocation.lng, lastUpdate:now, nurseId:uid});
     try{ await fdb.collection('nurses').doc(uid).set(payload,{merge:true}); }catch(e){}
     updateOnlineUI(true);
-    document.getElementById('saveStatus').textContent=`🟢 ONLINE now! Saved with time ${timeStr} — You now appear in book-nurse.html and book-nurse-50-percent.html! Location: ${currentLocation.lat.toFixed(5)},${currentLocation.lng.toFixed(5)}`;
-
-    // Keep updating every 2 mins to stay online
+    document.getElementById('saveStatus').textContent=`🟢 ONLINE now! Saved with time ${timeStr} — You now appear in book-nurse.html! Location: ${currentLocation.lat.toFixed(5)},${currentLocation.lng.toFixed(5)}`;
     if(onlineInterval) clearInterval(onlineInterval);
     onlineInterval=setInterval(async()=>{
       const n=Date.now();
-      await rtdb.ref('nurses/'+uid).update({lastSeen:n, lastActive:n, lastUpdate:n, updatedAt:n, lat:currentLocation.lat, lng:currentLocation.lng}).catch(()=>{});
+      await rtdb.ref('nurses/'+uid).update({lastSeen:n, lastActive:n}).catch(()=>{});
       await rtdb.ref('onlineNurses/'+uid).update({lastSeen:n, timeStr:new Date().toLocaleString('en-GH')}).catch(()=>{});
-      await rtdb.ref('nursePresence/'+uid).update({lastSeen:n}).catch(()=>{});
-      await rtdb.ref('nurseLocations/'+uid).update({lastUpdate:n}).catch(()=>{});
     },120000);
-
-    alert(`🟢 You are ONLINE now!\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nPhoto: ${photo?'YES':'NO'}\nTime: ${timeStr}\nLocation: ${currentLocation.lat.toFixed(5)}, ${currentLocation.lng.toFixed(5)}\n\nYou now appear in:\n- book-nurse.html\n- book-nurse-50-percent.html\n\nClients can book you! Your custom tone + SMS will ring when booked!`);
-
-  }catch(e){ alert('Error going online: '+e.message); }
+  }catch(e){ alert('Online failed: '+e.message); }
 }
-
 async function setOfflineNow(){
   const uid=currentNurseId||localStorage.getItem('lcg_nurse_uid')||'demo-nurse';
   const now=Date.now();
-  const timeStr=new Date().toLocaleString('en-GH');
   try{
-    await rtdb.ref('nurses/'+uid).update({isOnline:false, online:false, isAvailable:false, available:false, status:'offline', presence:'offline', lastSeen:now, timeStr});
     await rtdb.ref('onlineNurses/'+uid).remove();
-    await rtdb.ref('nursePresence/'+uid).set({status:'offline', isOnline:false, lastSeen:now, timeStr});
-    await rtdb.ref('nurseLocations/'+uid).remove().catch(()=>{});
-    await rtdb.ref('liveNurseLocations/'+uid).remove().catch(()=>{});
-    try{ await fdb.collection('nurses').doc(uid).update({isOnline:false, status:'offline', lastSeen:now}); }catch(e){}
+    await rtdb.ref('nursePresence/'+uid).set({status:'offline', isOnline:false, lastSeen:now});
+    await rtdb.ref('nurses/'+uid).update({isOnline:false, online:false, status:'offline', lastSeen:now});
+    try{ await fdb.collection('nurses').doc(uid).set({isOnline:false, status:'offline', lastSeen:now},{merge:true}); }catch(e){}
     updateOnlineUI(false);
-    if(onlineInterval){ clearInterval(onlineInterval); onlineInterval=null; }
-    document.getElementById('saveStatus').textContent=`🔴 OFFLINE now! Time ${timeStr} — You are hidden from book-nurse.html and won't pop up for clients.`;
-    alert(`🔴 You are OFFLINE now!\n\nTime: ${timeStr}\n\nYou are hidden from:\n- book-nurse.html\n- book-nurse-50-percent.html\n\nClients CANNOT see you. Turn ONLINE to appear again.`);
-  }catch(e){ alert('Error going offline: '+e.message); }
+    document.getElementById('saveStatus').textContent=`🔴 OFFLINE now — Hidden from book-nurse.html`;
+    if(onlineInterval) clearInterval(onlineInterval);
+  }catch(e){ alert('Offline failed: '+e.message); }
 }
-
 function toggleOnline(){
-  const toggle=document.getElementById('onlineToggle');
-  if(toggle.checked){ setOnlineNow(); }else{ setOfflineNow(); }
+  const isChecked=document.getElementById('onlineToggle').checked;
+  if(isChecked) setOnlineNow(); else setOfflineNow();
 }
-
-window.logout=function(){ 
-  const uid=currentNurseId;
-  if(uid){ setOfflineNow(); }
-  setTimeout(()=>{ localStorage.clear(); location.href='nurse-login.html'; },500);
-}
-window.saveNurseDetails=saveNurseDetails;
-window.setOnlineNow=setOnlineNow;
-window.setOfflineNow=setOfflineNow;
-window.toggleOnline=toggleOnline;
-window.loadNurse=loadNurse;
-window.addEventListener('DOMContentLoaded', loadNurse);
-
-// Auto offline on tab close
-window.addEventListener('beforeunload',()=>{
-  const uid=currentNurseId||localStorage.getItem('lcg_nurse_uid');
-  if(uid){
-    // Don't auto offline — Keep online for 10 mins threshold logic
-    // If you want instant offline on close, uncomment:
-    // navigator.sendBeacon is not available for Firebase, so we rely on 10min threshold
-  }
-});
-
-function openD(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show')}
-function closeD(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
-window.openD=openD; window.closeD=closeD;
+function openD(){ document.getElementById('drawer').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeD(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+window.addEventListener('load', loadNurse);
 </script>
-</body></html>
+</body>
+</html>
