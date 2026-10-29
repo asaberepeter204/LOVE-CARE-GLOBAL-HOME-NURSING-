@@ -39,12 +39,13 @@
 <div class="grid">
 <a href="book-nurse.html" class="gcard purple"><div style="font-size:28px">🩺</div><b>Book Nurse</b></a>
 
-<!-- FIXED 1: MY BOOKINGS -> my-bookings.html + REAL DATE -->
-<a href="my-bookings.html" class="gcard blue">
-<div class="dateBox"><div id="myBookingMonth" style="font-size:14px">MAY</div><div id="myBookingDay" style="font-size:18px">13</div></div>
-<small id="myBookingCount" style="background:rgba(0,0,0,.2);border-radius:999px;padding:2px 8px;font-size:11px">0</small>
+<!-- MY BOOKINGS — AUTOMATIC REAL CALENDAR (updates every day) -->
+<a href="my-bookings.html" id="myBookingsBtn" class="gcard blue" style="position:relative;overflow:hidden">
+<div style="position:absolute;top:6px;right:6px;background:rgba(34,197,94,.9);color:white;font-size:7px;padding:2px 6px;border-radius:99px;font-weight:900;letter-spacing:.5px">● LIVE REAL DATE</div>
+<div class="dateBox" style="min-width:62px"><div id="myBookingMonth" style="font-size:13px">---</div><div style="display:flex;gap:4px;align-items:baseline;justify-content:center"><div id="myBookingDay" style="font-size:20px;line-height:1">--</div><div id="myBookingYear" style="font-size:8px;opacity:.7">----</div></div><div id="myBookingWeekday" style="font-size:7px;margin-top:2px;letter-spacing:.5px">---</div></div>
+<small id="myBookingCount" style="background:rgba(0,0,0,.25);border-radius:999px;padding:3px 9px;font-size:11px;font-weight:900">0</small>
 <b>My Bookings</b>
-<small style="font-size:9px;opacity:.8">Real date</small>
+<small id="myBookingFullDate" style="font-size:8px;opacity:.9;text-align:center;line-height:1.2;max-width:90%">Loading Ghana date...</small>
 </a>
 
 <a href="client-settings.html" class="gcard dark"><div style="font-size:24px">⚙️</div><b>Client Settings</b></a>
@@ -72,30 +73,54 @@ import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gsta
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
 
+function makeInitialAvatarDataURL(name){
+  const initial = (name && name.trim()? name.trim().charAt(0) : 'C').toUpperCase();
+  const canvas = document.createElement('canvas'); canvas.width=120; canvas.height=120;
+  const ctx=canvas.getContext('2d'); ctx.fillStyle='#2d1c4e'; ctx.fillRect(0,0,120,120);
+  ctx.fillStyle='#facc15'; ctx.font='bold 60px Inter, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(initial,60,64);
+  return canvas.toDataURL();
+}
 function loadClient(){
-  const name=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'ASABERE PETER';
-  const email=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'lovecareglobal@gmail.com';
-  const phone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'+233502957280';
-  const photo=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||'';
-  document.getElementById('clientName').textContent=name;
-  document.getElementById('clientEmail').textContent=email;
-  document.getElementById('clientPhone').textContent=phone;
-  document.getElementById('clientAvatar').src=photo||'https://ui-avatars.com/api/?name='+encodeURIComponent(name)+'&background=facc15&color=000';
+  const name=localStorage.getItem('clientName')||localStorage.getItem('fullName')||localStorage.getItem('client_fullName')||localStorage.getItem('pendingGoogleName')||'Client';
+  const email=localStorage.getItem('clientEmail')||localStorage.getItem('email')||localStorage.getItem('pendingGoogleEmail')||'';
+  const phone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'';
+  const photo=localStorage.getItem('clientPhoto')||localStorage.getItem('clientPhotoUrl')||localStorage.getItem('photoUrl')||localStorage.getItem('pendingGooglePhoto')||'';
+  document.getElementById('clientName').textContent=name.toUpperCase();
+  document.getElementById('clientEmail').textContent=email||'No email';
+  document.getElementById('clientPhone').textContent=phone||'No phone';
+  const av=document.getElementById('clientAvatar');
+  if(photo && (photo.startsWith('http')||photo.startsWith('data:'))){ av.src=photo; av.onerror=()=>{av.src=makeInitialAvatarDataURL(name);}; }
+  else { av.src=makeInitialAvatarDataURL(name); }
 }
 
-// FIXED: REAL DATE — Follows real dates
+// REAL DATE — AUTOMATIC REAL CALENDAR (Ghana time, updates daily)
 function setRealDate(){
-  const now=new Date();
+  // Use Africa/Accra timezone so date is correct in Ghana
+  const now = new Date();
+  const ghanaNow = new Date(now.toLocaleString('en-US', {timeZone: 'Africa/Accra'}));
   const months=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-  const month=months[now.getMonth()];
-  const day=now.getDate();
-  document.getElementById('myBookingMonth').textContent=month;
-  document.getElementById('myBookingDay').textContent=day;
-  // Also update count from localStorage bookings
-  try{
-    const bookings=JSON.parse(localStorage.getItem('lcg_bookings')||localStorage.getItem('bookings')||'[]');
-    document.getElementById('myBookingCount').textContent=bookings.length||0;
-  }catch(e){ document.getElementById('myBookingCount').textContent='0'; }
+  const weekdays=["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  const month = months[ghanaNow.getMonth()];
+  const day = ghanaNow.getDate();
+  const year = ghanaNow.getFullYear();
+  const weekday = weekdays[ghanaNow.getDay()];
+  const fullDate = ghanaNow.toLocaleDateString('en-GH',{weekday:'long', year:'numeric', month:'long', day:'numeric', timeZone:'Africa/Accra'});
+  const time = ghanaNow.toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit',hour12:true, timeZone:'Africa/Accra'});
+
+  const mEl = document.getElementById('myBookingMonth');
+  const dEl = document.getElementById('myBookingDay');
+  const yEl = document.getElementById('myBookingYear');
+  const wEl = document.getElementById('myBookingWeekday');
+  const fEl = document.getElementById('myBookingFullDate');
+  if(mEl) mEl.textContent = month;
+  if(dEl) dEl.textContent = day;
+  if(yEl) yEl.textContent = year;
+  if(wEl) wEl.textContent = weekday;
+  if(fEl) fEl.textContent = fullDate + ' • ' + time + ' — Live Ghana';
+  
+  // Tooltip for button
+  const btn = document.getElementById('myBookingsBtn');
+  if(btn) btn.title = fullDate + ' — Real calendar auto-updates daily';
 }
 
 async function loadBookingsCount(){
@@ -124,8 +149,10 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   setRealDate();
   await ensureAuth();
   loadBookingsCount();
-  // Update date every minute — follows real date live
-  setInterval(setRealDate, 60000);
+  // Update date every second — follows real calendar, auto-changes at midnight
+  setInterval(setRealDate, 1000);
+  // Extra midnight auto-reload
+  setInterval(()=>{ const n=new Date(); if(n.getHours()===0 && n.getMinutes()===0 && n.getSeconds()<2){ setRealDate(); loadBookingsCount(); } },1000);
   // Real-time count
   try{
     const phone=localStorage.getItem('clientPhone')||'';
