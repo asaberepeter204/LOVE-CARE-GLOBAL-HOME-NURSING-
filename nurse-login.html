@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Login - BLOCKED UNTIL CEO APPROVAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{background:rgba(28,18,56,.95);border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:28px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.logo{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-size:28px;margin:0 auto 12px}
+h2{font-weight:900;font-size:22px}
+.sub{font-size:12px;color:#a78bfa;margin:8px 0 16px}
+.inputWrap{position:relative;margin:10px 0}
+input{width:100%;padding:14px 44px 14px 14px;border-radius:12px;border:1.5px solid rgba(168,85,247,.22);background:rgba(14,10,28,.7);color:#f3e8ff;font-size:14px;outline:none}
+input:focus{border-color:#a855f7}
+.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:10px;border:1px solid rgba(168,85,247,.3);background:rgba(168,85,247,.2);cursor:pointer;display:grid;place-items:center}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;font-weight:900;cursor:pointer;font-size:14px;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+.btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}
+.btnGoogle{background:#fff;color:#000}
+.btnLight{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.22);color:#e9d5ff}
+.alert{padding:12px;border-radius:12px;font-size:12px;font-weight:700;margin:12px 0;border:1px solid;text-align:left}
+.alert-error{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5}
+.alert-success{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac}
+.alert-info{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93c5fd}
+.hidden{display:none}
+.divider{height:1px;background:rgba(168,85,247,.15);margin:16px 0;position:relative}
+.divider span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(28,18,56,.95);padding:0 10px;font-size:10px;color:#6b7280}
+.blockingModal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;place-items:center;z-index:9999;padding:20px}
+.blockingCard{background:rgba(28,18,56,.98);border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center}
+</style>
+</head>
+<body>
+<div class="card">
+<div class="logo">👩‍⚕️</div>
+<h2>Nurse Login</h2>
+<p class="sub">CEO approval required before login</p>
+
+<div id="msg"></div>
+
+<div class="inputWrap"><input id="email" type="email" placeholder="Email"></div>
+<div class="inputWrap"><input id="password" type="password" placeholder="Password"><button class="eyeBtn" type="button" onclick="togglePass()">👁️</button></div>
+
+<button class="btn btnPurple" id="loginBtn" onclick="loginWithEmail()">Login</button>
+
+<div class="divider"><span>OR</span></div>
+
+<button class="btn btnGoogle" onclick="loginWithGoogle()">🔍 Continue with Google</button>
+
+<a href="nurses-registration.html" class="btn btnLight" style="text-decoration:none">📝 Create Nurse Account</a>
+
+<div style="margin-top:12px;font-size:10px;color:#6b7280">🔒 Registration → CEO Approval → Login<br>Without CEO approval, you cannot login</div>
+</div>
+
+<!-- BLOCKING MODAL -->
+<div class="blockingModal" id="blockingModal">
+<div class="blockingCard">
+<div style="font-size:40px">⏳</div>
+<h3 style="margin:12px 0;color:#fca5a5" id="blockTitle">Access Denied</h3>
+<p style="font-size:12px;color:#c4b5fd;line-height:1.5" id="blockMessage">Your account is pending CEO approval.</p>
+<div style="margin-top:16px"><a id="blockAction" href="nurses-registration.html" class="btn btnPurple" style="text-decoration:none">Go to Registration</a></div>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getDatabase(app);
+
+function showMsg(text,type){ const el=document.getElementById('msg'); el.innerHTML=`<div class="alert alert-${type}">${text}</div>`; }
+function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
+function showBlocking(title, message, actionText, actionHref){
+  document.getElementById('blockTitle').textContent=title;
+  document.getElementById('blockMessage').innerHTML=message;
+  const btn=document.getElementById('blockAction');
+  btn.textContent=actionText; btn.href=actionHref;
+  document.getElementById('blockingModal').style.display='grid';
+}
+window.togglePass=function(){ const el=document.getElementById('password'); el.type=el.type==='password'?'text':'password'; };
+
+// CEO APPROVAL CHECK - GLOBAL
+async function isNurseApprovedByCEO(email, uid){
+  const emailKey=sanitizeEmail(email);
+  try{
+    // 1. Check allowedNurses whitelist - MAIN CHECK (written by CEO on approval)
+    const allowedSnap=await get(ref(db, 'allowedNurses/'+emailKey));
+    if(allowedSnap.exists()){
+      const data=allowedSnap.val();
+      if(data && (data.isApproved===true || data.approved===true || data.status==='approved')) return {approved:true, source:'allowedNurses'};
+      // If exists but not marked approved, still check other nodes
+    }
+  }catch(e){}
+  try{
+    // 2. Check allowedNurses by UID
+    if(uid){
+      const allowedByUid=await get(ref(db, 'allowedNursesByUid/'+uid));
+      if(allowedByUid.exists()){
+        const data=allowedByUid.val();
+        if(data && (data.isApproved===true || data.approved===true || data.status==='approved')) return {approved:true, source:'allowedNursesByUid'};
+      }
+    }
+  }catch(e){}
+  try{
+    // 3. Check nurses/{uid} node
+    if(uid){
+      const nurseSnap=await get(ref(db, 'nurses/'+uid));
+      if(nurseSnap.exists()){
+        const data=nurseSnap.val();
+        if(data && (data.isApproved===true || data.approved===true || data.status==='approved' || data.canLogin===true || data.isVerified===true)) return {approved:true, source:'nurses/'+uid};
+        // If exists but not approved, means pending
+        if(data && (data.status==='pending' || data.isApproved===false)) return {approved:false, reason:'pending CEO approval', source:'nurses/'+uid};
+      }
+    }
+  }catch(e){}
+  try{
+    // 4. Check nurse_registrations or pending_nurses by emailKey
+    const pending1=await get(ref(db, 'pending_nurses/'+emailKey));
+    if(pending1.exists()){
+      const data=pending1.val();
+      if(data && data.isApproved===true) return {approved:true, source:'pending_nurses/'+emailKey};
+      return {approved:false, reason:'pending CEO approval - found in pending_nurses', source:'pending_nurses'};
+    }
+  }catch(e){}
+  try{
+    const pending2=await get(ref(db, 'nurse_registrations/'+emailKey));
+    if(pending2.exists()){
+      const data=pending2.val();
+      if(data && data.isApproved===true) return {approved:true, source:'nurse_registrations'};
+      return {approved:false, reason:'pending CEO approval - found in nurse_registrations', source:'nurse_registrations'};
+    }
+  }catch(e){}
+  try{
+    // 5. Check ceoRegistrationCenter
+    if(uid){
+      const ceoSnap=await get(ref(db, 'ceoRegistrationCenter/nurses/'+uid));
+      if(ceoSnap.exists()){
+        const data=ceoSnap.val();
+        if(data && (data.isApproved===true || data.approved===true || data.status==='approved')) return {approved:true, source:'ceoRegistrationCenter'};
+        return {approved:false, reason:'pending CEO approval - in CEO center but not approved yet', source:'ceoRegistrationCenter'};
+      }
+    }
+  }catch(e){}
+
+  // No record = not registered
+  return {approved:false, reason:'not registered', source:'none'};
+}
+
+window.loginWithEmail=async function(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const password=document.getElementById('password').value.trim();
+  const btn=document.getElementById('loginBtn');
+  if(!email||!password){ showMsg('❌ Enter email and password', 'error'); return; }
+  if(!email.includes('@')){ showMsg('❌ Valid email required', 'error'); return; }
+
+  btn.textContent='Checking CEO approval...'; btn.disabled=true;
+  showMsg('🔍 Checking if CEO approved your registration...', 'info');
+
+  try{
+    const cred=await signInWithEmailAndPassword(auth, email, password);
+    const user=cred.user;
+    const check=await isNurseApprovedByCEO(email, user.uid);
+
+    if(check.approved===true){
+      // APPROVED - allow login
+      localStorage.setItem('nurseLoggedIn','true');
+      localStorage.setItem('nurseEmail', email);
+      localStorage.setItem('nurseUid', user.uid);
+      localStorage.setItem('nurseName', user.displayName||check.source);
+      showMsg('✅ CEO approved! Redirecting to dashboard...', 'success');
+      setTimeout(()=>{ location.replace('nurses-dashboard.html'); }, 1000);
+    }else{
+      // NOT APPROVED - BLOCK
+      await signOut(auth);
+      if(check.reason==='not registered'){
+        showBlocking('Not Registered', `No nurse account found for <b>${email}</b>.<br><br>Please register first. Registration will go to CEO for approval.`, 'Register Now', 'nurses-registration.html');
+        showMsg('❌ Not registered. Please register — goes to CEO approval.', 'error');
+      }else{
+        showBlocking('Pending CEO Approval', `Your registration for <b>${email}</b> is <b>waiting for CEO approval</b> in ceo-registration-center.html<br><br>Source: ${check.source}<br><br>You cannot login until CEO approves you. Please contact CEO or wait.`, 'Check Status', 'nurses-registration.html');
+        showMsg('⏳ PENDING CEO APPROVAL — You cannot login until CEO approves in ceo-registration-center.html', 'error');
+      }
+      btn.textContent='Login'; btn.disabled=false;
+    }
+
+  }catch(e){
+    console.error(e);
+    let msg=e.message;
+    if(e.code==='auth/user-not-found' || e.code==='auth/wrong-password' || e.code==='auth/invalid-credential') msg='Invalid email or password. If you registered, wait for CEO approval.';
+    showMsg('❌ '+msg, 'error');
+    btn.textContent='Login'; btn.disabled=false;
+  }
+};
+
+window.loginWithGoogle=async function(){
+  const provider=new GoogleAuthProvider();
+  showMsg('🔍 Checking Google account...', 'info');
+  try{
+    const result=await signInWithPopup(auth, provider);
+    const user=result.user;
+    const email=user.email.toLowerCase();
+    const emailKey=sanitizeEmail(email);
+
+    // ALL 4 REQUIRED CHECK
+    const hasName=(user.displayName && user.displayName.trim().length>=2);
+    const hasEmail=!!(user.email && user.email.includes('@'));
+    const hasPhoto=!!user.photoURL;
+    // Phone not available from Google, need to check DB
+    let hasPhone=false;
+    try{
+      const phoneCheck=await get(ref(db, 'nurses/'+user.uid+'/phone'));
+      if(phoneCheck.exists() && phoneCheck.val() && phoneCheck.val().length>=7) hasPhone=true;
+    }catch(e){}
+    // If phone missing, check allowedNurses
+    if(!hasPhone){
+      try{
+        const allowedPhone=await get(ref(db, 'allowedNurses/'+emailKey+'/phone'));
+        if(allowedPhone.exists() && allowedPhone.val() && allowedPhone.val().length>=7) hasPhone=true;
+      }catch(e){}
+    }
+
+    if(!hasName || !hasEmail || !hasPhoto){
+      // Missing fields - delete auth trace and redirect to registration
+      try{ await user.delete(); }catch(e){ try{ await signOut(auth); }catch(e2){} }
+      localStorage.setItem('pendingNurseEmail', email);
+      localStorage.setItem('pendingNurseName', user.displayName||'');
+      showBlocking('Incomplete Profile — ALL 4 Required', `Your Google account is missing:<br>${!hasName?'❌ Name<br>':''}${!hasEmail?'❌ Email<br>':''}${!hasPhoto?'❌ Photo<br>':''}${!hasPhone?'❌ Phone (required)<br>':''}<br>Please complete registration with ALL 4 fields: Name+Email+Phone+Photo`, 'Complete Registration', `nurses-registration.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(user.displayName||'')}&from=missing_all4`);
+      showMsg('❌ ALL 4 required: Name+Email+Phone+Photo. Redirecting to registration...', 'error');
+      setTimeout(()=>{ location.href=`nurses-registration.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(user.displayName||'')}&from=missing_all4`; }, 3000);
+      return;
+    }
+
+    // Check CEO approval
+    const check=await isNurseApprovedByCEO(email, user.uid);
+    if(check.approved===true){
+      localStorage.setItem('nurseLoggedIn','true');
+      localStorage.setItem('nurseEmail', email);
+      localStorage.setItem('nurseUid', user.uid);
+      localStorage.setItem('nurseName', user.displayName||'');
+      localStorage.setItem('nursePhoto', user.photoURL||'');
+      showMsg('✅ CEO approved! Redirecting...', 'success');
+      setTimeout(()=>{ location.replace('nurses-dashboard.html'); }, 1000);
+    }else{
+      await signOut(auth);
+      // Delete auth trace if not registered at all (NO AUTH TRACE requirement)
+      if(check.reason==='not registered'){
+        try{ await user.delete(); }catch(e){}
+        showBlocking('Not Registered', `Google account <b>${email}</b> not registered as nurse.<br><br>Please register — will go to CEO for approval. Auth removed to avoid trace.`, 'Register Now', `nurses-registration.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(user.displayName||'')}`);
+        showMsg('❌ Not registered. Auth trace removed. Please register — goes to CEO center.', 'error');
+        setTimeout(()=>{ location.href=`nurses-registration.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(user.displayName||'')}`; }, 2500);
+      }else{
+        // Pending approval - don't delete, just block
+        showBlocking('Pending CEO Approval', `Your Google account <b>${email}</b> is registered but <b>pending CEO approval</b> in ceo-registration-center.html<br><br>Source: ${check.source}<br><br>You cannot login until CEO approves.`, 'Wait for Approval', 'nurses-registration.html');
+        showMsg('⏳ Pending CEO approval — cannot login until approved.', 'error');
+      }
+    }
+
+  }catch(e){
+    console.error(e);
+    showMsg('❌ Google login failed: '+e.message, 'error');
+  }
+};
+
+// Auto message from URL
+(function(){
+  const params=new URLSearchParams(location.search);
+  const from=params.get('from');
+  if(from==='registered_pending') showMsg('✅ Registered! Now waiting for CEO approval in ceo-registration-center.html. You cannot login until approved.', 'info');
+  if(from==='missing_all4') showMsg('❌ Complete ALL 4: Name+Email+Phone+Photo required.', 'error');
+})();
+</script>
+</body>
+</html>
