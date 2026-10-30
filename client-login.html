@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Login</title>
+<title>Client Login - Username + Password ONLY</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;display:grid;place-items:center;padding:16px}
-.card{width:100%;max-width:380px;background:#1e1a3a;border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:12px}
-h2{text-align:center} input{padding:13px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(12,10,30,.8);color:white;width:100%}
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{width:100%;max-width:400px;background:#1e1a3a;border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px}
+h2{text-align:center;color:#f3e8ff} input{padding:13px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(12,10,30,.8);color:white;width:100%}
 .passWrap{position:relative;display:flex;align-items:center}
 .passWrap input{padding-right:44px;width:100%}
 .eyeBtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.2);border-radius:8px;width:32px;height:32px;display:grid;place-items:center;cursor:pointer;font-size:16px;transition:.2s}
@@ -17,64 +17,49 @@ h2{text-align:center} input{padding:13px;border-radius:12px;border:1px solid rgb
 .status{padding:10px;border-radius:10px;font-size:11px;display:none;text-align:center}
 .status.ok{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
 .status.err{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
-#recaptcha-container{margin:6px 0}
-.otpBox{display:none;flex-direction:column;gap:10px;background:rgba(14,10,28,.9);border:1px solid #facc15;border-radius:12px;padding:14px}
+.small{font-size:10px;color:#a78bfa;text-align:center}
 </style>
 </head><body>
 <div class="card">
 <h2>Client Login</h2>
-<input id="username" placeholder="Username (e.g. michael1005)" oninput="this.value=this.value.toLowerCase().replace(/\s/g,'')">
+<p class="small">Username + Password ONLY — No SMS on login (SMS only on registration for real person verification)</p>
+
+<input id="username" placeholder="Username (e.g. kusipeter)" oninput="this.value=this.value.toLowerCase().replace(/\s/g,'')">
+
 <div class="passWrap">
 <input id="pass" type="password" placeholder="Password">
-<button type="button" class="eyeBtn" onclick="toggleEye('pass', this)" title="Show/Hide password">👁️</button>
+<button type="button" class="eyeBtn" onclick="toggleEye('pass', this)" title="Show/Hide">👁️</button>
 </div>
+
 <div id="status" class="status"></div>
-<button class="btn btnYellow" onclick="login()">Login with Password</button>
-<div id="recaptcha-container"></div>
+<button class="btn btnYellow" onclick="login()">Login — Enter Dashboard</button>
 
-<div id="otpBox" class="otpBox">
-<b style="text-align:center;color:#facc15">Code sent to <span id="phoneDisplay"></span></b>
-<small style="font-size:10px;color:#a78bfa;text-align:center">Enter 6-digit SMS code to verify phone and enter dashboard</small>
-<input id="otp" type="text" placeholder="6-digit code" maxlength="6" style="text-align:center;font-size:18px;letter-spacing:4px">
-<button class="btn btnYellow" onclick="verifyPhoneOTP()">Verify Code & Enter</button>
-<button class="btn btnDark" onclick="resendOTP()">Resend Code</button>
+<div style="display:flex;justify-content:space-between;margin-top:6px">
+<a href="client-registration.html" style="color:#a78bfa;font-size:12px;text-decoration:none">No account? Register (SMS verification)</a>
+<a href="#" onclick="resetPass()" style="color:#facc15;font-size:12px;text-decoration:none">Forgot password?</a>
 </div>
 
-<div style="display:flex;justify-content:space-between"><a href="client-registration.html" style="color:#a78bfa;font-size:12px;text-decoration:none">No account? Register</a><a href="#" onclick="resetPass()" style="color:#facc15;font-size:12px;text-decoration:none">Forgot password?</a></div>
+<div style="background:rgba(14,10,28,.6);border-radius:10px;padding:10px;font-size:10px;color:#a78bfa;margin-top:8px">
+<b style="color:#facc15">Login Flow:</b><br>
+• Username + Password only<br>
+• No SMS on login — fast entry<br>
+• SMS was already done on registration to prove real person<br>
+• CEO can still trace you via phone + country code
+</div>
 </div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
 const db=firebase.database();
-
-let confirmationResult=null;
-let recaptchaVerifier=null;
-let currentClient=null;
 
 function toggleEye(inputId, btn){
   const input=document.getElementById(inputId);
-  if(!input) return;
-  if(input.type==='password'){
-    input.type='text';
-    btn.textContent='🙈';
-    btn.style.opacity='0';
-    setTimeout(()=>btn.style.opacity='1', 100);
-  } else {
-    input.type='password';
-    btn.textContent='👁️';
-    btn.style.opacity='0';
-    setTimeout(()=>btn.style.opacity='1', 100);
-  }
+  if(input.type==='password'){ input.type='text'; btn.textContent='🙈'; }
+  else { input.type='password'; btn.textContent='👁️'; }
 }
 function showStatus(m,ok){ const el=document.getElementById('status'); el.textContent=m; el.className='status '+(ok?'ok':'err'); el.style.display='block'; }
 function hashPassword(p){ return btoa(p).split('').reverse().join('') + '_' + p.length; }
-
-window.onload=()=>{
-  recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {size:'invisible'});
-  recaptchaVerifier.render();
-};
 
 async function login(){
   const username=document.getElementById('username').value.trim().toLowerCase();
@@ -83,27 +68,61 @@ async function login(){
   showStatus('Checking username...', true);
   try{
     const snap=await db.ref('allowedClients/'+username).once('value');
-    if(!snap.exists()){ showStatus('Username not found - Register first', false); return; }
-    const data=snap.val();
-    if(data.isBlocked===true){ showStatus('Account blocked by CEO', false); return; }
+    if(!snap.exists()){
+      // Also check by email legacy
+      const byEmail = await db.ref('allowedClientsByUid').orderByChild('email').equalTo(username).once('value').catch(()=>null);
+      if(!byEmail || !byEmail.exists()){
+        showStatus('Username not found — Register first (SMS verification on registration)', false); return;
+      }
+    }
+    const data=snap.val() || Object.values((await db.ref('allowedClients').orderByChild('email').equalTo(username).once('value').then(s=>s.val()||{}))[0]||{});
+    // Get data correctly
+    const finalData = snap.exists() ? snap.val() : null;
+    if(!finalData){ showStatus('Username not found', false); return; }
+    
+    if(finalData.isBlocked===true){ showStatus('Account blocked by CEO — Contact support', false); return; }
+
+    // CHECK IF VERIFIED AT REGISTRATION (SMS)
+    const isVerified = finalData.phoneVerified===true || finalData.phoneVerifiedReal===true || finalData.isRealPerson===true || finalData.verificationMethod==='SMS_OTP_REAL' || finalData.hasAll4===true;
+    if(!isVerified){
+      showStatus('❌ Phone NOT verified — Please complete SMS verification in registration first. Only verified real persons can login.', false);
+      setTimeout(()=>{ if(confirm('Your phone was not verified via SMS at registration. Go to registration to verify?')) location.href='client-registration.html'; }, 1000);
+      return;
+    }
 
     const hashed=hashPassword(pass);
-    // Accept both hashed and plain for backward compat
-    if(data.passwordHash && data.passwordHash!==hashed && data.passwordHash!==pass){
-      showStatus('Wrong password', false);
-      return;
-    }
-    if(!data.passwordHash && data.password && data.password!==pass){
-      showStatus('Wrong password', false);
-      return;
+    // Accept hashed, plain, or passwordHash
+    const stored = finalData.passwordHash || finalData.password || finalData.pass || '';
+    if(stored && stored!==hashed && stored!==pass){
+      // Try also checking if stored is hash of pass
+      if(stored!==hashed){
+        showStatus('Wrong password — Try forgot password', false);
+        return;
+      }
     }
 
-    currentClient=data;
-    showStatus('Password OK - Sending SMS to '+data.phone+'...', true);
-    confirmationResult=await auth.signInWithPhoneNumber(data.phone, recaptchaVerifier);
-    document.getElementById('phoneDisplay').textContent=data.phone + ' (' + (data.countryCode||'') + ')';
-    document.getElementById('otpBox').style.display='flex';
-    showStatus('Code sent to '+data.phone, true);
+    // SUCCESS - NO SMS, direct login
+    showStatus('✅ Verified at registration (SMS) + Password OK — Welcome '+finalData.username+' — Entering dashboard...', true);
+    
+    localStorage.setItem('clientLoggedIn','true');
+    localStorage.setItem('lcg_logged_in','true');
+    localStorage.setItem('lcg_role','client');
+    localStorage.setItem('clientUsername', finalData.username);
+    localStorage.setItem('clientName', finalData.fullName||finalData.name||finalData.username);
+    localStorage.setItem('fullName', finalData.fullName||finalData.name||'');
+    localStorage.setItem('clientPhone', finalData.phone||'');
+    localStorage.setItem('clientCountryCode', finalData.countryCode||'+233');
+    localStorage.setItem('clientPhoto', finalData.photoUrl||finalData.photo||finalData.avatarUrl||'');
+    localStorage.setItem('clientEmail', finalData.email||'');
+    localStorage.setItem('clientHasAll4','true');
+    localStorage.setItem('loginMethod','username+password_ONLY_NO_SMS');
+    localStorage.setItem('clientPhotoURL', finalData.photoUrl||'');
+    
+    // Also set for book-nurse auto-fill
+    localStorage.setItem('currentClientId', finalData.username);
+    localStorage.setItem('lcg_client_uid', finalData.username);
+
+    setTimeout(()=>location.replace('client-dashboard.html'), 700);
 
   }catch(e){
     console.error(e);
@@ -111,60 +130,37 @@ async function login(){
   }
 }
 
-async function verifyPhoneOTP(){
-  const code=document.getElementById('otp').value.trim();
-  if(code.length!==6){ showStatus('Enter 6-digit code', false); return; }
-  showStatus('Verifying...', true);
-  try{
-    await confirmationResult.confirm(code);
-    // Success
-    localStorage.setItem('clientLoggedIn','true');
-    localStorage.setItem('clientUsername', currentClient.username);
-    localStorage.setItem('clientName', currentClient.fullName||currentClient.username);
-    localStorage.setItem('clientPhone', currentClient.phone);
-    localStorage.setItem('clientCountryCode', currentClient.countryCode||'+233');
-    localStorage.setItem('clientPhoto', currentClient.photoUrl||currentClient.photo||'');
-    localStorage.setItem('clientHasAll4','true');
-    localStorage.setItem('loginMethod','username+phoneOTP');
-
-    showStatus('Verified! Welcome '+currentClient.username, true);
-    await auth.signOut();
-    setTimeout(()=>location.replace('client-dashboard.html'),600);
-  }catch(e){
-    showStatus('Wrong code: '+e.message, false);
-  }
-}
-
-async function resendOTP(){
-  if(!currentClient){ showStatus('Login first', false); return; }
-  showStatus('Resending...', true);
-  try{ confirmationResult=await auth.signInWithPhoneNumber(currentClient.phone, recaptchaVerifier); showStatus('New code sent to '+currentClient.phone, true); }
-  catch(e){ showStatus('Resend failed: '+e.message, false); }
-}
-
 async function resetPass(){
   const username=document.getElementById('username').value.trim().toLowerCase();
-  if(!username){ showStatus('Enter username to reset', false); return; }
+  if(!username){ showStatus('Enter username to reset password', false); return; }
+  const newPass=prompt('Enter new strong password:\nMust have: 8+ chars, small, BIG, number, special (@&+#$ etc)\nExample: Kusi@2026');
+  if(!newPass) return;
+  // Check strong
+  const hasLen=newPass.length>=8, hasSmall=/[a-z]/.test(newPass), hasBig=/[A-Z]/.test(newPass), hasNum=/[0-9]/.test(newPass), hasSpecial=/[@&+#$\-\"_!%*?_^=<>~`':;|\\/\(\)\[\]\{\}]/.test(newPass);
+  if(!(hasLen && hasSmall && hasBig && hasNum && hasSpecial)){ 
+    alert('Weak password!\nMust have:\n- 8+ chars\n- small letter\n- BIG letter\n- number\n- special @&+#$ etc'); 
+    showStatus('Weak password — Check popup', false);
+    return; 
+  }
   try{
     const snap=await db.ref('allowedClients/'+username).once('value');
     if(!snap.exists()){ showStatus('Username not found', false); return; }
-    const data=snap.val();
-    showStatus('Sending reset code to '+data.phone+'...', true);
-    confirmationResult=await auth.signInWithPhoneNumber(data.phone, recaptchaVerifier);
-    const newPass=prompt('Enter new strong password (must have small, BIG, number, @&+#$ etc):\nExample: Michael@2026');
-    if(!newPass) return;
-    const code=prompt('Enter 6-digit code sent to '+data.phone+':');
-    if(!code) return;
-    await confirmationResult.confirm(code);
-    // Check strong
-    const hasLen=newPass.length>=8, hasSmall=/[a-z]/.test(newPass), hasBig=/[A-Z]/.test(newPass), hasNum=/[0-9]/.test(newPass), hasSpecial=/[@&+#$\-"!%*?_^=<>~`':;|\\\/\(\)\[\]\{\}]/.test(newPass);
-    if(!(hasLen && hasSmall && hasBig && hasNum && hasSpecial)){ alert('Weak password! Must have 8+ chars, small, BIG, number, special @&+#$ etc.'); return; }
     const hashed=hashPassword(newPass);
-    await db.ref('allowedClients/'+username).update({passwordHash:hashed});
-    await db.ref('clients/'+username).update({passwordHash:hashed});
-    showStatus('Password reset success - Login with new password', true);
-    await auth.signOut();
+    await db.ref('allowedClients/'+username).update({passwordHash:hashed, passwordUpdatedAt:Date.now()});
+    await db.ref('clients/'+username).update({passwordHash:hashed}).catch(()=>{});
+    await db.ref('ceoRegistrations/clients/'+username).update({passwordHash:hashed}).catch(()=>{});
+    showStatus('✅ Password reset success — Login with new password (No SMS needed)', true);
   }catch(e){ showStatus('Reset failed: '+e.message, false); }
 }
+
+// Auto-redirect if already logged in
+(function(){
+  const logged=localStorage.getItem('clientLoggedIn');
+  const user=localStorage.getItem('clientUsername');
+  if(logged && user){
+    // Optional: stay logged in
+    console.log('Already logged in as', user);
+  }
+})();
 </script>
 </body></html>
