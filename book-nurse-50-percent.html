@@ -144,7 +144,38 @@ input.auto-filled{background:rgba(251,191,36,.15);border-color:#fbbf24}
 </div>
 </div>
 
-<div id="nursePreviewModal" class="nursePreviewOverlay"><div class="nursePreviewCard"><div class="previewMedia"><img id="previewPhoto" style="display:none"><div id="previewPhotoFallback" style="display:none;width:100%;height:100%;display:grid;place-items:center;font-size:48px">👩‍⚕️</div><div style="position:absolute;top:10px;right:10px"><button onclick="closeNursePreview()" style="background:rgba(0,0,0,.6);border:none;color:white;padding:6px 10px;border-radius:999px;cursor:pointer">✕</button></div></div><div style="padding:16px"><b id="previewName" style="font-size:15px;color:#f3e8ff">Nurse</b><p id="previewBio" style="font-size:11px;color:#fde68a;margin:6px 0">Bio</p><div id="previewMeta" style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#a78bfa"></div><div style="display:flex;gap:8px;margin-top:12px"><button onclick="closeNursePreview()" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(251,191,36,.15);cursor:pointer;font-size:12px">Close</button><button onclick="confirmNurseSelection()" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:900;cursor:pointer;border:none;font-size:12px">✅ Continue — ONLINE Nurse 50%</button></div></div></div></div>
+<div id="nursePreviewModal" class="nursePreviewOverlay">
+<div class="nursePreviewCard">
+<div style="display:flex;gap:4px;padding:10px 10px 0 10px">
+<button id="tabPhoto" onclick="switchPreviewTab('photo')" style="flex:1;padding:8px;border-radius:10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1e0a3a;font-weight:900;border:none;cursor:pointer;font-size:11px">📷 Photo</button>
+<button id="tabVideo" onclick="switchPreviewTab('video')" style="flex:1;padding:8px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(251,191,36,.15);cursor:pointer;font-size:11px">🎥 Video</button>
+<button id="tabDocs" onclick="switchPreviewTab('docs')" style="flex:1;padding:8px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(251,191,36,.15);cursor:pointer;font-size:11px">📜 Docs</button>
+</div>
+<div class="previewMedia" style="height:380px">
+<img id="previewPhoto" style="display:none">
+<video id="previewVideo" controls playsinline controlsList="nodownload" style="display:none;background:#000;width:100%;height:100%;object-fit:cover"></video>
+<div id="previewVideoFallback" style="display:none;width:100%;height:100%;display:grid;place-items:center;text-align:center;padding:20px;background:rgba(14,10,28,.8)">
+<div><div style="font-size:40px">🎥</div><b style="color:#fca5a5;font-size:12px">No video uploaded</b><br><small style="color:#a78bfa">This nurse didn't upload intro video yet</small></div>
+</div>
+<div id="previewPhotoFallback" style="display:none;width:100%;height:100%;display:grid;place-items:center;font-size:48px">👩‍⚕️</div>
+<div id="previewDocsBox" style="display:none;width:100%;height:100%;overflow-y:auto;padding:12px;background:rgba(14,10,28,.9)">
+<div id="previewDocsContent"></div>
+</div>
+<div style="position:absolute;top:10px;right:10px"><button onclick="closeNursePreview()" style="background:rgba(0,0,0,.6);border:none;color:white;padding:6px 10px;border-radius:999px;cursor:pointer">✕</button></div>
+<div id="videoSoundBadge" style="display:none;position:absolute;bottom:10px;right:10px;background:rgba(34,197,94,.9);color:#000;padding:4px 8px;border-radius:999px;font-size:9px;font-weight:900">🔊 Sound ON - Watch with sound</div>
+</div>
+<div style="padding:16px">
+<b id="previewName" style="font-size:15px;color:#f3e8ff">Nurse</b>
+<p id="previewBio" style="font-size:11px;color:#fde68a;margin:6px 0">Bio</p>
+<div id="previewMeta" style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#a78bfa"></div>
+<div id="previewVideoHint" style="display:none;margin-top:8px;padding:8px;background:rgba(251,191,36,.12);border-radius:8px;font-size:10px;color:#fde68a;border:1px solid rgba(251,191,36,.2)">💡 <b>Watch nurse video before booking:</b> See how nurse talks, cares, explains. Tap Play to watch intro video with sound.</div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<button onclick="closeNursePreview()" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(251,191,36,.15);cursor:pointer;font-size:12px">Close</button>
+<button onclick="confirmNurseSelection()" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:900;cursor:pointer;border:none;font-size:12px">✅ Book ONLINE Nurse 50%</button>
+</div>
+</div>
+</div>
+</div>
 <div id="successModal" class="modalOverlay"><div class="modal"><h2 style="color:#86efac;font-size:16px">✅ 50% Booking Successful! — ONLINE Nurse</h2><div style="padding:10px;background:rgba(14,10,28,.5);border-radius:10px;font-size:11px;margin:10px 0"><div>ID: <b id="modalBookingId">LCG-50-...</b></div><div id="modalNurseInfo" style="margin-top:4px;color:#a78bfa"></div><div id="modalClientInfo" style="margin-top:6px;color:#d8b4fe;font-size:10px"></div></div><div id="modalCalc" style="padding:10px;background:rgba(251,191,36,.08);border-radius:10px;font-size:10px;text-align:left;margin:10px 0;color:#c4b5fd"></div><div style="display:flex;gap:8px"><a href="./index.html" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;text-align:center;text-decoration:none;font-size:12px">Home</a><a href="ceo-booking-receiver.html" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1e0a3a;text-align:center;text-decoration:none;font-size:12px;font-weight:900">👑 CEO Receiver</a></div></div></div>
 
 <script>
@@ -211,15 +242,43 @@ function initMap(lat=5.6037,lng=-0.1870){
 }
 function addBlinkingNurseMarker(lat,lng,n){const html=`<div class="nurse-blink-marker"><div class="nurse-blink-pulse"></div><div class="nurse-blink-pulse2"></div><div class="nurse-blink-dot"></div></div>`;const icon=L.divIcon({className:'',html:html,iconSize:[30,30],iconAnchor:[15,15]});const m=L.marker([lat,lng],{icon:icon}).addTo(map);m.bindPopup(`<b>${n.fullName}</b><br><span style="color:#22c55e">🟢 ONLINE — 50% booking</span><br>⭐ ${n.rating} • ${n.distance.toFixed(1)}km`);return m}
 
+// FIXED: OFFLINE TAKES PRIORITY - 50% version
 function isNurseOnline(v){
-  const now=Date.now(); const ONLINE_THRESHOLD=10*60*1000;
-  if(v.isOnline===true || v.online===true || v.isAvailable===true || v.available===true || v.isOnlineNow===true || v.currentlyOnline===true) return true;
+  const now=Date.now();
+  const ONLINE_THRESHOLD=3*60*1000; // 3 mins
+  const OFFLINE_THRESHOLD=2*60*1000;
+  // OFFLINE FIRST
+  if(v.isOnline===false || v.online===false || v.isAvailable===false || v.available===false) return false;
+  if(v.status && v.status.toLowerCase()==='offline') return false;
+  if(v.presence && v.presence==='offline') return false;
+  if(v.availability && v.availability.toLowerCase()==='offline') return false;
+  const offlineFields=['lastOffline','offlineAt','wentOfflineAt'];
+  for(const f of offlineFields){
+    const t=v[f];
+    if(t){
+      const ts=typeof t==='number'?t:(new Date(t).getTime()||0);
+      if(ts && (now-ts)<OFFLINE_THRESHOLD) return false;
+      const onlineTs=v.lastOnline||v.onlineAt||v.lastSeen||0;
+      const onlineTime=typeof onlineTs==='number'?onlineTs:(new Date(onlineTs).getTime()||0);
+      if(ts && onlineTime && ts>onlineTime) return false;
+    }
+  }
+  if(v.isOnline===true || v.online===true || v.isAvailable===true || v.available===true || v.isOnlineNow===true || v.currentlyOnline===true){
+    const lastActive=v.lastSeen||v.lastActive||v.lastOnline||v.updatedAt||0;
+    const lastTs=typeof lastActive==='number'?lastActive:(new Date(lastActive).getTime()||0);
+    if(lastTs && (now-lastTs)>ONLINE_THRESHOLD) return false;
+    return true;
+  }
   if(v.availability && (v.availability.toLowerCase()==='online' || v.availability.toLowerCase()==='available')) return true;
-  if(v.status && (v.status.toLowerCase()==='online' || v.status.toLowerCase()==='available')) return true;
-  const timeFields=['lastSeen','lastActive','lastOnline','onlineAt','lastSeenAt','lastActiveAt','updatedAt','lastUpdate','lastLocationUpdate'];
-  for(const f of timeFields){ const t=v[f]; if(t){ const ts=typeof t==='number'?t:(new Date(t).getTime()||0); if(ts && (now-ts)<ONLINE_THRESHOLD) return true; } }
-  const hasOnlineField=('isOnline' in v)||('online' in v)||('isAvailable' in v)||('lastSeen' in v);
-  if(!hasOnlineField){ return true; } // Allow old nurses until online tracking
+  if(v.status && (v.status.toLowerCase()==='online' || v.status.toLowerCase()==='available')){
+    const lastActive=v.lastSeen||v.lastActive||0;
+    const lastTs=typeof lastActive==='number'?lastActive:0;
+    if(lastTs && (now-lastTs)>ONLINE_THRESHOLD) return false;
+    return true;
+  }
+  if(v.presence && v.presence==='online') return true;
+  const hasOnlineField=('isOnline' in v)||('online' in v)||('isAvailable' in v)||('status' in v)||('presence' in v);
+  if(!hasOnlineField) return false; // Strict offline
   return false;
 }
 
@@ -236,16 +295,25 @@ async function searchNearbyNurses(){
       rtdb.ref('nurseLocations').once('value').catch(()=>null)
     ]);
     let onlineIds=new Set();
-    if(onlineSnap && onlineSnap.exists()){ onlineSnap.forEach(ch=>{ onlineIds.add(ch.key); }); }
-    if(presenceSnap && presenceSnap.exists()){ presenceSnap.forEach(ch=>{ const v=ch.val(); if(v===true || v==='online' || (v && v.status==='online')) onlineIds.add(ch.key); else if(typeof v==='object' && v.isOnline) onlineIds.add(ch.key); }); }
+    let offlineIds=new Set();
+    if(onlineSnap && onlineSnap.exists()){ onlineSnap.forEach(ch=>{ const val=ch.val(); if(!val || val.isOnline!==false) onlineIds.add(ch.key); }); }
+    if(presenceSnap && presenceSnap.exists()){ presenceSnap.forEach(ch=>{ const v=ch.val(); if(v && typeof v==='object'){ if(v.status==='offline' || v.isOnline===false) offlineIds.add(ch.key); else if(v.status==='online' || v.isOnline===true || v.online===true) onlineIds.add(ch.key); } else if(v===true || v==='online') onlineIds.add(ch.key); }); }
     let locationData={}; if(locationsSnap && locationsSnap.exists()){ locationsSnap.forEach(ch=>{ locationData[ch.key]=ch.val(); }); }
 
     let nurses=[];
     if(nursesSnap.exists()){
       nursesSnap.forEach(child=>{
         const v=child.val(); if(!v.isApproved && !v.fullName) return;
-        const loc=locationData[child.key]; if(loc){ v.nurseLat=loc.lat||loc.nurseLat; v.nurseLng=loc.lng||loc.nurseLng; v.lastUpdate=loc.lastUpdate||loc.updatedAt||0; }
-        const inOnlineList=onlineIds.has(child.key); const onlineByLogic=isNurseOnline(v); const isOnline=inOnlineList||onlineByLogic;
+        if(offlineIds.has(child.key)) return;
+        const loc=locationData[child.key]; 
+        if(loc){ 
+          v.nurseLat=loc.lat||loc.nurseLat; v.nurseLng=loc.lng||loc.nurseLng; v.lastUpdate=loc.lastUpdate||loc.updatedAt||0; 
+          if(loc.isLive===false || loc.isOnline===false || loc.status==='offline') return;
+        }
+        const inOnlineList=onlineIds.has(child.key); 
+        const onlineByLogic=isNurseOnline(v); 
+        const notExplicitOffline=!(v.isOnline===false || v.online===false || v.status==='offline' || v.presence==='offline');
+        const isOnline=inOnlineList && notExplicitOffline && onlineByLogic;
         if(!isOnline) return;
         const lat=v.lat||v.latitude||v.nurseLat||5.61; const lng=v.lng||v.longitude||v.nurseLng||-0.19;
         const dist=Math.sqrt(Math.pow((lat-clientLatLng.lat)*111,2)+Math.pow((lng-clientLatLng.lng)*111*Math.cos(clientLatLng.lat*Math.PI/180),2));
@@ -281,7 +349,12 @@ function renderNurses(list){
   }).join('');
 }
 function previewNurse(uid){const n=allNurses.find(x=>x.uid===uid);if(!n)return;pendingNurse=n;document.getElementById('previewName').textContent=n.fullName+' 🟢 ONLINE — 50%';document.getElementById('previewBio').textContent=n.bio+' — ONLINE now — 50% booking — Pay 50% now!';document.getElementById('previewMeta').innerHTML=`<span class="onlineBadge">🟢 ONLINE — 50% booking</span><span style="font-size:10px;color:#a78bfa">⭐ ${n.rating} • ${n.distance.toFixed(1)}km</span>`;const photoEl=document.getElementById('previewPhoto');const fallback=document.getElementById('previewPhotoFallback');if(n.photoURL){photoEl.src=n.photoURL;photoEl.style.display='block';fallback.style.display='none';}else{photoEl.style.display='none';fallback.style.display='grid';}document.getElementById('nursePreviewModal').classList.add('show')}
-function closeNursePreview(){document.getElementById('nursePreviewModal').classList.remove('show');pendingNurse=null}
+function closeNursePreview(){
+  const videoEl=document.getElementById('previewVideo');
+  if(videoEl){ videoEl.pause(); videoEl.src=''; }
+  document.getElementById('nursePreviewModal').classList.remove('show');
+  pendingNurse=null;
+}
 function confirmNurseSelection(){if(!pendingNurse)return;const n=pendingNurse;selectedNurseId=n.uid;selectedNurseName=n.fullName;selectedNursePhone=n.phone;document.getElementById('selectedNurseInfo').innerHTML=`✅ Selected: <b style="color:#22c55e">🟢 ${n.fullName} — ONLINE — 50% booking</b> — Patient: ${patientLatLng.lat.toFixed(4)}, ${patientLatLng.lng.toFixed(4)} — ONLINE nurse will get tone + SMS!`;renderNurses(allNurses);closeNursePreview();calcTotal()}
 function useMyLocation(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(pos=>{clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};patientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};document.getElementById('clientLatInput').value=clientLatLng.lat;document.getElementById('clientLngInput').value=clientLatLng.lng;document.getElementById('patientLatInput').value=patientLatLng.lat;document.getElementById('patientLngInput').value=patientLatLng.lng;document.getElementById('clientLocationDisplay').innerHTML=`✅ Client: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b>`;document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient: <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b>`;initMap(pos.coords.latitude,pos.coords.longitude);searchNearbyNurses()},{enableHighAccuracy:true})}
 
