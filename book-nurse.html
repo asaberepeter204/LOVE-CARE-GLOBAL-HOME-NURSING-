@@ -87,17 +87,17 @@ input.auto-filled{background:rgba(168,85,247,.15);border-color:#a855f7}
 <div class="card">
 <h3 style="font-size:13px;color:#f3e8ff">⏱️ Booking — FULL PAYMENT</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr 110px;gap:8px;margin-top:12px">
-<div><label>START TIME *</label><input id="startTime" type="time" value="08:00" onchange="calcTotal()"></div>
-<div><label>END TIME *</label><input id="endTime" type="time" value="17:00" onchange="calcTotal()"></div>
+<div><label>START TIME *</label><input id="startTime" type="time" value="08:00" oninput="calcTotal()" onchange="calcTotal()"></div>
+<div><label>END TIME *</label><input id="endTime" type="time" value="17:00" oninput="calcTotal()" onchange="calcTotal()"></div>
 <div><label>HOURS/DAY (AUTO)</label><div class="timeBadge"><span id="hoursPerDayDisplay">9.0</span> hrs/day</div></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-<div><label>CARE MODE</label><select id="careMode" onchange="calcTotal()"><option value="Daily" selected>Daily</option><option value="Weekly">Weekly (x7)</option><option value="Monthly">Monthly (x30)</option></select></div>
-<div><label>QUANTITY</label><input id="quantity" type="number" value="1" min="1" onchange="calcTotal()"></div>
+<div><label>CARE MODE</label><select id="careMode" oninput="calcTotal()" onchange="calcTotal()"><option value="Daily" selected>Daily</option><option value="Weekly">Weekly (x7)</option><option value="Monthly">Monthly (x30)</option></select></div>
+<div><label>QUANTITY</label><input id="quantity" type="number" value="1" min="1" oninput="calcTotal()" onchange="calcTotal()"></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-<div><label>COUNTRY — CURRENCY</label><select id="countrySelect" onchange="calcTotal()" style="border:2px solid #a855f7"><option value="GHS" selected>🇬🇭 Ghana — GHS</option><option value="USD">🇺🇸 USA — USD</option></select></div>
-<div><label>TRANSPORT</label><input id="transport" type="number" value="100" onchange="calcTotal()"></div>
+<div><label>COUNTRY — CURRENCY</label><select id="countrySelect" oninput="calcTotal()" onchange="calcTotal()" style="border:2px solid #a855f7"><option value="GHS" selected>🇬🇭 Ghana — GHS</option><option value="USD">🇺🇸 USA — USD</option></select></div>
+<div><label>TRANSPORT</label><input id="transport" type="number" value="100" oninput="calcTotal()" onchange="calcTotal()"></div>
 </div>
 
 <div style="margin-top:16px;padding:12px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:14px">
@@ -199,14 +199,61 @@ function getSelectedCurrency(){const sel=document.getElementById('countrySelect'
 function calcHours(s,e){if(!s||!e)return 0;const[sh,sm]=s.split(':').map(Number);const[eh,em]=e.split(':').map(Number);let h=(eh+em/60)-(sh+sm/60);if(h<0)h+=24;return h;}
 function formatTimeBoth(t){if(!t)return'';const[h,m]=t.split(':').map(Number);const ampm=h>=12?'PM':'AM';const hh12=h%12||12;return `${hh12}:${String(m).padStart(2,'0')} ${ampm} / ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;}
 function calcTotal(){
-  const start=document.getElementById('startTime').value;const end=document.getElementById('endTime').value;const mode=document.getElementById('careMode').value;const qty=parseFloat(document.getElementById('quantity').value)||1;const transport=parseFloat(document.getElementById('transport').value)||0;
-  const hrs=calcHours(start,end);document.getElementById('hoursPerDayDisplay').textContent=hrs>0?hrs.toFixed(1):'0';if(hrs<=0)return{total:0};
-  let totHrs=hrs*qty;let modeMult=1;if(mode==='Weekly'){totHrs=hrs*7*qty;modeMult=7}if(mode==='Monthly'){totHrs=hrs*30*qty;modeMult=30}
-  const curr=getSelectedCurrency();const curRate=curr.rate;const currCode=curr.code;const base=curRate*totHrs;const total=base+transport;
-  document.getElementById('cbTime').innerHTML=`${formatTimeBoth(start)} → ${formatTimeBoth(end)}`;document.getElementById('cbHrsDay').textContent=hrs.toFixed(1)+' hrs/day';document.getElementById('cbQty').textContent=qty+' × '+mode;document.getElementById('cbTotalHrs').textContent=totHrs.toFixed(1)+' hrs';document.getElementById('cbRate').textContent=`${currCode} ${curRate}/hr`;document.getElementById('cbBase').textContent=`${currCode} ${base.toFixed(2)}`;document.getElementById('cbTransport').textContent=`${currCode} ${transport.toFixed(2)}`;document.getElementById('cbTotal').textContent=`${currCode} ${total.toFixed(2)} — FULL PAY NOW`;
-  const btn=document.getElementById('paystackBtn');if(btn)btn.textContent=`💳 Pay FULL Now — ${currCode} ${total.toFixed(2)} — ONLINE Nurse Only`;
-  return{total,totalHours:totHrs,hrsPerDay:hrs,start,end,mode,qty,transport,curRate,base,modeMult,currCode};
+  const start=document.getElementById('startTime')?.value||'08:00';
+  const end=document.getElementById('endTime')?.value||'17:00';
+  const mode=document.getElementById('careMode')?.value||'Daily';
+  let qty=parseFloat(document.getElementById('quantity')?.value);
+  if(isNaN(qty) || qty<1) qty=1;
+  let transport=parseFloat(document.getElementById('transport')?.value);
+  if(isNaN(transport)) transport=0;
+  
+  const hrs=calcHours(start,end);
+  const hrsDisplay=document.getElementById('hoursPerDayDisplay');
+  if(hrsDisplay) hrsDisplay.textContent=hrs>0?hrs.toFixed(1):'0';
+  if(hrs<=0){
+    const cbTotal=document.getElementById('cbTotal');
+    if(cbTotal) cbTotal.textContent='Set valid time';
+    return{total:0};
+  }
+  
+  // FIXED: Quantity MUST multiply - Boss reported quantity not included
+  let totHrs=hrs*qty;
+  let modeMult=1;
+  let modeLabel='Daily';
+  if(mode==='Weekly'){totHrs=hrs*7*qty;modeMult=7;modeLabel='Weekly (7 days)';}
+  if(mode==='Monthly'){totHrs=hrs*30*qty;modeMult=30;modeLabel='Monthly (30 days)';}
+  if(mode==='Daily'){modeLabel='Daily';}
+  
+  const curr=getSelectedCurrency();
+  const curRate=curr.rate||17;
+  const currCode=curr.code||'GHS';
+  const base=curRate*totHrs;
+  const total=base+transport;
+  
+  const cbTime=document.getElementById('cbTime');
+  const cbHrsDay=document.getElementById('cbHrsDay');
+  const cbQty=document.getElementById('cbQty');
+  const cbTotalHrs=document.getElementById('cbTotalHrs');
+  const cbRate=document.getElementById('cbRate');
+  const cbBase=document.getElementById('cbBase');
+  const cbTransport=document.getElementById('cbTransport');
+  const cbTotal=document.getElementById('cbTotal');
+  
+  if(cbTime) cbTime.innerHTML=`${formatTimeBoth(start)} → ${formatTimeBoth(end)}`;
+  if(cbHrsDay) cbHrsDay.textContent=hrs.toFixed(1)+' hrs/day';
+  if(cbQty) cbQty.textContent=`${qty} × ${mode} = ${qty} × ${modeMult} days`;
+  if(cbTotalHrs) cbTotalHrs.textContent=`${hrs.toFixed(1)} × ${qty} × ${modeMult} = ${totHrs.toFixed(1)} hrs`;
+  if(cbRate) cbRate.textContent=`${currCode} ${curRate}/hr — CEO Live`;
+  if(cbBase) cbBase.textContent=`${currCode} ${curRate} × ${totHrs.toFixed(1)} = ${currCode} ${base.toFixed(2)}`;
+  if(cbTransport) cbTransport.textContent=`${currCode} ${transport.toFixed(2)}`;
+  if(cbTotal) cbTotal.innerHTML=`<b style="color:#22c55e">${currCode} ${total.toFixed(2)} — FULL PAY NOW</b><br><small style="font-size:9px;color:#a78bfa">Qty ${qty} included: ${hrs.toFixed(1)}hrs × ${qty} × ${modeMult} = ${totHrs.toFixed(1)}hrs</small>`;
+  
+  const btn=document.getElementById('paystackBtn');
+  if(btn) btn.textContent=`💳 Pay FULL Now — ${currCode} ${total.toFixed(2)} (Qty ${qty} × ${hrs.toFixed(1)}hrs) — ONLINE Only`;
+  
+  return{total,totalHours:totHrs,hrsPerDay:hrs,start,end,mode,qty,transport,curRate,base,modeMult,currCode,baseTotal:base};
 }
+
 function initMap(lat=5.6037,lng=-0.1870){
   if(map){map.setView([lat,lng],13);return;}
   map=L.map('map').setView([lat,lng],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(map);
@@ -499,6 +546,7 @@ window.addEventListener('DOMContentLoaded',function(){
   setInterval(()=>{ searchNearbyNurses(); },15000);
   // Listen to nurse presence changes real-time
   rtdb.ref('nursePresence').on('value',()=>{ searchNearbyNurses(); });
+  const qtyEl=document.getElementById('quantity'); if(qtyEl){ qtyEl.addEventListener('input', calcTotal); qtyEl.addEventListener('change', calcTotal); qtyEl.addEventListener('keyup', calcTotal); }
   rtdb.ref('onlineNurses').on('value',()=>{ searchNearbyNurses(); });
   rtdb.ref('nurseLocations').on('value',()=>{ searchNearbyNurses(); });
 });
