@@ -453,7 +453,22 @@ function payWithPaystack(){
             totalHours:calc.totalHours||9,hrsPerDay:calc.hrsPerDay||9,startTime:calc.start||'08:00',endTime:calc.end||'17:00',careMode:calc.mode||'Daily',quantity:calc.qty||1,transport:calc.transport||0,
             hourlyRateUsed:calc.curRate,service:calc.mode||'Elderly Care',amountSplit:{nurse:payNow*0.8,ceo:payNow*0.2}
           };
-          try{await rtdb.ref('bookings/'+bookingId).set(data);await rtdb.ref('myJobOffers/'+selectedNurseId+'/'+bookingId).set(data);await rtdb.ref('ceoBookings/'+bookingId).set(data);await rtdb.ref('allBookings/'+bookingId).set(data);if(currentClientData.uid){await rtdb.ref('clientBookings/'+currentClientData.uid+'/'+bookingId).set(data);}}catch(e){console.log(e);}
+          try{
+            // KEEP NURSE ONLINE - Don't set offline on 50% payment
+            await rtdb.ref('bookings/'+bookingId).set(data);
+            await rtdb.ref('myJobOffers/'+selectedNurseId+'/'+bookingId).set(data);
+            await rtdb.ref('ceoBookings/'+bookingId).set(data);
+            await rtdb.ref('allBookings/'+bookingId).set(data);
+            await rtdb.ref('nurseBookings/'+selectedNurseId+'/'+bookingId).set(data);
+            if(currentClientData.uid){await rtdb.ref('clientBookings/'+currentClientData.uid+'/'+bookingId).set(data);}
+            // FIX: Explicitly keep nurse ONLINE after 50% payment - this was the bug
+            const keepOnlineTime = Date.now();
+            await rtdb.ref('nurses/'+selectedNurseId).update({isOnline:true, online:true, status:'online', lastSeen:keepOnlineTime, lastBookingAt:keepOnlineTime, lastBookingId:bookingId, isBooked:false}).catch(()=>{});
+            await rtdb.ref('onlineNurses/'+selectedNurseId).update({isOnline:true, lastSeen:keepOnlineTime, lastBookingId:bookingId}).catch(()=>{});
+            await rtdb.ref('nursePresence/'+selectedNurseId).update({isOnline:true, status:'online', lastSeen:keepOnlineTime}).catch(()=>{});
+            await rtdb.ref('liveNurses/'+selectedNurseId).update({isOnline:true, lastSeen:keepOnlineTime}).catch(()=>{});
+            console.log('✅ 50% booking created, nurse KEPT ONLINE');
+          }catch(e){console.log('Booking save error', e);}
           document.getElementById('modalBookingId').textContent=bookingId;
           document.getElementById('modalNurseInfo').textContent=`🟢 ONLINE Nurse: ${selectedNurseName} • ${currCode} ${payNow.toFixed(2)} now (50%) — Total ${total.toFixed(2)} — Patient: ${patientName} — Nurse ONLINE will get tone + SMS!`;
           document.getElementById('modalClientInfo').innerHTML=`👤 Client: ${clientName} — Pays 50% NOW: ${currCode} ${payNow.toFixed(2)}<br>🏥 Patient: ${patientName} — ${patientPhone}<br>📍 ${patientLocText}<br>📍 ${pLat.toFixed(5)}, ${pLng.toFixed(5)} — 50% booking — Nurse was ONLINE`;
