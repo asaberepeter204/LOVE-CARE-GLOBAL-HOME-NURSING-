@@ -470,10 +470,15 @@ window.addEventListener('DOMContentLoaded',function(){
 
   const btn=document.getElementById('paystackBtn');if(btn){btn.addEventListener('click',payWithPaystack)}
   auth.onAuthStateChanged(async(user)=>{await loadClientData();});loadClientData();setTimeout(()=>{autoCaptureClientLocation();},1500);
-  setInterval(()=>{ searchNearbyNurses(); },15000);
+  setInterval(()=>{ searchNearbyNurses(); },5000); // FAST 5 sec for instant online
   rtdb.ref('nursePresence').on('value',()=>{ searchNearbyNurses(); });
   rtdb.ref('onlineNurses').on('value',()=>{ searchNearbyNurses(); });
+  rtdb.ref('onlineNurses').on('child_added',()=>{ console.log('🟢 ONLINE instant'); searchNearbyNurses(); });
+  rtdb.ref('onlineNurses').on('child_removed',()=>{ console.log('🔴 OFFLINE instant'); searchNearbyNurses(); });
   rtdb.ref('nurseLocations').on('value',()=>{ searchNearbyNurses(); });
+  rtdb.ref('liveNurses').on('value',()=>{ searchNearbyNurses(); });
+  rtdb.ref('liveNurses').on('child_added',()=>{ searchNearbyNurses(); });
+  rtdb.ref('liveNurses').on('child_removed',()=>{ searchNearbyNurses(); });
 });
 </script>
 </body></html>
