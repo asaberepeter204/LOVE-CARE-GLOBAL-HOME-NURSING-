@@ -414,7 +414,8 @@ async function setOnlineNow(){
     
     // Setup onDisconnect to auto-offline if app closed
     try{
-      rtdb.ref('onlineNurses/'+uid).onDisconnect().remove();
+      // FIX: Don't auto-remove online on disconnect during booking - keep 2min grace
+      rtdb.ref('onlineNurses/'+uid).onDisconnect().update({isOnline:false, offlineAt:rtdb.ServerValue.TIMESTAMP, lastSeen:rtdb.ServerValue.TIMESTAMP}); // changed from remove() to update
       rtdb.ref('liveNurses/'+uid).onDisconnect().remove();
       rtdb.ref('liveNurseLocations/'+uid).onDisconnect().remove();
       rtdb.ref('nursePresence/'+uid).onDisconnect().set({status:'offline', isOnline:false, lastSeen:rtdb.ServerValue.TIMESTAMP, offlineAt:rtdb.ServerValue.TIMESTAMP});
@@ -437,7 +438,28 @@ async function setOnlineNow(){
         ]);
         console.log('💓 Heartbeat online', tStr);
       }catch(e){}
-    }, 15000); // 15 seconds heartbeat
+    }, 5000); // FIX: 5 seconds heartbeat (was 15s) - keeps you ONLINE during 50% payment
+
+    // FIX: Listen for new 50% bookings - keep ONLINE and show notification, DON'T go offline
+    try{
+      rtdb.ref('myJobOffers/'+uid).on('child_added', (snap)=>{
+        const booking = snap.val();
+        if(!booking) return;
+        console.log('🔔 New 50% booking!', booking.bookingId);
+        // KEEP ONLINE when booking comes - this is the main bug fix
+        rtdb.ref('nurses/'+uid).update({isOnline:true, online:true, status:'online', lastSeen:Date.now(), hasNewBooking:true}).catch(()=>{});
+        rtdb.ref('onlineNurses/'+uid).update({isOnline:true, lastSeen:Date.now()}).catch(()=>{});
+        rtdb.ref('nursePresence/'+uid).update({isOnline:true, status:'online'}).catch(()=>{});
+        // Show browser notification
+        if(Notification && Notification.permission==='granted'){
+          new Notification('New 50% Booking!', {body: `Patient: ${booking.patientName||'Patient'} - ${booking.amountPaidNow||''} paid`});
+        }
+        // Play sound if available
+        const audio = document.getElementById('notifSound');
+        if(audio) audio.play().catch(()=>{});
+      });
+      console.log('✅ Booking listener attached - will stay ONLINE on 50% payment');
+    }catch(e){ console.log('Booking listener error', e); }
     
     // Double broadcast after 1 second to ensure client gets it
     setTimeout(async()=>{
