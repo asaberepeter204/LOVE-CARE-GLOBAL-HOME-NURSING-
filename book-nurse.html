@@ -543,7 +543,7 @@ window.addEventListener('DOMContentLoaded',function(){
   const btn=document.getElementById('paystackBtn');if(btn){btn.addEventListener('click',payWithPaystack)}
   auth.onAuthStateChanged(async(user)=>{await loadClientData();});loadClientData();setTimeout(()=>{autoCaptureClientLocation();},1500);
   // Real-time online updates every 15 seconds
-  setInterval(()=>{ searchNearbyNurses(); },15000);
+  setInterval(()=>{ searchNearbyNurses(); },5000); // FAST 5 sec poll for instant online
   // Listen to nurse presence changes real-time
   rtdb.ref('nursePresence').on('value',()=>{ searchNearbyNurses(); });
   const qtyEl=document.getElementById('quantity'); if(qtyEl){ qtyEl.addEventListener('input', calcTotal); qtyEl.addEventListener('change', calcTotal); qtyEl.addEventListener('keyup', calcTotal); }
