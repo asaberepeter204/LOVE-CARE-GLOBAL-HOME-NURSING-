@@ -314,7 +314,7 @@ async function saveNurseDetails(){
   try{const prof=JSON.parse(localStorage.getItem('nurseProfile')||'{}'); localStorage.setItem('nurseProfile',JSON.stringify({...prof,...payload}));}catch(e){localStorage.setItem('nurseProfile',JSON.stringify(payload));}
   try{ await fdb.collection('nurses').doc(uid).set(payload,{merge:true}); }catch(e){console.log(e);}
   await saveNurseToRTDB(uid,payload);
-  document.getElementById('saveStatus').textContent=`✅ Saved! Name: ${name}, Phone: ${phone}, Email: ${email}, Photo: ${photo?'YES':'NO'}, Time: ${timeStr} — Will appear in book-nurse.html when ONLINE`;
+  const sEl=document.getElementById('saveStatus'); if(sEl) sEl.textContent=`✅ Saved! Name: ${name}, Phone: ${phone}, Email: ${email}, Photo: ${photo?'YES':'NO'}, Time: ${timeStr} — Will appear in book-nurse.html when ONLINE`;
   alert(`✅ Saved!\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nPhoto: ${photo?'YES':'NO'}\nTime: ${timeStr}\n\nSaved with time — When you go ONLINE, you will appear in book-nurse.html`);
   loadNurse();
 }
@@ -382,66 +382,69 @@ async function setOnlineNow(){
     await rtdb.ref('nursePresence/'+uid).set({status:'online', isOnline:true, lastSeen:now, timeStr, nurseId:uid});
     await rtdb.ref('nurseLocations/'+uid).set({lat:currentLocation.lat, lng:currentLocation.lng, lastUpdate:now, updatedAt:now, nurseId:uid, nurseName:name, isLive:true, status:'online'});
     await rtdb.ref('liveNurseLocations/'+uid).set({lat:currentLocation.lat, lng:currentLocation.lng, lastUpdate:now, nurseId:uid});
+    await rtdb.ref('liveNurses/'+uid).set({lat:currentLocation.lat, lng:currentLocation.lng, lastUpdate:now, nurseId:uid, isOnline:true});
+    await rtdb.ref('allNurses/'+uid).update({isOnline:true, online:true, status:'online', lastSeen:now, lastOnline:now}).catch(()=>{});
     try{ await fdb.collection('nurses').doc(uid).set(payload,{merge:true}); }catch(e){}
     updateOnlineUI(true);
-    document.getElementById('saveStatus').textContent=`🟢 ONLINE now! Saved with time ${timeStr} — You now appear in book-nurse.html! Location: ${currentLocation.lat.toFixed(5)},${currentLocation.lng.toFixed(5)}`;
-    if(onlineInterval) clearInterval(onlineInterval);
-    // Set onDisconnect to auto-offline if browser closes / app killed
-    try{
-      const presenceRef = rtdb.ref('nursePresence/'+uid);
-      const onlineRef = rtdb.ref('onlineNurses/'+uid);
-      const nursesRef = rtdb.ref('nurses/'+uid);
-      // onDisconnect - auto offline
-      presenceRef.onDisconnect().set({status:'offline', isOnline:false, lastSeen:rtdb.ServerValue.TIMESTAMP, offlineAt:rtdb.ServerValue.TIMESTAMP}).catch(()=>{});
-      onlineRef.onDisconnect().remove().catch(()=>{});
-      nursesRef.onDisconnect().update({isOnline:false, online:false, status:'offline', lastSeen:rtdb.ServerValue.TIMESTAMP}).catch(()=>{});
-    }catch(e){ console.log('onDisconnect setup failed', e); }
+    const saveEl=document.getElementById('saveStatus');
+    if(saveEl) saveEl.textContent=`🟢 ONLINE now! ${timeStr} — You now appear in book-nurse.html!`;
+    else console.log(`🟢 ONLINE now! ${timeStr}`);
     
+    // Setup auto-offline on disconnect
+    try{
+      rtdb.ref('onlineNurses/'+uid).onDisconnect().remove();
+      rtdb.ref('nursePresence/'+uid).onDisconnect().set({status:'offline', isOnline:false, lastSeen:rtdb.ServerValue.TIMESTAMP});
+      rtdb.ref('nurses/'+uid).onDisconnect().update({isOnline:false, online:false, status:'offline', lastSeen:rtdb.ServerValue.TIMESTAMP});
+      rtdb.ref('nurseLocations/'+uid).onDisconnect().update({isLive:false, isOnline:false, status:'offline'});
+    }catch(e){}
+    
+    if(onlineInterval) clearInterval(onlineInterval);
     onlineInterval=setInterval(async()=>{
       const n=Date.now();
       await rtdb.ref('nurses/'+uid).update({lastSeen:n, lastActive:n}).catch(()=>{});
       await rtdb.ref('onlineNurses/'+uid).update({lastSeen:n, timeStr:new Date().toLocaleString('en-GH')}).catch(()=>{});
       await rtdb.ref('nursePresence/'+uid).update({lastSeen:n, isOnline:true, status:'online'}).catch(()=>{});
     },120000);
-  }catch(e){ alert('Online failed: '+e.message); }
+  }catch(e){ alert('Online failed: '+e.message); console.error(e); }
 }
 async function setOfflineNow(){
   const uid=currentNurseId||localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('uid')||'demo-nurse';
   const now=Date.now();
   const timeStr=new Date().toLocaleString('en-GH');
-  // Optimistic UI - show OFFLINE immediately
+  // Optimistic UI immediately
   updateOnlineUI(false);
-  const toggle=document.getElementById('onlineToggle'); if(toggle) toggle.checked=false;
+  const tgl=document.getElementById('onlineToggle'); if(tgl) tgl.checked=false;
   try{
-    // REMOVE from all online presence paths that clients read
+    // Remove from ALL paths clients read - fixes "still online on client phone"
     await rtdb.ref('onlineNurses/'+uid).remove().catch(()=>{});
     await rtdb.ref('liveNurseLocations/'+uid).remove().catch(()=>{});
     await rtdb.ref('liveNurses/'+uid).remove().catch(()=>{});
     await rtdb.ref('nurseLocations/'+uid).update({isLive:false, isOnline:false, status:'offline', lastSeen:now, updatedAt:now}).catch(async()=>{ await rtdb.ref('nurseLocations/'+uid).remove().catch(()=>{}); });
     
-    // SET offline status in all nurse data paths
-    const offlinePayload = {
-      isOnline:false, online:false, isAvailable:false, available:false,
-      status:'offline', presence:'offline',
-      lastSeen:now, lastActive:now, lastOffline:now, offlineAt:now, updatedAt:now,
-      timeStr: timeStr
-    };
+    const offlinePayload={isOnline:false, online:false, isAvailable:false, available:false, status:'offline', presence:'offline', lastSeen:now, lastOffline:now, offlineAt:now, updatedAt:now, timeStr};
     
     await rtdb.ref('nursePresence/'+uid).set({status:'offline', isOnline:false, lastSeen:now, offlineAt:now, timeStr}).catch(()=>{});
     await rtdb.ref('nurses/'+uid).update(offlinePayload).catch(()=>{});
+    await rtdb.ref('allNurses/'+uid).update(offlinePayload).catch(()=>{});
     await rtdb.ref('pending_nurses/'+uid).update(offlinePayload).catch(()=>{});
     await rtdb.ref('pendingNurses/'+uid).update(offlinePayload).catch(()=>{});
-    await rtdb.ref('allNurses/'+uid).update(offlinePayload).catch(()=>{});
-    await rtdb.ref('ceoNurseUpdates/'+uid).update(offlinePayload).catch(()=>{});
-    await rtdb.ref('ceoRegistrationCenter/nurses/'+uid).update(offlinePayload).catch(()=>{});
     
-    try{ await fdb.collection('nurses').doc(uid).set(offlinePayload,{merge:true}); }catch(e){}
+    try{ await fdb.collection('nurses').doc(uid).set({isOnline:false, status:'offline', lastSeen:now, offlineAt:now},{merge:true}); }catch(e){}
     
     updateOnlineUI(false);
-    document.getElementById('saveStatus').textContent=`🔴 OFFLINE now — Hidden from book-nurse.html — Clients will NOT see you online anymore`;
+    const saveEl=document.getElementById('saveStatus');
+    if(saveEl) saveEl.textContent=`🔴 OFFLINE now — Hidden from book-nurse.html — Clients will NOT see you`;
+    console.log(`🔴 OFFLINE now — Hidden`);
     if(onlineInterval) clearInterval(onlineInterval);
     
-    // Extra: Force remove again after 500ms to ensure clients get update
+    // Cancel onDisconnect handlers
+    try{
+      rtdb.ref('onlineNurses/'+uid).onDisconnect().cancel();
+      rtdb.ref('nursePresence/'+uid).onDisconnect().cancel();
+      rtdb.ref('nurses/'+uid).onDisconnect().cancel();
+    }catch(e){}
+    
+    // Force remove again after 500ms
     setTimeout(async()=>{
       await rtdb.ref('onlineNurses/'+uid).remove().catch(()=>{});
       await rtdb.ref('liveNurses/'+uid).remove().catch(()=>{});
@@ -449,8 +452,9 @@ async function setOfflineNow(){
     
   }catch(e){ 
     console.error(e);
-    alert('Offline failed: '+e.message); 
-    // Still update UI to offline even if error
+    alert('Offline failed: '+e.message);
+    const saveEl=document.getElementById('saveStatus');
+    if(saveEl) saveEl.textContent=`🔴 OFFLINE error: ${e.message}`;
     updateOnlineUI(false);
   }
 }
@@ -460,30 +464,6 @@ function toggleOnline(){
 }
 function openD(){ document.getElementById('drawer').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
 function closeD(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
-
-// AUTO-OFFLINE when nurse closes app / browser / goes offline
-window.addEventListener('beforeunload', async()=>{
-  const uid=currentNurseId||localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('uid');
-  if(!uid) return;
-  try{
-    // Synchronous best effort - use navigator.sendBeacon style via local Firebase
-    const now=Date.now();
-    // Try to set offline quickly
-    rtdb.ref('onlineNurses/'+uid).remove();
-    rtdb.ref('nursePresence/'+uid).set({status:'offline', isOnline:false, lastSeen:now});
-    rtdb.ref('nurses/'+uid).update({isOnline:false, online:false, status:'offline', lastSeen:now});
-  }catch(e){}
-});
-
-// Also handle visibility change (app backgrounded)
-document.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState==='hidden'){
-    // Don't auto-offline on hide, just update lastSeen - user might come back quickly
-    // But if hidden for 5 mins, the interval will still keep them online until they manually go offline
-    console.log('App hidden');
-  }
-});
-
 window.addEventListener('load', loadNurse);
 </script>
 </body>
