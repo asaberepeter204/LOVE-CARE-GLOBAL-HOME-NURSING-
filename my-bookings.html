@@ -151,7 +151,7 @@
 <div class="card" style="margin:0 0 12px 0;background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25)">
   <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b style="font-size:11px;color:#86efac">[RED] LIVE - Real Date Follows Device - Client Photo Saved</b></div>
   <div style="font-size:9px;color:#9a95b8;margin-top:6px">- Top date auto-updates daily - Client photo from registration - Booking dates show real booking time</div>
-  <select id="filterStatus" onchange="render()" style="margin-top:8px;padding:10px;border-radius:10px;background:#0e0a1c;color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:11px;width:100%"><option value="all">All - Live - Real Date</option><option value="pending" selected>Pending - Live</option><option value="accepted">Accepted - Live Tracking</option><option value="rejected">Rejected - Live</option></select>
+  <select id="filterStatus" onchange="render()" onchange="render()" style="margin-top:8px;padding:10px;border-radius:10px;background:#0e0a1c;color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:11px;width:100%"><option value="all">All - Live - Real Date</option><option value="pending" selected>Pending - Live</option><option value="accepted">Accepted - Live Tracking</option><option value="rejected">Rejected - Live</option></select>
 </div>
 <div id="list"></div>
 <div id="emptyState" class="card" style="display:none;text-align:center;padding:24px"><div style="font-size:36px">[DATE]</div><b>No live bookings yet</b><br><small style="color:#9a95b8">Real Date: <span id="emptyRealDate">-</span> - Only real bookings - No demo<br>Your profile is shown above [OK]</small><br><br><a href="book-nurse.html" class="btn btnYellow" style="flex:none;padding:14px 24px">+ Book Nurse Now - Real Date</a></div>
@@ -424,6 +424,11 @@ function render(){
   list.innerHTML=filtered.map(b=>{
     const status=(b.status||'pending').toLowerCase();const isAccepted=status==='accepted';const isRejected=status==='rejected';
     const badgeClass=isAccepted?'badge-accepted':isRejected?'badge-rejected':'badge-pending';
+    const payType = (b.paymentType||b.paymentMethod||'').toLowerCase();
+    const isHalf = payType.includes('50') || (b.status||'').includes('50');
+    const payBadge = isHalf ? '50% HALF' : '100% FULL';
+    const payColor = isHalf ? 'rgba(250,204,21,.15)' : 'rgba(34,197,94,.15)';
+
     const curr=b.currency||'GHS';
     // Client photo - priority: booking photo > global clientPhoto > initials
     const rawPhoto=b.clientPhotoUrl||b.clientPhoto||clientPhoto||'';
