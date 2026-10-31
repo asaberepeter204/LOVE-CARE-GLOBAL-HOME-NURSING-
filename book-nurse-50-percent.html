@@ -47,7 +47,7 @@ input.auto-filled{background:rgba(251,191,36,.15);border-color:#fbbf24}
 .onlineBadge{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);padding:3px 8px;border-radius:99px;font-size:9px;font-weight:900}
 </style></head><body>
 <div class="topbar">
-<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;font-size:20px">🟢</div><div><b style="color:#f3e8ff;font-size:13px">BOOK NURSE — 50% — ONLY ONLINE NURSES</b><br><small style="color:#86efac;font-size:10px">🟢 LIVE — Only online nurses show — Pay 50% now, 50% later</small></div></div>
+<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#22c55e,#16a34a);display:grid;place-items:center;font-size:20px">🟢</div><div><b style="color:#f3e8ff;font-size:13px">BOOK NURSE — FULL PAY — ONLY ONLINE NURSES</b><br><small style="color:#86efac;font-size:10px">🟢 LIVE — Only online nurses show — Pay 100% now - Full Payment</small></div></div>
 <div style="display:flex;gap:6px;align-items:center">
 <a href="book-nurse.html" style="padding:10px 16px;border-radius:999px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;font-weight:900;font-size:11px;text-decoration:none;">💳 Full Pay</a>
 <a href="./index.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.12);color:#e9d5ff;text-decoration:none;font-weight:800;font-size:10px">Home</a>
@@ -176,7 +176,7 @@ input.auto-filled{background:rgba(251,191,36,.15);border-color:#fbbf24}
 </div>
 </div>
 </div>
-<div id="successModal" class="modalOverlay"><div class="modal"><h2 style="color:#86efac;font-size:16px">✅ 50% Booking Successful! — ONLINE Nurse</h2><div style="padding:10px;background:rgba(14,10,28,.5);border-radius:10px;font-size:11px;margin:10px 0"><div>ID: <b id="modalBookingId">LCG-50-...</b></div><div id="modalNurseInfo" style="margin-top:4px;color:#a78bfa"></div><div id="modalClientInfo" style="margin-top:6px;color:#d8b4fe;font-size:10px"></div></div><div id="modalCalc" style="padding:10px;background:rgba(251,191,36,.08);border-radius:10px;font-size:10px;text-align:left;margin:10px 0;color:#c4b5fd"></div><div style="display:flex;gap:8px"><a href="./index.html" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;text-align:center;text-decoration:none;font-size:12px">Home</a><a href="ceo-booking-receiver.html" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1e0a3a;text-align:center;text-decoration:none;font-size:12px;font-weight:900">👑 CEO Receiver</a></div></div></div>
+<div id="successModal" class="modalOverlay"><div class="modal"><h2 style="color:#86efac;font-size:16px">✅ 50% Booking Successful! — ONLINE Nurse</h2><div style="padding:10px;background:rgba(14,10,28,.5);border-radius:10px;font-size:11px;margin:10px 0"><div>ID: <b id="modalBookingId">LCG-FULL-...</b></div><div id="modalNurseInfo" style="margin-top:4px;color:#a78bfa"></div><div id="modalClientInfo" style="margin-top:6px;color:#d8b4fe;font-size:10px"></div></div><div id="modalCalc" style="padding:10px;background:rgba(251,191,36,.08);border-radius:10px;font-size:10px;text-align:left;margin:10px 0;color:#c4b5fd"></div><div style="display:flex;gap:8px"><a href="./index.html" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;text-align:center;text-decoration:none;font-size:12px">Home</a><a href="ceo-booking-receiver.html" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1e0a3a;text-align:center;text-decoration:none;font-size:12px;font-weight:900">👑 CEO Receiver</a></div></div></div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
@@ -432,7 +432,7 @@ function payWithPaystack(){
   if(!patientLocText){alert('Enter patient address');return}
   if(!pLat||!pLng){alert('Set patient location');return}
   if(typeof PaystackPop==='undefined'){alert('Paystack not loaded');return}
-  const bookingId='LCG-50-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  const bookingId='LCG-FULL-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).substr(2,6).toUpperCase();
   const payKobo=Math.round(payNow*100);
   try{
     var handler=PaystackPop.setup({
@@ -449,18 +449,36 @@ function payWithPaystack(){
             patientRelationship:patientRel,
             serviceLocation:{lat:pLat,lng:pLng},destination:{lat:pLat,lng:pLng},mainLat:pLat,mainLng:pLng,
             nurseId:selectedNurseId,nurseName:selectedNurseName,nursePhone:selectedNursePhone,nurseWasOnline:true,nurseOnlineAt:Date.now(),
-            amount:total,amountPaidNow:payNow,amountBalance:payNow,payNow:payNow,payLater:payNow,currency:currCode,paymentMethod:'paystack_50',paymentType:'50_percent',paystackRef:response.reference,status:'pending_50_percent',time:Date.now(),createdAt:Date.now(),
+            amount:total,amountPaidNow:payNow,amountBalance:payNow,payNow:payNow,payLater:payNow,currency:currCode,paymentMethod:'paystack_full',paymentType:'full_payment',paystackRef:response.reference,status:'pending_50_percent',time:Date.now(),createdAt:Date.now(),
             totalHours:calc.totalHours||9,hrsPerDay:calc.hrsPerDay||9,startTime:calc.start||'08:00',endTime:calc.end||'17:00',careMode:calc.mode||'Daily',quantity:calc.qty||1,transport:calc.transport||0,
             hourlyRateUsed:calc.curRate,service:calc.mode||'Elderly Care',amountSplit:{nurse:payNow*0.8,ceo:payNow*0.2}
           };
           try{
-            // KEEP NURSE ONLINE - Don't set offline on 50% payment
+            // FIX: Save to ALL nodes so CEO, Client My-Bookings, and Nurse My-Job-Offer all see it
+            // This fixes: CEO sees it but client/nurse see nothing
+            const emailKey = (clientEmail||'').toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
+            const clientUidToUse = currentClientData.uid||'';
+            
             await rtdb.ref('bookings/'+bookingId).set(data);
             await rtdb.ref('myJobOffers/'+selectedNurseId+'/'+bookingId).set(data);
             await rtdb.ref('ceoBookings/'+bookingId).set(data);
             await rtdb.ref('allBookings/'+bookingId).set(data);
             await rtdb.ref('nurseBookings/'+selectedNurseId+'/'+bookingId).set(data);
-            if(currentClientData.uid){await rtdb.ref('clientBookings/'+currentClientData.uid+'/'+bookingId).set(data);}
+            await rtdb.ref('clientBookings/'+selectedNurseId+'_nurse_view/'+bookingId).set(data).catch(()=>{}); // debug
+            
+            // FIX FOR MY-BOOKINGS: Save to clientBookings/{uid} - this was missing!
+            if(clientUidToUse){
+              await rtdb.ref('clientBookings/'+clientUidToUse+'/'+bookingId).set(data);
+              console.log('✅ Saved to clientBookings/'+clientUidToUse);
+            }
+            // Fallback: also save by emailKey so my-bookings finds it even if UID mismatch (Michael case)
+            if(emailKey){
+              await rtdb.ref('clientBookings/'+emailKey+'/'+bookingId).set(data).catch(()=>{});
+              await rtdb.ref('clientBookingsByEmail/'+emailKey+'/'+bookingId).set(data).catch(()=>{});
+            }
+            // Also save to bookingsByClient and bookingsByNurse for CEO indexes
+            await rtdb.ref('bookingsByClient/'+(clientUidToUse||emailKey)+'/'+bookingId).set(data).catch(()=>{});
+            await rtdb.ref('bookingsByNurse/'+selectedNurseId+'/'+bookingId).set(data).catch(()=>{});
             // FIX: Explicitly keep nurse ONLINE after 50% payment - this was the bug
             const keepOnlineTime = Date.now();
             await rtdb.ref('nurses/'+selectedNurseId).update({isOnline:true, online:true, status:'online', lastSeen:keepOnlineTime, lastBookingAt:keepOnlineTime, lastBookingId:bookingId, isBooked:false}).catch(()=>{});
