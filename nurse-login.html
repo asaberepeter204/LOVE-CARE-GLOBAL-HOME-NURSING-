@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Login — LOVE CARE GLOBAL</title>
+<title>Nurse Login â€” LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 <script>
-// Auto-redirect if already logged in as nurse — BUT will be validated by Firebase check later
+// Auto-redirect if already logged in as nurse â€” BUT will be validated by Firebase check later
 // Boss rule: even if local session exists, onAuthStateChanged will verify photo/video/phone
 (function(){
   try{
@@ -89,7 +89,7 @@ input:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-shadow:0 0 0 3
 <body>
 <div class="bg"></div>
 <div class="wrap"><div class="card">
-<div class="logo">👩‍⚕️</div>
+<div class="logo">ðŸ‘©â€âš•ï¸</div>
 <h1>Nurse Login</h1>
 <p class="sub">LOVE CARE GLOBAL HOME NURSING</p>
 
@@ -114,7 +114,7 @@ input:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-shadow:0 0 0 3
 <div class="inputWrap">
 <input id="password" type="password" placeholder="Enter password" autocomplete="current-password">
 <button class="eyeBtn" type="button" onclick="toggleEye('password', this)">
-<span class="eye-open">👁️</span><span class="eye-closed" style="display:none">🙈</span>
+<span class="eye-open">ðŸ‘ï¸</span><span class="eye-closed" style="display:none">ðŸ™ˆ</span>
 </button>
 </div>
 <div id="msg" class="alert"></div>
@@ -272,7 +272,7 @@ window.emailLogin=async()=>{
 
     // ===== ROLE ISOLATION FIRST: block clients =====
     if(await isClientAccount(email)){
-      showMsg('❌ This email is registered as a CLIENT. Please use Client Login page.','alert-error');
+      showMsg('âŒ This email is registered as a CLIENT. Please use Client Login page.','alert-error');
       return;
     }
 
@@ -281,7 +281,7 @@ window.emailLogin=async()=>{
 
     // Double check after login
     if(await isClientAccount(user.email || email)){
-      showMsg('❌ This email belongs to a CLIENT account. Access denied on Nurse Login.','alert-error');
+      showMsg('âŒ This email belongs to a CLIENT account. Access denied on Nurse Login.','alert-error');
       await signOut(auth);
       return;
     }
@@ -292,16 +292,16 @@ window.emailLogin=async()=>{
       if(snap.exists()){
         const data=snap.data();
         displayName = data.fullName || data.name || data.displayName || displayName;
-        if(data.blocked){ showMsg('Account blocked by CEO — Contact support','alert-error'); await signOut(auth); return; }
-        if(data.suspended){ showMsg('Account suspended — Contact CEO','alert-error'); await signOut(auth); return; }
+        if(data.blocked){ showMsg('Account blocked by CEO â€” Contact support','alert-error'); await signOut(auth); return; }
+        if(data.suspended){ showMsg('Account suspended â€” Contact CEO','alert-error'); await signOut(auth); return; }
       }
     }catch(e){ console.log('Name fetch error', e.message); }
 
     // === BOSS CHECK: PHOTO, VIDEO, PHONE REQUIRED ===
-    showMsg('🔍 Verifying photo, video & phone...','alert-info');
+    showMsg('ðŸ” Verifying photo, video & phone...','alert-info');
     const check = await checkNurseProfileComplete(user.uid, user.email||email);
     if(!check.complete){
-      showMsg(`❌ Cannot login — Missing ${check.missing.join(', ')}. Complete registration with photo, video & phone.`, 'alert-error');
+      showMsg(`âŒ Cannot login â€” Missing ${check.missing.join(', ')}. Complete registration with photo, video & phone.`, 'alert-error');
       await blockIncompleteAndRedirect(user.uid, user.email||email, check.missing);
       return;
     }
@@ -323,7 +323,7 @@ window.emailLogin=async()=>{
   }catch(e){ 
     let msg=e.message;
     if(msg.includes('invalid-credential')) msg='Wrong email or password';
-    if(msg.includes('user-not-found')) msg='Account not found — Create nurse account first';
+    if(msg.includes('user-not-found')) msg='Account not found â€” Create nurse account first';
     showMsg('Login failed: '+msg,'alert-error'); 
   }
 }
@@ -337,7 +337,7 @@ window.googleLogin=async()=>{
 
     // ROLE ISOLATION FIRST
     if(await isClientAccount(user.email)){
-      showMsg('❌ This email is registered as a CLIENT. Please use Client Login page.','alert-error');
+      showMsg('âŒ This email is registered as a CLIENT. Please use Client Login page.','alert-error');
       await signOut(auth);
       return;
     }
