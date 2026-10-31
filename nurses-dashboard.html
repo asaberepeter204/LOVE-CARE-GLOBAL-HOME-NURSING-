@@ -1,5 +1,130 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head>
+
+<script>
+// === BOSS SECURITY GUARD - Photo, Video, Phone required ===
+window.BOSS_CHECK_PASSED = false;
+(function(){
+  // Immediate localStorage check - fast block
+  const uid = localStorage.getItem('lcg_nurse_uid') || localStorage.getItem('nurseUid') || localStorage.getItem('currentNurseId') || localStorage.getItem('uid');
+  const hasPhoto = localStorage.getItem('nursePhoto') || localStorage.getItem('nursePhotoUrl') || localStorage.getItem('photoURL') || localStorage.getItem('clientPhoto');
+  const hasPhone = localStorage.getItem('nursePhone') || localStorage.getItem('phone') || localStorage.getItem('nursePhoneNumber');
+  // Don't block immediately on localStorage alone, but flag
+  console.log('BOSS GUARD: uid', uid, 'photo', !!hasPhoto, 'phone', !!hasPhone);
+})();
+</script>
+<script type="module">
+// === BOSS FIREBASE VALIDATION - MUST HAVE PHOTO, VIDEO, PHONE ===
+import { initializeApp as bossInit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getAuth as bossGetAuth, onAuthStateChanged as bossOnAuth, signOut as bossSignOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { getFirestore as bossGetFirestore, doc as bossDoc, getDoc as bossGetDoc, collection as bossCol, query as bossQuery, where as bossWhere, getDocs as bossGetDocs, limit as bossLimit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+import { getDatabase as bossGetDB, ref as bossRef, get as bossGet } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+const bossConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+let bossApp;
+try{ bossApp=bossInit(bossConfig); }catch(e){ bossApp=null; }
+
+function bossExtract(obj, keys){
+  if(!obj) return null;
+  for(const k of keys){
+    const v=obj[k];
+    if(v && typeof v==='string' && v.trim().length>3) return v.trim();
+  }
+  return null;
+}
+
+async function bossCheckComplete(uid, email){
+  let merged={}; let found=false;
+  if(bossApp){
+    const db=bossGetFirestore(bossApp);
+    const rtdb=bossGetDB(bossApp);
+    try{
+      const snap=await bossGetDoc(bossDoc(db,'nurses',uid));
+      if(snap.exists()){ merged={...merged,...snap.data()}; found=true; }
+    }catch{}
+    if(email){
+      try{
+        const q=bossQuery(bossCol(db,'nurses'), bossWhere('email','==', email.toLowerCase()), bossLimit(1));
+        const qs=await bossGetDocs(q);
+        if(!qs.empty){ merged={...merged,...qs.docs[0].data()}; found=true; }
+      }catch{}
+    }
+    try{
+      const s=await bossGet(bossRef(rtdb,'nurses/'+uid));
+      if(s.exists()){ merged={...merged,...s.val()}; found=true; }
+    }catch{}
+    if(email){
+      try{
+        const key=email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
+        const a=await bossGet(bossRef(rtdb,'allowedNurses/'+key));
+        if(a.exists()){ merged={...merged,...a.val()}; found=true; }
+      }catch{}
+    }
+  }
+  if(!found) return {complete:false, missing:['profile'], reason:'No nurse profile in Firebase'};
+
+  const photo=bossExtract(merged,['photoURL','photoUrl','photo','image','avatar','profilePhoto','nursePhoto','nursePhotoUrl','imageUrl']);
+  const video=bossExtract(merged,['videoURL','videoUrl','video','introVideo','profileVideo','nurseVideo','introVideoUrl','videoLink']);
+  const phone=bossExtract(merged,['phone','phoneNumber','mobile','nursePhone','phone_number','contactPhone']);
+
+  const missing=[];
+  if(!photo) missing.push('photo');
+  if(!video) missing.push('video');
+  if(!phone) missing.push('phone number');
+
+  return {complete: missing.length===0, missing, data:merged, photo, video, phone};
+}
+
+async function bossBlock(missing, uid, email){
+  alert(`❌ ACCESS DENIED - Nurse profile incomplete!\nMissing: ${missing.join(', ')}\n\nPhoto, video & phone are required in Firebase.\nRedirecting to registration...`);
+  try{
+    if(bossApp){
+      const auth=bossGetAuth(bossApp);
+      await bossSignOut(auth);
+    }
+  }catch{}
+  try{
+    const keys=['lcg_nurse_uid','nurseUid','currentNurseId','uid','lcg_nurse_email','currentNurseEmail','nurseEmail','nurseName','fullName','currentNurseName','lcg_logged_in','lcg_role','lcg_session_expiry','nurseProfile','nursePhoto','nursePhotoUrl','nurseData','lcg_nurse_profile','nurseInfo','nurseVideo','nurseVideoUrl','nursePhone'];
+    keys.forEach(k=>{ try{ localStorage.removeItem(k); sessionStorage.removeItem(k);}catch{} });
+  }catch{}
+  window.location.replace(`nurse-registration.html?reason=missing_${missing.join('_')}&email=${encodeURIComponent(email||'')}&uid=${encodeURIComponent(uid||'')}`);
+}
+
+if(bossApp){
+  const auth=bossGetAuth(bossApp);
+  bossOnAuth(auth, async (user)=>{
+    if(!user){
+      const uid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('currentNurseId')||localStorage.getItem('uid');
+      if(!uid){
+        // No auth and no local uid - redirect to login
+        // window.location.replace('nurse-login_5.html');
+        return;
+      }
+      const email=localStorage.getItem('lcg_nurse_email')||localStorage.getItem('nurseEmail')||'';
+      const check=await bossCheckComplete(uid, email);
+      if(!check.complete){
+        await bossBlock(check.missing, uid, email);
+        return;
+      }
+      window.BOSS_CHECK_PASSED=true;
+    } else {
+      const check=await bossCheckComplete(user.uid, user.email);
+      if(!check.complete){
+        await bossBlock(check.missing, user.uid, user.email);
+        return;
+      }
+      window.BOSS_CHECK_PASSED=true;
+      // Save valid data
+      try{
+        if(check.photo) localStorage.setItem('nursePhoto', check.photo);
+        if(check.video) localStorage.setItem('nurseVideo', check.video);
+        if(check.phone) localStorage.setItem('nursePhone', check.phone);
+      }catch{}
+    }
+  });
+}
+</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Nurses Dashboard — ONLINE Status — LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="icon-transparent-512.png">
