@@ -354,6 +354,7 @@ function renderClientHeader(){
 
 async function ensureAuth(){return new Promise(r=>{const u=onAuthStateChanged(auth,async usr=>{u();if(usr){r(usr);}else{try{const c=await signInAnonymously(auth);r(c.user);}catch{r(null);}}});setTimeout(()=>r(null),3000);});}
 function getNavUrl(b,nLat,nLng){const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;return `https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;}
+function showToast(m){const n=document.getElementById('notifAccept');if(n){document.getElementById('notifTitleA').textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),4000);}else{alert(m);}}
 function showAccept(b,gmaps){const n=document.getElementById('notifAccept');document.getElementById('notifTitleA').textContent=`[OK] ${b.nurseName||'Nurse'} Accepted! Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifMsgA').textContent=`${b.nurseName||'Nurse'} accepted ${b.bookingId||b.id} on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifNavA').href=gmaps;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),15000);}
 function showReject(b){const n=document.getElementById('notifReject');document.getElementById('notifMsgR').textContent=`Booking ${b.bookingId||b.id} rejected on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}. Reason: ${b.rejectReason||'Not available'}. Book another or increase rate.`;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),15000);}
 function initMapLive(id,booking){
@@ -444,13 +445,49 @@ function render(){
       </div>
       ${follow}
       <div id="map_${b.id}" class="mapWrap" style="display:${isAccepted?'block':'none'}"><div id="mapInner_${b.id}" style="width:100%;height:100%"></div></div>
-      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px"><a href="${gmapsUrl}" target="_blank" class="btn btnGreen">MAP Open Maps - Track Nurse</a><button class="btn btnBlue" onclick="initMapLive('${b.id}',all.find(x=>x.id==='${b.id}'))">RELOAD Refresh Live</button><a href="tel:${b.nursePhone||''}" class="btn" style="background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe"> Call Nurse</a><a href="${clientGmaps}" target="_blank" class="btn btnBlue" style="background:#3b82f6">MAP Client Location</a></div>
-      <div style="margin-top:10px;display:grid;gap:10px"><button class="btn btnYellow" onclick="confirmFinished('${b.id}')">[OK] Confirm Nurse Finished - Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}</button><button class="btn btnRed" onclick="complainNurse('${b.id}')">! Complain About ONLY This Nurse ${b.nurseName||'Nurse'} -> client-complaint.html - Saves Photo Email Phone + Time</button></div>
-      ${isRejected?`<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><a href="book-nurse.html" class="btn btnYellow">+ Book Another</a><a href="book-nurse.html?increaseRate=true" class="btn btnGreen"> Increase Rate & Book Again - Real Date</a><a href="refund-query.html?bookingId=${b.id}" class="btn" style="background:rgba(250,204,21,.15);color:#facc15;border:1px solid rgba(250,204,21,.3)"> Refund Query - Photo Saved</a></div>`:''}
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${!isAccepted && !isRejected ? `<button class="btn btnRed" onclick="cancelBooking('${b.id}')" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;font-weight:900">❌ CANCEL Booking — Before Nurse Accepts</button><button class="btn btnBlue" onclick="loadBookings()">🔄 RELOAD — Check Accept/Reject</button>` : ''}
+        ${isAccepted ? `<a href="${gmapsUrl}" target="_blank" class="btn btnGreen">🗺️ MAP Open Maps - Track Nurse</a><button class="btn btnBlue" onclick="initMapLive('${b.id}',all.find(x=>x.id==='${b.id}'))">🔄 RELOAD Refresh Live</button><a href="tel:${b.nursePhone||''}" class="btn" style="background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe">📞 Call Nurse</a><a href="${clientGmaps}" target="_blank" class="btn btnBlue" style="background:#3b82f6">📍 Client Location</a>` : ''}
+        ${isRejected ? `<div style="background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);padding:10px;border-radius:10px;font-size:12px;font-weight:700;text-align:center">❌ REJECTED by ${b.nurseName||'Nurse'} on ${new Date(b.rejectedAt||Date.now()).toLocaleString('en-GH')} — Book another nurse</div>` : ''}
+      </div>
+      ${isAccepted ? `<div style="margin-top:10px;display:grid;gap:10px"><div style="background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);padding:12px;border-radius:12px;font-size:12px;font-weight:800;text-align:center">✅ ACCEPTED by ${b.nurseName||'Nurse'} on ${new Date(b.acceptedAt||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'})} — Nurse is coming! Track on map below</div><button class="btn btnYellow" onclick="confirmFinished('${b.id}')">[OK] Confirm Nurse Finished — Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}</button><button class="btn btnRed" onclick="complainNurse('${b.id}')">! Complain About ONLY This Nurse ${b.nurseName||'Nurse'}</button></div>` : ''}
+      ${!isAccepted && !isRejected ? `<div style="margin-top:10px;display:grid;gap:10px"><div style="background:rgba(245,158,11,.12);color:#fde68a;border:1px solid rgba(245,158,11,.3);padding:10px;border-radius:10px;font-size:11px;text-align:center">⏳ PENDING — Waiting for ${b.nurseName||'Nurse'} to ACCEPT or REJECT — You can CANCEL now before nurse accepts — Auto-refreshes every 5 sec</div></div>` : ''}
+      ${isRejected?`<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><a href="book-nurse.html" class="btn btnYellow">+ Book Another Nurse</a><a href="book-nurse.html?increaseRate=true" class="btn btnGreen">💰 Increase Rate & Book Again</a><a href="refund-query.html?bookingId=${b.id}" class="btn" style="background:rgba(250,204,21,.15);color:#facc15;border:1px solid rgba(250,204,21,.3)">💸 Refund Query</a></div>`:''}
     </div>`;
   }).join('');
   setTimeout(()=>{filtered.filter(b=>(b.status||'').toLowerCase()==='accepted').forEach(b=>initMapLive(b.id,b));},500);
 }
+
+
+window.cancelBooking=async function(id){
+  const b=all.find(x=>x.id===id);
+  if(!b){alert('Booking not found');return;}
+  const s=(b.status||'pending').toLowerCase();
+  if(s==='accepted'){alert('❌ Cannot cancel — Already ACCEPTED by nurse. Nurse is coming. If emergency, call nurse or complain.');return;}
+  if(s==='rejected'){alert('Already rejected');return;}
+  if(!confirm(`CANCEL this booking?\n\nNurse: ${b.nurseName||'Nurse'}\nAmount: ${b.currency||'GHS'} ${b.amount}\nPatient: ${b.patientName||''}\n\nReal Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nThis will set status to CANCELLED and nurse will see it.`)) return;
+  if(!confirm('Are you SURE you want to CANCEL? This cannot be undone. Nurse will be notified.')) return;
+  try{
+    const now=Date.now();
+    const cancelData={status:'cancelled_by_client', cancelledAt:now, cancelledAtStr:new Date().toLocaleString('en-GH'), cancelledBy:'client', clientCancelled:true};
+    await update(ref(db,'bookings/'+id),cancelData);
+    try{await update(ref(db,'ceoBookings/'+id),cancelData);}catch(e){}
+    try{await update(ref(db,'allBookings/'+id),cancelData);}catch(e){}
+    try{await update(ref(db,'myJobOffers/'+b.nurseId+'/'+id),cancelData);}catch(e){}
+    try{await update(ref(db,'nurseBookings/'+b.nurseId+'/'+id),cancelData);}catch(e){}
+    if(clientUid){
+      try{await update(ref(db,'clientBookings/'+clientUid+'/'+id),cancelData);}catch(e){}
+    }
+    if(clientEmail){
+      try{
+        const key=clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
+        await update(ref(db,'clientBookings/'+key+'/'+id),cancelData);
+      }catch(e){}
+    }
+    alert('✅ CANCELLED on '+new Date().toLocaleString('en-GH')+' — Nurse will see CANCELLED in My Job Offers');
+    loadBookings();
+  }catch(e){alert('Cancel error: '+e.message);}
+};
 
 window.confirmFinished=async function(id){
   const b=all.find(x=>x.id===id);if(!b){alert('Booking not found');return;}
@@ -465,6 +502,35 @@ window.complainNurse=function(id){
   if(confirm(`Complain about ${b.nurseName}? Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})} - Go to client-complaint.html LIVE with Photo Email Phone + Time?`)){location.href=`client-complaint.html?${p.toString()}`;}
 };
 function startRealtimeLive(){
+  // FIX: Also listen to clientBookings for instant accept/reject updates
+  if(clientUid){
+    try{
+      onValue(ref(db,'clientBookings/'+clientUid),(snap)=>{
+        if(!snap.exists()) return;
+        let changed=false;
+        snap.forEach(ch=>{
+          const v=ch.val(); const id=ch.key;
+          const idx=all.findIndex(x=>x.id===id);
+          if(idx!==-1){
+            const curr=(v.status||'').toLowerCase();
+            const prevStatus=prev[id];
+            if(prevStatus && prevStatus!==curr){
+              if(curr==='accepted'){
+                const cLat=v.clientLat||5.6037;const cLng=v.clientLng||-0.1870;
+                get(ref(db,'nurses/'+v.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const vv=s.val();nLat=vv.lat||vv.latitude||nLat;nLng=vv.lng||vv.longitude||nLng;}const gmaps=getNavUrl(v,nLat,nLng);showAccept({...v,id},gmaps);});
+              }else if(curr==='rejected'){showReject({...v,id});}
+              else if(curr==='cancelled_by_client'){showToast('Booking cancelled');}
+            }
+            prev[id]=curr;
+            all[idx]={...v,id};
+            changed=true;
+          }
+        });
+        if(changed){render();}
+      });
+    }catch(e){}
+  }
+  
   onValue(ref(db,'bookings'),(snap)=>{
     if(!snap.exists())return;let changed=false;
     snap.forEach(ch=>{
