@@ -378,9 +378,30 @@ function initMapLive(id,booking){
 window.loadBookings=async function(){
   getAllClientKeys();renderClientHeader();setRealDate();
   await ensureAuth();getAllClientKeys();await fetchClientFromFirebase();renderClientHeader();
-  const list=document.getElementById('list');list.innerHTML='<div class="card" style="text-align:center;color:#a78bfa">[RED] Loading LIVE bookings for '+(clientName||'Client')+' on '+new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})+'...<br><small>'+(clientEmail||'No email')+'</small></div>';
-  let map={};const paths=['bookings','ceoBookings','allBookings'];
-  for(const p of paths){try{const snap=await get(ref(db,p));if(snap.exists()){snap.forEach(ch=>{const v=ch.val();const id=ch.key;if(id==='LCG-20251016-ABC123'||v.bookingId==='LCG-20251016-ABC123'||v.paystackRef==='DEMO-REF') return;const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);const emailMatch=(v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase())||(v.clientEmail&&clientEmail&&v.clientEmail.toLowerCase()===clientEmail.toLowerCase());const uidMatch=v.clientId&&clientUid&&v.clientId===clientUid;if(phoneMatch||emailMatch||uidMatch){if(!map[id]||(v.time||0)>(map[id].time||0)) map[id]={...v,id};}});}}catch(e){}
+  const list=document.getElementById('list');list.innerHTML='<div class="card" style="text-align:center;color:#a78bfa">[RED] Loading LIVE bookings for '+(clientName||'Client')+' on '+new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})+'...<br><small>'+(clientEmail||'No email')+' | '+(clientPhone||'No phone')+' | '+(clientUid||'No UID')+'</small></div>';
+  let map={};
+  // FIX: Check ALL possible booking locations including clientBookings/{uid}
+  const paths=['bookings','ceoBookings','allBookings','nurseBookings'];
+  for(const p of paths){try{const snap=await get(ref(db,p));if(snap.exists()){snap.forEach(ch=>{const v=ch.val();const id=ch.key;if(id==='LCG-20251016-ABC123'||v.bookingId==='LCG-20251016-ABC123'||v.paystackRef==='DEMO-REF') return;const phoneA=(v.phone||v.clientPhone||'').replace(/[^0-9]/g,'').slice(-9);const phoneB=(clientPhone||'').replace(/[^0-9]/g,'').slice(-9);const phoneMatch=phoneA&&phoneB&&phoneA===phoneB;const emailMatch=(v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase())||(v.clientEmail&&clientEmail&&v.clientEmail.toLowerCase()===clientEmail.toLowerCase());const uidMatch=(v.clientId&&clientUid&&v.clientId===clientUid)||(v.clientUid&&clientUid&&v.clientUid===clientUid);if(phoneMatch||emailMatch||uidMatch){if(!map[id]||(v.time||0)>(map[id].time||0)) map[id]={...v,id};}});}}catch(e){console.log('load path err',p,e);}}
+  // FIX: Directly check clientBookings/{uid} - most reliable
+  if(clientUid){
+    try{
+      const snap=await get(ref(db,'clientBookings/'+clientUid));
+      if(snap.exists()){
+        snap.forEach(ch=>{const v=ch.val();const id=ch.key;if(!map[id]||(v.time||0)>(map[id].time||0)) map[id]={...v,id};});
+      }
+    }catch(e){}
+    // Also check by emailKey
+    if(clientEmail){
+      try{
+        const key=clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
+        const snap2=await get(ref(db,'clientBookings/'+key));
+        if(snap2.exists()){
+          snap2.forEach(ch=>{const v=ch.val();const id=ch.key;if(!map[id]) map[id]={...v,id};});
+        }
+      }catch(e){}
+    }
+  }
   let arr=Object.values(map);
   if(arr.length===0){all=[];render();return;}
   arr.forEach(b=>{const curr=(b.status||'pending').toLowerCase();const previous=prev[b.id];if(previous&&previous!==curr){const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;if(curr==='accepted'){get(ref(db,'nurses/'+b.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const v=s.val();nLat=v.lat||v.latitude||nLat;nLng=v.lng||v.longitude||nLng;}const gmaps=getNavUrl(b,nLat,nLng);showAccept(b,gmaps);if(confirm(`[OK] ${b.nurseName||'Nurse'} ACCEPTED ${b.bookingId||b.id}! Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nOpen Google Maps now?`)){window.open(gmaps,'_blank');}});}else if(curr==='rejected'){showReject(b);}}prev[b.id]=curr;});
