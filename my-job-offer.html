@@ -98,19 +98,48 @@ function ringNurseTone(booking){
 window.ringNurseTone=ringNurseTone; window.playNursePreset=playNursePreset;
 
 function getNurse(){
-  const KEYS=['nurse','nurseData','currentUser','user','auth_user','nurse_profile'];
+  // FIX: Prioritize real UID from localStorage - this is why nurse gets no offers
+  const directUidKeys=['lcg_nurse_uid','nurseUid','currentNurseId','currentNurseUid','nurseId','uid','nurse_uid','nurseUidBig'];
+  let realUid=null;
+  for(const store of [localStorage, sessionStorage]){
+    for(const k of directUidKeys){
+      try{
+        const v=store.getItem(k);
+        if(v && v.length>=10 && !v.includes(' ') && !v.includes('@')){ realUid=v; break; }
+      }catch{}
+    }
+    if(realUid) break;
+  }
+  
+  const KEYS=['nurse','nurseData','currentUser','user','auth_user','nurse_profile','nurseProfile','currentNurse','lcg_nurse_profile'];
   for(const store of [localStorage, sessionStorage]){
     for(const k of KEYS){
       try{
         const raw=store.getItem(k); if(!raw) continue;
-        const d=JSON.parse(raw); const o=d.user||d.nurse||d.data||d;
-        const full=o.fullName||o.name||o.displayName; if(full) return {id:(o.id||o.nurseId||o.uid||full.toLowerCase().replace(/\s+/g,'-')).toLowerCase().replace(/[^a-z0-9-]/g,''), fullName:full, firstName:o.firstName||full.split(' ')[0], location:o.location||'Accra', photo:o.photo||null, phone:o.phone||o.phoneNumber||''};
+        let d=null;
+        try{ d=JSON.parse(raw); }catch{ continue; }
+        const o=d.user||d.nurse||d.data||d.profile||d;
+        const full=o.fullName||o.name||o.displayName||o.full_name;
+        const uid=o.uid||o.id||o.nurseId||o.nurseUid||realUid;
+        if(full || uid){
+          const finalId = uid || realUid || (full?full.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''):'nurse');
+          return {id:finalId, uid:uid||realUid, fullName:full||'Nurse', firstName:o.firstName||(full?full.split(' ')[0]:'Nurse'), location:o.location||'Accra', photo:o.photo||o.photoUrl||o.photoURL||null, phone:o.phone||o.phoneNumber||''};
+        }
       }catch{}
     }
   }
-  const p=new URLSearchParams(location.search); const q=p.get('nurse')||p.get('name');
-  if(q) return {id:q.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''), fullName:q, firstName:q.split(' ')[0], location:'Accra', photo:null, phone:''};
-  return {id:'asabere-peter', fullName:'Asabere Peter', firstName:'Asabere', location:'East Legon', photo:null, phone:''};
+  
+  if(realUid){
+    const nameFromStorage = localStorage.getItem('nurseName')||localStorage.getItem('fullName')||localStorage.getItem('currentNurseName')||'Nurse';
+    return {id:realUid, uid:realUid, fullName:nameFromStorage, firstName:nameFromStorage.split(' ')[0], location:'Accra', photo:null, phone:''};
+  }
+  
+  const p=new URLSearchParams(location.search); const q=p.get('nurse')||p.get('name')||p.get('nurseId')||p.get('uid');
+  if(q) {
+    if(q.length>15) return {id:q, uid:q, fullName:q, firstName:q.split(' ')[0], location:'Accra', photo:null, phone:''};
+    return {id:q.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''), uid:q, fullName:q, firstName:q.split(' ')[0], location:'Accra', photo:null, phone:''};
+  }
+  return {id:realUid||'demo-nurse', uid:realUid||'demo-nurse', fullName:'Nurse', firstName:'Nurse', location:'Accra', photo:null, phone:''};
 }
 let nurseWatchId=null;let lastLat=null;let lastLng=null;let isTracking=false;
 function calcDistance(lat1,lon1,lat2,lon2){if(!lat1||!lon1||!lat2||!lon2) return 0;const R=6371;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));return R*c;}
@@ -260,11 +289,46 @@ function App(){
   const prevCountRef=useRef(0);
   const prevIdsRef=useRef(new Set());
   useEffect(()=>{
-    const nurseId=nurse.id;
+    const nurseId=nurse.id||nurse.uid;
+    const nurseUid=nurse.uid||nurse.id;
+    // FIX: Check ALL possible ID locations for job offers
+    const possibleIds=[nurseId, nurseUid, nurse.id, nurse.uid].filter(Boolean);
+    const uniqueIds=[...new Set(possibleIds)];
+    console.log('🔍 Nurse checking job offers for IDs:', uniqueIds);
+    // Try primary ID first
     const offersRef=rtdb.ref('myJobOffers/'+nurseId);
-    offersRef.on('value', snap=>{
-      const val=snap.val();
-      const arr = val ? Object.values(val).sort((a,b)=>(b.time||0)-(a.time||0)) : [];
+    // Also check all ID variants
+    const allOffersMap={};
+    const checkAllIds = async()=>{
+      for(const idToCheck of uniqueIds){
+        try{
+          const s=await rtdb.ref('myJobOffers/'+idToCheck).once('value');
+          if(s.exists()){
+            s.forEach(ch=>{ const v=ch.val(); const bid=ch.key; if(!allOffersMap[bid]) allOffersMap[bid]=v; });
+          }
+        }catch(e){}
+      }
+      // Fallback: check ceoBookings where nurseId matches
+      try{
+        const ceoSnap=await rtdb.ref('ceoBookings').once('value');
+        if(ceoSnap.exists()){
+          ceoSnap.forEach(ch=>{
+            const v=ch.val();
+            const bid=ch.key;
+            if(v.nurseId && uniqueIds.includes(v.nurseId) && !allOffersMap[bid]){
+              allOffersMap[bid]=v;
+            }
+          });
+        }
+      }catch(e){}
+    };
+    
+    offersRef.on('value', async snap=>{
+      await checkAllIds();
+      let val=snap.val();
+      // Merge with allOffersMap
+      const merged={...(val||{}), ...allOffersMap};
+      const arr = Object.keys(merged).length ? Object.values(merged).sort((a,b)=>(b.time||0)-(a.time||0)) : [];
       const newIds=new Set(arr.map(o=>o.id));
       const prevIds=prevIdsRef.current;
       let hasNewBooking=false; let newBookingObj=null;
