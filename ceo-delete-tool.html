@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>CEO DELETE USER TOOL</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<style>body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;padding:20px}input{padding:12px;width:100%;border-radius:10px;border:1px solid #a855f7;background:#1e1a3a;color:white;margin:6px 0}button{padding:14px 20px;border-radius:12px;border:none;font-weight:900;cursor:pointer;margin:6px} .del{background:linear-gradient(135deg,#ef4444,#dc2626);color:white} .check{background:#2a2250;color:#a78bfa} .card{background:#1e1a3a;border:1px solid rgba(168,85,247,.2);border-radius:16px;padding:20px;margin:10px 0}</style>
+</head><body>
+<h2>🔐 CEO - Complete Delete User Tool</h2>
+<p>Enter email or UID to delete EVERYWHERE</p>
+<input id="email" placeholder="Email e.g. asaberepeter204@gmail.com">
+<input id="uid" placeholder="UID (optional, will auto-find)">
+<button class="check" onclick="checkUser()">1. Check Where User Exists</button>
+<button class="del" onclick="deleteEverywhere()">2. DELETE EVERYWHERE - Auth + Firestore + RTDB + Storage</button>
+<div id="log"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.firestore();
+const rtdb=firebase.database();
+const storage=firebase.storage();
+
+function log(m){ document.getElementById('log').innerHTML+=`<div class="card">${m}</div>`; console.log(m); }
+
+async function findUidByEmail(email){
+  try{
+    const q=await db.collection('nurses').where('email','==',email.toLowerCase()).limit(1).get();
+    if(!q.empty) return q.docs[0].id;
+  }catch{}
+  try{
+    const s=await rtdb.ref('nurses').orderByChild('email').equalTo(email.toLowerCase()).once('value');
+    if(s.exists()) return Object.keys(s.val())[0];
+  }catch{}
+  return null;
+}
+
+async function checkUser(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  let uid=document.getElementById('uid').value.trim();
+  if(!uid && email) uid=await findUidByEmail(email);
+  if(!uid && !email){ log('Enter email or UID'); return; }
+  log(`Checking ${email} / ${uid}...`);
+  
+  // Firestore
+  if(uid){ const d=await db.collection('nurses').doc(uid).get(); log(`Firestore nurses/${uid}: ${d.exists?'EXISTS - '+JSON.stringify(d.data()).slice(0,200):'NOT FOUND'}`); }
+  // RTDB
+  const paths=[`nurses/${uid}`,`onlineNurses/${uid}`,`liveNurses/${uid}`,`nursePresence/${uid}`,`allNurses/${uid}`,`allowedNurses/${email.replace(/[.\#\$@\[\]]/g,'_')}`];
+  for(const p of paths){ const s=await rtdb.ref(p).once('value'); log(`RTDB ${p}: ${s.exists()?'EXISTS':'NOT FOUND'}`); }
+  // Auth cannot be checked client side, must check console
+  log(`Auth: Check manually in console.firebase.google.com -> Authentication -> Search ${email}`);
+}
+
+async function deleteEverywhere(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  let uid=document.getElementById('uid').value.trim();
+  if(!uid && email) uid=await findUidByEmail(email);
+  if(!uid){ log('UID not found - enter UID manually from Auth console'); return; }
+  if(!confirm(`DELETE EVERYTHING for ${email} (${uid})? This cannot be undone!`)) return;
+  
+  log(`🗑️ Starting complete deletion for ${uid}...`);
+  
+  try{ await db.collection('nurses').doc(uid).delete(); log('✅ Deleted Firestore nurses/'+uid); }catch(e){ log('Firestore error: '+e.message); }
+  try{ await rtdb.ref('nurses/'+uid).remove(); log('✅ Deleted RTDB nurses/'+uid); }catch(e){ log(e.message); }
+  try{ await rtdb.ref('onlineNurses/'+uid).remove(); log('✅ Deleted onlineNurses'); }catch{}
+  try{ await rtdb.ref('liveNurses/'+uid).remove(); log('✅ Deleted liveNurses'); }catch{}
+  try{ await rtdb.ref('liveNurseLocations/'+uid).remove(); }catch{}
+  try{ await rtdb.ref('nursePresence/'+uid).remove(); }catch{}
+  try{ await rtdb.ref('nurseLocations/'+uid).remove(); }catch{}
+  try{ await rtdb.ref('allNurses/'+uid).remove(); }catch{}
+  try{ await rtdb.ref('pending_nurses/'+uid).remove(); }catch{}
+  try{ await rtdb.ref('allowedNurses/'+email.replace(/[.\#\$@\[\]]/g,'_')).remove(); log('✅ Deleted allowedNurses'); }catch{}
+  try{ await rtdb.ref('myJobOffers/'+uid).remove(); log('✅ Deleted myJobOffers'); }catch{}
+  
+  // Storage
+  try{ const list=await storage.ref('nurses/'+uid).listAll(); for(const item of list.items){ await item.delete(); } log('✅ Deleted Storage nurses/'+uid); }catch(e){ log('Storage: '+(e.message||'none or already empty')); }
+  try{ const list2=await storage.ref('nursePhotos/'+uid).listAll(); for(const item of list2.items){ await item.delete(); } }catch{}
+  
+  log(`<b style="color:#facc15">⚠️ NOW GO TO Firebase Console -> Authentication -> Find ${email} -> Delete User manually. Client SDK cannot delete other users for security.</b><br>If you are currently logged in as that user, this will delete Auth now:`);
+  
+  try{
+    if(auth.currentUser && (auth.currentUser.uid===uid || auth.currentUser.email.toLowerCase()===email)){
+      await auth.currentUser.delete();
+      log('✅✅ AUTH USER DELETED - Complete!');
+    } else {
+      log('Not logged in as target user - Go to console to delete Auth. Or login as that user first then click delete again.');
+    }
+  }catch(e){ log('Auth delete error (needs recent login): '+e.message+' -> Go to console to delete'); }
+  
+  log('🎉 Deletion complete! Check console to ensure Auth user is gone.');
+}
+</script>
+</body></html>
