@@ -449,11 +449,47 @@ function App(){
                     ):React.createElement('div',{style:{fontSize:11,color:'#fca5a5'}},'⚠️ No location')
                   ),
                   React.createElement('div',{style:{display:'flex',gap:8,marginTop:14,flexWrap:'wrap'}},
-                    (o.status==='PENDING'||!o.status)&&React.createElement(React.Fragment,null,
-                      React.createElement('button',{className:'btn-gold',onClick:()=>setSelAccept(o)},'✅ Accept + Navigate'),
-                      React.createElement('button',{className:'btn-ghost',onClick:()=>{ if(confirm('Reject?')){ rtdb.ref('myJobOffers/'+nurse.id+'/'+o.id).update({status:'REJECTED'}); showToast('Rejected'); } }},'❌ Reject')
-                    ),
-                    (o.status==='ACCEPTED'||o.status==='accepted')&&React.createElement('button',{className:'btn-nav',style:{flex:1},onClick:()=>openGoogleMapsNavigation(navLat, navLng, gpsInfo.lat, gpsInfo.lng)},'🧭 Navigate to PATIENT')
+                    (()=>{
+                      const s=(o.status||'').toLowerCase();
+                      const isPending = !o.status || s==='pending' || s.includes('pending') || s==='pending_full_payment' || s==='pending_50_percent' || s==='pending_50' || s==='pending_full';
+                      const isAccepted = s==='accepted' || s==='accept';
+                      const isRejected = s==='rejected' || s==='reject';
+                      
+                      if(isPending){
+                        return React.createElement(React.Fragment,null,
+                          React.createElement('button',{className:'btn-gold',style:{flex:1.2,minWidth:140,background:'linear-gradient(135deg,#facc15,#f59e0b)',color:'#000',fontWeight:900,padding:'12px 16px',borderRadius:999,border:0,cursor:'pointer'},onClick:()=>setSelAccept(o)},'✅ ACCEPT — Client will see Accepted!'),
+                          React.createElement('button',{className:'btn-ghost',style:{flex:1,minWidth:100,padding:'12px 16px'},onClick:()=>{ 
+                            if(confirm('Reject this booking? Client will see REJECTED in My Bookings.')){
+                              const rejectData={status:'rejected', rejectedAt:Date.now(), rejectedAtStr:new Date().toLocaleString('en-GH')};
+                              // FIX: Update ALL nodes so client sees rejection instantly
+                              rtdb.ref('myJobOffers/'+nurse.id+'/'+o.id).update(rejectData);
+                              rtdb.ref('bookings/'+o.id).update(rejectData).catch(()=>{});
+                              rtdb.ref('ceoBookings/'+o.id).update(rejectData).catch(()=>{});
+                              rtdb.ref('allBookings/'+o.id).update(rejectData).catch(()=>{});
+                              rtdb.ref('nurseBookings/'+nurse.id+'/'+o.id).update(rejectData).catch(()=>{});
+                              if(o.clientId||o.clientUid){
+                                const cid=o.clientId||o.clientUid;
+                                rtdb.ref('clientBookings/'+cid+'/'+o.id).update(rejectData).catch(()=>{});
+                              }
+                              if(o.clientEmail){
+                                const ekey=o.clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
+                                rtdb.ref('clientBookings/'+ekey+'/'+o.id).update(rejectData).catch(()=>{});
+                              }
+                              showToast('❌ Rejected — Client will see it in My Bookings');
+                            }
+                          }},'❌ Reject — Client sees Rejected')
+                        );
+                      } else if(isAccepted){
+                        return React.createElement('div',{style:{display:'flex',gap:8,flexWrap:'wrap',width:'100%'}},
+                          React.createElement('div',{style:{flex:1,background:'rgba(34,197,94,.15)',color:'#86efac',border:'1px solid rgba(34,197,94,.3)',padding:'10px 14px',borderRadius:999,fontSize:12,fontWeight:700,textAlign:'center'}},'✅ ACCEPTED — Client sees Accepted in My Bookings'),
+                          React.createElement('button',{className:'btn-nav',style:{flex:1,minWidth:140},onClick:()=>openGoogleMapsNavigation(navLat, navLng, gpsInfo.lat, gpsInfo.lng)},'🧭 Navigate to PATIENT')
+                        );
+                      } else if(isRejected){
+                        return React.createElement('div',{style:{background:'rgba(239,68,68,.15)',color:'#fca5a5',border:'1px solid rgba(239,68,68,.3)',padding:'10px 14px',borderRadius:999,fontSize:12,fontWeight:700,textAlign:'center',width:'100%'}},'❌ REJECTED — Client sees Rejected');
+                      } else {
+                        return React.createElement('div',{style:{background:'rgba(168,85,247,.15)',color:'#d8b4fe',padding:'8px 12px',borderRadius:999,fontSize:11}},`Status: ${o.status}`);
+                      }
+                    })()
                   )
                 )
               )
@@ -476,16 +512,37 @@ function App(){
         React.createElement('h3',{style:{margin:0,fontFamily:'Fraunces'}},'✅ Accept Job?'),
         React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:10}},`Patient: ${selAccept.patientName||'Patient'} — Amount: GH₵ ${selAccept.amount||0}`),
         React.createElement('div',{style:{display:'flex',gap:10,marginTop:16}},
-          React.createElement('button',{className:'btn-nav',style:{flex:1.5},onClick:()=>{
+          React.createElement('button',{className:'btn-nav',style:{flex:1.5,background:'linear-gradient(135deg,#22c55e,#16a34a)',fontWeight:900},onClick:()=>{
             const pLoc=getPatientLocation(selAccept); const cLoc=getClientLocation(selAccept); const navLat=pLoc.lat||cLoc.lat; const navLng=pLoc.lng||cLoc.lng;
-            rtdb.ref('myJobOffers/'+nurse.id+'/'+selAccept.id).update({status:'ACCEPTED', acceptedAt:Date.now()});
-            rtdb.ref('bookings/'+selAccept.id).update({status:'accepted', nurseId:nurse.id, nurseName:nurse.fullName, acceptedAt:Date.now()});
+            const acceptData={
+              status:'accepted', 
+              acceptedAt:Date.now(), 
+              acceptedAtStr:new Date().toLocaleString('en-GH'),
+              nurseId:nurse.id, 
+              nurseName:nurse.fullName,
+              nursePhone:nurse.phone||'',
+              acceptedByNurse:true
+            };
+            // FIX: Update ALL nodes so Client My Bookings shows ACCEPTED instantly
+            rtdb.ref('myJobOffers/'+nurse.id+'/'+selAccept.id).update(acceptData);
+            rtdb.ref('bookings/'+selAccept.id).update(acceptData).catch(()=>{});
+            rtdb.ref('ceoBookings/'+selAccept.id).update(acceptData).catch(()=>{});
+            rtdb.ref('allBookings/'+selAccept.id).update(acceptData).catch(()=>{});
+            rtdb.ref('nurseBookings/'+nurse.id+'/'+selAccept.id).update(acceptData).catch(()=>{});
+            if(selAccept.clientId||selAccept.clientUid){
+              const cid=selAccept.clientId||selAccept.clientUid;
+              rtdb.ref('clientBookings/'+cid+'/'+selAccept.id).update(acceptData).catch(()=>{});
+            }
+            if(selAccept.clientEmail){
+              const ekey=selAccept.clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
+              rtdb.ref('clientBookings/'+ekey+'/'+selAccept.id).update(acceptData).catch(()=>{});
+            }
             setOffers(arr=>arr.map(o=>o.id===selAccept.id?{...o,status:'ACCEPTED'}:o));
-            showToast('✅ Accepted — GPS + Navigate');
+            showToast('✅ ACCEPTED — Client will see Accepted in My Bookings now!');
             startNurseGPSTracking(selAccept.id, nurse, 'accepted');
             setTimeout(()=>{ if(navLat&&navLng){ openGoogleMapsNavigation(navLat, navLng, lastLat, lastLng); } },800);
             setSelAccept(null);
-          }},'✅ Accept + GPS + Navigate'),
+          }},'✅ ACCEPT — Client sees Accepted! + GPS + Navigate'),
           React.createElement('button',{className:'btn-ghost',style:{flex:1},onClick:()=>setSelAccept(null)},'Cancel')
         )
       )
