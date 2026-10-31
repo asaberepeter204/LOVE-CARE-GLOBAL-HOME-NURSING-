@@ -512,27 +512,87 @@ function payWithPaystack(){
       key:PAYSTACK_KEY,email:clientEmail,amount:payKobo,currency:currCode,ref:bookingId+'_'+Date.now(),
       callback:function(response){
         (async function(){
+          // === RESOLVE CLIENT UID ROBUSTLY ===
+          const authUser = auth.currentUser;
+          const authUid = authUser ? authUser.uid : '';
+          const lsUid = localStorage.getItem('clientUid') || localStorage.getItem('uid') || localStorage.getItem('userId') || '';
+          const finalClientUid = currentClientData.uid || authUid || lsUid || '';
+          const sanitizedEmail = clientEmail ? clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_') : '';
+
+          const now = Date.now();
           const data={
             id:bookingId,bookingId:bookingId,
-            clientName:clientName,clientFullName:clientName,phone:clientPhone,clientPhone:clientPhone,clientEmail:clientEmail,email:clientEmail,clientPhotoUrl:clientPhoto,clientPhoto:clientPhoto,photoUrl:clientPhoto,clientUid:currentClientData.uid||'',clientId:currentClientData.uid||'',
+            clientName:clientName,clientFullName:clientName,phone:clientPhone,clientPhone:clientPhone,clientEmail:clientEmail,email:clientEmail,clientPhotoUrl:clientPhoto,clientPhoto:clientPhoto,photoUrl:clientPhoto,clientUid:finalClientUid,clientId:finalClientUid,uid:finalClientUid,
             clientLat:cLat,clientLng:cLng,clientLatLng:{lat:cLat,lng:cLng},clientLatitude:cLat,clientLongitude:cLng,clientLocation:{lat:cLat,lng:cLng},
             patientName:patientName,patientFullName:patientName,patientPhone:patientPhone,patientPhoneNumber:patientPhone,patientContact:patientPhone,
             patientLocation:patientLocText,patientAddress:patientLocText,patientLocationText:patientLocText,
             patientLat:pLat,patientLng:pLng,patientLatLng:{lat:pLat,lng:pLng},patientLatitude:pLat,patientLongitude:pLng,patientLocationLat:pLat,patientLocationLng:pLng,
-            patientRelationship:patientRel,patientLocationCapturedAt:Date.now(),
+            patientRelationship:patientRel,patientLocationCapturedAt:now,
             patientLocationSource:document.getElementById('sameAsClientCheck').checked?'same_as_client':'different_manual',
             serviceLocation:{lat:pLat,lng:pLng},destination:{lat:pLat,lng:pLng},mainLat:pLat,mainLng:pLng,destLat:pLat,destLng:pLng,
             lat:pLat,lng:pLng,latitude:pLat,longitude:pLng,
-            nurseId:selectedNurseId,nurseName:selectedNurseName,nursePhone:selectedNursePhone,nurseWasOnline:true,nurseOnlineAt:Date.now(),
-            amount:totalAmount,currency:currCode,paymentMethod:'paystack_full',paystackRef:response.reference,status:'pending_full_payment',time:Date.now(),createdAt:Date.now(),
+            nurseId:selectedNurseId,nurseName:selectedNurseName,nursePhone:selectedNursePhone,nurseWasOnline:true,nurseOnlineAt:now,
+            amount:totalAmount,currency:currCode,paymentMethod:'paystack_full',paystackRef:response.reference,
+            // === STATUS FIX FOR my-bookings.html COMPATIBILITY ===
+            status:'pending', // primary status for my-bookings filter
+            paymentStatus:'pending_full_payment',
+            bookingStatus:'pending',
+            fullStatus:'pending_full_payment',
+            isPending:true,
+            isPaid:true,
+            paid:true,
+            time:now,createdAt:now,updatedAt:now,
             totalHours:calc.totalHours||9,hrsPerDay:calc.hrsPerDay||9,startTime:calc.start||'08:00',endTime:calc.end||'17:00',careMode:calc.mode||'Daily',quantity:calc.qty||1,transport:calc.transport||0,
             hourlyRateUsed:calc.curRate,service:calc.mode||'Elderly Care',amountSplit:{nurse:totalAmount*0.8,ceo:totalAmount*0.2}
           };
-          try{await rtdb.ref('bookings/'+bookingId).set(data);await rtdb.ref('myJobOffers/'+selectedNurseId+'/'+bookingId).set(data);await rtdb.ref('ceoBookings/'+bookingId).set(data);await rtdb.ref('allBookings/'+bookingId).set(data);await rtdb.ref('bookingsByFull/'+bookingId).set(data);if(currentClientData.uid){await rtdb.ref('clientBookings/'+currentClientData.uid+'/'+bookingId).set(data);}}catch(e){console.log(e);}
+
+          // === 1. LOCAL STORAGE SAVE - INSTANT REFLECTION IN my-bookings.html ===
+          try{
+            const localBookingsKey = 'myBookings';
+            let existing = [];
+            try{ existing = JSON.parse(localStorage.getItem(localBookingsKey) || '[]'); }catch(e){ existing = []; }
+            existing.unshift(data);
+            localStorage.setItem(localBookingsKey, JSON.stringify(existing));
+
+            // Alternative keys used by many templates
+            localStorage.setItem('lovecare_bookings', JSON.stringify(existing));
+            localStorage.setItem('clientBookings', JSON.stringify(existing));
+            localStorage.setItem('lastBookingId', bookingId);
+            localStorage.setItem('lastBooking', JSON.stringify(data));
+            // Keep client uid persistent
+            if(finalClientUid) localStorage.setItem('clientUid', finalClientUid);
+          }catch(lsErr){ console.warn('Local save failed', lsErr); }
+
+          // === 2. FIREBASE SAVE - ALL PATHS WITH INDIVIDUAL TRY/CATCH ===
+          const saves = [];
+          saves.push(rtdb.ref('bookings/'+bookingId).set(data).catch(e=>console.warn('bookings save',e)));
+          saves.push(rtdb.ref('myJobOffers/'+selectedNurseId+'/'+bookingId).set(data).catch(e=>console.warn('myJobOffers',e)));
+          saves.push(rtdb.ref('ceoBookings/'+bookingId).set(data).catch(e=>console.warn('ceo',e)));
+          saves.push(rtdb.ref('allBookings/'+bookingId).set(data).catch(e=>console.warn('allBookings',e)));
+          saves.push(rtdb.ref('bookingsByFull/'+bookingId).set(data).catch(e=>console.warn('bookingsByFull',e)));
+          // Client-specific paths - MOST IMPORTANT FOR my-bookings.html
+          if(finalClientUid){
+            saves.push(rtdb.ref('clientBookings/'+finalClientUid+'/'+bookingId).set(data).catch(e=>console.warn('clientBookings uid',e)));
+            saves.push(rtdb.ref('users/'+finalClientUid+'/bookings/'+bookingId).set(data).catch(e=>console.warn('users bookings',e)));
+            saves.push(rtdb.ref('myBookings/'+finalClientUid+'/'+bookingId).set(data).catch(e=>console.warn('myBookings',e)));
+          }
+          if(sanitizedEmail){
+            saves.push(rtdb.ref('clientBookingsByEmail/'+sanitizedEmail+'/'+bookingId).set(data).catch(e=>console.warn('byEmail',e)));
+            saves.push(rtdb.ref('bookingsByEmail/'+sanitizedEmail+'/'+bookingId).set(data).catch(e=>console.warn('bookingsByEmail',e)));
+          }
+          // Phone fallback
+          if(clientPhone){
+            const cleanPhone = clientPhone.replace(/[^0-9+]/g,'');
+            saves.push(rtdb.ref('bookingsByPhone/'+cleanPhone+'/'+bookingId).set(data).catch(()=>{}));
+          }
+          await Promise.all(saves);
+
           document.getElementById('modalBookingId').textContent=bookingId;
           document.getElementById('modalNurseInfo').textContent=`🟢 ONLINE Nurse: ${selectedNurseName} • ${currCode} ${totalAmount.toFixed(2)} — Patient: ${patientName} — Nurse is ONLINE and will get tone + SMS!`;
-          document.getElementById('modalClientInfo').innerHTML=`👤 Client: ${clientName} — Pays FULL<br>🏥 Patient: ${patientName} — ${patientPhone}<br>📍 ${patientLocText}<br>📍 ${pLat.toFixed(5)}, ${pLng.toFixed(5)} — Nurse NAVIGATES HERE — Nurse was ONLINE at booking time`;
-          document.getElementById('successModal').classList.add('show')
+          document.getElementById('modalClientInfo').innerHTML=`👤 Client: ${clientName} — Pays FULL<br>🏥 Patient: ${patientName} — ${patientPhone}<br>📍 ${patientLocText}<br>📍 ${pLat.toFixed(5)}, ${pLng.toFixed(5)} — Nurse NAVIGATES HERE — Nurse was ONLINE at booking time<br><br><a href="my-bookings.html" style="display:inline-block;padding:8px 14px;background:#22c55e;color:#fff;border-radius:8px;text-decoration:none;font-weight:900">📋 View in My Bookings</a>`;
+          document.getElementById('successModal').classList.add('show');
+          // Optional auto redirect hint after 3s
+          document.getElementById('bookResult').innerHTML='✅ Booking saved! <a href="my-bookings.html" style="color:#22c55e;font-weight:900">Go to My Bookings → See pending booking</a>';
         })()
       },
       onClose:function(){document.getElementById('bookResult').textContent='Payment cancelled'}
