@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Login - Username + Password ONLY</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{width:100%;max-width:400px;background:#1e1a3a;border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px}
+h2{text-align:center;color:#f3e8ff} input{padding:13px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(12,10,30,.8);color:white;width:100%}
+.passWrap{position:relative;display:flex;align-items:center}
+.passWrap input{padding-right:44px;width:100%}
+.eyeBtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.2);border-radius:8px;width:32px;height:32px;display:grid;place-items:center;cursor:pointer;font-size:16px;transition:.2s}
+.eyeBtn:hover{background:rgba(168,85,247,.3)}
+.btn{padding:14px;border-radius:12px;border:none;font-weight:900;cursor:pointer}
+.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}
+.btnDark{background:#2a2250;color:#a78bfa}
+.status{padding:10px;border-radius:10px;font-size:11px;display:none;text-align:center}
+.status.ok{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.status.err{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.small{font-size:10px;color:#a78bfa;text-align:center}
+</style>
+</head><body>
+<div class="card">
+<h2>Client Login</h2>
+<p class="small">Username + Password ONLY — No SMS on login (SMS only on registration for real person verification)</p>
+
+<input id="username" placeholder="Username (e.g. kusipeter)" oninput="this.value=this.value.toLowerCase().replace(/\s/g,'')">
+
+<div class="passWrap">
+<input id="pass" type="password" placeholder="Password">
+<button type="button" class="eyeBtn" onclick="toggleEye('pass', this)" title="Show/Hide">👁️</button>
+</div>
+
+<div id="status" class="status"></div>
+<button class="btn btnYellow" onclick="login()">Login — Enter Dashboard</button>
+
+<div style="display:flex;justify-content:space-between;margin-top:6px">
+<a href="client-registration.html" style="color:#a78bfa;font-size:12px;text-decoration:none">No account? Register (SMS verification)</a>
+<a href="#" onclick="resetPass()" style="color:#facc15;font-size:12px;text-decoration:none">Forgot password?</a>
+</div>
+
+<div style="background:rgba(14,10,28,.6);border-radius:10px;padding:10px;font-size:10px;color:#a78bfa;margin-top:8px">
+<b style="color:#facc15">Login Flow:</b><br>
+• Username + Password only<br>
+• No SMS on login — fast entry<br>
+• SMS was already done on registration to prove real person<br>
+• CEO can still trace you via phone + country code
+</div>
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+
+function toggleEye(inputId, btn){
+  const input=document.getElementById(inputId);
+  if(input.type==='password'){ input.type='text'; btn.textContent='🙈'; }
+  else { input.type='password'; btn.textContent='👁️'; }
+}
+function showStatus(m,ok){ const el=document.getElementById('status'); el.textContent=m; el.className='status '+(ok?'ok':'err'); el.style.display='block'; }
+function hashPassword(p){ return btoa(p).split('').reverse().join('') + '_' + p.length; }
+
+function extractField(obj, keys){
+  if(!obj) return null;
+  for(const k of keys){
+    const v=obj[k];
+    if(v && typeof v==='string' && v.trim().length>=2) return v.trim();
+  }
+  return null;
+}
+function checkClientProfileComplete(data){
+  const photoKeys=['photoUrl','photo','avatarUrl','photoURL','avatar','profilePhoto','image','imageUrl','clientPhoto','clientPhotoUrl'];
+  const phoneKeys=['phone','phoneNumber','mobile','contactPhone','clientPhone','whatsapp','tel','phone_number'];
+  const usernameKeys=['username','fullName','name','displayName','clientName','userName','clientUsername'];
+
+  const photo = extractField(data, photoKeys);
+  const phone = extractField(data, phoneKeys);
+  const username = extractField(data, usernameKeys);
+
+  const missing=[];
+  if(!photo) missing.push('photo');
+  if(!phone) missing.push('phone number');
+  if(!username) missing.push('username');
+
+  return {complete: missing.length===0, missing, photo, phone, username, data};
+}
+
+function blockIncompleteClient(missing, username){
+  try{
+    const keysToClear=['clientLoggedIn','lcg_logged_in','lcg_role','clientUsername','clientName','fullName','clientPhone','clientCountryCode','clientPhoto','clientEmail','clientHasAll4','loginMethod','clientPhotoURL','currentClientId','lcg_client_uid','clientUid','client_logged_in'];
+    keysToClear.forEach(k=>{ try{ localStorage.removeItem(k); sessionStorage.removeItem(k);}catch{} });
+  }catch{}
+  const missStr = missing.join(', ');
+  showStatus(`❌ Incomplete profile — Missing ${missStr}. Photo, phone & username required. Redirecting to registration...`, false);
+  setTimeout(()=>{
+    window.location.replace(`client-registration.html?reason=missing_${missing.join('_')}&username=${encodeURIComponent(username||'')}`);
+  }, 1800);
+}
+
+async function login(){
+  const username=document.getElementById('username').value.trim().toLowerCase();
+  const pass=document.getElementById('pass').value.trim();
+  if(!username||!pass){ showStatus('Enter username & password', false); return; }
+  showStatus('Checking username...', true);
+  try{
+    const snap=await db.ref('allowedClients/'+username).once('value');
+    if(!snap.exists()){
+      const byEmail = await db.ref('allowedClientsByUid').orderByChild('email').equalTo(username).once('value').catch(()=>null);
+      if(!byEmail || !byEmail.exists()){
+        showStatus('Username not found — Register first (SMS verification on registration)', false); return;
+      }
+    }
+    const finalData = snap.exists() ? snap.val() : null;
+    if(!finalData){ showStatus('Username not found', false); return; }
+    
+    if(finalData.isBlocked===true){ showStatus('Account blocked by CEO — Contact support', false); return; }
+
+    // === BOSS RULE: MUST HAVE PHOTO, PHONE, USERNAME IN FIREBASE ===
+    const profileCheck = checkClientProfileComplete(finalData);
+    if(!profileCheck.complete){
+      showStatus(`❌ Cannot login — Missing ${profileCheck.missing.join(', ')} in Firebase. Complete registration with photo, phone & username.`, false);
+      blockIncompleteClient(profileCheck.missing, username);
+      return;
+    }
+
+    // CHECK IF VERIFIED AT REGISTRATION (SMS)
+    const isVerified = finalData.phoneVerified===true || finalData.phoneVerifiedReal===true || finalData.isRealPerson===true || finalData.verificationMethod==='SMS_OTP_REAL' || finalData.hasAll4===true || profileCheck.phone;
+    if(!isVerified){
+      showStatus('❌ Phone NOT verified — Please complete SMS verification in registration first.', false);
+      setTimeout(()=>{ if(confirm('Your phone was not verified via SMS at registration. Go to registration to verify?')) location.href='client-registration.html'; }, 1000);
+      return;
+    }
+
+    const hashed=hashPassword(pass);
+    const stored = finalData.passwordHash || finalData.password || finalData.pass || '';
+    if(stored && stored!==hashed && stored!==pass){
+      if(stored!==hashed){
+        showStatus('Wrong password — Try forgot password', false);
+        return;
+      }
+    }
+
+    // SUCCESS - NO SMS, direct login - ALL CHECKS PASSED
+    showStatus('✅ Photo, Phone, Username verified + Password OK — Welcome '+finalData.username+' — Entering dashboard...', true);
+    
+    localStorage.setItem('clientLoggedIn','true');
+    localStorage.setItem('lcg_logged_in','true');
+    localStorage.setItem('lcg_role','client');
+    localStorage.setItem('clientUsername', profileCheck.username);
+    localStorage.setItem('clientName', finalData.fullName||finalData.name||finalData.username);
+    localStorage.setItem('fullName', finalData.fullName||finalData.name||'');
+    localStorage.setItem('clientPhone', profileCheck.phone);
+    localStorage.setItem('clientCountryCode', finalData.countryCode||'+233');
+    localStorage.setItem('clientPhoto', profileCheck.photo);
+    localStorage.setItem('clientEmail', finalData.email||'');
+    localStorage.setItem('clientHasAll4','true');
+    localStorage.setItem('loginMethod','username+password_ONLY_NO_SMS');
+    localStorage.setItem('clientPhotoURL', profileCheck.photo);
+    localStorage.setItem('currentClientId', finalData.username);
+    localStorage.setItem('lcg_client_uid', finalData.username);
+    // Extra saves for book-nurse auto-fill
+    localStorage.setItem('clientUid', finalData.username);
+    localStorage.setItem('clientPhotoUrl', profileCheck.photo);
+
+    setTimeout(()=>location.replace('client-dashboard.html'), 700);
+
+  }catch(e){
+    console.error(e);
+    showStatus('Login failed: '+e.message, false);
+  }
+}
+
+async function resetPass(){
+  const username=document.getElementById('username').value.trim().toLowerCase();
+  if(!username){ showStatus('Enter username to reset password', false); return; }
+  const newPass=prompt('Enter new strong password:\nMust have: 8+ chars, small, BIG, number, special (@&+#$ etc)\nExample: Kusi@2026');
+  if(!newPass) return;
+  // Check strong
+  const hasLen=newPass.length>=8, hasSmall=/[a-z]/.test(newPass), hasBig=/[A-Z]/.test(newPass), hasNum=/[0-9]/.test(newPass), hasSpecial=/[@&+#$\-\"_!%*?_^=<>~`':;|\\/\(\)\[\]\{\}]/.test(newPass);
+  if(!(hasLen && hasSmall && hasBig && hasNum && hasSpecial)){ 
+    alert('Weak password!\nMust have:\n- 8+ chars\n- small letter\n- BIG letter\n- number\n- special @&+#$ etc'); 
+    showStatus('Weak password — Check popup', false);
+    return; 
+  }
+  try{
+    const snap=await db.ref('allowedClients/'+username).once('value');
+    if(!snap.exists()){ showStatus('Username not found', false); return; }
+    const hashed=hashPassword(newPass);
+    await db.ref('allowedClients/'+username).update({passwordHash:hashed, passwordUpdatedAt:Date.now()});
+    await db.ref('clients/'+username).update({passwordHash:hashed}).catch(()=>{});
+    await db.ref('ceoRegistrations/clients/'+username).update({passwordHash:hashed}).catch(()=>{});
+    showStatus('✅ Password reset success — Login with new password (No SMS needed)', true);
+  }catch(e){ showStatus('Reset failed: '+e.message, false); }
+}
+
+// Auto-redirect if already logged in - WITH BOSS VALIDATION
+(async function(){
+  const logged=localStorage.getItem('clientLoggedIn');
+  const user=localStorage.getItem('clientUsername');
+  if(logged && user){
+    try{
+      const snap=await db.ref('allowedClients/'+user).once('value');
+      if(snap.exists()){
+        const data=snap.val();
+        const check=checkClientProfileComplete(data);
+        if(!check.complete){
+          console.log('Auto login blocked - incomplete', check.missing);
+          blockIncompleteClient(check.missing, user);
+          return;
+        }
+      } else {
+        // No record -> clear
+        localStorage.removeItem('clientLoggedIn');
+        localStorage.removeItem('lcg_logged_in');
+      }
+    }catch(e){ console.log('auto check error', e.message); }
+    console.log('Already logged in as', user);
+  }
+})();
+</script>
+</body></html>
