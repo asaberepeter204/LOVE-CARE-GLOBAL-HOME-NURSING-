@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Login — LOVE CARE GLOBAL — STRICT CEO APPROVAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),linear-gradient(180deg,#0e0a1c 0%, #120e26 100%)}
+.wrap{width:100%;max-width:440px}.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.18);border-radius:24px;padding:26px;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.logo{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;margin:0 auto 12px;font-size:28px}
+h1{text-align:center;font-weight:800;font-size:22px;color:#f3e8ff}.sub{text-align:center;font-size:11px;color:#a78bfa;margin:6px 0 18px;letter-spacing:.5px}
+label{font-size:11px;font-weight:800;margin:12px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase;letter-spacing:.8px}
+.inputWrap{position:relative;display:flex;align-items:center}
+.inputWrap input{width:100%;padding:13px 44px 13px 14px;border-radius:14px;border:1.5px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);color:#f3e8ff;font-size:13px;outline:none}
+input{width:100%;padding:13px 14px;border-radius:14px;border:1.5px solid rgba(168,85,247,.18);background:rgba(14,10,28,.6);color:#f3e8ff;font-size:13px;outline:none}
+input:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-shadow:0 0 0 3px rgba(168,85,247,.18)}
+.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(76,29,149,.25);border:1px solid rgba(168,85,247,.25);width:36px;height:36px;border-radius:10px;cursor:pointer;display:grid;place-items:center;z-index:10}
+.btn{width:100%;padding:13px;border-radius:14px;font-weight:800;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:12px;text-decoration:none;min-height:48px}
+.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35);font-size:14px}
+.btnDark{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.18);color:#e9d5ff}
+.btnGoogle{background:#FFFFFF;color:#1F1F1F;border:1px solid #747775;border-radius:20px;height:44px;font-family:Roboto,Inter,sans-serif;font-size:14px;font-weight:500;letter-spacing:0.25px;display:flex;align-items:center;justify-content:center;gap:12px}
+.alert{padding:11px;border-radius:10px;font-size:11px;font-weight:700;margin:10px 0;border:1px solid;display:none;line-height:1.4}
+.alert.show{display:block}.alert-error{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.3);color:#fca5a5}
+.alert-success{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.3);color:#86efac}
+.alert-info{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.3);color:#93c5fd}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:#6b5b8a;font-size:11px;font-weight:800;letter-spacing:1px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(168,85,247,.15)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap"><div class="card">
+<div class="logo">👩‍⚕️</div>
+<h1>Nurse Login</h1>
+<p class="sub">LOVE CARE GLOBAL — CEO APPROVAL REQUIRED</p>
+<button class="btn btnGoogle" onclick="googleLogin()" type="button">Continue with Google</button>
+<div class="divider">OR</div>
+<label>Email</label><input id="email" type="email" placeholder="nurse@email.com">
+<label>Password</label><div class="inputWrap"><input id="password" type="password" placeholder="Enter password"><button class="eyeBtn" type="button" onclick="toggleEye()">👁️</button></div>
+<div id="msg" class="alert"></div>
+<button class="btn btnPrimary" onclick="emailLogin()" type="button">Login as Nurse</button>
+<a href="nurse-registration.html" class="btn btnDark">No account? Register</a>
+<a href="client-login.html" class="btn btnDark" style="font-size:11px">Client Login</a>
+</div></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const rtdb=getDatabase(app);
+
+function showMsg(t,type='alert-error'){const el=document.getElementById('msg');el.textContent=t;el.className='alert show '+type;}
+function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');}
+function toggleEye(){const i=document.getElementById('password');i.type=i.type==='password'?'text':'password';}
+window.toggleEye=toggleEye;
+
+function extractField(obj, keys){
+  if(!obj) return null;
+  for(const k of keys){const v=obj[k]; if(v && typeof v==='string' && v.trim().length>3) return v.trim();}
+  return null;
+}
+
+// ===== STRICT CHECK: PHOTO + PHONE + VIDEO + CEO APPROVAL =====
+async function checkNurseCompleteAndApproved(uid, email){
+  let merged={}; let found=false;
+  const eLower=(email||'').toLowerCase().trim();
+  // 1. Firestore nurses/{uid}
+  try{const s=await getDoc(doc(db,'nurses',uid)); if(s.exists()){merged={...merged,...s.data()}; found=true;}}catch{}
+  if(eLower){try{const q=query(collection(db,'nurses'),where('email','==',eLower),limit(1)); const qs=await getDocs(q); if(!qs.empty){merged={...merged,...qs.docs[0].data()}; found=true;}}catch{}}
+  // 2. RTDB nurses/{uid}
+  try{const s=await get(ref(rtdb,'nurses/'+uid)); if(s.exists()){merged={...merged,...s.val()}; found=true;}}catch{}
+  // 3. allowedNurses
+  if(eLower){try{const k=sanitizeEmail(eLower); const s=await get(ref(rtdb,'allowedNurses/'+k)); if(s.exists()){merged={...merged,...s.val()}; found=true;}}catch{}}
+  
+  if(!found) return {complete:false, approved:false, missing:['profile'], reason:'No nurse profile - Register first', data:{}};
+
+  const photo=extractField(merged,['photoURL','photoUrl','photo','image','nursePhoto','nursePhotoUrl']);
+  const video=extractField(merged,['videoURL','videoUrl','video','introVideo','profileVideo','nurseVideo','introVideoUrl']);
+  const phone=extractField(merged,['phone','phoneNumber','mobile','nursePhone']);
+
+  const missing=[];
+  if(!photo) missing.push('photo');
+  if(!video) missing.push('video');
+  if(!phone) missing.push('phone');
+
+  // CEO APPROVAL CHECK from ceo-registration-center
+  let approved=false;
+  let approvalSource='';
+  // Check 1: nurses/{uid} isApproved / canLogin / status
+  if(merged.isApproved===true || merged.approved===true || merged.canLogin===true || merged.status==='approved' || merged.isApproved==='true') {approved=true; approvalSource='nurses/'+uid;}
+  // Check 2: ceoRegistrationCenter/nurses/{uid}
+  if(!approved){
+    try{const s=await get(ref(rtdb,'ceoRegistrationCenter/nurses/'+uid)); if(s.exists()){const v=s.val(); if(v.isApproved===true || v.approved===true || v.canLogin===true || v.status==='approved' || v.isApproved==='true'){approved=true; approvalSource='ceoRegistrationCenter/nurses'; merged={...merged,...v};}}}catch{}
+  }
+  // Check 3: ceoNurseUpdates/{uid}
+  if(!approved){
+    try{const s=await get(ref(rtdb,'ceoNurseUpdates/'+uid)); if(s.exists()){const v=s.val(); if(v.isApproved===true || v.approved===true || v.canLogin===true || v.status==='approved'){approved=true; approvalSource='ceoNurseUpdates';}}}catch{}
+  }
+  // Check 4: allowedNurses has approval
+  if(!approved && eLower){
+    try{const k=sanitizeEmail(eLower); const s=await get(ref(rtdb,'allowedNurses/'+k)); if(s.exists()){const v=s.val(); if(v.isApproved===true || v.approved===true || v.canLogin===true || v.status==='approved'){approved=true; approvalSource='allowedNurses';}}}catch{}
+  }
+  // Check 5: Firestore ceoRegistrationCenter/nurses/{uid}
+  if(!approved){
+    try{const s=await getDoc(doc(db,'ceoRegistrationCenter','nurses',uid)); if(s.exists()){const v=s.data(); if(v.isApproved===true || v.approved===true){approved=true; approvalSource='firestore ceoRegistrationCenter';}}}catch{}
+    try{const s=await getDoc(doc(db,'ceoRegistrationCenter/nurses/'+uid));}catch{}
+  }
+
+  const complete = missing.length===0;
+  return {complete, approved, missing, data:merged, photo, video, phone, approvalSource, approvedValue:approved};
+}
+
+async function handleFailedLogin(user, missing, approved, reason){
+  const email=user.email||'';
+  console.log('FAILED LOGIN - will delete auth user to not save email', {missing, approved, email});
+  showMsg(`❌ LOGIN BLOCKED - ${missing.length? 'Missing: '+missing.join(', ')+'. ' : ''}${!approved? 'CEO approval PENDING from ceo-registration-center.html. ' : ''}${reason||''} Auth will be removed.`, 'alert-error');
+  try{
+    // TRY DELETE AUTH USER so email not saved
+    await deleteUser(user);
+    console.log('Auth user DELETED because login failed - email not saved');
+  }catch(delErr){
+    console.log('Delete failed (needs recent login), signing out', delErr.message);
+    try{await signOut(auth);}catch{}
+    // Still try delete via compat if needed
+  }
+  try{
+    const keys=['lcg_nurse_uid','nurseUid','currentNurseId','uid','lcg_nurse_email','currentNurseEmail','nurseEmail','nurseName','fullName','currentNurseName','lcg_logged_in','lcg_role','lcg_session_expiry','nurseProfile','nursePhoto','nursePhotoUrl','nurseVideo','nursePhone'];
+    keys.forEach(k=>{try{localStorage.removeItem(k); sessionStorage.removeItem(k);}catch{}});
+  }catch{}
+  setTimeout(()=>{ window.location.href=`nurse-registration.html?error=blocked&missing=${missing.join('_')}&approved=${approved}&email=${encodeURIComponent(email)}`; }, 2500);
+}
+
+async function isClientAccount(email){
+  const eLower=email.toLowerCase().trim(); const key=sanitizeEmail(eLower);
+  try{const s=await get(ref(rtdb,'allowedClients/'+key)); if(s.exists()) return true;}catch{}
+  try{const s=await get(ref(rtdb,'clients')); if(s.exists()){let f=false; s.forEach(ch=>{const v=ch.val()||{}; const em=(v.email||v.profile?.email||'').toLowerCase(); if(em===eLower) f=true;}); if(f) return true;}}catch{}
+  try{const q=query(collection(db,'clients'),where('email','==',eLower),limit(1)); const qs=await getDocs(q); if(!qs.empty) return true;}catch{}
+  return false;
+}
+
+function saveNurseSession(user, name){
+  localStorage.setItem('lcg_nurse_uid',user.uid); localStorage.setItem('nurseUid',user.uid);
+  localStorage.setItem('currentNurseId',user.uid); localStorage.setItem('nurseName',name);
+  localStorage.setItem('lcg_nurse_email',user.email||''); localStorage.setItem('nurseEmail',user.email||'');
+  localStorage.setItem('lcg_logged_in','true'); localStorage.setItem('lcg_role','nurse');
+  localStorage.setItem('lcg_session_expiry',(Date.now()+24*60*60*1000).toString());
+  ['lcg_client_uid','currentClientId'].forEach(k=>localStorage.removeItem(k));
+}
+
+function redirectToDashboard(){ showMsg('✅ Approved! Redirecting to dashboard...','alert-success'); setTimeout(()=>{window.location.replace('nurses-dashboard.html');}, 800);}
+
+onAuthStateChanged(auth, async (user)=>{
+  if(user && (localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('lcg_role')==='nurse')){
+    if(localStorage.getItem('lcg_client_uid')) return;
+    const check=await checkNurseCompleteAndApproved(user.uid, user.email);
+    if(!check.complete || !check.approved){
+      await handleFailedLogin(user, check.missing, check.approved, 'Auto-login blocked');
+      return;
+    }
+    try{localStorage.setItem('nursePhoto',check.photo); localStorage.setItem('nurseVideo',check.video); localStorage.setItem('nursePhone',check.phone);}catch{}
+    redirectToDashboard();
+  }
+});
+
+window.emailLogin=async()=>{
+  const email=document.getElementById('email').value.trim();
+  const password=document.getElementById('password').value;
+  if(!email||!password){showMsg('Enter email and password','alert-error'); return;}
+  try{
+    showMsg('Checking CLIENT block + CEO approval...','alert-info');
+    if(await isClientAccount(email)){showMsg('❌ CLIENT email - Use Client Login','alert-error'); return;}
+    const cred=await signInWithEmailAndPassword(auth,email,password);
+    const user=cred.user;
+    if(await isClientAccount(user.email||email)){showMsg('❌ CLIENT account blocked','alert-error'); await signOut(auth); return;}
+    
+    const check=await checkNurseCompleteAndApproved(user.uid, user.email||email);
+    if(!check.complete){
+      await handleFailedLogin(user, check.missing, check.approved, `Missing ${check.missing.join(', ')} in Firebase`);
+      return;
+    }
+    if(!check.approved){
+      await handleFailedLogin(user, [], false, 'No CEO approval from ceo-registration-center.html - CEO must approve in ceoRegistrationCenter/nurses/'+user.uid);
+      return;
+    }
+    let displayName=check.data.fullName||check.data.name||user.displayName||email.split('@')[0];
+    saveNurseSession(user, displayName);
+    localStorage.setItem('nursePhoto',check.photo); localStorage.setItem('nurseVideo',check.video); localStorage.setItem('nursePhone',check.phone);
+    redirectToDashboard();
+  }catch(e){
+    let m=e.message; if(m.includes('invalid-credential')) m='Wrong email/password';
+    showMsg('Login failed: '+m,'alert-error');
+  }
+}
+
+window.googleLogin=async()=>{
+  try{
+    showMsg('Opening Google...','alert-info');
+    const provider=new GoogleAuthProvider();
+    const cred=await signInWithPopup(auth,provider);
+    const user=cred.user;
+    if(await isClientAccount(user.email)){showMsg('❌ CLIENT email - Use Client Login','alert-error'); await handleFailedLogin(user, ['client'], false, 'Client email blocked'); return;}
+    
+    showMsg('🔍 Checking photo, video, phone + CEO approval...','alert-info');
+    const check=await checkNurseCompleteAndApproved(user.uid, user.email);
+    if(!check.complete || !check.approved){
+      await handleFailedLogin(user, check.missing, check.approved, check.approved? 'Profile incomplete' : 'CEO approval pending - ceo-registration-center must approve');
+      return;
+    }
+    const displayName=check.data.fullName||user.displayName||user.email.split('@')[0];
+    saveNurseSession(user, displayName);
+    localStorage.setItem('nursePhoto',check.photo); localStorage.setItem('nurseVideo',check.video); localStorage.setItem('nursePhone',check.phone);
+    redirectToDashboard();
+  }catch(e){showMsg('Google login failed: '+e.message,'alert-error');}
+}
+</script>
+</body>
+</html>
