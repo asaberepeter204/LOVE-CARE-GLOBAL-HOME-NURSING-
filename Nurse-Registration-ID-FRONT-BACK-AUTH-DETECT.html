@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Registration - ID Front & Back + Auto Auth Detect</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding:16px;padding-bottom:120px;overflow-y:auto}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),linear-gradient(180deg,#0e0a1c 0%, #120e26 100%)}
+.wrap{width:100%;max-width:580px;margin:0 auto;position:relative;z-index:1}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.22);border-radius:24px;padding:22px;padding-bottom:40px;box-shadow:0 20px 50px rgba(0,0,0,.6);margin-bottom:20px}
+.logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-weight:900;margin:0 auto 10px;font-size:24px;color:#1e0a3a}
+h1{text-align:center;font-weight:800;font-size:17px;color:#f3e8ff}
+.subtitle{text-align:center;font-size:11px;color:#a78bfa;margin:6px 0 10px}
+.badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.badge{padding:5px 10px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid}
+.badgeGreen{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.3)}
+.badgePurple{background:rgba(168,85,247,.15);color:#d8b4fe;border-color:rgba(168,85,247,.25)}
+.badgeYellow{background:rgba(245,158,11,.15);color:#facc15;border-color:rgba(245,158,11,.25)}
+.badgeBlue{background:rgba(59,130,246,.15);color:#93c5fd;border-color:rgba(59,130,246,.3)}
+label{font-size:11px;font-weight:800;margin:12px 0 5px;display:block;color:#c4b5fd;text-transform:uppercase}
+label.required:after{content:" *";color:#facc15}
+label.optional:after{content:" (Optional)";color:#6b7280;font-weight:400;text-transform:none}
+.inputWrap{position:relative}
+input,select,textarea{width:100%;padding:14px 46px 14px 14px;border-radius:12px;border:1.5px solid rgba(168,85,247,.22);background:rgba(14,10,28,.7);color:#f3e8ff;font-size:14px;outline:none}
+select,textarea{padding-right:14px}
+textarea{resize:vertical;min-height:60px}
+input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.18)}
+.eyeBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(168,85,247,.25);border:1px solid rgba(168,85,247,.35);width:46px;height:46px;border-radius:12px;cursor:pointer;display:grid;place-items:center;z-index:20;font-size:18px}
+.btn{width:100%;padding:16px;border-radius:14px;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;margin-top:12px;min-height:52px;transition:.15s}
+.btn:active{transform:scale(0.96)}
+.btnPurple{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;box-shadow:0 8px 20px rgba(168,85,247,.35)}
+.btnLight{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.22);color:#e9d5ff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:500px){.grid2{grid-template-columns:1fr}}
+.fileBox{background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.35);border-radius:12px;padding:12px;margin-top:6px;cursor:pointer;position:relative}
+.fileBox.hasFile{border-color:#22c55e!important;background:rgba(34,197,94,.1)!important}
+.fileBox.required{border-color:rgba(250,204,21,.4)}
+.fileBox.authOk{border-color:#22c55e!important;background:rgba(34,197,94,.12)!important;box-shadow:0 0 12px rgba(34,197,94,.2)}
+.fileBox.authFail{border-color:#ef4444!important;background:rgba(239,68,68,.1)!important}
+.fileName{font-size:11px;color:#86efac;font-weight:700;margin-top:6px;display:none}
+.alert{padding:12px;border-radius:12px;font-size:11px;font-weight:700;margin:10px 0;border:1px solid;word-break:break-word}
+.alert-info{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93c5fd}
+.alert-success{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac}
+.alert-error{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5}
+.alert-warn{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3);color:#fde68a}
+.stepper{display:flex;align-items:center;justify-content:center;gap:0;margin:16px 0 20px}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.stepCircle{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:14px;border:2px solid rgba(168,85,247,.25);background:rgba(14,10,28,.7);color:#a78bfa;transition:.3s}
+.step.active .stepCircle{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border-color:#a855f7}
+.step.done .stepCircle{background:rgba(34,197,94,.2);border-color:#22c55e;color:#86efac}
+.stepLabel{font-size:10px;font-weight:800;text-transform:uppercase;color:#6b7280}
+.step.active .stepLabel{color:#d8b4fe}
+.stepLine{position:absolute;top:17px;left:60%;width:80%;height:2px;background:rgba(168,85,247,.2);z-index:-1}
+.step:last-child .stepLine{display:none}
+.section{display:none}
+.section.active{display:block;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.sectionTitle{font-size:13px;font-weight:800;color:#f3e8ff;margin-bottom:4px}
+.sectionDesc{font-size:11px;color:#a78bfa;margin-bottom:14px}
+.navRow{display:flex;gap:10px;margin-top:16px}
+.navRow .btn{margin-top:0;flex:1}
+.previewImg{width:100%;height:150px;border-radius:12px;object-fit:cover;background:rgba(14,10,28,.5);display:none;margin-top:8px;border:1px solid rgba(168,85,247,.15)}
+.gpsBox{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:14px;margin-top:8px}
+.progressBar{height:8px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;margin:12px 0;display:none}
+.progressFill{height:100%;background:linear-gradient(90deg,#a855f7,#facc15);width:0%;transition:.4s}
+.compressInfo{font-size:10px;color:#22c55e;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);padding:6px 8px;border-radius:8px;margin-top:4px}
+.logBox{background:rgba(0,0,0,.4);border:1px solid rgba(168,85,247,.15);border-radius:8px;padding:8px;margin-top:8px;font-size:10px;color:#a78bfa;max-height:160px;overflow-y:auto;display:none;white-space:pre-wrap}
+.videoInfo{font-size:10px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);padding:6px 8px;border-radius:8px;margin-top:4px;color:#d8b4fe}
+.authStatus{font-size:11px;font-weight:800;padding:8px;border-radius:8px;margin-top:6px;display:none;border:1px solid}
+.authStatus.ok{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#86efac;display:block}
+.authStatus.fail{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5;display:block}
+.authStatus.checking{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#93c5fd;display:block}
+.idPair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:500px){.idPair{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap"><div class="card">
+<div class="logo">👩‍⚕️</div>
+<h1>Nurse Registration - ID FRONT/BACK + AUTH DETECT</h1>
+<p class="subtitle">ID Front + Back Required • Auto-detects authenticity • Photo ~200KB • Video fast • No ghost</p>
+<div class="badges">
+<span class="badge badgeGreen">✅ Front + Back</span>
+<span class="badge badgeBlue">🔍 Auto Auth Detect</span>
+<span class="badge badgePurple">⚡ Photo 200KB</span>
+<span class="badge badgeYellow">📦 CEO Approval</span>
+</div>
+
+<div class="stepper">
+<div class="step active" id="stepper1"><div class="stepCircle">1</div><div class="stepLabel">Personal Info</div><div class="stepLine"></div></div>
+<div class="step" id="stepper2"><div class="stepCircle">2</div><div class="stepLabel">Documents</div></div>
+</div>
+<div id="msg"></div>
+
+<div class="section active" id="section1">
+<div class="sectionTitle">👤 Step 1 — Personal & Professional Details</div>
+<div class="sectionDesc">All mandatory. ID Front+Back required with auto authentication check.</div>
+
+<div class="grid2">
+<div><label class="required">Full Name</label><input id="fullName" placeholder="Enter full name"></div>
+<div><label class="required">Email</label><input id="email" type="email" placeholder="email@gmail.com"></div>
+</div>
+<div class="grid2">
+<div><label class="required">Phone</label><input id="phone" type="tel" placeholder="0596672863"></div>
+<div><label class="required">Password</label><div class="inputWrap"><input id="password" type="password" placeholder="Min 6 chars"><button type="button" class="eyeBtn" onclick="togglePass()">👁️</button></div></div>
+</div>
+<div class="grid2">
+<div><label class="required">Country</label><select id="country"><option value="Ghana" selected>Ghana</option><option value="Nigeria">Nigeria</option><option value="USA">USA</option><option value="UK">UK</option><option value="Other">Other</option></select></div>
+<div><label class="required">Experience</label><select id="experience"><option value="1">1 Year</option><option value="2" selected>2 Years</option><option value="3">3 Years</option><option value="5">5+ Years</option><option value="10">10+ Years</option></select></div>
+</div>
+<label class="required">Qualification</label><input id="qualification" placeholder="e.g., BSc Nursing">
+<label class="required">Services</label><select id="services"><option value="General Nursing" selected>General Nursing</option><option value="Elderly Care">Elderly Care</option><option value="Home Care">Home Care</option></select>
+<div class="grid2">
+<div><label class="required">Reference Name</label><input id="referenceName" placeholder="Reference"></div>
+<div><label class="required">Reference Phone</label><input id="referencePhone" type="tel" placeholder="Reference phone"></div>
+</div>
+<div class="gpsBox">
+<label class="required">📍 Location</label>
+<div id="gpsStatus" style="font-size:11px;color:#a78bfa;margin:6px 0">Tap to capture GPS — REQUIRED</div>
+<button type="button" class="btn btnLight" id="gpsBtn" onclick="captureGPS()">📍 Capture My Location</button>
+</div>
+<div class="navRow"><button type="button" class="btn btnPurple" onclick="goToStep2()">Next → Documents</button></div>
+</div>
+
+<div class="section" id="section2">
+<div class="sectionTitle">📄 Step 2 — Documents (FRONT + BACK + AUTH)</div>
+<div class="sectionDesc">National ID now needs FRONT and BACK. System auto-detects if ID is authentic (checks GHANA CARD format, photo, text).</div>
+
+<div class="progressBar" id="progressBarWrap"><div class="progressFill" id="progressFill"></div></div>
+<div id="logBox" class="logBox"></div>
+
+<label class="required">Profile Photo — REQUIRED — Any size → ~200KB</label>
+<div class="fileBox required" id="boxPhoto" onclick="document.getElementById('photoFile').click()">
+<input type="file" id="photoFile" accept="image/*" style="display:none">
+<div style="font-size:12px">📸 Tap to upload Profile Photo *</div>
+<div class="compressInfo">ANY SIZE → auto compress to ~200KB</div>
+<div class="fileName" id="nameBoxPhoto"></div>
+<img id="previewPhoto" class="previewImg">
+</div>
+
+<label class="required">National ID — FRONT SIDE — REQUIRED — Auto auth detect</label>
+<div class="fileBox required" id="boxIdFront" onclick="document.getElementById('idFrontFile').click()">
+<input type="file" id="idFrontFile" accept="image/*,.pdf" style="display:none">
+<div style="font-size:12px">🪪 Tap to upload ID FRONT *</div>
+<div class="compressInfo">Front side: Photo + Name + GHANA visible • Any size → ~200KB • Auto checks authenticity</div>
+<div class="fileName" id="nameBoxIdFront"></div>
+<img id="previewIdFront" class="previewImg">
+<div id="authIdFront" class="authStatus"></div>
+<div id="idFrontCompressInfo" style="font-size:10px;color:#22c55e;margin-top:4px;display:none"></div>
+</div>
+
+<label class="required">National ID — BACK SIDE — REQUIRED — Auto auth detect</label>
+<div class="fileBox required" id="boxIdBack" onclick="document.getElementById('idBackFile').click()">
+<input type="file" id="idBackFile" accept="image/*,.pdf" style="display:none">
+<div style="font-size:12px">🪪 Tap to upload ID BACK *</div>
+<div class="compressInfo">Back side: QR Code / Fingerprint / Issue Date visible • Any size → ~200KB • Auto checks</div>
+<div class="fileName" id="nameBoxIdBack"></div>
+<img id="previewIdBack" class="previewImg">
+<div id="authIdBack" class="authStatus"></div>
+<div id="idBackCompressInfo" style="font-size:10px;color:#22c55e;margin-top:4px;display:none"></div>
+</div>
+
+<label class="required">Licence — REQUIRED — PDF → image</label>
+<div class="fileBox required" id="boxLicence" onclick="document.getElementById('licenceFile').click()">
+<input type="file" id="licenceFile" accept="image/*,.pdf" style="display:none">
+<div style="font-size:12px">📜 Tap to upload Nursing Licence *</div>
+<div class="compressInfo">Any size PDF → ~200KB image</div>
+<div class="fileName" id="nameBoxLicence"></div>
+<img id="previewLicence" class="previewImg">
+<div id="licCompressInfo" style="font-size:10px;color:#22c55e;margin-top:4px;display:none"></div>
+</div>
+
+<label class="required">Intro Video — REQUIRED — Compressed fast</label>
+<div class="fileBox required" id="boxVideo" onclick="document.getElementById('videoFile').click()">
+<input type="file" id="videoFile" accept="video/*" style="display:none">
+<div style="font-size:12px">🎥 Tap to upload Intro Video *</div>
+<div class="videoInfo">ANY SIZE → 480p, ~500kbps, max 90s, ~2-5MB fast download</div>
+<div class="fileName" id="nameBoxVideo"></div>
+<video id="previewVideo" class="previewImg" controls style="display:none"></video>
+<div id="videoCompressInfo" style="font-size:10px;color:#22c55e;margin-top:4px;display:none"></div>
+</div>
+
+<label class="optional">Certificate — OPTIONAL</label>
+<div class="fileBox optional" id="boxCert" onclick="document.getElementById('certFile').click()">
+<input type="file" id="certFile" accept="image/*,.pdf" style="display:none">
+<div style="font-size:12px">📜 Certificate (Optional)</div>
+<div class="fileName" id="nameBoxCert"></div>
+<img id="previewCert" class="previewImg">
+</div>
+
+<div class="navRow">
+<button type="button" class="btn btnLight" onclick="goToStep1()">← Back</button>
+<button type="button" class="btn btnPurple" id="registerBtn" onclick="registerNurse()">🔍 Verify IDs & Register</button>
+</div>
+</div>
+
+</div></div>
+
+<canvas id="videoCanvas" style="display:none"></canvas>
+<video id="hiddenVideo" style="display:none" muted playsinline></video>
+<canvas id="authCanvas" style="display:none"></canvas>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
+const storage=firebase.storage();
+if(window.pdfjsLib){ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }
+
+let currentLat=null, currentLng=null, currentGPSName='';
+let filesState={photo:null, idFront:null, idBack:null, licence:null, video:null, cert:null};
+let authState={idFront:false, idBack:false, idFrontScore:0, idBackScore:0, idFrontText:'', idBackText:''};
+
+function log(msg){
+  const box=document.getElementById('logBox');
+  box.style.display='block';
+  box.textContent+=`[${new Date().toLocaleTimeString()}] ${msg}\n`;
+  box.scrollTop=box.scrollHeight;
+}
+function showMsg(text,type){
+  const el=document.getElementById('msg');
+  el.innerHTML=`<div class="alert alert-${type}">${text}</div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(type!=='error') setTimeout(()=>{ if(el.innerHTML.includes(text.substring(0,15))) el.innerHTML=''; }, 6000);
+}
+function togglePass(){const el=document.getElementById('password'); el.type=el.type==='password'?'text':'password';}
+function goToStep2(){
+  const fullName=document.getElementById('fullName').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('password').value.trim();
+  const qualification=document.getElementById('qualification').value.trim();
+  const refName=document.getElementById('referenceName').value.trim();
+  const refPhone=document.getElementById('referencePhone').value.trim();
+  if(!fullName||!email||!phone||!password){ showMsg('❌ Fill Name, Email, Phone, Password', 'error'); return; }
+  if(password.length<6){ showMsg('❌ Password min 6 chars', 'error'); return; }
+  if(!qualification){ showMsg('❌ Qualification required', 'error'); return; }
+  if(!refName||!refPhone){ showMsg('❌ Reference required', 'error'); return; }
+  if(!currentLat){ showMsg('📍 Capture GPS', 'error'); return; }
+  document.getElementById('section1').classList.remove('active');
+  document.getElementById('section2').classList.add('active');
+  document.getElementById('stepper1').classList.remove('active'); document.getElementById('stepper1').classList.add('done'); document.getElementById('stepper1').querySelector('.stepCircle').innerHTML='✓';
+  document.getElementById('stepper2').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goToStep1(){
+  document.getElementById('section2').classList.remove('active');
+  document.getElementById('section1').classList.add('active');
+  document.getElementById('stepper1').classList.add('active'); document.getElementById('stepper1').classList.remove('done'); document.getElementById('stepper1').querySelector('.stepCircle').innerHTML='1';
+  document.getElementById('stepper2').classList.remove('active');
+}
+async function captureGPS(){
+  const btn=document.getElementById('gpsBtn'); const statusEl=document.getElementById('gpsStatus');
+  btn.textContent='⏳ Capturing...'; btn.disabled=true;
+  navigator.geolocation.getCurrentPosition(async(pos)=>{
+    currentLat=pos.coords.latitude; currentLng=pos.coords.longitude;
+    statusEl.innerHTML=`✅ ${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`; statusEl.style.color='#86efac';
+    btn.textContent='✅ Captured'; btn.disabled=false;
+    try{ const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}`); const data=await res.json(); currentGPSName=data.display_name||''; }catch(e){}
+  }, (err)=>{ showMsg('GPS failed: '+err.message,'error'); btn.textContent='📍 Try Again'; btn.disabled=false; }, {enableHighAccuracy:true, timeout:15000});
+}
+
+// === IMAGE COMPRESS ~200KB ===
+function compressImageFile(file, maxW=900){
+  return new Promise((resolve)=>{
+    const reader=new FileReader();
+    reader.onload=(e)=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        let w=img.width, h=img.height;
+        if(w>maxW){ h=Math.round(h*maxW/w); w=maxW; }
+        if(h>1200){ w=Math.round(w*1200/h); h=1200; }
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        let q=0.7; let dataUrl=canvas.toDataURL('image/jpeg', q);
+        while(dataUrl.length>320000 && q>0.15){ q-=0.1; dataUrl=canvas.toDataURL('image/jpeg', q); }
+        canvas.toBlob((blob)=>{ resolve({blob, dataUrl, origSize:file.size, compSize:blob.size, quality:q, w, h, img}); }, 'image/jpeg', q);
+      };
+      img.onerror=()=>{ resolve({blob:file, dataUrl:e.target.result, origSize:file.size, compSize:file.size}); };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function convertPdfToImage(file){
+  return new Promise(async(resolve)=>{
+    try{
+      const arrayBuffer=await file.arrayBuffer();
+      const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+      const page=await pdf.getPage(1);
+      const viewport=page.getViewport({scale:2});
+      const canvas=document.createElement('canvas');
+      canvas.width=viewport.width; canvas.height=viewport.height;
+      const ctx=canvas.getContext('2d');
+      await page.render({canvasContext:ctx, viewport:viewport}).promise;
+      let q=0.7; let dataUrl=canvas.toDataURL('image/jpeg', q);
+      while(dataUrl.length>320000 && q>0.15){ q-=0.1; dataUrl=canvas.toDataURL('image/jpeg', q); }
+      canvas.toBlob((blob)=>{ resolve({blob, dataUrl, origSize:file.size, compSize:blob.size, fromPdf:true}); }, 'image/jpeg', q);
+    }catch(e){
+      resolve({blob:file, dataUrl:'', origSize:file.size, compSize:file.size, fromPdf:false, error:e.message});
+    }
+  });
+}
+
+async function processFile(file){
+  if(!file) return null;
+  if(file.type==='application/pdf' || file.name.toLowerCase().endsWith('.pdf')){
+    return await convertPdfToImage(file);
+  }else if(file.type.startsWith('image/')){
+    return await compressImageFile(file);
+  }else{
+    return {blob:file, dataUrl:'', origSize:file.size, compSize:file.size};
+  }
+}
+
+// === AUTO AUTH DETECTION FOR GHANA CARD ===
+async function detectIdAuth(file, dataUrl, side){
+  const authEl=document.getElementById(side==='front'?'authIdFront':'authIdBack');
+  const boxEl=document.getElementById(side==='front'?'boxIdFront':'boxIdBack');
+  
+  authEl.className='authStatus checking';
+  authEl.style.display='block';
+  authEl.innerHTML='🔍 Checking authenticity... Scanning ID...';
+  if(boxEl) boxEl.classList.remove('authOk','authFail');
+  
+  log(`🔍 Auto-detecting ${side} ID authenticity...`);
+  
+  let score=0;
+  let checks=[];
+  let textDetected='';
+  
+  try{
+    // Check 1: Image size & resolution
+    const img=new Image();
+    await new Promise((res,rej)=>{
+      img.onload=res;
+      img.onerror=rej;
+      img.src=dataUrl;
+    });
+    
+    if(img.width>=300 && img.height>=180){
+      score+=20;
+      checks.push('✅ Resolution OK ('+img.width+'x'+img.height+')');
+    }else{
+      checks.push('⚠️ Low resolution ('+img.width+'x'+img.height+') - may be blurry');
+    }
+    
+    // Check 2: Not blank image - check pixel variance
+    const canvas=document.getElementById('authCanvas');
+    canvas.width=100; canvas.height=100;
+    const ctx=canvas.getContext('2d');
+    ctx.drawImage(img,0,0,100,100);
+    const imageData=ctx.getImageData(0,0,100,100).data;
+    let variance=0;
+    for(let i=0;i<imageData.length;i+=4*10){
+      variance+=Math.abs(imageData[i]-128);
+    }
+    if(variance>5000){
+      score+=15;
+      checks.push('✅ Image not blank - has content');
+    }else{
+      checks.push('❌ Image appears blank or too uniform');
+    }
+    
+    // Check 3: OCR - detect Ghana Card keywords
+    try{
+      log(`🔍 Running OCR for ${side}... (may take 5-10 sec)`);
+      authEl.innerHTML='🔍 OCR scanning text... Checking for GHANA CARD keywords...';
+      
+      const result=await Tesseract.recognize(dataUrl, 'eng', {
+        logger: m => {
+          if(m.status==='recognizing text'){
+            authEl.innerHTML=`🔍 OCR ${Math.round(m.progress*100)}% — scanning for authenticity...`;
+          }
+        }
+      });
+      
+      textDetected=result.data.text.toUpperCase();
+      const text=textDetected;
+      log(`OCR ${side} text: ${text.substring(0,200)}`);
+      
+      // Ghana Card keywords for FRONT
+      if(side==='front'){
+        if(text.includes('GHANA') || text.includes('GHANA CARD') || text.includes('CARD')){
+          score+=25; checks.push('✅ GHANA CARD text detected');
+        }
+        if(text.includes('GHA-') || text.match(/GHA[-\s]?\d/) || text.match(/\d{3}-\d{7}/)){
+          score+=20; checks.push('✅ Ghana Card number format (GHA-...) detected');
+        }
+        if(text.match(/PERSONAL ID|PIN|DATE OF BIRTH|NATIONALITY|SURNAME|GIVEN NAME|HEIGHT|SEX/i) || text.includes('NAME') || text.includes('BIRTH')){
+          score+=15; checks.push('✅ Personal info fields detected (Name, DOB, etc)');
+        }
+        // Photo presence check - assume front should have face
+        if(img.width>img.height*0.6){
+          score+=10; checks.push('✅ ID aspect ratio looks like real card');
+        }
+      }
+      // BACK side keywords
+      else{
+        if(text.includes('GHANA') || text.includes('NIA') || text.includes('NATIONAL IDENTIFICATION')){
+          score+=20; checks.push('✅ NIA/GHANA text detected on back');
+        }
+        if(text.match(/ISSUE|EXPIRY|PLACE OF ISSUE|HOLDER|SIGNATURE|QR|CODE/i) || text.includes('ISSUED') || text.includes('DATE')){
+          score+=20; checks.push('✅ Back side info (Issue date, etc) detected');
+        }
+        if(text.match(/GHA-|QR|NIA|AUTHORITY/i)){
+          score+=15; checks.push('✅ Back side security text detected');
+        }
+        // Back often has QR code - check for high detail
+        if(variance>15000){
+          score+=15; checks.push('✅ High detail (QR/patterns) detected on back');
+        }
+      }
+      
+      // Generic checks
+      if(text.length>20){
+        score+=10; checks.push('✅ Text detected ('+text.length+' chars)');
+      }
+      if(text.match(/\d{2}[\/-]\d{2}[\/-]\d{4}|\d{4}[\/-]\d{2}[\/-]\d{2}/)){
+        score+=10; checks.push('✅ Date format detected');
+      }
+      
+    }catch(ocrErr){
+      log(`⚠️ OCR failed for ${side}: ${ocrErr.message} — using image checks only`);
+      checks.push('⚠️ OCR failed, using image checks');
+      score+=30; // Give benefit if OCR fails but image looks OK
+    }
+    
+  }catch(e){
+    log(`Auth detect error ${side}: ${e.message}`);
+    checks.push('⚠️ Error during check: '+e.message);
+    score=50; // Default middle score on error
+  }
+  
+  // Final score
+  const isAuth=score>=60;
+  const percent=Math.min(100, score);
+  
+  if(side==='front'){
+    authState.idFront=isAuth;
+    authState.idFrontScore=percent;
+    authState.idFrontText=textDetected;
+  }else{
+    authState.idBack=isAuth;
+    authState.idBackScore=percent;
+    authState.idBackText=textDetected;
+  }
+  
+  if(isAuth){
+    authEl.className='authStatus ok';
+    authEl.innerHTML=`✅ <b>Authentic ${side.toUpperCase()} detected (${percent}%)</b><br>`+checks.join('<br>');
+    if(boxEl){ boxEl.classList.add('authOk'); boxEl.classList.remove('authFail'); }
+    log(`✅ ${side} ID AUTHENTIC (${percent}%): `+checks.join(', '));
+  }else{
+    authEl.className='authStatus fail';
+    authEl.innerHTML=`⚠️ <b>Low authenticity score (${percent}%) — please retake clearer photo of ${side}</b><br>`+checks.join('<br>')+'<br><small>You can still proceed but CEO may reject if blurry.</small>';
+    if(boxEl){ boxEl.classList.add('authFail'); boxEl.classList.remove('authOk'); }
+    log(`⚠️ ${side} ID LOW SCORE (${percent}%): `+checks.join(', '));
+  }
+  
+  return {isAuth, score:percent, checks, text:textDetected};
+}
+
+// === VIDEO COMPRESS ===
+async function compressVideo(file){
+  return new Promise((resolve)=>{
+    log(`🎥 Video: ${(file.size/1024/1024).toFixed(2)}MB → compressing to 480p ~2-5MB...`);
+    const infoEl=document.getElementById('videoCompressInfo');
+    if(infoEl){ infoEl.style.display='block'; infoEl.textContent='⏳ Compressing video...'; }
+    const video=document.getElementById('hiddenVideo');
+    const canvas=document.getElementById('videoCanvas');
+    const ctx=canvas.getContext('2d');
+    const url=URL.createObjectURL(file);
+    video.src=url; video.muted=true; video.playsInline=true;
+    video.onloadedmetadata=async()=>{
+      const duration=Math.min(video.duration, 90);
+      let targetW=640, targetH=360;
+      const aspect=video.videoWidth/video.videoHeight;
+      if(aspect>1){ targetW=640; targetH=Math.round(640/aspect); }else{ targetH=640; targetW=Math.round(640*aspect); }
+      canvas.width=targetW; canvas.height=targetH;
+      let stream;
+      try{ stream=canvas.captureStream(24); }catch(e){ URL.revokeObjectURL(url); resolve({blob:file, compressed:false}); return; }
+      try{
+        const audioStream=video.captureStream ? video.captureStream() : (video.mozCaptureStream ? video.mozCaptureStream() : null);
+        if(audioStream){ const audioTracks=audioStream.getAudioTracks(); if(audioTracks.length>0) stream.addTrack(audioTracks[0]); }
+      }catch(e){}
+      const chunks=[];
+      let mimeType='video/webm;codecs=vp9';
+      if(!MediaRecorder.isTypeSupported(mimeType)) mimeType='video/webm;codecs=vp8';
+      if(!MediaRecorder.isTypeSupported(mimeType)) mimeType='video/webm';
+      let recorder;
+      try{ recorder=new MediaRecorder(stream, {mimeType, videoBitsPerSecond:500000}); }
+      catch(e){ try{ recorder=new MediaRecorder(stream, {mimeType:'video/webm'}); }catch(e2){ URL.revokeObjectURL(url); resolve({blob:file, compressed:false}); return; } }
+      recorder.ondataavailable=(e)=>{ if(e.data && e.data.size>0) chunks.push(e.data); };
+      recorder.onstop=()=>{
+        URL.revokeObjectURL(url);
+        const blob=new Blob(chunks, {type:mimeType});
+        log(`✅ Video compressed: ${(file.size/1024/1024).toFixed(2)}MB → ${(blob.size/1024/1024).toFixed(2)}MB`);
+        if(infoEl){ infoEl.textContent=`✅ Compressed: ${(file.size/1024/1024).toFixed(2)}MB → ${(blob.size/1024/1024).toFixed(2)}MB (fast!)`; infoEl.style.color='#22c55e'; }
+        resolve({blob, compressed:true, origSize:file.size, compSize:blob.size});
+      };
+      video.currentTime=0;
+      const playPromise=video.play(); if(playPromise) await playPromise.catch(()=>{});
+      recorder.start(100);
+      let elapsed=0;
+      const drawInterval=setInterval(()=>{
+        if(video.paused || video.ended || elapsed>=duration){
+          clearInterval(drawInterval);
+          try{ recorder.stop(); video.pause(); }catch(e){}
+          return;
+        }
+        ctx.drawImage(video,0,0,targetW,targetH);
+        elapsed+=1/24;
+      }, 1000/24);
+      setTimeout(()=>{ clearInterval(drawInterval); try{ if(recorder.state==='recording') recorder.stop(); video.pause(); }catch(e){} }, (duration*1000)+5000);
+      video.onended=()=>{ clearInterval(drawInterval); try{ if(recorder.state==='recording') recorder.stop(); }catch(e){} };
+    };
+    video.onerror=()=>{ URL.revokeObjectURL(url); resolve({blob:file, compressed:false}); };
+  });
+}
+
+async function handleFileSelect(file, boxId, nameId, previewId, stateKey, infoId, sideForAuth){
+  if(!file) return;
+  filesState[stateKey]=file;
+  const box=document.getElementById(boxId);
+  const nameEl=document.getElementById(nameId);
+  const preview=document.getElementById(previewId);
+  const infoEl=infoId?document.getElementById(infoId):null;
+  if(box) box.classList.add('hasFile');
+  if(nameEl){ nameEl.style.display='block'; nameEl.textContent='✓ '+file.name+' ('+(file.size/1024/1024).toFixed(2)+'MB) — checking auth...'; nameEl.style.color='#86efac'; }
+  
+  let dataUrl='';
+  let processed;
+  
+  if(file.type.startsWith('image/')){
+    const r=new FileReader();
+    dataUrl=await new Promise(res=>{ r.onload=e=>{ res(e.target.result); }; r.readAsDataURL(file); });
+    if(preview){ preview.src=dataUrl; preview.style.display='block'; }
+    processed=await compressImageFile(file);
+    if(infoEl){ infoEl.style.display='block'; infoEl.textContent=`✅ ${ (processed.origSize/1024/1024).toFixed(2)}MB → ${(processed.compSize/1024).toFixed(0)}KB`; infoEl.style.color='#22c55e'; }
+  }else if(file.type==='application/pdf' || file.name.toLowerCase().endsWith('.pdf')){
+    processed=await convertPdfToImage(file);
+    dataUrl=processed.dataUrl;
+    if(preview && dataUrl){ preview.src=dataUrl; preview.style.display='block'; }
+    else if(preview){ preview.style.display='none'; }
+    if(infoEl){ infoEl.style.display='block'; infoEl.textContent=processed.fromPdf?`✅ PDF→JPG: ${(processed.origSize/1024/1024).toFixed(2)}MB → ${(processed.compSize/1024).toFixed(0)}KB`:`PDF original`; infoEl.style.color='#22c55e'; }
+  }else if(file.type.startsWith('video/')){
+    if(preview){ preview.src=URL.createObjectURL(file); preview.style.display='block'; }
+    dataUrl='';
+  }
+  
+  showMsg('✅ '+file.name+' selected', 'success');
+  
+  // AUTO AUTH DETECT FOR ID FRONT/BACK
+  if(sideForAuth && (stateKey==='idFront' || stateKey==='idBack')){
+    if(dataUrl){
+      await detectIdAuth(file, dataUrl, sideForAuth);
+    }else if(processed && processed.dataUrl){
+      await detectIdAuth(file, processed.dataUrl, sideForAuth);
+    }
+  }
+}
+
+document.getElementById('photoFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxPhoto', 'nameBoxPhoto', 'previewPhoto', 'photo'); });
+document.getElementById('idFrontFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxIdFront', 'nameBoxIdFront', 'previewIdFront', 'idFront', 'idFrontCompressInfo', 'front'); });
+document.getElementById('idBackFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxIdBack', 'nameBoxIdBack', 'previewIdBack', 'idBack', 'idBackCompressInfo', 'back'); });
+document.getElementById('licenceFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxLicence', 'nameBoxLicence', 'previewLicence', 'licence', 'licCompressInfo'); });
+document.getElementById('videoFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxVideo', 'nameBoxVideo', 'previewVideo', 'video'); });
+document.getElementById('certFile').addEventListener('change', function(){ handleFileSelect(this.files[0], 'boxCert', 'nameBoxCert', 'previewCert', 'cert'); });
+
+function uploadWithRetry(blob, path, timeoutMs=180000, retries=2){
+  return new Promise((resolve, reject)=>{
+    let attempt=0;
+    function tryUpload(){
+      attempt++;
+      log(`📤 Attempt ${attempt}/${retries+1}: ${path.split('/').pop()} (${(blob.size/1024).toFixed(0)}KB)...`);
+      let timedOut=false;
+      const timer=setTimeout(()=>{
+        timedOut=true;
+        log(`❌ TIMEOUT ${timeoutMs/1000}s for ${path.split('/').pop()}`);
+        if(attempt<=retries){ log(`🔄 Retrying...`); setTimeout(tryUpload, 2000); }
+        else{ reject(new Error(`Upload timeout after ${timeoutMs/1000}s for ${path.split('/').pop()} — slow network`)); }
+      }, timeoutMs);
+      try{
+        const sRef=storage.ref(path);
+        const task=sRef.put(blob);
+        task.on('state_changed',
+          (snapshot)=>{
+            if(timedOut) return;
+            const progress=(snapshot.bytesTransferred/snapshot.totalBytes)*100;
+            log(`⬆️ ${path.split('/').pop()}: ${progress.toFixed(0)}% (${(snapshot.bytesTransferred/1024/1024).toFixed(2)}MB)`);
+          },
+          (error)=>{
+            clearTimeout(timer);
+            if(timedOut) return;
+            log(`❌ Upload error ${path.split('/').pop()}: ${error.code} - ${error.message}`);
+            if(attempt<=retries){ setTimeout(tryUpload, 2000); }
+            else{ reject(new Error(`${error.code}: ${error.message}`)); }
+          },
+          async()=>{
+            clearTimeout(timer);
+            if(timedOut) return;
+            try{ const url=await sRef.getDownloadURL(); log(`✅ DONE: ${path.split('/').pop()}`); resolve(url); }
+            catch(e){ if(attempt<=retries) setTimeout(tryUpload, 1000); else reject(e); }
+          }
+        );
+      }catch(e){ clearTimeout(timer); if(attempt<=retries) setTimeout(tryUpload, 1000); else reject(e); }
+    }
+    tryUpload();
+  });
+}
+
+async function cleanupFailedRegistration(user){
+  log('CLEANUP: Deleting Auth to avoid ghost...');
+  try{ if(user){ await user.delete(); log('✅ Auth deleted'); } }catch(e){ try{ await auth.signOut(); }catch(e2){} }
+  try{ if(user && user.uid){ await db.ref('nurses/'+user.uid).remove().catch(()=>{}); await db.ref('pending_nurses/'+user.uid).remove().catch(()=>{}); await db.ref('ceoRegistrationCenter/nurses/'+user.uid).remove().catch(()=>{}); log('✅ DB cleaned'); } }catch(e){}
+}
+
+async function registerNurse(){
+  const fullName=document.getElementById('fullName').value.trim();
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('password').value.trim();
+  const country=document.getElementById('country').value;
+  const experience=document.getElementById('experience').value;
+  const qualification=document.getElementById('qualification').value.trim();
+  const services=document.getElementById('services').value;
+  const refName=document.getElementById('referenceName').value.trim();
+  const refPhone=document.getElementById('referencePhone').value.trim();
+
+  if(!fullName||!email||!phone||!password){ showMsg('❌ Name, Email, Phone, Password required', 'error'); return; }
+  if(password.length<6){ showMsg('❌ Password min 6 chars', 'error'); return; }
+  if(!currentLat){ showMsg('📍 Capture GPS', 'error'); return; }
+  if(!filesState.photo){ showMsg('❌ Profile Photo REQUIRED', 'error'); return; }
+  if(!filesState.idFront){ showMsg('❌ ID FRONT REQUIRED — tap box', 'error'); return; }
+  if(!filesState.idBack){ showMsg('❌ ID BACK REQUIRED — tap box', 'error'); return; }
+  if(!filesState.licence){ showMsg('❌ Licence REQUIRED', 'error'); return; }
+  if(!filesState.video){ showMsg('❌ Video REQUIRED', 'error'); return; }
+
+  // Auth check warning but allow proceed
+  if(!authState.idFront || !authState.idBack){
+    const proceed=confirm(`⚠️ ID authenticity low:\nFront: ${authState.idFrontScore}%\nBack: ${authState.idBackScore}%\n\nThis may be blurry or not GHANA CARD. CEO may reject.\n\nDo you want to retake clearer photos or proceed anyway?\n\nOK = Proceed anyway (CEO will manually verify)\nCancel = Retake photos`);
+    if(!proceed){
+      showMsg('📸 Please retake clearer FRONT and BACK photos of GHANA CARD with good light', 'warn');
+      return;
+    }
+  }
+
+  const btn=document.getElementById('registerBtn');
+  const progressWrap=document.getElementById('progressBarWrap');
+  const progressFill=document.getElementById('progressFill');
+  
+  btn.disabled=true; btn.textContent='⚡ Compressing Front/Back + Video...';
+  progressWrap.style.display='block'; progressFill.style.width='5%';
+  document.getElementById('logBox').style.display='block'; document.getElementById('logBox').textContent='';
+  log('START '+email+' with Front+Back ID auth check');
+
+  let createdUser=null;
+
+  try{
+    progressFill.style.width='10%';
+    log('Creating Auth user...');
+    const cred=await auth.createUserWithEmailAndPassword(email, password);
+    createdUser=cred.user; const uid=createdUser.uid;
+    await createdUser.updateProfile({displayName:fullName});
+    progressFill.style.width='15%';
+
+    log('Compressing photo...');
+    const compPhoto=await processFile(filesState.photo);
+    progressFill.style.width='20%';
+
+    log('Compressing ID FRONT...');
+    btn.textContent='🪪 Compressing ID FRONT (auth detected)...';
+    const compIdFront=await processFile(filesState.idFront);
+    progressFill.style.width='35%';
+    log(`ID Front ${ (filesState.idFront.size/1024/1024).toFixed(2)}MB → ${(compIdFront.compSize/1024).toFixed(0)}KB — Auth: ${authState.idFrontScore}%`);
+
+    log('Compressing ID BACK...');
+    btn.textContent='🪪 Compressing ID BACK (auth detected)...';
+    const compIdBack=await processFile(filesState.idBack);
+    progressFill.style.width='50%';
+    log(`ID Back ${ (filesState.idBack.size/1024/1024).toFixed(2)}MB → ${(compIdBack.compSize/1024).toFixed(0)}KB — Auth: ${authState.idBackScore}%`);
+
+    log('Compressing Licence...');
+    btn.textContent='📜 Compressing Licence...';
+    const compLic=await processFile(filesState.licence);
+    progressFill.style.width='60%';
+
+    log('Compressing video...');
+    btn.textContent='🎥 Compressing video...';
+    let videoResult;
+    try{ videoResult=await compressVideo(filesState.video); }catch(e){ videoResult={blob:filesState.video, compressed:false}; }
+    progressFill.style.width='70%';
+
+    let certResult=null;
+    if(filesState.cert){ certResult=await processFile(filesState.cert); }
+
+    progressFill.style.width='75%';
+    log('Uploading fast versions with Front/Back auth info...');
+
+    let photoURL='', idFrontURL='', idBackURL='', licenceURL='', videoURL='', certURL='';
+
+    photoURL=await uploadWithRetry(compPhoto.blob, 'nurses/'+uid+'/photo_'+Date.now()+'.jpg', 180000, 2);
+    progressFill.style.width='80%';
+
+    const idFrontExt=compIdFront.blob.type.includes('pdf')?'.pdf':'.jpg';
+    idFrontURL=await uploadWithRetry(compIdFront.blob, 'nurses/'+uid+'/id_front_'+Date.now()+idFrontExt, 180000, 2);
+    progressFill.style.width='85%';
+
+    const idBackExt=compIdBack.blob.type.includes('pdf')?'.pdf':'.jpg';
+    idBackURL=await uploadWithRetry(compIdBack.blob, 'nurses/'+uid+'/id_back_'+Date.now()+idBackExt, 180000, 2);
+    progressFill.style.width='88%';
+
+    const licExt=compLic.blob.type.includes('pdf')?'.pdf':'.jpg';
+    licenceURL=await uploadWithRetry(compLic.blob, 'nurses/'+uid+'/licence_'+Date.now()+licExt, 180000, 2);
+    progressFill.style.width='92%';
+
+    videoURL=await uploadWithRetry(videoResult.blob, 'nurses/'+uid+'/video_'+Date.now()+'.webm', 180000, 2);
+    progressFill.style.width='96%';
+
+    if(certResult){
+      try{ certURL=await uploadWithRetry(certResult.blob, 'nurses/'+uid+'/cert_'+Date.now()+'.jpg', 120000, 1); }catch(e){ log('Cert optional fail'); }
+    }
+
+    progressFill.style.width='98%';
+    log('Saving to CEO Center with Front/Back + Auth scores...');
+
+    const now=Date.now();
+    const nurseData={
+      uid,id:uid,fullName,name:fullName,email,phone,phoneNumber:phone,country,experience,qualification,services,specialty:services,referenceName:refName,referencePhone:refPhone,
+      lat:currentLat,lng:currentLng,gpsActualName:currentGPSName||'',
+      photo:photoURL,photoURL:photoURL,
+      idFrontURL:idFrontURL, idBackURL:idBackURL,
+      idURL:idFrontURL, idFront:idFrontURL, idBack:idBackURL, // keep backward compat
+      licenceURL,licenseUrl:licenceURL,videoURL,videoUrl:videoURL,cvURL:certURL,cvUrl:certURL,
+      idAuth:{ front:{score:authState.idFrontScore, authentic:authState.idFront, text:authState.idFrontText.substring(0,500)}, back:{score:authState.idBackScore, authentic:authState.idBack, text:authState.idBackText.substring(0,500)}, overall: (authState.idFrontScore+authState.idBackScore)/2, bothAuthentic: authState.idFront && authState.idBack },
+      hasIdFront:true, hasIdBack:true, hasIdFrontAndBack:true,
+      hasAll5:true,hasAll4:true,isApproved:false,canLogin:false,status:'pending',rating:5.0,
+      createdAt:now,updatedAt:now,source:'ID-FRONT-BACK-AUTH-DETECT'
+    };
+
+    await db.ref('nurses/'+uid).set(nurseData);
+    await db.ref('pending_nurses/'+uid).set(nurseData);
+    await db.ref('ceoNurseUpdates/'+uid).set({...nurseData, updatedBy:'FRONT-BACK-AUTH'});
+    await db.ref('ceoRegistrationCenter/nurses/'+uid).set(nurseData);
+
+    progressFill.style.width='100%';
+    log(`✅ COMPLETE - Front ${authState.idFrontScore}% + Back ${authState.idBackScore}% auth`);
+    showMsg(`✅ SUCCESS! ID Front (${authState.idFrontScore}% authentic) + Back (${authState.idBackScore}% authentic) uploaded. Video compressed. Sent to CEO!`, 'success');
+    btn.textContent='✅ Registered — CEO Verification Pending';
+    localStorage.setItem('nurseProfile', JSON.stringify(nurseData));
+    setTimeout(()=>{ location.href='nurse-login.html?from=registered'; }, 2000);
+
+  }catch(e){
+    console.error(e);
+    log('❌ FAILED: '+e.message);
+    await cleanupFailedRegistration(createdUser);
+    showMsg('❌ '+e.message+' — Auth deleted, no ghost. Try again.', 'error');
+    progressWrap.style.display='none';
+    btn.disabled=false; btn.textContent='🔍 Verify IDs & Register — Try Again';
+  }
+}
+
+(function(){
+  const params=new URLSearchParams(location.search);
+  const email=params.get('email'); const name=params.get('name');
+  if(email) document.getElementById('email').value=email;
+  if(name) document.getElementById('fullName').value=name;
+})();
+</script>
+</body>
+</html>
