@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO View All Uploads - FIXED APPROVED MARK</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding:12px}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(14,10,28,.96);border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tab{padding:10px 16px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(28,18,56,.6);color:#d8b4fe;font-weight:800;font-size:11px;cursor:pointer}
+.tab.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}
+.searchRow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.input{padding:10px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#fff;font-size:12px;flex:1;min-width:180px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.card{background:rgba(28,18,56,.96);border:1px solid rgba(168,85,247,.18);border-radius:18px;padding:14px;position:relative}
+.card.approved{border-color:rgba(34,197,94,.4);background:rgba(22,48,32,.4)}
+.card.pending{border-color:rgba(251,191,36,.3)}
+.cardHeader{display:flex;gap:10px;align-items:start}
+.avatar{width:64px;height:64px;border-radius:50%;background:#2e1065;display:grid;place-items:center;font-weight:900;overflow:hidden;flex-shrink:0;border:2px solid rgba(168,85,247,.3)}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.badge{font-size:9px;font-weight:900;padding:4px 8px;border-radius:999px;border:1px solid;display:inline-flex;margin:2px}
+.badgePending{background:rgba(251,191,36,.15);color:#fbbf24;border-color:rgba(251,191,36,.3)}
+.badgeApproved{background:rgba(34,197,94,.15);color:#4ade80;border-color:rgba(34,197,94,.4)}
+.badgeAll5{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.2)}
+.badgeMissing{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+.info{font-size:11px;color:#a78bfa;line-height:1.5;margin-top:6px}
+.docs{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.docBox{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.15);border-radius:12px;padding:8px;text-align:center;cursor:pointer;transition:.15s}
+.docBox:hover{border-color:#a855f7;transform:translateY(-2px)}
+.docBox img, .docBox video{width:100%;height:80px;object-fit:cover;border-radius:8px;background:#000}
+.docLabel{font-size:9px;font-weight:800;margin-top:4px;color:#c4b5fd;text-transform:uppercase}
+.docMissing{opacity:.3;border-style:dashed}
+.actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.btn{flex:1;padding:10px;border-radius:10px;font-weight:900;font-size:10px;border:none;cursor:pointer;min-width:90px}
+.btnApprove{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16;box-shadow:0 4px 12px rgba(34,197,94,.3)}
+.btnReject{background:linear-gradient(135deg,#ef4444,#991b1b);color:white}
+.btnView{background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.3)}
+.btnFix{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}
+.btnDelete{background:linear-gradient(135deg,#991b1b,#7f1d1d);color:#fecaca;border:1px solid rgba(239,68,68,.4);box-shadow:0 4px 12px rgba(239,68,68,.2)}
+.btnDelete:hover{background:linear-gradient(135deg,#dc2626,#991b1b)}
+.btnDeleteConfirm{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;place-items:center;z-index:9999;padding:20px}
+.modalContent{background:rgba(28,18,56,.98);border:1px solid rgba(168,85,247,.3);border-radius:16px;padding:16px;max-width:90vw;max-height:90vh;overflow:auto;text-align:center}
+.modalContent img, .modalContent video{max-width:100%;max-height:70vh;border-radius:12px}
+.toast{position:fixed;right:14px;bottom:14px;z-index:200;background:#1e0a3a;border:1px solid rgba(168,85,247,.3);color:#fff;padding:12px 16px;border-radius:12px;font-size:12px;display:none;max-width:90vw}
+.progressLog{background:rgba(0,0,0,.4);border:1px solid rgba(168,85,247,.15);border-radius:8px;padding:8px;margin-top:8px;font-size:10px;color:#a78bfa;max-height:100px;overflow-y:auto;display:none}
+
+.videoInline{position:relative;background:#000;border-radius:8px;overflow:hidden}
+.videoInline video{width:100%;height:100px;object-fit:cover;background:#000}
+.soundTag{position:absolute;top:4px;right:4px;font-size:8px;padding:2px 6px;border-radius:999px;background:rgba(34,197,94,.9);color:#000;font-weight:900}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+<div><b>👑 CEO — FIXED — Approve Marks in ALL Paths</b><br><small id="counts" style="color:#a78bfa">Loading...</small></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button onclick="loadAll()" style="padding:8px 14px;border-radius:999px;background:#2e1065;color:#d8b4fe;border:1px solid rgba(168,85,247,.2);cursor:pointer">🔄 Refresh</button>
+<button onclick="fixAllApproved()" style="padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,#facc15,#f59e0b);color:#000;font-weight:900;border:none;cursor:pointer">⚡ Fix All Stuck Approved</button>
+<a href="ceo-dashboard.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);color:#fff;text-decoration:none;font-size:11px">🏠 Dashboard</a>
+</div>
+</div>
+
+<div class="searchRow">
+<input id="search" class="input" placeholder="Search Full Name, Username, Email, Phone, Country Code..." oninput="render()">
+<select id="filterDoc" class="input" style="max-width:180px" onchange="render()">
+<option value="all">All Documents</option>
+<option value="missing">Missing ALL 5</option>
+<option value="hasVideo">Has Video</option>
+<option value="hasPhoto">Has Photo</option>
+</select>
+</div>
+
+<div class="tabs">
+<button class="tab active" data-tab="nursesPending" onclick="switchTab('nursesPending')">👩‍⚕️ Nurses Pending <small id="c_nursesPending">0</small></button>
+<button class="tab" data-tab="nursesApproved" onclick="switchTab('nursesApproved')">✅ Nurses Approved <small id="c_nursesApproved">0</small></button>
+<button class="tab" data-tab="clientsPending" onclick="switchTab('clientsPending')">👥 Clients Pending <small id="c_clientsPending">0</small></button>
+<button class="tab" data-tab="clientsApproved" onclick="switchTab('clientsApproved')">✅ Clients Approved <small id="c_clientsApproved">0</small></button>
+<button class="tab" data-tab="all" onclick="switchTab('all')">📦 ALL <small id="c_all">0</small></button>
+</div>
+
+<div id="grid" class="grid"></div>
+<div id="empty" style="padding:30px;text-align:center;color:#6b7280;display:none">No records</div>
+<div id="logBox" class="progressLog"></div>
+
+<div class="modal" id="modal" onclick="closeModal()">
+<div class="modalContent" onclick="event.stopPropagation()">
+<div id="modalTitle" style="font-weight:900;margin-bottom:10px"></div>
+<div id="modalBody"></div>
+<button onclick="closeModal()" style="margin-top:12px;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;cursor:pointer">Close</button>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const firestore=firebase.firestore();
+const storage=firebase.storage();
+const auth=firebase.auth();
+
+let allData={nursesPending:[],nursesApproved:[],clientsPending:[],clientsApproved:[],all:[]};
+let currentTab='nursesPending';
+
+function log(msg){
+  const box=document.getElementById('logBox');
+  box.style.display='block';
+  box.innerHTML+=`[${new Date().toLocaleTimeString()}] ${msg}<br>`;
+  box.scrollTop=box.scrollHeight;
+  console.log(msg);
+}
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
+function switchTab(tab){currentTab=tab;document.querySelectorAll('.tab[data-tab]').forEach(b=>b.classList.remove('active'));document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add('active');render();}
+function sanitizeEmail(e){ return (e||'').toLowerCase().replace(/[.#$@\[\]]/g,'_'); }
+
+function normalizeRecord(id, raw, type){
+  const v=raw.profile||raw.data||raw||{};
+  // OLD: email system, NEW: username system
+  const email=(v.email||v.clientEmail||'').toLowerCase();
+  const username=v.username||v.userName||id||'';
+  const fullName=v.fullName||v.name||v.displayName||v.clientName||username||(email?email.split('@')[0]:'Unnamed');
+  const name=fullName; // for display
+  const phone=v.phone||v.phoneNumber||v.clientPhone||v.phoneNumberFull||'';
+  const countryCode=v.countryCode||''; // NEW
+  const photo=v.photoURL||v.photo||v.photoUrl||v.avatar||v.avatarUrl||'';
+  const idURL=v.idURL||v.idUrl||v.nationalIdUrl||'';
+  const licenceURL=v.licenceURL||v.licenseUrl||v.licence||v.licenceUrl||'';
+  const videoURL=v.videoURL||v.videoUrl||'';
+  const certURL=v.cvURL||v.cvUrl||v.certificateURL||v.certificate||'';
+  const lat=v.lat||v.latitude||null;
+  const lng=v.lng||v.longitude||null;
+  const gpsName=v.gpsActualName||v.gpsName||'';
+  // Check approval from ANY flag
+  const isApproved = v.isApproved===true || v.approved===true || v.status==='approved' || v.canLogin===true || v.isVerified===true || v.status==='Approved' || v.hasAll4===true;
+  // NEW: client hasAll5 = fullName + username + photo + phone (no email needed)
+  const hasAll5=type==='client' ? !!(fullName && username && photo && phone) : !!(fullName && photo && phone && videoURL);
+  const hasAll4=!!(fullName && username && photo && phone);
+  return {
+    id: id, uid: v.uid||id, type: type, 
+    fullName: fullName.substring(0,50), name: name.substring(0,40), username: username, email: email, phone: phone, countryCode: countryCode,
+    photo: photo, idURL: idURL, licenceURL: licenceURL, videoURL: videoURL, certURL: certURL,
+    lat: lat, lng: lng, gpsName: gpsName, isApproved: isApproved, hasAll5: hasAll5, hasAll4: hasAll4,
+    hasPhoto: !!photo, hasVideo: !!videoURL, hasId: !!idURL, hasLicence: !!licenceURL, hasCert: !!certURL,
+    raw: v, createdAt: v.createdAt||v.timestamp||Date.now(), qualification: v.qualification||'', services: v.services||v.specialty||'',
+    referenceName: v.referenceName||'', referencePhone: v.referencePhone||'',
+    passwordHash: v.passwordHash||''
+  };
+}
+
+async function loadAll(){
+  document.getElementById('grid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:#6b7280">Loading all uploads from nurses + clients...</div>';
+  allData={nursesPending:[],nursesApproved:[],clientsPending:[],clientsApproved:[],all:[]};
+  const nursesMap={};
+  const clientsMap={};
+
+  // NURSES - from multiple paths - BUT PRIORITIZE APPROVED STATUS (fix bug)
+  const nursePaths=['ceoRegistrationCenter/nurses','nurses','pending_nurses','pendingNurses','ceoNurseUpdates','nurse_registrations','allNurses','nurseUsers','nurseApplications','allowedNurses','allowedNursesByUid','verified_nurses'];
+  for(const path of nursePaths){
+    try{
+      const snap=await db.ref(path).once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const id=ch.key;
+          const raw=ch.val();
+          if(!raw) return;
+          const rec=normalizeRecord(id, raw, 'nurse');
+          const key=rec.uid||id;
+          if(!nursesMap[key]){
+            nursesMap[key]=rec;
+          }else{
+            // Merge - BUT KEEP TRUE APPROVAL, don't overwrite with false
+            const existing=nursesMap[key];
+            const isApprovedNow = existing.isApproved || rec.isApproved; // PRIORITY: true wins
+            const mergedPhoto = existing.photo || rec.photo;
+            const mergedVideo = existing.videoURL || rec.videoURL;
+            const mergedId = existing.idURL || rec.idURL;
+            const mergedLic = existing.licenceURL || rec.licenceURL;
+            const mergedCert = existing.certURL || rec.certURL;
+            nursesMap[key]={...existing, ...rec, photo: mergedPhoto, videoURL: mergedVideo, idURL: mergedId, licenceURL: mergedLic, certURL: mergedCert, isApproved: isApprovedNow, hasPhoto: !!(mergedPhoto), hasVideo: !!(mergedVideo)};
+          }
+        });
+      }
+    }catch(e){ console.log('nurse path err', path, e); }
+  }
+
+  const clientPaths=['ceoRegistrationCenter/clients','clients','client_registrations','allClients','clientUsers','pendingClientRegistrations','ceoClientUpdates','allowedClients','allowedClientsByUid'];
+  for(const path of clientPaths){
+    try{
+      const snap=await db.ref(path).once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const id=ch.key;
+          const raw=ch.val();
+          if(!raw) return;
+          const rec=normalizeRecord(id, raw, 'client');
+          const key=rec.uid||id;
+          if(!clientsMap[key]) clientsMap[key]=rec;
+          else{
+            const existing=clientsMap[key];
+            const isApprovedNow = existing.isApproved || rec.isApproved;
+            clientsMap[key]={...existing, ...rec, photo: existing.photo||rec.photo, isApproved: isApprovedNow};
+          }
+        });
+      }
+    }catch(e){ console.log('client path err', path, e); }
+  }
+
+  const nurses=Object.values(nursesMap);
+  const clients=Object.values(clientsMap);
+
+  allData.nursesPending=nurses.filter(n=>!n.isApproved);
+  allData.nursesApproved=nurses.filter(n=>n.isApproved);
+  allData.clientsPending=clients.filter(c=>!c.isApproved);
+  allData.clientsApproved=clients.filter(c=>c.isApproved);
+  allData.all=[...nurses, ...clients].sort((a,b)=>b.createdAt-a.createdAt);
+
+  document.getElementById('counts').textContent=`Nurses: ${nurses.length} (${allData.nursesPending.length} pending, ${allData.nursesApproved.length} approved) | Clients: ${clients.length} (${allData.clientsPending.length} pending, ${allData.clientsApproved.length} approved)`;
+  document.getElementById('c_nursesPending').textContent=allData.nursesPending.length;
+  document.getElementById('c_nursesApproved').textContent=allData.nursesApproved.length;
+  document.getElementById('c_clientsPending').textContent=allData.clientsPending.length;
+  document.getElementById('c_clientsApproved').textContent=allData.clientsApproved.length;
+  document.getElementById('c_all').textContent=allData.all.length;
+
+  render();
+}
+
+function render(){
+  const grid=document.getElementById('grid');
+  const empty=document.getElementById('empty');
+  const search=(document.getElementById('search').value||'').toLowerCase();
+  const docFilter=document.getElementById('filterDoc').value;
+  let list=allData[currentTab]||[];
+
+  if(search) list=list.filter(r=> (r.fullName+' '+r.name+' '+r.username+' '+r.email+' '+r.phone+' '+(r.countryCode||'')+' '+r.phone).toLowerCase().includes(search));
+  if(docFilter==='missing') list=list.filter(r=>!r.hasAll5);
+  else if(docFilter==='hasVideo') list=list.filter(r=>r.hasVideo);
+  else if(docFilter==='hasPhoto') list=list.filter(r=>r.hasPhoto);
+
+  if(list.length===0){
+    grid.innerHTML='';
+    empty.style.display='block';
+    empty.textContent=currentTab+' — No records'+(search?' for "'+search+'"':'');
+    return;
+  }
+  empty.style.display='none';
+  grid.innerHTML='';
+
+  list.forEach(rec=>{
+    const card=document.createElement('div');
+    card.className='card '+(rec.isApproved?'approved':'pending');
+    const displayName = rec.fullName||rec.name;
+    const usernameShow = rec.username||rec.email||rec.id;
+    const phoneShow = rec.countryCode ? `${rec.countryCode} ${rec.phone.replace(rec.countryCode,'')}` : rec.phone;
+    const fullPhoneShow = rec.phone;
+    card.innerHTML=`
+      <div class="cardHeader">
+        <div class="avatar">${rec.photo?`<img src="${rec.photo}" onerror="this.parentElement.textContent='${displayName.charAt(0).toUpperCase()}'">`:displayName.charAt(0).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
+            <div style="font-weight:900;font-size:13px">${displayName} ${rec.type==='nurse'?'👩‍⚕️':'👤'}<br><small style="color:#a78bfa;font-size:10px">Username: ${usernameShow}</small></div>
+            <div>
+              <span class="badge ${rec.isApproved?'badgeApproved':'badgePending'}">${rec.isApproved?'✅ APPROVED':'⏳ PENDING'}</span>
+              <span class="badge ${rec.hasAll5||rec.hasAll4?'badgeAll5':'badgeMissing'}">${rec.hasAll5||rec.hasAll4?'✅ ALL 4':'❌ Missing'}</span>
+            </div>
+          </div>
+          <div class="info">
+            📧 ${rec.email||'no email'}<br>
+            📞 ${rec.phone||'no phone'}<br>
+            ${rec.type==='nurse'?`🎓 ${rec.qualification||''} • ${rec.services||''}<br>👤 Ref: ${rec.referenceName||''} ${rec.referencePhone||''}<br>`:''}
+            📍 ${rec.gpsName||''} ${rec.lat?`(${Number(rec.lat).toFixed(4)}, ${Number(rec.lng).toFixed(4)})`:''}<br>
+            <small style="color:#6b7280">UID: ${rec.uid} • ${new Date(rec.createdAt).toLocaleString()}</small>
+          </div>
+        </div>
+      </div>
+      <div class="docs">
+        <div class="docBox ${rec.hasPhoto?'':'docMissing'}" onclick="viewDoc('${rec.photo}','Photo - ${rec.name}','image')">
+          ${rec.photo?`<img src="${rec.photo}" loading="lazy">`:`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Photo</div>`}
+          <div class="docLabel">📸 Photo ${rec.hasPhoto?'✅':'❌'}</div>
+        </div>
+        ${rec.type==='nurse'?`
+        <div class="docBox ${rec.hasId?'':'docMissing'}" onclick="viewDoc('${rec.idURL}','ID - ${rec.name}','image')">
+          ${rec.idURL? (rec.idURL.includes('.pdf')?`<div style="height:80px;display:grid;place-items:center">📄 PDF</div>`:`<img src="${rec.idURL}" loading="lazy">`) :`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No ID</div>`}
+          <div class="docLabel">🪪 ID ${rec.hasId?'✅':'❌'}</div>
+        </div>
+        <div class="docBox ${rec.hasLicence?'':'docMissing'}" onclick="viewDoc('${rec.licenceURL}','Licence - ${rec.name}','image')">
+          ${rec.licenceURL? (rec.licenceURL.includes('.pdf')?`<div style="height:80px;display:grid;place-items:center">📄 PDF</div>`:`<img src="${rec.licenceURL}" loading="lazy">`) :`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Licence</div>`}
+          <div class="docLabel">📜 Licence ${rec.hasLicence?'✅':'❌'}</div>
+        </div>
+        <div class="docBox ${rec.hasVideo?'':'docMissing'}" onclick="viewDoc('${rec.videoURL}','Video - ${rec.name}','video')">
+          ${rec.videoURL?`<video src="${rec.videoURL}" muted playsinline preload="metadata" style="height:80px;pointer-events:none"></video>`:`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Video</div>`}
+          <div class="docLabel">🎥 Video ${rec.hasVideo?'✅':'❌ REQ'}</div>
+        </div>
+        <div class="docBox ${rec.hasCert?'':'docMissing'}" onclick="viewDoc('${rec.certURL}','Certificate - ${rec.name}','image')" style="grid-column:span 2">
+          ${rec.certURL? `<img src="${rec.certURL}" loading="lazy">` :`<div style="height:80px;display:grid;place-items:center;color:#6b7280">No Cert (Optional)</div>`}
+          <div class="docLabel">📜 Cert ${rec.hasCert?'✅':'➖ Optional'}</div>
+        </div>
+        ` : `<div class="docBox" style="grid-column:span 2">Client - Photo only (ALL 4)</div>`}
+      </div>
+      <div class="actions">
+        ${!rec.isApproved?`<button class="btn btnApprove" onclick="approve('${rec.uid}','${rec.email}','${rec.type}')">✅ APPROVE — Fix All Paths</button>`: `<button class="btn btnView" style="background:rgba(34,197,94,.2);color:#86efac">✅ Already Approved</button>`}
+        <button class="btn btnView" onclick="viewAllDocs('${rec.uid}')">👁️ View All</button>
+        ${!rec.isApproved?`<button class="btn btnReject" onclick="reject('${rec.uid}','${rec.email}','${rec.type}')">❌ Reject</button>`:``}
+      </div>
+      <div class="actions" style="margin-top:6px">
+        <button class="btn btnDelete" onclick="deleteAccount('${rec.uid}','${rec.email}','${rec.type}','${(rec.fullName||rec.name||'').replace(/'/g, "\\'")}')">🗑️ DELETE — Remove ALL data from Firebase</button>
+      </div>
+      <div style="font-size:8px;color:#6b7280;margin-top:4px;text-align:center">Delete removes DB + Storage + Firestore. Auth must be deleted in Firebase Console > Authentication</div>
+
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function viewDoc(url, title, type){
+  if(!url){ toast('No file'); return; }
+  const modal=document.getElementById('modal');
+  document.getElementById('modalTitle').textContent=title + ' — 🔊 Sound Fixed';
+  const body=document.getElementById('modalBody');
+  if(url.includes('.pdf')) body.innerHTML=`<a href="${url}" target="_blank" style="color:#93c5fd">📄 Open PDF</a><br><br><iframe src="${url}" style="width:100%;height:60vh"></iframe>`;
+  else if(type==='video') {
+    body.innerHTML=`
+      <div style="background:#000;border-radius:12px;overflow:hidden;border:2px solid rgba(168,85,247,.3)">
+        <video id="modalVideoPlayer" src="${url}" controls playsinline preload="metadata" style="width:100%;max-height:70vh;background:#000" onloadeddata="this.volume=1.0; this.muted=false; document.getElementById('soundStatus')&&(document.getElementById('soundStatus').textContent='🔊 Sound ON — Ready to play');" onplay="this.muted=false; this.volume=1.0; let s=document.getElementById('soundStatus'); if(s) s.textContent='🔊 Playing with sound — Volume '+(this.volume*100).toFixed(0)+'%'"></video>
+        <div style="display:flex;gap:8px;padding:10px;background:rgba(14,10,28,.95);justify-content:space-between;align-items:center;flex-wrap:wrap">
+          <span id="soundStatus" style="font-size:10px;padding:5px 10px;border-radius:999px;background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)">🔊 Sound ON — Volume 100%</span>
+          <div style="display:flex;gap:6px">
+            <button onclick="let v=document.getElementById('modalVideoPlayer'); v.muted=false; v.volume=1.0; v.play().then(()=>{document.getElementById('soundStatus').textContent='🔊 Playing with sound';}).catch(()=>{document.getElementById('soundStatus').textContent='▶️ Tap video play button';});" style="padding:7px 12px;border-radius:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-weight:800;border:none;font-size:10px;cursor:pointer">▶️ Play with Sound</button>
+            <button onclick="let v=document.getElementById('modalVideoPlayer'); v.muted=!v.muted; document.getElementById('soundStatus').textContent=v.muted?'🔇 Muted — Tap to unmute':'🔊 Sound ON'; document.getElementById('soundStatus').style.background=v.muted?'rgba(239,68,68,.15)':'rgba(34,197,94,.15)'; document.getElementById('soundStatus').style.color=v.muted?'#fca5a5':'#86efac';" style="padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);font-size:10px;cursor:pointer">🔊 Toggle Mute</button>
+            <button onclick="let v=document.getElementById('modalVideoPlayer'); v.volume=1.0; v.muted=false; document.getElementById('soundStatus').textContent='🔊 Max Volume 100%';" style="padding:6px 10px;border-radius:8px;background:rgba(168,85,247,.2);color:#d8b4fe;border:1px solid rgba(168,85,247,.3);font-size:10px;cursor:pointer">🔊 Max Vol</button>
+          </div>
+        </div>
+      </div>
+      <br><a href="${url}" target="_blank" style="color:#93c5fd;font-size:11px">🔗 Open video in new tab</a>
+      <div style="font-size:10px;color:#facc15;margin-top:8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);padding:8px;border-radius:8px">💡 If no sound: 1) Tap ▶️ Play with Sound button 2) Tap 🔊 speaker icon inside video 3) Drag volume slider to max. Browser blocks autoplay with sound until you tap — this is fixed by tapping play.</div>
+    `;
+    setTimeout(()=>{ let v=document.getElementById('modalVideoPlayer'); if(v){ v.volume=1.0; v.muted=false; v.play().catch(()=>{ let s=document.getElementById('soundStatus'); if(s) s.textContent='▶️ Tap Play with Sound button 🔊 — Browser blocked autoplay'; }); } }, 400);
+  }
+  else body.innerHTML=`<img src="${url}" style="max-width:100%;max-height:70vh"><br><a href="${url}" target="_blank" style="color:#93c5fd">🔗 Open image</a>`;
+  modal.style.display='grid';
+}
+function viewAllDocs(uid){
+  const rec=allData.all.find(r=>r.uid===uid);
+  if(!rec) return;
+  const modal=document.getElementById('modal');
+  document.getElementById('modalTitle').textContent=`All Uploads — ${rec.fullName||rec.name}`;
+  document.getElementById('modalBody').innerHTML=`<div style="text-align:left;font-size:11px"><b>Full Name: ${rec.fullName||rec.name}</b><br>Username (Login): <b>${rec.username||rec.id}</b><br>Email: ${rec.email||'N/A (Username System)'}<br>Country Code: ${rec.countryCode||'N/A'}<br>Phone: ${rec.phone}<br>Full Phone: ${rec.countryCode||''} ${rec.phone}<br>Approved: ${rec.isApproved?'YES ✅':'NO ⏳'}<br>HasAll4: ${rec.hasAll4?'YES ✅':'NO'}<br>Photo: ${rec.photo?`<a href="${rec.photo}" target="_blank">View</a>`:'Missing'}<br>ID: ${rec.idURL?`<a href="${rec.idURL}" target="_blank">View</a>`:'Missing'}<br>Licence: ${rec.licenceURL?`<a href="${rec.licenceURL}" target="_blank">View</a>`:'Missing'}<br>Video: ${rec.videoURL?`<a href="${rec.videoURL}" target="_blank">View</a>`:'Missing'}<br>Cert: ${rec.certURL?`<a href="${rec.certURL}" target="_blank">View</a>`:'Optional'}</div>`;
+  modal.style.display='grid';
+}
+function closeModal(){ document.getElementById('modal').style.display='none'; }
+
+
+// ===== DELETE ACCOUNT COMPLETELY - ALL PATHS + STORAGE + FIRESTORE =====
+async function deleteAccount(uid, email, type, fullName){
+  const displayName = fullName || email || uid;
+  if(!confirm(`⚠️ DELETE ${type.toUpperCase()} ${displayName}?\n\nEmail: ${email}\nUID: ${uid}\n\nThis will DELETE:\n- All RTDB paths (12+ locations)\n- Firestore docs\n- Storage files (photo, ID, licence, video, cert)\n- allowedNurses/allowedClients whitelist\n\nThis CANNOT be undone!`)) return;
+  if(!confirm(`FINAL CONFIRM: Really DELETE ${displayName} (${email}) PERMANENTLY from Firebase?\n\nType YES in next prompt to confirm`)) return;
+  const typed = prompt(`Type DELETE to confirm deletion of ${displayName}:`);
+  if(typed !== 'DELETE'){ toast('❌ Deletion cancelled - you must type DELETE'); return; }
+
+  const logBox=document.getElementById('logBox');
+  logBox.style.display='block'; logBox.innerHTML='';
+  log(`🗑️ STARTING FULL DELETE for ${type} ${email} (${uid})...`);
+  let deletedCount=0; let errors=0;
+
+  const emailKey=sanitizeEmail(email);
+
+  // 1. RTDB PATHS - NURSES
+  const nurseRtdbPaths=[
+    'nurses/'+uid,
+    'pending_nurses/'+uid,
+    'pendingNurses/'+uid,
+    'nurse_registrations/'+uid,
+    'nurseApplications/'+uid,
+    'allNurses/'+uid,
+    'nurseUsers/'+uid,
+    'ceoNurseUpdates/'+uid,
+    'ceoRegistrationCenter/nurses/'+uid,
+    'verified_nurses/'+uid,
+    'ceoBookingReceiverNurses/'+uid,
+    'nurse_registrations/'+uid,
+    'pendingNurseRegistrations/'+uid,
+    'onlineNurses/'+uid,
+    'liveNurses/'+uid,
+    'liveNurseLocations/'+uid,
+    'nursePresence/'+uid,
+    'nurseLocations/'+uid,
+    'myJobOffers/'+uid,
+    'allNurses/'+uid,
+    'allowedNurses/'+emailKey,
+    'allowedNursesByUid/'+uid,
+    'nurse_registrations/'+uid
+  ];
+
+  const clientRtdbPaths=[
+    'clients/'+uid,
+    'client_registrations/'+uid,
+    'allClients/'+uid,
+    'clientUsers/'+uid,
+    'ceoClientUpdates/'+uid,
+    'ceoRegistrationCenter/clients/'+uid,
+    'pendingClientRegistrations/'+uid,
+    'allowedClients/'+emailKey,
+    'allowedClientsByUid/'+uid,
+    'onlineClients/'+uid,
+    'clientPresence/'+uid
+  ];
+
+  const pathsToDelete = type==='nurse' ? nurseRtdbPaths : clientRtdbPaths;
+
+  // Also delete generic paths that might exist for both
+  const extraPaths=[
+    'ceoRegistrationCenter/nurses/'+uid,
+    'ceoRegistrationCenter/clients/'+uid,
+    'nurses/'+uid,
+    'clients/'+uid,
+    'allowedNurses/'+emailKey,
+    'allowedClients/'+emailKey
+  ];
+
+  for(const path of [...new Set([...pathsToDelete, ...extraPaths])]){
+    try{
+      await db.ref(path).remove();
+      log(`✅ RTDB Deleted: ${path}`);
+      deletedCount++;
+    }catch(e){
+      log(`⚠️ RTDB ${path} not found or error: ${e.message}`);
+      errors++;
+    }
+  }
+
+  // 2. FIRESTORE DOCS
+  const firestorePaths=[
+    {col:'nurses', id:uid},
+    {col:'clients', id:uid},
+    {col:'ceoRegistrationCenter/nurses', id:uid},
+    {col:'ceoRegistrationCenter/clients', id:uid}
+  ];
+  for(const {col, id} of firestorePaths){
+    try{
+      // Try both direct doc and nested path handling
+      if(col.includes('/')){
+        const parts=col.split('/');
+        if(parts.length===2){
+          await firestore.collection(parts[0]).doc(parts[1]).collection('').doc(id).delete().catch(()=>{});
+          // Actually try collection(parts[0]).doc(id) for simple
+          await firestore.collection(col).doc(id).delete().catch(()=>{});
+        }
+      } else {
+        await firestore.collection(col).doc(id).delete();
+      }
+      log(`✅ Firestore Deleted: ${col}/${id}`);
+      deletedCount++;
+    }catch(e){
+      log(`⚠️ Firestore ${col}/${id} : ${e.message}`);
+    }
+  }
+  // More firestore attempts
+  try{ await firestore.collection('nurses').doc(uid).delete(); log(`✅ Firestore nurses/${uid} deleted`); }catch(e){}
+  try{ await firestore.collection('ceoRegistrationCenter').doc('nurses').collection('nurses').doc(uid).delete(); }catch(e){}
+  try{ await firestore.collection('allowedNurses').doc(emailKey).delete(); log(`✅ Firestore allowedNurses/${emailKey} deleted`);}catch(e){}
+  try{ await firestore.collection('allowedClients').doc(emailKey).delete();}catch(e){}
+
+  // 3. STORAGE FILES - List and delete all files under nurses/{uid}/
+  try{
+    const folderRef = storage.ref(`nurses/${uid}`);
+    const listResult = await folderRef.listAll();
+    log(`📁 Found ${listResult.items.length} files in nurses/${uid}/`);
+    for(const itemRef of listResult.items){
+      try{
+        await itemRef.delete();
+        log(`✅ Storage Deleted: ${itemRef.fullPath}`);
+        deletedCount++;
+      }catch(e){ log(`⚠️ Storage delete fail ${itemRef.fullPath}: ${e.message}`); errors++; }
+    }
+    // Also check prefixes
+    for(const prefixRef of listResult.prefixes){
+      try{
+        const subList=await prefixRef.listAll();
+        for(const itemRef of subList.items){
+          await itemRef.delete();
+          log(`✅ Storage Deleted: ${itemRef.fullPath}`);
+        }
+      }catch(e){}
+    }
+  }catch(e){
+    log(`⚠️ Storage list error (may not exist): ${e.message}`);
+  }
+
+  // Also try common storage paths
+  const storagePathsToTry=[
+    `nurses/${uid}/photo_`,
+    `nurses/${uid}/id_`,
+    `nurses/${uid}/licence_`,
+    `nurses/${uid}/video_`,
+    `nurses/${uid}/cv_`
+  ];
+  // We already deleted via listAll, so skip
+
+  // 4. Mark as deleted in a log collection
+  try{
+    await db.ref('deletedNurses/'+uid).set({
+      uid:uid, email:email, fullName:fullName, type:type,
+      deletedAt:Date.now(), deletedBy:'CEO', deletedByUid: auth.currentUser?auth.currentUser.uid:'ceo',
+      originalData: allData.all.find(r=>r.uid===uid)?.raw||{}
+    });
+    log(`✅ Logged to deletedNurses/${uid}`);
+  }catch(e){}
+
+  try{
+    await db.ref('deletedAccounts/'+uid).set({
+      uid, email, fullName, type, deletedAt:Date.now(), deletedBy:'CEO'
+    });
+  }catch(e){}
+
+  log(`🎉 DELETE COMPLETE for ${displayName}. Deleted ${deletedCount} items, ${errors} errors`);
+  toast(`🗑️ ${displayName} DELETED - ${deletedCount} items removed. Also delete Auth in Firebase Console > Authentication > ${email}`);
+
+  // Also prompt for Auth deletion
+  setTimeout(()=>{
+    if(confirm(`DB & Storage deleted for ${email}.\n\nDo you want instructions to delete AUTH user?\n\nAuth CANNOT be deleted from this page (requires Admin SDK). Go to Firebase Console > Authentication > Users > Find ${email} > Delete.`)){
+      window.open('https://console.firebase.google.com/project/web-care-618e8/authentication/users','_blank');
+    }
+    loadAll();
+  }, 1000);
+}
+
+// FIXED APPROVE - UPDATES ALL PATHS
+
+async function approve(uid, email, type){
+  if(!confirm(`Approve ${type} ${email}?\n\nThis will update ALL 12 database paths so nurse moves to Approved and can login.`)) return;
+  const logBox=document.getElementById('logBox');
+  logBox.style.display='block'; logBox.innerHTML='';
+  log(`Approving ${type} ${email} (${uid}) in ALL paths...`);
+  
+  try{
+    const emailKey=sanitizeEmail(email);
+    const now=Date.now();
+    const approvedPayload={
+      isApproved:true, approved:true, status:'approved', canLogin:true, isVerified:true, approvedAt:now, approvedBy:'CEO', updatedAt:now
+    };
+    
+    if(type==='nurse'){
+      const nursePaths=[
+        'nurses/'+uid,
+        'pending_nurses/'+uid,
+        'pendingNurses/'+uid,
+        'nurse_registrations/'+uid,
+        'nurseApplications/'+uid,
+        'allNurses/'+uid,
+        'nurseUsers/'+uid,
+        'ceoNurseUpdates/'+uid,
+        'ceoRegistrationCenter/nurses/'+uid,
+        'verified_nurses/'+uid
+      ];
+      
+      for(const path of nursePaths){
+        try{
+          const snap=await db.ref(path).once('value');
+          if(snap.exists()){
+            await db.ref(path).update(approvedPayload);
+            log(`✅ Updated ${path} → approved`);
+          }
+        }catch(e){ log(`⚠️ ${path} not exist or err: ${e.message}`); }
+      }
+      
+      // Whitelist - create
+      const data=allData.all.find(r=>r.uid===uid)||{};
+      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayload};
+      await db.ref('allowedNurses/'+emailKey).set(whitelistData);
+      log(`✅ Created allowedNurses/${emailKey}`);
+      await db.ref('allowedNursesByUid/'+uid).set(whitelistData);
+      log(`✅ Created allowedNursesByUid/${uid}`);
+      
+    }else{
+      const clientPaths=[
+        'clients/'+uid,
+        'client_registrations/'+uid,
+        'allClients/'+uid,
+        'clientUsers/'+uid,
+        'ceoClientUpdates/'+uid,
+        'ceoRegistrationCenter/clients/'+uid,
+        'pendingClientRegistrations/'+uid
+      ];
+      for(const path of clientPaths){
+        try{
+          const snap=await db.ref(path).once('value');
+          if(snap.exists()){
+            await db.ref(path).update(approvedPayload);
+            log(`✅ Updated ${path}`);
+          }
+        }catch(e){}
+      }
+      const data=allData.all.find(r=>r.uid===uid)||{};
+      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayload};
+      await db.ref('allowedClients/'+emailKey).set(whitelistData);
+      await db.ref('allowedClientsByUid/'+uid).set(whitelistData);
+      log(`✅ Created allowedClients`);
+    }
+    
+    toast(`✅ ${email} APPROVED in ALL paths — now moves to Approved tab and can login!`);
+    log(`✅ DONE — ${email} approved in ALL paths`);
+    setTimeout(loadAll, 1500);
+    
+  }catch(e){
+    log(`❌ Approve failed: ${e.message}`);
+    toast('Approve failed: '+e.message);
+  }
+}
+
+async function reject(uid, email, type){
+  if(!confirm(`Reject ${type} ${email}?`)) return;
+  try{
+    if(type==='nurse'){
+      await db.ref('nurses/'+uid).update({isApproved:false,status:'rejected',rejectedAt:Date.now()});
+      await db.ref('ceoRegistrationCenter/nurses/'+uid).update({isApproved:false,status:'rejected'});
+      await db.ref('allowedNurses/'+sanitizeEmail(email)).remove().catch(()=>{});
+      await db.ref('allowedNursesByUid/'+uid).remove().catch(()=>{});
+    }else{
+      await db.ref('clients/'+uid).update({isApproved:false,status:'rejected'});
+      await db.ref('ceoRegistrationCenter/clients/'+uid).update({isApproved:false,status:'rejected'});
+    }
+    toast(`❌ ${email} rejected`);
+    setTimeout(loadAll, 800);
+  }catch(e){ toast('Reject failed: '+e.message); }
+}
+
+// Fix all stuck approved nurses at once
+async function fixAllApproved(){
+  if(!confirm('This will scan all nurses that are in allowedNurses whitelist but still showing pending, and fix them to approved in ALL paths. Continue?')) return;
+  const logBox=document.getElementById('logBox');
+  logBox.style.display='block'; logBox.innerHTML='';
+  log('Scanning allowedNurses whitelist...');
+  
+  try{
+    const snap=await db.ref('allowedNurses').once('value');
+    if(!snap.exists()){ toast('No allowedNurses found'); return; }
+    let fixed=0;
+    const promises=[];
+    snap.forEach(ch=>{
+      const v=ch.val()||{};
+      const uid=v.uid;
+      const email=v.email;
+      if(uid && email){
+        const payload={isApproved:true,approved:true,status:'approved',canLogin:true,isVerified:true,approvedAt:Date.now(),updatedAt:Date.now()};
+        promises.push(
+          db.ref('nurses/'+uid).update(payload).then(()=>log(`Fixed nurses/${uid}`)).catch(()=>{}),
+          db.ref('pending_nurses/'+uid).update(payload).catch(()=>{}),
+          db.ref('pendingNurses/'+uid).update(payload).catch(()=>{}),
+          db.ref('ceoRegistrationCenter/nurses/'+uid).update(payload).then(()=>log(`Fixed ceo center ${uid}`)).catch(()=>{}),
+          db.ref('ceoNurseUpdates/'+uid).update(payload).catch(()=>{}),
+          db.ref('nurse_registrations/'+uid).update(payload).catch(()=>{})
+        );
+        fixed++;
+      }
+    });
+    await Promise.all(promises);
+    toast(`✅ Fixed ${fixed} nurses — they will now show in Approved`);
+    log(`✅ Fixed ${fixed} nurses`);
+    setTimeout(loadAll, 1500);
+  }catch(e){ toast('Fix failed: '+e.message); log('Fix failed: '+e.message); }
+}
+
+loadAll();
+</script>
+</body>
+</html>
