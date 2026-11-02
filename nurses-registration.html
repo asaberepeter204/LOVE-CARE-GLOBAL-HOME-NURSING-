@@ -11,6 +11,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding:16px;padding-bottom:120px}
@@ -146,8 +147,8 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3p
 <div class="fileBox required" id="boxLicence" onclick="document.getElementById('licenceFile').click()"><input id="licenceFile" type="file" accept="image/*,.pdf" onchange="handleFile(this,'boxLicence','')" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">📜 Tap to select licence *</div></div>
 <div class="fileName" id="nameLicence"></div>
 
-<label>CV * REQUIRED — .docx/.pdf — FIXED</label>
-<div class="fileBox required" id="boxCv" onclick="document.getElementById('cvFile').click()"><input id="cvFile" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="handleFile(this,'boxCv',''); previewCV(this.files[0])" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">📄 Tap to select CV * REQUIRED — PDF or DOCX (max 10MB)</div></div>
+<label>CV * REQUIRED — PDF or DOCX — BOTH ALLOWED</label>
+<div class="fileBox required" id="boxCv" onclick="document.getElementById('cvFile').click()"><input id="cvFile" type="file" accept=".pdf,.docx,.doc,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="handleFile(this,'boxCv',''); previewCV(this.files[0])" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">📄 Tap to select CV * REQUIRED — PDF or DOCX (Both Allowed, max 10MB)</div></div>
 <div class="fileName" id="nameCv"></div>
 <div id="cvPreviewBox" style="display:none;background:rgba(14,10,28,.6);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:10px;margin-top:8px;max-height:200px;overflow:auto"><div style="font-size:10px;font-weight:800;color:#86efac;margin-bottom:6px">📄 CV Particulars Preview:</div><div id="cvPreviewText" style="font-size:11px;color:#e8e0ff;white-space:pre-wrap"></div></div>
 
@@ -331,18 +332,38 @@ async function previewCV(file){
   box.style.display='block';
   textEl.textContent='⏳ Reading CV... '+file.name;
   try{
-    if(file.name.toLowerCase().endsWith('.pdf')){
-      textEl.textContent='✅ PDF CV selected: '+file.name+' ('+(file.size/1024).toFixed(0)+'KB) — Will upload as PDF\n\nPDF particulars will be saved.';
-    }else if(file.name.toLowerCase().endsWith('.docx')){
+    const lower=file.name.toLowerCase();
+    if(lower.endsWith('.pdf')){
+      // PDF text extract
+      textEl.textContent='⏳ Reading PDF CV...';
+      const arrayBuffer=await file.arrayBuffer();
+      if(typeof pdfjsLib!=='undefined'){
+        pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+        let fullText='';
+        const pages=Math.min(pdf.numPages, 3); // first 3 pages for preview
+        for(let i=1;i<=pages;i++){
+          const page=await pdf.getPage(i);
+          const txt=await page.getTextContent();
+          fullText+=txt.items.map(s=>s.str).join(' ')+'\n';
+        }
+        const preview=fullText.substring(0,900);
+        textEl.textContent='✅ PDF CV Read Success! ('+pdf.numPages+' pages)\n\n'+preview+'\n...\n\nTotal preview chars: '+fullText.length+' — Full PDF will be uploaded.';
+      }else{
+        textEl.textContent='✅ PDF CV selected: '+file.name+' ('+(file.size/1024).toFixed(0)+'KB) — PDF.js not loaded, but file will upload as PDF.\n\nPDF particulars will be saved.';
+      }
+    }else if(lower.endsWith('.docx')){
       const arrayBuffer=await file.arrayBuffer();
       const result=await mammoth.extractRawText({arrayBuffer});
-      const txt=result.value.substring(0,800);
-      textEl.textContent='✅ DOCX CV Read Success!\n\n'+txt+'\n...'+'\n\nTotal chars: '+result.value.length+' — Will upload fully.';
-    }else if(file.name.toLowerCase().endsWith('.doc')){
-      textEl.textContent='✅ DOC selected: '+file.name+' — Old .doc format, will upload. For best preview use .docx or PDF.';
+      const txt=result.value.substring(0,900);
+      textEl.textContent='✅ DOCX CV Read Success!\n\n'+txt+'\n...\n\nTotal chars: '+result.value.length+' — Will upload fully.';
+    }else if(lower.endsWith('.doc')){
+      textEl.textContent='✅ DOC selected: '+file.name+' ('+(file.size/1024).toFixed(0)+'KB) — Old .doc format, will upload. For best preview use .docx or PDF.';
+    }else{
+      textEl.textContent='✅ CV selected: '+file.name+' ('+(file.size/1024).toFixed(0)+'KB) — Supported: PDF or DOCX.';
     }
   }catch(e){
-    textEl.textContent='✅ CV selected: '+file.name+' ('+(file.size/1024).toFixed(0)+'KB) — Preview failed but file will still upload.\nError: '+e.message;
+    textEl.textContent='✅ CV selected: '+file.name+' ('+(file.size/1024).toFixed(0)+'KB) — Preview failed but file will STILL upload.\nError: '+e.message;
   }
 }
 
