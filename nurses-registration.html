@@ -568,7 +568,7 @@ async function registerNurse(){
       idURL:idURL,licenceURL:licenceURL,licenseUrl:licenceURL,
       cvURL:'',cvUrl:'', // CV removed
       videoURL:videoURL,videoUrl:videoURL,video:videoURL,introVideo:videoURL,nurseVideo:videoURL,
-      isApproved:false,canLogin:false,status:'pending',needsCEOApproval:true,ceoApproved:false,
+      isApproved:false,canLogin:false,status:'pending',needsCEOApproval:true,ceoApproved:false,isPendingApproval:true,awaitingCEO:true,
       rating:5.0,createdAt:now,updatedAt:now,source:'ALL-REQUIRED-FIXED-UPLOAD'
     };
 
@@ -589,7 +589,9 @@ async function registerNurse(){
     showMsg('✅ Registration SUCCESS! All 4 files saved! CEO will approve in ceo-registration-center. You CANNOT login until CEO approves. Redirecting to login...', 'success');
     localStorage.setItem('nurseProfile', JSON.stringify(nurseData));
     if(btn){ btn.disabled=false; btn.textContent='✅ Registered — Go to Login'; }
-    setTimeout(()=>{ location.href='nurse-login_6.html'; }, 3000);
+    localStorage.setItem('pendingCEOApproval', 'true');
+    localStorage.setItem('nurseEmail', email.toLowerCase());
+    setTimeout(()=>{ location.href='nurse-login.html?registered=true&pendingApproval=true'; }, 3000);
 
   }catch(e){
     console.error(e);
