@@ -30,7 +30,7 @@
 <img id="clientAvatar" class="avatar" src="">
 <div style="flex:1">
 <b style="font-size:18px;color:#fff">Welcome, <span id="clientName">ASABERE PETER</span> 👋</b><br>
-<small id="clientEmail" style="color:#a78bfa;font-size:12px">lovecareglobal@gmail.com</small><br>
+<small id="clientUsername" style="color:#a78bfa;font-size:12px;display:none"></small>
 <small id="clientPhone" style="color:#86efac;font-size:12px">+233502957280</small><br>
 <a href="client-settings.html" style="font-size:11px;color:#facc15;text-decoration:underline">Edit name & picture</a> <span style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e;border-radius:999px;padding:2px 8px;font-size:10px;font-weight:900;margin-left:6px">● Verified</span>
 </div>
@@ -81,13 +81,35 @@ function makeInitialAvatarDataURL(name){
   return canvas.toDataURL();
 }
 function loadClient(){
-  const name=localStorage.getItem('clientName')||localStorage.getItem('fullName')||localStorage.getItem('client_fullName')||localStorage.getItem('pendingGoogleName')||'Client';
-  const email=localStorage.getItem('clientEmail')||localStorage.getItem('email')||localStorage.getItem('pendingGoogleEmail')||'';
+  const name=localStorage.getItem('clientName')||localStorage.getItem('fullName')||localStorage.getItem('client_fullName')||localStorage.getItem('clientUsername')||localStorage.getItem('username')||'Client';
+  const username=localStorage.getItem('clientUsername')||localStorage.getItem('username')||localStorage.getItem('clientUserName')||'';
   const phone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'';
-  const photo=localStorage.getItem('clientPhoto')||localStorage.getItem('clientPhotoUrl')||localStorage.getItem('photoUrl')||localStorage.getItem('pendingGooglePhoto')||'';
+  const photo=localStorage.getItem('clientPhoto')||localStorage.getItem('clientPhotoUrl')||localStorage.getItem('photoUrl')||'';
+  
   document.getElementById('clientName').textContent=name.toUpperCase();
-  document.getElementById('clientEmail').textContent=email||'No email';
-  document.getElementById('clientPhone').textContent=phone||'No phone';
+  
+  // Show username if exists, hide email completely
+  const usernameEl=document.getElementById('clientUsername');
+  if(usernameEl){
+    if(username){
+      usernameEl.textContent='@'+username;
+      usernameEl.style.display='block';
+    } else {
+      usernameEl.style.display='none';
+    }
+  }
+  
+  // Phone only - no "No phone" text
+  const phoneEl=document.getElementById('clientPhone');
+  if(phoneEl){
+    if(phone){
+      phoneEl.textContent=phone;
+      phoneEl.style.display='block';
+    } else {
+      phoneEl.style.display='none';
+    }
+  }
+  
   const av=document.getElementById('clientAvatar');
   if(photo && (photo.startsWith('http')||photo.startsWith('data:'))){ av.src=photo; av.onerror=()=>{av.src=makeInitialAvatarDataURL(name);}; }
   else { av.src=makeInitialAvatarDataURL(name); }
@@ -125,7 +147,7 @@ function setRealDate(){
 
 async function loadBookingsCount(){
   const phone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'';
-  const email=localStorage.getItem('clientEmail')||'';
+  const username=localStorage.getItem('clientUsername')||localStorage.getItem('username')||'';
   try{
     const snap=await get(ref(db,'bookings'));
     if(!snap.exists()) return;
@@ -134,8 +156,8 @@ async function loadBookingsCount(){
       const b=child.val();
       const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,''); const myPhone=phone.replace(/[^0-9]/g,'');
       const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);
-      const emailMatch=b.clientEmail&&email&&b.clientEmail.toLowerCase()===email.toLowerCase();
-      if(phoneMatch||emailMatch) count++;
+      const usernameMatch=b.clientUsername&&username&&b.clientUsername.toLowerCase()===username.toLowerCase();
+      if(phoneMatch||usernameMatch) count++;
     });
     document.getElementById('myBookingCount').textContent=count;
     localStorage.setItem('lcg_bookings_count', count);
@@ -156,7 +178,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   // Real-time count
   try{
     const phone=localStorage.getItem('clientPhone')||'';
-    const email=localStorage.getItem('clientEmail')||'';
+    const username=localStorage.getItem('clientUsername')||localStorage.getItem('username')||'';
     onValue(ref(db,'bookings'), snap=>{
       if(!snap.exists()) return;
       let count=0;
@@ -164,8 +186,8 @@ window.addEventListener('DOMContentLoaded', async ()=>{
         const b=child.val();
         const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,''); const myPhone=phone.replace(/[^0-9]/g,'');
         const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);
-        const emailMatch=b.clientEmail&&email&&b.clientEmail.toLowerCase()===email.toLowerCase();
-        if(phoneMatch||emailMatch) count++;
+        const usernameMatch=b.clientUsername&&username&&b.clientUsername.toLowerCase()===username.toLowerCase();
+        if(phoneMatch||usernameMatch) count++;
       });
       document.getElementById('myBookingCount').textContent=count;
     });
