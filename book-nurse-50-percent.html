@@ -188,18 +188,51 @@ const PAYSTACK_KEY='pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
 function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');}
 let currentClientData={name:'',phone:'',email:'',photoUrl:'',uid:''};
 
+let clientWatchId=null;
 function autoCaptureClientLocation(){
   if(!navigator.geolocation) return;
+  
+  // Get initial location
   navigator.geolocation.getCurrentPosition(pos=>{
     clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
     patientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
     document.getElementById('clientLatInput').value=clientLatLng.lat;document.getElementById('clientLngInput').value=clientLatLng.lng;
     document.getElementById('patientLatInput').value=patientLatLng.lat;document.getElementById('patientLngInput').value=patientLatLng.lng;
-    document.getElementById('clientLocationDisplay').innerHTML=`✅ Client: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b>`;
-    document.getElementById('clientLocBadge').innerHTML=`📍 Client: ${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}`;
+    document.getElementById('clientLocationDisplay').innerHTML=`✅ Client LIVE: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b> - Auto GPS`;
+    document.getElementById('clientLocBadge').innerHTML=`📍 Client LIVE: ${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)} - Distances update live`;
     document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient (same): <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b> — Nurse goes here`;
     initMap(clientLatLng.lat,clientLatLng.lng);searchNearbyNurses();
-  },{},{enableHighAccuracy:true,timeout:15000});
+    
+    // Watch for live updates - client moving
+    if(clientWatchId) navigator.geolocation.clearWatch(clientWatchId);
+    clientWatchId=navigator.geolocation.watchPosition(pos=>{
+      clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      document.getElementById('clientLatInput').value=clientLatLng.lat;document.getElementById('clientLngInput').value=clientLatLng.lng;
+      document.getElementById('clientLocBadge').innerHTML=`📍 Client LIVE: ${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)} - Updating...`;
+      document.getElementById('clientLocationDisplay').innerHTML=`✅ Client LIVE: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b> - Auto GPS`;
+      if(document.getElementById('sameAsClientCheck').checked){
+        patientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+        document.getElementById('patientLatInput').value=patientLatLng.lat;document.getElementById('patientLngInput').value=patientLatLng.lng;
+        document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient (same): <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b> — Live`;
+      }
+      // Update distances live
+      if(allNurses && allNurses.length>0){
+        allNurses.forEach(n=>{
+          function haversine(lat1, lon1, lat2, lon2){
+            const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
+            const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+            const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c;
+          }
+          n.distance=haversine(clientLatLng.lat, clientLatLng.lng, n.lat, n.lng);
+        });
+        renderNurses(allNurses);
+      }
+    }, null, {enableHighAccuracy:true, maximumAge:5000, timeout:10000});
+    
+  }, err=>{
+    console.log('GPS error', err);
+    document.getElementById('clientLocBadge').innerHTML=`⚠️ GPS: ${err.message} - Using default - Enable location`;
+  },{enableHighAccuracy:true,timeout:15000, maximumAge:0});
 }
 function toggleSameLocation(){
   const checked=document.getElementById('sameAsClientCheck').checked;
