@@ -18,6 +18,7 @@
 - https://lovecareglobal.com/force-fix-ceo-approval.html
 - https://lovecareglobal.com/force-delete.html
 - https://lovecareglobal.com/cleanup-auto-approval.html
+- https://lovecareglobal.com/force-delete-client.html
 
 ## 📅 BOOKING FLOW
 - [book-nurse.html](https://lovecareglobal.com/book-nurse.html)
