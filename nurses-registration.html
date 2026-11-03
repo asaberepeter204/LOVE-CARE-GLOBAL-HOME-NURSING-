@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Registration | LOVE CARE GLOBAL - ALL REQUIRED</title>
+<title>Nurse Registration - NO CV - PENDING APPROVAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -65,7 +65,6 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3p
 .idCheckPass{color:#86efac} .idCheckFail{color:#fca5a5} .idCheckWarn{color:#facc15}
 .idScoreBar{height:8px;background:rgba(168,85,247,.2);border-radius:999px;overflow:hidden;margin-top:8px}
 .idScoreFill{height:100%;transition:.5s}
-
 .gpsBox{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:14px;margin-top:8px}
 .progressBox{background:rgba(14,10,28,.8);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:12px;margin-top:12px;display:none}
 .progressBar{height:8px;background:rgba(168,85,247,.2);border-radius:999px;overflow:hidden;margin-top:6px}
@@ -74,94 +73,148 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3p
 </head>
 <body>
 <div class="bg"></div>
-<div class="wrap"><div class="card">
-<div class="logo">👩‍⚕️</div>
+<div class="wrap">
+<div class="card">
+<div class="logo">LC</div>
 <h1>Nurse Registration</h1>
-<p class="subtitle">ALL DOCUMENTS REQUIRED - Photo + ID + Licence + CV + Video</p>
+<p class="subtitle">4 files only - No CV - Pending CEO approval</p>
 <div class="badges">
-<span class="badge badgeGreen">💰 CEO 20% | Nurse 80%</span>
-<span class="badge badgePurple">⭐ Rating 5.0 → Visible</span>
-<span class="badge badgeYellow">📦 50% Now + 50% Cash</span>
-</div>
-<div class="stepper">
-<div class="step active" id="stepper1"><div class="stepCircle">1</div><div class="stepLabel">Personal Info</div><div class="stepLine"></div></div>
-<div class="step" id="stepper2"><div class="stepCircle">2</div><div class="stepLabel">Documents *ALL REQ</div></div>
-</div>
-<div id="msg"></div>
-<div id="progressBox" class="progressBox">
-<div id="progressText" style="font-size:11px;color:#d8b4fe;font-weight:800">Uploading...</div>
-<div class="progressBar"><div id="progressFill" class="progressFill"></div></div>
-<div id="progressDetail" style="font-size:10px;color:#a78bfa;margin-top:4px"></div>
+<span class="badge badgeGreen">NO CV - 4 FILES ONLY</span>
+<span class="badge badgePurple">PENDING APPROVAL</span>
+<span class="badge badgeYellow">FIXED UPLOAD</span>
 </div>
 
+<div class="stepper">
+<div class="step active" id="step1"><div class="stepCircle">1</div><div class="stepLabel">Info</div><div class="stepLine"></div></div>
+<div class="step" id="step2"><div class="stepCircle">2</div><div class="stepLabel">Files</div><div class="stepLine"></div></div>
+<div class="step" id="step3"><div class="stepCircle">3</div><div class="stepLabel">Review</div></div>
+</div>
+
+<div id="msgBox"></div>
+
+<!-- SECTION 1 -->
 <div class="section active" id="section1">
-<div class="sectionTitle">👤 Step 1 — Personal & Professional</div>
-<label>Full Name *</label><input id="fullName" type="text" placeholder="e.g., Ama Serwaa">
+<div class="sectionTitle">Personal Information</div>
+<div class="sectionDesc">Enter your details - will be pending until CEO approves</div>
+
+<label>Full Name *</label>
+<input id="fullName" type="text" placeholder="e.g. Asabere Peter">
+
 <div class="grid2">
 <div><label>Email *</label><input id="email" type="email" placeholder="nurse@email.com"></div>
-<div><label>Phone *</label><input id="phone" type="tel" placeholder="055..."></div>
+<div><label>Phone *</label><input id="phone" type="tel" placeholder="05441211814"></div>
 </div>
-<label>Password *</label><div class="inputWrap"><input id="password" type="password" placeholder="Min 6 chars"><button class="eyeBtn" type="button" id="eyeBtn" onclick="toggleEye()">👁️</button></div>
+
 <div class="grid2">
-<div><label>Country *</label><select id="country"><option value="">Select</option><option value="GH" selected>Ghana</option><option value="NG">Nigeria</option><option value="ZA">South Africa</option><option value="GB">UK</option><option value="US">USA</option><option value="OTHER">Other</option></select></div>
-<div><label>Experience *</label><select id="experience"><option value="">Select</option><option value="1-2 years">1-2 years</option><option value="3-5 years">3-5 years</option><option value="5+ years">5+ years</option><option value="10+ years">10+ years</option></select></div>
+<div><label>Password *</label><div class="inputWrap"><input id="password" type="password" placeholder="Min 6 chars"><button type="button" class="eyeBtn" onclick="toggleEye('password')">👁️</button></div></div>
+<div><label>Confirm Password *</label><div class="inputWrap"><input id="confirmPassword" type="password" placeholder="Confirm"><button type="button" class="eyeBtn" onclick="toggleEye('confirmPassword')">👁️</button></div></div>
 </div>
-<label>Qualification *</label><input id="qualification" type="text" placeholder="e.g., BSc Nursing">
-<label>Services *</label><select id="services"><option value="">Select service</option><option value="General">General</option><option value="Elderly Care">Elderly Care</option><option value="Post-Surgery">Post-Surgery</option><option value="Baby Care">Baby Care</option><option value="24h Live-in">24h Live-in</option><option value="Hospital Companion">Hospital Companion</option></select>
-<label>📍 Live GPS *</label>
+
+<label>Country *</label>
+<select id="country"><option value="Ghana">Ghana</option><option value="Nigeria">Nigeria</option><option value="Other">Other</option></select>
+
+<div class="grid2">
+<div><label>Qualification *</label><select id="qualification"><option value="Bsc.in Nursing">Bsc.in Nursing</option><option value="Diploma">Diploma</option><option value="Masters">Masters</option></select></div>
+<div><label>Specialty *</label><select id="services"><option value="General">General</option><option value="Pediatric">Pediatric</option><option value="ICU">ICU</option><option value="Midwifery">Midwifery</option></select></div>
+</div>
+
+<label>Experience *</label>
+<select id="experience"><option value="1-2 years">1-2 years</option><option value="3-5 years">3-5 years</option><option value="5+ years">5+ years</option></select>
+
+<label>Bio *</label>
+<textarea id="bio" placeholder="Tell us about yourself..."></textarea>
+
+<div class="grid2">
+<div><label>Reference Name *</label><input id="refName" type="text" placeholder="Hospital Matron, Rita Anokye"></div>
+<div><label>Reference Phone *</label><input id="refPhone" type="tel" placeholder="233545823625"></div>
+</div>
+
+<label>GPS Location *</label>
 <div class="gpsBox">
-<button type="button" class="btn btnPurple" id="gpsBtn" onclick="captureGPS()" style="margin:0">📍 Capture My GPS Now</button>
-<div id="gpsStatus" style="font-size:12px;color:#a78bfa;margin-top:10px;padding:8px;background:rgba(14,10,28,.5);border-radius:8px">Not captured — Click button — Required</div>
-<div id="gpsMap" style="width:100%;height:200px;border-radius:10px;border:1px solid rgba(168,85,247,.2);display:none;margin-top:10px;background:#0e0a1c"></div>
-<small id="gpsName" style="font-size:10px;color:#86efac;display:block;margin-top:6px"></small>
+<div style="display:flex;gap:8px">
+<button type="button" class="btn btnLight" style="flex:1;margin-top:0" onclick="getGPS()">📍 Get GPS</button>
+<button type="button" class="btn btnLight" style="flex:1;margin-top:0" onclick="openMap()">🗺️ Pick on Map</button>
 </div>
-<label>Guarantor Name *</label><input id="referenceName" type="text" placeholder="Hospital Matron, Pastor">
-<label>Reference Phone *</label><input id="referencePhone" type="tel" placeholder="+233...">
-<label>Bio</label><textarea id="bio" placeholder="Short bio..."></textarea>
-<div class="navRow"><button class="btn btnPurple" type="button" onclick="goToStep2()">Continue → Next Step</button></div>
-<a class="btn btnLight" href="nurse-login.html">Already have account? Login</a>
+<div id="gpsDisplay" style="font-size:11px;margin-top:8px;color:#a78bfa">No GPS yet - Click Get GPS</div>
 </div>
-
-<div class="section" id="section2">
-<div class="sectionTitle">📄 Step 2 — Upload Documents — ALL REQUIRED</div>
-<p class="sectionDesc">Photo + ID + Licence + CV + Video ALL required. Max video 50MB. CV .docx/.pdf max 5MB.</p>
-
-<label>Profile Photo * REQUIRED — Clients see</label>
-<div class="fileBox required" id="boxPhoto" onclick="document.getElementById('photoFile').click()"><input id="photoFile" type="file" accept="image/*" onchange="handleFile(this,'boxPhoto','previewPhoto')" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">📷 Tap to select photo *</div></div>
-<div class="fileName" id="namePhoto"></div><img id="previewPhoto" class="previewImg">
-
-<label>National ID * REQUIRED — Auto-Verified per Country</label>
-<div class="fileBox required" id="boxId" onclick="document.getElementById('idFile').click()"><input id="idFile" type="file" accept="image/*,.pdf" onchange="handleFile(this,'boxId',''); verifyIDFile(this.files[0])" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">🪪 Tap to select ID * — Will auto-check if real</div></div>
-<div class="fileName" id="nameId"></div>
-<div id="idVerifyBox" class="idVerifyBox">
-<div style="font-size:12px;font-weight:900;color:#f3e8ff;margin-bottom:8px">🔍 AI ID Verification — Checking if ID is Real...</div>
-<div id="idVerifyList"></div>
-<div class="idScoreBar"><div id="idScoreFill" class="idScoreFill" style="width:0%"></div></div>
-<div id="idVerifyResult" style="font-size:11px;font-weight:800;margin-top:8px"></div>
-<div id="idOcrText" style="font-size:9px;color:#6b7280;margin-top:6px;max-height:60px;overflow:auto;background:rgba(0,0,0,.3);padding:6px;border-radius:6px;display:none"></div>
-</div>
-
-<label>Licence * REQUIRED</label>
-<div class="fileBox required" id="boxLicence" onclick="document.getElementById('licenceFile').click()"><input id="licenceFile" type="file" accept="image/*,.pdf" onchange="handleFile(this,'boxLicence','')" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">📜 Tap to select licence *</div></div>
-<div class="fileName" id="nameLicence"></div>
-
-<label>CV * REQUIRED — .docx/.pdf</label>
-<div class="fileBox required" id="boxCv" onclick="document.getElementById('cvFile').click()"><input id="cvFile" type="file" accept=".pdf,.doc,.docx" onchange="handleFile(this,'boxCv','')" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">📄 Tap to select CV * REQUIRED</div></div>
-<div class="fileName" id="nameCv"></div>
-
-<label>Intro Video * REQUIRED — 30 sec (Max 50MB)</label>
-<div class="fileBox required" id="boxVideo" onclick="document.getElementById('videoFile').click()"><input id="videoFile" type="file" accept="video/*" onchange="handleFile(this,'boxVideo','previewVideo')" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">🎥 Tap to select video * REQUIRED</div></div>
-<div class="fileName" id="nameVideo"></div>
-<video id="previewVideo" class="previewImg" controls style="display:none;height:200px"></video>
 
 <div class="navRow">
-<button class="btn btnLight" type="button" onclick="goToStep1()">← Back</button>
-<button class="btn btnPurple" type="button" id="registerBtn" onclick="registerNurse()">✅ Register — Upload ALL</button>
+<button type="button" class="btn btnPurple" onclick="goToStep(2)">Next → Files</button>
 </div>
-<a class="btn btnLight" href="index.html">Home</a>
-<p style="font-size:10px;color:#6b7280;text-align:center;margin-top:10px">By registering, you agree: Rating visible — CEO 20% / Nurse 80% — CEO approval required from ceo-registration-center</p>
 </div>
-</div></div>
+
+<!-- SECTION 2 -->
+<div class="section" id="section2">
+<div class="sectionTitle">Upload Files - 4 Files Only (No CV)</div>
+<div class="sectionDesc">Photo + ID + Licence + Video - All required, CV removed</div>
+
+<label>Profile Photo * (Max 5MB)</label>
+<div class="fileBox" id="photoBox" onclick="document.getElementById('photoFile').click()">
+<div>📸 Click to upload Photo</div>
+<div class="fileName" id="photoName"></div>
+<img id="photoPreview" class="previewImg">
+</div>
+<input type="file" id="photoFile" accept="image/*" style="display:none" onchange="handleFile(this,'photo')">
+
+<label>Ghana ID Card * (Max 5MB) - Auto Verified</label>
+<div class="fileBox" id="idBox" onclick="document.getElementById('idFile').click()">
+<div>🪪 Click to upload Ghana ID</div>
+<div class="fileName" id="idName"></div>
+<img id="idPreview" class="previewImg">
+</div>
+<input type="file" id="idFile" accept="image/*" style="display:none" onchange="handleFile(this,'id')">
+<div class="idVerifyBox" id="idVerifyBox">
+<div style="font-size:11px;font-weight:800;color:#d8b4fe">ID Verification</div>
+<div id="idVerifyContent"></div>
+<div class="idScoreBar"><div id="idScoreFill" class="idScoreFill" style="width:0%"></div></div>
+<div id="idScoreText" style="font-size:10px;margin-top:4px"></div>
+</div>
+
+<label>Nursing Licence * (Max 5MB)</label>
+<div class="fileBox" id="licenceBox" onclick="document.getElementById('licenceFile').click()">
+<div>📜 Click to upload Licence</div>
+<div class="fileName" id="licenceName"></div>
+<img id="licencePreview" class="previewImg">
+</div>
+<input type="file" id="licenceFile" accept="image/*,application/pdf" style="display:none" onchange="handleFile(this,'licence')">
+
+<label>Intro Video * (Max 20MB)</label>
+<div class="fileBox" id="videoBox" onclick="document.getElementById('videoFile').click()">
+<div>🎥 Click to upload Video</div>
+<div class="fileName" id="videoName"></div>
+<video id="videoPreview" style="width:100%;height:140px;border-radius:12px;display:none;margin-top:8px" controls></video>
+</div>
+<input type="file" id="videoFile" accept="video/*" style="display:none" onchange="handleFile(this,'video')">
+
+<div class="progressBox" id="progressBox">
+<div id="progressText" style="font-size:11px;font-weight:700">Uploading...</div>
+<div class="progressBar"><div id="progressFill" class="progressFill"></div></div>
+<div id="progressDetail" style="font-size:10px;margin-top:4px;color:#a78bfa"></div>
+</div>
+
+<div class="navRow">
+<button type="button" class="btn btnLight" onclick="goToStep(1)">← Back</button>
+<button type="button" class="btn btnPurple" onclick="goToStep(3)">Next → Review</button>
+</div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section" id="section3">
+<div class="sectionTitle">Review & Register</div>
+<div class="sectionDesc">Check all files, then register - Will be PENDING until CEO approves</div>
+
+<div id="reviewBox" style="background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:12px;font-size:11px"></div>
+
+<button type="button" class="btn btnPurple" id="registerBtn" onclick="doRegister()">✅ Register - PENDING CEO Approval</button>
+
+<div class="navRow">
+<button type="button" class="btn btnLight" onclick="goToStep(2)">← Back to Files</button>
+<a href="nurse-login_7.html" class="btn btnLight">Already have account? Login</a>
+</div>
+</div>
+
+</div>
+</div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
@@ -171,370 +224,179 @@ const db=firebase.database();
 const firestore=firebase.firestore();
 const storage=firebase.storage();
 
-let currentLat=null, currentLng=null, currentGPSName='', gpsMapInstance=null;
+let currentLat=0, currentLng=0, currentGPSName='', photoFile=null, idFile=null, licenceFile=null, videoFile=null;
+let idVerified=false, idScore=0;
 
-function showMsg(text, type){
-  const el=document.getElementById('msg');
-  if(!el) return;
-  const cls=type==='error'?'alert-error':type==='success'?'alert-success':'alert-info';
-  el.innerHTML=text?`<div class="alert ${cls}">${text}</div>`:'';
-  if(text) el.scrollIntoView({behavior:'smooth', block:'center'});
-}
-function showProgress(show, text, percent, detail){
+function sanitizeFileName(name){ return (name||'file').replace(/[^a-zA-Z0-9._-]/g,'_').replace(/__+/g,'_'); }
+function toggleEye(id){ const el=document.getElementById(id); el.type=el.type==='password'?'text':'password'; }
+function showMsg(msg,type){ const box=document.getElementById('msgBox'); box.innerHTML=`<div class="alert alert-${type}">${msg}</div>`; }
+function showProgress(show,text,percent,detail){
   const box=document.getElementById('progressBox');
   if(!show){ box.style.display='none'; return; }
   box.style.display='block';
-  if(text) document.getElementById('progressText').textContent=text;
-  if(typeof percent==='number'){ document.getElementById('progressFill').style.width=percent+'%'; }
-  if(detail) document.getElementById('progressDetail').textContent=detail;
+  document.getElementById('progressText').textContent=text||'Uploading...';
+  document.getElementById('progressFill').style.width=(percent||0)+'%';
+  document.getElementById('progressDetail').textContent=detail||'';
 }
-function toggleEye(){
-  const input=document.getElementById('password');
-  const btn=document.getElementById('eyeBtn');
-  if(input.type==='password'){ input.type='text'; if(btn) btn.textContent='🙈'; }
-  else{ input.type='password'; if(btn) btn.textContent='👁️'; }
+
+function goToStep(n){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active','done'));
+  document.getElementById('section'+n).classList.add('active');
+  for(let i=1;i<n;i++){ document.getElementById('step'+i).classList.add('done'); }
+  document.getElementById('step'+n).classList.add('active');
+  if(n===3){ doReview(); }
+  window.scrollTo(0,0);
 }
-function goToStep2(){
-  const fullName=document.getElementById('fullName').value.trim();
-  const email=document.getElementById('email').value.trim();
-  const phone=document.getElementById('phone').value.trim();
-  const password=document.getElementById('password').value.trim();
-  if(!fullName||!email||!phone||!password){ showMsg('Fill Step 1 required fields', 'error'); return; }
-  if(!currentLat||!currentLng){ showMsg('📍 Capture GPS first', 'error'); return; }
-  document.getElementById('section1').classList.remove('active');
-  document.getElementById('section2').classList.add('active');
-  document.getElementById('stepper1').classList.add('done');
-  document.getElementById('stepper1').classList.remove('active');
-  document.getElementById('stepper2').classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function goToStep1(){
-  document.getElementById('section2').classList.remove('active');
-  document.getElementById('section1').classList.add('active');
-  document.getElementById('stepper1').classList.add('active');
-  document.getElementById('stepper1').classList.remove('done');
-  document.getElementById('stepper2').classList.remove('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function handleFile(input, boxId, previewId){
+
+function handleFile(input,type){
   const file=input.files[0];
   if(!file) return;
-  // Size checks
-  if(boxId==='boxVideo' && file.size > 50*1024*1024){ showMsg('Video too large - Max 50MB. Please compress video', 'error'); input.value=''; return; }
-  if(boxId==='boxCv' && file.size > 5*1024*1024){ showMsg('CV too large - Max 5MB', 'error'); input.value=''; return; }
-  const box=document.getElementById(boxId);
-  const nameId='name'+boxId.replace('box','');
-  const nameEl=document.getElementById(nameId);
-  if(box) { box.classList.add('hasFile'); box.classList.remove('required'); }
-  if(nameEl){ nameEl.style.display='block'; nameEl.textContent='✓ '+file.name+' ('+(file.size/1024/1024).toFixed(2)+' MB)'; }
-  if(previewId){
-    const preview=document.getElementById(previewId);
-    if(!preview) return;
-    if(file.type.startsWith('image/')){
-      const reader=new FileReader();
-      reader.onload=function(e){preview.src=e.target.result;preview.style.display='block';};
-      reader.readAsDataURL(file);
-    }else if(file.type.startsWith('video/')){
-      const url=URL.createObjectURL(file);
-      preview.src=url;preview.style.display='block';
-    }
-  }
-  showMsg('File selected: '+file.name, 'success');
+  const maxSize = type==='video'?20*1024*1024:5*1024*1024;
+  if(file.size>maxSize){ showMsg(`❌ ${type} too large: ${(file.size/1024/1024).toFixed(1)}MB > ${maxSize/1024/1024}MB`, 'error'); return; }
+  
+  if(type==='photo'){ photoFile=file; document.getElementById('photoName').textContent=file.name; document.getElementById('photoName').style.display='block'; document.getElementById('photoBox').classList.add('hasFile'); const r=new FileReader(); r.onload=e=>{ const img=document.getElementById('photoPreview'); img.src=e.target.result; img.style.display='block'; }; r.readAsDataURL(file); }
+  if(type==='id'){ idFile=file; document.getElementById('idName').textContent=file.name; document.getElementById('idName').style.display='block'; document.getElementById('idBox').classList.add('hasFile'); const r=new FileReader(); r.onload=e=>{ const img=document.getElementById('idPreview'); img.src=e.target.result; img.style.display='block'; verifyID(e.target.result); }; r.readAsDataURL(file); }
+  if(type==='licence'){ licenceFile=file; document.getElementById('licenceName').textContent=file.name; document.getElementById('licenceName').style.display='block'; document.getElementById('licenceBox').classList.add('hasFile'); if(file.type.startsWith('image/')){ const r=new FileReader(); r.onload=e=>{ const img=document.getElementById('licencePreview'); img.src=e.target.result; img.style.display='block'; }; r.readAsDataURL(file); } }
+  if(type==='video'){ videoFile=file; document.getElementById('videoName').textContent=file.name; document.getElementById('videoName').style.display='block'; document.getElementById('videoBox').classList.add('hasFile'); const url=URL.createObjectURL(file); const v=document.getElementById('videoPreview'); v.src=url; v.style.display='block'; }
 }
 
-
-// ===== COUNTRY ID PATTERNS =====
-const ID_PATTERNS = {
-  GH: {
-    name: 'Ghana Card',
-    patterns: [/GHA-?\d{9}-?\d/gi, /GHA\d{10,}/gi, /\b\d{3}[ -]?\d{3}[ -]?\d{3}\b/g],
-    keywords: ['ghana', 'card', 'national', 'identification', 'GHA', 'Ghana Card', 'Republic of Ghana', 'NIA'],
-    minLength: 10,
-    example: 'GHA-XXXXXXXXX-X'
-  },
-  NG: {
-    name: 'Nigeria NIN',
-    patterns: [/\b\d{11}\b/g, /NIN/gi, /National Identification Number/gi],
-    keywords: ['nigeria', 'NIN', 'national', 'identification', 'Federal Republic'],
-    minLength: 11,
-    example: '11-digit NIN e.g., 12345678901'
-  },
-  ZA: {
-    name: 'South Africa ID',
-    patterns: [/\b\d{13}\b/g, /\b\d{6}[ ]?\d{4}[ ]?\d{2}[ ]?\d\b/g],
-    keywords: ['south africa', 'republic', 'identity', 'ID No'],
-    minLength: 13,
-    example: '13-digit YYMMDDSSSSCAZ'
-  },
-  GB: {
-    name: 'UK Passport/Driving Licence',
-    patterns: [/\b[A-Z]{2}\d{7}\b/gi, /\b[A-Z0-9]{5,9}\b/g, /\b\d{4} \d{4} \d{4} \d{4}\b/g],
-    keywords: ['united kingdom', 'passport', 'driving licence', 'DVLA', 'UK'],
-    minLength: 8,
-    example: 'Passport: 2 letters + 7 digits'
-  },
-  US: {
-    name: 'US ID / Passport',
-    patterns: [/\b\d{3}-\d{2}-\d{4}\b/g, /\b[A-Z0-9]{9}\b/g],
-    keywords: ['united states', 'passport', 'driver license', 'ID', 'USA'],
-    minLength: 9,
-    example: '9-digit passport / DL'
-  },
-  OTHER: {
-    name: 'International ID',
-    patterns: [/\b[A-Z0-9]{6,15}\b/g, /\d{6,}/g],
-    keywords: ['national', 'identification', 'passport', 'ID', 'card'],
-    minLength: 6,
-    example: 'At least 6 chars ID number'
+async function verifyID(imageSrc){
+  const box=document.getElementById('idVerifyBox');
+  box.style.display='block';
+  document.getElementById('idVerifyContent').innerHTML='<div style="color:#a78bfa">🔍 Verifying Ghana ID...</div>';
+  try{
+    const result=await Tesseract.recognize(imageSrc,'eng');
+    const text=result.data.text||'';
+    const checks=[
+      {name:'Ghana ID Text', pass:/GHANA|REPUBLIC|IDENTITY|ECOWAS/i.test(text)},
+      {name:'ID Number', pass:/[0-9]{8,}/.test(text)},
+      {name:'Name Visible', pass:text.length>20}
+    ];
+    let score=0;
+    let html='';
+    checks.forEach(c=>{
+      if(c.pass) score++;
+      html+=`<div class="idVerifyItem"><span>${c.name}</span><span class="${c.pass?'idCheckPass':'idCheckFail'}">${c.pass?'✅':'❌'}</span></div>`;
+    });
+    document.getElementById('idVerifyContent').innerHTML=html;
+    idScore=Math.round((score/checks.length)*100);
+    document.getElementById('idScoreFill').style.width=idScore+'%';
+    document.getElementById('idScoreFill').style.background=idScore>=60?'#22c55e':idScore>=30?'#facc15':'#ef4444';
+    document.getElementById('idScoreText').textContent=`Score: ${idScore}% - ${idScore>=60?'Verified ✅':idScore>=30?'Partial - You can still register':'Failed - Try clearer photo'}`;
+    idVerified=idScore>=30;
+  }catch(e){
+    document.getElementById('idVerifyContent').innerHTML=`<div style="color:#fca5a5">ID verify failed: ${e.message} - You can still register</div>`;
+    idVerified=true;
+    idScore=50;
   }
-};
+}
 
-let lastIdVerification = {score:0, passed:false, details:{}};
+function getGPS(){
+  if(!navigator.geolocation){ showMsg('GPS not supported', 'error'); return; }
+  showMsg('📍 Getting GPS...', 'info');
+  navigator.geolocation.getCurrentPosition(pos=>{
+    currentLat=pos.coords.latitude;
+    currentLng=pos.coords.longitude;
+    document.getElementById('gpsDisplay').textContent=`✅ GPS: (${currentLat.toFixed(4)}, ${currentLng.toFixed(4)})`;
+    showMsg('✅ GPS captured', 'success');
+  }, err=>{ showMsg('GPS failed: '+err.message+' - You can still register', 'error'); currentLat=5.6487; currentLng=-0.2198; document.getElementById('gpsDisplay').textContent=`⚠️ Using default GPS (${currentLat}, ${currentLng})`; });
+}
 
-function checkImageQuality(file){
-  return new Promise((resolve)=>{
-    const img=new Image();
-    img.onload=()=>{
-      const w=img.width, h=img.height;
-      const minRes = w>=800 && h>=500;
-      const aspect = w/h;
-      const goodAspect = aspect>0.5 && aspect<2.5;
-      // Simple blur check via canvas variance
-      const canvas=document.createElement('canvas');
-      canvas.width=100; canvas.height=100;
-      const ctx=canvas.getContext('2d');
-      ctx.drawImage(img,0,0,100,100);
-      const data=ctx.getImageData(0,0,100,100).data;
-      let sum=0, sumSq=0, count=0;
-      for(let i=0;i<data.length;i+=4){
-        const gray=0.299*data[i]+0.587*data[i+1]+0.114*data[i+2];
-        sum+=gray; sumSq+=gray*gray; count++;
+function openMap(){
+  const lat=prompt('Enter Latitude', currentLat||'5.6487');
+  const lng=prompt('Enter Longitude', currentLng||'-0.2198');
+  if(lat&&lng){ currentLat=parseFloat(lat); currentLng=parseFloat(lng); document.getElementById('gpsDisplay').textContent=`✅ GPS: (${currentLat}, ${currentLng}) - Picked on map`; }
+}
+
+function doReview(){
+  const fullName=document.getElementById('fullName').value;
+  const email=document.getElementById('email').value;
+  const phone=document.getElementById('phone').value;
+  let html=`<div><b>Name:</b> ${fullName||'❌ Missing'}</div><div><b>Email:</b> ${email||'❌'}</div><div><b>Phone:</b> ${phone||'❌'}</div>`;
+  html+=`<div><b>Photo:</b> ${photoFile?`✅ ${photoFile.name}`:'❌ Missing'}</div>`;
+  html+=`<div><b>ID:</b> ${idFile?`✅ ${idFile.name} - Score ${idScore}%`:'❌ Missing'}</div>`;
+  html+=`<div><b>Licence:</b> ${licenceFile?`✅ ${licenceFile.name}`:'❌ Missing'}</div>`;
+  html+=`<div><b>Video:</b> ${videoFile?`✅ ${videoFile.name}`:'❌ Missing'}</div>`;
+  html+=`<div style="margin-top:8px;color:#facc15"><b>⚠️ After registration: PENDING - CEO must approve in ceo-registration-center.html</b></div>`;
+  document.getElementById('reviewBox').innerHTML=html;
+}
+
+function uploadCompat(file, path){
+  return new Promise((resolve, reject)=>{
+    const storageRef=storage.ref(path);
+    const uploadTask=storageRef.put(file, {contentType: file.type||'application/octet-stream'});
+    let lastProgress=Date.now();
+    uploadTask.on('state_changed',
+      (snapshot)=>{
+        const prog=(snapshot.bytesTransferred / snapshot.totalBytes * 100);
+        const overallBase = path.includes('photo')?10 : path.includes('id')?30 : path.includes('licence')?50 : 75;
+        const overall = overallBase + (prog*0.2);
+        showProgress(true, `Uploading ${file.name}... ${prog.toFixed(0)}%`, overall, `${(snapshot.bytesTransferred/1024/1024).toFixed(1)}MB / ${(snapshot.totalBytes/1024/1024).toFixed(1)}MB`);
+      },
+      (error)=>{
+        console.error('Upload error', path, error);
+        reject(error);
+      },
+      async ()=>{
+        try{
+          const url=await uploadTask.snapshot.ref.getDownloadURL();
+          resolve(url);
+        }catch(e){ reject(e); }
       }
-      const mean=sum/count;
-      const variance=(sumSq/count)-(mean*mean);
-      const notBlurry = variance>100; // higher variance = sharper
-      resolve({width:w, height:h, minRes, goodAspect, notBlurry, variance:Math.round(variance), score:(minRes?25:0)+(goodAspect?10:0)+(notBlurry?15:0)});
-    };
-    img.onerror=()=>resolve({width:0,height:0,minRes:false,goodAspect:false,notBlurry:false,variance:0,score:0});
-    img.src=URL.createObjectURL(file);
+    );
+    const interval=setInterval(()=>{
+      if(Date.now()-lastProgress > 60000){
+        clearInterval(interval);
+        uploadTask.cancel();
+        reject(new Error('Upload timeout - no progress for 60s. Check internet / Storage Rules'));
+      }
+    }, 5000);
+    uploadTask.then(()=>clearInterval(interval)).catch(()=>clearInterval(interval));
   });
 }
 
-async function verifyIDFile(file){
-  if(!file){ return; }
-  if(file.type==='application/pdf'){
-    showMsg('📄 PDF detected - Cannot OCR PDF, checking file only. Please upload clear photo ID for better verification.', 'info');
-    document.getElementById('idVerifyBox').style.display='block';
-    document.getElementById('idVerifyList').innerHTML=`<div class="idVerifyItem"><span>File Type</span><span class="idCheckWarn">PDF - Manual check by CEO</span></div>`;
-    document.getElementById('idVerifyResult').innerHTML=`<span class="idCheckWarn">⚠️ PDF uploaded - CEO will manually verify</span>`;
-    document.getElementById('idScoreFill').style.width='60%';
-    document.getElementById('idScoreFill').style.background='#facc15';
-    lastIdVerification={score:60, passed:true, details:{isPDF:true}};
-    return;
-  }
-  const country=document.getElementById('country').value||'GH';
-  const patternInfo=ID_PATTERNS[country]||ID_PATTERNS['OTHER'];
-  
-  const box=document.getElementById('idVerifyBox');
-  const list=document.getElementById('idVerifyList');
-  const result=document.getElementById('idVerifyResult');
-  const scoreFill=document.getElementById('idScoreFill');
-  const ocrTextEl=document.getElementById('idOcrText');
-  
-  box.style.display='block';
-  list.innerHTML=`<div class="idVerifyItem"><span>🔍 Checking image quality...</span><span>⏳</span></div>`;
-  result.textContent='Running AI verification...';
-  scoreFill.style.width='10%';
-  scoreFill.style.background='linear-gradient(135deg,#a855f7,#d8b4fe)';
-  
-  // 1. Image quality
-  const quality=await checkImageQuality(file);
-  let checks=[];
-  checks.push({label:`Resolution ${quality.width}x${quality.height}`, pass:quality.minRes, msg: quality.minRes? '✅ Good (>=800px)' : '❌ Too low - Retake clearer photo'});
-  checks.push({label:'Sharpness', pass:quality.notBlurry, msg: quality.notBlurry? `✅ Sharp (variance ${quality.variance})` : `❌ Blurry (variance ${quality.variance}) - Retake`});
-  checks.push({label:'File Size', pass:file.size>30000, msg: file.size>30000? `✅ ${(file.size/1024).toFixed(0)}KB` : '❌ Too small - Might be screenshot'});
-  
-  let html=checks.map(c=>`<div class="idVerifyItem"><span>${c.label}</span><span class="${c.pass?'idCheckPass':'idCheckFail'}">${c.msg}</span></div>`).join('');
-  list.innerHTML=html;
-  let totalScore=quality.score;
-  
-  // 2. OCR if image
-  if(file.size>10000){
-    list.innerHTML+=`<div class="idVerifyItem"><span>🔤 OCR Reading text...</span><span>⏳ Running Tesseract...</span></div>`;
-    try{
-      const worker = await Tesseract.createWorker('eng');
-      const ret = await worker.recognize(file);
-      await worker.terminate();
-      const text=ret.data.text||'';
-      ocrTextEl.style.display='block';
-      ocrTextEl.textContent=`OCR Text: ${text.substring(0,300)}... (confidence ${ret.data.confidence?.toFixed(0)||0}%)`;
-      
-      const hasNumber = /\d/.test(text);
-      const textLen = text.trim().length;
-      const hasIDPattern = patternInfo.patterns.some(p=>p.test(text));
-      const hasKeyword = patternInfo.keywords.some(k=>text.toLowerCase().includes(k.toLowerCase()));
-      const confidence = ret.data.confidence||0;
-      
-      const ocrChecks=[
-        {label:'Text Found', pass:textLen>10, msg: textLen>10? `✅ ${textLen} chars` : '❌ No text - Not a real ID?'},
-        {label:'Has Numbers', pass:hasNumber, msg: hasNumber?'✅ Contains numbers':'❌ No numbers found'},
-        {label:`${patternInfo.name} Pattern (${patternInfo.example})`, pass:hasIDPattern, msg: hasIDPattern? `✅ Matches ${patternInfo.name}` : `⚠️ Pattern not detected - Will be manual check`},
-        {label:'Country Keywords', pass:hasKeyword, msg: hasKeyword? `✅ Found ${country} keyword` : `⚠️ No ${country} keyword - Maybe foreign ID`},
-        {label:'OCR Confidence', pass:confidence>60, msg: confidence>60? `✅ ${confidence.toFixed(0)}% confidence` : `⚠️ ${confidence.toFixed(0)}% low - Try clearer photo`}
-      ];
-      
-      let ocrScore=0;
-      ocrChecks.forEach(c=>{ if(c.pass) ocrScore+=10; });
-      
-      html+=ocrChecks.map(c=>`<div class="idVerifyItem"><span>${c.label}</span><span class="${c.pass?'idCheckPass':'idCheckWarn'}">${c.msg}</span></div>`).join('');
-      list.innerHTML=html;
-      totalScore+=ocrScore;
-      
-      // Final decision
-      const passed = quality.minRes && quality.notBlurry && textLen>10 && hasNumber;
-      const warn = !hasIDPattern || !hasKeyword;
-      
-      lastIdVerification={score:totalScore, passed:passed, details:{quality, textLen, hasIDPattern, hasKeyword, text:text.substring(0,200)}};
-      
-      scoreFill.style.width=Math.min(totalScore,100)+'%';
-      if(passed && !warn){
-        scoreFill.style.background='linear-gradient(135deg,#22c55e,#16a34a)';
-        result.innerHTML=`<span class="idCheckPass">✅ ID Looks REAL — Score ${totalScore}/100 — ${patternInfo.name} verified, good quality. You can register.</span>`;
-        showMsg(`✅ ID Verified as real ${patternInfo.name} - Score ${totalScore}`, 'success');
-      }else if(passed && warn){
-        scoreFill.style.background='linear-gradient(135deg,#facc15,#f59e0b)';
-        result.innerHTML=`<span class="idCheckWarn">⚠️ ID Quality OK but pattern not perfect — Score ${totalScore}/100 — CEO will manually verify. You can still register.</span>`;
-        showMsg(`⚠️ ID quality OK but ${patternInfo.name} pattern not perfect — CEO will check`, 'info');
-      }else{
-        scoreFill.style.background='linear-gradient(135deg,#ef4444,#991b1b)';
-        result.innerHTML=`<span class="idCheckFail">❌ ID Looks FAKE or POOR QUALITY — Score ${totalScore}/100 — Please retake clear photo of real National ID from ${country}. Make sure all text visible.</span>`;
-        showMsg(`❌ ID verification failed - Score ${totalScore} - Please upload clearer real ID`, 'error');
-      }
-      
-    }catch(e){
-      console.error('OCR fail', e);
-      list.innerHTML+=`<div class="idVerifyItem"><span>OCR Error</span><span class="idCheckWarn">${e.message} - Manual check by CEO</span></div>`;
-      totalScore+=20;
-      scoreFill.style.width=totalScore+'%';
-      result.innerHTML=`<span class="idCheckWarn">⚠️ OCR failed but file OK — CEO will manually verify</span>`;
-      lastIdVerification={score:totalScore, passed:true, details:{ocrError:true}};
-    }
-  }
-}
-
-
-async function captureGPS(){
-  const btn=document.getElementById('gpsBtn');
-  const status=document.getElementById('gpsStatus');
-  if(btn) btn.textContent='📍 Capturing...';
-  showMsg('Capturing GPS... Allow location', 'info');
-  if(!navigator.geolocation){ showMsg('Geolocation not supported', 'error'); if(btn) btn.textContent='📍 Capture My GPS Now'; return; }
-  navigator.geolocation.getCurrentPosition(async (pos)=>{
-    currentLat=pos.coords.latitude;
-    currentLng=pos.coords.longitude;
-    status.textContent=`✅ GPS Captured: ${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`;
-    document.getElementById('gpsName').textContent=`Lat: ${currentLat}, Lng: ${currentLng}`;
-    if(btn) btn.textContent='✅ GPS Captured';
-    showMsg('GPS Captured!', 'success');
-  }, (err)=>{
-    showMsg('GPS Error: '+err.message, 'error');
-    if(btn) btn.textContent='📍 Try Again GPS';
-  }, {enableHighAccuracy:true, timeout:15000});
-}
-
-async function registerNurse(){
+async function doRegister(){
   const fullName=document.getElementById('fullName').value.trim();
-  const email=document.getElementById('email').value.trim();
+  const email=document.getElementById('email').value.trim().toLowerCase();
   const phone=document.getElementById('phone').value.trim();
-  const password=document.getElementById('password').value.trim();
+  const password=document.getElementById('password').value;
+  const confirmPassword=document.getElementById('confirmPassword').value;
   const country=document.getElementById('country').value;
-  const experience=document.getElementById('experience').value;
-  const qualification=document.getElementById('qualification').value.trim();
+  const qualification=document.getElementById('qualification').value;
   const services=document.getElementById('services').value;
-  const refName=document.getElementById('referenceName').value.trim();
-  const refPhone=document.getElementById('referencePhone').value.trim();
-  const bio=document.getElementById('bio')?.value.trim()||'';
-  const photoFile=document.getElementById('photoFile').files[0];
-  const idFile=document.getElementById('idFile').files[0];
-  const licenceFile=document.getElementById('licenceFile').files[0];
-  const cvFile=document.getElementById('cvFile').files[0];
-  const videoFile=document.getElementById('videoFile').files[0];
-
-  if(!currentLat||!currentLng){ showMsg('📍 Capture GPS first', 'error'); return; }
-  if(!fullName||!email||!phone||!password){ showMsg('Fill all required', 'error'); return; }
-  if(password.length<6){ showMsg('Password min 6 chars', 'error'); return; }
-  if(!photoFile){ showMsg('❌ Profile Photo REQUIRED', 'error'); return; }
-  if(!idFile){ showMsg('❌ National ID REQUIRED', 'error'); return; }
-  if(lastIdVerification.score>0 && !lastIdVerification.passed && lastIdVerification.score<30){ showMsg('❌ National ID looks fake or too blurry - Score '+lastIdVerification.score+' - Please retake clear photo of real ID', 'error'); document.getElementById('idVerifyBox').scrollIntoView({behavior:'smooth'}); return; }
-  if(!licenceFile){ showMsg('❌ Licence REQUIRED', 'error'); return; }
-  if(!cvFile){ showMsg('❌ CV REQUIRED - .docx or .pdf', 'error'); return; }
-  if(!videoFile){ showMsg('❌ Intro Video REQUIRED', 'error'); return; }
-
+  const experience=document.getElementById('experience').value;
+  const bio=document.getElementById('bio').value.trim();
+  const refName=document.getElementById('refName').value.trim();
+  const refPhone=document.getElementById('refPhone').value.trim();
+  
+  if(!fullName||!email||!phone||!password){ showMsg('❌ Fill all required fields', 'error'); goToStep(1); return; }
+  if(password.length<6){ showMsg('❌ Password min 6 chars', 'error'); return; }
+  if(password!==confirmPassword){ showMsg('❌ Passwords do not match', 'error'); return; }
+  if(!photoFile||!idFile||!licenceFile||!videoFile){ showMsg('❌ Upload all 4 files: Photo, ID, Licence, Video', 'error'); goToStep(2); return; }
+  
   const btn=document.getElementById('registerBtn');
-  if(btn){ btn.disabled=true; btn.textContent='⏳ Starting...'; }
-  showProgress(true, 'Creating account...', 5, 'Step 1/6: Creating auth user');
-
+  btn.disabled=true;
+  btn.textContent='⏳ Registering...';
+  
   try{
-    // 1. Create auth user FIRST
+    showProgress(true, 'Creating account...', 5, 'Creating Firebase Auth');
     const cred=await auth.createUserWithEmailAndPassword(email, password);
     const uid=cred.user.uid;
-    await cred.user.updateProfile({displayName:fullName});
-    showProgress(true, 'Auth created - Uploading files...', 10, `UID: ${uid}`);
-
-    // 2. Robust upload function using COMPAT SDK - fixes stuck 0%
-    function uploadCompat(file, path){
-      return new Promise((resolve, reject)=>{
-        const storageRef=storage.ref(path);
-        const uploadTask=storageRef.put(file);
-        let lastProgress=Date.now();
-        uploadTask.on('state_changed',
-          (snapshot)=>{
-            const prog=(snapshot.bytesTransferred / snapshot.totalBytes * 100);
-            const overallBase = path.includes('photo')?10 : path.includes('id')?25 : path.includes('licence')?40 : path.includes('cv')?55 : 70;
-            const overall = overallBase + (prog*0.15);
-            showProgress(true, `Uploading ${file.name}... ${prog.toFixed(0)}%`, overall, `${snapshot.bytesTransferred/1024/1024}MB / ${snapshot.totalBytes/1024/1024}MB`);
-            if(btn) btn.textContent=`⏳ ${prog.toFixed(0)}% - ${file.name}`;
-            lastProgress=Date.now();
-          },
-          (error)=>{
-            console.error('Upload error', path, error);
-            reject(error);
-          },
-          async ()=>{
-            try{
-              const url=await uploadTask.snapshot.ref.getDownloadURL();
-              resolve(url);
-            }catch(e){ reject(e); }
-          }
-        );
-        // Timeout check - if no progress for 60s, fail
-        const interval=setInterval(()=>{
-          if(Date.now()-lastProgress > 60000){
-            clearInterval(interval);
-            uploadTask.cancel();
-            reject(new Error('Upload timeout - no progress for 60s. Check internet / Storage Rules'));
-          }
-        }, 5000);
-        uploadTask.then(()=>clearInterval(interval)).catch(()=>clearInterval(interval));
-      });
-    }
-
-    let photoURL='', idURL='', licenceURL='', cvURL='', videoURL='';
+    
+    let photoURL='', idURL='', licenceURL='', videoURL='';
     try{
       showMsg('⏳ Uploading Photo...', 'info');
-      photoURL=await uploadCompat(photoFile, `nurses/${uid}/photo_${Date.now()}_${photoFile.name}`);
+      photoURL=await uploadCompat(photoFile, `nurses/${uid}/photo_${Date.now()}_${sanitizeFileName(photoFile.name)}`);
       showMsg('✅ Photo uploaded, uploading ID...', 'success');
       
-      idURL=await uploadCompat(idFile, `nurses/${uid}/id_${Date.now()}_${idFile.name}`);
+      idURL=await uploadCompat(idFile, `nurses/${uid}/id_${Date.now()}_${sanitizeFileName(idFile.name)}`);
       showMsg('✅ ID uploaded, uploading Licence...', 'success');
       
-      licenceURL=await uploadCompat(licenceFile, `nurses/${uid}/licence_${Date.now()}_${licenceFile.name}`);
-      showMsg('✅ Licence uploaded, uploading CV...', 'success');
+      licenceURL=await uploadCompat(licenceFile, `nurses/${uid}/licence_${Date.now()}_${sanitizeFileName(licenceFile.name)}`);
+      showMsg('✅ Licence uploaded, uploading Video (biggest)...', 'success');
       
-      cvURL=await uploadCompat(cvFile, `nurses/${uid}/cv_${Date.now()}_${cvFile.name}`);
-      showMsg('✅ CV uploaded, uploading Video (biggest)...', 'success');
-      
-      videoURL=await uploadCompat(videoFile, `nurses/${uid}/video_${Date.now()}_${videoFile.name}`);
+      videoURL=await uploadCompat(videoFile, `nurses/${uid}/video_${Date.now()}_${sanitizeFileName(videoFile.name)}`);
       showMsg('✅ Video uploaded!', 'success');
     }catch(uploadErr){
       console.error('Upload failed', uploadErr);
@@ -542,65 +404,57 @@ async function registerNurse(){
       let code=uploadErr.code||'';
       if(code==='storage/unauthorized' || errMsg.includes('unauthorized')){
         showMsg(`❌ STORAGE RULES BLOCK - Go to Firebase Console > Storage > Rules and set:\n\nallow read, write: if request.auth != null;\n\nError: ${code} ${errMsg}`, 'error');
-        showProgress(true, 'STORAGE RULES BLOCKED', 0, `Error: ${code} - Fix rules in Firebase Console`);
-      }else if(code==='storage/retry-limit-exceeded' || errMsg.includes('timeout')){
-        showMsg(`❌ Upload timeout - Poor internet or file too large. Try compress video to <20MB. Error: ${errMsg}`, 'error');
       }else{
         showMsg(`❌ Upload failed: ${code} ${errMsg}. Check Storage Rules and internet.`, 'error');
       }
       if(btn){ btn.disabled=false; btn.textContent='✅ Retry Register'; }
-      // Delete auth user so email not saved if upload fails
-      try{ await cred.user.delete(); console.log('Auth deleted because upload failed'); }catch(e){ await auth.signOut(); }
+      try{ await cred.user.delete(); }catch(e){ await auth.signOut(); }
+      showProgress(false);
       return;
     }
 
-    if(!photoURL || !idURL || !licenceURL || !cvURL || !videoURL){
+    if(!photoURL || !idURL || !licenceURL || !videoURL){
       showMsg('❌ One or more URLs empty - upload failed', 'error');
       if(btn){ btn.disabled=false; btn.textContent='✅ Register'; }
       return;
     }
 
-    showProgress(true, 'Saving to database...', 90, 'All files uploaded, saving profiles');
+    showProgress(true, 'Saving to database...', 90, 'All files uploaded, saving as PENDING');
     const now=Date.now();
     const nurseData={
-      uid:uid,id:uid,fullName:fullName,name:fullName,email:email.toLowerCase(),phone:phone,phoneNumber:phone,country:country,experience:experience,qualification:qualification,services:services,specialty:services,bio:bio,
+      uid:uid,id:uid,fullName:fullName,name:fullName,email:email,phone:phone,phoneNumber:phone,country:country,experience:experience,qualification:qualification,services:services,specialty:services,bio:bio,
       referenceName:refName,referencePhone:refPhone,lat:currentLat,lng:currentLng,gpsActualName:currentGPSName||'',
       photo:photoURL,photoURL:photoURL,photoUrl:photoURL,
       idURL:idURL,licenceURL:licenceURL,licenseUrl:licenceURL,
-      cvURL:cvURL,cvUrl:cvURL,
       videoURL:videoURL,videoUrl:videoURL,video:videoURL,introVideo:videoURL,nurseVideo:videoURL,
       isApproved:false,approved:false,canLogin:false,ceoApproved:false,isVerified:false,
       status:'pending',needsCEOApproval:true,pending:true,approvalStatus:'pending',
-      rating:5.0,createdAt:now,updatedAt:now,source:'PENDING-CEO-APPROVAL-REQUIRED'
+      rating:5.0,createdAt:now,updatedAt:now,source:'PENDING-NO-CV-4-FILES'
     };
 
-    // FIXED: Only create PENDING locations, NOT allowedNurses
-    // allowedNurses should ONLY be created by CEO approval
+    // ONLY PENDING LOCATIONS - NO allowedNurses
     await db.ref('nurses/'+uid).set(nurseData);
     await db.ref('pending_nurses/'+uid).set(nurseData);
     await db.ref('pendingNurses/'+uid).set(nurseData);
     await db.ref('nurse_registrations/'+uid).set(nurseData);
     await db.ref('pendingNurseRegistrations/'+uid).set(nurseData);
     await db.ref('nurseUsers/'+uid).set(nurseData);
-    await db.ref('ceoNurseUpdates/'+uid).set({...nurseData, updatedBy:'all-required-pending'});
+    await db.ref('ceoNurseUpdates/'+uid).set({...nurseData, updatedBy:'pending-no-cv'});
     await db.ref('ceoRegistrationCenter/nurses/'+uid).set(nurseData);
     await db.ref('ceoBookingReceiverNurses/'+uid).set(nurseData);
     await db.ref('allNurses/'+uid).set(nurseData);
-    // DO NOT create allowedNurses here - CEO will create it on approval
-    // const emailKey=email.toLowerCase().replace(/[.#$@\[\]]/g,'_');
-    // await db.ref('allowedNurses/'+emailKey).set(nurseData); // REMOVED - causes auto-approve bug
+    // DO NOT create allowedNurses - CEO will create on approval
     await firestore.collection('nurses').doc(uid).set({...nurseData, createdAt: firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-    // Also create Firestore pending
     await firestore.collection('pending_nurses').doc(uid).set({...nurseData, createdAt: firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
     await firestore.doc(`ceoRegistrationCenter/nurses/${uid}`).set({...nurseData, createdAt: firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
 
     try{ await cred.user.sendEmailVerification(); }catch{}
 
-    showProgress(true, '✅ SUCCESS!', 100, 'Registration complete - CEO must approve');
-    showMsg('✅ Registration SUCCESS! All 5 files saved!\n\nSTATUS: PENDING - Waiting for CEO approval in ceo-registration-center.html\n\nYou CANNOT login until CEO clicks Approve. Your data is in PENDING, not approved. Redirecting to login...', 'success');
+    showProgress(true, '✅ SUCCESS!', 100, 'Registration complete - PENDING CEO approval');
+    showMsg('✅ Registration SUCCESS! All 4 files saved (No CV)!\n\nSTATUS: PENDING - Waiting for CEO approval in ceo-registration-center.html\n\nYou CANNOT login until CEO clicks Approve. Redirecting to login...', 'success');
     localStorage.setItem('nurseProfile', JSON.stringify(nurseData));
-    if(btn){ btn.disabled=false; btn.textContent='✅ Registered — Go to Login'; }
-    setTimeout(()=>{ location.href='nurse-login_6.html'; }, 3000);
+    if(btn){ btn.disabled=false; btn.textContent='✅ Registered — PENDING'; }
+    setTimeout(()=>{ location.href='nurse-login_7.html'; }, 3000);
 
   }catch(e){
     console.error(e);
