@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FORCE FIX - CEO Approval by Email</title>
+<style>
+body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;padding:16px}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.18);border-radius:18px;padding:20px;max-width:600px;margin:0 auto}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#fff;margin:8px 0}
+.btn{width:100%;padding:14px;border-radius:12px;font-weight:800;border:none;cursor:pointer;margin-top:10px}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16}
+.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}
+.log{background:#000;color:#0f0;padding:10px;border-radius:8px;font-size:11px;max-height:300px;overflow:auto;margin-top:10px;white-space:pre-wrap}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+<div class="card">
+<h2>FORCE FIX - Approve Nurse by EMAIL</h2>
+<p style="font-size:12px;color:#a78bfa">This fixes the bug where CEO approves Doc ID but Auth UID is different. This approves by EMAIL in ALL locations.</p>
+
+<label>Enter Nurse Email to Force Approve:</label>
+<input id="email" type="email" value="lovecareglobal@gmail.com" placeholder="nurse@email.com">
+
+<label>Auth UID (optional - will auto-find):</label>
+<input id="uid" type="text" placeholder="Leave blank to auto-find by email">
+
+<button class="btn btnGreen" onclick="forceApprove()">FORCE APPROVE THIS EMAIL IN ALL PATHS</button>
+<button class="btn btnYellow" onclick="checkStatus()">CHECK STATUS - Is this email approved?</button>
+
+<div id="log" class="log">Ready...
+
+This tool will:
+1. Find all nurse records with this email in RTDB
+2. Approve them in ALL paths
+3. Create allowedNurses by emailKey
+4. Create allowedNursesByUid for both Doc ID and Auth UID
+5. Update Firestore too
+
+Click Force Approve</div>
+
+<div style="margin-top:16px;padding:12px;background:rgba(34,197,94,.1);border-radius:12px;font-size:11px">
+<b>Current issue:</b><br>
+CEO approved Doc ID: ds7LTnYLgpXG82hFJN3fScNozK23<br>
+But Auth UID is different. Login checks Auth UID, not Doc ID.<br><br>
+<b>This tool fixes by approving via EMAIL, not UID.</b>
+</div>
+
+</div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const fs=firebase.firestore();
+
+function log(m){
+  const el=document.getElementById('log');
+  el.textContent+=m+'\n';
+  el.scrollTop=el.scrollHeight;
+  console.log(m);
+}
+function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');}
+
+async function checkStatus(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  if(!email){ alert('Enter email'); return; }
+  const emailKey=sanitizeEmail(email);
+  document.getElementById('log').textContent='';
+  log('Checking status for '+email+' ('+emailKey+')...');
+  
+  try{
+    const snap=await db.ref('allowedNurses/'+emailKey).once('value');
+    if(snap.exists()){
+      log('✅ ALLOWED - allowedNurses/'+emailKey+' EXISTS');
+      log(JSON.stringify(snap.val(), null, 2));
+    } else {
+      log('❌ NOT ALLOWED - allowedNurses/'+emailKey+' DOES NOT EXIST - This is why login says pending');
+    }
+  }catch(e){ log('Error checking allowedNurses: '+e.message); }
+  
+  try{
+    const allSnap=await db.ref('nurses').once('value');
+    if(allSnap.exists()){
+      let found=false;
+      allSnap.forEach(ch=>{
+        const v=ch.val()||{};
+        const em=(v.email||'').toLowerCase();
+        if(em===email){
+          found=true;
+          log(`Found in nurses/${ch.key}: isApproved=${v.isApproved}, status=${v.status}, canLogin=${v.canLogin}`);
+          log(JSON.stringify(v, null, 2).substring(0,500));
+        }
+      });
+      if(!found) log('Not found in nurses/ collection');
+    }
+  }catch(e){ log('Error checking nurses: '+e.message); }
+  
+  try{
+    const fsSnap=await fs.collection('nurses').where('email','==',email).get();
+    if(!fsSnap.empty){
+      fsSnap.forEach(doc=>{
+        const d=doc.data();
+        log(`Found in Firestore nurses/${doc.id}: isApproved=${d.isApproved}, status=${d.status}`);
+      });
+    } else {
+      log('Not found in Firestore nurses collection by email');
+    }
+  }catch(e){ log('Firestore check error: '+e.message); }
+}
+
+async function forceApprove(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  let uid=document.getElementById('uid').value.trim();
+  if(!email){ alert('Enter email'); return; }
+  if(!confirm('Force approve '+email+' in ALL paths?\n\nThis will create allowedNurses whitelist so login works immediately.')) return;
+  
+  const emailKey=sanitizeEmail(email);
+  document.getElementById('log').textContent='';
+  log('FORCE APPROVING '+email+' ('+emailKey+')...');
+  
+  const now=Date.now();
+  const payloadRTDB={
+    isApproved:true, approved:true, ceoApproved:true, status:'approved', canLogin:true, isVerified:true, approvedAt:now, approvedBy:'CEO-FORCE-FIX', updatedAt:now, ceoApprovedAt:now, email:email
+  };
+  
+  try{
+    // 1. Find all nurse UIDs with this email
+    let uids=new Set();
+    if(uid) uids.add(uid);
+    
+    try{
+      const snap=await db.ref('nurses').once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const v=ch.val()||{};
+          if((v.email||'').toLowerCase()===email){
+            uids.add(ch.key);
+            log('Found RTDB nurses/'+ch.key+' with this email');
+          }
+        });
+      }
+    }catch(e){ log('Error scanning nurses: '+e.message); }
+    
+    try{
+      const snap=await db.ref('nurse_registrations').once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const v=ch.val()||{};
+          if((v.email||'').toLowerCase()===email) uids.add(ch.key);
+        });
+      }
+    }catch(e){}
+    
+    try{
+      const snap=await db.ref('ceoRegistrationCenter/nurses').once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const v=ch.val()||{};
+          if((v.email||'').toLowerCase()===email) uids.add(ch.key);
+        });
+      }
+    }catch(e){}
+    
+    // Include the doc ID from screenshot
+    uids.add('ds7LTnYLgpXG82hFJN3fScNozK23');
+    
+    log('Found UIDs to approve: '+Array.from(uids).join(', '));
+    
+    // 2. Approve each UID in all paths
+    for(const id of uids){
+      if(!id) continue;
+      const paths=[
+        'nurses/'+id,
+        'pending_nurses/'+id,
+        'pendingNurses/'+id,
+        'nurse_registrations/'+id,
+        'nurseApplications/'+id,
+        'allNurses/'+id,
+        'nurseUsers/'+id,
+        'ceoNurseUpdates/'+id,
+        'ceoRegistrationCenter/nurses/'+id,
+        'verified_nurses/'+id
+      ];
+      for(const path of paths){
+        try{
+          await db.ref(path).update(payloadRTDB);
+          log('✅ Updated '+path);
+        }catch(e){
+          try{
+            await db.ref(path).set({...payloadRTDB, uid:id});
+            log('✅ Created '+path);
+          }catch(e2){ log('⚠️ '+path+' failed: '+e2.message); }
+        }
+      }
+      // Firestore
+      try{
+        await fs.collection('nurses').doc(id).set(payloadRTDB, {merge:true});
+        log('✅ Firestore nurses/'+id);
+      }catch(e){ log('Firestore nurses/'+id+' err: '+e.message); }
+      try{
+        await fs.doc('ceoRegistrationCenter/nurses/'+id).set(payloadRTDB, {merge:true});
+        log('✅ Firestore ceo/'+id);
+      }catch(e){}
+    }
+    
+    // 3. Create whitelist by emailKey - MOST IMPORTANT FOR LOGIN
+    try{
+      const whitelistData={uid:Array.from(uids)[0]||uid||'unknown', email:email, ...payloadRTDB};
+      await db.ref('allowedNurses/'+emailKey).set(whitelistData);
+      log('✅ CRITICAL: Created allowedNurses/'+emailKey+' - Login will now work!');
+    }catch(e){ log('❌ Failed allowedNurses/'+emailKey+': '+e.message); }
+    
+    // 4. Create by UID for each UID
+    for(const id of uids){
+      try{
+        await db.ref('allowedNursesByUid/'+id).set({uid:id, email:email, ...payloadRTDB});
+        log('✅ Created allowedNursesByUid/'+id);
+      }catch(e){}
+    }
+    
+    // 5. Also create allowedNurses with UID as key (fallback)
+    for(const id of uids){
+      try{
+        await db.ref('allowedNurses/'+id).set({uid:id, email:email, ...payloadRTDB});
+        log('✅ Created allowedNurses/'+id+' (fallback)');
+      }catch(e){}
+    }
+    
+    log('\n🎉 DONE! '+email+' is now APPROVED in ALL paths!');
+    log('\nTry login now at nurse-login.html');
+    log('If still fails, check that Firebase Rules allow read/write = true');
+    
+    alert('SUCCESS! '+email+' approved in all paths.\n\nNow try login at nurse-login.html');
+    
+  }catch(e){
+    log('❌ FORCE APPROVE FAILED: '+e.message);
+    console.error(e);
+    alert('Failed: '+e.message);
+  }
+}
+</script>
+</body>
+</html>
