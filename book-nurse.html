@@ -160,18 +160,51 @@ const PAYSTACK_KEY='pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
 function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');}
 let currentClientData={name:'',phone:'',email:'',photoUrl:'',uid:''};
 
+let clientWatchId=null;
 function autoCaptureClientLocation(){
   if(!navigator.geolocation) return;
+  
+  // Get initial location
   navigator.geolocation.getCurrentPosition(pos=>{
     clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
     patientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
     document.getElementById('clientLatInput').value=clientLatLng.lat;document.getElementById('clientLngInput').value=clientLatLng.lng;
     document.getElementById('patientLatInput').value=patientLatLng.lat;document.getElementById('patientLngInput').value=patientLatLng.lng;
-    document.getElementById('clientLocationDisplay').innerHTML=`✅ Client: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b>`;
-    document.getElementById('clientLocBadge').innerHTML=`📍 Client: ${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}`;
+    document.getElementById('clientLocationDisplay').innerHTML=`✅ Client LIVE: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b> - Auto GPS`;
+    document.getElementById('clientLocBadge').innerHTML=`📍 Client LIVE: ${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)} - Distances update live`;
     document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient (same): <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b> — Nurse goes here`;
     initMap(clientLatLng.lat,clientLatLng.lng);searchNearbyNurses();
-  },{},{enableHighAccuracy:true,timeout:15000});
+    
+    // Watch for live updates - client moving
+    if(clientWatchId) navigator.geolocation.clearWatch(clientWatchId);
+    clientWatchId=navigator.geolocation.watchPosition(pos=>{
+      clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      document.getElementById('clientLatInput').value=clientLatLng.lat;document.getElementById('clientLngInput').value=clientLatLng.lng;
+      document.getElementById('clientLocBadge').innerHTML=`📍 Client LIVE: ${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)} - Updating...`;
+      document.getElementById('clientLocationDisplay').innerHTML=`✅ Client LIVE: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b> - Auto GPS`;
+      if(document.getElementById('sameAsClientCheck').checked){
+        patientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+        document.getElementById('patientLatInput').value=patientLatLng.lat;document.getElementById('patientLngInput').value=patientLatLng.lng;
+        document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient (same): <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b> — Live`;
+      }
+      // Update distances live
+      if(allNurses && allNurses.length>0){
+        allNurses.forEach(n=>{
+          function haversine(lat1, lon1, lat2, lon2){
+            const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
+            const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+            const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c;
+          }
+          n.distance=haversine(clientLatLng.lat, clientLatLng.lng, n.lat, n.lng);
+        });
+        renderNurses(allNurses);
+      }
+    }, null, {enableHighAccuracy:true, maximumAge:5000, timeout:10000});
+    
+  }, err=>{
+    console.log('GPS error', err);
+    document.getElementById('clientLocBadge').innerHTML=`⚠️ GPS: ${err.message} - Using default - Enable location`;
+  },{enableHighAccuracy:true,timeout:15000, maximumAge:0});
 }
 function toggleSameLocation(){
   const checked=document.getElementById('sameAsClientCheck').checked;
@@ -404,22 +437,72 @@ async function searchNearbyNurses(){
           return;
         }
 
-        const lat=v.lat||v.latitude||v.nurseLat||5.61;
-        const lng=v.lng||v.longitude||v.nurseLng||-0.19;
-        const dist=Math.sqrt(Math.pow((lat-clientLatLng.lat)*111,2)+Math.pow((lng-clientLatLng.lng)*111*Math.cos(clientLatLng.lat*Math.PI/180),2));
+        // LIVE GPS: Prioritize live location over registration location
+        let liveLat=null, liveLng=null, liveSource='registration';
+        
+        // Check live locations from various sources - LIVE takes priority
+        if(loc && loc.lat && loc.lng){
+          liveLat=parseFloat(loc.lat); liveLng=parseFloat(loc.lng); liveSource='live - nurseLocations';
+        }
+        // Check onlineNurses live GPS
+        const onlineData = onlineSnap && onlineSnap.exists() ? (function(){ let found=null; onlineSnap.forEach(ch=>{ if(ch.key===child.key) found=ch.val(); }); return found; })() : null;
+        if(onlineData){
+          if(onlineData.lat && onlineData.lng){ liveLat=parseFloat(onlineData.lat); liveLng=parseFloat(onlineData.lng); liveSource='live - onlineNurses'; }
+          else if(onlineData.currentLat && onlineData.currentLng){ liveLat=parseFloat(onlineData.currentLat); liveLng=parseFloat(onlineData.currentLng); liveSource='live - current'; }
+          else if(onlineData.liveLat && onlineData.liveLng){ liveLat=parseFloat(onlineData.liveLat); liveLng=parseFloat(onlineData.liveLng); liveSource='live - liveLat'; }
+        }
+        // Check presence for live
+        const presenceData = presenceSnap && presenceSnap.exists() ? (function(){ let found=null; presenceSnap.forEach(ch=>{ if(ch.key===child.key) found=ch.val(); }); return found; })() : null;
+        if(presenceData && presenceData.lat && presenceData.lng){
+          liveLat=parseFloat(presenceData.lat); liveLng=parseFloat(presenceData.lng); liveSource='live - presence';
+        }
+        
+        // Use live if available, else registration
+        const regLat=v.lat||v.latitude||v.nurseLat||v.currentLat||5.61;
+        const regLng=v.lng||v.longitude||v.nurseLng||v.currentLng||-0.19;
+        const finalLat = liveLat || regLat;
+        const finalLng = liveLng || regLng;
+        if(liveLat) liveSource='live'; else liveSource='registration';
+        
+        // Haversine distance - accurate
+        function haversine(lat1, lon1, lat2, lon2){
+          const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
+          const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+          const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c;
+        }
+        const dist=haversine(clientLatLng.lat, clientLatLng.lng, finalLat, finalLng);
+        
+        // Get video URL - from registration
+        const videoURL = v.videoURL||v.videoUrl||v.video||v.introVideo||v.nurseVideo||'';
+        const photoURL = v.photoURL||v.photo||v.photoUrl||'';
+        const idURL = v.idURL||'';
+        const licenceURL = v.licenceURL||v.licenseUrl||'';
+        
         if(dist<=radius){
           nurses.push({
             uid:child.key,
             fullName:v.fullName||v.name||'Nurse',
-            photoURL:v.photoURL||v.photo||'',
+            photoURL:photoURL,
+            videoURL:videoURL,
+            idURL:idURL,
+            licenceURL:licenceURL,
             rating:v.rating||4.9,
-            lat,lng,
+            lat:finalLat,
+            lng:finalLng,
+            regLat:regLat,
+            regLng:regLng,
+            liveLat:liveLat,
+            liveLng:liveLng,
+            liveSource:liveSource,
+            isLive:!!liveLat,
             phone:v.phone||'',
             bio:v.bio||'Experienced — ONLINE — Can be booked now',
             distance:dist,
             isOnline:true,
             lastSeen:v.lastSeen||v.lastActive||v.lastOnline||v.lastUpdate||Date.now(),
-            specialty:v.specialty||v.serviceType||'Home Nursing'
+            specialty:v.specialty||v.serviceType||v.qualification||'Home Nursing',
+            qualification:v.qualification||'',
+            experience:v.experience||''
           });
         }
       });
@@ -460,26 +543,110 @@ function renderNurses(list){
   grid.innerHTML=list.map(n=>{
     const isSel=selectedNurseId===n.uid;
     const lastSeenStr = n.lastSeen ? new Date(n.lastSeen).toLocaleTimeString('en-GH') : 'Now';
+    const distanceText = n.distance<1 ? `${(n.distance*1000).toFixed(0)}m` : `${n.distance.toFixed(1)}km`;
+    const liveBadge = n.isLive ? `<span style="background:rgba(34,197,94,.2);color:#86efac;border:1px solid rgba(34,197,94,.4);padding:2px 6px;border-radius:99px;font-size:8px;font-weight:900">📍 LIVE GPS</span>` : `<span style="background:rgba(168,85,247,.15);color:#c4b5fd;border:1px solid rgba(168,85,247,.2);padding:2px 6px;border-radius:99px;font-size:8px">📍 REG GPS</span>`;
+    const videoBadge = n.videoURL ? `<span style="background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.25);padding:2px 6px;border-radius:99px;font-size:8px">🎥 VIDEO</span>` : '';
     return `<div class="nurse-card ${isSel?'selected':''}" onclick="previewNurse('${n.uid}')" style="border-color:rgba(34,197,94,.3)">
       <div style="display:flex;gap:10px;align-items:center">
-        <div style="position:relative;width:60px;height:60px;border-radius:10px;overflow:hidden;background:#1a1633;flex-shrink:0;border:2px solid #22c55e">
+        <div style="position:relative;width:60px;height:60px;border-radius:10px;overflow:hidden;background:#1a1633;flex-shrink:0;border:2px solid #22c55e;cursor:pointer">
           ${n.photoURL?`<img src="${n.photoURL}" style="width:100%;height:100%;object-fit:cover">`:`<div style="display:grid;place-items:center;width:100%;height:100%;color:white;font-weight:800;background:linear-gradient(135deg,#22c55e,#16a34a)">${(n.fullName||'N')[0]}</div>`}
           <span style="position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;background:#22c55e;border:2px solid #0e0a1c;border-radius:50%;box-shadow:0 0 0 3px rgba(34,197,94,.3)"></span>
+          ${n.videoURL?`<span style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,.7);color:white;padding:1px 4px;border-radius:4px;font-size:7px">▶️</span>`:''}
         </div>
         <div style="flex:1;min-width:0">
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><b style="font-size:13px;color:#fff">${n.fullName}</b> ${isSel?'<span style="background:#a855f7;color:#fff;padding:2px 6px;border-radius:999px;font-size:9px">SELECTED</span>':''} <span class="onlineBadge">🟢 ONLINE</span></div>
-          <small style="color:#86efac;font-size:11px">⭐ ${n.rating} • 📍 ${n.distance.toFixed(1)}km • 🟢 Online now • ${n.specialty}</small><br>
-          <small style="color:#6b7280;font-size:9px">Last seen: ${lastSeenStr} • Can be booked now — Custom tone + SMS will ring for nurse</small>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><b style="font-size:13px;color:#fff">${n.fullName}</b> ${isSel?'<span style="background:#a855f7;color:#fff;padding:2px 6px;border-radius:999px;font-size:9px">SELECTED</span>':''} <span class="onlineBadge">🟢 ONLINE</span> ${videoBadge}</div>
+          <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin:2px 0">
+            <small style="color:#86efac;font-size:11px">⭐ ${n.rating}</small>
+            <small style="background:rgba(34,197,94,.15);color:#86efac;padding:2px 6px;border-radius:99px;font-size:10px;font-weight:800">📍 ${distanceText} away</small>
+            ${liveBadge}
+            <small style="color:#c4b5fd;font-size:10px">• ${n.specialty}</small>
+          </div>
+          <small style="color:#6b7280;font-size:9px">Last seen: ${lastSeenStr} • ${n.isLive?'📍 LIVE location - Nurse is currently here':'📍 Registration location'} • Click to watch video</small>
         </div>
-        <div style="text-align:right"><span class="onlineDot"></span><br><small style="font-size:9px;color:#22c55e;font-weight:900">ONLINE</small></div>
+        <div style="text-align:right"><span class="onlineDot"></span><br><small style="font-size:9px;color:#22c55e;font-weight:900">ONLINE</small><br><small style="font-size:8px;color:#86efac">${distanceText}</small></div>
       </div>
     </div>`;
   }).join('');
 }
-function previewNurse(uid){const n=allNurses.find(x=>x.uid===uid);if(!n)return;pendingNurse=n;document.getElementById('previewName').textContent=n.fullName+' 🟢 ONLINE';document.getElementById('previewBio').textContent=n.bio+' — ONLINE now — Will get custom tone + SMS when you book!';document.getElementById('previewMeta').innerHTML=`<span class="onlineBadge">🟢 ONLINE — Can be booked</span><span style="font-size:10px;color:#a78bfa">⭐ ${n.rating} • ${n.distance.toFixed(1)}km</span><span style="font-size:10px;color:#86efac">Last seen: ${new Date(n.lastSeen).toLocaleString('en-GH')}</span>`;const photoEl=document.getElementById('previewPhoto');const fallback=document.getElementById('previewPhotoFallback');if(n.photoURL){photoEl.src=n.photoURL;photoEl.style.display='block';fallback.style.display='none';}else{photoEl.style.display='none';fallback.style.display='grid';}document.getElementById('nursePreviewModal').classList.add('show')}
+function previewNurse(uid){
+  const n=allNurses.find(x=>x.uid===uid);if(!n)return;pendingNurse=n;
+  document.getElementById('previewName').textContent=n.fullName+' 🟢 ONLINE';
+  document.getElementById('previewBio').textContent=n.bio+' — ONLINE now — Will get custom tone + SMS when you book!';
+  const distanceText = n.distance<1 ? `${(n.distance*1000).toFixed(0)}m` : `${n.distance.toFixed(1)}km`;
+  const liveText = n.isLive ? `📍 LIVE GPS - Nurse is currently at this location (${n.lat.toFixed(4)}, ${n.lng.toFixed(4)}) - ${distanceText} from you` : `📍 Registration GPS - Nurse registered at (${n.regLat.toFixed(4)}, ${n.regLng.toFixed(4)}) - Live location not available yet`;
+  document.getElementById('previewMeta').innerHTML=`<span class="onlineBadge">🟢 ONLINE — Can be booked</span><span style="font-size:10px;color:#a78bfa">⭐ ${n.rating} • ${distanceText} away</span><span style="font-size:10px;color:${n.isLive?'#86efac':'#c4b5fd'}">${liveText}</span><br><span style="font-size:10px;color:#86efac">Last seen: ${new Date(n.lastSeen).toLocaleString('en-GH')}</span><span style="font-size:9px;color:#a78bfa">Qualification: ${n.qualification||'N/A'} • Experience: ${n.experience||'N/A'}</span>`;
+  
+  // Show photo and video
+  const photoEl=document.getElementById('previewPhoto');
+  const videoEl=document.getElementById('previewVideo');
+  const fallback=document.getElementById('previewPhotoFallback');
+  
+  // Reset
+  if(photoEl) photoEl.style.display='none';
+  if(videoEl) { videoEl.style.display='none'; videoEl.pause(); videoEl.src=''; }
+  if(fallback) fallback.style.display='none';
+  
+  // Show video if exists - PRIORITY for client to watch nurse video
+  if(n.videoURL){
+    if(videoEl){
+      videoEl.src=n.videoURL;
+      videoEl.style.display='block';
+      videoEl.controls=true;
+      videoEl.poster=n.photoURL||'';
+      // Auto play muted preview
+      videoEl.muted=true;
+      videoEl.play().catch(()=>{});
+    }
+    // Show photo as fallback below video
+    if(photoEl && n.photoURL){
+      photoEl.src=n.photoURL;
+      // Don't hide, but video is primary
+    }
+  } else if(n.photoURL){
+    if(photoEl){
+      photoEl.src=n.photoURL;
+      photoEl.style.display='block';
+    }
+    if(fallback) fallback.style.display='none';
+  } else {
+    if(fallback) fallback.style.display='grid';
+  }
+  
+  // Add video controls in modal
+  let videoControls=document.getElementById('videoControls');
+  if(!videoControls){
+    const meta=document.getElementById('previewMeta');
+    const div=document.createElement('div');
+    div.id='videoControls';
+    div.style.marginTop='10px';
+    meta.parentNode.insertBefore(div, meta.nextSibling);
+    videoControls=div;
+  }
+  if(n.videoURL){
+    videoControls.innerHTML=`<div style="display:flex;gap:6px;margin-top:8px"><button onclick="document.getElementById('previewVideo').muted=false; document.getElementById('previewVideo').play()" style="flex:1;padding:8px;border-radius:8px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.25);color:#93c5fd;font-size:11px;font-weight:800;cursor:pointer">🔊 Unmute & Play Video</button><button onclick="document.getElementById('previewVideo').pause()" style="padding:8px;border-radius:8px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(168,85,247,.15);cursor:pointer;font-size:11px">⏸️ Pause</button></div><div style="font-size:9px;color:#93c5fd;margin-top:4px">🎥 This is nurse's intro video from registration - Watch to know nurse</div>`;
+  } else {
+    videoControls.innerHTML=`<div style="font-size:9px;color:#fca5a5;margin-top:4px">No video uploaded by nurse</div>`;
+  }
+  
+  document.getElementById('nursePreviewModal').classList.add('show');
+}
 function closeNursePreview(){document.getElementById('nursePreviewModal').classList.remove('show');pendingNurse=null}
 function confirmNurseSelection(){if(!pendingNurse)return;const n=pendingNurse;selectedNurseId=n.uid;selectedNurseName=n.fullName;selectedNursePhone=n.phone;document.getElementById('selectedNurseInfo').innerHTML=`✅ Selected: <b style="color:#22c55e">🟢 ${n.fullName} — ONLINE</b> — Patient: ${patientLatLng.lat.toFixed(4)}, ${patientLatLng.lng.toFixed(4)} — Nurse is ONLINE and will get tone + SMS!`;renderNurses(allNurses);closeNursePreview();calcTotal()}
-function useMyLocation(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(pos=>{clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};patientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};document.getElementById('clientLatInput').value=clientLatLng.lat;document.getElementById('clientLngInput').value=clientLatLng.lng;document.getElementById('patientLatInput').value=patientLatLng.lat;document.getElementById('patientLngInput').value=patientLatLng.lng;document.getElementById('clientLocationDisplay').innerHTML=`✅ Client: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b>`;document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient: <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b> — Nurse goes here`;initMap(pos.coords.latitude,pos.coords.longitude);searchNearbyNurses()},{enableHighAccuracy:true})}
+function useMyLocation(){
+  if(!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    clientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    patientLatLng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    document.getElementById('clientLatInput').value=clientLatLng.lat;
+    document.getElementById('clientLngInput').value=clientLatLng.lng;
+    document.getElementById('patientLatInput').value=patientLatLng.lat;
+    document.getElementById('patientLngInput').value=patientLatLng.lng;
+    document.getElementById('clientLocationDisplay').innerHTML=`✅ Client LIVE: <b>${clientLatLng.lat.toFixed(5)}, ${clientLatLng.lng.toFixed(5)}</b> - Current`;
+    document.getElementById('patientLocationDisplay').innerHTML=`🏥 Patient: <b>${patientLatLng.lat.toFixed(5)}, ${patientLatLng.lng.toFixed(5)}</b> — Nurse goes here`;
+    initMap(pos.coords.latitude,pos.coords.longitude);
+    searchNearbyNurses();
+  },{enableHighAccuracy:true, maximumAge:0, timeout:10000});
+}
 
 function payWithPaystack(){
   const clientName=document.getElementById('clientFullName').value.trim()||currentClientData.name||'Client';
