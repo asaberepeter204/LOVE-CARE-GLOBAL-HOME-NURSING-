@@ -147,7 +147,7 @@ input.auto-filled{background:rgba(168,85,247,.15);border-color:#a855f7}
 </div>
 </div>
 
-<div id="nursePreviewModal" class="nursePreviewOverlay"><div class="nursePreviewCard"><div class="previewMedia"><img id="previewPhoto" style="display:none"><video id="previewVideo" controls style="display:none"></video><div id="previewPhotoFallback" style="display:none;width:100%;height:100%;display:grid;place-items:center;font-size:48px">👩‍⚕️</div><div style="position:absolute;top:10px;right:10px"><button onclick="closeNursePreview()" style="background:rgba(0,0,0,.6);border:none;color:white;padding:6px 10px;border-radius:999px;cursor:pointer">✕</button></div></div><div style="padding:16px"><b id="previewName" style="font-size:15px;color:#f3e8ff">Nurse</b><p id="previewBio" style="font-size:11px;color:#c4b5fd;margin:6px 0">Bio</p><div id="previewMeta" style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#a78bfa"></div><div style="display:flex;gap:8px;margin-top:12px"><button onclick="closeNursePreview()" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(168,85,247,.15);cursor:pointer;font-size:12px">Close</button><button onclick="confirmNurseSelection()" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:900;cursor:pointer;border:none;font-size:12px">✅ Continue — ONLINE Nurse</button></div></div></div></div>
+<div id="nursePreviewModal" class="nursePreviewOverlay"><div class="nursePreviewCard"><div class="previewMedia"><img id="previewPhoto" style="display:none;width:100%;height:100%;object-fit:cover"><video id="previewVideo" controls style="display:none;width:100%;height:100%;object-fit:cover;background:#000" playsinline></video><div id="previewPhotoFallback" style="display:none;width:100%;height:100%;display:grid;place-items:center;font-size:48px">👩‍⚕️</div><div style="position:absolute;top:10px;right:10px"><button onclick="closeNursePreview()" style="background:rgba(0,0,0,.6);border:none;color:white;padding:6px 10px;border-radius:999px;cursor:pointer">✕</button></div></div><div style="padding:16px"><b id="previewName" style="font-size:15px;color:#f3e8ff">Nurse</b><p id="previewBio" style="font-size:11px;color:#c4b5fd;margin:6px 0">Bio</p><div id="previewMeta" style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#a78bfa"></div><div style="display:flex;gap:8px;margin-top:12px"><button onclick="closeNursePreview()" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(168,85,247,.15);cursor:pointer;font-size:12px">Close</button><button onclick="confirmNurseSelection()" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:900;cursor:pointer;border:none;font-size:12px">✅ Continue — ONLINE Nurse</button></div></div></div></div>
 <div id="successModal" class="modalOverlay"><div class="modal"><h2 style="color:#86efac;font-size:16px">✅ Full Booking Successful! — ONLINE Nurse Booked</h2><div style="padding:10px;background:rgba(14,10,28,.5);border-radius:10px;font-size:11px;margin:10px 0"><div>ID: <b id="modalBookingId">LCG-FULL-...</b></div><div id="modalNurseInfo" style="margin-top:4px;color:#a78bfa"></div><div id="modalClientInfo" style="margin-top:6px;color:#d8b4fe;font-size:10px"></div></div><div id="modalCalc" style="padding:10px;background:rgba(168,85,247,.08);border-radius:10px;font-size:10px;text-align:left;margin:10px 0;color:#c4b5fd"></div><div style="display:flex;gap:8px"><a href="./index.html" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);color:#d8b4fe;text-align:center;text-decoration:none;font-size:12px">Home</a><a href="ceo-booking-receiver.html" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;text-align:center;text-decoration:none;font-size:12px;font-weight:900">👑 CEO Receiver</a></div></div></div>
 
 <script>
@@ -359,11 +359,19 @@ function isNurseOnline(v){
 }
 
 async function searchNearbyNurses(){
+  if(isSearching) return; // Prevent concurrent searches that cause shake
+  isSearching=true;
   const radius=parseFloat(document.getElementById('radiusSelect').value)||10;
   const grid=document.getElementById('nurseGrid');
   const countBadge=document.getElementById('onlineCountBadge');
-  grid.innerHTML='🟢 Checking ONLINE nurses only... Please wait...';
-  countBadge.textContent='🟢 Checking...';
+  // Don't show loading if we already have data - prevents shake
+  const hasExistingData = grid && grid.querySelector('.nurse-card');
+  if(!hasExistingData){
+    grid.innerHTML='🟢 Checking ONLINE nurses only... Please wait...';
+    countBadge.textContent='🟢 Checking...';
+  } else {
+    countBadge.textContent='🔄 Updating...';
+  }
   try{
     // Fetch nurses + online presence + locations in parallel
     const [nursesSnap, onlineSnap, presenceSnap, locationsSnap] = await Promise.all([
@@ -508,7 +516,21 @@ async function searchNearbyNurses(){
       });
     }
 
+    // Check if nurses changed - prevent shake if same data
+    const nursesHash = nurses.map(n=>`${n.uid}-${n.lat.toFixed(4)}-${n.lng.toFixed(4)}-${n.isOnline}`).join('|');
+    const isSameData = nursesHash === lastNursesHash && nurses.length === allNurses.length;
+    lastNursesHash = nursesHash;
+    
+    if(isSameData && hasExistingData){
+      // Same data, don't re-render - prevents shaking
+      countBadge.textContent=`🟢 ${nurses.length} ONLINE nurses within ${radius}km — Only online show`;
+      isSearching=false;
+      return;
+    }
+    
     allNurses=nurses;
+    
+    // Smooth marker updates - don't clear all, update only changed
     // Clear old markers
     nurseMarkers.forEach(m=>{try{map.removeLayer(m)}catch(e){}});
     nurseMarkers=[];
@@ -518,23 +540,30 @@ async function searchNearbyNurses(){
     });
 
     // Update UI
-    countBadge.textContent=`🟢 ${nurses.length} ONLINE nurses within ${radius}km — Only online show`;
+    countBadge.textContent=`🟢 ${nurses.length} ONLINE nurses within ${radius}km — Only online show • Instant update`;
     if(!nurses.length){
-      grid.innerHTML=`<div style="text-align:center;padding:20px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:12px">
-        <div style="font-size:32px">😴</div>
-        <b style="color:#fca5a5">No ONLINE nurses within ${radius}km</b><br>
-        <small style="color:#a78bfa">All nurses are currently offline — Nurses must go online in nurse-dashboard.html or my-job-offer.html to appear here.<br>
-        Try increasing radius to 50km or check back later. Offline nurses are hidden and won't pop up for client selection.</small><br><br>
-        <button onclick="searchNearbyNurses()" style="padding:10px 16px;border-radius:10px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac;font-weight:800;cursor:pointer">🔄 Refresh — Check Online Again</button>
-      </div>`;
+      if(!hasExistingData || lastNursesHash===''){
+        grid.innerHTML=`<div style="text-align:center;padding:20px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:12px">
+          <div style="font-size:32px">😴</div>
+          <b style="color:#fca5a5">No ONLINE nurses within ${radius}km</b><br>
+          <small style="color:#a78bfa">All nurses are currently offline — Nurses must go online in nurse-dashboard.html or my-job-offer.html to appear here.<br>
+          Try increasing radius to 50km or check back later. Offline nurses are hidden and won't pop up for client selection.</small><br><br>
+          <button onclick="searchNearbyNurses()" style="padding:10px 16px;border-radius:10px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac;font-weight:800;cursor:pointer">🔄 Refresh — Check Online Again</button>
+        </div>`;
+      }
     }else{
       renderNurses(nurses);
     }
+    
+    isSearching=false;
 
   }catch(e){
     console.error(e);
-    grid.innerHTML=`<div style="color:#fca5a5">Error loading nurses: ${e.message} — Try refresh</div>`;
+    if(!hasExistingData){
+      grid.innerHTML=`<div style="color:#fca5a5">Error loading nurses: ${e.message} — Try refresh</div>`;
+    }
     countBadge.textContent='❌ Error';
+    isSearching=false;
   }
 }
 
@@ -765,17 +794,43 @@ function payWithPaystack(){
       onClose:function(){document.getElementById('bookResult').textContent='Payment cancelled'}
     });handler.openIframe()}catch(err){alert('Paystack error: '+err.message)}
 }
+let lastNursesHash='', searchDebounceTimer=null, isSearching=false;
+
+function debouncedSearch(){
+  if(searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  searchDebounceTimer=setTimeout(()=>{ searchNearbyNurses(); }, 300); // Debounce 300ms - no shake
+}
+
 window.addEventListener('DOMContentLoaded',function(){
-  initMap(5.6037,-0.1870);searchNearbyNurses();loadCEORates();calcTotal();
+  initMap(5.6037,-0.1870);
+  searchNearbyNurses();
+  loadCEORates();
+  calcTotal();
   const btn=document.getElementById('paystackBtn');if(btn){btn.addEventListener('click',payWithPaystack)}
-  auth.onAuthStateChanged(async(user)=>{await loadClientData();});loadClientData();setTimeout(()=>{autoCaptureClientLocation();},1500);
-  // Real-time online updates every 15 seconds
-  setInterval(()=>{ searchNearbyNurses(); },5000); // FAST 5 sec poll for instant online
-  // Listen to nurse presence changes real-time
-  rtdb.ref('nursePresence').on('value',()=>{ searchNearbyNurses(); });
-  const qtyEl=document.getElementById('quantity'); if(qtyEl){ qtyEl.addEventListener('input', calcTotal); qtyEl.addEventListener('change', calcTotal); qtyEl.addEventListener('keyup', calcTotal); }
-  rtdb.ref('onlineNurses').on('value',()=>{ searchNearbyNurses(); });
-  rtdb.ref('nurseLocations').on('value',()=>{ searchNearbyNurses(); });
+  auth.onAuthStateChanged(async(user)=>{await loadClientData();});
+  loadClientData();
+  setTimeout(()=>{autoCaptureClientLocation();},1500);
+  
+  // FAST INSTANT ONLINE/OFFLINE - Realtime listeners, no polling, no shake
+  // Debounced to prevent shaking
+  rtdb.ref('onlineNurses').on('child_added',()=>{ console.log('🟢 Nurse ONLINE instant'); debouncedSearch(); });
+  rtdb.ref('onlineNurses').on('child_changed',()=>{ console.log('🟢 Nurse UPDATE instant'); debouncedSearch(); });
+  rtdb.ref('onlineNurses').on('child_removed',()=>{ console.log('🔴 Nurse OFFLINE instant'); debouncedSearch(); });
+  rtdb.ref('onlineNurses').on('value',()=>{ debouncedSearch(); });
+  
+  rtdb.ref('nursePresence').on('child_added',()=>{ debouncedSearch(); });
+  rtdb.ref('nursePresence').on('child_changed',()=>{ debouncedSearch(); });
+  rtdb.ref('nursePresence').on('child_removed',()=>{ debouncedSearch(); });
+  
+  rtdb.ref('nurseLocations').on('child_changed',()=>{ debouncedSearch(); });
+  rtdb.ref('liveNurses').on('child_added',()=>{ debouncedSearch(); });
+  rtdb.ref('liveNurses').on('child_changed',()=>{ debouncedSearch(); });
+  rtdb.ref('liveNurses').on('child_removed',()=>{ debouncedSearch(); });
+  
+  const qtyEl=document.getElementById('quantity'); 
+  if(qtyEl){ qtyEl.addEventListener('input', calcTotal); qtyEl.addEventListener('change', calcTotal); qtyEl.addEventListener('keyup', calcTotal); }
+  
+  // NO MORE setInterval 5s polling - causes shaking! Realtime listeners handle it instantly
 });
 </script>
 </body></html>
