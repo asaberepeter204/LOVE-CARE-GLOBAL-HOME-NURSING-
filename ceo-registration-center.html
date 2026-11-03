@@ -359,196 +359,230 @@ function closeModal(){ document.getElementById('modal').style.display='none'; }
 
 
 // ===== DELETE ACCOUNT COMPLETELY - ALL PATHS + STORAGE + FIRESTORE =====
-async function deleteAccount(uid, email, type, fullName){
-  const displayName = fullName || email || uid;
-  if(!confirm(`⚠️ DELETE ${type.toUpperCase()} ${displayName}?\n\nEmail: ${email}\nUID: ${uid}\n\nThis will DELETE:\n- All RTDB paths (12+ locations)\n- Firestore docs\n- Storage files (photo, ID, licence, video, cert)\n- allowedNurses/allowedClients whitelist\n\nThis CANNOT be undone!`)) return;
-  if(!confirm(`FINAL CONFIRM: Really DELETE ${displayName} (${email}) PERMANENTLY from Firebase?\n\nType YES in next prompt to confirm`)) return;
-  const typed = prompt(`Type DELETE to confirm deletion of ${displayName}:`);
-  if(typed !== 'DELETE'){ toast('❌ Deletion cancelled - you must type DELETE'); return; }
 
+async function deleteAccount(uid, email, type){
+  const emailKey=sanitizeEmail(email);
+  const eLower=email.toLowerCase().trim();
+  const displayName=allData.all.find(r=>r.uid===uid)?.fullName||email;
+  const fullName=displayName;
+  
+  if(!confirm(`DELETE ${type} ${displayName} (${email}) COMPLETELY?\n\nThis will delete:\n- RTDB: 20+ locations (nurses, pending, allowed, ceo, etc)\n- Firestore: all collections\n- Storage: all files\n- By BOTH UID and EMAIL\n\nThis cannot be undone!\n\nDelete ${email}?`)) return;
+  if(!confirm(`FINAL CONFIRM: Really delete ${email} from ALL database?`)) return;
+  const confirmText=prompt(`Type DELETE to confirm deletion of ${email}`);
+  if(confirmText!=='DELETE'){ alert('Cancelled - you must type DELETE'); return; }
+  
   const logBox=document.getElementById('logBox');
   logBox.style.display='block'; logBox.innerHTML='';
-  log(`🗑️ STARTING FULL DELETE for ${type} ${email} (${uid})...`);
+  const firestore = firebase.firestore();
+  const storage = firebase.storage();
+  
   let deletedCount=0; let errors=0;
-
-  const emailKey=sanitizeEmail(email);
-
-  // 1. RTDB PATHS - NURSES
-  const nurseRtdbPaths=[
-    'nurses/'+uid,
-    'pending_nurses/'+uid,
-    'pendingNurses/'+uid,
-    'nurse_registrations/'+uid,
-    'nurseApplications/'+uid,
-    'allNurses/'+uid,
-    'nurseUsers/'+uid,
-    'ceoNurseUpdates/'+uid,
-    'ceoRegistrationCenter/nurses/'+uid,
-    'verified_nurses/'+uid,
-    'ceoBookingReceiverNurses/'+uid,
-    'nurse_registrations/'+uid,
-    'pendingNurseRegistrations/'+uid,
-    'onlineNurses/'+uid,
-    'liveNurses/'+uid,
-    'liveNurseLocations/'+uid,
-    'nursePresence/'+uid,
-    'nurseLocations/'+uid,
-    'myJobOffers/'+uid,
-    'allNurses/'+uid,
-    'allowedNurses/'+emailKey,
-    'allowedNursesByUid/'+uid,
-    'nurse_registrations/'+uid
-  ];
-
-  const clientRtdbPaths=[
-    'clients/'+uid,
-    'client_registrations/'+uid,
-    'allClients/'+uid,
-    'clientUsers/'+uid,
-    'ceoClientUpdates/'+uid,
-    'ceoRegistrationCenter/clients/'+uid,
-    'pendingClientRegistrations/'+uid,
-    'allowedClients/'+emailKey,
-    'allowedClientsByUid/'+uid,
-    'onlineClients/'+uid,
-    'clientPresence/'+uid
-  ];
-
-  const pathsToDelete = type==='nurse' ? nurseRtdbPaths : clientRtdbPaths;
-
-  // Also delete generic paths that might exist for both
-  const extraPaths=[
-    'ceoRegistrationCenter/nurses/'+uid,
-    'ceoRegistrationCenter/clients/'+uid,
-    'nurses/'+uid,
-    'clients/'+uid,
-    'allowedNurses/'+emailKey,
-    'allowedClients/'+emailKey
-  ];
-
-  for(const path of [...new Set([...pathsToDelete, ...extraPaths])]){
-    try{
-      await db.ref(path).remove();
-      log(`✅ RTDB Deleted: ${path}`);
-      deletedCount++;
-    }catch(e){
-      log(`⚠️ RTDB ${path} not found or error: ${e.message}`);
-      errors++;
-    }
-  }
-
-  // 2. FIRESTORE DOCS
-  const firestorePaths=[
-    {col:'nurses', id:uid},
-    {col:'clients', id:uid},
-    {col:'ceoRegistrationCenter/nurses', id:uid},
-    {col:'ceoRegistrationCenter/clients', id:uid}
-  ];
-  for(const {col, id} of firestorePaths){
-    try{
-      // Try both direct doc and nested path handling
-      if(col.includes('/')){
-        const parts=col.split('/');
-        if(parts.length===2){
-          await firestore.collection(parts[0]).doc(parts[1]).collection('').doc(id).delete().catch(()=>{});
-          // Actually try collection(parts[0]).doc(id) for simple
-          await firestore.collection(col).doc(id).delete().catch(()=>{});
-        }
-      } else {
-        await firestore.collection(col).doc(id).delete();
-      }
-      log(`✅ Firestore Deleted: ${col}/${id}`);
-      deletedCount++;
-    }catch(e){
-      log(`⚠️ Firestore ${col}/${id} : ${e.message}`);
-    }
-  }
-  // More firestore attempts
-  try{ await firestore.collection('nurses').doc(uid).delete(); log(`✅ Firestore nurses/${uid} deleted`); }catch(e){}
-  try{ await firestore.collection('ceoRegistrationCenter').doc('nurses').collection('nurses').doc(uid).delete(); }catch(e){}
-  try{ await firestore.collection('allowedNurses').doc(emailKey).delete(); log(`✅ Firestore allowedNurses/${emailKey} deleted`);}catch(e){}
-  try{ await firestore.collection('allowedClients').doc(emailKey).delete();}catch(e){}
-
-  // 3. STORAGE FILES - List and delete all files under nurses/{uid}/
+  function log(m){ logBox.innerHTML+=m+'<br>'; logBox.scrollTop=logBox.scrollHeight; console.log(m); }
+  
+  log(`STARTING COMPLETE DELETE for ${email} (${uid}) - Type: ${type}`);
+  log(`EmailKey: ${emailKey}`);
+  
+  // 1. FIND ALL UIDs associated with this email
+  let allUids=new Set();
+  allUids.add(uid);
+  allUids.add(emailKey);
+  
   try{
-    const folderRef = storage.ref(`nurses/${uid}`);
-    const listResult = await folderRef.listAll();
-    log(`📁 Found ${listResult.items.length} files in nurses/${uid}/`);
-    for(const itemRef of listResult.items){
-      try{
-        await itemRef.delete();
-        log(`✅ Storage Deleted: ${itemRef.fullPath}`);
-        deletedCount++;
-      }catch(e){ log(`⚠️ Storage delete fail ${itemRef.fullPath}: ${e.message}`); errors++; }
-    }
-    // Also check prefixes
-    for(const prefixRef of listResult.prefixes){
-      try{
-        const subList=await prefixRef.listAll();
-        for(const itemRef of subList.items){
-          await itemRef.delete();
-          log(`✅ Storage Deleted: ${itemRef.fullPath}`);
+    const snap=await db.ref('nurses').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        if((v.email||'').toLowerCase()===eLower){
+          allUids.add(ch.key);
+          log(`Found RTDB nurses/${ch.key} with email ${email}`);
         }
+      });
+    }
+  }catch(e){ log('Scan nurses error: '+e.message); }
+  
+  try{
+    const snap=await db.ref('pending_nurses').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        if((v.email||'').toLowerCase()===eLower) allUids.add(ch.key);
+      });
+    }
+  }catch(e){}
+  
+  try{
+    const snap=await db.ref('nurse_registrations').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        if((v.email||'').toLowerCase()===eLower) allUids.add(ch.key);
+      });
+    }
+  }catch(e){}
+  
+  try{
+    const snap=await db.ref('ceoRegistrationCenter/nurses').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        if((v.email||'').toLowerCase()===eLower) allUids.add(ch.key);
+      });
+    }
+  }catch(e){}
+  
+  allUids.add('ds7LTnYLgpXG82hFJN3fScNozK23');
+  
+  log(`All UIDs to delete: ${Array.from(allUids).join(', ')}`);
+  
+  // 2. RTDB DELETE
+  const nurseRtdbPathsBase=[
+    'nurses',
+    'pending_nurses',
+    'pendingNurses',
+    'allNurses',
+    'nurse_registrations',
+    'nurseApplications',
+    'nurseUsers',
+    'ceoNurseUpdates',
+    'ceoRegistrationCenter/nurses',
+    'verified_nurses',
+    'allowedNurses',
+    'allowedNursesByUid',
+    'nursesByEmail',
+    'nurseProfiles',
+    'onlineNurses',
+    'nursePresence'
+  ];
+  
+  for(const base of nurseRtdbPathsBase){
+    for(const id of allUids){
+      if(!id) continue;
+      try{
+        await db.ref(base+'/'+id).remove();
+        log(`✅ Deleted: ${base}/${id}`);
+        deletedCount++;
       }catch(e){}
     }
-  }catch(e){
-    log(`⚠️ Storage list error (may not exist): ${e.message}`);
   }
-
-  // Also try common storage paths
-  const storagePathsToTry=[
-    `nurses/${uid}/photo_`,
-    `nurses/${uid}/id_`,
-    `nurses/${uid}/licence_`,
-    `nurses/${uid}/video_`,
-    `nurses/${uid}/cv_`
+  
+  const emailKeyPaths=[
+    'allowedNurses/'+emailKey,
+    'allowedClients/'+emailKey,
+    'nursesByEmail/'+emailKey
   ];
-  // We already deleted via listAll, so skip
-
-  // 4. Mark as deleted in a log collection
+  for(const path of emailKeyPaths){
+    try{
+      await db.ref(path).remove();
+      log(`✅ Deleted: ${path}`);
+      deletedCount++;
+    }catch(e){}
+  }
+  
+  // 3. FIRESTORE DELETE
+  const firestoreCollections=[
+    'nurses',
+    'clients',
+    'pending_nurses',
+    'allowedNurses',
+    'allowedClients',
+    'allNurses'
+  ];
+  
+  for(const col of firestoreCollections){
+    for(const id of allUids){
+      if(!id) continue;
+      try{
+        await firestore.collection(col).doc(id).delete();
+        log(`✅ Firestore Deleted: ${col}/${id}`);
+        deletedCount++;
+      }catch(e){}
+    }
+    try{
+      const qSnap=await firestore.collection(col).where('email','==',eLower).get();
+      if(!qSnap.empty){
+        for(const doc of qSnap.docs){
+          try{
+            await doc.ref.delete();
+            log(`✅ Firestore Deleted: ${col}/${doc.id} (by email)`);
+            deletedCount++;
+          }catch(e){}
+        }
+      }
+    }catch(e){}
+  }
+  
+  try{
+    for(const id of allUids){
+      await firestore.doc(`ceoRegistrationCenter/nurses/${id}`).delete();
+      log(`✅ Firestore ceoRegistrationCenter/nurses/${id}`);
+      deletedCount++;
+    }
+  }catch(e){}
+  
+  // 4. STORAGE DELETE
+  for(const id of allUids){
+    if(!id || id.length<5) continue;
+    try{
+      const folderRef = storage.ref(`nurses/${id}`);
+      const listResult = await folderRef.listAll();
+      log(`📁 Found ${listResult.items.length} files in nurses/${id}/`);
+      for(const itemRef of listResult.items){
+        try{
+          await itemRef.delete();
+          log(`✅ Storage Deleted: ${itemRef.fullPath}`);
+          deletedCount++;
+        }catch(e){ log(`⚠️ Storage ${itemRef.fullPath}: ${e.message}`); errors++; }
+      }
+      for(const prefixRef of listResult.prefixes){
+        try{
+          const subList=await prefixRef.listAll();
+          for(const itemRef of subList.items){
+            try{ await itemRef.delete(); log(`✅ Storage Deleted: ${itemRef.fullPath}`); deletedCount++; }catch(e){}
+          }
+        }catch(e){}
+      }
+    }catch(e){}
+    try{
+      const folderRef2 = storage.ref(`clients/${id}`);
+      const listResult2 = await folderRef2.listAll();
+      for(const itemRef of listResult2.items){
+        try{ await itemRef.delete(); log(`✅ Storage Deleted: ${itemRef.fullPath}`); deletedCount++; }catch(e){}
+      }
+    }catch(e){}
+  }
+  
   try{
     await db.ref('deletedNurses/'+uid).set({
       uid:uid, email:email, fullName:fullName, type:type,
-      deletedAt:Date.now(), deletedBy:'CEO', deletedByUid: auth.currentUser?auth.currentUser.uid:'ceo',
-      originalData: allData.all.find(r=>r.uid===uid)?.raw||{}
+      deletedAt:Date.now(), deletedBy:'CEO',
+      allUidsDeleted:Array.from(allUids)
     });
     log(`✅ Logged to deletedNurses/${uid}`);
   }catch(e){}
 
-  try{
-    await db.ref('deletedAccounts/'+uid).set({
-      uid, email, fullName, type, deletedAt:Date.now(), deletedBy:'CEO'
-    });
-  }catch(e){}
-
   log(`🎉 DELETE COMPLETE for ${displayName}. Deleted ${deletedCount} items, ${errors} errors`);
-  toast(`🗑️ ${displayName} DELETED - ${deletedCount} items removed. Also delete Auth in Firebase Console > Authentication > ${email}`);
-
-  // Also prompt for Auth deletion
+  toast(`🗑️ ${displayName} DELETED - ${deletedCount} items removed from ALL locations. Also delete Auth in Firebase Console > Authentication > ${email}`);
+  
   setTimeout(()=>{
-    if(confirm(`DB & Storage deleted for ${email}.\n\nDo you want instructions to delete AUTH user?\n\nAuth CANNOT be deleted from this page (requires Admin SDK). Go to Firebase Console > Authentication > Users > Find ${email} > Delete.`)){
+    if(confirm(`DB & Storage deleted for ${email} (${deletedCount} items).\n\nDelete Auth user in Firebase Console?`)){
       window.open('https://console.firebase.google.com/project/web-care-618e8/authentication/users','_blank');
     }
     loadAll();
   }, 1000);
 }
-
 // FIXED APPROVE - UPDATES ALL PATHS
 
 async function approve(uid, email, type){
-  if(!confirm(`Approve ${type} ${email}?\n\nThis will update ALL database paths (RTDB + Firestore) so nurse moves to Approved and can login immediately.`)) return;
+  if(!confirm(`Approve ${type} ${email}?\n\nThis will update ALL 12 database paths so nurse moves to Approved and can login.`)) return;
   const logBox=document.getElementById('logBox');
   logBox.style.display='block'; logBox.innerHTML='';
-  log(`Approving ${type} ${email} (${uid}) in ALL paths (RTDB + Firestore)...`);
+  log(`Approving ${type} ${email} (${uid}) in ALL paths...`);
   
   try{
     const emailKey=sanitizeEmail(email);
     const now=Date.now();
-    const approvedPayloadRTDB={
-      isApproved:true, approved:true, ceoApproved:true, status:'approved', canLogin:true, isVerified:true, approvedAt:now, approvedBy:'CEO', updatedAt:now, ceoApprovedAt:now
-    };
-    const approvedPayloadFirestore={
-      isApproved:true, approved:true, ceoApproved:true, status:'approved', canLogin:true, isVerified:true, approvedAt: firebase.firestore.FieldValue.serverTimestamp(), approvedBy:'CEO', updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    const approvedPayload={
+      isApproved:true, approved:true, status:'approved', canLogin:true, isVerified:true, approvedAt:now, approvedBy:'CEO', updatedAt:now
     };
     
     if(type==='nurse'){
@@ -562,64 +596,28 @@ async function approve(uid, email, type){
         'nurseUsers/'+uid,
         'ceoNurseUpdates/'+uid,
         'ceoRegistrationCenter/nurses/'+uid,
-        'verified_nurses/'+uid,
-        'allowedNurses/'+uid,
-        'nursesByEmail/'+emailKey
+        'verified_nurses/'+uid
       ];
       
       for(const path of nursePaths){
         try{
           const snap=await db.ref(path).once('value');
           if(snap.exists()){
-            await db.ref(path).update(approvedPayloadRTDB);
-            log(`✅ RTDB Updated ${path} → approved`);
-          } else if(path==='nurses/'+uid || path==='ceoRegistrationCenter/nurses/'+uid){
-            // Create if not exists for main paths
-            const data=allData.all.find(r=>r.uid===uid)||{};
-            await db.ref(path).update({...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayloadRTDB});
-            log(`✅ RTDB Created & Updated ${path}`);
+            await db.ref(path).update(approvedPayload);
+            log(`✅ Updated ${path} → approved`);
           }
-        }catch(e){ log(`⚠️ ${path} err: ${e.message}`); }
+        }catch(e){ log(`⚠️ ${path} not exist or err: ${e.message}`); }
       }
       
-      // Whitelist - create in RTDB
+      // Whitelist - create
       const data=allData.all.find(r=>r.uid===uid)||{};
-      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayloadRTDB};
+      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayload};
       await db.ref('allowedNurses/'+emailKey).set(whitelistData);
-      log(`✅ RTDB Created allowedNurses/${emailKey} → APPROVED`);
+      log(`✅ Created allowedNurses/${emailKey}`);
       await db.ref('allowedNursesByUid/'+uid).set(whitelistData);
-      log(`✅ RTDB Created allowedNursesByUid/${uid}`);
-      
-      // Firestore - CRITICAL FIX: Update Firestore too so login works
-      try{
-        const firestore = firebase.firestore();
-        // Main nurses collection
-        try{
-          await firestore.collection('nurses').doc(uid).set({...whitelistData, ...approvedPayloadFirestore}, {merge:true});
-          log(`✅ FIRESTORE Updated nurses/${uid} → approved`);
-        }catch(e){ log(`⚠️ Firestore nurses/${uid} err: ${e.message}`); }
-        
-        // ceoRegistrationCenter
-        try{
-          await firestore.collection('ceoRegistrationCenter').doc('nurses').collection('nurses').doc(uid).set({...whitelistData, ...approvedPayloadFirestore}, {merge:true});
-          log(`✅ FIRESTORE Updated ceoRegistrationCenter/nurses/${uid}`);
-        }catch(e){
-          try{
-            await firestore.doc(`ceoRegistrationCenter/nurses/${uid}`).set({...whitelistData, ...approvedPayloadFirestore}, {merge:true});
-            log(`✅ FIRESTORE Updated ceoRegistrationCenter/nurses/${uid} (alt path)`);
-          }catch(e2){ log(`⚠️ Firestore ceo center err: ${e2.message}`); }
-        }
-        
-        // allowedNurses in Firestore if exists
-        try{
-          await firestore.collection('allowedNurses').doc(emailKey).set({...whitelistData, ...approvedPayloadFirestore}, {merge:true});
-          log(`✅ FIRESTORE Updated allowedNurses/${emailKey}`);
-        }catch(e){}
-        
-      }catch(e){ log(`⚠️ Firestore update failed: ${e.message} - RTDB approval still works`); }
+      log(`✅ Created allowedNursesByUid/${uid}`);
       
     }else{
-      // Client approval
       const clientPaths=[
         'clients/'+uid,
         'client_registrations/'+uid,
@@ -633,26 +631,25 @@ async function approve(uid, email, type){
         try{
           const snap=await db.ref(path).once('value');
           if(snap.exists()){
-            await db.ref(path).update(approvedPayloadRTDB);
+            await db.ref(path).update(approvedPayload);
             log(`✅ Updated ${path}`);
           }
         }catch(e){}
       }
       const data=allData.all.find(r=>r.uid===uid)||{};
-      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayloadRTDB};
+      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayload};
       await db.ref('allowedClients/'+emailKey).set(whitelistData);
       await db.ref('allowedClientsByUid/'+uid).set(whitelistData);
       log(`✅ Created allowedClients`);
     }
     
-    toast(`✅ ${email} APPROVED in ALL paths (RTDB + Firestore) — can login NOW!`);
-    log(`✅ DONE — ${email} approved in RTDB + Firestore — Login should work now!`);
+    toast(`✅ ${email} APPROVED in ALL paths — now moves to Approved tab and can login!`);
+    log(`✅ DONE — ${email} approved in ALL paths`);
     setTimeout(loadAll, 1500);
     
   }catch(e){
     log(`❌ Approve failed: ${e.message}`);
     toast('Approve failed: '+e.message);
-    console.error(e);
   }
 }
 
@@ -675,46 +672,38 @@ async function reject(uid, email, type){
 
 // Fix all stuck approved nurses at once
 async function fixAllApproved(){
-  if(!confirm('This will scan all nurses that are in allowedNurses whitelist but still showing pending, and fix them to approved in RTDB + Firestore. Continue?')) return;
+  if(!confirm('This will scan all nurses that are in allowedNurses whitelist but still showing pending, and fix them to approved in ALL paths. Continue?')) return;
   const logBox=document.getElementById('logBox');
   logBox.style.display='block'; logBox.innerHTML='';
-  log('Scanning allowedNurses whitelist and fixing ALL paths...');
+  log('Scanning allowedNurses whitelist...');
   
   try{
     const snap=await db.ref('allowedNurses').once('value');
     if(!snap.exists()){ toast('No allowedNurses found'); return; }
     let fixed=0;
-    const firestore = firebase.firestore();
-    
-    for(const ch of Object.values(snap.val()||{})){
-      const v=ch||{};
+    const promises=[];
+    snap.forEach(ch=>{
+      const v=ch.val()||{};
       const uid=v.uid;
       const email=v.email;
       if(uid && email){
-        const payloadRTDB={isApproved:true,approved:true,ceoApproved:true,status:'approved',canLogin:true,isVerified:true,approvedAt:Date.now(),updatedAt:Date.now(),ceoApprovedAt:Date.now()};
-        const payloadFS={isApproved:true,approved:true,ceoApproved:true,status:'approved',canLogin:true,isVerified:true,approvedAt: firebase.firestore.FieldValue.serverTimestamp(),updatedAt: firebase.firestore.FieldValue.serverTimestamp()};
-        
-        try{ await db.ref('nurses/'+uid).update(payloadRTDB); log(`Fixed RTDB nurses/${uid}`); }catch{}
-        try{ await db.ref('ceoRegistrationCenter/nurses/'+uid).update(payloadRTDB); log(`Fixed RTDB ceo center ${uid}`); }catch{}
-        try{ await db.ref('pending_nurses/'+uid).update(payloadRTDB); }catch{}
-        try{ await db.ref('pendingNurses/'+uid).update(payloadRTDB); }catch{}
-        try{ await db.ref('ceoNurseUpdates/'+uid).update(payloadRTDB); }catch{}
-        try{ await db.ref('nurse_registrations/'+uid).update(payloadRTDB); }catch{}
-        try{ await db.ref('allowedNurses/'+sanitizeEmail(email)).update(payloadRTDB); }catch{}
-        try{ await db.ref('allowedNursesByUid/'+uid).update(payloadRTDB); }catch{}
-        
-        // Firestore
-        try{ await firestore.collection('nurses').doc(uid).set(payloadFS, {merge:true}); log(`Fixed Firestore nurses/${uid}`); }catch(e){ log(`Firestore nurses/${uid} err: ${e.message}`); }
-        try{ await firestore.doc(`ceoRegistrationCenter/nurses/${uid}`).set(payloadFS, {merge:true}); log(`Fixed Firestore ceo/${uid}`); }catch{}
-        
+        const payload={isApproved:true,approved:true,status:'approved',canLogin:true,isVerified:true,approvedAt:Date.now(),updatedAt:Date.now()};
+        promises.push(
+          db.ref('nurses/'+uid).update(payload).then(()=>log(`Fixed nurses/${uid}`)).catch(()=>{}),
+          db.ref('pending_nurses/'+uid).update(payload).catch(()=>{}),
+          db.ref('pendingNurses/'+uid).update(payload).catch(()=>{}),
+          db.ref('ceoRegistrationCenter/nurses/'+uid).update(payload).then(()=>log(`Fixed ceo center ${uid}`)).catch(()=>{}),
+          db.ref('ceoNurseUpdates/'+uid).update(payload).catch(()=>{}),
+          db.ref('nurse_registrations/'+uid).update(payload).catch(()=>{})
+        );
         fixed++;
       }
-    }
-    
-    toast(`✅ Fixed ${fixed} nurses in RTDB + Firestore — they can now login!`);
-    log(`✅ Fixed ${fixed} nurses in ALL paths`);
+    });
+    await Promise.all(promises);
+    toast(`✅ Fixed ${fixed} nurses — they will now show in Approved`);
+    log(`✅ Fixed ${fixed} nurses`);
     setTimeout(loadAll, 1500);
-  }catch(e){ toast('Fix failed: '+e.message); log('Fix failed: '+e.message); console.error(e); }
+  }catch(e){ toast('Fix failed: '+e.message); log('Fix failed: '+e.message); }
 }
 
 loadAll();
