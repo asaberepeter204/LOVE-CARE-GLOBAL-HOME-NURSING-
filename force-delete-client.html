@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DELETE CLIENT BY PHONE</title>
+<style>body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;padding:16px}.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.18);border-radius:18px;padding:20px;max-width:600px;margin:0 auto}input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#fff;margin:8px 0}.btn{width:100%;padding:14px;border-radius:12px;font-weight:800;border:none;cursor:pointer;margin-top:10px}.btnRed{background:linear-gradient(135deg,#ef4444,#991b1b);color:white}.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}.log{background:#000;color:#0f0;padding:10px;border-radius:8px;font-size:11px;max-height:400px;overflow:auto;margin-top:10px;white-space:pre-wrap}</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script></head><body><div class="card">
+<h2>DELETE CLIENT BY PHONE</h2>
+<p style="font-size:11px;color:#a78bfa">Clients register with phone + username + photo. Enter phone number to delete completely.</p>
+<label>Phone Number:</label>
+<input id="phone" type="text" placeholder="05441211814" value="">
+<label>Username (optional):</label>
+<input id="username" type="text" placeholder="username if you know it">
+<button class="btn btnYellow" onclick="check()">CHECK - Find client by phone</button>
+<button class="btn btnRed" onclick="del()">DELETE BY PHONE - ALL LOCATIONS</button>
+<div id="log" class="log">Ready...
+
+Enter phone number that client used to register.
+This will find client in:
+- clients/{uid}
+- clientUsernames/{username}
+- clientPhones/{phone}
+- allowedClients/{phoneKey}
+- Firestore clients where phone == phone
+- Storage clients/{uid}
+
+Then delete all.
+</div>
+</div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();const fs=firebase.firestore();const storage=firebase.storage();
+function log(m){document.getElementById('log').textContent+=m+'\n';document.getElementById('log').scrollTop=99999;}
+
+async function check(){
+  const phone=document.getElementById('phone').value.trim();
+  const username=document.getElementById('username').value.trim().toLowerCase();
+  if(!phone && !username){alert('Enter phone or username');return;}
+  document.getElementById('log').textContent='';
+  log(`Searching for client phone=${phone}, username=${username}...`);
+  
+  const phoneDigits=phone.replace(/[^0-9]/g,'');
+  
+  // Check clients
+  try{
+    const snap=await db.ref('clients').once('value');
+    if(snap.exists()){
+      let found=false;
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        const p=(v.phone||'').replace(/[^0-9]/g,'');
+        const un=(v.username||'').toLowerCase();
+        if((phoneDigits && p.includes(phoneDigits)) || (username && un===username) || ch.key===phone || ch.key===username){
+          found=true;
+          log(`FOUND clients/${ch.key}: username=${v.username}, phone=${v.phone}, email=${v.email}`);
+        }
+      });
+      if(!found) log('Not found in clients/');
+    }
+  }catch(e){log('Error: '+e.message);}
+  
+  // Check clientPhones mapping
+  try{
+    const snap=await db.ref('clientPhones').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        if(ch.key.includes(phoneDigits) || ch.key===phone){
+          log(`FOUND clientPhones/${ch.key} -> UID ${ch.val()}`);
+        }
+      });
+    }
+  }catch(e){}
+  
+  // Check clientUsernames
+  try{
+    const snap=await db.ref('clientUsernames').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        if(username && ch.key.toLowerCase()===username){
+          log(`FOUND clientUsernames/${ch.key} -> UID ${ch.val()}`);
+        }
+      });
+    }
+  }catch(e){}
+  
+  // Check allowedClients
+  try{
+    const snap=await db.ref('allowedClients').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        const p=(v.phone||'').replace(/[^0-9]/g,'');
+        if(phoneDigits && p.includes(phoneDigits)){
+          log(`FOUND allowedClients/${ch.key}: phone=${v.phone}, username=${v.username}`);
+        }
+      });
+    }
+  }catch(e){}
+}
+
+async function del(){
+  const phone=document.getElementById('phone').value.trim();
+  const username=document.getElementById('username').value.trim().toLowerCase();
+  if(!phone && !username){alert('Enter phone or username');return;}
+  if(!confirm(`DELETE client phone=${phone}, username=${username} from EVERYWHERE?`)) return;
+  if(prompt('Type DELETE to confirm')!=='DELETE'){alert('Cancelled');return;}
+  
+  document.getElementById('log').textContent='';
+  log(`Deleting client phone=${phone}, username=${username}...`);
+  
+  const phoneDigits=phone.replace(/[^0-9]/g,'');
+  let allUids=new Set();
+  let allKeys=new Set();
+  if(phone) allKeys.add(phone);
+  if(phoneDigits) allKeys.add(phoneDigits);
+  if(username) allKeys.add(username);
+  
+  // Find UIDs
+  try{
+    const snap=await db.ref('clients').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        const p=(v.phone||'').replace(/[^0-9]/g,'');
+        const un=(v.username||'').toLowerCase();
+        if((phoneDigits && p.includes(phoneDigits)) || (username && un===username)){
+          allUids.add(ch.key);
+          log(`Found UID ${ch.key} for phone ${phone}`);
+          if(v.username) allKeys.add(v.username.toLowerCase());
+          if(v.phone) allKeys.add(v.phone.replace(/[^0-9]/g,''));
+        }
+      });
+    }
+  }catch(e){}
+  
+  try{
+    const snap=await db.ref('clientPhones').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        if(ch.key.includes(phoneDigits) || ch.key===phone){
+          allUids.add(ch.val());
+          allKeys.add(ch.val());
+        }
+      });
+    }
+  }catch(e){}
+  
+  try{
+    const snap=await db.ref('clientUsernames').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        if(username && ch.key.toLowerCase()===username){
+          allUids.add(ch.val());
+          allKeys.add(ch.val());
+        }
+      });
+    }
+  }catch(e){}
+  
+  const allIds=Array.from(new Set([...allUids, ...allKeys]));
+  log(`Deleting IDs: ${allIds.join(', ')}`);
+  
+  const bases=['clients','client_registrations','allClients','clientUsers','ceoRegistrationCenter/clients','allowedClients','allowedClientsByUid','pendingClientRegistrations','ceoClientUpdates','verified_clients','onlineClients','clientPresence'];
+  
+  for(const base of bases){
+    for(const id of allIds){
+      if(!id || id.length<2) continue;
+      try{ await db.ref(base+'/'+id).remove(); log(`Deleted ${base}/${id}`); }catch(e){}
+    }
+  }
+  
+  // Delete mappings
+  const mappings=[`clientUsernames/${username}`, `clientPhones/${phone}`, `clientPhones/${phoneDigits}`, `allowedClients/${phone}`, `allowedClients/${phoneDigits}`];
+  for(const p of mappings){
+    if(!p.split('/')[1]) continue;
+    try{ await db.ref(p).remove(); log(`Deleted ${p}`); }catch(e){}
+  }
+  
+  // Delete all clientUsernames pointing to these UIDs
+  try{
+    const snap=await db.ref('clientUsernames').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        if(allUids.has(ch.val())){
+          db.ref('clientUsernames/'+ch.key).remove();
+          log(`Deleted clientUsernames/${ch.key}`);
+        }
+      });
+    }
+  }catch(e){}
+  
+  try{
+    const snap=await db.ref('clientPhones').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        if(allUids.has(ch.val())){
+          db.ref('clientPhones/'+ch.key).remove();
+          log(`Deleted clientPhones/${ch.key}`);
+        }
+      });
+    }
+  }catch(e){}
+  
+  // Firestore
+  for(const id of allIds){
+    try{ await fs.collection('clients').doc(id).delete(); log(`Deleted Firestore clients/${id}`); }catch(e){}
+  }
+  
+  try{
+    const q=await fs.collection('clients').where('phone','==',phone).get();
+    for(const d of q.docs){ await d.ref.delete(); log(`Deleted Firestore clients/${d.id} by phone`); }
+  }catch(e){}
+  
+  try{
+    const q=await fs.collection('clients').where('phone','==',phoneDigits).get();
+    for(const d of q.docs){ await d.ref.delete(); log(`Deleted Firestore clients/${d.id} by phoneDigits`); }
+  }catch(e){}
+  
+  // Storage
+  for(const id of allUids){
+    if(!id || id.length<5) continue;
+    try{
+      const ref=storage.ref(`clients/${id}`);
+      const list=await ref.listAll();
+      for(const item of list.items){ await item.delete(); log(`Deleted Storage ${item.fullPath}`); }
+    }catch(e){}
+  }
+  
+  log('\nDONE! Client deleted');
+  alert('Client deleted from DB & Storage. Also delete Auth in Firebase Console if exists.');
+}
+</script></body></html>
