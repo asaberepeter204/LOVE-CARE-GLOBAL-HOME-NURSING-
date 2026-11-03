@@ -10,8 +10,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding:16px;padding-bottom:120px}
@@ -79,7 +77,7 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3p
 <div class="wrap"><div class="card">
 <div class="logo">👩‍⚕️</div>
 <h1>Nurse Registration</h1>
-<p class="subtitle">ALL DOCUMENTS REQUIRED - Photo + ID + Licence + Video</p>
+<p class="subtitle">ALL DOCUMENTS REQUIRED - Photo + ID + Licence + CV + Video</p>
 <div class="badges">
 <span class="badge badgeGreen">💰 CEO 20% | Nurse 80%</span>
 <span class="badge badgePurple">⭐ Rating 5.0 → Visible</span>
@@ -126,7 +124,7 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3p
 
 <div class="section" id="section2">
 <div class="sectionTitle">📄 Step 2 — Upload Documents — ALL REQUIRED</div>
-<p class="sectionDesc">Photo + ID + Licence + Video ALL required. Max video 50MB.</p>
+<p class="sectionDesc">Photo + ID + Licence + CV + Video ALL required. Max video 50MB. CV .docx/.pdf max 5MB.</p>
 
 <label>Profile Photo * REQUIRED — Clients see</label>
 <div class="fileBox required" id="boxPhoto" onclick="document.getElementById('photoFile').click()"><input id="photoFile" type="file" accept="image/*" onchange="handleFile(this,'boxPhoto','previewPhoto')" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">📷 Tap to select photo *</div></div>
@@ -147,6 +145,10 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3p
 <div class="fileBox required" id="boxLicence" onclick="document.getElementById('licenceFile').click()"><input id="licenceFile" type="file" accept="image/*,.pdf" onchange="handleFile(this,'boxLicence','')" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">📜 Tap to select licence *</div></div>
 <div class="fileName" id="nameLicence"></div>
 
+<label>CV * REQUIRED — .docx/.pdf</label>
+<div class="fileBox required" id="boxCv" onclick="document.getElementById('cvFile').click()"><input id="cvFile" type="file" accept=".pdf,.doc,.docx" onchange="handleFile(this,'boxCv','')" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">📄 Tap to select CV * REQUIRED</div></div>
+<div class="fileName" id="nameCv"></div>
+
 <label>Intro Video * REQUIRED — 30 sec (Max 50MB)</label>
 <div class="fileBox required" id="boxVideo" onclick="document.getElementById('videoFile').click()"><input id="videoFile" type="file" accept="video/*" onchange="handleFile(this,'boxVideo','previewVideo')" style="display:none"><div style="text-align:center;padding:10px;color:#a78bfa">🎥 Tap to select video * REQUIRED</div></div>
 <div class="fileName" id="nameVideo"></div>
@@ -154,7 +156,7 @@ input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3p
 
 <div class="navRow">
 <button class="btn btnLight" type="button" onclick="goToStep1()">← Back</button>
-<button class="btn btnPurple" type="button" id="registerBtn" onclick="registerNurse()">✅ Register — Upload 4 Files</button>
+<button class="btn btnPurple" type="button" id="registerBtn" onclick="registerNurse()">✅ Register — Upload ALL</button>
 </div>
 <a class="btn btnLight" href="index.html">Home</a>
 <p style="font-size:10px;color:#6b7280;text-align:center;margin-top:10px">By registering, you agree: Rating visible — CEO 20% / Nurse 80% — CEO approval required from ceo-registration-center</p>
@@ -217,10 +219,9 @@ function goToStep1(){
 function handleFile(input, boxId, previewId){
   const file=input.files[0];
   if(!file) return;
-  // Size checks - FIXED
+  // Size checks
   if(boxId==='boxVideo' && file.size > 50*1024*1024){ showMsg('Video too large - Max 50MB. Please compress video', 'error'); input.value=''; return; }
-  if(boxId==='boxCv' && file.size > 10*1024*1024){ showMsg('CV too large - Max 10MB (was 5MB). Please compress', 'error'); input.value=''; return; }
-  if(boxId==='boxLicence' && file.size > 10*1024*1024){ showMsg('Licence too large - Max 10MB', 'error'); input.value=''; return; }
+  if(boxId==='boxCv' && file.size > 5*1024*1024){ showMsg('CV too large - Max 5MB', 'error'); input.value=''; return; }
   const box=document.getElementById(boxId);
   const nameId='name'+boxId.replace('box','');
   const nameEl=document.getElementById(nameId);
@@ -318,8 +319,6 @@ function checkImageQuality(file){
     img.src=URL.createObjectURL(file);
   });
 }
-
-async function previewCV(file){ return; }
 
 async function verifyIDFile(file){
   if(!file){ return; }
@@ -458,6 +457,7 @@ async function registerNurse(){
   const photoFile=document.getElementById('photoFile').files[0];
   const idFile=document.getElementById('idFile').files[0];
   const licenceFile=document.getElementById('licenceFile').files[0];
+  const cvFile=document.getElementById('cvFile').files[0];
   const videoFile=document.getElementById('videoFile').files[0];
 
   if(!currentLat||!currentLng){ showMsg('📍 Capture GPS first', 'error'); return; }
@@ -467,6 +467,7 @@ async function registerNurse(){
   if(!idFile){ showMsg('❌ National ID REQUIRED', 'error'); return; }
   if(lastIdVerification.score>0 && !lastIdVerification.passed && lastIdVerification.score<30){ showMsg('❌ National ID looks fake or too blurry - Score '+lastIdVerification.score+' - Please retake clear photo of real ID', 'error'); document.getElementById('idVerifyBox').scrollIntoView({behavior:'smooth'}); return; }
   if(!licenceFile){ showMsg('❌ Licence REQUIRED', 'error'); return; }
+  if(!cvFile){ showMsg('❌ CV REQUIRED - .docx or .pdf', 'error'); return; }
   if(!videoFile){ showMsg('❌ Intro Video REQUIRED', 'error'); return; }
 
   const btn=document.getElementById('registerBtn');
@@ -478,24 +479,20 @@ async function registerNurse(){
     const cred=await auth.createUserWithEmailAndPassword(email, password);
     const uid=cred.user.uid;
     await cred.user.updateProfile({displayName:fullName});
-    showProgress(true, 'Auth created - Uploading 4 files...', 10, `UID: ${uid}`);
+    showProgress(true, 'Auth created - Uploading files...', 10, `UID: ${uid}`);
 
-    // 2. Robust upload function - FIXED FOR CV/DOCX
-    function sanitizeName(name){
-      return name.replace(/[^a-zA-Z0-9._-]/g,'_').substring(0,80);
-    }
+    // 2. Robust upload function using COMPAT SDK - fixes stuck 0%
     function uploadCompat(file, path){
       return new Promise((resolve, reject)=>{
         const storageRef=storage.ref(path);
-        const metadata = { contentType: file.type || 'application/octet-stream' };
-        const uploadTask=storageRef.put(file, metadata);
+        const uploadTask=storageRef.put(file);
         let lastProgress=Date.now();
         uploadTask.on('state_changed',
           (snapshot)=>{
             const prog=(snapshot.bytesTransferred / snapshot.totalBytes * 100);
-            const overallBase = path.includes('photo')?10 : path.includes('id')?30 : path.includes('licence')?50 : 70;
+            const overallBase = path.includes('photo')?10 : path.includes('id')?25 : path.includes('licence')?40 : path.includes('cv')?55 : 70;
             const overall = overallBase + (prog*0.15);
-            showProgress(true, `Uploading ${file.name}... ${prog.toFixed(0)}%`, overall, `${(snapshot.bytesTransferred/1024/1024).toFixed(2)}MB / ${(snapshot.totalBytes/1024/1024).toFixed(2)}MB`);
+            showProgress(true, `Uploading ${file.name}... ${prog.toFixed(0)}%`, overall, `${snapshot.bytesTransferred/1024/1024}MB / ${snapshot.totalBytes/1024/1024}MB`);
             if(btn) btn.textContent=`⏳ ${prog.toFixed(0)}% - ${file.name}`;
             lastProgress=Date.now();
           },
@@ -510,6 +507,7 @@ async function registerNurse(){
             }catch(e){ reject(e); }
           }
         );
+        // Timeout check - if no progress for 60s, fail
         const interval=setInterval(()=>{
           if(Date.now()-lastProgress > 60000){
             clearInterval(interval);
@@ -521,19 +519,22 @@ async function registerNurse(){
       });
     }
 
-    let photoURL='', idURL='', licenceURL='', videoURL=''; let cvURL=''; // CV removed
+    let photoURL='', idURL='', licenceURL='', cvURL='', videoURL='';
     try{
       showMsg('⏳ Uploading Photo...', 'info');
-      photoURL=await uploadCompat(photoFile, `nurses/${uid}/photo_${Date.now()}_${sanitizeName(photoFile.name)}`);
+      photoURL=await uploadCompat(photoFile, `nurses/${uid}/photo_${Date.now()}_${photoFile.name}`);
       showMsg('✅ Photo uploaded, uploading ID...', 'success');
       
-      idURL=await uploadCompat(idFile, `nurses/${uid}/id_${Date.now()}_${sanitizeName(idFile.name)}`);
+      idURL=await uploadCompat(idFile, `nurses/${uid}/id_${Date.now()}_${idFile.name}`);
       showMsg('✅ ID uploaded, uploading Licence...', 'success');
       
-      licenceURL=await uploadCompat(licenceFile, `nurses/${uid}/licence_${Date.now()}_${sanitizeName(licenceFile.name)}`);
-      showMsg('✅ Licence uploaded, uploading Video...', 'success');
+      licenceURL=await uploadCompat(licenceFile, `nurses/${uid}/licence_${Date.now()}_${licenceFile.name}`);
+      showMsg('✅ Licence uploaded, uploading CV...', 'success');
       
-      videoURL=await uploadCompat(videoFile, `nurses/${uid}/video_${Date.now()}_${sanitizeName(videoFile.name)}`);
+      cvURL=await uploadCompat(cvFile, `nurses/${uid}/cv_${Date.now()}_${cvFile.name}`);
+      showMsg('✅ CV uploaded, uploading Video (biggest)...', 'success');
+      
+      videoURL=await uploadCompat(videoFile, `nurses/${uid}/video_${Date.now()}_${videoFile.name}`);
       showMsg('✅ Video uploaded!', 'success');
     }catch(uploadErr){
       console.error('Upload failed', uploadErr);
@@ -553,7 +554,7 @@ async function registerNurse(){
       return;
     }
 
-    if(!photoURL || !idURL || !licenceURL || !videoURL){
+    if(!photoURL || !idURL || !licenceURL || !cvURL || !videoURL){
       showMsg('❌ One or more URLs empty - upload failed', 'error');
       if(btn){ btn.disabled=false; btn.textContent='✅ Register'; }
       return;
@@ -566,32 +567,40 @@ async function registerNurse(){
       referenceName:refName,referencePhone:refPhone,lat:currentLat,lng:currentLng,gpsActualName:currentGPSName||'',
       photo:photoURL,photoURL:photoURL,photoUrl:photoURL,
       idURL:idURL,licenceURL:licenceURL,licenseUrl:licenceURL,
-      cvURL:'',cvUrl:'', // CV removed
+      cvURL:cvURL,cvUrl:cvURL,
       videoURL:videoURL,videoUrl:videoURL,video:videoURL,introVideo:videoURL,nurseVideo:videoURL,
-      isApproved:false,canLogin:false,status:'pending',needsCEOApproval:true,ceoApproved:false,isPendingApproval:true,awaitingCEO:true,
-      rating:5.0,createdAt:now,updatedAt:now,source:'ALL-REQUIRED-FIXED-UPLOAD'
+      isApproved:false,approved:false,canLogin:false,ceoApproved:false,isVerified:false,
+      status:'pending',needsCEOApproval:true,pending:true,approvalStatus:'pending',
+      rating:5.0,createdAt:now,updatedAt:now,source:'PENDING-CEO-APPROVAL-REQUIRED'
     };
 
+    // FIXED: Only create PENDING locations, NOT allowedNurses
+    // allowedNurses should ONLY be created by CEO approval
     await db.ref('nurses/'+uid).set(nurseData);
+    await db.ref('pending_nurses/'+uid).set(nurseData);
+    await db.ref('pendingNurses/'+uid).set(nurseData);
     await db.ref('nurse_registrations/'+uid).set(nurseData);
     await db.ref('pendingNurseRegistrations/'+uid).set(nurseData);
     await db.ref('nurseUsers/'+uid).set(nurseData);
-    await db.ref('ceoNurseUpdates/'+uid).set({...nurseData, updatedBy:'all-required'});
+    await db.ref('ceoNurseUpdates/'+uid).set({...nurseData, updatedBy:'all-required-pending'});
     await db.ref('ceoRegistrationCenter/nurses/'+uid).set(nurseData);
     await db.ref('ceoBookingReceiverNurses/'+uid).set(nurseData);
-    const emailKey=email.toLowerCase().replace(/[.#$@\[\]]/g,'_');
-    await db.ref('allowedNurses/'+emailKey).set(nurseData);
+    await db.ref('allNurses/'+uid).set(nurseData);
+    // DO NOT create allowedNurses here - CEO will create it on approval
+    // const emailKey=email.toLowerCase().replace(/[.#$@\[\]]/g,'_');
+    // await db.ref('allowedNurses/'+emailKey).set(nurseData); // REMOVED - causes auto-approve bug
     await firestore.collection('nurses').doc(uid).set({...nurseData, createdAt: firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+    // Also create Firestore pending
+    await firestore.collection('pending_nurses').doc(uid).set({...nurseData, createdAt: firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+    await firestore.doc(`ceoRegistrationCenter/nurses/${uid}`).set({...nurseData, createdAt: firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
 
     try{ await cred.user.sendEmailVerification(); }catch{}
 
     showProgress(true, '✅ SUCCESS!', 100, 'Registration complete - CEO must approve');
-    showMsg('✅ Registration SUCCESS! All 4 files saved! CEO will approve in ceo-registration-center. You CANNOT login until CEO approves. Redirecting to login...', 'success');
+    showMsg('✅ Registration SUCCESS! All 5 files saved!\n\nSTATUS: PENDING - Waiting for CEO approval in ceo-registration-center.html\n\nYou CANNOT login until CEO clicks Approve. Your data is in PENDING, not approved. Redirecting to login...', 'success');
     localStorage.setItem('nurseProfile', JSON.stringify(nurseData));
     if(btn){ btn.disabled=false; btn.textContent='✅ Registered — Go to Login'; }
-    localStorage.setItem('pendingCEOApproval', 'true');
-    localStorage.setItem('nurseEmail', email.toLowerCase());
-    setTimeout(()=>{ location.href='nurse-login.html?registered=true&pendingApproval=true'; }, 3000);
+    setTimeout(()=>{ location.href='nurse-login_6.html'; }, 3000);
 
   }catch(e){
     console.error(e);
