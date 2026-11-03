@@ -477,7 +477,7 @@ function updateOnlineUI(isOnline){
     if(dot) dot.classList.add('online');
     if(badge){ badge.textContent='🟢 ONLINE — Visible to clients'; badge.className='badge badgeOnline'; }
     if(sessionText){ sessionText.textContent='ONLINE'; sessionText.style.color='#86efac'; }
-    if(display) display.innerHTML=`<b style="color:#86efac">🟢 You are ONLINE</b><br>Clients can see you in book-nurse.html and book you!<br><small style="color:#6b7280">Last update: ${new Date().toLocaleString('en-GH')} — Updating every 2 mins</small>`;
+    if(display) display.innerHTML=`<b style="color:#86efac">🟢 You are ONLINE</b><br>Clients can see you in book-nurse.html and book you!<br><small style="color:#6b7280">Last update: ${new Date().toLocaleString('en-GH')} — Live GPS every 3s</small><br><small id="liveGpsDisplay" style="color:#86efac;font-size:10px">📍 LIVE GPS starting...</small>`;
     if(toggle) toggle.checked=true;
   }else{
     if(dot) dot.classList.remove('online');
@@ -487,6 +487,72 @@ function updateOnlineUI(isOnline){
     if(toggle) toggle.checked=false;
   }
 }
+
+// === LIVE GPS TRACKING FOR CLIENT DISTANCE - STARTS WHEN ONLINE ===
+let liveWatchId=null;
+let liveHeartbeat=null;
+
+function startLiveGPSTracking(uid){
+  if(!navigator.geolocation) return;
+  if(liveWatchId) navigator.geolocation.clearWatch(liveWatchId);
+  
+  console.log('📍 Starting LIVE GPS tracking for client distance');
+  
+  // Watch position - updates every 3-5 seconds
+  liveWatchId=navigator.geolocation.watchPosition(pos=>{
+    const lat=pos.coords.latitude, lng=pos.coords.longitude, now=Date.now();
+    const timeStr=new Date().toLocaleString('en-GH');
+    currentLocation={lat:lat,lng:lng};
+    
+    // Update all live locations for client to see distance - FAST
+    const liveUpdates={
+      lat:lat, lng:lng,
+      currentLat:lat, currentLng:lng,
+      liveLat:lat, liveLng:lng,
+      nurseLat:lat, nurseLng:lng,
+      lastSeen:now,
+      lastUpdate:now,
+      lastOnline:now,
+      isOnline:true,
+      online:true,
+      isLive:true,
+      status:'online',
+      timeStr:timeStr
+    };
+    
+    // Parallel updates - clients see instantly via realtime listeners
+    rtdb.ref('onlineNurses/'+uid).update(liveUpdates).catch(()=>{});
+    rtdb.ref('nurseLocations/'+uid).update({...liveUpdates, isLive:true}).catch(()=>{});
+    rtdb.ref('nursePresence/'+uid).update({lat:lat,lng:lng,currentLat:lat,currentLng:lng,lastSeen:now,isOnline:true,status:'online'}).catch(()=>{});
+    rtdb.ref('liveNurses/'+uid).update(liveUpdates).catch(()=>{});
+    rtdb.ref('nurses/'+uid).update({lat:lat,lng:lng,currentLat:lat,currentLng:lng,liveLat:lat,liveLng:lng,lastSeen:now}).catch(()=>{});
+    
+    // Update UI
+    const gpsEl=document.getElementById('liveGpsDisplay');
+    if(gpsEl) gpsEl.textContent=`📍 LIVE: ${lat.toFixed(5)}, ${lng.toFixed(5)} - Clients see this - Updates every 3s`;
+    
+    console.log(`Live GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)} - Updated for clients`);
+    
+  }, err=>{
+    console.log('Live GPS error', err);
+  }, {enableHighAccuracy:true, maximumAge:3000, timeout:10000, distanceFilter:5});
+  
+  // Heartbeat every 5s to keep online status fresh
+  if(liveHeartbeat) clearInterval(liveHeartbeat);
+  liveHeartbeat=setInterval(()=>{
+    const now=Date.now();
+    rtdb.ref('onlineNurses/'+uid).update({lastSeen:now}).catch(()=>{});
+    rtdb.ref('nursePresence/'+uid).update({lastSeen:now, isOnline:true}).catch(()=>{});
+  }, 5000);
+}
+
+function stopLiveGPSTracking(){
+  if(liveWatchId){ navigator.geolocation.clearWatch(liveWatchId); liveWatchId=null; }
+  if(liveHeartbeat){ clearInterval(liveHeartbeat); liveHeartbeat=null; }
+  console.log('Stopped live GPS tracking');
+}
+
+
 async function setOnlineNow(){
   const uid=currentNurseId||localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('uid')||'demo-nurse';
   const nurseNameEl = document.getElementById('nurseName');
@@ -562,7 +628,7 @@ async function setOnlineNow(){
       rtdb.ref('nurseLocations/'+uid).onDisconnect().update({isLive:false, isOnline:false, status:'offline'});
     }catch(e){ console.log('onDisconnect setup fail', e); }
     
-    // FAST HEARTBEAT - Update every 15 seconds (not 2 mins) so client knows you're still online
+    // FAST HEARTBEAT + LIVE GPS - Update every 5 seconds
     if(onlineInterval) clearInterval(onlineInterval);
     onlineInterval=setInterval(async()=>{
       const n=Date.now();
@@ -575,9 +641,11 @@ async function setOnlineNow(){
           rtdb.ref('nurseLocations/'+uid).update({lastUpdate:n, updatedAt:n, isLive:true}).catch(()=>{}),
           rtdb.ref('liveNurses/'+uid).update({lastUpdate:n, isOnline:true}).catch(()=>{})
         ]);
-        console.log('💓 Heartbeat online', tStr);
       }catch(e){}
-    }, 5000); // FIX: 5 seconds heartbeat (was 15s) - keeps you ONLINE during 50% payment
+    }, 5000);
+    
+    // START LIVE GPS TRACKING FOR CLIENT DISTANCE
+    startLiveGPSTracking(uid);
 
     // FIX: Listen for new 50% bookings - keep ONLINE and show notification, DON'T go offline
     try{
@@ -645,6 +713,7 @@ async function setOfflineNow(){
     updateOnlineUI(false);
     if(saveEl) saveEl.textContent=`🔴 OFFLINE NOW — Hidden from all clients at ${timeStr} — Clients will NOT see you in 1-2 seconds`;
     if(onlineInterval) clearInterval(onlineInterval);
+    stopLiveGPSTracking();
     
     try{
       rtdb.ref('onlineNurses/'+uid).onDisconnect().cancel();
