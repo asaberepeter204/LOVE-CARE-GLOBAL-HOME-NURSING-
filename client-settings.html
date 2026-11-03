@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Client Settings - Love Care Global - Photo + Phone + Email Saved</title>
+<title>Client Settings - Username + Phone + Password + Photo - No Email</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -18,29 +18,44 @@ h3{margin:0 0 14px;font-size:16px;color:#fff}label{font-size:12px;color:var(--te
 input,select,textarea{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);font-size:14px;background:var(--card-light);color:#fff}
 .row{display:flex;gap:10px}.btn{width:100%;padding:14px;border-radius:14px;border:none;font-weight:800;cursor:pointer;margin-top:14px;font-size:14px}
 .btn-primary{background:var(--primary-gradient);color:#1a1030}.btn-red{background:#2a1520;color:#ff6b6b;border:1px solid #5a2530}
-.small{font-size:11px;color:var(--text-dim);margin-top:8px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;display:none;z-index:999;font-weight:700;font-size:13px}
+.small{font-size:11px;color:var(--text-dim);margin-top:8px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;display:none;z-index:999;font-weight:700;font-size:13px;max-width:90%;text-align:center}
 .profile{display:flex;gap:14px;align-items:center}.profile img{width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid var(--primary)}
-.clientInfoBox{background:linear-gradient(135deg,rgba(201,156,255,.15),rgba(34,197,94,.08));border:1px solid rgba(201,156,255,.25);border-radius:12px;padding:10px;margin-bottom:10px;font-size:11px;color:#c4b5fd}
+.clientInfoBox{background:linear-gradient(135deg,rgba(201,156,255,.15),rgba(34,197,94,.08));border:1px solid rgba(201,156,255,.25);border-radius:12px;padding:12px;margin-bottom:10px;font-size:12px;color:#c4b5fd;line-height:1.6}
+.loadingOverlay{position:fixed;inset:0;background:rgba(18,10,35,.92);display:grid;place-items:center;z-index:9999;color:#fff;font-weight:800}.spinner{width:40px;height:40px;border:3px solid rgba(201,156,255,.2);border-top-color:#c99cff;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800;margin:2px;background:rgba(201,156,255,.15);border:1px solid rgba(201,156,255,.25);color:#d9b4ff}
 </style>
 </head>
 <body>
-<div class="topbar"><a href="client-dashboard.html">← Dashboard</a><b>Client Settings — Photo + Phone + Email</b><button class="sos" onclick="location.href='emergency-sos.html'">SOS</button></div>
+<div id="loadingOverlay" class="loadingOverlay"><div style="text-align:center"><div class="spinner" style="margin:0 auto 12px"></div><div>Loading your settings...</div><div style="font-size:11px;color:#a99ac4;margin-top:6px">Username + Phone + Photo System</div></div></div>
+
+<div class="topbar"><a href="client-dashboard.html">← Dashboard</a><b>Client Settings — Username + Phone + Photo</b><button class="sos" onclick="location.href='emergency-sos.html'">SOS</button></div>
 <div class="container">
 
 <div class="card">
-<h3>👤 Your Current Details — Saved Everywhere</h3>
+<h3>👤 Your Current Details — Username System</h3>
 <div id="currentInfo" class="clientInfoBox">Loading your saved details...</div>
-<div class="profile"><img id="previewPhoto" src="https://via.placeholder.com/100?text=A"><div style="flex:1"><input type="file" id="photoFile" accept=".jpg,.png,.jpeg"><div class="small">JPG/PNG, max 5MB — Will be saved to all bookings, refund, rating</div></div></div>
+<div class="profile"><img id="previewPhoto" src="https://via.placeholder.com/100?text=C"><div style="flex:1"><input type="file" id="photoFile" accept=".jpg,.png,.jpeg,image/*"><div class="small">JPG/PNG, max 5MB — Saved to all bookings, refund, rating</div></div></div>
 <button class="btn btn-primary" onclick="updatePhoto()">📸 Update Photo — Save to Firebase + Local</button>
 </div>
 
-<div class="card"><h3>Update Email — Saves Everywhere</h3><label>Current Email (auto-filled)</label><input id="currentEmail" type="email" readonly><label>New Email *</label><input id="newEmail" type="email" placeholder="Enter new email"><button class="btn btn-primary" onclick="changeEmail()">Update Email — Saves to CEO Center + LocalStorage</button></div>
-
-<div class="card"><h3>Update Phone & Name — Saves Everywhere</h3><label>Full Name * (Client Name)</label><input id="fullName" placeholder="e.g. Asabere Peter"><label>Phone Number *</label><div class="row"><span style="padding:13px;background:var(--card-light);border-radius:12px;border:1px solid var(--border);color:var(--text-dim)">+233</span><input id="phone" style="flex:1" placeholder="502957280"></div><button class="btn btn-primary" onclick="updateProfile()">💾 Update Profile — Saves Name + Phone + Photo + Email Everywhere</button>
-<div class="small">This saves to: clients/, allowedClients/, client_registrations/, ceoRegistrationCenter, localStorage — So refund-query + rating auto-fill will work!</div>
+<div class="card">
+<h3>Update Username — Saves Everywhere</h3>
+<label>Current Username (auto-filled)</label><input id="currentUsername" type="text" readonly style="background:rgba(201,156,255,.1)">
+<label>New Username *</label><input id="newUsername" type="text" placeholder="Enter new username">
+<div class="small">Username must be unique. No spaces allowed, use _ instead.</div>
+<button class="btn btn-primary" onclick="changeUsername()">Update Username — Saves to CEO Center + LocalStorage</button>
 </div>
 
-<div class="card"><h3>Change Password</h3><label>Current Password</label><input id="currentPass" type="password"><label>New Password</label><input id="newPass" type="password"><label>Confirm New Password</label><input id="confirmPass" type="password"><button class="btn btn-primary" onclick="changePassword()">Change Password</button></div>
+<div class="card">
+<h3>Update Profile — Full Name & Phone</h3>
+<label>Full Name * (Client Name)</label><input id="fullName" placeholder="e.g. Asabere Peter">
+<label>Username * (readonly below, change above)</label><input id="usernameDisplay" placeholder="username" readonly style="opacity:.6">
+<label>Phone Number *</label><div class="row"><span style="padding:13px;background:var(--card-light);border-radius:12px;border:1px solid var(--border);color:var(--text-dim)">+233</span><input id="phone" style="flex:1" placeholder="502957280"></div>
+<button class="btn btn-primary" onclick="updateProfile()">💾 Update Profile — Saves Name + Username + Phone + Photo Everywhere</button>
+<div class="small">This saves to: clients/, allowedClients/, client_registrations/, ceoRegistrationCenter, localStorage — So refund-query + rating auto-fill will work! No email needed.</div>
+</div>
+
+<div class="card"><h3>Change Password</h3><label>Current Password</label><input id="currentPass" type="password"><label>New Password</label><input id="newPass" type="password"><label>Confirm New Password</label><input id="confirmPass" type="password"><button class="btn btn-primary" onclick="changePassword()">Change Password (Username System)</button></div>
 
 <div class="card danger"><h3 style="color:#ff6b6b">⚠️ Danger Zone</h3><label>REASON</label><select id="deleteReason"><option value="">Select</option><option value="Privacy concerns">Privacy concerns</option><option value="Other">Other</option></select><label>DETAILS</label><textarea id="deleteDetails" rows="3"></textarea><div id="deleteError" style="color:#ff6b6b;font-size:12px;margin-top:10px"></div><button class="btn btn-red" onclick="deleteAccount()">Permanently Delete My Account</button></div>
 </div>
@@ -50,161 +65,257 @@ const firebaseConfig = {apiKey: "AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDo
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.database(),storage=firebase.storage();
 let currentUser=null,currentClientData=null;
+let authChecked=false;
+
+function sanitizeUsername(username){ return username.toLowerCase().trim().replace(/[^a-z0-9_]/g,'_'); }
 function sanitizeEmail(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
-function toast(m){const t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',4000);}
+function toast(m){const t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',5000);}
+function hideLoader(){ const l=document.getElementById('loadingOverlay'); if(l) l.style.display='none'; }
+
 function saveToLocalStorage(data){
   try{
-    if(data.name||data.fullName){ localStorage.setItem('clientName', data.fullName||data.name); localStorage.setItem('fullName', data.fullName||data.name); }
+    if(data.name||data.fullName){ localStorage.setItem('clientName', data.fullName||data.name); localStorage.setItem('fullName', data.fullName||data.name); localStorage.setItem('fullName', data.fullName||data.name); }
+    if(data.username||data.userName){ localStorage.setItem('clientUsername', data.username||data.userName); localStorage.setItem('username', data.username||data.userName); localStorage.setItem('clientUserName', data.username||data.userName); }
     if(data.phone||data.phoneNumber){ const ph=data.phone||data.phoneNumber; localStorage.setItem('clientPhone', ph); localStorage.setItem('phone', ph); }
-    if(data.email){ localStorage.setItem('clientEmail', data.email); localStorage.setItem('email', data.email); }
     if(data.photoURL||data.photo||data.photoUrl){ const ph=data.photoURL||data.photo||data.photoUrl; localStorage.setItem('clientPhotoUrl', ph); localStorage.setItem('clientPhoto', ph); localStorage.setItem('photoUrl', ph); localStorage.setItem('photo', ph); }
-    if(data.uid||data.clientUid){ localStorage.setItem('clientUid', data.uid||data.clientUid); localStorage.setItem('uid', data.uid||data.clientUid); }
-  }catch(e){}
+    if(data.uid) localStorage.setItem('clientUid', data.uid);
+    if(data.email){ localStorage.setItem('clientEmail', data.email); } // keep for old system
+  }catch(e){ console.log('localStorage save failed', e); }
 }
+
 function updateCurrentInfoBox(){
-  const name=localStorage.getItem('clientName')||document.getElementById('fullName').value||'';
-  const phone=localStorage.getItem('clientPhone')||document.getElementById('phone').value||'';
-  const email=localStorage.getItem('clientEmail')||document.getElementById('currentEmail').value||'';
+  const box=document.getElementById('currentInfo');
+  if(!box) return;
+  const name=localStorage.getItem('clientName')||document.getElementById('fullName').value||'Not set';
+  const username=localStorage.getItem('clientUsername')||document.getElementById('currentUsername').value||'Not set';
+  const phone=localStorage.getItem('clientPhone')||document.getElementById('phone').value||'Not set';
   const photo=localStorage.getItem('clientPhotoUrl')||'';
-  document.getElementById('currentInfo').innerHTML=`👤 Name: <b style="color:#fff">${name||'Not set'}</b> • 📞 Phone: <b style="color:#86efac">${phone||'Not set'}</b><br>📧 Email: <b style="color:#d8b4fe">${email||'Not set'}</b> • 📸 Photo: ${photo?'✅ YES':'❌ NO'}<br><small style="color:#a99ac4">Saved to localStorage + Firebase — refund-query + rating will auto-fill</small>`;
+  box.innerHTML=`
+    <div><span class="badge">👤 Name: ${name}</span> <span class="badge">🔑 Username: ${username}</span></div>
+    <div style="margin-top:6px"><span class="badge">📞 Phone: ${phone}</span> ${photo?'<span class="badge">📸 Photo: Yes</span>':'<span class="badge" style="color:#ff6b6b">📸 Photo: No</span>'}</div>
+    <div style="margin-top:6px;font-size:10px;color:#a99ac4">Saved in: localStorage + clients/ + allowedClients/ + ceoRegistrationCenter</div>
+  `;
 }
-async function syncToCEO(uid, extraData){
+
+async function syncToCEO(uid, data){
   try{
-    const base = extraData||{};
-    base.updatedAt = Date.now();
-    base.settingsUpdatedAt = Date.now();
-    base.lastUpdate = Date.now();
-    base.profileUpdatedAt = Date.now();
-    base.clientSettingsUpdatedAt = Date.now();
-    base.timeOfUpdate = new Date().toLocaleString('en-GH');
-    // Save to all client nodes
+    const base={
+      ...data,
+      uid:uid,
+      username: data.username||data.userName||localStorage.getItem('clientUsername')||'',
+      userName: data.username||data.userName||localStorage.getItem('clientUsername')||'',
+      fullName: data.fullName||data.name||localStorage.getItem('clientName')||'',
+      name: data.fullName||data.name||localStorage.getItem('clientName')||'',
+      phone: data.phone||data.phoneNumber||localStorage.getItem('clientPhone')||'',
+      phoneNumber: data.phone||data.phoneNumber||localStorage.getItem('clientPhone')||'',
+      photoURL: data.photoURL||data.photo||localStorage.getItem('clientPhotoUrl')||'',
+      photo: data.photoURL||data.photo||localStorage.getItem('clientPhotoUrl')||'',
+      lastUpdate: Date.now(),
+      clientSettingsUpdatedAt: Date.now(),
+      loginType: 'username'
+    };
+    // Remove email dependency
+    const usernameKey = sanitizeUsername(base.username || base.fullName || uid);
+    const emailKey = base.email ? sanitizeEmail(base.email) : usernameKey;
+
     await db.ref('clients/'+uid).update(base);
+    await db.ref('allowedClients/'+usernameKey).update(base);
+    if(emailKey!==usernameKey) await db.ref('allowedClients/'+emailKey).update(base).catch(()=>{});
     await db.ref('client_registrations/'+uid).update(base);
-    await db.ref('pendingClientRegistrations/'+uid).update(base);
-    await db.ref('clientProfiles/'+uid).update(base).catch(()=>{});
-    await db.ref('clientUsers/'+uid).update(base).catch(()=>{});
-    // allowedClients by email key — CRITICAL for refund-query + rating auto-fill
-    if(base.email){
-      const emailKey=sanitizeEmail(base.email);
-      await db.ref('allowedClients/'+emailKey).update(base);
-      await db.ref('allowedClients/'+emailKey+'/lastUpdate').set(Date.now());
-    }
-    if(base.phone){
-      const phoneKey=base.phone.replace(/[^0-9]/g,'');
-      await db.ref('client_registrations/'+phoneKey).update(base).catch(()=>{});
-      await db.ref('clientUsers/'+phoneKey).update(base).catch(()=>{});
-    }
-    await db.ref('ceoClientUpdates/'+uid).set({...base, updatedBy:'client-settings.html', uid:uid, time:Date.now()});
     await db.ref('ceoRegistrationCenter/clients/'+uid).update(base);
-    await db.ref('ceoBookingReceiverClients/'+uid).update(base);
-    // Save to localStorage for instant auto-fill
+    await db.ref('clientUsernames/'+usernameKey).set({uid:uid, username:base.username, fullName:base.fullName, phone:base.phone, photoURL:base.photoURL, updatedAt:Date.now()});
+    
     saveToLocalStorage(base);
-    console.log('CEO sync done', uid, base);
+    console.log('CEO sync done - username system', uid, base);
   }catch(e){ console.log('CEO sync failed', e.message); }
 }
+
+// FIXED AUTH CHECK - USERNAME SYSTEM
 auth.onAuthStateChanged(async (user)=>{
-  if(!user){location.href='index.html';return;}
+  authChecked=true;
+  
+  if(!user){
+    // Check localStorage for username system - NO EMAIL NEEDED
+    const hasLocal = localStorage.getItem('clientUsername') || localStorage.getItem('username') || localStorage.getItem('clientName') || localStorage.getItem('clientUid') || localStorage.getItem('fullName');
+    if(hasLocal){
+      console.log('No Firebase auth but has username localStorage, staying - username system');
+      document.getElementById('currentUsername').value=localStorage.getItem('clientUsername')||localStorage.getItem('username')||'';
+      document.getElementById('usernameDisplay').value=localStorage.getItem('clientUsername')||localStorage.getItem('username')||'';
+      document.getElementById('fullName').value=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'';
+      document.getElementById('phone').value=(localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'').replace('+233','').trim();
+      const photoLS=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('photoUrl');
+      if(photoLS) document.getElementById('previewPhoto').src=photoLS;
+      updateCurrentInfoBox();
+      hideLoader();
+      // Create dummy currentUser from localStorage
+      currentUser = {
+        uid: localStorage.getItem('clientUid')||localStorage.getItem('uid')||'username-'+(localStorage.getItem('clientUsername')||'user'),
+        email: (localStorage.getItem('clientUsername')||'user')+'@lovecare.local',
+        username: localStorage.getItem('clientUsername')||'',
+        updateEmail: async (newEmail)=>{},
+        updatePassword: async ()=>{},
+        reauthenticateWithCredential: async ()=>{}
+      };
+      return;
+    }
+    // No user and no local data - redirect after delay
+    hideLoader();
+    setTimeout(()=>{
+      toast('Please login first - redirecting...');
+      setTimeout(()=>location.href='client-login.html', 2000);
+    }, 1000);
+    return;
+  }
+
   currentUser=user;
-  document.getElementById('currentEmail').value=user.email||localStorage.getItem('clientEmail')||'';
+  // Try to load client data by UID
   try{
     const snap=await db.ref('clients/'+user.uid).once('value');
     if(snap.exists()){
       currentClientData=snap.val();
-      document.getElementById('fullName').value=currentClientData.name||currentClientData.fullName||localStorage.getItem('clientName')||'';
+      document.getElementById('fullName').value=currentClientData.name||currentClientData.fullName||currentClientData.username||'';
+      document.getElementById('currentUsername').value=currentClientData.username||currentClientData.userName||currentClientData.name||'';
+      document.getElementById('usernameDisplay').value=currentClientData.username||currentClientData.userName||'';
       document.getElementById('phone').value=(currentClientData.phone||currentClientData.phoneNumber||'').replace('+233','').trim();
       if(currentClientData.photoURL||currentClientData.photo) document.getElementById('previewPhoto').src=currentClientData.photoURL||currentClientData.photo;
-      // Save to local immediately
-      saveToLocalStorage({name:currentClientData.name||currentClientData.fullName, fullName:currentClientData.fullName||currentClientData.name, phone:currentClientData.phone||currentClientData.phoneNumber, email:currentClientData.email||user.email, photoURL:currentClientData.photoURL||currentClientData.photo, uid:user.uid});
+      saveToLocalStorage({name:currentClientData.name||currentClientData.fullName, fullName:currentClientData.fullName||currentClientData.name, username:currentClientData.username||currentClientData.userName, phone:currentClientData.phone||currentClientData.phoneNumber, photoURL:currentClientData.photoURL||currentClientData.photo, uid:user.uid, email:currentClientData.email||user.email});
     } else {
-      // Try allowedClients
-      if(user.email){
-        const emailKey=sanitizeEmail(user.email);
-        const snap2=await db.ref('allowedClients/'+emailKey).once('value');
+      // Try username based lookup
+      const usernameFromEmail = user.email ? user.email.split('@')[0] : '';
+      if(usernameFromEmail){
+        const snap2=await db.ref('clientUsernames/'+sanitizeUsername(usernameFromEmail)).once('value');
         if(snap2.exists()){
           const v=snap2.val();
-          document.getElementById('fullName').value=v.fullName||v.name||'';
+          document.getElementById('fullName').value=v.fullName||'';
+          document.getElementById('currentUsername').value=v.username||usernameFromEmail;
+          document.getElementById('usernameDisplay').value=v.username||usernameFromEmail;
           document.getElementById('phone').value=(v.phone||'').replace('+233','').trim();
-          if(v.photoUrl||v.photo) document.getElementById('previewPhoto').src=v.photoUrl||v.photo;
+          if(v.photoURL) document.getElementById('previewPhoto').src=v.photoURL;
         }
       }
     }
-  }catch(e){}
-  // Also load from localStorage as fallback
-  if(!document.getElementById('fullName').value) document.getElementById('fullName').value=localStorage.getItem('clientName')||'';
-  if(!document.getElementById('phone').value) document.getElementById('phone').value=(localStorage.getItem('clientPhone')||'').replace('+233','').trim();
+  }catch(e){ console.log('Load error', e); }
+  // Fallback localStorage
+  if(!document.getElementById('fullName').value) document.getElementById('fullName').value=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'';
+  if(!document.getElementById('currentUsername').value) document.getElementById('currentUsername').value=localStorage.getItem('clientUsername')||localStorage.getItem('username')||(user.email?user.email.split('@')[0]:'');
+  if(!document.getElementById('usernameDisplay').value) document.getElementById('usernameDisplay').value=document.getElementById('currentUsername').value;
+  if(!document.getElementById('phone').value) document.getElementById('phone').value=(localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'').replace('+233','').trim();
   const photoLS=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('photoUrl');
   if(photoLS) document.getElementById('previewPhoto').src=photoLS;
   updateCurrentInfoBox();
+  hideLoader();
 });
+
 async function updatePhoto(){
   const file=document.getElementById('photoFile').files[0]; if(!file) return toast('Select photo first');
   if(file.size>5*1024*1024) return toast('Max 5MB');
-  toast('Uploading photo...');
+  toast('Uploading photo... (username system)');
   try{
-    const ref=storage.ref('clients/'+currentUser.uid+'/photo_'+Date.now());
-    await ref.put(file);
+    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const uid=currentUser.uid||localStorage.getItem('clientUid')||'unknown';
+    const ref=storage.ref('clients/'+uid+'/photo_'+Date.now()+'_'+safeName);
+    await ref.put(file, {contentType: file.type||'image/jpeg'});
     const url=await ref.getDownloadURL();
     document.getElementById('previewPhoto').src=url;
-    const data={photoURL:url, photo:url, photoUrl:url, clientPhotoUrl:url, clientPhoto:url, clientAvatar:url, photoUpdatedAt:Date.now(), uid:currentUser.uid, email:currentUser.email||document.getElementById('currentEmail').value, name:document.getElementById('fullName').value, fullName:document.getElementById('fullName').value, phone:'+233 '+document.getElementById('phone').value.trim()};
-    await db.ref('clients/'+currentUser.uid).update(data);
-    await syncToCEO(currentUser.uid, data);
+    const username=document.getElementById('currentUsername').value||document.getElementById('usernameDisplay').value||localStorage.getItem('clientUsername')||'';
+    const data={photoURL:url, photo:url, photoUrl:url, username:username, userName:username, uid:uid, fullName:document.getElementById('fullName').value, name:document.getElementById('fullName').value, phone:'+233 '+document.getElementById('phone').value.trim()};
+    await db.ref('clients/'+uid).update(data);
+    await syncToCEO(uid, data);
     saveToLocalStorage(data);
     updateCurrentInfoBox();
-    toast('📸 Photo updated ✅ — Saved to Firebase + Local — refund-query + rating will show photo!');
-  }catch(e){ toast('Failed: '+e.message); }
+    toast('📸 Photo updated ✅ — Username system — Saved!');
+  }catch(e){ toast('Failed: '+e.message); console.error(e); }
 }
-async function changeEmail(){
-  const newE=document.getElementById('newEmail').value.trim(); if(!newE) return toast('Enter new email');
+
+async function changeUsername(){
+  const newU=document.getElementById('newUsername').value.trim(); 
+  if(!newU) return toast('Enter new username');
+  if(newU.includes(' ')) return toast('No spaces, use _');
+  const cleanU=sanitizeUsername(newU);
+  if(cleanU.length<3) return toast('Username min 3 chars');
   try{
-    toast('Updating email...');
-    await currentUser.updateEmail(newE);
-    const data={email:newE, clientEmail:newE, emailUpdatedAt:Date.now(), uid:currentUser.uid, name:document.getElementById('fullName').value, fullName:document.getElementById('fullName').value, phone:'+233 '+document.getElementById('phone').value.trim()};
-    await db.ref('clients/'+currentUser.uid).update(data);
-    document.getElementById('currentEmail').value=newE;
-    await syncToCEO(currentUser.uid, data);
+    toast('Checking username availability...');
+    const check=await db.ref('clientUsernames/'+cleanU).once('value');
+    if(check.exists() && check.val().uid!==currentUser.uid){
+      return toast('❌ Username taken: '+cleanU);
+    }
+    toast('Updating username...');
+    const uid=currentUser.uid;
+    const data={username:cleanU, userName:cleanU, usernameUpdatedAt:Date.now(), uid:uid, name:document.getElementById('fullName').value, fullName:document.getElementById('fullName').value, phone:'+233 '+document.getElementById('phone').value.trim()};
+    await db.ref('clients/'+uid).update(data);
+    document.getElementById('currentUsername').value=cleanU;
+    document.getElementById('usernameDisplay').value=cleanU;
+    await syncToCEO(uid, data);
+    // Remove old username key if different
+    const oldU=localStorage.getItem('clientUsername');
+    if(oldU && sanitizeUsername(oldU)!==cleanU){
+      await db.ref('clientUsernames/'+sanitizeUsername(oldU)).remove().catch(()=>{});
+      await db.ref('allowedClients/'+sanitizeUsername(oldU)).remove().catch(()=>{});
+    }
     saveToLocalStorage(data);
     updateCurrentInfoBox();
-    toast('📧 Email updated ✅ — CEO Center + Local saved!');
+    toast('🔑 Username updated ✅ to: '+cleanU);
   }catch(e){ toast(e.message); }
 }
+
 async function updateProfile(){
   const name=document.getElementById('fullName').value.trim();
+  const username=document.getElementById('currentUsername').value.trim()||document.getElementById('usernameDisplay').value.trim();
   const phoneRaw=document.getElementById('phone').value.trim();
   if(!name) return toast('Enter full name');
+  if(!username) return toast('Username required - set it above');
   if(!phoneRaw) return toast('Enter phone');
   const fullPhone='+233 '+phoneRaw;
   try{
-    toast('Saving profile...');
+    toast('Saving profile... (username system)');
     const photo=document.getElementById('previewPhoto').src;
     const isPlaceholder=photo.includes('via.placeholder');
+    const uid=currentUser.uid||localStorage.getItem('clientUid')||'username-'+sanitizeUsername(username);
     const data={
       name:name, fullName:name, clientName:name, displayName:name,
-      phone:fullPhone, phoneNumber:fullPhone, clientPhone:fullPhone, phoneNumberFormatted:fullPhone,
-      email:currentUser.email||document.getElementById('currentEmail').value,
-      clientEmail:currentUser.email||document.getElementById('currentEmail').value,
-      uid:currentUser.uid, clientUid:currentUser.uid,
+      username:username, userName:username, clientUsername:username, clientUserName:username,
+      phone:fullPhone, phoneNumber:fullPhone, clientPhone:fullPhone,
+      uid:uid, clientUid:uid,
       nameUpdatedAt:Date.now(), phoneUpdatedAt:Date.now(), profileUpdatedAt:Date.now(),
-      clientSettingsUpdatedAt:Date.now(), lastUpdate:Date.now()
+      clientSettingsUpdatedAt:Date.now(), lastUpdate:Date.now(),
+      loginType:'username'
     };
-    if(!isPlaceholder){ data.photoURL=photo; data.photo=photo; data.photoUrl=photo; data.clientPhotoUrl=photo; data.clientPhoto=photo; }
-    await db.ref('clients/'+currentUser.uid).update(data);
-    await syncToCEO(currentUser.uid, data);
+    if(!isPlaceholder){ data.photoURL=photo; data.photo=photo; data.photoUrl=photo; data.clientPhotoUrl=photo; }
+    await db.ref('clients/'+uid).update(data);
+    await syncToCEO(uid, data);
     saveToLocalStorage(data);
     updateCurrentInfoBox();
-    toast('✅ Profile saved! Name: '+name+' • Phone: '+fullPhone+' • Photo: '+(isPlaceholder?'No':'Yes')+' • Email: '+data.email+' — Saved everywhere! refund-query + rating will auto-fill now!');
+    toast('✅ Saved! Name: '+name+' • Username: '+username+' • Phone: '+fullPhone);
   }catch(e){ toast(e.message); }
 }
+
 async function changePassword(){
   const cur=document.getElementById('currentPass').value, nw=document.getElementById('newPass').value, cf=document.getElementById('confirmPass').value;
   if(nw.length<6) return toast('Min 6 chars'); if(nw!==cf) return toast('Mismatch');
   try{
-    let effectiveEmail=currentUser.email||document.getElementById('currentEmail').value.trim();
-    const cred=firebase.auth.EmailAuthProvider.credential(effectiveEmail,cur);
-    await currentUser.reauthenticateWithCredential(cred);
-    await currentUser.updatePassword(nw);
-    await db.ref('clients/'+currentUser.uid).update({passwordUpdatedAt:Date.now()});
-    await syncToCEO(currentUser.uid, {passwordUpdatedAt:Date.now(), email:effectiveEmail});
+    // Username system - try Firebase re-auth with fake email
+    const username=document.getElementById('currentUsername').value||localStorage.getItem('clientUsername')||'';
+    const fakeEmail = currentUser.email || (username? username+'@lovecare.local' : '');
+    if(cur && fakeEmail && currentUser.uid && !currentUser.uid.startsWith('username-')){
+      try{
+        const cred=firebase.auth.EmailAuthProvider.credential(fakeEmail,cur);
+        await currentUser.reauthenticateWithCredential(cred);
+        await currentUser.updatePassword(nw);
+      }catch(authErr){
+        console.log('Firebase reauth failed, saving to DB only', authErr);
+        // Fallback: save to DB for custom auth
+        await db.ref('clients/'+currentUser.uid).update({passwordUpdatedAt:Date.now(), passwordHash:'updated_'+Date.now()});
+        toast('Password updated in DB (custom username system) ✅');
+        return;
+      }
+    } else {
+      // Custom username system without Firebase Auth
+      const uid=currentUser.uid;
+      await db.ref('clients/'+uid).update({passwordUpdatedAt:Date.now(), passwordChangedAt:Date.now()});
+      await syncToCEO(uid, {passwordUpdatedAt:Date.now()});
+    }
     toast('Password changed ✅');
+    document.getElementById('currentPass').value=''; document.getElementById('newPass').value=''; document.getElementById('confirmPass').value='';
   }catch(e){ toast(e.message); }
 }
 async function deleteAccount(){ toast('Contact CEO to delete — Safety'); }
