@@ -434,29 +434,113 @@ async function deleteAccount(uid, email, type){
   
   log(`All UIDs to delete: ${Array.from(allUids).join(', ')}`);
   
-  // 2. RTDB DELETE
-  const nurseRtdbPathsBase=[
-    'nurses',
-    'pending_nurses',
-    'pendingNurses',
-    'allNurses',
-    'nurse_registrations',
-    'nurseApplications',
-    'nurseUsers',
-    'ceoNurseUpdates',
-    'ceoRegistrationCenter/nurses',
-    'verified_nurses',
-    'allowedNurses',
-    'allowedNursesByUid',
-    'nursesByEmail',
-    'nurseProfiles',
-    'onlineNurses',
-    'nursePresence'
-  ];
+  // 2. RTDB DELETE - Handle both nurse (email) and client (phone+username)
+  let rtdbBases=[];
+  let mappingPaths=[];
   
-  for(const base of nurseRtdbPathsBase){
+  if(type==='nurse' || eLower.includes('@')){
+    rtdbBases=[
+      'nurses',
+      'pending_nurses',
+      'pendingNurses',
+      'allNurses',
+      'nurse_registrations',
+      'nurseApplications',
+      'nurseUsers',
+      'ceoNurseUpdates',
+      'ceoRegistrationCenter/nurses',
+      'verified_nurses',
+      'allowedNurses',
+      'allowedNursesByUid',
+      'nursesByEmail',
+      'nurseProfiles',
+      'onlineNurses',
+      'nursePresence'
+    ];
+    mappingPaths=[
+      'allowedNurses/'+emailKey,
+      'allowedClients/'+emailKey,
+      'nursesByEmail/'+emailKey,
+      'allowedNurses/'+uid,
+      'allowedNursesByUid/'+uid
+    ];
+  } else {
+    // CLIENT - phone + username based
+    const rawData=allData.all.find(r=>r.uid===uid)?.raw||{};
+    const username=(rawData.username||rawData.userName||'').toLowerCase();
+    const phoneRaw=rawData.phone||rawData.phoneNumber||'';
+    const phoneDigits=phoneRaw.replace(/[^0-9]/g,'');
+    
+    rtdbBases=[
+      'clients',
+      'client_registrations',
+      'allClients',
+      'clientUsers',
+      'ceoClientUpdates',
+      'ceoRegistrationCenter/clients',
+      'allowedClients',
+      'allowedClientsByUid',
+      'pendingClientRegistrations',
+      'verified_clients',
+      'onlineClients',
+      'clientPresence',
+      'clientsByEmail',
+      'clientBookings',
+      'bookings'
+    ];
+    mappingPaths=[
+      'allowedClients/'+emailKey,
+      'allowedClients/'+uid,
+      'allowedClientsByUid/'+uid,
+      'clientUsernames/'+username,
+      'clientUsernames/'+(username?username.toLowerCase():'' ),
+      'clientPhones/'+phoneRaw,
+      'clientPhones/'+phoneDigits,
+      'clientsByEmail/'+emailKey,
+      'allowedClients/'+(rawData.username||''),
+      'clients/'+(rawData.username||'')
+    ];
+    // Also add phone variants
+    if(phoneDigits) {
+      allUids.add(phoneDigits);
+      allUids.add(phoneRaw);
+    }
+    if(username) {
+      allUids.add(username);
+      allUids.add(username.toLowerCase());
+    }
+    
+    // Find additional UIDs via clientUsernames / clientPhones mappings
+    try{
+      const snap=await db.ref('clientUsernames').once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const val=ch.val();
+          if(val===uid || ch.key.toLowerCase()===username){
+            allUids.add(ch.key);
+            allUids.add(val);
+            log(`Found via clientUsernames/${ch.key} -> ${val}`);
+          }
+        });
+      }
+    }catch(e){}
+    try{
+      const snap=await db.ref('clientPhones').once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          if(ch.val()===uid || ch.key===phoneDigits || ch.key===phoneRaw){
+            allUids.add(ch.key);
+            allUids.add(ch.val());
+            log(`Found via clientPhones/${ch.key} -> ${ch.val()}`);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  
+  for(const base of rtdbBases){
     for(const id of allUids){
-      if(!id) continue;
+      if(!id || id.length<2) continue;
       try{
         await db.ref(base+'/'+id).remove();
         log(`✅ Deleted: ${base}/${id}`);
@@ -465,16 +549,39 @@ async function deleteAccount(uid, email, type){
     }
   }
   
-  const emailKeyPaths=[
-    'allowedNurses/'+emailKey,
-    'allowedClients/'+emailKey,
-    'nursesByEmail/'+emailKey
-  ];
-  for(const path of emailKeyPaths){
+  for(const path of mappingPaths){
+    const key=path.split('/')[1];
+    if(!key || key.length<2) continue;
     try{
       await db.ref(path).remove();
       log(`✅ Deleted: ${path}`);
       deletedCount++;
+    }catch(e){}
+  }
+  
+  // Extra: delete all clientUsernames pointing to this UID
+  if(type!=='nurse'){
+    try{
+      const snap=await db.ref('clientUsernames').once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          if(ch.val()===uid || allUids.has(ch.val())){
+            db.ref('clientUsernames/'+ch.key).remove().then(()=>log(`✅ Deleted clientUsernames/${ch.key}`));
+            deletedCount++;
+          }
+        });
+      }
+    }catch(e){}
+    try{
+      const snap=await db.ref('clientPhones').once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          if(ch.val()===uid || allUids.has(ch.val())){
+            db.ref('clientPhones/'+ch.key).remove().then(()=>log(`✅ Deleted clientPhones/${ch.key}`));
+            deletedCount++;
+          }
+        });
+      }
     }catch(e){}
   }
   
