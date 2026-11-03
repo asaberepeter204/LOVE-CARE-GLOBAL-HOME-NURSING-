@@ -16,6 +16,7 @@
 - https://lovecareglobal.com/ceo-bulk-delete-anonymous.html
 - https://lovecareglobal.com/ceo-delete-tool.html
 - https://lovecareglobal.com/force-fix-ceo-approval.html
+- https://lovecareglobal.com/force-delete.html
 
 ## 📅 BOOKING FLOW
 - [book-nurse.html](https://lovecareglobal.com/book-nurse.html)
