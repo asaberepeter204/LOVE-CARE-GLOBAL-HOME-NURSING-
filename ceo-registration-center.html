@@ -536,16 +536,19 @@ async function deleteAccount(uid, email, type, fullName){
 // FIXED APPROVE - UPDATES ALL PATHS
 
 async function approve(uid, email, type){
-  if(!confirm(`Approve ${type} ${email}?\n\nThis will update ALL 12 database paths so nurse moves to Approved and can login.`)) return;
+  if(!confirm(`Approve ${type} ${email}?\n\nThis will update ALL database paths (RTDB + Firestore) so nurse moves to Approved and can login immediately.`)) return;
   const logBox=document.getElementById('logBox');
   logBox.style.display='block'; logBox.innerHTML='';
-  log(`Approving ${type} ${email} (${uid}) in ALL paths...`);
+  log(`Approving ${type} ${email} (${uid}) in ALL paths (RTDB + Firestore)...`);
   
   try{
     const emailKey=sanitizeEmail(email);
     const now=Date.now();
-    const approvedPayload={
-      isApproved:true, approved:true, status:'approved', canLogin:true, isVerified:true, approvedAt:now, approvedBy:'CEO', updatedAt:now
+    const approvedPayloadRTDB={
+      isApproved:true, approved:true, ceoApproved:true, status:'approved', canLogin:true, isVerified:true, approvedAt:now, approvedBy:'CEO', updatedAt:now, ceoApprovedAt:now
+    };
+    const approvedPayloadFirestore={
+      isApproved:true, approved:true, ceoApproved:true, status:'approved', canLogin:true, isVerified:true, approvedAt: firebase.firestore.FieldValue.serverTimestamp(), approvedBy:'CEO', updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     
     if(type==='nurse'){
@@ -559,28 +562,64 @@ async function approve(uid, email, type){
         'nurseUsers/'+uid,
         'ceoNurseUpdates/'+uid,
         'ceoRegistrationCenter/nurses/'+uid,
-        'verified_nurses/'+uid
+        'verified_nurses/'+uid,
+        'allowedNurses/'+uid,
+        'nursesByEmail/'+emailKey
       ];
       
       for(const path of nursePaths){
         try{
           const snap=await db.ref(path).once('value');
           if(snap.exists()){
-            await db.ref(path).update(approvedPayload);
-            log(`✅ Updated ${path} → approved`);
+            await db.ref(path).update(approvedPayloadRTDB);
+            log(`✅ RTDB Updated ${path} → approved`);
+          } else if(path==='nurses/'+uid || path==='ceoRegistrationCenter/nurses/'+uid){
+            // Create if not exists for main paths
+            const data=allData.all.find(r=>r.uid===uid)||{};
+            await db.ref(path).update({...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayloadRTDB});
+            log(`✅ RTDB Created & Updated ${path}`);
           }
-        }catch(e){ log(`⚠️ ${path} not exist or err: ${e.message}`); }
+        }catch(e){ log(`⚠️ ${path} err: ${e.message}`); }
       }
       
-      // Whitelist - create
+      // Whitelist - create in RTDB
       const data=allData.all.find(r=>r.uid===uid)||{};
-      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayload};
+      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayloadRTDB};
       await db.ref('allowedNurses/'+emailKey).set(whitelistData);
-      log(`✅ Created allowedNurses/${emailKey}`);
+      log(`✅ RTDB Created allowedNurses/${emailKey} → APPROVED`);
       await db.ref('allowedNursesByUid/'+uid).set(whitelistData);
-      log(`✅ Created allowedNursesByUid/${uid}`);
+      log(`✅ RTDB Created allowedNursesByUid/${uid}`);
+      
+      // Firestore - CRITICAL FIX: Update Firestore too so login works
+      try{
+        const firestore = firebase.firestore();
+        // Main nurses collection
+        try{
+          await firestore.collection('nurses').doc(uid).set({...whitelistData, ...approvedPayloadFirestore}, {merge:true});
+          log(`✅ FIRESTORE Updated nurses/${uid} → approved`);
+        }catch(e){ log(`⚠️ Firestore nurses/${uid} err: ${e.message}`); }
+        
+        // ceoRegistrationCenter
+        try{
+          await firestore.collection('ceoRegistrationCenter').doc('nurses').collection('nurses').doc(uid).set({...whitelistData, ...approvedPayloadFirestore}, {merge:true});
+          log(`✅ FIRESTORE Updated ceoRegistrationCenter/nurses/${uid}`);
+        }catch(e){
+          try{
+            await firestore.doc(`ceoRegistrationCenter/nurses/${uid}`).set({...whitelistData, ...approvedPayloadFirestore}, {merge:true});
+            log(`✅ FIRESTORE Updated ceoRegistrationCenter/nurses/${uid} (alt path)`);
+          }catch(e2){ log(`⚠️ Firestore ceo center err: ${e2.message}`); }
+        }
+        
+        // allowedNurses in Firestore if exists
+        try{
+          await firestore.collection('allowedNurses').doc(emailKey).set({...whitelistData, ...approvedPayloadFirestore}, {merge:true});
+          log(`✅ FIRESTORE Updated allowedNurses/${emailKey}`);
+        }catch(e){}
+        
+      }catch(e){ log(`⚠️ Firestore update failed: ${e.message} - RTDB approval still works`); }
       
     }else{
+      // Client approval
       const clientPaths=[
         'clients/'+uid,
         'client_registrations/'+uid,
@@ -594,25 +633,26 @@ async function approve(uid, email, type){
         try{
           const snap=await db.ref(path).once('value');
           if(snap.exists()){
-            await db.ref(path).update(approvedPayload);
+            await db.ref(path).update(approvedPayloadRTDB);
             log(`✅ Updated ${path}`);
           }
         }catch(e){}
       }
       const data=allData.all.find(r=>r.uid===uid)||{};
-      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayload};
+      const whitelistData={...data.raw, uid:uid, email:email.toLowerCase(), ...approvedPayloadRTDB};
       await db.ref('allowedClients/'+emailKey).set(whitelistData);
       await db.ref('allowedClientsByUid/'+uid).set(whitelistData);
       log(`✅ Created allowedClients`);
     }
     
-    toast(`✅ ${email} APPROVED in ALL paths — now moves to Approved tab and can login!`);
-    log(`✅ DONE — ${email} approved in ALL paths`);
+    toast(`✅ ${email} APPROVED in ALL paths (RTDB + Firestore) — can login NOW!`);
+    log(`✅ DONE — ${email} approved in RTDB + Firestore — Login should work now!`);
     setTimeout(loadAll, 1500);
     
   }catch(e){
     log(`❌ Approve failed: ${e.message}`);
     toast('Approve failed: '+e.message);
+    console.error(e);
   }
 }
 
@@ -635,38 +675,46 @@ async function reject(uid, email, type){
 
 // Fix all stuck approved nurses at once
 async function fixAllApproved(){
-  if(!confirm('This will scan all nurses that are in allowedNurses whitelist but still showing pending, and fix them to approved in ALL paths. Continue?')) return;
+  if(!confirm('This will scan all nurses that are in allowedNurses whitelist but still showing pending, and fix them to approved in RTDB + Firestore. Continue?')) return;
   const logBox=document.getElementById('logBox');
   logBox.style.display='block'; logBox.innerHTML='';
-  log('Scanning allowedNurses whitelist...');
+  log('Scanning allowedNurses whitelist and fixing ALL paths...');
   
   try{
     const snap=await db.ref('allowedNurses').once('value');
     if(!snap.exists()){ toast('No allowedNurses found'); return; }
     let fixed=0;
-    const promises=[];
-    snap.forEach(ch=>{
-      const v=ch.val()||{};
+    const firestore = firebase.firestore();
+    
+    for(const ch of Object.values(snap.val()||{})){
+      const v=ch||{};
       const uid=v.uid;
       const email=v.email;
       if(uid && email){
-        const payload={isApproved:true,approved:true,status:'approved',canLogin:true,isVerified:true,approvedAt:Date.now(),updatedAt:Date.now()};
-        promises.push(
-          db.ref('nurses/'+uid).update(payload).then(()=>log(`Fixed nurses/${uid}`)).catch(()=>{}),
-          db.ref('pending_nurses/'+uid).update(payload).catch(()=>{}),
-          db.ref('pendingNurses/'+uid).update(payload).catch(()=>{}),
-          db.ref('ceoRegistrationCenter/nurses/'+uid).update(payload).then(()=>log(`Fixed ceo center ${uid}`)).catch(()=>{}),
-          db.ref('ceoNurseUpdates/'+uid).update(payload).catch(()=>{}),
-          db.ref('nurse_registrations/'+uid).update(payload).catch(()=>{})
-        );
+        const payloadRTDB={isApproved:true,approved:true,ceoApproved:true,status:'approved',canLogin:true,isVerified:true,approvedAt:Date.now(),updatedAt:Date.now(),ceoApprovedAt:Date.now()};
+        const payloadFS={isApproved:true,approved:true,ceoApproved:true,status:'approved',canLogin:true,isVerified:true,approvedAt: firebase.firestore.FieldValue.serverTimestamp(),updatedAt: firebase.firestore.FieldValue.serverTimestamp()};
+        
+        try{ await db.ref('nurses/'+uid).update(payloadRTDB); log(`Fixed RTDB nurses/${uid}`); }catch{}
+        try{ await db.ref('ceoRegistrationCenter/nurses/'+uid).update(payloadRTDB); log(`Fixed RTDB ceo center ${uid}`); }catch{}
+        try{ await db.ref('pending_nurses/'+uid).update(payloadRTDB); }catch{}
+        try{ await db.ref('pendingNurses/'+uid).update(payloadRTDB); }catch{}
+        try{ await db.ref('ceoNurseUpdates/'+uid).update(payloadRTDB); }catch{}
+        try{ await db.ref('nurse_registrations/'+uid).update(payloadRTDB); }catch{}
+        try{ await db.ref('allowedNurses/'+sanitizeEmail(email)).update(payloadRTDB); }catch{}
+        try{ await db.ref('allowedNursesByUid/'+uid).update(payloadRTDB); }catch{}
+        
+        // Firestore
+        try{ await firestore.collection('nurses').doc(uid).set(payloadFS, {merge:true}); log(`Fixed Firestore nurses/${uid}`); }catch(e){ log(`Firestore nurses/${uid} err: ${e.message}`); }
+        try{ await firestore.doc(`ceoRegistrationCenter/nurses/${uid}`).set(payloadFS, {merge:true}); log(`Fixed Firestore ceo/${uid}`); }catch{}
+        
         fixed++;
       }
-    });
-    await Promise.all(promises);
-    toast(`✅ Fixed ${fixed} nurses — they will now show in Approved`);
-    log(`✅ Fixed ${fixed} nurses`);
+    }
+    
+    toast(`✅ Fixed ${fixed} nurses in RTDB + Firestore — they can now login!`);
+    log(`✅ Fixed ${fixed} nurses in ALL paths`);
     setTimeout(loadAll, 1500);
-  }catch(e){ toast('Fix failed: '+e.message); log('Fix failed: '+e.message); }
+  }catch(e){ toast('Fix failed: '+e.message); log('Fix failed: '+e.message); console.error(e); }
 }
 
 loadAll();
