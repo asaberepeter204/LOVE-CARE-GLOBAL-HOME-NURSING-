@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CLEANUP - Fix Auto-Approved Bug</title>
+<style>body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;padding:16px}.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.18);border-radius:18px;padding:20px;max-width:600px;margin:0 auto}.btn{width:100%;padding:14px;border-radius:12px;font-weight:800;border:none;cursor:pointer;margin-top:10px}.btnRed{background:linear-gradient(135deg,#ef4444,#991b1b);color:white}.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16}.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}.log{background:#000;color:#0f0;padding:10px;border-radius:8px;font-size:11px;max-height:400px;overflow:auto;margin-top:10px;white-space:pre-wrap}</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script></head><body><div class="card">
+<h2>CLEANUP - Fix Auto-Approved Nurses</h2>
+<p style="font-size:11px;color:#fca5a5">Existing nurses were auto-approved because registration created allowedNurses. This tool moves them back to PENDING.</p>
+<button class="btn btnYellow" onclick="scan()">SCAN - Find auto-approved nurses (allowedNurses with isApproved=false)</button>
+<button class="btn btnRed" onclick="fixPending()">FIX - Move auto-approved back to PENDING (delete allowedNurses)</button>
+<button class="btn btnGreen" onclick="checkAll()">CHECK ALL - Show all nurses status</button>
+<div id="log" class="log">Ready...
+
+This will find nurses where allowedNurses exists but isApproved=false and delete allowedNurses so they become pending again.
+
+CEO will then need to approve them properly.</div>
+</div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();const fs=firebase.firestore();
+function log(m){const el=document.getElementById('log');el.textContent+=m+'\n';el.scrollTop=el.scrollHeight;}
+function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');}
+
+async function scan(){
+  document.getElementById('log').textContent='';
+  log('Scanning allowedNurses for auto-approved bug...');
+  try{
+    const snap=await db.ref('allowedNurses').once('value');
+    if(!snap.exists()){ log('No allowedNurses found'); return; }
+    let count=0;
+    snap.forEach(ch=>{
+      const v=ch.val()||{};
+      const isApproved=v.isApproved;
+      const status=v.status;
+      if(isApproved===false || status==='pending'){
+        count++;
+        log(`BUG FOUND: allowedNurses/${ch.key} has isApproved=${isApproved}, status=${status}, email=${v.email} - Should be PENDING, not in allowedNurses`);
+      } else {
+        log(`OK: allowedNurses/${ch.key} isApproved=${isApproved}, status=${status}, email=${v.email}`);
+      }
+    });
+    log(`\nFound ${count} auto-approved nurses that should be pending`);
+  }catch(e){ log('Error: '+e.message); }
+}
+
+async function fixPending(){
+  if(!confirm('This will DELETE allowedNurses entries for nurses that have isApproved=false, moving them back to PENDING.\n\nCEO will need to approve them again properly.\n\nContinue?')) return;
+  document.getElementById('log').textContent='';
+  log('Fixing auto-approved nurses - moving to pending...');
+  try{
+    const snap=await db.ref('allowedNurses').once('value');
+    if(!snap.exists()){ log('No allowedNurses'); return; }
+    let fixed=0;
+    for(const ch of Object.values(snap.val()||{})){
+      // Actually need to iterate properly
+    }
+    const snap2=await db.ref('allowedNurses').once('value');
+    const promises=[];
+    snap2.forEach(child=>{
+      const v=child.val()||{};
+      if(v.isApproved===false || v.status==='pending' || v.canLogin===false){
+        const key=child.key;
+        promises.push(
+          db.ref('allowedNurses/'+key).remove().then(()=>log(`✅ Deleted allowedNurses/${key} - now pending`)).catch(e=>log(`Error ${key}: ${e.message}`)),
+          db.ref('allowedNursesByUid/'+(v.uid||key)).remove().catch(()=>{})
+        );
+        // Ensure pending locations exist
+        if(v.uid){
+          const pendingData={...v, isApproved:false, approved:false, canLogin:false, status:'pending', pending:true};
+          promises.push(
+            db.ref('pending_nurses/'+v.uid).set(pendingData).then(()=>log(`✅ Ensured pending_nurses/${v.uid}`)).catch(()=>{}),
+            db.ref('pendingNurses/'+v.uid).set(pendingData).catch(()=>{}),
+            db.ref('nurses/'+v.uid).update({isApproved:false, approved:false, canLogin:false, status:'pending', pending:true}).catch(()=>{}),
+            db.ref('ceoRegistrationCenter/nurses/'+v.uid).update({isApproved:false, approved:false, canLogin:false, status:'pending'}).catch(()=>{})
+          );
+        }
+        fixed++;
+      }
+    });
+    await Promise.all(promises);
+    log(`\nFixed ${fixed} nurses - moved back to PENDING`);
+    log('Now CEO page should show them in Pending tab, not Approved');
+    alert(`Fixed ${fixed} nurses. They are now pending. CEO must approve them in ceo-registration-center.html`);
+  }catch(e){ log('Error: '+e.message); }
+}
+
+async function checkAll(){
+  document.getElementById('log').textContent='';
+  log('Checking all nurses...');
+  try{
+    const snap=await db.ref('nurses').once('value');
+    if(!snap.exists()){ log('No nurses'); return; }
+    snap.forEach(ch=>{
+      const v=ch.val()||{};
+      log(`nurses/${ch.key}: email=${v.email}, isApproved=${v.isApproved}, status=${v.status}, canLogin=${v.canLogin}`);
+    });
+  }catch(e){ log('Error: '+e.message); }
+  
+  try{
+    const snap=await db.ref('allowedNurses').once('value');
+    if(snap.exists()){
+      log('\n--- allowedNurses ---');
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        log(`allowedNurses/${ch.key}: email=${v.email}, isApproved=${v.isApproved}`);
+      });
+    }
+  }catch(e){}
+}
+</script></body></html>
