@@ -446,7 +446,10 @@ function App(){
             )
           )
         ),
-        React.createElement('div',{className:'badge',style:{padding:'8px 14px',background:'var(--card)'}},'⭐ 5.0 Trust 98%')
+        React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center'}},
+              React.createElement('button',{id:'onlineToggleBtn', className:'btn-green', style:{padding:'10px 16px', fontSize:12, fontWeight:900, background:'linear-gradient(135deg,#22c55e,#16a34a)', color:'#fff', border:'none', borderRadius:999, cursor:'pointer'}, onClick:()=>{ const isOnline = nurse.isOnline || nurse.online; if(isOnline) goOfflineFast(); else goOnlineFast(); }}, (nurse.isOnline||nurse.online)?'🟢 ONLINE - Click to go OFFLINE':'🔴 OFFLINE - Click to go ONLINE FAST'),
+              React.createElement('div',{className:'badge',style:{padding:'8px 14px',background:'var(--card)'}},'⭐ 5.0 Trust 98%')
+            )
       )
     ),
     React.createElement('main',{className:'wrap',style:{padding:'28px 20px',display:'grid',gridTemplateColumns:'1.2fr .8fr',gap:20,paddingBottom:100}},
@@ -650,6 +653,134 @@ function App(){
     )
   );
 }
+
+
+// === FAST ONLINE/OFFLINE - INSTANT FOR CLIENTS ===
+async function goOnlineFast(){
+  try{
+    const nurseId = nurse.id || nurse.uid;
+    const nurseUid = nurse.uid || nurse.id;
+    if(!nurseId){ alert('No nurse ID'); return; }
+    
+    const btn = document.getElementById('onlineToggleBtn');
+    if(btn){ btn.textContent='🟢 Going Online...'; btn.disabled=true; }
+    
+    const now=Date.now();
+    let lat=0, lng=0;
+    
+    // Get GPS first - fast
+    try{
+      const pos=await new Promise((res,rej)=>{
+        navigator.geolocation.getCurrentPosition(res, rej, {enableHighAccuracy:true, maximumAge:0, timeout:8000});
+      });
+      lat=pos.coords.latitude; lng=pos.coords.longitude;
+      console.log('Got GPS for online:', lat, lng);
+    }catch(e){ console.log('GPS failed for online, using 0,0', e); }
+    
+    const onlineData={
+      uid:nurseId,
+      id:nurseId,
+      nurseId:nurseId,
+      fullName:nurse.fullName||nurseProfile.fullName||'Nurse',
+      name:nurse.fullName||'Nurse',
+      lat:lat, lng:lng,
+      currentLat:lat, currentLng:lng,
+      liveLat:lat, liveLng:lng,
+      nurseLat:lat, nurseLng:lng,
+      isOnline:true,
+      online:true,
+      isAvailable:true,
+      available:true,
+      status:'online',
+      presence:'online',
+      isLive:true,
+      lastSeen:now,
+      lastOnline:now,
+      onlineAt:now,
+      lastUpdate:now,
+      photoURL:nurseProfile.photo||nurse.photo||'',
+      rating:5.0
+    };
+    
+    // INSTANT updates to ALL locations - clients see immediately via realtime listeners
+    const updates=[
+      rtdb.ref('onlineNurses/'+nurseId).set(onlineData),
+      rtdb.ref('nursePresence/'+nurseId).set({uid:nurseId, status:'online', presence:'online', isOnline:true, online:true, lat:lat, lng:lng, currentLat:lat, currentLng:lng, lastSeen:now, onlineAt:now}),
+      rtdb.ref('nurseLocations/'+nurseId).set({uid:nurseId, lat:lat, lng:lng, currentLat:lat, currentLng:lng, liveLat:lat, liveLng:lng, isOnline:true, online:true, isLive:true, lastUpdate:now, lastSeen:now}),
+      rtdb.ref('liveNurses/'+nurseId).set(onlineData),
+      rtdb.ref('nurses/'+nurseId).update({isOnline:true, online:true, status:'online', presence:'online', lat:lat, lng:lng, currentLat:lat, currentLng:lng, liveLat:lat, liveLng:lng, lastSeen:now, lastOnline:now, isAvailable:true}),
+      rtdb.ref('allowedNurses/'+nurseId).update({isOnline:true, online:true, status:'online', lastSeen:now}).catch(()=>{}),
+      rtdb.ref('nursesByEmail/'+(nurse.email||'').toLowerCase().replace(/[.#$@\[\]]/g,'_')).update({isOnline:true}).catch(()=>{})
+    ];
+    
+    await Promise.all(updates);
+    
+    // Start live GPS tracking
+    if(window.startNurseGPSTracking){
+      startNurseGPSTracking('online-status', nurse, 'online');
+    } else if(typeof startNurseGPSTracking !== 'undefined'){
+      startNurseGPSTracking('online-status', nurse, 'online');
+    }
+    
+    console.log('✅ ONLINE FAST - Nurse is now online, clients will see instantly');
+    if(btn){ btn.textContent='🟢 ONLINE - Clients see you now'; btn.style.background='linear-gradient(135deg,#22c55e,#16a34a)'; }
+    
+    // Show toast
+    if(window.showToast) showToast('🟢 ONLINE - You are now visible to clients instantly!');
+    
+    // Update UI state
+    setTimeout(()=>{ location.reload(); }, 1000);
+    
+  }catch(e){
+    console.error('Online fast error', e);
+    alert('Online failed: '+e.message);
+    const btn=document.getElementById('onlineToggleBtn');
+    if(btn){ btn.textContent='🟢 Go Online'; btn.disabled=false; }
+  }
+}
+
+async function goOfflineFast(){
+  try{
+    const nurseId = nurse.id || nurse.uid;
+    if(!nurseId){ alert('No nurse ID'); return; }
+    
+    const btn = document.getElementById('onlineToggleBtn');
+    if(btn){ btn.textContent='🔴 Going Offline...'; btn.disabled=true; }
+    
+    const now=Date.now();
+    
+    // INSTANT offline - remove from online lists immediately so clients don't see
+    const updates=[
+      rtdb.ref('onlineNurses/'+nurseId).remove(),
+      rtdb.ref('liveNurses/'+nurseId).remove(),
+      rtdb.ref('nursePresence/'+nurseId).set({uid:nurseId, status:'offline', presence:'offline', isOnline:false, online:false, offlineAt:now, lastOffline:now}),
+      rtdb.ref('nurseLocations/'+nurseId).update({isOnline:false, online:false, isLive:false, offlineAt:now, lastOffline:now}),
+      rtdb.ref('nurses/'+nurseId).update({isOnline:false, online:false, status:'offline', presence:'offline', isAvailable:false, offlineAt:now, lastOffline:now, wentOfflineAt:now}),
+      rtdb.ref('allowedNurses/'+nurseId).update({isOnline:false, offlineAt:now}).catch(()=>{})
+    ];
+    
+    await Promise.all(updates);
+    
+    // Stop GPS tracking
+    if(window.stopNurseGPSTracking) stopNurseGPSTracking();
+    if(window.watchId) navigator.geolocation.clearWatch(window.watchId);
+    
+    console.log('🔴 OFFLINE FAST - Nurse is now offline, clients will hide you instantly');
+    if(btn){ btn.textContent='🔴 OFFLINE - Clients hide you'; btn.style.background='rgba(239,68,68,.15)'; }
+    
+    if(window.showToast) showToast('🔴 OFFLINE - You are now hidden from clients instantly!');
+    
+    setTimeout(()=>{ location.reload(); }, 1000);
+    
+  }catch(e){
+    console.error('Offline fast error', e);
+    alert('Offline failed: '+e.message);
+  }
+}
+
+window.goOnlineFast=goOnlineFast;
+window.goOfflineFast=goOfflineFast;
+
 
 // === AUTO-START LIVE GPS FOR CLIENT DISTANCE FEATURE ===
 (function(){
