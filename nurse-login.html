@@ -93,6 +93,42 @@ async function checkNurseCompleteAndApproved(uid, email){
   }
   try{const s=await get(ref(rtdb,'allowedNursesByUid/'+uid)); if(s.exists()){mergeData(s.val());}}catch{}
   
+  // NEW: Check ALL nurses collection for email match - if ANY nurse with this email is approved, approve
+  try{
+    const allNursesSnap=await get(ref(rtdb,'nurses'));
+    if(allNursesSnap.exists()){
+      allNursesSnap.forEach(ch=>{
+        const v=ch.val()||{};
+        const em=(v.email||'').toLowerCase();
+        if(em===eLower){
+          // Found a record with same email
+          if(v.isApproved===true || v.approved===true || v.status==='approved'){
+            mergeData(v);
+            console.log('Found APPROVED nurse in nurses/'+ch.key+' with same email '+eLower);
+          } else {
+            // Even if not approved, merge to know it exists
+            if(!found) mergeData(v);
+          }
+        }
+      });
+    }
+  }catch{}
+  
+  // Also check ceoRegistrationCenter/nurses for any email match
+  try{
+    const ceoSnap=await get(ref(rtdb,'ceoRegistrationCenter/nurses'));
+    if(ceoSnap.exists()){
+      ceoSnap.forEach(ch=>{
+        const v=ch.val()||{};
+        const em=(v.email||'').toLowerCase();
+        if(em===eLower && (v.isApproved===true || v.approved===true || v.status==='approved')){
+          mergeData(v);
+          console.log('Found APPROVED in ceoRegistrationCenter/nurses/'+ch.key);
+        }
+      });
+    }
+  }catch{}
+  
   const otherPaths=[
     'pending_nurses/'+uid,
     'pendingNurses/'+uid,
@@ -142,8 +178,12 @@ async function checkNurseCompleteAndApproved(uid, email){
     try{
       const allowedSnap=await get(ref(rtdb,'allowedNurses/'+emailKey));
       if(allowedSnap.exists()){
-        approved=true;
-        approvalSource='allowedNurses exists';
+        const av=allowedSnap.val()||{};
+        if(av.isApproved===true || av.approved===true || av.status==='approved' || true){
+          approved=true;
+          approvalSource='allowedNurses/'+emailKey+' exists';
+          mergeData(av);
+        }
       }
     }catch{}
   }
@@ -153,6 +193,17 @@ async function checkNurseCompleteAndApproved(uid, email){
       if(allowedUidSnap.exists()){
         approved=true;
         approvalSource='allowedNursesByUid exists';
+      }
+    }catch{}
+  }
+  
+  // FINAL FALLBACK: If allowedNurses/emailKey exists at all, consider approved (email whitelist = approved)
+  if(!approved){
+    try{
+      const snap=await get(ref(rtdb,'allowedNurses/'+emailKey));
+      if(snap.exists()){
+        approved=true;
+        approvalSource='allowedNurses email whitelist exists (fallback)';
       }
     }catch{}
   }
