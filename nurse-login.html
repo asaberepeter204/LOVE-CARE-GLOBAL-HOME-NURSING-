@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Login — LOVE CARE GLOBAL — STRICT CEO APPROVAL</title>
+<title>Nurse Login â€” LOVE CARE GLOBAL â€” STRICT CEO APPROVAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -32,13 +32,13 @@ input:focus{border-color:#a855f7;background:rgba(14,10,28,.9);box-shadow:0 0 0 3
 <body>
 <div class="bg"></div>
 <div class="wrap"><div class="card">
-<div class="logo">👩‍⚕️</div>
+<div class="logo">ðŸ‘©â€âš•ï¸</div>
 <h1>Nurse Login</h1>
-<p class="sub">LOVE CARE GLOBAL — CEO APPROVAL REQUIRED</p>
+<p class="sub">LOVE CARE GLOBAL â€” CEO APPROVAL REQUIRED</p>
 <button class="btn btnGoogle" onclick="googleLogin()" type="button">Continue with Google</button>
 <div class="divider">OR</div>
 <label>Email</label><input id="email" type="email" placeholder="nurse@email.com">
-<label>Password</label><div class="inputWrap"><input id="password" type="password" placeholder="Enter password"><button class="eyeBtn" type="button" onclick="toggleEye()">👁️</button></div>
+<label>Password</label><div class="inputWrap"><input id="password" type="password" placeholder="Enter password"><button class="eyeBtn" type="button" onclick="toggleEye()">ðŸ‘ï¸</button></div>
 <div id="msg" class="alert"></div>
 <button class="btn btnPrimary" onclick="emailLogin()" type="button">Login as Nurse</button>
 <a href="nurse-registration.html" class="btn btnDark">No account? Register</a>
@@ -67,17 +67,140 @@ function extractField(obj, keys){
   return null;
 }
 
-// ===== STRICT CHECK: PHOTO + PHONE + VIDEO + CEO APPROVAL =====
+// ===== FIXED CHECK: PHOTO + PHONE + VIDEO + CEO APPROVAL - CHECKS ALL PATHS =====
 async function checkNurseCompleteAndApproved(uid, email){
   let merged={}; let found=false;
   const eLower=(email||'').toLowerCase().trim();
+  const emailKey=sanitizeEmail(eLower);
+  
+  // Helper to merge
+  function mergeData(newData){
+    if(newData && typeof newData==='object'){
+      merged={...merged, ...newData};
+      found=true;
+    }
+  }
+  
   // 1. Firestore nurses/{uid}
-  try{const s=await getDoc(doc(db,'nurses',uid)); if(s.exists()){merged={...merged,...s.data()}; found=true;}}catch{}
-  if(eLower){try{const q=query(collection(db,'nurses'),where('email','==',eLower),limit(1)); const qs=await getDocs(q); if(!qs.empty){merged={...merged,...qs.docs[0].data()}; found=true;}}catch{}}
-  // 2. RTDB nurses/{uid}
-  try{const s=await get(ref(rtdb,'nurses/'+uid)); if(s.exists()){merged={...merged,...s.val()}; found=true;}}catch{}
-  // 3. allowedNurses
-  if(eLower){try{const k=sanitizeEmail(eLower); const s=await get(ref(rtdb,'allowedNurses/'+k)); if(s.exists()){merged={...merged,...s.val()}; found=true;}}catch{}}
+  try{const s=await getDoc(doc(db,'nurses',uid)); if(s.exists()){mergeData(s.data()); console.log('Found in Firestore nurses/'+uid);}}catch(e){console.log('Firestore nurses/'+uid+' error', e.message);}
+  if(eLower){
+    try{
+      const q=query(collection(db,'nurses'),where('email','==',eLower),limit(1)); 
+      const qs=await getDocs(q); 
+      if(!qs.empty){mergeData(qs.docs[0].data()); console.log('Found in Firestore nurses by email');}
+    }catch(e){}
+  }
+  
+  // 2. RTDB nurses/{uid} - MAIN
+  try{const s=await get(ref(rtdb,'nurses/'+uid)); if(s.exists()){mergeData(s.val()); console.log('Found in RTDB nurses/'+uid);}}catch{}
+  
+  // 3. allowedNurses - CEO whitelist - MOST IMPORTANT FOR APPROVAL
+  if(eLower){
+    try{const s=await get(ref(rtdb,'allowedNurses/'+emailKey)); if(s.exists()){mergeData(s.val()); console.log('Found in allowedNurses/'+emailKey);}}catch{}
+  }
+  try{const s=await get(ref(rtdb,'allowedNursesByUid/'+uid)); if(s.exists()){mergeData(s.val()); console.log('Found in allowedNursesByUid/'+uid);}}catch{}
+  
+  // 4. Check other RTDB paths
+  const otherPaths=[
+    'pending_nurses/'+uid,
+    'pendingNurses/'+uid,
+    'allNurses/'+uid,
+    'nurse_registrations/'+uid,
+    'nurseApplications/'+uid,
+    'nurseUsers/'+uid,
+    'ceoNurseUpdates/'+uid,
+    'ceoRegistrationCenter/nurses/'+uid,
+    'verified_nurses/'+uid,
+    'allowedNurses/'+uid
+  ];
+  for(const path of otherPaths){
+    try{
+      const s=await get(ref(rtdb,path)); 
+      if(s.exists()){
+        mergeData(s.val()); 
+        console.log('Found in '+path);
+      }
+    }catch{}
+  }
+  
+  // 5. Firestore ceoRegistrationCenter
+  try{const s=await getDoc(doc(db,'ceoRegistrationCenter/nurses/'+uid)); if(s.exists()){mergeData(s.data()); console.log('Found in Firestore ceoRegistrationCenter/nurses/'+uid);}}catch{}
+  if(eLower){
+    try{
+      const q=query(collection(db,'ceoRegistrationCenter/nurses'),where('email','==',eLower),limit(1));
+      const qs=await getDocs(q);
+      if(!qs.empty){mergeData(qs.docs[0].data()); console.log('Found in Firestore ceoRegistrationCenter by email');}
+    }catch{}
+  }
+
+  // Extract fields - check MANY possible keys
+  let photo = extractField(merged, ['photoURL','photoUrl','photo','clientPhotoUrl','profilePhoto','avatar','image','photoURL_firestore','nursePhoto']);
+  let video = extractField(merged, ['videoURL','videoUrl','video','introVideo','videoFile','nurseVideo']);
+  let phone = extractField(merged, ['phone','phoneNumber','clientPhone','mobile','tel','phoneNo','nursePhone']);
+  
+  // Check approval - ANY true means approved - VERY LENIENT
+  let approved=false;
+  let approvalSource='none';
+  
+  const approvedChecks=[
+    {val: merged.isApproved, source: 'isApproved'},
+    {val: merged.approved, source: 'approved'},
+    {val: merged.canLogin, source: 'canLogin'},
+    {val: merged.isVerified, source: 'isVerified'},
+    {val: merged.ceoApproved, source: 'ceoApproved'},
+    {val: merged.status==='approved', source: 'status=approved'},
+    {val: merged.status==='Approved', source: 'status=Approved'},
+    {val: merged.verified, source: 'verified'},
+  ];
+  
+  for(const check of approvedChecks){
+    if(check.val===true){
+      approved=true;
+      approvalSource=check.source;
+      console.log('APPROVED via', check.source);
+      break;
+    }
+  }
+  
+  // Also check if exists in allowedNurses = approved
+  if(!approved){
+    try{
+      const allowedSnap=await get(ref(rtdb,'allowedNurses/'+emailKey));
+      if(allowedSnap.exists()){
+        approved=true;
+        approvalSource='allowedNurses exists';
+        console.log('APPROVED via allowedNurses exists');
+      }
+    }catch{}
+  }
+  if(!approved){
+    try{
+      const allowedUidSnap=await get(ref(rtdb,'allowedNursesByUid/'+uid));
+      if(allowedUidSnap.exists()){
+        approved=true;
+        approvalSource='allowedNursesByUid exists';
+        console.log('APPROVED via allowedNursesByUid exists');
+      }
+    }catch{}
+  }
+  
+  console.log('Final check:', {uid, email:eLower, found, approved, approvalSource, photo:!!photo, phone:!!phone, video:!!video, mergedKeys:Object.keys(merged)});
+  
+  // Check if registered - has ANY data in nurse paths
+  const isRegistered = found || !!merged.email || !!merged.fullName || !!merged.name || Object.keys(merged).length > 0;
+  
+  // Missing check - ONLY require photo and phone, video optional if CEO approved
+  let missing=[];
+  if(!photo) missing.push('photo');
+  if(!phone) missing.push('phone');
+  // Video is nice to have but not blocking if approved
+  if(!video && !approved){
+    missing.push('video');
+  }
+  
+  const complete = missing.length===0 || (approved && photo && phone); // If approved and has photo+phone, allow even if video missing
+  return {complete, approved, missing, data:merged, photo, video, phone, approvalSource, approvedValue:approved, isRegistered, found};
+}
   
   if(!found) return {complete:false, approved:false, missing:['profile'], reason:'No nurse profile - Register first', data:{}};
 
@@ -117,24 +240,43 @@ async function checkNurseCompleteAndApproved(uid, email){
   return {complete, approved, missing, data:merged, photo, video, phone, approvalSource, approvedValue:approved};
 }
 
-async function handleFailedLogin(user, missing, approved, reason){
+async function handleFailedLogin(user, missing, approved, reason, isRegistered=false){
   const email=user.email||'';
-  console.log('FAILED LOGIN - will delete auth user to not save email', {missing, approved, email});
-  showMsg(`❌ LOGIN BLOCKED - ${missing.length? 'Missing: '+missing.join(', ')+'. ' : ''}${!approved? 'CEO approval PENDING from ceo-registration-center.html. ' : ''}${reason||''} Auth will be removed.`, 'alert-error');
-  try{
-    // TRY DELETE AUTH USER so email not saved
-    await deleteUser(user);
-    console.log('Auth user DELETED because login failed - email not saved');
-  }catch(delErr){
-    console.log('Delete failed (needs recent login), signing out', delErr.message);
-    try{await signOut(auth);}catch{}
-    // Still try delete via compat if needed
+  const uid=user.uid||'';
+  console.log('FAILED LOGIN - Smart delete check', {missing, approved, email, isRegistered, reason});
+  
+  if(!approved){
+    if(isRegistered){
+      // CASE 1: Nurse already registered, waiting for CEO approval - DON'T DELETE, just block
+      showMsg(`â³ WAITING FOR CEO APPROVAL\n\nYou have registered as nurse.\nEmail: ${email}\n\nCEO has NOT approved you yet in ceo-registration-center.html\n\n${missing.length? 'Missing: '+missing.join(', ')+'. ' : ''}Reason: ${reason||'Pending CEO approval'}\n\nYour account is SAFE and saved. Wait for CEO approval, then login again. You will NOT need to re-register.`, 'alert-error');
+      try{ await signOut(auth); }catch{}
+      // Keep auth user, keep local data for retry
+      localStorage.setItem('pendingApprovalEmail', email);
+      localStorage.setItem('pendingApprovalUid', uid);
+      console.log('Registered nurse waiting approval - Auth KEPT, not deleted');
+    } else {
+      // CASE 2: Random Google login, never registered as nurse - DELETE to prevent email save
+      showMsg(`âŒ NOT A REGISTERED NURSE\n\nEmail ${email} never registered as nurse.\n\nYou must first register at nurse-registration.html with Photo + ID + Licence + Video.\n\nThis login attempt will be removed to prevent unauthorized access.\n\nReason: ${reason||'Not registered'}`, 'alert-error');
+      try{
+        console.log('Random unregistered Google login - DELETING auth user to prevent email save');
+        await deleteUser(user);
+        console.log('Auth user DELETED - unregistered email not saved');
+      }catch(delErr){
+        console.log('Delete failed, signing out', delErr.message);
+        try{await signOut(auth);}catch{}
+      }
+      // Clear all nurse localStorage
+      try{
+        const keys=['lcg_nurse_uid','nurseUid','currentNurseId','uid','lcg_nurse_email','currentNurseEmail','nurseEmail','nurseName','fullName','currentNurseName','lcg_logged_in','lcg_role','lcg_session_expiry','nurseProfile','nursePhoto','nursePhotoUrl','nurseVideo','nursePhone'];
+        keys.forEach(k=>{try{localStorage.removeItem(k); sessionStorage.removeItem(k);}catch{}});
+      }catch{}
+      setTimeout(()=>{ window.location.href=`nurse-registration.html?error=not_registered&email=${encodeURIComponent(email)}`; }, 2500);
+    }
+  } else {
+    // Approved but missing fields
+    showMsg(`âŒ LOGIN BLOCKED - Approved but ${missing.length? 'Missing: '+missing.join(', ')+'. ' : ''}Reason: ${reason||''}\n\nYour account is SAFE. Please complete profile.`, 'alert-error');
+    try{ await signOut(auth); }catch{}
   }
-  try{
-    const keys=['lcg_nurse_uid','nurseUid','currentNurseId','uid','lcg_nurse_email','currentNurseEmail','nurseEmail','nurseName','fullName','currentNurseName','lcg_logged_in','lcg_role','lcg_session_expiry','nurseProfile','nursePhoto','nursePhotoUrl','nurseVideo','nursePhone'];
-    keys.forEach(k=>{try{localStorage.removeItem(k); sessionStorage.removeItem(k);}catch{}});
-  }catch{}
-  setTimeout(()=>{ window.location.href=`nurse-registration.html?error=blocked&missing=${missing.join('_')}&approved=${approved}&email=${encodeURIComponent(email)}`; }, 2500);
 }
 
 async function isClientAccount(email){
@@ -154,17 +296,31 @@ function saveNurseSession(user, name){
   ['lcg_client_uid','currentClientId'].forEach(k=>localStorage.removeItem(k));
 }
 
-function redirectToDashboard(){ showMsg('✅ Approved! Redirecting to dashboard...','alert-success'); setTimeout(()=>{window.location.replace('nurses-dashboard.html');}, 800);}
+function redirectToDashboard(){ showMsg('âœ… Approved! Redirecting to dashboard...','alert-success'); setTimeout(()=>{window.location.replace('nurses-dashboard.html');}, 800);}
 
 onAuthStateChanged(auth, async (user)=>{
   if(user && (localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('lcg_role')==='nurse')){
     if(localStorage.getItem('lcg_client_uid')) return;
     const check=await checkNurseCompleteAndApproved(user.uid, user.email);
-    if(!check.complete || !check.approved){
-      await handleFailedLogin(user, check.missing, check.approved, 'Auto-login blocked');
+    if(!check.approved){
+      console.log('Auto-login: not approved yet, staying on login page');
+      // Don't block auto-login aggressively, just show message and stay
+      showMsg(`â³ Waiting for CEO approval â€” Your account exists but CEO hasn't approved yet.\nApproval source checked: ${check.approvalSource||'none'}. Please wait or contact CEO.`, 'alert-info');
       return;
     }
-    try{localStorage.setItem('nursePhoto',check.photo); localStorage.setItem('nurseVideo',check.video); localStorage.setItem('nursePhone',check.phone);}catch{}
+    if(!check.complete){
+      console.log('Auto-login: approved but incomplete', check.missing, 'isRegistered', check.isRegistered);
+      if(check.approved && check.photo && check.phone){
+        console.log('Approved + has photo+phone, allowing login despite missing', check.missing);
+      } else if(!check.isRegistered){
+        console.log('Auto-login: not registered at all, blocking');
+        await handleFailedLogin(user, check.missing, check.approved, 'Auto-login blocked - not registered', false);
+        return;
+      } else {
+        showMsg(`âš ï¸ Profile incomplete: ${check.missing.join(', ')}. But CEO approved, so you can login. Please complete profile later.`, 'alert-info');
+      }
+    }
+    try{localStorage.setItem('nursePhoto',check.photo||''); localStorage.setItem('nurseVideo',check.video||''); localStorage.setItem('nursePhone',check.phone||'');}catch{}
     redirectToDashboard();
   }
 });
@@ -175,19 +331,27 @@ window.emailLogin=async()=>{
   if(!email||!password){showMsg('Enter email and password','alert-error'); return;}
   try{
     showMsg('Checking CLIENT block + CEO approval...','alert-info');
-    if(await isClientAccount(email)){showMsg('❌ CLIENT email - Use Client Login','alert-error'); return;}
+    if(await isClientAccount(email)){showMsg('âŒ CLIENT email - Use Client Login','alert-error'); return;}
     const cred=await signInWithEmailAndPassword(auth,email,password);
     const user=cred.user;
-    if(await isClientAccount(user.email||email)){showMsg('❌ CLIENT account blocked','alert-error'); await signOut(auth); return;}
+    if(await isClientAccount(user.email||email)){showMsg('âŒ CLIENT account blocked','alert-error'); await signOut(auth); return;}
     
     const check=await checkNurseCompleteAndApproved(user.uid, user.email||email);
-    if(!check.complete){
-      await handleFailedLogin(user, check.missing, check.approved, `Missing ${check.missing.join(', ')} in Firebase`);
+    console.log('Login check result:', check);
+    
+    if(!check.approved){
+      await handleFailedLogin(user, check.missing, false, 'No CEO approval yet - CEO must approve in ceo-registration-center.html. Found data: '+(check.data?Object.keys(check.data).join(','):'none')+' Approval source: '+(check.approvalSource||'none'), check.isRegistered);
       return;
     }
-    if(!check.approved){
-      await handleFailedLogin(user, [], false, 'No CEO approval from ceo-registration-center.html - CEO must approve in ceoRegistrationCenter/nurses/'+user.uid);
-      return;
+    // If approved, allow login even if some fields missing (CEO approval is main gate)
+    if(!check.complete){
+      if(check.photo && check.phone){
+        console.log('Approved and has photo+phone, allowing login despite missing:', check.missing);
+        showMsg(`âœ… CEO Approved! Profile has minor missing: ${check.missing.join(', ')}. Logging in anyway...`, 'alert-success');
+      } else {
+        await handleFailedLogin(user, check.missing, true, `Approved but missing critical: ${check.missing.join(', ')} - Please add photo/phone`, check.isRegistered);
+        return;
+      }
     }
     let displayName=check.data.fullName||check.data.name||user.displayName||email.split('@')[0];
     saveNurseSession(user, displayName);
@@ -205,12 +369,16 @@ window.googleLogin=async()=>{
     const provider=new GoogleAuthProvider();
     const cred=await signInWithPopup(auth,provider);
     const user=cred.user;
-    if(await isClientAccount(user.email)){showMsg('❌ CLIENT email - Use Client Login','alert-error'); await handleFailedLogin(user, ['client'], false, 'Client email blocked'); return;}
+    if(await isClientAccount(user.email)){showMsg('âŒ CLIENT email - Use Client Login','alert-error'); await handleFailedLogin(user, ['client'], false, 'Client email blocked'); return;}
     
-    showMsg('🔍 Checking photo, video, phone + CEO approval...','alert-info');
+    showMsg('ðŸ” Checking photo, video, phone + CEO approval...','alert-info');
     const check=await checkNurseCompleteAndApproved(user.uid, user.email);
-    if(!check.complete || !check.approved){
-      await handleFailedLogin(user, check.missing, check.approved, check.approved? 'Profile incomplete' : 'CEO approval pending - ceo-registration-center must approve');
+    if(!check.approved){
+      await handleFailedLogin(user, check.missing, false, 'CEO approval pending - ceo-registration-center must approve. Source: '+(check.approvalSource||'none'), check.isRegistered);
+      return;
+    }
+    if(!check.complete && (!check.photo || !check.phone)){
+      await handleFailedLogin(user, check.missing, true, 'Approved but missing photo/phone', check.isRegistered);
       return;
     }
     const displayName=check.data.fullName||user.displayName||user.email.split('@')[0];
