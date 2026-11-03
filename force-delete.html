@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FORCE DELETE BY EMAIL</title>
+<style>body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;padding:16px}.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.18);border-radius:18px;padding:20px;max-width:600px;margin:0 auto}input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#fff;margin:8px 0}.btn{width:100%;padding:14px;border-radius:12px;font-weight:800;border:none;cursor:pointer;margin-top:10px}.btnRed{background:linear-gradient(135deg,#ef4444,#991b1b);color:white}.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}.log{background:#000;color:#0f0;padding:10px;border-radius:8px;font-size:11px;max-height:400px;overflow:auto;margin-top:10px;white-space:pre-wrap}</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script></head><body><div class="card">
+<h2>FORCE DELETE BY EMAIL</h2><p style="font-size:12px;color:#fca5a5">Deletes nurse from EVERYWHERE by email</p>
+<label>Email:</label><input id="email" type="email" value="lovecareglobal@gmail.com">
+<label>UID (optional):</label><input id="uid" type="text" placeholder="ds7LTnYLgpXG82hFJN3fScNozK23">
+<button class="btn btnRed" onclick="forceDelete()">DELETE COMPLETELY</button>
+<button class="btn btnYellow" onclick="checkWhere()">CHECK WHERE EXISTS</button>
+<div id="log" class="log">Ready...</div></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();const fs=firebase.firestore();const storage=firebase.storage();
+function log(m){const el=document.getElementById('log');el.textContent+=m+'\n';el.scrollTop=el.scrollHeight;}
+function sanitizeEmail(e){return e.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');}
+async function checkWhere(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const emailKey=sanitizeEmail(email);
+  document.getElementById('log').textContent='';
+  log('Checking '+email+'...');
+  const bases=['nurses','pending_nurses','nurse_registrations','ceoRegistrationCenter/nurses','allowedNurses','allowedNursesByUid'];
+  for(const base of bases){
+    try{
+      const snap=await db.ref(base).once('value');
+      if(snap.exists()){
+        snap.forEach(ch=>{
+          const v=ch.val()||{};
+          if((v.email||'').toLowerCase()===email || ch.key===emailKey){
+            log('FOUND RTDB '+base+'/'+ch.key);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  try{
+    const snap=await db.ref('allowedNurses/'+emailKey).once('value');
+    if(snap.exists()) log('FOUND allowedNurses/'+emailKey+' EXISTS - this blocks delete');
+    else log('NOT FOUND allowedNurses/'+emailKey);
+  }catch(e){}
+  try{
+    const q=await fs.collection('nurses').where('email','==',email).get();
+    if(!q.empty){ q.forEach(d=>log('FOUND Firestore nurses/'+d.id)); }
+  }catch(e){}
+}
+async function forceDelete(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  let uid=document.getElementById('uid').value.trim();
+  if(!email){alert('Enter email');return;}
+  if(!confirm('DELETE '+email+' from EVERYWHERE?')) return;
+  const c=prompt('Type DELETE to confirm');
+  if(c!=='DELETE'){alert('Cancelled');return;}
+  const emailKey=sanitizeEmail(email);
+  document.getElementById('log').textContent='';
+  log('DELETING '+email+'...');
+  let allUids=new Set();
+  if(uid) allUids.add(uid);
+  allUids.add(emailKey);
+  allUids.add('ds7LTnYLgpXG82hFJN3fScNozK23');
+  try{
+    const snap=await db.ref('nurses').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        if((v.email||'').toLowerCase()===email) allUids.add(ch.key);
+      });
+    }
+  }catch(e){}
+  try{
+    const snap=await db.ref('ceoRegistrationCenter/nurses').once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        const v=ch.val()||{};
+        if((v.email||'').toLowerCase()===email) allUids.add(ch.key);
+      });
+    }
+  }catch(e){}
+  log('UIDs: '+Array.from(allUids).join(', '));
+  const bases=['nurses','pending_nurses','pendingNurses','allNurses','nurse_registrations','nurseApplications','nurseUsers','ceoNurseUpdates','ceoRegistrationCenter/nurses','verified_nurses','allowedNurses','allowedNursesByUid','nursesByEmail'];
+  for(const base of bases){
+    for(const id of allUids){
+      try{ await db.ref(base+'/'+id).remove(); log('Deleted '+base+'/'+id); }catch(e){}
+    }
+  }
+  const emailPaths=['allowedNurses/'+emailKey,'allowedClients/'+emailKey];
+  for(const p of emailPaths){
+    try{ await db.ref(p).remove(); log('Deleted '+p); }catch(e){}
+  }
+  for(const id of allUids){
+    try{ await fs.collection('nurses').doc(id).delete(); log('Deleted Firestore nurses/'+id); }catch(e){}
+    try{ await fs.doc('ceoRegistrationCenter/nurses/'+id).delete(); log('Deleted Firestore ceo/'+id); }catch(e){}
+  }
+  try{
+    const q=await fs.collection('nurses').where('email','==',email).get();
+    for(const d of q.docs){ await d.ref.delete(); log('Deleted Firestore nurses/'+d.id+' by email'); }
+  }catch(e){}
+  try{ await fs.collection('allowedNurses').doc(emailKey).delete(); log('Deleted Firestore allowedNurses/'+emailKey); }catch(e){}
+  for(const id of allUids){
+    try{
+      const folderRef=storage.ref('nurses/'+id);
+      const list=await folderRef.listAll();
+      for(const item of list.items){ await item.delete(); log('Deleted Storage '+item.fullPath); }
+    }catch(e){}
+  }
+  log('\nDONE! Deleted from all locations');
+  alert('Deleted from DB & Storage. Now delete Auth in Firebase Console > Authentication');
+}
+</script></body></html>
