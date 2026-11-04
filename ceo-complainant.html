@@ -45,8 +45,8 @@ header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-f
 .actionGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 .actionBtn{padding:12px;border-radius:12px;font-weight:800;font-size:11px;border:1px solid;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .actionWarn{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.25)}
-.actionSuspend{background:rgba(245,158,11,.15);color:#f59e0b;border-color:rgba(245,158,11,.3)}
-.actionBlock{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+.actionTemporary Restriction{background:rgba(245,158,11,.15);color:#f59e0b;border-color:rgba(245,158,11,.3)}
+.actionRestrict Access{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)}
 .actionTrust{background:rgba(96,165,250,.12);color:#93c5fd;border-color:rgba(96,165,250,.25)}
 .actionResolve{background:rgba(52,211,153,.15);color:#6ee7b7;border-color:rgba(52,211,153,.3)}
 </style>
@@ -172,10 +172,10 @@ function viewComplaint(id){
         ${c.evidenceFiles.length>0?`<div><b>📎 Files — ${c.evidenceFiles.length} evidence:</b><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${c.evidenceFiles.map((f,idx)=>`<div style="background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;gap:10px;align-items:center"><span>${f.type?.startsWith('image/')?'🖼️':f.type?.startsWith('video/')?'🎥':'📎'}</span><div style="flex:1"><div style="font-weight:700;font-size:12px">${f.name||`Evidence ${idx+1}`}</div><small>${f.type||'File'}</small></div>${f.type?.startsWith('image/')&&f.url?`<img src="${f.url}" style="width:50px;height:50px;object-fit:cover;border-radius:6px">`:''}${f.url?`<a href="${f.url}" target="_blank" class="btn" style="padding:4px 8px;font-size:10px">👁️ View</a>`:''}</div>`).join('')}</div></div>`:''}
       </div>
     </div>
-    <div><div style="font-size:13px;font-weight:800;margin-bottom:12px">⚖️ CEO PUNISHMENT SYSTEM — Write / Speak + Punish + Immediate Effect</div>
+    <div><div style="font-size:13px;font-weight:800;margin-bottom:12px">⚖️ CEO REVIEWMENT SYSTEM — Write / Speak + Feedback Action + Immediate Effect</div>
     
     <div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:10px">
-      <label style="font-size:11px;color:#facc15;font-weight:700">🎯 WHO TO PUNISH — Select victim (Reported Person)</label>
+      <label style="font-size:11px;color:#facc15;font-weight:700">🎯 WHO TO REVIEW — Select victim (Reported Person)</label>
       <select id="punishVictimSelect" style="width:100%;padding:10px;border-radius:10px;background:#0c0a1e;color:#fff;border:1px solid rgba(250,204,21,.25);margin-top:6px;font-size:12px">
         <option value="">Select victim...</option>
         <option value="nurse">👩‍⚕️ Nurse — ${c.nurseName||c.nurseId}</option>
@@ -185,31 +185,31 @@ function viewComplaint(id){
     </div>
 
     <div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:10px">
-      <label style="font-size:11px;color:#ef4444;font-weight:700">⚖️ PUNISHMENT TYPE — Immediate Effect on System</label>
+      <label style="font-size:11px;color:#ef4444;font-weight:700">⚖️ REVIEWMENT TYPE — Immediate Effect on System</label>
       <select id="punishmentType" style="width:100%;padding:10px;border-radius:10px;background:#0c0a1e;color:#fff;border:1px solid rgba(239,68,68,.25);margin-top:6px;font-size:12px">
         <option value="">Select punishment...</option>
-        <option value="warning">⚠️ Warning — Yellow card, no block</option>
-        <option value="decrease_trust">📉 Decrease Trust -10% to -50%</option>
-        <option value="fine_deduct">💰 Fine — Deduct from wallet</option>
-        <option value="suspend_1day">⏸️ Suspend 1 Day — Cannot book/be booked</option>
-        <option value="suspend_3days">⏸️ Suspend 3 Days</option>
-        <option value="suspend_7days">⏸️ Suspend 7 Days</option>
-        <option value="suspend_30days">⏸️ Suspend 30 Days</option>
-        <option value="block_temporary">🚫 Block Temporary — Must appeal</option>
-        <option value="block_permanent">🚫 Block Permanent — Banned forever</option>
+        <option value="guidance">⚠️ Warning — Yellow card, no block</option>
+        <option value="decrease_trust">📉 Adjust Trust Score -10% to -50%</option>
+        <option value="fine_deduct">💰 Deduct Rating Points — Deduct from wallet</option>
+        <option value="suspend_1day">⏸️ Temporary Restriction 1 Day — Cannot book/be booked</option>
+        <option value="suspend_3days">⏸️ Temporary Restriction 3 Days</option>
+        <option value="suspend_7days">⏸️ Temporary Restriction 7 Days</option>
+        <option value="suspend_30days">⏸️ Temporary Restriction 30 Days</option>
+        <option value="block_temporary">🚫 Restrict Access Temporary — Must appeal</option>
+        <option value="block_permanent">🚫 Restrict Access Permanent — Banned forever</option>
         <option value="ban_booking">🚫 Ban Booking — Cannot book new jobs</option>
         <option value="reduce_rating">⭐ Reduce Rating — Lower stars</option>
         <option value="resolve_no_punish">✅ Resolve — No punishment, just advice</option>
       </select>
       <div id="punishExtra" style="margin-top:8px;display:none">
-        <label style="font-size:10px;color:#facc15">Extra: Trust % to deduct / Fine amount / Days</label>
+        <label style="font-size:10px;color:#facc15">Extra: Trust % to deduct / Deduct Rating Points amount / Days</label>
         <input id="punishExtraValue" type="number" placeholder="e.g., 20 for 20% or 50 for GHS 50" style="width:100%;padding:8px;border-radius:8px;background:#0c0a1e;color:#fff;border:1px solid rgba(250,204,21,.2);margin-top:4px;font-size:12px">
       </div>
     </div>
 
     <div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:10px">
       <label style="font-size:11px;color:#60a5fa;font-weight:700">📝 CEO MESSAGE — Write to Victim (They will READ this)</label>
-      <textarea id="ceoMessageText" placeholder="Write your judgment / advice / punishment reason... Example: After reviewing evidence, I found nurse late 2 hours. Punished with 3 days suspension. Please be punctual..." style="width:100%;min-height:100px;padding:10px;border-radius:10px;background:#0c0a1e;color:#fff;border:1px solid rgba(96,165,250,.2);margin-top:6px;font-size:12px;resize:vertical"></textarea>
+      <textarea id="ceoMessageText" placeholder="Write your judgment / advice / punishment reason... Example: After reviewing evidence, I found nurse late 2 hours. Feedback Actioned with 3 days suspension. Please be punctual..." style="width:100%;min-height:100px;padding:10px;border-radius:10px;background:#0c0a1e;color:#fff;border:1px solid rgba(96,165,250,.2);margin-top:6px;font-size:12px;resize:vertical"></textarea>
       <small style="font-size:9px;color:#6b7280">Victim will read this in their punishment inbox + notification</small>
     </div>
 
@@ -224,11 +224,11 @@ function viewComplaint(id){
     </div>
 
     <div class="actionGrid" style="margin-top:12px">
-      <button class="actionBtn actionWarn" onclick="ceoPunish('${c.id}','warning')">⚠️ Warn</button>
-      <button class="actionBtn actionTrust" onclick="ceoPunish('${c.id}','decrease_trust')">📉 Trust -</button>
-      <button class="actionBtn actionSuspend" onclick="ceoPunish('${c.id}','suspend')">⏸️ Suspend</button>
-      <button class="actionBtn actionBlock" onclick="ceoPunish('${c.id}','block')">🚫 Block</button>
-      <button class="actionBtn actionResolve" style="grid-column:span 2;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:white;border:1px solid rgba(168,85,247,.3);padding:14px;font-size:13px" onclick="ceoPunishFull('${c.id}')">⚖️ SEND PUNISHMENT + MESSAGE + VOICE — Immediate Effect</button>
+      <button class="actionBtn actionWarn" onclick="ceoFeedback Action('${c.id}','warning')">⚠️ Warn</button>
+      <button class="actionBtn actionTrust" onclick="ceoFeedback Action('${c.id}','decrease_trust')">📉 Trust -</button>
+      <button class="actionBtn actionTemporary Restriction" onclick="ceoFeedback Action('${c.id}','suspend')">⏸️ Temporary Restriction</button>
+      <button class="actionBtn actionRestrict Access" onclick="ceoFeedback Action('${c.id}','block')">🚫 Restrict Access</button>
+      <button class="actionBtn actionResolve" style="grid-column:span 2;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:white;border:1px solid rgba(168,85,247,.3);padding:14px;font-size:13px" onclick="ceoFeedback ActionFull('${c.id}')">⚖️ SEND REVIEWMENT + MESSAGE + VOICE — Immediate Effect</button>
     </div>
     <small style="font-size:9px;color:#facc15;margin-top:8px;display:block">✅ Victim gets notification instantly + punishment applies immediately on system: blocked cannot book, suspended cannot go online, trust decreased, etc.</small>
     </div>
@@ -267,12 +267,12 @@ function ceoStopVoice(){
   toast('✅ Voice recorded');
 }
 
-async function ceoPunish(complaintId, quickAction){
+async function ceoFeedback Action(complaintId, quickAction){
   document.getElementById('punishmentType').value=quickAction;
-  ceoPunishFull(complaintId);
+  ceoFeedback ActionFull(complaintId);
 }
 
-async function ceoPunishFull(complaintId){
+async function ceoFeedback ActionFull(complaintId){
   const c=allComplaints.find(x=>x.id===complaintId);if(!c)return;
   
   const victimType=document.getElementById('punishVictimSelect').value;
@@ -281,8 +281,8 @@ async function ceoPunishFull(complaintId){
   const extraValue=document.getElementById('punishExtraValue').value;
   
   if(!victimType){ alert('Select WHO to punish — Nurse or Client'); return; }
-  if(!punishType){ alert('Select PUNISHMENT TYPE'); return; }
-  if(!ceoMessage && !ceoVoiceBlob){ if(!confirm('No message or voice — Punish without message?')) return; }
+  if(!punishType){ alert('Select REVIEWMENT TYPE'); return; }
+  if(!ceoMessage && !ceoVoiceBlob){ if(!confirm('No message or voice — Feedback Action without message?')) return; }
   
   // Robust victim ID extraction - try all possible fields
   const victimId = victimType==='nurse' ? (c.nurseId||c.nurseUid||c.nurse_id||c.nurseID||c.nurseEmail||c.nursePhone||'') : (c.clientId||c.clientUid||c.client_id||c.clientID||c.clientEmail||c.clientPhone||'');
@@ -291,11 +291,11 @@ async function ceoPunishFull(complaintId){
   const victimEmail = victimType==='nurse' ? (c.nurseEmail||c.nurse_email||c.email||'') : (c.clientEmail||c.client_email||c.email||'');
   console.log('Victim:', victimType, victimId, victimName, victimPhone, victimEmail, 'Full complaint:', c);
   
-  if(!confirm(`⚖️ CONFIRM PUNISHMENT\n\nVictim: ${victimType.toUpperCase()} — ${victimName}\nPunishment: ${punishType.toUpperCase()}\nExtra: ${extraValue||'N/A'}\n\nMessage: ${ceoMessage.substring(0,100)}...\n\nThis will APPLY IMMEDIATELY on system! Blocked cannot book, suspended cannot go online.`)) return;
+  if(!confirm(`⚖️ CONFIRM REVIEWMENT\n\nVictim: ${victimType.toUpperCase()} — ${victimName}\nFeedback Actionment: ${punishType.toUpperCase()}\nExtra: ${extraValue||'N/A'}\n\nMessage: ${ceoMessage.substring(0,100)}...\n\nThis will APPLY IMMEDIATELY on system! Restrict Accessed cannot book, suspended cannot go online.`)) return;
   
   try{
     const now=Date.now();
-    const punishmentId=`PUNISH-${complaintId}-${now}`;
+    const punishmentId=`REVIEW-${complaintId}-${now}`;
     
     // Prepare punishment data
     let punishmentData={
@@ -324,12 +324,12 @@ async function ceoPunishFull(complaintId){
     };
     
     // Determine suspension days and trust deduction
-    let suspendUntil=0, trustDeduct=0, isBlocked=false, isSuspended=false, canBook=true;
+    let suspendUntil=0, trustDeduct=0, isRestrict Accessed=false, isTemporary Restrictioned=false, canBook=true;
     
     if(punishType==='warning'){ trustDeduct=5; }
     else if(punishType==='decrease_trust'){ trustDeduct=parseInt(extraValue)||20; }
     else if(punishType.includes('suspend')){
-      isSuspended=true;
+      isTemporary Restrictioned=true;
       let days=1;
       if(punishType==='suspend_1day') days=1;
       else if(punishType==='suspend_3days') days=3;
@@ -341,8 +341,8 @@ async function ceoPunishFull(complaintId){
       canBook=false;
     }
     else if(punishType.includes('block')){
-      isBlocked=true;
-      isSuspended=true;
+      isRestrict Accessed=true;
+      isTemporary Restrictioned=true;
       suspendUntil= punishType==='block_permanent' ? 0 : now + (30*24*60*60*1000);
       trustDeduct=30;
       canBook=false;
@@ -351,10 +351,10 @@ async function ceoPunishFull(complaintId){
     else if(punishType==='fine_deduct'){ trustDeduct=10; }
     
     punishmentData.suspendUntil=suspendUntil;
-    punishmentData.suspendUntilStr= suspendUntil ? new Date(suspendUntil).toLocaleString('en-GH') : (isBlocked && punishType==='block_permanent' ? 'PERMANENT' : '');
+    punishmentData.suspendUntilStr= suspendUntil ? new Date(suspendUntil).toLocaleString('en-GH') : (isRestrict Accessed && punishType==='block_permanent' ? 'PERMANENT' : '');
     punishmentData.trustDeduct=trustDeduct;
-    punishmentData.isBlocked=isBlocked;
-    punishmentData.isSuspended=isSuspended;
+    punishmentData.isRestrict Accessed=isRestrict Accessed;
+    punishmentData.isTemporary Restrictioned=isTemporary Restrictioned;
     punishmentData.canBook=canBook;
     
     // Upload voice if exists
@@ -381,14 +381,14 @@ async function ceoPunishFull(complaintId){
     
     // 1. Save punishment in multiple places - ALL keys so victim finds it
     for(let key of uniqueKeys){
-      await db.ref('ceoPunishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
-      await db.ref('userPunishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
-      await db.ref('nursePunishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
-      await db.ref('clientPunishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
+      await db.ref('ceoFeedback Actionments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
+      await db.ref('userFeedback Actionments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
+      await db.ref('nurseFeedback Actionments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
+      await db.ref('clientFeedback Actionments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
       await db.ref('punishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
       await db.ref('notifications/'+key+'/'+punishmentId).set({
         type:'punishment',
-        title:`⚖️ CEO Punishment: ${punishType.toUpperCase()}`,
+        title:`⚖️ CEO Feedback Actionment: ${punishType.toUpperCase()}`,
         message:ceoMessage.substring(0,200),
         fullMessage:ceoMessage,
         punishmentId,
@@ -400,11 +400,11 @@ async function ceoPunishFull(complaintId){
         isRead:false,
         immediateEffect:true,
         suspendUntil:suspendUntil,
-        isBlocked:isBlocked
+        isRestrict Accessed:isRestrict Accessed
       }).catch(()=>{});
     }
     // Also save to main collections
-    await db.ref('allPunishments/'+punishmentId).set(punishmentData).catch(()=>{});
+    await db.ref('allFeedback Actionments/'+punishmentId).set(punishmentData).catch(()=>{});
     await db.ref('punishmentsByComplaint/'+complaintId+'/'+punishmentId).set(punishmentData).catch(()=>{});
     await db.ref('ceoActions/'+punishmentId).set(punishmentData).catch(()=>{});
     // Save to specific email and phone paths
@@ -419,28 +419,28 @@ async function ceoPunishFull(complaintId){
     if(victimType==='nurse'){
       // Nurses - block from going online, block from being booked
       await db.ref('nurses/'+victimId).update({
-        isBlocked:isBlocked,
-        isSuspended:isSuspended,
+        isRestrict Accessed:isRestrict Accessed,
+        isTemporary Restrictioned:isTemporary Restrictioned,
         suspendUntil:suspendUntil,
         suspendUntilStr:punishmentData.suspendUntilStr,
         canBeBooked:canBook,
-        canGoOnline: !isBlocked && !isSuspended,
-        isOnline: isBlocked||isSuspended ? false : undefined,
-        online: isBlocked||isSuspended ? false : undefined,
+        canGoOnline: !isRestrict Accessed && !isTemporary Restrictioned,
+        isOnline: isRestrict Accessed||isTemporary Restrictioned ? false : undefined,
+        online: isRestrict Accessed||isTemporary Restrictioned ? false : undefined,
         trustScore: db.ref('nurses/'+victimId+'/trustScore').once ? undefined : undefined, // Will deduct via transaction
-        lastPunishment:punishmentId,
-        lastPunishmentType:punishType,
-        lastPunishmentAt:now,
+        lastFeedback Actionment:punishmentId,
+        lastFeedback ActionmentType:punishType,
+        lastFeedback ActionmentAt:now,
         punishmentCount: (await db.ref('nurses/'+victimId+'/punishmentCount').once('value').then(s=> (s.val()||0)+1).catch(()=>1)),
-        hasActivePunishment:true
+        hasActiveFeedback Actionment:true
       });
       
       // If blocked/suspended, immediately remove from online lists
-      if(isBlocked||isSuspended){
+      if(isRestrict Accessed||isTemporary Restrictioned){
         await db.ref('onlineNurses/'+victimId).remove().catch(()=>{});
         await db.ref('liveNurses/'+victimId).remove().catch(()=>{});
-        await db.ref('nursePresence/'+victimId).set({status:'offline', isOnline:false, isBlocked:isBlocked, isSuspended:isSuspended, suspendUntil:suspendUntil, lastPunishment:punishmentId}).catch(()=>{});
-        await db.ref('nurseLocations/'+victimId).update({isOnline:false, isBlocked:isBlocked, isSuspended:isSuspended}).catch(()=>{});
+        await db.ref('nursePresence/'+victimId).set({status:'offline', isOnline:false, isRestrict Accessed:isRestrict Accessed, isTemporary Restrictioned:isTemporary Restrictioned, suspendUntil:suspendUntil, lastFeedback Actionment:punishmentId}).catch(()=>{});
+        await db.ref('nurseLocations/'+victimId).update({isOnline:false, isRestrict Accessed:isRestrict Accessed, isTemporary Restrictioned:isTemporary Restrictioned}).catch(()=>{});
       }
       
       // Deduct trust via transaction
@@ -454,27 +454,27 @@ async function ceoPunishFull(complaintId){
     } else if(victimType==='client'){
       // Clients - block from booking
       await db.ref('clients/'+victimId).update({
-        isBlocked:isBlocked,
-        isSuspended:isSuspended,
+        isRestrict Accessed:isRestrict Accessed,
+        isTemporary Restrictioned:isTemporary Restrictioned,
         suspendUntil:suspendUntil,
         suspendUntilStr:punishmentData.suspendUntilStr,
         canBook:canBook,
         canBookNurse:canBook,
-        lastPunishment:punishmentId,
-        lastPunishmentType:punishType,
-        lastPunishmentAt:now,
+        lastFeedback Actionment:punishmentId,
+        lastFeedback ActionmentType:punishType,
+        lastFeedback ActionmentAt:now,
         punishmentCount: (await db.ref('clients/'+victimId+'/punishmentCount').once('value').then(s=> (s.val()||0)+1).catch(()=>1)),
-        hasActivePunishment:true
+        hasActiveFeedback Actionment:true
       }).catch(async()=>{
         // Try alternative paths
         const emailKey = victimEmail ? victimEmail.toLowerCase().replace(/[.#$@\[\]]/g,'_') : '';
         if(emailKey){
-          await db.ref('allowedClients/'+emailKey).update({isBlocked:isBlocked, isSuspended:isSuspended, suspendUntil:suspendUntil, canBook:canBook}).catch(()=>{});
-          await db.ref('clientsByEmail/'+emailKey).update({isBlocked:isBlocked, isSuspended:isSuspended, suspendUntil:suspendUntil}).catch(()=>{});
+          await db.ref('allowedClients/'+emailKey).update({isRestrict Accessed:isRestrict Accessed, isTemporary Restrictioned:isTemporary Restrictioned, suspendUntil:suspendUntil, canBook:canBook}).catch(()=>{});
+          await db.ref('clientsByEmail/'+emailKey).update({isRestrict Accessed:isRestrict Accessed, isTemporary Restrictioned:isTemporary Restrictioned, suspendUntil:suspendUntil}).catch(()=>{});
         }
         const phoneKey = victimPhone ? victimPhone.replace(/[^0-9]/g,'').slice(-9) : '';
         if(phoneKey){
-          await db.ref('clientsByPhone/'+phoneKey).update({isBlocked:isBlocked, isSuspended:isSuspended}).catch(()=>{});
+          await db.ref('clientsByPhone/'+phoneKey).update({isRestrict Accessed:isRestrict Accessed, isTemporary Restrictioned:isTemporary Restrictioned}).catch(()=>{});
         }
       });
     }
@@ -482,7 +482,7 @@ async function ceoPunishFull(complaintId){
     // 3. Send notification to victim - they will see punishment inbox
     await db.ref('notifications/'+victimId+'/'+punishmentId).set({
       type:'punishment',
-      title:`⚖️ CEO Punishment: ${punishType.toUpperCase()}`,
+      title:`⚖️ CEO Feedback Actionment: ${punishType.toUpperCase()}`,
       message:ceoMessage.substring(0,200),
       fullMessage:ceoMessage,
       punishmentId,
@@ -494,7 +494,7 @@ async function ceoPunishFull(complaintId){
       isRead:false,
       immediateEffect:true,
       suspendUntil:suspendUntil,
-      isBlocked:isBlocked
+      isRestrict Accessed:isRestrict Accessed
     });
     
     // 4. Update complaint status
@@ -503,8 +503,8 @@ async function ceoPunishFull(complaintId){
     await db.ref('clientComplaints/'+complaintId).update({status:punishType, punishmentId:punishmentId}).catch(()=>{});
     await db.ref('nurseComplaints/'+complaintId).update({status:punishType, punishmentId:punishmentId}).catch(()=>{});
     
-    toast(`✅ PUNISHED: ${victimName} — ${punishType.toUpperCase()} — Immediate effect!`);
-    alert(`✅ PUNISHMENT APPLIED IMMEDIATELY!\n\nVictim: ${victimName} (${victimType})\nPunishment: ${punishType}\nTrust -${trustDeduct}%\n${suspendUntil ? 'Suspended until: '+punishmentData.suspendUntilStr : isBlocked ? 'BLOCKED PERMANENTLY' : ''}\n\nMessage: ${ceoMessage}\nVoice: ${ceoVoiceBlob?'YES - Victim can listen':'No voice'}\n\nVictim will get notification and see punishment in their inbox with your message + voice. System immediately blocks them from booking/going online.`);
+    toast(`✅ REVIEWED: ${victimName} — ${punishType.toUpperCase()} — Immediate effect!`);
+    alert(`✅ REVIEWMENT APPLIED IMMEDIATELY!\n\nVictim: ${victimName} (${victimType})\nFeedback Actionment: ${punishType}\nTrust -${trustDeduct}%\n${suspendUntil ? 'Temporary Restrictioned until: '+punishmentData.suspendUntilStr : isRestrict Accessed ? 'BLOCKED PERMANENTLY' : ''}\n\nMessage: ${ceoMessage}\nVoice: ${ceoVoiceBlob?'YES - Victim can listen':'No voice'}\n\nVictim will get notification and see punishment in their inbox with your message + voice. System immediately blocks them from booking/going online.`);
     
     loadComplaints();
     closeModal();
@@ -512,13 +512,13 @@ async function ceoPunishFull(complaintId){
   }catch(e){
     console.error(e);
     toast('Error: '+e.message);
-    alert('Punishment failed: '+e.message);
+    alert('Feedback Actionment failed: '+e.message);
   }
 }
 
 async function ceoAction(complaintId, action){
   // Old quick action - redirect to full punish
-  ceoPunish(complaintId, action);
+  ceoFeedback Action(complaintId, action);
 }
 
 document.getElementById('punishmentType')?.addEventListener('change', (e)=>{
@@ -544,7 +544,7 @@ function attachLiveComplaints(){
 window.onload=()=>{loadComplaints();setInterval(loadComplaints,20000);};
 </script>
 
-<!-- === UNIVERSAL PUNISHMENT MODAL - Add to ANY complaints.html === -->
+<!-- === UNIVERSAL REVIEWMENT MODAL - Add to ANY complaints.html === -->
 <style>
 .punishModal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);display:none;place-items:center;padding:20px;backdrop-filter:blur(10px)}
 .punishModal.active{display:grid}
@@ -552,8 +552,8 @@ window.onload=()=>{loadComplaints();setInterval(loadComplaints,20000);};
 .punishModalHeader{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:linear-gradient(135deg,#1a1633,#0c0a1e);border-radius:20px 20px 0 0}
 .punishModalBody{padding:20px;display:flex;flex-direction:column;gap:14px}
 .punishBadge{padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900;border:1px solid}
-.punishBlock{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)}
-.punishSuspend{background:rgba(245,158,11,.15);color:#fcd34d;border-color:rgba(245,158,11,.3)}
+.punishRestrict Access{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+.punishTemporary Restriction{background:rgba(245,158,11,.15);color:#fcd34d;border-color:rgba(245,158,11,.3)}
 .punishWarn{background:rgba(250,204,21,.15);color:#facc15;border-color:rgba(250,204,21,.3)}
 .punishEffect{background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(245,158,11,.08));border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px}
 .punishMessageBox{background:rgba(12,10,30,.7);border:1px solid rgba(96,165,250,.2);border-radius:12px;padding:14px}
@@ -563,8 +563,8 @@ window.onload=()=>{loadComplaints();setInterval(loadComplaints,20000);};
 <div id="punishmentModal" class="punishModal">
   <div class="punishModalCard">
     <div class="punishModalHeader">
-      <div><b style="font-family:Fraunces,serif;font-size:16px">⚖️ CEO Punishment — Read & Listen</b><br><small id="punishModalSubtitle" style="font-size:10px;color:#9a95b8">CEO judgment — Immediate effect on system</small></div>
-      <button onclick="closePunishmentModal()" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;font-size:18px">×</button>
+      <div><b style="font-family:Fraunces,serif;font-size:16px">⚖️ CEO Feedback Actionment — Read & Listen</b><br><small id="punishModalSubtitle" style="font-size:10px;color:#9a95b8">CEO judgment — Immediate effect on system</small></div>
+      <button onclick="closeFeedback ActionmentModal()" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;font-size:18px">×</button>
     </div>
     <div class="punishModalBody" id="punishmentModalBody">
       <!-- Dynamic content -->
@@ -573,12 +573,12 @@ window.onload=()=>{loadComplaints();setInterval(loadComplaints,20000);};
 </div>
 
 <script>
-function openPunishmentModal(punishmentData){
+function openFeedback ActionmentModal(punishmentData){
   const modal=document.getElementById('punishmentModal');
   const body=document.getElementById('punishmentModalBody');
-  const isBlocked=punishmentData.isBlocked, isSuspended=punishmentData.isSuspended;
-  const badgeClass=isBlocked?'punishBlock': isSuspended?'punishSuspend':'punishWarn';
-  const badgeText=isBlocked?'🚫 BLOCKED PERMANENTLY': isSuspended?'⏸️ SUSPENDED — '+ (punishmentData.suspendUntilStr||'') : '⚠️ '+punishmentData.action.toUpperCase();
+  const isRestrict Accessed=punishmentData.isRestrict Accessed, isTemporary Restrictioned=punishmentData.isTemporary Restrictioned;
+  const badgeClass=isRestrict Accessed?'punishRestrict Access': isTemporary Restrictioned?'punishTemporary Restriction':'punishWarn';
+  const badgeText=isRestrict Accessed?'🚫 BLOCKED PERMANENTLY': isTemporary Restrictioned?'⏸️ SUSPENDED — '+ (punishmentData.suspendUntilStr||'') : '⚠️ '+punishmentData.action.toUpperCase();
   const timeStr=punishmentData.createdAtStr||new Date(punishmentData.createdAt).toLocaleString('en-GH');
   
   body.innerHTML=`
@@ -592,17 +592,17 @@ function openPunishmentModal(punishmentData){
     <div class="punishEffect">
       <b style="font-size:12px;color:#fca5a5">⚡ Immediate Effect On System:</b><br>
       <div style="font-size:11px;color:#e8e0ff;margin-top:6px;line-height:1.6">
-        ${isBlocked ? `
+        ${isRestrict Accessed ? `
           🚫 <b style="color:#fca5a5">YOU ARE BLOCKED</b> — Cannot go online, cannot be booked, cannot book nurses. Hidden from all clients in book-nurse.html instantly. Must appeal to CEO.<br>
           • Trust Score: -${punishmentData.trustDeduct||30}%<br>
           • Status: BLOCKED PERMANENTLY until CEO unblocks
-        ` : isSuspended ? `
+        ` : isTemporary Restrictioned ? `
           ⏸️ <b style="color:#fcd34d">YOU ARE SUSPENDED ${punishmentData.suspendUntilStr ? 'Until '+punishmentData.suspendUntilStr : ''}</b> — Cannot work/book until suspension ends.<br>
           • Hidden from book-nurse list for ${punishmentData.suspendUntil ? Math.ceil((punishmentData.suspendUntil-Date.now())/(24*60*60*1000))+' days' : 'suspension period'}<br>
           • Trust Score: -${punishmentData.trustDeduct||10}%<br>
           • After ${punishmentData.suspendUntilStr||'suspension ends'}, you can go online again
         ` : `
-          ⚠️ <b style="color:#facc15">WARNING</b> — Yellow card, no block but trust decreased<br>
+          ⚠️ <b style="color:#facc15">Professional Guidance</b> — Yellow card, no block but trust decreased<br>
           • Trust Score: -${punishmentData.trustDeduct||5}%<br>
           • Keep good behavior, next punishment will be suspension/block
         `}
@@ -634,49 +634,49 @@ function openPunishmentModal(punishmentData){
     ` : '<div style="padding:10px;background:rgba(255,255,255,.04);border-radius:10px;font-size:11px;color:#6b6788">No voice message — Only written message</div>'}
     
     <div style="background:rgba(12,10,30,.5);border-radius:10px;padding:10px;font-size:10px;color:#6b6788">
-      <b>Punishment Details:</b><br>
+      <b>Feedback Actionment Details:</b><br>
       ID: ${punishmentData.punishmentId} • Complaint: ${punishmentData.complaintId} • Victim: ${punishmentData.victimName||''} • Type: ${punishmentData.action}<br>
-      Trust: -${punishmentData.trustDeduct||0}% • ${punishmentData.suspendUntilStr? 'Suspended until: '+punishmentData.suspendUntilStr : punishmentData.isBlocked ? 'BLOCKED PERMANENTLY' : 'Warning only'} • ${timeStr}
+      Trust: -${punishmentData.trustDeduct||0}% • ${punishmentData.suspendUntilStr? 'Temporary Restrictioned until: '+punishmentData.suspendUntilStr : punishmentData.isRestrict Accessed ? 'BLOCKED PERMANENTLY' : 'Warning only'} • ${timeStr}
     </div>
     
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button onclick="markPunishmentRead('${punishmentData.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.25);font-weight:800;font-size:12px;cursor:pointer">✅ I Have Read & Listened — Mark Read</button>
-      <button onclick="appealPunishmentFromModal('${punishmentData.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.25);font-weight:800;font-size:12px;cursor:pointer">📝 Appeal to CEO</button>
+      <button onclick="markFeedback ActionmentRead('${punishmentData.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.25);font-weight:800;font-size:12px;cursor:pointer">✅ I Have Read & Listened — Mark Read</button>
+      <button onclick="appealFeedback ActionmentFromModal('${punishmentData.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.25);font-weight:800;font-size:12px;cursor:pointer">📝 Appeal to CEO</button>
     </div>
     
-    <div style="text-align:center"><button onclick="closePunishmentModal()" style="padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.08);font-size:11px;cursor:pointer">Close Modal</button></div>
+    <div style="text-align:center"><button onclick="closeFeedback ActionmentModal()" style="padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.08);font-size:11px;cursor:pointer">Close Modal</button></div>
   `;
   
   modal.classList.add('active');
   // Mark as viewed (not read, just viewed)
-  const userId=getUserIdForPunishment();
+  const userId=getUserIdForFeedback Actionment();
   if(userId){
-    firebase.database().ref('userPunishments/'+userId+'/'+punishmentData.punishmentId).update({isViewed:true, viewedAt:Date.now()}).catch(()=>{});
+    firebase.database().ref('userFeedback Actionments/'+userId+'/'+punishmentData.punishmentId).update({isViewed:true, viewedAt:Date.now()}).catch(()=>{});
   }
 }
 
-function closePunishmentModal(){
+function closeFeedback ActionmentModal(){
   document.getElementById('punishmentModal').classList.remove('active');
 }
 
-function getUserIdForPunishment(){
+function getUserIdForFeedback Actionment(){
   return localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('clientUid')||localStorage.getItem('clientId')||localStorage.getItem('uid')||localStorage.getItem('clientEmail')||'';
 }
 
-function markPunishmentRead(punishmentId){
-  const uid=getUserIdForPunishment();
+function markFeedback ActionmentRead(punishmentId){
+  const uid=getUserIdForFeedback Actionment();
   if(!uid) return;
-  firebase.database().ref('userPunishments/'+uid+'/'+punishmentId).update({isRead:true, readAt:Date.now(), isListened:true}).then(()=>{
+  firebase.database().ref('userFeedback Actionments/'+uid+'/'+punishmentId).update({isRead:true, readAt:Date.now(), isListened:true}).then(()=>{
     alert('✅ Marked as read — CEO will see you read punishment');
-    closePunishmentModal();
+    closeFeedback ActionmentModal();
   });
-  firebase.database().ref('ceoPunishments/'+uid+'/'+punishmentId).update({isRead:true}).catch(()=>{});
+  firebase.database().ref('ceoFeedback Actionments/'+uid+'/'+punishmentId).update({isRead:true}).catch(()=>{});
 }
 
-function appealPunishmentFromModal(punishmentId){
+function appealFeedback ActionmentFromModal(punishmentId){
   const reason=prompt('📝 APPEAL TO CEO — Explain why punishment should be removed or reduced:\n\nBe respectful and explain:');
   if(!reason) return;
-  const uid=getUserIdForPunishment();
+  const uid=getUserIdForFeedback Actionment();
   firebase.database().ref('punishmentAppeals/'+punishmentId).set({
     punishmentId:punishmentId,
     userId:uid,
@@ -687,22 +687,22 @@ function appealPunishmentFromModal(punishmentId){
     status:'pending'
   }).then(()=>{
     alert('✅ Appeal sent to CEO — CEO will review and decide to unblock or reduce punishment');
-    closePunishmentModal();
+    closeFeedback ActionmentModal();
   });
 }
 
 // Auto-check for new punishments and open modal automatically
-function autoCheckPunishments(){
-  const uid=getUserIdForPunishment();
+function autoCheckFeedback Actionments(){
+  const uid=getUserIdForFeedback Actionment();
   if(!uid) return;
-  firebase.database().ref('userPunishments/'+uid).on('child_added', snap=>{
+  firebase.database().ref('userFeedback Actionments/'+uid).on('child_added', snap=>{
     const v=snap.val();
     if(!v) return;
     // If punishment is recent (last 30 seconds) and not read, auto-open modal
     if(v.createdAt && Date.now()-v.createdAt<30000 && !v.isRead){
       setTimeout(()=>{
-        if(confirm(`🚨 NEW CEO PUNISHMENT!\n\n${v.action.toUpperCase()} — ${v.victimName||''}\n\nCEO punished you! Do you want to read punishment now?\n\nMessage: ${(v.ceoMessage||'').substring(0,100)}...`)){
-          openPunishmentModal(v);
+        if(confirm(`🚨 NEW CEO REVIEWMENT!\n\n${v.action.toUpperCase()} — ${v.victimName||''}\n\nCEO punished you! Do you want to read punishment now?\n\nMessage: ${(v.ceoMessage||'').substring(0,100)}...`)){
+          openFeedback ActionmentModal(v);
         }
       }, 1000);
     }
@@ -710,7 +710,7 @@ function autoCheckPunishments(){
 }
 
 // Call auto-check on load
-window.addEventListener('load', ()=>{ setTimeout(autoCheckPunishments, 2000); });
+window.addEventListener('load', ()=>{ setTimeout(autoCheckFeedback Actionments, 2000); });
 </script>
 
 </body>
