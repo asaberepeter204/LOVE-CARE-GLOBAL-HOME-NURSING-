@@ -284,10 +284,12 @@ async function ceoPunishFull(complaintId){
   if(!punishType){ alert('Select PUNISHMENT TYPE'); return; }
   if(!ceoMessage && !ceoVoiceBlob){ if(!confirm('No message or voice — Punish without message?')) return; }
   
-  const victimId = victimType==='nurse' ? (c.nurseId||c.nurseUid||c.nurseEmail) : (c.clientId||c.clientUid||c.clientEmail);
-  const victimName = victimType==='nurse' ? (c.nurseName||'Nurse') : (c.clientName||'Client');
-  const victimPhone = victimType==='nurse' ? (c.nursePhone||'') : (c.clientPhone||'');
-  const victimEmail = victimType==='nurse' ? (c.nurseEmail||'') : (c.clientEmail||'');
+  // Robust victim ID extraction - try all possible fields
+  const victimId = victimType==='nurse' ? (c.nurseId||c.nurseUid||c.nurse_id||c.nurseID||c.nurseEmail||c.nursePhone||'') : (c.clientId||c.clientUid||c.client_id||c.clientID||c.clientEmail||c.clientPhone||'');
+  const victimName = victimType==='nurse' ? (c.nurseName||c.nurseFullName||c.nurse_name||'Nurse') : (c.clientName||c.clientFullName||c.client_name||'Client');
+  const victimPhone = victimType==='nurse' ? (c.nursePhone||c.nurse_phone||c.phone||'') : (c.clientPhone||c.client_phone||c.phone||'');
+  const victimEmail = victimType==='nurse' ? (c.nurseEmail||c.nurse_email||c.email||'') : (c.clientEmail||c.client_email||c.email||'');
+  console.log('Victim:', victimType, victimId, victimName, victimPhone, victimEmail, 'Full complaint:', c);
   
   if(!confirm(`⚖️ CONFIRM PUNISHMENT\n\nVictim: ${victimType.toUpperCase()} — ${victimName}\nPunishment: ${punishType.toUpperCase()}\nExtra: ${extraValue||'N/A'}\n\nMessage: ${ceoMessage.substring(0,100)}...\n\nThis will APPLY IMMEDIATELY on system! Blocked cannot book, suspended cannot go online.`)) return;
   
@@ -366,14 +368,52 @@ async function ceoPunishFull(complaintId){
       punishmentData.voiceBase64=voiceBase64;
     }
     
-    // === APPLY IMMEDIATE EFFECT ON SYSTEM ===
+    // === APPLY IMMEDIATE EFFECT - SAVE TO ALL POSSIBLE IDs SO VICTIM RECEIVES IT ===
     
-    // 1. Save punishment in multiple places
-    await db.ref('ceoPunishments/'+victimId+'/'+punishmentId).set(punishmentData);
-    await db.ref('userPunishments/'+victimId+'/'+punishmentId).set(punishmentData);
-    await db.ref('allPunishments/'+punishmentId).set(punishmentData);
-    await db.ref('punishmentsByComplaint/'+complaintId+'/'+punishmentId).set(punishmentData);
-    await db.ref('ceoActions/'+punishmentId).set(punishmentData);
+    // Build all possible victim keys
+    const victimEmailKey = victimEmail ? victimEmail.toLowerCase().replace(/[.#$@\[\]]/g,'_') : '';
+    const victimPhoneKey = victimPhone ? victimPhone.replace(/[^0-9]/g,'').slice(-9) : '';
+    const victimKeys = [victimId, victimEmail, victimEmailKey, victimPhoneKey, victimPhone].filter(k=>k && k.length>2);
+    // Remove duplicates
+    const uniqueKeys=[...new Set(victimKeys)];
+    
+    console.log('Saving punishment to keys:', uniqueKeys);
+    
+    // 1. Save punishment in multiple places - ALL keys so victim finds it
+    for(let key of uniqueKeys){
+      await db.ref('ceoPunishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
+      await db.ref('userPunishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
+      await db.ref('nursePunishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
+      await db.ref('clientPunishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
+      await db.ref('punishments/'+key+'/'+punishmentId).set(punishmentData).catch(()=>{});
+      await db.ref('notifications/'+key+'/'+punishmentId).set({
+        type:'punishment',
+        title:`⚖️ CEO Punishment: ${punishType.toUpperCase()}`,
+        message:ceoMessage.substring(0,200),
+        fullMessage:ceoMessage,
+        punishmentId,
+        complaintId,
+        victimType,
+        action:punishType,
+        hasVoice:!!ceoVoiceBlob,
+        createdAt:now,
+        isRead:false,
+        immediateEffect:true,
+        suspendUntil:suspendUntil,
+        isBlocked:isBlocked
+      }).catch(()=>{});
+    }
+    // Also save to main collections
+    await db.ref('allPunishments/'+punishmentId).set(punishmentData).catch(()=>{});
+    await db.ref('punishmentsByComplaint/'+complaintId+'/'+punishmentId).set(punishmentData).catch(()=>{});
+    await db.ref('ceoActions/'+punishmentId).set(punishmentData).catch(()=>{});
+    // Save to specific email and phone paths
+    if(victimEmailKey){
+      await db.ref('punishmentsByEmail/'+victimEmailKey+'/'+punishmentId).set(punishmentData).catch(()=>{});
+    }
+    if(victimPhoneKey){
+      await db.ref('punishmentsByPhone/'+victimPhoneKey+'/'+punishmentId).set(punishmentData).catch(()=>{});
+    }
     
     // 2. Update victim's main record with punishment - IMMEDIATE EFFECT
     if(victimType==='nurse'){
