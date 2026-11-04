@@ -116,6 +116,242 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
 </div>
 
 <div class="wrap">
+
+<!-- CEO HOME PAGE BANNER - Controlled by CEO Control Chat -->
+<style>
+#ceoHomeBanner{margin:0 0 16px; border-radius:16px; overflow:hidden; display:none; position:relative; border:2px solid rgba(250,204,21,.3); animation:slideDown .5s ease}
+#ceoHomeBanner.active{display:block}
+#ceoHomeBanner.marquee_fast .ceoBannerText{animation:marquee 8s linear infinite}
+#ceoHomeBanner.marquee_slow .ceoBannerText{animation:marquee 30s linear infinite}
+#ceoHomeBanner.marquee_medium .ceoBannerText{animation:marquee 15s linear infinite}
+#ceoHomeBanner.blink{animation:blinkBanner 1s infinite}
+@keyframes marquee{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+@keyframes blinkBanner{0%,100%{opacity:1}50%{opacity:.6}}
+@keyframes slideDown{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.ceoBannerHeader{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,0,0,.2);border-bottom:1px solid rgba(255,255,255,.1)}
+.ceoBannerAvatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #facc15}
+.ceoBannerMeta{flex:1}
+.ceoBannerMeta b{font-size:13px;display:block}
+.ceoBannerMeta small{font-size:10px;opacity:.8}
+.ceoBannerClose{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);color:#fff;cursor:pointer;display:grid;place-items:center}
+.ceoBannerContent{padding:12px 14px;overflow:hidden;position:relative}
+.ceoBannerText{font-size:14px;font-weight:600;line-height:1.5;white-space:nowrap;display:inline-block}
+.ceoBannerText.static{white-space:normal}
+.ceoBannerMedia{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.ceoBannerMedia img{max-width:100%;border-radius:12px;max-height:400px;object-fit:cover}
+.ceoBannerMedia video{max-width:100%;border-radius:12px;max-height:400px;background:#000}
+.ceoTicker{position:fixed;bottom:0;left:0;right:0;z-index:50;padding:10px 14px;display:none;overflow:hidden;white-space:nowrap}
+.ceoTicker.active{display:block}
+.ceoTickerText{display:inline-block;animation:marquee 20s linear infinite; font-weight:700}
+</style>
+
+<div id="ceoHomeBanner">
+<div class="ceoBannerHeader">
+<img id="ceoBannerAvatar" src="https://ui-avatars.com/api/?name=Asabere+Peter&background=facc15&color=000" class="ceoBannerAvatar">
+<div class="ceoBannerMeta"><b id="ceoBannerName">👑 CEO Announcement — Asabere Peter</b><small id="ceoBannerTime">Just now • LoveCare Global</small></div>
+<button class="ceoBannerClose" onclick="closeCeoBanner()" id="ceoBannerCloseBtn">✕</button>
+</div>
+<div class="ceoBannerContent" id="ceoBannerContent">
+<div class="ceoBannerText" id="ceoBannerText">Loading CEO announcement...</div>
+<div class="ceoBannerMedia" id="ceoBannerMedia"></div>
+</div>
+</div>
+
+<div id="ceoTicker" class="ceoTicker" style="background:#facc15;color:#000">
+<div class="ceoTickerText" id="ceoTickerText">CEO Announcement</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+(function(){
+  const cfg={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+  if(!firebase.apps.length) firebase.initializeApp(cfg);
+  const db=firebase.database();
+
+  function showCeoBanner(data){
+    if(!data || !data.active) { document.getElementById('ceoHomeBanner').classList.remove('active'); document.getElementById('ceoTicker').classList.remove('active'); return; }
+    
+    const banner=document.getElementById('ceoHomeBanner');
+    const textEl=document.getElementById('ceoBannerText');
+    const mediaEl=document.getElementById('ceoBannerMedia');
+    const avatarEl=document.getElementById('ceoBannerAvatar');
+    const nameEl=document.getElementById('ceoBannerName');
+    const timeEl=document.getElementById('ceoBannerTime');
+    const ticker=document.getElementById('ceoTicker');
+    const tickerText=document.getElementById('ceoTickerText');
+    const closeBtn=document.getElementById('ceoBannerCloseBtn');
+    
+    // Colours
+    banner.style.background=data.bgColor||'#1a1633';
+    banner.style.color=data.textColor||'#ffffff';
+    banner.style.borderColor=data.textColor||'rgba(250,204,21,.3)';
+    
+    // Position handling - default is inside welcome card
+    if(data.position==='top_banner'){
+      banner.style.margin='0 0 16px';
+    }
+    
+    // Avatar & Name
+    if(data.senderPhoto) avatarEl.src=data.senderPhoto;
+    nameEl.textContent='👑 '+ (data.senderName||'CEO Announcement');
+    timeEl.textContent=(data.createdAtStr||'Just now')+' • CEO: Asabere Peter';
+    
+    // Display type & speed
+    banner.className='';
+    banner.classList.add('active');
+    const displayType=data.displayType||'marquee_slow';
+    banner.classList.add(displayType);
+    
+    if(displayType.includes('marquee') || data.speed){
+      let duration='15s';
+      if(data.speed==='slow' || displayType==='marquee_slow') duration='30s';
+      else if(data.speed==='medium' || displayType==='marquee_medium') duration='15s';
+      else if(data.speed==='fast' || displayType==='marquee_fast') duration='8s';
+      else if(data.speed==='very_fast') duration='4s';
+      
+      textEl.style.animationDuration=duration;
+      textEl.style.whiteSpace='nowrap';
+      textEl.classList.remove('static');
+      textEl.innerHTML='📢 '+escapeHtml(data.text||'')+' — 👑 CEO: Asabere Peter — '+ (data.createdAtStr||'') +' — 📢 '+escapeHtml(data.text||'');
+    } else if(displayType==='static'){
+      textEl.style.animation='none';
+      textEl.classList.add('static');
+      textEl.textContent=data.text||'';
+    } else if(displayType==='blink'){
+      textEl.textContent=data.text||'';
+      banner.classList.add('blink');
+    } else if(displayType==='photo_full' || displayType==='carousel'){
+      textEl.textContent=data.text||'';
+      textEl.classList.add('static');
+      textEl.style.whiteSpace='normal';
+    }
+    
+    // Media - photos/videos display well across
+    mediaEl.innerHTML='';
+    if(data.images && data.images.length>0){
+      data.images.forEach(img=>{
+        const im=document.createElement('img');
+        im.src=img.data||img.url;
+        im.style.maxWidth='100%';
+        im.style.borderRadius='12px';
+        im.style.maxHeight='500px';
+        im.style.objectFit='cover';
+        im.style.width='100%';
+        mediaEl.appendChild(im);
+      });
+    }
+    if(data.videos && data.videos.length>0){
+      data.videos.forEach(v=>{
+        const vd=document.createElement('video');
+        vd.src=v.data||v.url;
+        vd.controls=true;
+        vd.style.maxWidth='100%';
+        vd.style.borderRadius='12px';
+        vd.style.maxHeight='500px';
+        vd.style.width='100%';
+        mediaEl.appendChild(vd);
+      });
+    }
+    
+    // Ticker mode
+    if(data.displayType==='ticker'){
+      banner.classList.remove('active');
+      ticker.classList.add('active');
+      ticker.style.background=data.bgColor||'#facc15';
+      ticker.style.color=data.textColor||'#000';
+      tickerText.textContent='📢 '+data.text+' — CEO: Asabere Peter';
+      let dur='20s';
+      if(data.speed==='slow') dur='40s';
+      if(data.speed==='fast') dur='10s';
+      if(data.speed==='very_fast') dur='5s';
+      tickerText.style.animationDuration=dur;
+    } else {
+      ticker.classList.remove('active');
+    }
+    
+    // Close button
+    if(data.allowClose===false){
+      closeBtn.style.display='none';
+    } else {
+      closeBtn.style.display='grid';
+    }
+    
+    // Duration handling
+    if(data.duration && data.duration!=='permanent'){
+      let ms=0;
+      if(data.duration==='1h') ms=3600000;
+      if(data.duration==='24h') ms=86400000;
+      if(data.duration==='7d') ms=604800000;
+      if(ms>0){
+        setTimeout(()=>{ closeCeoBanner(); }, ms);
+      }
+    }
+  }
+  
+  function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+  
+  window.closeCeoBanner=function(){
+    document.getElementById('ceoHomeBanner').classList.remove('active');
+    document.getElementById('ceoTicker').classList.remove('active');
+    // Save closed state locally so it doesn't reappear immediately
+    localStorage.setItem('ceoBannerClosed', Date.now());
+  };
+  
+  // Listen to CEO home page announcements - current
+  db.ref('ceoHomePageCurrent').on('value', snap=>{
+    if(snap.exists()){
+      const data=snap.val();
+      // Check if user closed recently (within 10 minutes) and banner is closable
+      const closed=localStorage.getItem('ceoBannerClosed');
+      if(closed && Date.now() - parseInt(closed) < 600000 && data.allowClose!==false){
+        return; // Don't show if closed recently
+      }
+      showCeoBanner(data);
+    } else {
+      // No current, check active announcements
+      db.ref('ceoHomePageAnnouncements').orderByChild('createdAt').limitToLast(1).once('value').then(snap=>{
+        if(snap.exists()){
+          let latest=null;
+          snap.forEach(ch=>{ latest=ch.val(); });
+          if(latest && latest.active) showCeoBanner(latest);
+        }
+      });
+    }
+  });
+  
+  // Also listen to homePageBanner/current
+  db.ref('homePageBanner/current').on('value', snap=>{
+    if(snap.exists()){
+      showCeoBanner(snap.val());
+    }
+  });
+  
+  // Listen to all active home announcements for latest
+  db.ref('ceoHomePageAnnouncements').on('value', snap=>{
+    if(!snap.exists()) return;
+    let latest=null, latestTime=0;
+    snap.forEach(ch=>{
+      const v=ch.val();
+      if(v.active && v.createdAt > latestTime){
+        latest=v;
+        latestTime=v.createdAt;
+      }
+    });
+    if(latest){
+      // Only show if no current is set or current is older
+      db.ref('ceoHomePageCurrent').once('value').then(curSnap=>{
+        if(!curSnap.exists()){
+          showCeoBanner(latest);
+        }
+      });
+    }
+  });
+
+})();
+</script>
+<!-- END CEO HOME PAGE BANNER -->
+
 <div class="welcomeCard" style="display:block">
 <div class="welcomeText">
 <h1 class="hWelcome">Welcome to<br><span>LOVE CARE GLOBAL<br>HOME NURSING</span></h1>
