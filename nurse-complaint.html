@@ -152,17 +152,70 @@ function openMyPunishments(){
   if(sec.style.display==='block') loadMyPunishments();
 }
 async function loadMyPunishments(){
-  const nurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
-  if(!nurseId) return;
-  const snap=await db.ref('userPunishments/'+nurseId).once('value');
-  const list=snap.exists()? Object.values(snap.val()).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)) : [];
+  const ids=[
+    localStorage.getItem('lcg_nurse_uid'),
+    localStorage.getItem('nurseUid'),
+    localStorage.getItem('nurseId'),
+    localStorage.getItem('uid'),
+    localStorage.getItem('nurseEmail'),
+    localStorage.getItem('nurseEmail')? localStorage.getItem('nurseEmail').toLowerCase().replace(/[.#$@\[\]]/g,'_') : '',
+    localStorage.getItem('nursePhone'),
+    localStorage.getItem('nursePhone')? localStorage.getItem('nursePhone').replace(/[^0-9]/g,'').slice(-9) : '',
+    localStorage.getItem('email'),
+    localStorage.getItem('phone')
+  ].filter(Boolean);
+  
+  console.log('Searching nurse punishments for IDs:', ids);
+  
+  let allPunishments={};
+  for(let id of ids){
+    try{
+      const paths=['userPunishments/'+id, 'ceoPunishments/'+id, 'nursePunishments/'+id, 'punishments/'+id, 'punishmentsByEmail/'+id, 'punishmentsByPhone/'+id];
+      for(let path of paths){
+        const snap=await db.ref(path).once('value');
+        if(snap.exists()){
+          const val=snap.val();
+          if(typeof val==='object'){
+            Object.values(val).forEach(p=>{ if(p && p.punishmentId) allPunishments[p.punishmentId]=p; });
+          }
+        }
+      }
+    }catch(e){}
+  }
+  
+  try{
+    const allSnap=await db.ref('allPunishments').once('value');
+    if(allSnap.exists()){
+      const nurseEmail=(localStorage.getItem('nurseEmail')||localStorage.getItem('email')||'').toLowerCase();
+      const nursePhone=(localStorage.getItem('nursePhone')||localStorage.getItem('phone')||'').replace(/[^0-9]/g,'').slice(-9);
+      Object.values(allSnap.val()).forEach(p=>{
+        if(!p || p.victimType!=='nurse') return;
+        const pEmail=(p.victimEmail||'').toLowerCase();
+        const pPhone=(p.victimPhone||'').replace(/[^0-9]/g,'').slice(-9);
+        if((nurseEmail && pEmail && pEmail===nurseEmail) || (nursePhone && pPhone && pPhone===nursePhone) || ids.includes(p.victimId)){
+          allPunishments[p.punishmentId]=p;
+        }
+      });
+    }
+  }catch(e){}
+  
+  const list=Object.values(allPunishments).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  console.log('Found nurse punishments:', list);
+  
   const el=document.getElementById('myPunishList');
   const badge=document.getElementById('punishBadge');
   const unread=list.filter(p=>!p.isRead).length;
   if(badge){ badge.textContent=unread; badge.style.display= unread>0 ? 'inline-block' : 'none'; }
-  if(!list.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:#6b6788">✅ No punishments</div>'; return; }
-  el.innerHTML=list.map(p=>`<div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer" onclick='openPunishmentModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'><div style="display:flex;gap:6px"><span style="background:${p.isBlocked?'rgba(239,68,68,.15)': p.isSuspended?'rgba(245,158,11,.15)':'rgba(250,204,21,.15)'};color:${p.isBlocked?'#fca5a5': p.isSuspended?'#fcd34d':'#facc15'};padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800">${p.isBlocked?'🚫 BLOCKED': p.isSuspended?'⏸️ SUSPENDED': p.action.toUpperCase()}</span><span style="font-size:10px;color:#6b6788">${p.createdAtStr||''}</span></div><div style="font-weight:700;font-size:12px;margin-top:6px">CEO: ${p.action} — Click to read + listen</div><div style="font-size:11px;color:#9a95b8">${(p.ceoMessage||'').substring(0,80)}...</div></div>`).join('');
+  if(!list.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:#6b6788">✅ No punishments<br><small style="font-size:9px">Checked: '+ids.join(', ').substring(0,100)+'</small></div>'; return; }
+  el.innerHTML=list.map(p=>`<div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="openPunishmentModalById('${p.punishmentId}')"><div style="display:flex;gap:6px"><span style="background:${p.isBlocked?'rgba(239,68,68,.15)': p.isSuspended?'rgba(245,158,11,.15)':'rgba(250,204,21,.15)'};color:${p.isBlocked?'#fca5a5': p.isSuspended?'#fcd34d':'#facc15'};padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800">${p.isBlocked?'🚫 BLOCKED': p.isSuspended?'⏸️ SUSPENDED': (p.action||'').toUpperCase()}</span><span style="font-size:10px;color:#6b6788">${p.createdAtStr||''}</span>${p.hasVoice?'<span style="font-size:10px;background:rgba(167,139,250,.12);color:#c4b5fd;padding:3px 6px;border-radius:999px">🎤 Voice</span>':''}</div><div style="font-weight:700;font-size:12px;margin-top:6px">CEO: ${p.action} — Click to read + listen</div><div style="font-size:11px;color:#9a95b8">${(p.ceoMessage||'').substring(0,80)}...</div></div>`).join('');
+  window._allPunishments=allPunishments;
 }
+
+function openPunishmentModalById(punishmentId){
+  const p=window._allPunishments && window._allPunishments[punishmentId];
+  if(p) openPunishmentModal(p);
+}
+
 window.onload=()=>{getParams(); setTimeout(loadMyPunishments,1500);};
 
 <!-- === UNIVERSAL PUNISHMENT MODAL - Add to ANY complaints.html === -->
@@ -281,8 +334,45 @@ function closePunishmentModal(){
 }
 
 function getUserIdForPunishment(){
-  return localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('clientUid')||localStorage.getItem('clientId')||localStorage.getItem('uid')||localStorage.getItem('clientEmail')||'';
+  return localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||localStorage.getItem('nurseEmail')||'';
 }
+function getAllUserIdsForPunishment(){
+  return [
+    localStorage.getItem('lcg_nurse_uid'),
+    localStorage.getItem('nurseUid'),
+    localStorage.getItem('uid'),
+    localStorage.getItem('nurseEmail'),
+    localStorage.getItem('nurseEmail')? localStorage.getItem('nurseEmail').toLowerCase().replace(/[.#$@\[\]]/g,'_') : '',
+    localStorage.getItem('nursePhone'),
+    localStorage.getItem('nursePhone')? localStorage.getItem('nursePhone').replace(/[^0-9]/g,'').slice(-9) : '',
+    localStorage.getItem('email'),
+    localStorage.getItem('phone')
+  ].filter(Boolean);
+}
+function autoCheckPunishments(){
+  const ids=getAllUserIdsForPunishment();
+  ids.forEach(uid=>{
+    firebase.database().ref('userPunishments/'+uid).on('child_added', snap=>{
+      const v=snap.val();
+      if(!v) return;
+      if(v.createdAt && Date.now()-v.createdAt<60000 && !v.isRead){
+        setTimeout(()=>{
+          if(confirm(`🚨 NEW CEO PUNISHMENT!\n\n${(v.action||'').toUpperCase()} — CEO punished you! Read now?`)){
+            openPunishmentModal(v);
+          }
+          loadMyPunishments();
+        }, 1000);
+      }
+    });
+    firebase.database().ref('ceoPunishments/'+uid).on('child_added', snap=>{
+      const v=snap.val();
+      if(v && v.createdAt && Date.now()-v.createdAt<60000 && !v.isRead){
+        setTimeout(()=>{ openPunishmentModal(v); loadMyPunishments(); }, 500);
+      }
+    });
+  });
+}
+
 
 function markPunishmentRead(punishmentId){
   const uid=getUserIdForPunishment();
