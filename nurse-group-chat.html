@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurses Community Chat — All Nurses Talk Together — LoveCare Global</title>
+<title>Nurses Community Chat — All Nurses Talk Together — FINAL FIXED</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
 :root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--faint:#6b6788;--gold:#facc15;--purple:#a78bfa;--green:#34d399}
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-header{padding:14px 20px;background:rgba(12,10,30,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-shrink:0}
-.brand{font-family:Fraunces,serif;font-weight:700;font-size:18px}
-.headerBtns{display:flex;gap:8px;overflow-x:auto;align-items:center}
+header{padding:14px 20px;background:rgba(12,10,30,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:16px}
+.headerBtns{display:flex;gap:8px;overflow-x:auto;align-items:center;flex-wrap:wrap}
 .btn{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap}
-.btnPurple{background:linear-gradient(135deg,#a78bfa,#8b5cf6);color:#fff;border:0}
-.btnGreen{background:linear-gradient(135deg,#34d399,#059669);color:#fff;border:0}
 .main{flex:1;display:flex;overflow:hidden}
 .sidebar{width:260px;background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
 @media(max-width:768px){.sidebar{position:fixed;inset:0;z-index:30;transform:translateX(-100%);transition:.3s}.sidebar.open{transform:translateX(0)}}
@@ -22,32 +20,47 @@ header{padding:14px 20px;background:rgba(12,10,30,.96);backdrop-filter:blur(20px
 .onlineDot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .chatArea{flex:1;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at top,rgba(167,139,250,.08),transparent 50%), var(--bg)}
-.messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.message{max-width:75%;padding:12px 14px;border-radius:18px;position:relative;animation:slideIn .2s}
+.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.message{max-width:80%;padding:0;border-radius:18px;position:relative;overflow:hidden;animation:slideIn .2s}
 @keyframes slideIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
-.message.me{align-self:flex-end;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border-bottom-right-radius:6px}
-.message.other{align-self:flex-start;background:rgba(26,22,51,.9);border:1px solid var(--line);border-bottom-left-radius:6px}
-.messageInfo{font-size:10px;margin-bottom:4px;opacity:.8;display:flex;gap:6px;align-items:center}
+.message.me{align-self:flex-end}
+.message.me .bubble{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border-bottom-right-radius:6px}
+.message.other{align-self:flex-start}
+.message.other .bubble{background:rgba(26,22,51,.95);border:1px solid var(--line);border-bottom-left-radius:6px;color:var(--text)}
+.bubble{padding:0;border-radius:18px;overflow:hidden}
+.messageHeader{padding:10px 12px 6px;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.15)}
+.message.me .messageHeader{background:rgba(0,0,0,.1)}
+.avatarImg{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.2);flex-shrink:0}
+.message.other .avatarImg{border-color:var(--purple)}
+.message.me .avatarImg{border-color:rgba(255,255,255,.4)}
+.headerText{flex:1;min-width:0}
+.headerName{font-weight:800;font-size:13px;line-height:1.2;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.headerTime{font-size:10px;opacity:.7;margin-top:2px}
+.badgeCEO{background:rgba(250,204,21,.25);color:#facc15;padding:2px 6px;border-radius:999px;font-size:8px;font-weight:900;border:1px solid rgba(250,204,21,.3)}
+.badgeYou{background:rgba(255,255,255,.15);color:#fff;padding:2px 6px;border-radius:999px;font-size:8px}
+.badgeNurse{background:rgba(167,139,250,.2);color:#c4b5fd;padding:2px 6px;border-radius:999px;font-size:8px}
+.messageContent{padding:8px 14px 12px}
 .messageText{font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .messageMedia{margin-top:8px;display:flex;flex-direction:column;gap:6px}
 .mediaImg{max-width:100%;border-radius:10px;max-height:240px;object-fit:cover;cursor:pointer}
 .mediaVideo{max-width:100%;border-radius:10px;max-height:240px;background:#000}
 .audioPlayer{width:100%;margin-top:4px}
-.fileCard{background:rgba(0,0,0,.2);border-radius:10px;padding:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.inputArea{padding:14px 16px;background:rgba(12,10,30,.9);border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.fileCard{background:rgba(0,0,0,.2);border-radius:10px;padding:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px}
+.actions{padding:6px 14px 10px;display:flex;gap:6px}
+.actBtn{padding:5px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.15);color:#fff;font-size:10px;cursor:pointer}
+.actBtn.edit{background:rgba(96,165,250,.2);color:#93c5fd}
+.actBtn.del{background:rgba(239,68,68,.2);color:#fca5a5}
+.inputArea{padding:12px 14px;background:rgba(12,10,30,.95);border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
 .inputRow{display:flex;gap:8px;align-items:flex-end}
-.textInput{flex:1;padding:12px 16px;border-radius:24px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:13px;resize:none;min-height:44px;max-height:120px;outline:none}
-.textInput:focus{border-color:rgba(167,139,250,.4)}
+.textInput{flex:1;padding:12px 16px;border-radius:24px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:13px;resize:none;min-height:44px;max-height:100px;outline:none}
 .iconBtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:18px;cursor:pointer;display:grid;place-items:center;flex-shrink:0}
-.iconBtn:hover{background:rgba(255,255,255,.1)}
 .iconBtn.primary{background:linear-gradient(135deg,#a78bfa,#7c3aed);border:0;color:#fff}
-.mediaTools{display:flex;gap:8px;flex-wrap:wrap}
-.toolBtn{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;cursor:pointer;display:flex;gap:6px;align-items:center}
-.toolBtn:hover{background:rgba(255,255,255,.1)}
+.mediaTools{display:flex;gap:6px;flex-wrap:wrap}
+.toolBtn{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;cursor:pointer}
 .recordingBox{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:10px;display:none;align-items:center;gap:10px}
 .recordingBox.active{display:flex}
-.toast{position:fixed;right:16px;bottom:100px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
-.typing{font-size:11px;color:var(--muted);padding:0 20px 4px;display:none}
+.toast{position:fixed;right:16px;bottom:100px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;display:none;max-width:300px}
+.typing{font-size:11px;color:var(--muted);padding:0 16px 4px;display:none}
 .emojiPanel{position:absolute;bottom:70px;right:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:none;grid-template-columns:repeat(6,1fr);gap:6px;z-index:10;max-height:200px;overflow-y:auto}
 .emojiPanel.active{display:grid}
 .emoji{font-size:20px;cursor:pointer;padding:6px;border-radius:8px;text-align:center}
@@ -57,37 +70,31 @@ header{padding:14px 20px;background:rgba(12,10,30,.96);backdrop-filter:blur(20px
 <header>
 <div class="brand">👩‍⚕️ Nurses Community Chat — All Nurses Talk Together 💬</div>
 <div class="headerBtns">
-<button class="btn" onclick="toggleSidebar()">👥 Online Nurses (<span id="onlineCount">0</span>)</button>
+<button class="btn" onclick="toggleSidebar()">👥 Online (<span id="onlineCount">0</span>)</button>
 <a href="nurse-dashboard.html" class="btn">🏠 Dashboard</a>
-<a href="my-job-offer.html" class="btn">📋 My Jobs</a>
-<a href="nurse-complaint.html" class="btn">📝 Complaint</a>
-<a href="index.html" class="btn">🏠 Home</a>
+<a href="my-job-offer.html" class="btn">📋 Jobs</a>
+<a href="ceo-control-chat.html" class="btn" style="background:rgba(250,204,21,.15);color:#facc15;border-color:rgba(250,204,21,.25)">👑 CEO Board</a>
 </div>
 </header>
 <div class="main">
 <div id="sidebar" class="sidebar">
-<div class="sidebarHeader">
-<div style="display:flex;justify-content:space-between;align-items:center"><b>👥 Online Nurses</b><button class="btn" onclick="toggleSidebar()">✕</button></div>
-<div style="font-size:11px;color:var(--muted);margin-top:6px">All registered nurses — Live</div>
-<input id="searchNurse" class="textInput" style="width:100%;margin-top:10px;padding:8px 12px;border-radius:999px;font-size:11px" placeholder="🔍 Search nurse..." oninput="filterNurses()">
-</div>
-<div id="onlineList" class="sidebarBody"><div style="padding:20px;text-align:center;color:var(--muted);font-size:11px">Loading nurses...</div></div>
-<div style="padding:12px;border-top:1px solid var(--line)"><div style="font-size:10px;color:var(--faint)">💡 This is community chat — All nurses can talk, share experiences, ask help, post pictures/videos</div></div>
+<div class="sidebarHeader"><div style="display:flex;justify-content:space-between;align-items:center"><b>👥 Nurses</b><button class="btn" onclick="toggleSidebar()">✕</button></div><input id="searchNurse" class="textInput" style="width:100%;margin-top:10px;padding:8px 12px;font-size:11px" placeholder="🔍 Search..." oninput="filterNurses()"></div>
+<div id="onlineList" class="sidebarBody">Loading...</div>
 </div>
 <div class="chatArea">
-<div id="messages" class="messages"><div style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:40px">💬</div><div style="margin-top:12px;font-weight:700">Welcome to Nurses Community Chat!</div><div style="font-size:12px;margin-top:6px">All nurses in LoveCare Global can chat here — Share your work experiences, ask questions, support each other, post pictures & videos</div><div style="font-size:11px;margin-top:10px;color:var(--faint)">No punishment — Just friendly community 😊</div></div></div>
-<div id="typing" class="typing">Someone is typing...</div>
+<div id="messages" class="messages"><div style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:40px">💬</div><div style="margin-top:12px;font-weight:700">Welcome to Nurses Community Chat!</div><div style="font-size:12px;margin-top:6px">Photo + Name appears for everyone who chats</div></div></div>
+<div id="typing" class="typing"></div>
 <div id="emojiPanel" class="emojiPanel"></div>
 <div class="inputArea">
-<div id="recordingAudio" class="recordingBox"><span class="onlineDot" style="background:#ef4444"></span><span>Recording audio... <span id="audioTimer">00:00</span></span><button class="btn" onclick="stopAudio()">⏹️ Stop & Send</button><button class="btn" onclick="cancelAudio()">✕ Cancel</button></div>
-<div id="recordingVideo" class="recordingBox" style="flex-direction:column;align-items:stretch"><div style="display:flex;gap:10px;align-items:center"><span class="onlineDot" style="background:#a78bfa"></span><span>Recording video... <span id="videoTimer">00:00</span></span><button class="btn" onclick="stopVideo()">⏹️ Stop & Send</button><button class="btn" onclick="cancelVideo()">✕ Cancel</button></div><video id="videoLive" autoplay muted style="width:100%;height:160px;background:#000;border-radius:10px;margin-top:8px"></video></div>
-<div id="filePreview" style="display:none;flex-direction:column;gap:6px;max-height:120px;overflow-y:auto"></div>
+<div id="recordingAudio" class="recordingBox"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block;animation:blink 1s infinite"></span> Recording audio... <span id="audioTimer">00:00</span> <button class="btn" onclick="stopAudio()">⏹️ Stop</button><button class="btn" onclick="cancelAudio()">✕</button></div>
+<div id="recordingVideo" class="recordingBox" style="flex-direction:column"><div style="display:flex;gap:10px;align-items:center;width:100%"><span style="width:10px;height:10px;border-radius:50%;background:#a78bfa;display:inline-block"></span> Recording video... <span id="videoTimer">00:00</span> <button class="btn" onclick="stopVideo()">⏹️ Stop</button><button class="btn" onclick="cancelVideo()">✕</button></div><video id="videoLive" autoplay muted style="width:100%;height:150px;background:#000;border-radius:10px;margin-top:8px"></video></div>
+<div id="filePreview" style="display:none;flex-direction:column;gap:6px;max-height:100px;overflow-y:auto"></div>
 <div class="mediaTools">
 <button class="toolBtn" onclick="document.getElementById('imageInput').click()">🖼️ Photo</button>
 <button class="toolBtn" onclick="document.getElementById('videoInput').click()">🎥 Video</button>
-<button class="toolBtn" onclick="document.getElementById('fileInput').click()">📄 Document</button>
+<button class="toolBtn" onclick="document.getElementById('fileInput').click()">📄 Doc</button>
 <button class="toolBtn" onclick="startAudio()">🎤 Voice</button>
-<button class="toolBtn" onclick="startVideo()">📹 Video Message</button>
+<button class="toolBtn" onclick="startVideo()">📹 Video Msg</button>
 <button class="toolBtn" onclick="toggleEmoji()">😊 Emoji</button>
 <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleImages(this.files)">
 <input type="file" id="videoInput" accept="video/*" multiple style="display:none" onchange="handleVideos(this.files)">
@@ -95,10 +102,9 @@ header{padding:14px 20px;background:rgba(12,10,30,.96);backdrop-filter:blur(20px
 </div>
 <div class="inputRow">
 <textarea id="messageInput" class="textInput" placeholder="Type message to all nurses... 💬" rows="1" oninput="autoResize(this); handleTyping()" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
-<button class="iconBtn" onclick="toggleEmoji()" title="Emoji">😊</button>
-<button class="iconBtn primary" onclick="sendMessage()" title="Send">➤</button>
+<button class="iconBtn" onclick="toggleEmoji()">😊</button>
+<button class="iconBtn primary" onclick="sendMessage()">➤</button>
 </div>
-<div style="font-size:9px;color:var(--faint);text-align:center">Press Enter to send • Shift+Enter for new line • All nurses see your message instantly</div>
 </div>
 </div>
 </div>
@@ -108,234 +114,147 @@ const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomai
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
-let currentUserId = localStorage.getItem('lcg_nurse_uid') || localStorage.getItem('nurseUid') || localStorage.getItem('uid') || 'nurse_'+Date.now();
-let currentUserName = localStorage.getItem('nurseName') || localStorage.getItem('fullName') || localStorage.getItem('displayName') || 'Nurse';
+let currentUserId = localStorage.getItem('lcg_nurse_uid') || localStorage.getItem('nurseUid') || localStorage.getItem('uid') || localStorage.getItem('nurseId') || 'nurse_'+Date.now();
+let currentUserName = localStorage.getItem('nurseName') || localStorage.getItem('fullName') || localStorage.getItem('displayName') || localStorage.getItem('name') || 'Nurse';
 let currentUserPhoto = localStorage.getItem('nursePhoto') || localStorage.getItem('photoURL') || localStorage.getItem('photo') || '';
-// Try to load real photo from nurses collection
-(async()=>{
-  try{
-    const uid = currentUserId;
-    const snap = await db.ref('nurses/'+uid+'/photoURL').once('value');
-    if(snap.exists() && snap.val()){ currentUserPhoto=snap.val(); localStorage.setItem('nursePhoto', currentUserPhoto); }
-    else {
-      const snap2=await db.ref('nurses/'+uid).once('value');
-      if(snap2.exists()){
-        const v=snap2.val();
-        const p=v.photoURL||v.photo||v.profilePhoto||v.avatar||'';
-        if(p){ currentUserPhoto=p; localStorage.setItem('nursePhoto', p); }
-      }
-    }
-  }catch(e){}
-})();
 let pendingImages=[], pendingVideos=[], pendingFiles=[];
 let audioRecorder=null, audioChunks=[], audioBlob=null, audioTimerInt=null, audioSec=0;
 let videoRecorder=null, videoChunks=[], videoBlob=null, videoStream=null, videoTimerInt=null, videoSec=0;
+let blockedUsersList=[];
+
+// Try to load real photo
+(async()=>{
+  try{
+    const snap = await db.ref('nurses/'+currentUserId).once('value');
+    if(snap.exists()){
+      const v=snap.val();
+      const p=v.photoURL||v.photo||v.profilePhoto||v.avatar||v.image||'';
+      if(p){ currentUserPhoto=p; localStorage.setItem('nursePhoto', p); }
+      const n=v.fullName||v.name||v.displayName||'';
+      if(n){ currentUserName=n; localStorage.setItem('nurseName', n); }
+    }
+  }catch(e){}
+})();
 
 function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',3000);}
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
-function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
-
-const emojis=['😊','😂','❤️','👍','👏','🙏','💪','😍','🥰','😘','😅','🤣','😎','🤩','😭','🥺','😮','😱','🤔','👌','✌️','🤝','💯','🔥','⭐','🌟','💖','💜','💙','💚','💛','🧡','😇','🤗','🫶','👩‍⚕️','🏥','💊','❤️‍🩹','🩺'];
+function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
+const emojis=['😊','😂','❤️','👍','👏','🙏','💪','😍','🥰','😘','😅','🤣','😎','🤩','😭','🥺','😮','😱','🤔','👌','✌️','🤝','💯','🔥','⭐','🌟','💖','💜','👩‍⚕️','🏥','💊','🩺'];
 function initEmoji(){ const panel=document.getElementById('emojiPanel'); panel.innerHTML=emojis.map(e=>`<div class="emoji" onclick="insertEmoji('${e}')">${e}</div>`).join(''); }
-function toggleEmoji(){ const p=document.getElementById('emojiPanel'); p.classList.toggle('active'); }
+function toggleEmoji(){ document.getElementById('emojiPanel').classList.toggle('active'); }
 function insertEmoji(e){ const input=document.getElementById('messageInput'); input.value+=e; input.focus(); autoResize(input); }
 
 function loadOnlineNurses(){
   db.ref('nurses').once('value').then(snap=>{
-    if(!snap.exists()){ document.getElementById('onlineList').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">No nurses yet</div>'; return; }
-    const nurses=Object.values(snap.val());
+    if(!snap.exists()){ document.getElementById('onlineList').innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:11px">No nurses</div>'; return; }
+    const nurses=[]; snap.forEach(ch=>{ const v=ch.val(); nurses.push({id:ch.key, name:v.fullName||v.name||'Nurse', photo:v.photoURL||v.photo||'', specialty:v.specialty||'General'}); });
+    window.allNurses=nurses;
     document.getElementById('onlineCount').textContent=nurses.length;
     renderOnlineNurses(nurses);
-    window.allNurses=nurses;
   });
-  // Live presence
   db.ref('onlineNurses').on('value', snap=>{
-    const online=snap.exists()? Object.keys(snap.val()) : [];
-    document.getElementById('onlineCount').textContent=online.length || (window.allNurses? window.allNurses.length : 0);
+    const count=snap.exists()?Object.keys(snap.val()).length:0;
+    if(count>0) document.getElementById('onlineCount').textContent=count;
   });
 }
 function renderOnlineNurses(nurses){
   const container=document.getElementById('onlineList');
-  if(nurses.length===0){ container.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">No nurses</div>'; return; }
   container.innerHTML=nurses.map(n=>{
-    const name=n.fullName||n.name||n.displayName||'Nurse';
-    const photo=n.photoURL||n.photo||'';
-    const id=n.uid||n.id||'';
-    const isMe=id===currentUserId;
-    return `<div class="onlineUser"><img src="${photo||'https://ui-avatars.com/api/?name='+encodeURIComponent(name)+'&background=a78bfa&color=fff'}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(167,139,250,.3)" onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(name)+'&background=a78bfa&color=fff'"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#c4b5fd);display:grid;place-items:center;font-weight:800;color:#000;display:none">${name.charAt(0).toUpperCase()}</div><div style="flex:1"><div style="font-size:12px;font-weight:700">${name} ${isMe?'(You)':''}</div><div style="font-size:10px;color:var(--muted)">${n.specialty||'General Nurse'} • ${n.location||'Ghana'}</div></div><div class="onlineDot"></div></div>`;
+    const photo=n.photo||`https://ui-avatars.com/api/?name=${encodeURIComponent(n.name)}&background=a78bfa&color=fff`;
+    return `<div class="onlineUser"><img src="${photo}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(167,139,250,.3)" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(n.name)}&background=a78bfa&color=fff'"><div style="flex:1"><div style="font-size:12px;font-weight:700">${n.name}</div><div style="font-size:10px;color:var(--muted)">${n.specialty}</div></div><div class="onlineDot"></div></div>`;
   }).join('');
 }
-function filterNurses(){
-  const q=document.getElementById('searchNurse').value.toLowerCase();
-  if(!window.allNurses)return;
-  const filtered=window.allNurses.filter(n=> `${n.fullName||''} ${n.name||''} ${n.specialty||''}`.toLowerCase().includes(q));
-  renderOnlineNurses(filtered);
-}
+function filterNurses(){ const q=document.getElementById('searchNurse').value.toLowerCase(); if(!window.allNurses)return; renderOnlineNurses(window.allNurses.filter(n=> n.name.toLowerCase().includes(q))); }
 
 function loadMessages(){
-  const messagesRef=db.ref('nurseCommunityChat/messages').limitToLast(100);
-  messagesRef.on('child_added', snap=>{
-    const msg=snap.val();
-    if(!msg) return;
-    addMessageToUI(msg, snap.key);
-  });
-  messagesRef.on('child_changed', snap=>{
-    const el=document.getElementById('msg-'+snap.key);
-    if(el){ el.remove(); addMessageToUI(snap.val(), snap.key); }
+  const ref=db.ref('nurseCommunityChat/messages').limitToLast(150);
+  ref.on('child_added', snap=>{ const msg=snap.val(); if(msg) addMessage(msg,snap.key); });
+  ref.on('child_changed', snap=>{ const msg=snap.val(); if(!msg) return; const el=document.getElementById('msg-'+snap.key); if(el) el.remove(); addMessage(msg,snap.key); });
+  ref.on('child_removed', snap=>{ const el=document.getElementById('msg-'+snap.key); if(el) el.remove(); });
+  // Also listen to nurses_group_chat for CEO messages
+  db.ref('nurses_group_chat/messages').limitToLast(150).on('child_added', snap=>{
+    const msg=snap.val(); if(!msg) return;
+    if(msg.senderId && msg.senderId.includes('CEO')){
+      if(!document.getElementById('msg-'+snap.key)) addMessage(msg,snap.key);
+    }
   });
 }
 
-let editingMessageId=null;
-let blockedUsersList=[];
-
-function addMessageToUI(msg, key){
+function addMessage(msg, key){
   const container=document.getElementById('messages');
   if(container.querySelector('div[style*="Welcome"]')) container.innerHTML='';
-  
-  // Avoid duplicate
   if(document.getElementById('msg-'+key)) return;
   
   const isMe = msg.senderId===currentUserId;
-  const isCEO = (msg.senderId && msg.senderId.includes('CEO')) || msg.senderRole==='CEO' || (msg.senderName&&msg.senderName.includes('CEO')) || (msg.senderName&&msg.senderName.includes('Asabere'));
+  const isCEO = (msg.senderId && msg.senderId.toString().includes('CEO')) || msg.senderRole==='CEO' || (msg.senderName&&msg.senderName.includes('CEO')) || (msg.senderName&&msg.senderName.includes('Asabere'));
   
   const div=document.createElement('div');
-  div.className='message '+(isMe?'me': isCEO?'other' : 'other');
+  div.className='message '+(isMe?'me':'other');
   div.id='msg-'+key;
-  div.dataset.key=key;
-  if(isCEO) div.style.border='2px solid #facc15';
   
   const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-  const nameStr = isMe ? 'You' : (msg.senderName||'Nurse');
+  const nameStr = msg.senderName || currentUserName || 'Nurse';
+  const photoStr = msg.senderPhoto || (isCEO ? `https://ui-avatars.com/api/?name=Asabere+Peter&background=facc15&color=000` : `https://ui-avatars.com/api/?name=${encodeURIComponent(nameStr)}&background=a78bfa&color=fff`);
   const isEdited = msg.edited ? ' (edited)' : '';
   
   let mediaHtml='';
-  if(msg.images && msg.images.length>0){
-    mediaHtml+= msg.images.map(img=>`<img src="${img.data||img.url}" class="mediaImg" onclick="window.open('${img.data||img.url}','_blank')" loading="lazy"><a href="${img.data||img.url}" download="${img.name||'photo.jpg'}" style="font-size:10px;color:rgba(255,255,255,.7);text-decoration:none">⬇️ Download ${img.name||'Photo'}</a>`).join('');
-  }
-  if(msg.videos && msg.videos.length>0){
-    mediaHtml+= msg.videos.map(v=>`<video src="${v.data||v.url}" controls class="mediaVideo"></video><a href="${v.data||v.url}" download="${v.name||'video.mp4'}" style="font-size:10px;color:rgba(255,255,255,.7)">⬇️ Download ${v.name||'Video'}</a>`).join('');
-  }
-  if(msg.voice){
-    mediaHtml+= `<audio controls class="audioPlayer"><source src="${msg.voice}" type="audio/webm"></audio><a href="${msg.voice}" download="voice_${key}.webm" style="font-size:10px;color:rgba(255,255,255,.7)">⬇️ Download Voice</a>`;
-  }
-  if(msg.videoMessage){
-    mediaHtml+= `<video src="${msg.videoMessage}" controls class="mediaVideo"></video><a href="${msg.videoMessage}" download="video_msg_${key}.webm" style="font-size:10px">⬇️ Download Video Message</a>`;
-  }
-  if(msg.files && msg.files.length>0){
-    mediaHtml+= msg.files.map(f=>`<div class="fileCard"><span style="font-size:11px">📄 ${f.name} (${(f.size/1024).toFixed(1)}KB)</span><a href="${f.data}" download="${f.name}" style="padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.15);color:#fff;font-size:10px;text-decoration:none">⬇️ Download</a></div>`).join('');
-  }
+  if(msg.images) mediaHtml+=msg.images.map(img=>`<img src="${img.data||img.url}" class="mediaImg" onclick="window.open('${img.data||img.url}','_blank')"><br><a href="${img.data||img.url}" download="${img.name||'photo.jpg'}" style="font-size:10px;color:inherit">⬇️ Download</a>`).join('<br>');
+  if(msg.videos) mediaHtml+=msg.videos.map(v=>`<video src="${v.data||v.url}" controls class="mediaVideo"></video>`).join('');
+  if(msg.voice) mediaHtml+=`<audio controls class="audioPlayer"><source src="${msg.voice}" type="audio/webm"></audio><br><a href="${msg.voice}" download="voice_${key}.webm" style="font-size:10px;color:inherit">⬇️ Download Voice</a>`;
+  if(msg.videoMessage) mediaHtml+=`<video src="${msg.videoMessage}" controls class="mediaVideo"></video>`;
+  if(msg.files) mediaHtml+=msg.files.map(f=>`<div class="fileCard"><span>📄 ${f.name}</span><a href="${f.data}" download="${f.name}" style="color:#fff;font-size:10px">⬇️ Download</a></div>`).join('');
   
   let actionsHtml='';
   if(isMe){
-    actionsHtml=`<div style="display:flex;gap:6px;margin-top:8px"><button onclick="editMyMessage('${key}')" style="padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(96,165,250,.15);color:#93c5fd;font-size:10px;cursor:pointer">✏️ Edit</button><button onclick="deleteMyMessage('${key}')" style="padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(239,68,68,.15);color:#fca5a5;font-size:10px;cursor:pointer">🗑️ Delete</button></div>`;
+    actionsHtml=`<div class="actions"><button class="actBtn edit" onclick="editMyMessage('${key}')">✏️ Edit</button><button class="actBtn del" onclick="deleteMyMessage('${key}')">🗑️ Delete</button></div>`;
   } else if(isCEO){
-    actionsHtml=`<div style="margin-top:6px"><span style="background:rgba(250,204,21,.15);color:#facc15;padding:3px 8px;border-radius:999px;font-size:9px;font-weight:800">👑 CEO MESSAGE — From CEO Control Chat</span></div>`;
+    actionsHtml=`<div class="actions"><span style="font-size:9px;background:rgba(250,204,21,.2);color:#facc15;padding:4px 8px;border-radius:999px">👑 CEO — From CEO Control Chat</span></div>`;
   }
   
   div.innerHTML=`
-    <div class="messageInfo">${!isMe?`<span style="font-weight:700">${nameStr}</span>${isCEO?'<span style="background:rgba(250,204,21,.2);color:#facc15;padding:2px 6px;border-radius:999px;font-size:8px">👑 CEO</span>':''}`:''} <span>${timeStr}${isEdited}</span></div>
-    ${msg.text?`<div class="messageText">${escapeHtml(msg.text)}</div>`:''}
-    ${mediaHtml?`<div class="messageMedia">${mediaHtml}</div>`:''}
-    ${actionsHtml}
+    <div class="bubble">
+      <div class="messageHeader">
+        <img src="${photoStr}" class="avatarImg" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nameStr)}&background=a78bfa&color=fff'">
+        <div class="headerText">
+          <div class="headerName">${escapeHtml(nameStr)} ${isCEO?'<span class="badgeCEO">👑 CEO</span>': isMe?'<span class="badgeYou">You</span>':'<span class="badgeNurse">👩‍⚕️ Nurse</span>'}</div>
+          <div class="headerTime">${timeStr}${isEdited}</div>
+        </div>
+      </div>
+      <div class="messageContent">
+        ${msg.text?`<div class="messageText">${escapeHtml(msg.text)}</div>`:''}
+        ${mediaHtml?`<div class="messageMedia">${mediaHtml}</div>`:''}
+      </div>
+      ${actionsHtml}
+    </div>
   `;
   container.appendChild(div);
   container.scrollTop=container.scrollHeight;
 }
-
-function editMyMessage(key){
-  const el=document.getElementById('msg-'+key);
-  if(!el) return;
-  const textEl=el.querySelector('.messageText');
-  const currentText=textEl? textEl.textContent : '';
-  const newText=prompt('✏️ Edit your message:', currentText);
-  if(newText===null) return;
-  if(newText.trim()===''){ if(!confirm('Delete this message instead?')) return; deleteMyMessage(key); return; }
-  const now=Date.now();
-  db.ref('nurseCommunityChat/messages/'+key).update({text:newText, edited:true, editedAt:now}).catch(()=>{});
-  db.ref('nurses_group_chat/messages/'+key).update({text:newText, edited:true}).catch(()=>{});
-  db.ref('nurseGroupChat/'+key).update({text:newText, edited:true}).catch(()=>{});
-  toast('✅ Message edited');
-}
-async function deleteMyMessage(key){
-  if(!confirm('🗑️ Delete your message?')) return;
-  try{
-    await db.ref('nurseCommunityChat/messages/'+key).remove().catch(()=>{});
-    await db.ref('nurses_group_chat/messages/'+key).remove().catch(()=>{});
-    await db.ref('nurseGroupChat/'+key).remove().catch(()=>{});
-    await db.ref('communityChats/nurses/'+key).remove().catch(()=>{});
-    document.getElementById('msg-'+key)?.remove();
-    toast('🗑️ Message deleted');
-  }catch(e){ toast(e.message); }
-}
-
-// Check if current nurse is blocked
-function checkIfBlocked(){
-  db.ref('nurses_group_chat/blocked_users').on('value', snap=>{
-    blockedUsersList=[];
-    if(snap.exists()){
-      const val=snap.val();
-      for(let k in val){
-        const v=val[k];
-        if(v.userId===currentUserId){
-          blockedUsersList.push(v);
-        }
-      }
-    }
-    const inputArea=document.querySelector('.inputArea');
-    const existingWarning=document.getElementById('blockedWarning');
-    if(blockedUsersList.length>0){
-      if(!existingWarning){
-        const warning=document.createElement('div');
-        warning.id='blockedWarning';
-        warning.style.cssText='background:rgba(239,68,68,.15);border:2px solid rgba(239,68,68,.3);border-radius:12px;padding:12px;text-align:center;color:#fca5a5;font-size:12px;font-weight:700';
-        warning.innerHTML=`🚫 YOU ARE BLOCKED FROM CHATTING<br><small style="font-size:10px;color:#fca5a5">Reason: ${blockedUsersList[0].reason||'Misbehaving'} • Blocked by: ${blockedUsersList[0].blockedBy||'CEO'} • Contact CEO to unblock</small>`;
-        inputArea.prepend(warning);
-      }
-      document.getElementById('messageInput').disabled=true;
-      document.getElementById('messageInput').placeholder='🚫 You are blocked — Cannot send messages — Contact CEO';
-    } else {
-      if(existingWarning) existingWarning.remove();
-      document.getElementById('messageInput').disabled=false;
-      document.getElementById('messageInput').placeholder='Type message to all nurses... 💬';
-    }
-  });
-}
-
-function escapeHtml(t){ const div=document.createElement('div'); div.textContent=t; return div.innerHTML; }
+function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
 async function sendMessage(){
-  // Check if blocked
-  if(blockedUsersList.length>0){ toast('🚫 You are blocked from chatting — Contact CEO'); return; }
-  
+  if(blockedUsersList.length>0){ toast('🚫 You are blocked — Contact CEO'); return; }
   const input=document.getElementById('messageInput');
   const text=input.value.trim();
-  if(!text && pendingImages.length===0 && pendingVideos.length===0 && pendingFiles.length===0 && !audioBlob && !videoBlob){ return; }
+  if(!text && pendingImages.length===0 && pendingVideos.length===0 && pendingFiles.length===0 && !audioBlob && !videoBlob) return;
   
   const now=Date.now();
   const messageId='MSG-'+now+'-'+Math.random().toString(36).substr(2,5);
-  
   let msgData={
     messageId,
     senderId: currentUserId,
     senderName: currentUserName,
-    senderPhoto: currentUserPhoto,
+    senderPhoto: currentUserPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserName)}&background=a78bfa&color=fff`,
     text: text,
     createdAt: now,
     createdAtStr: new Date().toLocaleString('en-GH'),
-    type: 'nurse_community',
+    type: 'nurse_community'
   };
-  
-  if(pendingImages.length>0){ msgData.images=pendingImages; }
-  if(pendingVideos.length>0){ msgData.videos=pendingVideos; }
-  if(pendingFiles.length>0){ msgData.files=pendingFiles; }
-  if(audioBlob){
-    const audioBase64=await toBase64(audioBlob);
-    msgData.voice=audioBase64;
-  }
-  if(videoBlob){
-    const videoBase64=await toBase64(videoBlob);
-    msgData.videoMessage=videoBase64;
-  }
+  if(pendingImages.length>0) msgData.images=pendingImages;
+  if(pendingVideos.length>0) msgData.videos=pendingVideos;
+  if(pendingFiles.length>0) msgData.files=pendingFiles;
+  if(audioBlob) msgData.voice=await toBase64(audioBlob);
+  if(videoBlob) msgData.videoMessage=await toBase64(videoBlob);
   
   try{
     await db.ref('nurseCommunityChat/messages/'+messageId).set(msgData);
@@ -343,104 +262,86 @@ async function sendMessage(){
     await db.ref('nurseGroupChat/'+messageId).set(msgData);
     await db.ref('communityChats/nurses/'+messageId).set(msgData);
     await db.ref('ceoChats/nurseBoard/'+messageId).set(msgData);
-    // Clear
     input.value=''; autoResize(input);
     pendingImages=[]; pendingVideos=[]; pendingFiles=[]; audioBlob=null; videoBlob=null;
-    document.getElementById('filePreview').style.display='none'; document.getElementById('filePreview').innerHTML='';
-    document.getElementById('recordingAudio').classList.remove('active'); document.getElementById('recordingVideo').classList.remove('active');
-    toast('✅ Message sent to all nurses');
+    document.getElementById('filePreview').style.display='none';
+    document.getElementById('filePreview').innerHTML='';
+    toast('✅ Message sent with photo + name');
   }catch(e){ toast('Error: '+e.message); }
 }
 function toBase64(blob){ return new Promise(res=>{ const r=new FileReader(); r.onload=e=>res(e.target.result); r.readAsDataURL(blob); }); }
-
-function handleImages(files){
-  for(let f of files){
-    if(f.size>20*1024*1024){ toast(f.name+' too big'); continue; }
-    const reader=new FileReader();
-    reader.onload=e=>{
-      pendingImages.push({name:f.name, size:f.size, type:f.type, data:e.target.result});
-      showFilePreview();
-    };
-    reader.readAsDataURL(f);
-  }
-}
-function handleVideos(files){
-  for(let f of files){
-    if(f.size>50*1024*1024){ toast(f.name+' too big (max 50MB)'); continue; }
-    const reader=new FileReader();
-    reader.onload=e=>{
-      pendingVideos.push({name:f.name, size:f.size, type:f.type, data:e.target.result});
-      showFilePreview();
-    };
-    reader.readAsDataURL(f);
-  }
-}
-function handleFiles(files){
-  for(let f of files){
-    if(f.size>20*1024*1024){ toast(f.name+' too big'); continue; }
-    const reader=new FileReader();
-    reader.onload=e=>{
-      pendingFiles.push({name:f.name, size:f.size, type:f.type, data:e.target.result});
-      showFilePreview();
-    };
-    reader.readAsDataURL(f);
-  }
-}
+function handleImages(files){ for(let f of files){ if(f.size>20*1024*1024)continue; const reader=new FileReader(); reader.onload=e=>{ pendingImages.push({name:f.name,size:f.size,type:f.type,data:e.target.result}); showFilePreview(); }; reader.readAsDataURL(f);} }
+function handleVideos(files){ for(let f of files){ if(f.size>50*1024*1024)continue; const reader=new FileReader(); reader.onload=e=>{ pendingVideos.push({name:f.name,size:f.size,type:f.type,data:e.target.result}); showFilePreview(); }; reader.readAsDataURL(f);} }
+function handleFiles(files){ for(let f of files){ if(f.size>20*1024*1024)continue; const reader=new FileReader(); reader.onload=e=>{ pendingFiles.push({name:f.name,size:f.size,type:f.type,data:e.target.result}); showFilePreview(); }; reader.readAsDataURL(f);} }
 function showFilePreview(){
-  const container=document.getElementById('filePreview');
-  if(pendingImages.length===0 && pendingVideos.length===0 && pendingFiles.length===0){ container.style.display='none'; return; }
-  container.style.display='flex'; container.style.flexDirection='column';
-  container.innerHTML=[
-    ...pendingImages.map((f,i)=>`<div class="fileCard"><span>🖼️ ${f.name}</span><button class="btn" onclick="pendingImages.splice(${i},1); showFilePreview()">🗑️</button></div>`),
-    ...pendingVideos.map((f,i)=>`<div class="fileCard"><span>🎥 ${f.name}</span><button class="btn" onclick="pendingVideos.splice(${i},1); showFilePreview()">🗑️</button></div>`),
-    ...pendingFiles.map((f,i)=>`<div class="fileCard"><span>📄 ${f.name}</span><button class="btn" onclick="pendingFiles.splice(${i},1); showFilePreview()">🗑️</button></div>`),
-    audioBlob?`<div class="fileCard"><span>🎤 Voice recorded</span><button class="btn" onclick="audioBlob=null; showFilePreview()">🗑️</button></div>`:'',
-    videoBlob?`<div class="fileCard"><span>📹 Video recorded</span><button class="btn" onclick="videoBlob=null; showFilePreview()">🗑️</button></div>`:''
-  ].join('');
+  const c=document.getElementById('filePreview');
+  if(pendingImages.length===0&&pendingVideos.length===0&&pendingFiles.length===0&&!audioBlob&&!videoBlob){c.style.display='none';return;}
+  c.style.display='flex';
+  c.innerHTML=[...pendingImages.map((f,i)=>`<div class="fileCard"><span>🖼️ ${f.name}</span><button class="btn" onclick="pendingImages.splice(${i},1);showFilePreview()">✕</button></div>`),...pendingVideos.map((f,i)=>`<div class="fileCard"><span>🎥 ${f.name}</span><button class="btn" onclick="pendingVideos.splice(${i},1);showFilePreview()">✕</button></div>`),...pendingFiles.map((f,i)=>`<div class="fileCard"><span>📄 ${f.name}</span><button class="btn" onclick="pendingFiles.splice(${i},1);showFilePreview()">✕</button></div>`)].join('');
 }
-
-function startAudio(){
-  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-    audioRecorder=new MediaRecorder(stream); audioChunks=[];
-    audioRecorder.ondataavailable=e=>{ if(e.data.size>0) audioChunks.push(e.data); };
-    audioRecorder.onstop=()=>{ audioBlob=new Blob(audioChunks,{type:'audio/webm'}); showFilePreview(); toast('✅ Voice ready — Click Send'); try{stream.getTracks().forEach(t=>t.stop());}catch(e){} };
-    audioRecorder.start();
-    document.getElementById('recordingAudio').classList.add('active');
-    audioSec=0; audioTimerInt=setInterval(()=>{ audioSec++; const m=String(Math.floor(audioSec/60)).padStart(2,'0'); const s=String(audioSec%60).padStart(2,'0'); document.getElementById('audioTimer').textContent=m+':'+s; },1000);
-  }).catch(e=>toast('Mic error: '+e.message));
+function startAudio(){ navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{ audioRecorder=new MediaRecorder(s); audioChunks=[]; audioRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data);}; audioRecorder.onstop=()=>{ audioBlob=new Blob(audioChunks,{type:'audio/webm'}); showFilePreview(); toast('✅ Voice ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){}}; audioRecorder.start(); document.getElementById('recordingAudio').classList.add('active'); audioSec=0; audioTimerInt=setInterval(()=>{audioSec++; document.getElementById('audioTimer').textContent=String(Math.floor(audioSec/60)).padStart(2,'0')+':'+String(audioSec%60).padStart(2,'0');},1000);}).catch(e=>toast(e.message)); }
+function stopAudio(){ if(audioRecorder&&audioRecorder.state!=='inactive') audioRecorder.stop(); clearInterval(audioTimerInt); document.getElementById('recordingAudio').classList.remove('active'); }
+function cancelAudio(){ if(audioRecorder&&audioRecorder.state!=='inactive') audioRecorder.stop(); audioBlob=null; clearInterval(audioTimerInt); document.getElementById('recordingAudio').classList.remove('active'); showFilePreview(); }
+function startVideo(){ navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(s=>{ videoStream=s; document.getElementById('videoLive').srcObject=s; videoRecorder=new MediaRecorder(s); videoChunks=[]; videoRecorder.ondataavailable=e=>{if(e.data.size>0)videoChunks.push(e.data);}; videoRecorder.onstop=()=>{ videoBlob=new Blob(videoChunks,{type:'video/webm'}); showFilePreview(); toast('✅ Video ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){} videoStream=null; document.getElementById('videoLive').srcObject=null; }; videoRecorder.start(); document.getElementById('recordingVideo').classList.add('active'); videoSec=0; videoTimerInt=setInterval(()=>{videoSec++; document.getElementById('videoTimer').textContent=String(Math.floor(videoSec/60)).padStart(2,'0')+':'+String(videoSec%60).padStart(2,'0');},1000);}).catch(e=>toast(e.message)); }
+function stopVideo(){ if(videoRecorder&&videoRecorder.state!=='inactive') videoRecorder.stop(); clearInterval(videoTimerInt); document.getElementById('recordingVideo').classList.remove('active'); }
+function cancelVideo(){ if(videoRecorder&&videoRecorder.state!=='inactive') videoRecorder.stop(); videoBlob=null; if(videoStream){try{videoStream.getTracks().forEach(t=>t.stop());}catch(e){} videoStream=null; document.getElementById('videoLive').srcObject=null;} clearInterval(videoTimerInt); document.getElementById('recordingVideo').classList.remove('active'); showFilePreview(); }
+function editMyMessage(key){
+  const el=document.getElementById('msg-'+key);
+  const textEl=el?el.querySelector('.messageText'):null;
+  const currentText=textEl?textEl.textContent:'';
+  const newText=prompt('✏️ Edit your message:', currentText);
+  if(newText===null) return;
+  if(newText.trim()===''){ if(confirm('Delete?')) deleteMyMessage(key); return; }
+  const now=Date.now();
+  db.ref('nurseCommunityChat/messages/'+key).update({text:newText, edited:true, editedAt:now}).catch(()=>{});
+  db.ref('nurses_group_chat/messages/'+key).update({text:newText, edited:true}).catch(()=>{});
+  toast('✅ Edited');
 }
-function stopAudio(){ if(audioRecorder&&audioRecorder.state!=='inactive'){ audioRecorder.stop(); } clearInterval(audioTimerInt); document.getElementById('recordingAudio').classList.remove('active'); }
-function cancelAudio(){ if(audioRecorder&&audioRecorder.state!=='inactive'){ audioRecorder.stop(); } audioBlob=null; clearInterval(audioTimerInt); document.getElementById('recordingAudio').classList.remove('active'); showFilePreview(); }
-
-function startVideo(){
-  navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(stream=>{
-    videoStream=stream; document.getElementById('videoLive').srcObject=stream;
-    videoRecorder=new MediaRecorder(stream); videoChunks=[];
-    videoRecorder.ondataavailable=e=>{ if(e.data.size>0) videoChunks.push(e.data); };
-    videoRecorder.onstop=()=>{ videoBlob=new Blob(videoChunks,{type:'video/webm'}); showFilePreview(); toast('✅ Video ready — Click Send'); try{stream.getTracks().forEach(t=>t.stop());}catch(e){} videoStream=null; document.getElementById('videoLive').srcObject=null; };
-    videoRecorder.start();
-    document.getElementById('recordingVideo').classList.add('active');
-    videoSec=0; videoTimerInt=setInterval(()=>{ videoSec++; const m=String(Math.floor(videoSec/60)).padStart(2,'0'); const s=String(videoSec%60).padStart(2,'0'); document.getElementById('videoTimer').textContent=m+':'+s; },1000);
-  }).catch(e=>toast('Camera error: '+e.message));
+async function deleteMyMessage(key){
+  if(!confirm('🗑️ Delete?')) return;
+  await db.ref('nurseCommunityChat/messages/'+key).remove().catch(()=>{});
+  await db.ref('nurses_group_chat/messages/'+key).remove().catch(()=>{});
+  await db.ref('nurseGroupChat/'+key).remove().catch(()=>{});
+  document.getElementById('msg-'+key)?.remove();
+  toast('🗑️ Deleted');
 }
-function stopVideo(){ if(videoRecorder&&videoRecorder.state!=='inactive'){ videoRecorder.stop(); } clearInterval(videoTimerInt); document.getElementById('recordingVideo').classList.remove('active'); }
-function cancelVideo(){ if(videoRecorder&&videoRecorder.state!=='inactive'){ videoRecorder.stop(); } videoBlob=null; if(videoStream){ try{videoStream.getTracks().forEach(t=>t.stop());}catch(e){} videoStream=null; document.getElementById('videoLive').srcObject=null; } clearInterval(videoTimerInt); document.getElementById('recordingVideo').classList.remove('active'); showFilePreview(); }
-
+function checkIfBlocked(){
+  db.ref('nurses_group_chat/blocked_users').on('value', snap=>{
+    blockedUsersList=[];
+    if(snap.exists()){
+      const val=snap.val();
+      for(let k in val){ const v=val[k]; if(v.userId===currentUserId){ blockedUsersList.push(v); } }
+    }
+    const inputArea=document.querySelector('.inputArea');
+    const existing=document.getElementById('blockedWarning');
+    if(blockedUsersList.length>0){
+      if(!existing){
+        const warning=document.createElement('div');
+        warning.id='blockedWarning';
+        warning.style.cssText='background:rgba(239,68,68,.15);border:2px solid rgba(239,68,68,.3);border-radius:12px;padding:12px;text-align:center;color:#fca5a5;font-size:12px;font-weight:700';
+        warning.innerHTML=`🚫 YOU ARE BLOCKED<br><small>Reason: ${blockedUsersList[0].reason||'Misbehaving'} • By: ${blockedUsersList[0].blockedBy||'CEO'}</small>`;
+        inputArea.prepend(warning);
+      }
+      document.getElementById('messageInput').disabled=true;
+      document.getElementById('messageInput').placeholder='🚫 Blocked — Contact CEO';
+    } else {
+      if(existing) existing.remove();
+      const inp=document.getElementById('messageInput');
+      if(inp){ inp.disabled=false; inp.placeholder='Type message to all nurses... 💬'; }
+    }
+  });
+}
 function handleTyping(){
   db.ref('nurseCommunityChat/typing/'+currentUserId).set({name:currentUserName, time:Date.now()});
   setTimeout(()=>{ db.ref('nurseCommunityChat/typing/'+currentUserId).remove().catch(()=>{}); },3000);
 }
-
 window.onload=()=>{
-  checkIfBlocked();
-
   initEmoji();
   loadOnlineNurses();
   loadMessages();
-  // Set online
-  db.ref('onlineNurses/'+currentUserId).set({name:currentUserName, onlineAt:Date.now(), inChat:true});
+  checkIfBlocked();
+  db.ref('onlineNurses/'+currentUserId).set({name:currentUserName, photo:currentUserPhoto, onlineAt:Date.now(), inChat:true});
   db.ref('onlineNurses/'+currentUserId).onDisconnect().remove();
-  // Typing indicator
   db.ref('nurseCommunityChat/typing').on('value', snap=>{
     const typingEl=document.getElementById('typing');
     if(!snap.exists()){ typingEl.style.display='none'; return; }
