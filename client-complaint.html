@@ -1,364 +1,38 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Complaint — Saves Photo Name Phone Email + Time — LOVE CARE GLOBAL</title>
+<title>Client Complaint — Complain on Nurse — FIXED BUTTON</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--faint:#6b6788;--gold:#facc15;--green:#34d399;--red:#ef4444;--blue:#60a5fa}
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--faint:#6b6788;--gold:#facc15;--purple:#a78bfa;--red:#ef4444}
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:30px}
-header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .brand{font-family:Fraunces,serif;font-weight:700;font-size:18px}
-.btn{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.headerBtns{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;align-items:center;max-width:70%}
+.btn{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.btnPurple{background:linear-gradient(135deg,#a78bfa,#8b5cf6);color:#fff;font-weight:800;border:0}
 .btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:800;border:0}
-.btnBlue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;font-weight:800;border:0}
-.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a;font-weight:900;border:0}
+.btnPunish{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:900;border:2px solid #facc15;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
 .wrap{max-width:720px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
 .cardTitle{font-family:Fraunces,serif;font-size:16px;font-weight:700;margin-bottom:12px}
-.textarea,.select,.input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:13px;font-family:Instrument Sans}
+.textarea,.select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:13px}
 .textarea{min-height:110px;resize:vertical}
-.label{font-size:11px;color:var(--faint);text-transform:uppercase;font-weight:700;margin-bottom:6px;display:block;margin-top:12px}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid;display:inline-flex;align-items:center;gap:4px}
-.badgeRed{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.25)}
-.badgeGold{background:rgba(250,204,21,.12);color:#facc15;border-color:rgba(250,204,21,.25)}
-.avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #facc15;background:#1e1a3a}
-.nurseAvatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #22c55e}
+.label{font-size:11px;color:var(--faint);text-transform:uppercase;font-weight:700;margin-bottom:6px;display:block}
 .uploadZone{border:2px dashed rgba(255,255,255,.12);border-radius:14px;padding:18px;text-align:center;background:rgba(12,10,30,.4);cursor:pointer}
 .filePreview{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .fileItem{background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px}
-.recordingBox{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:14px;padding:14px;display:none}
+.recordingBox{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);border-radius:14px;padding:14px;display:none}
 .recordingBox.active{display:block}
-.recDot{width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block;animation:blink 1s infinite}
+.recDot{width:10px;height:10px;border-radius:50%;background:var(--purple);display:inline-block;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;font-weight:700;display:none;max-width:320px}
-</style></head><body>
-<header>
-<div class="brand">⚠️ Client Complaint — Saves Photo Email Phone + Time</div>
-<div style="display:flex;gap:8px"><a href="my-bookings.html" class="btn">📅 My Bookings</a><a href="client-dashboard.html" class="btn">🏠 Dashboard</a><button onclick="openMyPunishments()" class="btn" style="background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25)">⚖️ My Punishments <span id="punishBadge" style="background:#ef4444;color:white;padding:2px 6px;border-radius:999px;font-size:9px;display:none">0</span></button><a href="sos.html" class="btn btnRed">SOS</a></div>
-</header>
-<div class="wrap">
-
-<!-- CLIENT CARD — PHOTO NAME PHONE EMAIL — SAVED -->
-<div class="card" style="background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.08));border:2px solid rgba(250,204,21,.25)">
-<div class="cardTitle" style="color:#facc15">👤 Your Details — Photo + Name + Phone + Email Saved on Complaint</div>
-<div style="display:flex;gap:12px;align-items:center">
-<img id="clientAvatarTop" class="avatar" src="">
-<div style="flex:1"><b id="clientNameTop" style="font-size:14px;color:#fff">ASABERE PETER</b><br><small id="clientPhoneTop" style="color:#34d399;font-size:11px">+233502957280</small><br><small id="clientEmailTop" style="color:#a78bfa;font-size:11px">lovecareglobal@gmail.com</small><br><small style="font-size:9px;color:#facc15;background:rgba(250,204,21,.15);border-radius:999px;padding:2px 6px">CLIENT — PHOTO + EMAIL + PHONE + NAME + TIME SAVED</small></div>
-<div style="font-size:10px;color:#a78bfa"><span id="complaintDateTop">-</span></div>
-</div>
-<div style="margin-top:10px;font-size:10px;color:#6b6788" id="clientExtraTop">Loading client photo name phone email...</div>
-</div>
-
-<div class="card" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)">
-<div class="cardTitle">👩‍⚕️ Complaining About Booked Nurse Only — <span id="nurseNameDisplay" style="color:#fca5a5">Loading...</span></div>
-<div style="display:flex;gap:12px;align-items:center;margin-top:10px">
-<img id="nurseAvatarDisplay" class="nurseAvatar" src="">
-<div style="font-size:12px;color:var(--muted);line-height:1.5">
-Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700">-</span> • Service: <span id="serviceDisplay">-</span> • Amount: <span id="amountDisplay">-</span><br>
-Patient: <span id="patientDisplay" style="color:#facc15">-</span> • Nurse Phone: <span id="nursePhoneDisplay">-</span><br>
-<span class="badge badgeRed">⚠️ ONLY this booked nurse — Reflects on CEO ceo-complainant.html LIVE with Client Photo Email</span>
-</div>
-</div>
-</div>
-
-<div class="card">
-<div class="cardTitle">📝 Complaint Type + Text</div>
-<label class="label">Complaint Type</label>
-<select id="complaintType" class="select">
-<option value="">Select complaint type...</option>
-<option value="late_arrival">⏰ Late Arrival</option>
-<option value="unprofessional">😒 Unprofessional Behavior</option>
-<option value="poor_service">👎 Poor Service</option>
-<option value="not_completed">❌ Did Not Complete Work</option>
-<option value="rude">😡 Rude / Abusive</option>
-<option value="hygiene">🧼 Poor Hygiene</option>
-<option value="theft">💰 Theft / Missing Items</option>
-<option value="no_show">🚫 No Show</option>
-<option value="overcharge">💳 Overcharge</option>
-<option value="other">📝 Other</option>
-</select>
-<label class="label">📝 Complaint Text — Detailed</label>
-<textarea id="complaintText" class="textarea" placeholder="Type detailed complaint... Example: Nurse came 2 hours late, was rude, left after 4 hours not 8 hours. I paid GHS 1,200 but she only did 4 hours..."></textarea>
-</div>
-
-<div class="card">
-<div class="cardTitle">🎤 Audio Complaint — Record your voice</div>
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-<button id="startAudioBtn" class="btn btnRed" onclick="startAudioRecording()">🎤 Start Recording Audio</button>
-<button id="stopAudioBtn" class="btn" style="display:none" onclick="stopAudioRecording()">⏹️ Stop Recording</button>
-<button id="playAudioBtn" class="btn btnBlue" style="display:none" onclick="playAudioRecording()">▶️ Play Audio</button>
-<button id="deleteAudioBtn" class="btn" style="display:none" onclick="deleteAudioRecording()">🗑️ Delete Audio</button>
-</div>
-<div id="audioRecordingBox" class="recordingBox"><span class="recDot"></span> Recording Audio... <span id="audioTimer">00:00</span></div>
-<div id="audioPreview" style="margin-top:10px;display:none"><audio id="audioPlayback" controls style="width:100%"></audio></div>
-</div>
-
-<div class="card">
-<div class="cardTitle">🎥 Video Evidence — Record video or upload</div>
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-<button id="startVideoBtn" class="btn btnRed" onclick="startVideoRecording()">🎥 Start Recording Video</button>
-<button id="stopVideoBtn" class="btn" style="display:none" onclick="stopVideoRecording()">⏹️ Stop Video</button>
-<button id="playVideoBtn" class="btn btnBlue" style="display:none" onclick="playVideoRecording()">▶️ Play Video</button>
-<button id="deleteVideoBtn" class="btn" style="display:none" onclick="deleteVideoRecording()">🗑️ Delete Video</button>
-</div>
-<div id="videoRecordingBox" class="recordingBox"><span class="recDot"></span> Recording Video... <span id="videoTimer">00:00</span><video id="videoPreviewLive" autoplay muted style="width:100%;height:200px;background:#000;border-radius:10px;margin-top:10px"></video></div>
-<div id="videoPreview" style="margin-top:10px;display:none"><video id="videoPlayback" controls style="width:100%;height:220px;background:#000;border-radius:10px"></video></div>
-</div>
-
-<div class="card">
-<div class="cardTitle">📎 Evidence Files — Photos, Videos, Documents</div>
-<label class="label">Upload Photos, Videos, Documents — Evidence for CEO</label>
-<div class="uploadZone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-<div style="font-size:32px">📎</div><b>Click to upload or drag & drop</b><br><small>Photos (JPG, PNG), Videos (MP4), Documents (PDF) — Max 20MB each — Up to 10 files</small>
-<input type="file" id="fileInput" multiple accept="image/*,video/*,application/pdf,.doc,.docx" style="display:none" onchange="handleFiles(this.files)">
-</div>
-<div id="filePreview" class="filePreview"></div>
-</div>
-
-<div class="card" style="border:2px solid #facc15;background:linear-gradient(135deg,rgba(250,204,21,.08),rgba(26,22,51,.9))">
-<div class="cardTitle" style="color:#facc15">✅ Submit Complaint — Saves Client Photo Name Phone Email + Time</div>
-<div style="background:rgba(14,10,28,.6);border-radius:12px;padding:10px;font-size:11px;color:#c4b5fd;line-height:1.6;margin-bottom:12px">
-<b style="color:#fff">Will save on Firebase with:</b><br>
-👤 Client: Photo URL + Name + Phone + Email + ID + LatLng + Time<br>
-🏥 Patient: Name + Phone + Location + LatLng<br>
-👩‍⚕️ Nurse: Name + Phone + Photo + ID<br>
-📅 Booking: ID + Service + Amount + Paystack Ref + Status + Time<br>
-⚠️ Complaint: Type + Text + Audio + Video + Files + Status<br>
-<span style="color:#facc15">● Reflects on CEO ceo-complainant.html LIVE + CEO can call client via saved phone</span>
-</div>
-<div style="display:flex;gap:10px;flex-wrap:wrap">
-<button class="btn btnYellow" style="flex:1;padding:14px;font-size:13px;font-weight:900" onclick="submitComplaint()">⚠️ Submit Complaint — With Photo Email Phone</button>
-<button class="btn" style="flex:1;padding:14px" onclick="location.href='my-bookings.html'">Cancel</button>
-</div>
-</div>
-</div>
-<div id="toast" class="toast"></div>
-<script>
-const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig);const db=firebase.database();
-let bookingId, nurseName, nurseId, nursePhone, nursePhotoUrl, clientName, clientId, clientPhone, clientEmail, clientPhotoUrl, clientLat, clientLng, service, amount, patientName, patientPhone, patientLocation, patientLat, patientLng, paystackRef;
-let audioRecorder, audioChunks=[], audioBlob=null, audioUrl=null, audioTimerInterval=null, audioSeconds=0;
-let videoRecorder, videoChunks=[], videoBlob=null, videoUrl=null, videoTimerInterval=null, videoSeconds=0, videoStream=null;
-let uploadedFiles=[];
-
-function getClientInfo(){
-  clientName=localStorage.getItem('clientName')||localStorage.getItem('fullName')||'ASABERE PETER';
-  clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'+233502957280';
-  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'lovecareglobal@gmail.com';
-  clientPhotoUrl=localStorage.getItem('clientPhotoUrl')||localStorage.getItem('clientPhoto')||localStorage.getItem('photoUrl')||'';
-  clientId=localStorage.getItem('clientId')||localStorage.getItem('uid')||'client_demo';
-  clientLat=localStorage.getItem('clientLat')||localStorage.getItem('lat')||'';
-  clientLng=localStorage.getItem('clientLng')||localStorage.getItem('lng')||'';
-  document.getElementById('clientNameTop').textContent=clientName;
-  document.getElementById('clientPhoneTop').textContent=clientPhone;
-  document.getElementById('clientEmailTop').textContent=clientEmail;
-  const av=document.getElementById('clientAvatarTop');
-  if(clientPhotoUrl) av.src=clientPhotoUrl; else av.src='https://ui-avatars.com/api/?name='+encodeURIComponent(clientName)+'&background=facc15&color=000';
-  document.getElementById('complaintDateTop').textContent=new Date().toLocaleString('en-GH');
-  document.getElementById('clientExtraTop').textContent=`Photo: ${clientPhotoUrl?'YES — '+clientPhotoUrl.slice(0,40)+'...':'NO'} • Lat: ${clientLat||'N/A'} Lng: ${clientLng||'N/A'} • ID: ${clientId}`;
-  return {clientName,clientPhone,clientEmail,clientPhotoUrl,clientId,clientLat,clientLng};
-}
-
-function getParams(){
-  const p=new URLSearchParams(location.search);
-  bookingId=p.get('bookingId')||localStorage.getItem('lastBookingId')||'LCG-DEMO';
-  nurseName=p.get('nurseName')||'Nurse';
-  nurseId=p.get('nurseId')||'nurse_demo';
-  nursePhone=p.get('nursePhone')||'';
-  nursePhotoUrl=p.get('nursePhotoUrl')||p.get('nursePhoto')||'';
-  service=p.get('service')||'Nursing Care';
-  amount=p.get('amount')||'0';
-  patientName=p.get('patientName')||'';
-  patientPhone=p.get('patientPhone')||'';
-  patientLocation=p.get('patientLocation')||'';
-  patientLat=p.get('patientLat')||'';
-  patientLng=p.get('patientLng')||'';
-  paystackRef=p.get('paystackRef')||'';
-  document.getElementById('bookingIdDisplay').textContent=bookingId;
-  document.getElementById('nurseNameDisplay').textContent=nurseName;
-  document.getElementById('serviceDisplay').textContent=service;
-  document.getElementById('amountDisplay').textContent='GHS '+amount;
-  document.getElementById('patientDisplay').textContent=patientName||'N/A';
-  document.getElementById('nursePhoneDisplay').textContent=nursePhone||'N/A';
-  const nurseAv=document.getElementById('nurseAvatarDisplay');
-  nurseAv.src=nursePhotoUrl||'https://ui-avatars.com/api/?name='+encodeURIComponent(nurseName)+'&background=22c55e&color=fff';
-  // Try load from Firebase bookings if bookingId exists
-  if(bookingId && bookingId!=='LCG-DEMO'){
-    db.ref('bookings/'+bookingId).once('value').then(snap=>{
-      if(snap.exists()){
-        const b=snap.val();
-        if(b.nurseName) document.getElementById('nurseNameDisplay').textContent=b.nurseName;
-        if(b.nursePhotoUrl) nurseAv.src=b.nursePhotoUrl;
-        if(b.patientName) document.getElementById('patientDisplay').textContent=b.patientName;
-        nurseName=b.nurseName||nurseName; nursePhone=b.nursePhone||nursePhone; nursePhotoUrl=b.nursePhotoUrl||nursePhotoUrl;
-        patientName=b.patientName||patientName; patientPhone=b.patientPhone||patientPhone; patientLocation=b.patientLocation||patientLocation;
-      }
-    });
-  }
-}
-function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
-async function startAudioRecording(){
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    audioRecorder=new MediaRecorder(stream);audioChunks=[];
-    audioRecorder.ondataavailable=e=>{if(e.data.size>0) audioChunks.push(e.data);};
-    audioRecorder.onstop=()=>{audioBlob=new Blob(audioChunks,{type:'audio/webm'});audioUrl=URL.createObjectURL(audioBlob);document.getElementById('audioPlayback').src=audioUrl;document.getElementById('audioPreview').style.display='block';document.getElementById('playAudioBtn').style.display='inline-flex';document.getElementById('deleteAudioBtn').style.display='inline-flex';toast('🎤 Audio recorded');};
-    audioRecorder.start();document.getElementById('startAudioBtn').style.display='none';document.getElementById('stopAudioBtn').style.display='inline-flex';document.getElementById('audioRecordingBox').classList.add('active');
-    audioSeconds=0;audioTimerInterval=setInterval(()=>{audioSeconds++;const m=String(Math.floor(audioSeconds/60)).padStart(2,'0');const s=String(audioSeconds%60).padStart(2,'0');document.getElementById('audioTimer').textContent=`${m}:${s}`;},1000);
-  }catch(e){toast('Audio error: '+e.message);}
-}
-function stopAudioRecording(){if(audioRecorder&&audioRecorder.state!=='inactive'){audioRecorder.stop();audioRecorder.stream.getTracks().forEach(t=>t.stop());}document.getElementById('startAudioBtn').style.display='inline-flex';document.getElementById('stopAudioBtn').style.display='none';document.getElementById('audioRecordingBox').classList.remove('active');clearInterval(audioTimerInterval);}
-function playAudioRecording(){document.getElementById('audioPlayback').play();}
-function deleteAudioRecording(){audioBlob=null;audioUrl=null;document.getElementById('audioPreview').style.display='none';document.getElementById('playAudioBtn').style.display='none';document.getElementById('deleteAudioBtn').style.display='none';}
-async function startVideoRecording(){
-  try{
-    videoStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});document.getElementById('videoPreviewLive').srcObject=videoStream;
-    videoRecorder=new MediaRecorder(videoStream);videoChunks=[];
-    videoRecorder.ondataavailable=e=>{if(e.data.size>0) videoChunks.push(e.data);};
-    videoRecorder.onstop=()=>{videoBlob=new Blob(videoChunks,{type:'video/webm'});videoUrl=URL.createObjectURL(videoBlob);document.getElementById('videoPlayback').src=videoUrl;document.getElementById('videoPreview').style.display='block';document.getElementById('playVideoBtn').style.display='inline-flex';document.getElementById('deleteVideoBtn').style.display='inline-flex';toast('🎥 Video recorded');};
-    videoRecorder.start();document.getElementById('startVideoBtn').style.display='none';document.getElementById('stopVideoBtn').style.display='inline-flex';document.getElementById('videoRecordingBox').classList.add('active');
-    videoSeconds=0;videoTimerInterval=setInterval(()=>{videoSeconds++;const m=String(Math.floor(videoSeconds/60)).padStart(2,'0');const s=String(videoSeconds%60).padStart(2,'0');document.getElementById('videoTimer').textContent=`${m}:${s}`;},1000);
-  }catch(e){toast('Video error: '+e.message);}
-}
-function stopVideoRecording(){if(videoRecorder&&videoRecorder.state!=='inactive'){videoRecorder.stop();}if(videoStream){videoStream.getTracks().forEach(t=>t.stop());}document.getElementById('startVideoBtn').style.display='inline-flex';document.getElementById('stopVideoBtn').style.display='none';document.getElementById('videoRecordingBox').classList.remove('active');document.getElementById('videoPreviewLive').srcObject=null;clearInterval(videoTimerInterval);}
-function playVideoRecording(){document.getElementById('videoPlayback').play();}
-function deleteVideoRecording(){videoBlob=null;videoUrl=null;document.getElementById('videoPreview').style.display='none';document.getElementById('playVideoBtn').style.display='none';document.getElementById('deleteVideoBtn').style.display='none';}
-function handleDragOver(e){e.preventDefault();}function handleDragLeave(e){e.preventDefault();}function handleDrop(e){e.preventDefault();handleFiles(e.dataTransfer.files);}
-function handleFiles(files){for(let i=0;i<files.length;i++){const file=files[i];if(file.size>20*1024*1024){toast(`File ${file.name} too big`);continue;}if(uploadedFiles.length>=10){toast('Max 10 files');break;}const reader=new FileReader();reader.onload=e=>{uploadedFiles.push({name:file.name,size:file.size,type:file.type,data:e.target.result});renderFilePreview();};reader.readAsDataURL(file);}}
-function renderFilePreview(){const container=document.getElementById('filePreview');container.innerHTML='';uploadedFiles.forEach((f,idx)=>{const div=document.createElement('div');div.className='fileItem';const isImage=f.type.startsWith('image/');div.innerHTML=`<div style="display:flex;gap:8px;align-items:center"><span>${isImage?'🖼️':'📎'}</span><div><div style="font-weight:700">${f.name}</div><small>${(f.size/1024).toFixed(1)} KB</small></div>${isImage?`<img src="${f.data}" style="width:40px;height:40px;object-fit:cover;border-radius:6px">`:''}</div><button class="btn" style="padding:4px 8px" onclick="removeFile(${idx})">🗑️</button>`;container.appendChild(div);});}
-function removeFile(idx){uploadedFiles.splice(idx,1);renderFilePreview();}
-async function submitComplaint(){
-  const type=document.getElementById('complaintType').value;const text=document.getElementById('complaintText').value.trim();
-  if(!type){toast('Select complaint type');return;}if(!text||text.length<20){toast('Type complaint text — At least 20 chars');return;}
-  const ci=getClientInfo();
-  if(!confirm(`Submit complaint about ${nurseName}?`)) return;toast('Submitting with client photo name phone email + time...');
-  try{
-    const now=Date.now();const complaintId='CLIENT-COMP-'+bookingId+'-'+now;const evidenceUrls=[];
-    uploadedFiles.forEach((f,idx)=>{evidenceUrls.push({id:`FILE-${idx}`,name:f.name,type:f.type,size:f.size,url:f.data});});
-    if(audioBlob) evidenceUrls.push({id:'AUDIO-1',name:`audio_${complaintId}.webm`,type:'audio/webm',url:audioUrl, blobSize: audioBlob.size});
-    if(videoBlob) evidenceUrls.push({id:'VIDEO-1',name:`video_${complaintId}.webm`,type:'video/webm',url:videoUrl, blobSize: videoBlob.size});
-    const complaintData={
-      complaintId, bookingId, 
-      nurseId, nurseName, nursePhone, nursePhotoUrl,
-      // CLIENT — PHOTO NAME PHONE EMAIL SAVED + TIME
-      clientId: ci.clientId, clientName: ci.clientName, clientPhone: ci.clientPhone, clientEmail: ci.clientEmail, clientPhotoUrl: ci.clientPhotoUrl, clientPhoto: ci.clientPhotoUrl, clientLat: ci.clientLat, clientLng: ci.clientLng,
-      // PATIENT
-      patientName, patientPhone, patientLocation, patientLat, patientLng,
-      // BOOKING
-      service, amount, paystackRef, bookingStatus: 'completed',
-      // COMPLAINT
-      complaintType:type, complaintText:text, status:'pending', createdAt:now, createdAtStr: new Date().toLocaleString('en-GH'), time:now,
-      evidenceCount:evidenceUrls.length, evidenceFiles:evidenceUrls, hasAudio:!!audioBlob, hasVideo:!!videoBlob,
-      type:'client_complaint', from:'client', to:'nurse', reflectsOnCEO:true
-    };
-    await db.ref('clientComplaints/'+complaintId).set(complaintData);
-    await db.ref('allComplaints/'+complaintId).set(complaintData);
-    await db.ref('ceoComplaints/'+complaintId).set(complaintData);
-    await db.ref('complaintsByBooking/'+bookingId+'/'+complaintId).set(complaintData);
-    await db.ref('complaints/'+complaintId).set(complaintData);
-    try{
-      const hist=JSON.parse(localStorage.getItem('lcg_complaints')||'[]');
-      hist.unshift(complaintData);
-      localStorage.setItem('lcg_complaints', JSON.stringify(hist.slice(0,20)));
-    }catch(e){}
-    toast(`✅ Complaint Submitted with photo email!`);alert(`✅ COMPLAINT SUBMITTED!\n\nID: ${complaintId}\nNurse: ${nurseName}\nClient: ${ci.clientName} • ${ci.clientPhone} • ${ci.clientEmail}\nPhoto: ${ci.clientPhotoUrl?'YES':'NO'} • Time: ${new Date(now).toLocaleString('en-GH')}\n\nCEO sees it in ceo-complainant.html LIVE with your photo + email + phone`);
-    setTimeout(()=>{location.href='my-bookings.html';},1500);
-  }catch(e){toast('Error: '+e.message);}
-}
-
-function openMyPunishments(){
-  const sec=document.getElementById('myPunishmentsSection');
-  sec.style.display= sec.style.display==='none' ? 'block' : 'none';
-  if(sec.style.display==='block') loadMyPunishments();
-}
-async function loadMyPunishments(){
-  // Try ALL possible client IDs
-  const ids=[
-    localStorage.getItem('clientUid'),
-    localStorage.getItem('clientId'),
-    localStorage.getItem('uid'),
-    localStorage.getItem('clientUsername'),
-    localStorage.getItem('clientEmail'),
-    localStorage.getItem('clientEmail')? localStorage.getItem('clientEmail').toLowerCase().replace(/[.#$@\[\]]/g,'_') : '',
-    localStorage.getItem('clientPhone'),
-    localStorage.getItem('clientPhone')? localStorage.getItem('clientPhone').replace(/[^0-9]/g,'').slice(-9) : '',
-    localStorage.getItem('phone'),
-    localStorage.getItem('email'),
-    localStorage.getItem('email')? localStorage.getItem('email').toLowerCase().replace(/[.#$@\[\]]/g,'_') : ''
-  ].filter(Boolean);
-  
-  console.log('Searching punishments for client IDs:', ids);
-  
-  let allPunishments={};
-  for(let id of ids){
-    try{
-      const paths=['userPunishments/'+id, 'ceoPunishments/'+id, 'clientPunishments/'+id, 'punishments/'+id, 'punishmentsByEmail/'+id, 'punishmentsByPhone/'+id, 'notifications/'+id];
-      for(let path of paths){
-        const snap=await db.ref(path).once('value');
-        if(snap.exists()){
-          const val=snap.val();
-          // If it's a list of punishments
-          if(typeof val==='object'){
-            Object.values(val).forEach(p=>{
-              if(p && p.punishmentId) allPunishments[p.punishmentId]=p;
-              else if(p && p.type==='punishment' && p.punishmentId) allPunishments[p.punishmentId]=p;
-            });
-          }
-        }
-      }
-    }catch(e){ console.log('Search error for '+id, e); }
-  }
-  
-  // Also search allPunishments for client email/phone
-  try{
-    const allSnap=await db.ref('allPunishments').once('value');
-    if(allSnap.exists()){
-      const clientEmail=(localStorage.getItem('clientEmail')||'').toLowerCase();
-      const clientPhone=(localStorage.getItem('clientPhone')||'').replace(/[^0-9]/g,'').slice(-9);
-      Object.values(allSnap.val()).forEach(p=>{
-        if(!p || !p.victimType) return;
-        if(p.victimType!=='client') return;
-        const pEmail=(p.victimEmail||'').toLowerCase();
-        const pPhone=(p.victimPhone||'').replace(/[^0-9]/g,'').slice(-9);
-        if((clientEmail && pEmail && pEmail===clientEmail) || (clientPhone && pPhone && pPhone===clientPhone) || ids.includes(p.victimId)){
-          allPunishments[p.punishmentId]=p;
-        }
-      });
-    }
-  }catch(e){ console.log('allPunishments search error', e); }
-  
-  const list=Object.values(allPunishments).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-  console.log('Found punishments:', list);
-  
-  const el=document.getElementById('myPunishList');
-  const badge=document.getElementById('punishBadge');
-  const unread=list.filter(p=>!p.isRead).length;
-  if(badge){ badge.textContent=unread; badge.style.display= unread>0 ? 'inline-block' : 'none'; }
-  if(!list.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:#6b6788">✅ No punishments — Good behavior!<br><small style="font-size:9px">Checked IDs: '+ids.join(', ').substring(0,100)+'</small></div>'; return; }
-  el.innerHTML=list.map(p=>{
-    const pJson=JSON.stringify(p).replace(/'/g,"&#39;").replace(/"/g,"&quot;");
-    return `<div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="openPunishmentModalById('${p.punishmentId}')"><div style="display:flex;gap:6px"><span style="background:${p.isBlocked?'rgba(239,68,68,.15)': p.isSuspended?'rgba(245,158,11,.15)':'rgba(250,204,21,.15)'};color:${p.isBlocked?'#fca5a5': p.isSuspended?'#fcd34d':'#facc15'};padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800">${p.isBlocked?'🚫 BLOCKED': p.isSuspended?'⏸️ SUSPENDED': (p.action||'').toUpperCase()}</span><span style="font-size:10px;color:#6b6788">${p.createdAtStr||''}</span>${p.hasVoice?'<span style="font-size:10px;background:rgba(167,139,250,.12);color:#c4b5fd;padding:3px 6px;border-radius:999px">🎤 Voice</span>':''}</div><div style="font-weight:700;font-size:12px;margin-top:6px">CEO: ${p.action} — Click to read + listen</div><div style="font-size:11px;color:#9a95b8">${(p.ceoMessage||'').substring(0,80)}...</div></div>`;
-  }).join('');
-  
-  // Store for modal lookup
-  window._allPunishments=allPunishments;
-}
-
-function openPunishmentModalById(punishmentId){
-  const p=window._allPunishments && window._allPunishments[punishmentId];
-  if(p) openPunishmentModal(p);
-  else alert('Punishment not found: '+punishmentId);
-}
-
-
-window.onload=()=>{getClientInfo();getParams(); setTimeout(loadMyPunishments,1500);};
-
-<!-- === UNIVERSAL PUNISHMENT MODAL - Add to ANY complaints.html === -->
-<style>
-.punishModal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);display:none;place-items:center;padding:20px;backdrop-filter:blur(10px)}
+.toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;font-weight:700;display:none;max-width:300px}
+/* Punishment Modal */
+.punishModal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:none;place-items:center;padding:20px;backdrop-filter:blur(12px)}
 .punishModal.active{display:grid}
-.punishModalCard{background:linear-gradient(135deg,#1a1633,#0c0a1e);border:2px solid rgba(239,68,68,.3);border-radius:20px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.punishModalCard{background:linear-gradient(135deg,#1a1633,#0c0a1e);border:2px solid rgba(239,68,68,.4);border-radius:20px;max-width:620px;width:100%;max-height:90vh;overflow-y:auto}
 .punishModalHeader{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:linear-gradient(135deg,#1a1633,#0c0a1e);border-radius:20px 20px 0 0}
 .punishModalBody{padding:20px;display:flex;flex-direction:column;gap:14px}
 .punishBadge{padding:6px 12px;border-radius:999px;font-size:11px;font-weight:900;border:1px solid}
@@ -369,111 +43,171 @@ window.onload=()=>{getClientInfo();getParams(); setTimeout(loadMyPunishments,150
 .punishMessageBox{background:rgba(12,10,30,.7);border:1px solid rgba(96,165,250,.2);border-radius:12px;padding:14px}
 .punishVoiceBox{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);border-radius:12px;padding:14px}
 </style>
+</head><body>
+<header>
+<div class="brand">👤 Client Complaint — Complain on Nurse</div>
+<div class="headerBtns">
+<a href="my-bookings.html" class="btn">📋 My Job Offer</a>
+<a href="client-dashboard.html" class="btn">🏠 Dashboard</a>
+<button id="myPunishBtn" class="btn btnPunish" onclick="openMyPunishments()">⚖️ My Punishments <span id="punishBadge" style="background:#fff;color:#ef4444;padding:2px 6px;border-radius:999px;font-size:9px;display:none">0</span></button>
+<a href="index.html" class="btn">🏠 Home</a>
+</div>
+</header>
+<div class="wrap">
+<div class="card" style="background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2)">
+<div class="cardTitle">👩‍⚕️ Complaining About Nurse — <span id="clientNameDisplay" style="color:#c4b5fd">Loading...</span></div>
+<div style="font-size:12px;color:var(--muted)">Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700">-</span> • Nurse: <span id="clientNameDisplay">-</span></div>
+</div>
 
+<!-- MY PUNISHMENTS SECTION - HIDDEN UNTIL CLICK -->
+<div id="myPunishmentsSection" style="display:none">
+<div class="card" style="background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(250,204,21,.08));border:2px solid rgba(239,68,68,.25)">
+<div class="cardTitle" style="color:#fca5a5;display:flex;justify-content:space-between;align-items:center">
+<span>⚖️ My Punishments — CEO Judgments — Click to Read in Modal</span>
+<button onclick="closeMyPunishments()" style="padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:11px;cursor:pointer">✕ Close</button>
+</div>
+<div id="myPunishList">Loading punishments...</div>
+<div style="margin-top:10px;padding:10px;background:rgba(0,0,0,.2);border-radius:10px;font-size:10px;color:#6b6788">
+💡 Click any punishment card to open modal — Read CEO message + Listen CEO voice<br>
+Checked IDs: <span id="checkedIds" style="font-size:9px"></span>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="cardTitle">📝 Complaint Type + Text</div>
+<label class="label">Complaint Type</label>
+<select id="complaintType" class="select">
+<option value="">Select complaint type...</option>
+<option value="abuse">😡 Abuse / Verbal Abuse</option>
+<option value="non_payment">💰 Non Payment</option>
+<option value="unsafe">⚠️ Unsafe Environment</option>
+<option value="harassment">🚫 Harassment</option>
+<option value="false_accusation">❌ False Accusation</option>
+<option value="overwork">😰 Overwork</option>
+<option value="other">📝 Other</option>
+</select>
+<label class="label" style="margin-top:12px">Complaint Text — Detailed</label>
+<textarea id="complaintText" class="textarea" placeholder="Describe what client did..."></textarea>
+</div>
+<div class="card">
+<div class="cardTitle">🎤 Audio + 🎥 Video + 📎 Files — Evidence</div>
+<div class="uploadZone" onclick="document.getElementById('fileInput').click()">
+<b>Click to upload or drag & drop</b><br><small>Photos, Videos, Documents — Max 20MB</small>
+<input type="file" id="fileInput" multiple accept="image/*,video/*,application/pdf,.doc,.docx" style="display:none" onchange="handleFiles(this.files)">
+</div>
+<div id="filePreview" class="filePreview"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+<button id="startAudioBtn" class="btn btnRed" onclick="startAudioRecording()">🎤 Record Audio</button>
+<button id="stopAudioBtn" class="btn" style="display:none" onclick="stopAudioRecording()">⏹️ Stop Audio</button>
+<button id="startVideoBtn" class="btn btnRed" onclick="startVideoRecording()">🎥 Record Video</button>
+<button id="stopVideoBtn" class="btn" style="display:none" onclick="stopVideoRecording()">⏹️ Stop Video</button>
+</div>
+<div id="audioRecordingBox" class="recordingBox"><span class="recDot"></span> Recording Audio... <span id="audioTimer">00:00</span></div>
+<div id="audioPreview" style="margin-top:10px;display:none"><audio id="audioPlayback" controls style="width:100%"></audio></div>
+<div id="videoRecordingBox" class="recordingBox"><span class="recDot"></span> Recording Video... <span id="videoTimer">00:00</span><video id="videoPreviewLive" autoplay muted style="width:100%;height:200px;background:#000;border-radius:10px;margin-top:10px"></video></div>
+<div id="videoPreview" style="margin-top:10px;display:none"><video id="videoPlayback" controls style="width:100%;height:220px;background:#000;border-radius:10px"></video></div>
+</div>
+<div class="card">
+<div class="cardTitle">✅ Submit Nurse Complaint</div>
+<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+<button class="btn btnPurple" style="flex:1;padding:14px;font-size:13px;font-weight:900" onclick="submitComplaint()">👩‍⚕️ Submit Complaint About This Client</button>
+<button class="btn" style="flex:1;padding:14px" onclick="location.href='my-bookings.html'">Cancel</button>
+</div>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- PUNISHMENT MODAL -->
 <div id="punishmentModal" class="punishModal">
   <div class="punishModalCard">
     <div class="punishModalHeader">
-      <div><b style="font-family:Fraunces,serif;font-size:16px">⚖️ CEO Punishment — Read & Listen</b><br><small id="punishModalSubtitle" style="font-size:10px;color:#9a95b8">CEO judgment — Immediate effect on system</small></div>
+      <div><b style="font-family:Fraunces,serif;font-size:16px">⚖️ CEO Punishment — Read & Listen</b><br><small id="punishModalSubtitle" style="font-size:10px;color:#9a95b8">CEO judgment — Immediate effect</small></div>
       <button onclick="closePunishmentModal()" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;font-size:18px">×</button>
     </div>
-    <div class="punishModalBody" id="punishmentModalBody">
-      <!-- Dynamic content -->
-    </div>
+    <div class="punishModalBody" id="punishmentModalBody"></div>
   </div>
 </div>
 
 <script>
-function openPunishmentModal(punishmentData){
-  const modal=document.getElementById('punishmentModal');
-  const body=document.getElementById('punishmentModalBody');
-  const isBlocked=punishmentData.isBlocked, isSuspended=punishmentData.isSuspended;
-  const badgeClass=isBlocked?'punishBlock': isSuspended?'punishSuspend':'punishWarn';
-  const badgeText=isBlocked?'🚫 BLOCKED PERMANENTLY': isSuspended?'⏸️ SUSPENDED — '+ (punishmentData.suspendUntilStr||'') : '⚠️ '+punishmentData.action.toUpperCase();
-  const timeStr=punishmentData.createdAtStr||new Date(punishmentData.createdAt).toLocaleString('en-GH');
-  
-  body.innerHTML=`
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span class="punishBadge ${badgeClass}">${badgeText}</span>
-      <span style="font-size:10px;color:#6b6788">${timeStr}</span>
-      <span style="font-size:10px;background:rgba(96,165,250,.12);color:#93c5fd;padding:4px 8px;border-radius:999px">Complaint: ${punishmentData.complaintId||''}</span>
-      ${punishmentData.hasVoice?'<span style="font-size:10px;background:rgba(167,139,250,.12);color:#c4b5fd;padding:4px 8px;border-radius:999px">🎤 Voice Message</span>':''}
-    </div>
-    
-    <div class="punishEffect">
-      <b style="font-size:12px;color:#fca5a5">⚡ Immediate Effect On System:</b><br>
-      <div style="font-size:11px;color:#e8e0ff;margin-top:6px;line-height:1.6">
-        ${isBlocked ? `
-          🚫 <b style="color:#fca5a5">YOU ARE BLOCKED</b> — Cannot go online, cannot be booked, cannot book nurses. Hidden from all clients in book-nurse.html instantly. Must appeal to CEO.<br>
-          • Trust Score: -${punishmentData.trustDeduct||30}%<br>
-          • Status: BLOCKED PERMANENTLY until CEO unblocks
-        ` : isSuspended ? `
-          ⏸️ <b style="color:#fcd34d">YOU ARE SUSPENDED ${punishmentData.suspendUntilStr ? 'Until '+punishmentData.suspendUntilStr : ''}</b> — Cannot work/book until suspension ends.<br>
-          • Hidden from book-nurse list for ${punishmentData.suspendUntil ? Math.ceil((punishmentData.suspendUntil-Date.now())/(24*60*60*1000))+' days' : 'suspension period'}<br>
-          • Trust Score: -${punishmentData.trustDeduct||10}%<br>
-          • After ${punishmentData.suspendUntilStr||'suspension ends'}, you can go online again
-        ` : `
-          ⚠️ <b style="color:#facc15">WARNING</b> — Yellow card, no block but trust decreased<br>
-          • Trust Score: -${punishmentData.trustDeduct||5}%<br>
-          • Keep good behavior, next punishment will be suspension/block
-        `}
-      </div>
-    </div>
-    
-    <div class="punishMessageBox">
-      <b style="font-size:11px;color:#60a5fa">📝 CEO Written Message — READ THIS:</b>
-      <div style="margin-top:8px;padding:12px;background:rgba(0,0,0,.3);border-radius:10px;font-size:13px;line-height:1.7;color:#fff;border:1px solid rgba(255,255,255,.06)">${punishmentData.ceoMessage||'No written message from CEO'}</div>
-      <small style="font-size:9px;color:#6b6788;margin-top:6px;display:block">CEO wrote this judgment after reviewing evidence — Read carefully</small>
-    </div>
-    
-    ${punishmentData.hasVoice && punishmentData.voiceBase64 ? `
-    <div class="punishVoiceBox">
-      <b style="font-size:11px;color:#a78bfa">🎤 CEO Voice Message — LISTEN:</b><br>
-      <audio controls style="width:100%;margin-top:10px;border-radius:10px"><source src="${punishmentData.voiceBase64}" type="audio/webm"></audio>
-      <small style="font-size:9px;color:#a78bfa;margin-top:6px;display:block">CEO spoke to you — Listen to understand your punishment. Play it.</small>
-      <div style="margin-top:8px;display:flex;gap:6px">
-        <button onclick="this.nextElementSibling.nextElementSibling.play()" style="padding:6px 12px;border-radius:999px;background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.25);font-size:11px;font-weight:700;cursor:pointer">▶️ Play CEO Voice</button>
-        <button onclick="document.getElementById('punishVoiceTranscript').style.display='block'" style="padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.08);font-size:11px;cursor:pointer">📝 Show Transcript</button>
-      </div>
-      <div id="punishVoiceTranscript" style="display:none;margin-top:10px;padding:10px;background:rgba(0,0,0,.2);border-radius:8px;font-size:11px;color:#9a95b8">Voice transcript: ${punishmentData.ceoMessage||'Listen to audio above'}</div>
-    </div>
-    ` : punishmentData.voiceUrl ? `
-    <div class="punishVoiceBox">
-      <b style="font-size:11px;color:#a78bfa">🎤 CEO Voice — Listen:</b><br>
-      <audio controls style="width:100%;margin-top:10px"><source src="${punishmentData.voiceUrl}" type="audio/webm"></audio>
-    </div>
-    ` : '<div style="padding:10px;background:rgba(255,255,255,.04);border-radius:10px;font-size:11px;color:#6b6788">No voice message — Only written message</div>'}
-    
-    <div style="background:rgba(12,10,30,.5);border-radius:10px;padding:10px;font-size:10px;color:#6b6788">
-      <b>Punishment Details:</b><br>
-      ID: ${punishmentData.punishmentId} • Complaint: ${punishmentData.complaintId} • Victim: ${punishmentData.victimName||''} • Type: ${punishmentData.action}<br>
-      Trust: -${punishmentData.trustDeduct||0}% • ${punishmentData.suspendUntilStr? 'Suspended until: '+punishmentData.suspendUntilStr : punishmentData.isBlocked ? 'BLOCKED PERMANENTLY' : 'Warning only'} • ${timeStr}
-    </div>
-    
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button onclick="markPunishmentRead('${punishmentData.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.25);font-weight:800;font-size:12px;cursor:pointer">✅ I Have Read & Listened — Mark Read</button>
-      <button onclick="appealPunishmentFromModal('${punishmentData.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.25);font-weight:800;font-size:12px;cursor:pointer">📝 Appeal to CEO</button>
-    </div>
-    
-    <div style="text-align:center"><button onclick="closePunishmentModal()" style="padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.08);font-size:11px;cursor:pointer">Close Modal</button></div>
-  `;
-  
-  modal.classList.add('active');
-  // Mark as viewed (not read, just viewed)
-  const userId=getUserIdForPunishment();
-  if(userId){
-    firebase.database().ref('userPunishments/'+userId+'/'+punishmentData.punishmentId).update({isViewed:true, viewedAt:Date.now()}).catch(()=>{});
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+let bookingId, clientName, clientId, nurseName, clientId, service, amount;
+let audioRecorder, audioChunks=[], audioBlob=null, audioUrl=null, audioTimerInterval=null, audioSeconds=0;
+let videoRecorder, videoChunks=[], videoBlob=null, videoUrl=null, videoTimerInterval=null, videoSeconds=0, videoStream=null;
+let uploadedFiles=[];
+let _allPunishments={};
+
+function getParams(){
+  const p=new URLSearchParams(location.search);
+  bookingId=p.get('bookingId')||'LCG-DEMO';clientName=p.get('clientName')||'Client';clientId=p.get('clientId')||'client_demo';nurseName=p.get('nurseName')||'Nurse';clientId=p.get('clientId')||'nurse_demo';service=p.get('service')||'Nursing Care';amount=p.get('amount')||'0';
+  document.getElementById('bookingIdDisplay').textContent=bookingId;
+  document.getElementById('clientNameDisplay').textContent=clientName;
+  document.getElementById('clientNameDisplay').textContent=nurseName;
+}
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+
+async function startAudioRecording(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    audioRecorder=new MediaRecorder(stream);audioChunks=[];
+    audioRecorder.ondataavailable=e=>{if(e.data.size>0) audioChunks.push(e.data);};
+    audioRecorder.onstop=()=>{audioBlob=new Blob(audioChunks,{type:'audio/webm'});audioUrl=URL.createObjectURL(audioBlob);document.getElementById('audioPlayback').src=audioUrl;document.getElementById('audioPreview').style.display='block';toast('🎤 Audio recorded');};
+    audioRecorder.start();document.getElementById('startAudioBtn').style.display='none';document.getElementById('stopAudioBtn').style.display='inline-flex';document.getElementById('audioRecordingBox').classList.add('active');
+    audioSeconds=0;audioTimerInterval=setInterval(()=>{audioSeconds++;const m=String(Math.floor(audioSeconds/60)).padStart(2,'0');const s=String(audioSeconds%60).padStart(2,'0');document.getElementById('audioTimer').textContent=`${m}:${s}`;},1000);
+  }catch(e){toast('Audio error: '+e.message);}
+}
+function stopAudioRecording(){if(audioRecorder&&audioRecorder.state!=='inactive'){audioRecorder.stop();audioRecorder.stream.getTracks().forEach(t=>t.stop());}document.getElementById('startAudioBtn').style.display='inline-flex';document.getElementById('stopAudioBtn').style.display='none';document.getElementById('audioRecordingBox').classList.remove('active');clearInterval(audioTimerInterval);}
+async function startVideoRecording(){
+  try{
+    videoStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});document.getElementById('videoPreviewLive').srcObject=videoStream;
+    videoRecorder=new MediaRecorder(videoStream);videoChunks=[];
+    videoRecorder.ondataavailable=e=>{if(e.data.size>0) videoChunks.push(e.data);};
+    videoRecorder.onstop=()=>{videoBlob=new Blob(videoChunks,{type:'video/webm'});videoUrl=URL.createObjectURL(videoBlob);document.getElementById('videoPlayback').src=videoUrl;document.getElementById('videoPreview').style.display='block';toast('🎥 Video recorded');};
+    videoRecorder.start();document.getElementById('startVideoBtn').style.display='none';document.getElementById('stopVideoBtn').style.display='inline-flex';document.getElementById('videoRecordingBox').classList.add('active');
+    videoSeconds=0;videoTimerInterval=setInterval(()=>{videoSeconds++;const m=String(Math.floor(videoSeconds/60)).padStart(2,'0');const s=String(videoSeconds%60).padStart(2,'0');document.getElementById('videoTimer').textContent=`${m}:${s}`;},1000);
+  }catch(e){toast('Video error: '+e.message);}
+}
+function stopVideoRecording(){if(videoRecorder&&videoRecorder.state!=='inactive'){videoRecorder.stop();}if(videoStream){videoStream.getTracks().forEach(t=>t.stop());}document.getElementById('startVideoBtn').style.display='inline-flex';document.getElementById('stopVideoBtn').style.display='none';document.getElementById('videoRecordingBox').classList.remove('active');document.getElementById('videoPreviewLive').srcObject=null;clearInterval(videoTimerInterval);}
+function handleFiles(files){for(let i=0;i<files.length;i++){const file=files[i];if(file.size>20*1024*1024){toast(`File ${file.name} too big`);continue;}if(uploadedFiles.length>=10){toast('Max 10 files');break;}const reader=new FileReader();reader.onload=e=>{uploadedFiles.push({name:file.name,size:file.size,type:file.type,data:e.target.result});renderFilePreview();};reader.readAsDataURL(file);}}
+function renderFilePreview(){const container=document.getElementById('filePreview');container.innerHTML='';uploadedFiles.forEach((f,idx)=>{const div=document.createElement('div');div.className='fileItem';const isImage=f.type.startsWith('image/');div.innerHTML=`<div style="display:flex;gap:8px;align-items:center"><span>${isImage?'🖼️':'📎'}</span><div><div style="font-weight:700">${f.name}</div><small>${(f.size/1024).toFixed(1)} KB</small></div>${isImage?`<img src="${f.data}" style="width:40px;height:40px;object-fit:cover;border-radius:6px">`:''}</div><button class="btn" style="padding:4px 8px" onclick="removeFile(${idx})">🗑️</button>`;container.appendChild(div);});}
+function removeFile(idx){uploadedFiles.splice(idx,1);renderFilePreview();}
+async function submitComplaint(){
+  const type=document.getElementById('complaintType').value;const text=document.getElementById('complaintText').value.trim();
+  if(!type){toast('Select complaint type');return;}if(!text||text.length<20){toast('Type complaint text — At least 20 chars');return;}
+  if(!confirm(`Submit complaint about client ${clientName}?`)) return;toast('Submitting...');
+  try{
+    const now=Date.now();const complaintId='NURSE-COMP-'+bookingId+'-'+now;const evidenceUrls=[];
+    uploadedFiles.forEach((f,idx)=>{evidenceUrls.push({id:`FILE-${idx}`,name:f.name,type:f.type,size:f.size,url:f.data});});
+    if(audioBlob) evidenceUrls.push({id:'AUDIO-1',name:`audio_${complaintId}.webm`,type:'audio/webm',url:audioUrl});
+    if(videoBlob) evidenceUrls.push({id:'VIDEO-1',name:`video_${complaintId}.webm`,type:'video/webm',url:videoUrl});
+    const complaintData={complaintId, bookingId, clientId, clientName, clientId, nurseName, service, amount, complaintType:type, complaintText:text, status:'pending', createdAt:now, time:now, evidenceCount:evidenceUrls.length, evidenceFiles:evidenceUrls, hasAudio:!!audioBlob, hasVideo:!!videoBlob, type:'nurse_complaint', from:'nurse', to:'client', reflectsOnCEO:true};
+    await db.ref('nurseComplaints/'+complaintId).set(complaintData);await db.ref('allComplaints/'+complaintId).set(complaintData);await db.ref('ceoComplaints/'+complaintId).set(complaintData);await db.ref('complaintsByBooking/'+bookingId+'/'+complaintId).set(complaintData);
+    toast(`✅ Nurse complaint submitted`);alert(`✅ NURSE COMPLAINT SUBMITTED!\n\nID: ${complaintId}\nClient: ${clientName}\n\nCEO sees it LIVE`);setTimeout(()=>{location.href='my-bookings.html';},1500);
+  }catch(e){toast('Error: '+e.message);}
+}
+
+// === PUNISHMENT SYSTEM - FIXED BUTTON ===
+function openMyPunishments(){
+  console.log('Opening My Punishments');
+  const sec=document.getElementById('myPunishmentsSection');
+  if(!sec){ alert('Section not found'); return; }
+  if(sec.style.display==='none' || sec.style.display===''){
+    sec.style.display='block';
+    sec.scrollIntoView({behavior:'smooth'});
+    loadMyPunishments();
+  } else {
+    sec.style.display='none';
   }
 }
-
-function closePunishmentModal(){
-  document.getElementById('punishmentModal').classList.remove('active');
+function closeMyPunishments(){
+  document.getElementById('myPunishmentsSection').style.display='none';
 }
-
-function getUserIdForPunishment(){
-  return localStorage.getItem('clientUid')||localStorage.getItem('clientId')||localStorage.getItem('uid')||localStorage.getItem('clientEmail')||localStorage.getItem('clientPhone')||'';
-}
-function getAllUserIdsForPunishment(){
-  return [
+async function loadMyPunishments(){
+  const ids=[
+    localStorage.getItem('clientUid'),
     localStorage.getItem('clientUid'),
     localStorage.getItem('clientId'),
     localStorage.getItem('uid'),
@@ -482,67 +216,141 @@ function getAllUserIdsForPunishment(){
     localStorage.getItem('clientPhone'),
     localStorage.getItem('clientPhone')? localStorage.getItem('clientPhone').replace(/[^0-9]/g,'').slice(-9) : '',
     localStorage.getItem('email'),
-    localStorage.getItem('phone')
+    localStorage.getItem('phone'),
+    localStorage.getItem('phone')? localStorage.getItem('phone').replace(/[^0-9]/g,'').slice(-9) : ''
+  ].filter(Boolean);
+  
+  document.getElementById('checkedIds').textContent=ids.join(', ').substring(0,120);
+  console.log('Searching nurse punishments for IDs:', ids);
+  
+  let allPunishments={};
+  for(let id of ids){
+    try{
+      const paths=['userPunishments/'+id, 'ceoPunishments/'+id, 'nursePunishments/'+id, 'punishments/'+id, 'punishmentsByEmail/'+id, 'punishmentsByPhone/'+id];
+      for(let path of paths){
+        const snap=await db.ref(path).once('value');
+        if(snap.exists()){
+          const val=snap.val();
+          if(typeof val==='object'){
+            Object.values(val).forEach(p=>{ if(p && p.punishmentId) allPunishments[p.punishmentId]=p; });
+          }
+        }
+      }
+    }catch(e){ console.log('Error searching '+id, e); }
+  }
+  
+  try{
+    const allSnap=await db.ref('allPunishments').once('value');
+    if(allSnap.exists()){
+      const clientEmail=(localStorage.getItem('clientEmail')||localStorage.getItem('email')||'').toLowerCase();
+      const clientPhone=(localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'').replace(/[^0-9]/g,'').slice(-9);
+      Object.values(allSnap.val()).forEach(p=>{
+        if(!p || p.victimType!=='nurse') return;
+        const pEmail=(p.victimEmail||'').toLowerCase();
+        const pPhone=(p.victimPhone||'').replace(/[^0-9]/g,'').slice(-9);
+        if((clientEmail && pEmail && pEmail===clientEmail) || (clientPhone && pPhone && pPhone===clientPhone) || ids.includes(p.victimId)){
+          allPunishments[p.punishmentId]=p;
+        }
+      });
+    }
+  }catch(e){}
+  
+  const list=Object.values(allPunishments).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  console.log('Found nurse punishments:', list);
+  
+  const el=document.getElementById('myPunishList');
+  const badge=document.getElementById('punishBadge');
+  const unread=list.filter(p=>!p.isRead).length;
+  if(badge){ badge.textContent=unread>0?unread:''; badge.style.display= unread>0 ? 'inline-block' : 'none'; }
+  if(!list.length){ 
+    el.innerHTML='<div style="padding:20px;text-align:center;color:#6b6788">✅ No punishments — Good behavior!<br><small>Checked IDs: '+ids.join(', ').substring(0,100)+'</small><br><br><button onclick="loadMyPunishments()" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer">🔄 Refresh</button></div>'; 
+    return; 
+  }
+  el.innerHTML=list.map(p=>{
+    return `<div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="openPunishmentModalById('${p.punishmentId}')"><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="background:${p.isBlocked?'rgba(239,68,68,.15)': p.isSuspended?'rgba(245,158,11,.15)':'rgba(250,204,21,.15)'};color:${p.isBlocked?'#fca5a5': p.isSuspended?'#fcd34d':'#facc15'};padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800">${p.isBlocked?'🚫 BLOCKED': p.isSuspended?'⏸️ SUSPENDED': (p.action||'').toUpperCase()}</span><span style="font-size:10px;color:#6b6788">${p.createdAtStr||''}</span>${p.hasVoice?'<span style="font-size:10px;background:rgba(167,139,250,.12);color:#c4b5fd;padding:3px 6px;border-radius:999px">🎤 Voice</span>':''}</div><div style="font-weight:700;font-size:12px;margin-top:6px">CEO: ${p.action} — Click to read + listen</div><div style="font-size:11px;color:#9a95b8;margin-top:4px">${(p.ceoMessage||'').substring(0,80)}...</div></div>`;
+  }).join('');
+  _allPunishments=allPunishments;
+}
+
+function openPunishmentModalById(punishmentId){
+  const p=_allPunishments && _allPunishments[punishmentId];
+  if(p) openPunishmentModal(p);
+  else alert('Punishment not found: '+punishmentId+'\nTry refresh');
+}
+
+function openPunishmentModal(p){
+  const modal=document.getElementById('punishmentModal');
+  const body=document.getElementById('punishmentModalBody');
+  const isBlocked=p.isBlocked, isSuspended=p.isSuspended;
+  const badgeClass=isBlocked?'punishBlock': isSuspended?'punishSuspend':'punishWarn';
+  const badgeText=isBlocked?'🚫 BLOCKED PERMANENTLY': isSuspended?'⏸️ SUSPENDED — '+(p.suspendUntilStr||'') : '⚠️ '+(p.action||'').toUpperCase();
+  const timeStr=p.createdAtStr||new Date(p.createdAt).toLocaleString('en-GH');
+  
+  body.innerHTML=`
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="punishBadge ${badgeClass}">${badgeText}</span><span style="font-size:10px;color:#6b6788">${timeStr}</span></div>
+    <div class="punishEffect">
+      <b style="font-size:12px;color:#fca5a5">⚡ Immediate Effect:</b><br>
+      <div style="font-size:11px;margin-top:6px;line-height:1.6">
+        ${isBlocked ? `🚫 <b style="color:#fca5a5">YOU ARE BLOCKED</b> — Cannot go online, hidden from clients instantly. Must appeal.` : isSuspended ? `⏸️ <b style="color:#fcd34d">SUSPENDED Until ${p.suspendUntilStr||''}</b> — Hidden from clients.` : `⚠️ WARNING — Trust -${p.trustDeduct||5}%`}
+      </div>
+    </div>
+    <div class="punishMessageBox">
+      <b style="font-size:11px;color:#60a5fa">📝 CEO Message — READ:</b>
+      <div style="margin-top:8px;padding:12px;background:rgba(0,0,0,.3);border-radius:10px;font-size:13px;line-height:1.7;color:#fff">${p.ceoMessage||'No message'}</div>
+    </div>
+    ${p.hasVoice && p.voiceBase64 ? `<div class="punishVoiceBox"><b style="font-size:11px;color:#a78bfa">🎤 CEO Voice — LISTEN:</b><br><audio controls style="width:100%;margin-top:10px"><source src="${p.voiceBase64}" type="audio/webm"></audio></div>` : p.voiceUrl ? `<div class="punishVoiceBox"><b>🎤 CEO Voice:</b><br><audio controls style="width:100%;margin-top:10px"><source src="${p.voiceUrl}"></audio></div>` : '<div style="padding:10px;background:rgba(255,255,255,.04);border-radius:10px;font-size:11px;color:#6b6788">No voice</div>'}
+    <div style="display:flex;gap:8px"><button onclick="markPunishmentRead('${p.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.25);font-weight:800;cursor:pointer">✅ Mark Read</button><button onclick="appealPunishment('${p.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.25);font-weight:800;cursor:pointer">📝 Appeal</button></div>
+    <div style="text-align:center"><button onclick="closePunishmentModal()" style="padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.08);cursor:pointer">Close</button></div>
+  `;
+  modal.classList.add('active');
+}
+function closePunishmentModal(){ document.getElementById('punishmentModal').classList.remove('active'); }
+function markPunishmentRead(id){
+  const ids=[
+    localStorage.getItem('clientUid'),
+    localStorage.getItem('clientUid'),
+    localStorage.getItem('uid')
+  ].filter(Boolean);
+  const uid=ids[0]||'';
+  db.ref('userPunishments/'+uid+'/'+id).update({isRead:true, readAt:Date.now()}).then(()=>{ toast('✅ Marked read'); closePunishmentModal(); loadMyPunishments(); });
+}
+function appealPunishment(id){
+  const reason=prompt('Appeal to CEO — Explain why should be removed:');
+  if(!reason) return;
+  const uid=localStorage.getItem('clientUid')||localStorage.getItem('clientUid')||'';
+  db.ref('punishmentAppeals/'+id).set({punishmentId:id, userId:uid, reason:reason, createdAt:Date.now(), status:'pending'}).then(()=>{ toast('✅ Appeal sent'); closePunishmentModal(); });
+}
+
+function getAllIds(){
+  return [
+    localStorage.getItem('clientUid'),
+    localStorage.getItem('clientUid'),
+    localStorage.getItem('uid'),
+    localStorage.getItem('clientEmail'),
+    localStorage.getItem('clientPhone')
   ].filter(Boolean);
 }
 
-function markPunishmentRead(punishmentId){
-  const uid=getUserIdForPunishment();
-  if(!uid) return;
-  firebase.database().ref('userPunishments/'+uid+'/'+punishmentId).update({isRead:true, readAt:Date.now(), isListened:true}).then(()=>{
-    alert('✅ Marked as read — CEO will see you read punishment');
-    closePunishmentModal();
-  });
-  firebase.database().ref('ceoPunishments/'+uid+'/'+punishmentId).update({isRead:true}).catch(()=>{});
-}
-
-function appealPunishmentFromModal(punishmentId){
-  const reason=prompt('📝 APPEAL TO CEO — Explain why punishment should be removed or reduced:\n\nBe respectful and explain:');
-  if(!reason) return;
-  const uid=getUserIdForPunishment();
-  firebase.database().ref('punishmentAppeals/'+punishmentId).set({
-    punishmentId:punishmentId,
-    userId:uid,
-    userName: localStorage.getItem('clientName')||localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'User',
-    reason:reason,
-    createdAt:Date.now(),
-    createdAtStr:new Date().toLocaleString('en-GH'),
-    status:'pending'
-  }).then(()=>{
-    alert('✅ Appeal sent to CEO — CEO will review and decide to unblock or reduce punishment');
-    closePunishmentModal();
-  });
-}
-
-function autoCheckPunishments(){
-  const ids=getAllUserIdsForPunishment();
+window.onload=()=>{
+  getParams();
+  setTimeout(loadMyPunishments, 1000);
+  // Auto-check for new punishments
+  const ids=getAllIds();
   ids.forEach(uid=>{
-    firebase.database().ref('userPunishments/'+uid).on('child_added', snap=>{
+    db.ref('userPunishments/'+uid).on('child_added', snap=>{
       const v=snap.val();
       if(!v) return;
       if(v.createdAt && Date.now()-v.createdAt<60000 && !v.isRead){
         setTimeout(()=>{
-          if(confirm(`🚨 NEW CEO PUNISHMENT!\n\n${(v.action||'').toUpperCase()} — CEO punished you! Do you want to read now?\n\n${(v.ceoMessage||'').substring(0,100)}...`)){
+          if(confirm(`🚨 NEW PUNISHMENT!\n${(v.action||'').toUpperCase()} — CEO punished you! Read now?`)){
+            _allPunishments[v.punishmentId]=v;
             openPunishmentModal(v);
           }
           loadMyPunishments();
         }, 1000);
       }
     });
-    // Also listen to ceoPunishments
-    firebase.database().ref('ceoPunishments/'+uid).on('child_added', snap=>{
-      const v=snap.val();
-      if(!v) return;
-      if(v.createdAt && Date.now()-v.createdAt<60000 && !v.isRead){
-        setTimeout(()=>{ openPunishmentModal(v); loadMyPunishments(); }, 500);
-      }
-    });
   });
-}
-
-// Call auto-check on load
-window.addEventListener('load', ()=>{ setTimeout(autoCheckPunishments, 2000); });
-</script>
-
+};
 </script>
 </body></html>
