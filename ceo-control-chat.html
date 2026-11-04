@@ -1,477 +1,254 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CEO Control Chat — Send to Nurses OR Home Page (Index) — Master Control</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>CEO Control — Clean</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--gold:#facc15;--red:#ef4444;--purple:#a78bfa}
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
-.top{position:sticky;top:0;z-index:100;background:rgba(12,10,30,.98);backdrop-filter:blur(20px);border-bottom:1px solid rgba(168,85,247,.2);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.brand{font-family:Fraunces,serif;font-weight:700;font-size:14px;line-height:1.2}
-.brand small{display:block;font-size:9px;color:var(--muted);margin-top:2px}
-.btnTop{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:10px;font-weight:800;cursor:pointer;text-decoration:none}
-.btnDelete{background:linear-gradient(135deg,#ef4444,#991b1b);color:#fff}
-.btnBlock{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
-.btnCEO{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border:0}
-.btnIndex{background:linear-gradient(135deg,#facc15,#eab308);color:#000;border:0;font-weight:900}
-.wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.destinationBar{background:rgba(26,22,51,.9);border-bottom:1px solid var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-.destRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.destLabel{font-size:11px;font-weight:800;color:var(--muted)}
-.destBtn{padding:10px 16px;border-radius:12px;border:2px solid var(--line);background:rgba(12,10,30,.6);color:var(--text);font-size:11px;font-weight:800;cursor:pointer;transition:.2s}
-.destBtn.active{border-color:var(--purple);background:rgba(167,139,250,.15);color:#c4b5fd}
-.destBtn.active.indexActive{border-color:var(--gold);background:rgba(250,204,21,.15);color:#facc15}
-.controlsGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
-@media(max-width:600px){.controlsGrid{grid-template-columns:1fr}}
-.controlGroup{background:rgba(12,10,30,.5);border:1px solid var(--line);border-radius:12px;padding:10px}
-.controlGroup label{font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:6px}
-.controlGroup select, .controlGroup input{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:11px}
-.colorRow{display:flex;gap:8px;align-items:center}
-.colorInput{width:40px;height:36px;border-radius:8px;border:1px solid var(--line);background:none;cursor:pointer;padding:2px}
-.chat{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:radial-gradient(ellipse at top,rgba(168,85,247,.08),transparent 50%), var(--bg)}
-.msg{max-width:82%;padding:10px 12px;border-radius:14px;background:rgba(26,22,51,.9);border:1px solid var(--line);font-size:12px;position:relative}
-.msg.me{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;align-self:flex-end}
-.msg.me.indexMsg{background:linear-gradient(135deg,#facc15,#eab308);color:#000;align-self:flex-end;border:2px solid var(--gold)}
-.meta{font-size:10px;font-weight:800;margin-bottom:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.badge{padding:2px 7px;border-radius:999px;font-size:8px;font-weight:900}
-.badge-ceo{background:rgba(250,204,21,.2);color:#facc15;border:1px solid rgba(250,204,21,.3)}
-.badge-index{background:rgba(250,204,21,.3);color:#000;border:1px solid var(--gold)}
-.actions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.actBtn{font-size:10px;padding:5px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.2);color:#fff;cursor:pointer}
-.bar{background:rgba(12,10,30,.95);border-top:1px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:8px;position:sticky;bottom:0}
-.barRow{display:flex;gap:8px;align-items:flex-end}
-.bar textarea{flex:1;padding:12px 16px;border-radius:20px;border:1px solid var(--line);background:rgba(26,22,51,.8);color:#fff;font-size:13px;resize:none;outline:none;min-height:44px;max-height:100px}
-.iconBtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer;display:grid;place-items:center;flex-shrink:0}
-.iconBtn.send{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border:0}
-.iconBtn.sendIndex{background:linear-gradient(135deg,#facc15,#eab308);color:#000;border:0}
-.mediaTools{display:flex;gap:6px;flex-wrap:wrap}
-.toolBtn{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:10px;cursor:pointer}
-.previewBox{margin-top:8px;padding:10px;background:rgba(12,10,30,.6);border:1px dashed var(--line);border-radius:10px;display:none}
-.previewBox.active{display:block}
-.toast{position:fixed;right:14px;bottom:80px;z-index:300;background:#1e1a38;border:1px solid rgba(168,85,247,.3);padding:10px 14px;border-radius:10px;font-size:11px;display:none}
-.modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);display:none;place-items:center;padding:16px}
-.modal.show{display:grid}
-.modalCard{background:var(--card);border:1px solid rgba(168,85,247,.25);border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
-.modalHeader{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-.modalBody{padding:16px;overflow:auto;display:flex;flex-direction:column;gap:10px;background:rgba(12,10,30,.3)}
-.nurseRow{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:rgba(26,22,51,.6);margin-bottom:8px}
+:root{--bg:#0e0c1e;--card:#191531;--line:rgba(255,255,255,.07);--text:#f5f3ff;--muted:#9a95b8;--purple:#a78bfa;--gold:#facc15}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
+header{height:52px;padding:0 16px;background:rgba(20,16,40,.95);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+header b{font-size:14px;font-weight:700}
+header small{font-size:10px;color:var(--muted);margin-left:8px}
+.hBtns{display:flex;gap:6px}
+.hBtn{padding:7px 12px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);font-size:11px;cursor:pointer;text-decoration:none}
+.topBar{padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.4px}
+.pill{padding:10px 16px;border-radius:24px;border:1.5px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:.2s}
+.pill.active.nurses{border-color:var(--purple);background:rgba(167,139,250,.12);color:#c4b5fd}
+.pill.active.home{border-color:var(--gold);background:rgba(250,204,21,.12);color:var(--gold)}
+.hint{font-size:11px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--muted)}
+.hint.nurses{color:#c4b5fd;border-color:rgba(167,139,250,.2);background:rgba(167,139,250,.08)}
+.hint.home{color:var(--gold);border-color:rgba(250,204,21,.2);background:rgba(250,204,21,.08)}
+.settings{display:none;gap:10px;margin-top:4px}
+.settings.show{display:grid;grid-template-columns:1fr 1fr}
+@media(max-width:600px){.settings{grid-template-columns:1fr}}
+.set{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:10px}
+.set label{font-size:10px;color:var(--muted);font-weight:600;display:block;margin-bottom:6px}
+.set select,.set input{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(0,0,0,.2);color:#fff;font-size:11px;outline:none}
+.colorRow{display:flex;gap:6px}
+.colorRow input[type="color"]{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);padding:2px;background:none;cursor:pointer}
+.preview{margin-top:8px;padding:12px;border-radius:12px;border:1px dashed var(--line);background:rgba(0,0,0,.15);display:none}
+.preview.show{display:block}
+.previewBox{padding:10px;border-radius:10px;background:#1a1633;color:#fff;font-size:13px;overflow:hidden}
+.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:78%;padding:10px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-size:13px;line-height:1.4}
+.msg.me{align-self:flex-end;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border-bottom-right-radius:6px}
+.msg.me.home{background:linear-gradient(135deg,#facc15,#eab308);color:#000;border-color:var(--gold)}
+.msgMeta{font-size:10px;font-weight:700;opacity:.8;margin-bottom:4px;display:flex;gap:6px;flex-wrap:wrap}
+.badge{padding:2px 6px;border-radius:20px;font-size:9px;font-weight:800;background:rgba(0,0,0,.15)}
+.actions{margin-top:8px;display:flex;gap:6px}
+.aBtn{padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.15);color:inherit;font-size:10px;cursor:pointer}
+.footer{padding:12px 16px;background:rgba(20,16,40,.95);border-top:1px solid var(--line);flex-shrink:0}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tBtn{padding:7px 12px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font-size:11px;cursor:pointer}
+.tBtn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.composer{display:flex;gap:8px;align-items:flex-end}
+.composer textarea{flex:1;padding:12px 16px;border-radius:24px;border:1px solid var(--line);background:rgba(0,0,0,.2);color:#fff;font-size:13px;resize:none;min-height:44px;max-height:100px;outline:none}
+.icon{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;display:grid;place-items:center;flex-shrink:0}
+.icon.send{background:var(--purple);color:#fff;border:0}
+.icon.sendHome{background:var(--gold);color:#000;border:0}
+.status{font-size:10px;color:var(--muted);text-align:center;margin-top:8px}
+.recBox{display:none;padding:10px;border-radius:10px;margin-bottom:8px;align-items:center;gap:10px;font-size:11px}
+.recBox.show{display:flex}
+.recAudio{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2)}
+.recVideo{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);flex-direction:column}
+.fileList{display:none;flex-direction:column;gap:6px;margin-bottom:8px;max-height:80px;overflow-y:auto}
+.fileList.show{display:flex}
+.fileItem{padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:11px;display:flex;justify-content:space-between;align-items:center}
+.emojiPanel{position:absolute;bottom:90px;right:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:none;grid-template-columns:repeat(6,1fr);gap:6px;z-index:20;max-height:200px;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.emojiPanel.show{display:grid}
+.toast{position:fixed;right:16px;bottom:90px;z-index:100;background:var(--card);border:1px solid var(--line);padding:10px 14px;border-radius:10px;font-size:12px;display:none;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 </style>
 </head><body>
-<div class="top">
-<div><div class="brand">👑 CEO Control — Send to Nurses OR Home Page (Index) 👑<small>CEO: Asabere Peter — Choose destination — Edit colour, speed, display type — Text moves left fast/slow, Photo/Video displays across</small></div></div>
-<div style="display:flex;gap:6px;flex-wrap:wrap">
-<button class="btnTop btnDelete" onclick="showMasterDelete()">🗑️ Wipe All</button>
-<button class="btnTop btnBlock" onclick="showBlockManager()">🚫 Block</button>
-<a href="nurse-community-chat.html" class="btnTop btnCEO" style="text-decoration:none">💬 Nurses Board</a>
-<a href="index.html" class="btnTop btnIndex" style="text-decoration:none">🏠 Home (Index)</a>
+
+<header>
+<div><b>👑 CEO Control</b><small>nurse-group-chat.html • index.html</small></div>
+<div class="hBtns">
+<a href="nurse-group-chat.html" class="hBtn">💬 View Nurses</a>
+<a href="index.html" class="hBtn">🏠 View Home</a>
+</div>
+</header>
+
+<div class="topBar">
+<div class="row"><span class="label">SEND TO</span></div>
+<div class="row">
+<button id="btnNurses" class="pill active nurses" onclick="setDest('nurses')">💬 Nurses Group Chat</button>
+<button id="btnHome" class="pill" onclick="setDest('index')">🏠 Home Page Banner</button>
+</div>
+<div id="hint" class="hint nurses">Messages go to <b>nurse-group-chat.html</b> — Nurses see with photo + name</div>
+
+<div id="homeSettings" class="settings">
+<div class="set"><label>Text Colour</label><div class="colorRow"><input type="color" id="tColor" value="#ffffff" onchange="updPrev()"><input type="text" id="tColorTxt" value="#ffffff" style="flex:1" oninput="document.getElementById('tColor').value=this.value; updPrev()"></div></div>
+<div class="set"><label>Background</label><div class="colorRow"><input type="color" id="bColor" value="#191531" onchange="updPrev()"><input type="text" id="bColorTxt" value="#191531" style="flex:1" oninput="document.getElementById('bColor').value=this.value; updPrev()"></div></div>
+<div class="set"><label>Display Type</label><select id="dType" onchange="updPrev()"><option value="marquee_slow" selected>⬅️ Slow Move</option><option value="marquee_fast">⬅️ Fast Move</option><option value="static">📌 Static</option><option value="photo_full">🖼️ Full Photo/Video</option></select></div>
+<div class="set"><label>Speed</label><select id="speed" onchange="updPrev()"><option value="slow" selected>Slow</option><option value="medium">Medium</option><option value="fast">Fast</option></select></div>
+</div>
+
+<div id="previewWrap" class="preview">
+<div class="label">PREVIEW ON HOME PAGE</div>
+<div id="previewBox" class="previewBox" style="margin-top:8px">Type to preview...</div>
 </div>
 </div>
 
-<div class="destinationBar">
-<div class="destRow">
-<span class="destLabel">📤 SEND TO:</span>
-<button id="destNurses" class="destBtn active" onclick="setDestination('nurses')">💬 Nurses Group Chat</button>
-<button id="destIndex" class="destBtn" onclick="setDestination('index')">🏠 Home Page (Index) — Welcome Banner</button>
-<span id="destInfo" style="font-size:10px;color:var(--muted);margin-left:8px">→ Messages go to Nurses Board</span>
+<div id="chat" class="chat">
+<div style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:28px">👑</div><div style="margin-top:8px;font-weight:700;font-size:13px">Clean CEO Control</div><div style="font-size:11px;margin-top:6px">Select destination above • No 404 • nurse-group-chat.html</div></div>
 </div>
 
-<div id="indexControls" style="display:none">
-<div class="controlsGrid">
-<div class="controlGroup">
-<label>🎨 Text Colour</label>
-<div class="colorRow">
-<input type="color" id="textColor" class="colorInput" value="#ffffff" onchange="updatePreview()">
-<input type="text" id="textColorText" value="#ffffff" style="flex:1;padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:10px" onchange="document.getElementById('textColor').value=this.value; updatePreview()">
-</div>
-</div>
-<div class="controlGroup">
-<label>🎨 Background Colour</label>
-<div class="colorRow">
-<input type="color" id="bgColor" class="colorInput" value="#1a1633" onchange="updatePreview()">
-<input type="text" id="bgColorText" value="#1a1633" style="flex:1;padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff;font-size:10px" onchange="document.getElementById('bgColor').value=this.value; updatePreview()">
-</div>
-</div>
-<div class="controlGroup">
-<label>🎬 Display Type</label>
-<select id="displayType" onchange="updatePreview()">
-<option value="marquee_fast">⬅️ Moving Fast Left — Text scrolls fast</option>
-<option value="marquee_slow" selected>⬅️ Moving Slow Left — Text scrolls slow</option>
-<option value="marquee_medium">⬅️ Moving Medium — Balanced speed</option>
-<option value="static">📌 Static Banner — Fixed, no move</option>
-<option value="blink">💡 Blinking — Attention grab</option>
-<option value="ticker">📢 Ticker — Bottom ticker style</option>
-<option value="photo_full">🖼️ Photo/Video Full Width — Displays across home page</option>
-<option value="carousel">🎠 Carousel — Photo/Video carousel</option>
-</select>
-</div>
-<div class="controlGroup">
-<label>⚡ Speed (for moving text)</label>
-<select id="speed" onchange="updatePreview()">
-<option value="slow">🐢 Slow — Easy to read</option>
-<option value="medium" selected>🚶 Medium — Normal</option>
-<option value="fast">🏃 Fast — Urgent</option>
-<option value="very_fast">⚡ Very Fast — Emergency</option>
-</select>
-</div>
-<div class="controlGroup">
-<label>📍 Position on Index</label>
-<select id="position" onchange="updatePreview()">
-<option value="welcome_banner" selected>📍 Inside Welcome Card — Circled area</option>
-<option value="top_banner">📍 Top of Page — Above welcome</option>
-<option value="bottom_banner">📍 Bottom — Footer area</option>
-<option value="floating">📍 Floating — Over content</option>
-</select>
-</div>
-<div class="controlGroup">
-<label>✅ Status</label>
-<select id="activeStatus" onchange="updatePreview()">
-<option value="active" selected>✅ Active — Show on home page</option>
-<option value="inactive">⏸️ Inactive — Hide from home page</option>
-<option value="scheduled">⏰ Scheduled — Show later</option>
-</select>
-</div>
-</div>
-<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-<label style="font-size:10px"><input type="checkbox" id="showPhoto" checked> Show CEO Photo</label>
-<label style="font-size:10px"><input type="checkbox" id="allowClose" checked> Allow users to close</label>
-<label style="font-size:10px">Duration: <select id="duration" style="padding:4px 6px;border-radius:6px;background:rgba(12,10,30,.7);color:#fff;border:1px solid var(--line);font-size:10px"><option value="permanent">Permanent</option><option value="24h">24 Hours</option><option value="7d">7 Days</option><option value="1h">1 Hour</option></select></label>
-</div>
-<div id="previewArea" class="previewBox">
-<b style="font-size:10px">👁️ Preview on Home Page:</b>
-<div id="previewContent" style="margin-top:8px;padding:10px;border-radius:8px;background:#1a1633;color:#fff;font-size:13px">Preview will appear here...</div>
-</div>
-</div>
+<div class="footer" style="position:relative">
+<div id="recAudio" class="recBox recAudio"><span style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block"></span> Recording <span id="aTimer">00:00</span> <button class="hBtn" onclick="stopAudio()">Stop</button> <button class="hBtn" onclick="cancelAudio()">Cancel</button></div>
+<div id="recVideo" class="recBox recVideo"><div style="display:flex;gap:8px;width:100%;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#a78bfa;display:inline-block"></span> Recording video <span id="vTimer">00:00</span> <button class="hBtn" onclick="stopVideo()">Stop</button> <button class="hBtn" onclick="cancelVideo()">Cancel</button></div><video id="vLive" autoplay muted style="width:100%;height:140px;background:#000;border-radius:10px;margin-top:8px"></video></div>
+<div id="fileList" class="fileList"></div>
+
+<div class="tools">
+<button class="tBtn" onclick="document.getElementById('imgI').click()">🖼️ Photo</button>
+<button class="tBtn" onclick="document.getElementById('vidI').click()">🎥 Video</button>
+<button class="tBtn" onclick="document.getElementById('docI').click()">📄 Doc</button>
+<button class="tBtn" onclick="startAudio()">🎤 Voice</button>
+<button class="tBtn" onclick="startVideo()">📹 Video Msg</button>
+<button class="tBtn" onclick="toggleEmoji()">😊 Emoji</button>
+<input type="file" id="imgI" accept="image/*" multiple style="display:none" onchange="hImgs(this.files)">
+<input type="file" id="vidI" accept="video/*" multiple style="display:none" onchange="hVids(this.files)">
+<input type="file" id="docI" accept=".pdf,.doc,.docx,.txt" multiple style="display:none" onchange="hDocs(this.files)">
 </div>
 
-<div class="wrap">
-<div id="chat" class="chat"><div style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:40px">👑</div><div style="margin-top:10px;font-weight:800">CEO Control — Select destination above</div><small>💬 Nurses Board = nurses chat • 🏠 Home Page = Welcome banner (circled area)</small></div></div>
-<div class="bar">
-<div class="mediaTools">
-<button class="toolBtn" onclick="document.getElementById('imgInput').click()">🖼️ Photo</button>
-<button class="toolBtn" onclick="document.getElementById('vidInput').click()">🎥 Video</button>
-<button class="toolBtn" onclick="document.getElementById('docInput').click()">📄 Doc</button>
-<button class="toolBtn" onclick="startAudio()">🎤 Voice</button>
-<button class="toolBtn" onclick="startVideo()">📹 Video Msg</button>
-<input type="file" id="imgInput" accept="image/*" multiple style="display:none" onchange="handleImgs(this.files)">
-<input type="file" id="vidInput" accept="video/*" multiple style="display:none" onchange="handleVids(this.files)">
-<input type="file" id="docInput" accept=".pdf,.doc,.docx,.txt" multiple style="display:none" onchange="handleDocs(this.files)">
+<div class="composer">
+<textarea id="input" placeholder="Message to nurses..." rows="1" oninput="autoResize(this); updPrev()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault(); send();}"></textarea>
+<button class="icon" onclick="toggleEmoji()">😊</button>
+<button id="sendBtn" class="icon send" onclick="send()">➤</button>
 </div>
-<div id="filePreview" style="display:none;flex-direction:column;gap:6px;max-height:80px;overflow-y:auto"></div>
-<div class="barRow">
-<textarea id="msgInput" placeholder="Type message — Goes to Nurses Board..." rows="1" oninput="autoResize(this); updatePreview()" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
-<button id="sendBtn" class="iconBtn send" onclick="sendMessage()">➤</button>
-</div>
-<div style="font-size:9px;color:var(--muted);text-align:center" id="sendInfo">💬 Will send to Nurses Group Chat • Nurses see instantly with photo + name</div>
-</div>
+<div id="status" class="status">Sending to nurse-group-chat.html</div>
 </div>
 
-<div id="masterDeleteModal" class="modal"><div class="modalCard"><div class="modalHeader"><b style="color:#fca5a5">🗑️ Wipe All</b><button class="btnTop" onclick="closeMasterDelete()">✕</button></div><div class="modalBody"><div style="background:rgba(239,68,68,.12);border:2px solid rgba(239,68,68,.3);border-radius:12px;padding:12px"><b style="color:#ef4444">⚠️ Wipe ALL messages?</b><br><small>Wipes Nurses Board + Home Page Banner. Cannot undo!</small></div><div style="background:rgba(12,10,30,.6);padding:10px;border-radius:10px;font-size:11px"><span id="deleteStats">Loading...</span></div><input id="masterDeleteInput" placeholder="Type DELETE" style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fff;font-weight:800;margin-top:6px"><div style="display:flex;gap:8px;margin-top:12px"><button onclick="confirmMasterDelete()" style="flex:1;padding:12px;border-radius:10px;background:linear-gradient(135deg,#ef4444,#991b1b);color:#fff;border:none;font-weight:900;cursor:pointer">🗑️ CONFIRM WIPE ALL</button><button onclick="closeMasterDelete()" style="flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#fff;cursor:pointer">Cancel</button></div><div id="deleteProgress" style="margin-top:10px;font-size:10px;color:var(--muted);display:none"></div></div></div></div>
-<div id="blockManager" class="modal"><div class="modalCard"><div class="modalHeader"><b>🚫 Block Manager</b><button class="btnTop" onclick="closeBlockManager()">✕</button></div><div class="modalBody"><input id="nurseSearch" placeholder="🔍 Search nurse..." style="width:100%;padding:10px;border-radius:999px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff"><div style="display:flex;gap:6px;margin-top:8px"><button class="btnTop" onclick="loadAllNurses()">🔄 Refresh</button><button class="btnTop btnDelete" onclick="unblockAll()">✅ Unblock All</button><span id="nurseCount" style="font-size:10px;color:var(--muted);padding:8px">0</span></div><div id="blockList" style="margin-top:10px;max-height:400px;overflow-y:auto">Loading...</div></div></div></div>
+<div id="emojiPanel" class="emojiPanel"></div>
 <div id="toast" class="toast"></div>
 
 <script>
-const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
+const cfg={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(cfg); const db=firebase.database();
+const me={id:'CEO_ASABERE', name:'Asabere Peter — CEO', photo:'https://ui-avatars.com/api/?name=Asabere+Peter&background=facc15&color=000'};
+let dest='nurses', imgs=[], vids=[], docs=[], aBlob=null, vBlob=null;
+let aRec=null, aSec=0, aInt=null, vRec=null, vSec=0, vInt=null, vStream=null;
 
-const curUser={id:'CEO_ASABERE', name:'Asabere Peter — CEO', email:'ceo@lovecare.global', photo:'https://ui-avatars.com/api/?name=Asabere+Peter&background=facc15&color=000'};
-let destination='nurses'; // 'nurses' or 'index'
-let pendingImgs=[], pendingVids=[], pendingDocs=[];
-let audioRec=null, audioBlob=null, videoRec=null, videoBlob=null, videoStream=null;
-let blockedUsers=[], blockedMap={}, allNursesCache=[];
-
-function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',3000);}
+function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',2500); }
 function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
+function esc(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
-function setDestination(dest){
-  destination=dest;
-  document.getElementById('destNurses').classList.toggle('active', dest==='nurses');
-  document.getElementById('destIndex').classList.toggle('active', dest==='index');
-  document.getElementById('destIndex').classList.toggle('indexActive', dest==='index');
-  document.getElementById('indexControls').style.display = dest==='index' ? 'block' : 'none';
-  document.getElementById('previewArea').style.display = dest==='index' ? 'block' : 'none';
-  document.getElementById('previewArea').classList.toggle('active', dest==='index');
-  
-  const msgInput=document.getElementById('msgInput');
-  const sendBtn=document.getElementById('sendBtn');
-  const destInfo=document.getElementById('destInfo');
-  const sendInfo=document.getElementById('sendInfo');
-  
-  if(dest==='nurses'){
-    msgInput.placeholder='Type message — Goes to Nurses Board...';
-    destInfo.textContent='→ Messages go to Nurses Group Chat Board';
-    destInfo.style.color='var(--muted)';
-    sendInfo.textContent='💬 Will send to Nurses Group Chat • Nurses see instantly with photo + name';
-    sendBtn.className='iconBtn send';
+function setDest(d){
+  dest=d;
+  document.getElementById('btnNurses').classList.toggle('active', d==='nurses'); document.getElementById('btnNurses').classList.toggle('nurses', d==='nurses');
+  document.getElementById('btnHome').classList.toggle('active', d==='index'); document.getElementById('btnHome').classList.toggle('home', d==='index');
+  const hint=document.getElementById('hint'), set=document.getElementById('homeSettings'), prev=document.getElementById('previewWrap'), input=document.getElementById('input'), sendBtn=document.getElementById('sendBtn'), status=document.getElementById('status');
+  if(d==='nurses'){
+    hint.className='hint nurses'; hint.innerHTML='Messages go to <b>nurse-group-chat.html</b> — Nurses see with photo + name';
+    set.classList.remove('show'); prev.classList.remove('show');
+    input.placeholder='Message to nurses...'; sendBtn.className='icon send'; status.textContent='Sending to nurse-group-chat.html';
   } else {
-    msgInput.placeholder='Type announcement for Home Page (Index) — Welcome banner...';
-    destInfo.textContent='→ Will display in circled Welcome area on index.html';
-    destInfo.style.color='#facc15';
-    sendInfo.textContent='🏠 Will display on Home Page (Index) — Circled Welcome area — All visitors see it';
-    sendBtn.className='iconBtn sendIndex';
+    hint.className='hint home'; hint.innerHTML='Will display in <b>Welcome banner</b> on <b>index.html</b> — Colour + speed editable';
+    set.classList.add('show'); prev.classList.add('show');
+    input.placeholder='Announcement for home page...'; sendBtn.className='icon sendHome'; status.textContent='Sending to Home Page (index.html) Welcome banner';
   }
-  updatePreview();
+  updPrev();
+}
+function updPrev(){
+  if(dest!=='index') return;
+  const txt=document.getElementById('input').value||'Preview...';
+  const tc=document.getElementById('tColor').value, bc=document.getElementById('bColor').value, type=document.getElementById('dType').value, spd=document.getElementById('speed').value;
+  const box=document.getElementById('previewBox');
+  box.style.color=tc; box.style.background=bc;
+  if(type.includes('marquee')){
+    let dur='20s'; if(spd==='slow') dur='30s'; if(spd==='fast') dur='8s';
+    if(type==='marquee_fast') dur='8s';
+    box.innerHTML=`<div style="overflow:hidden;white-space:nowrap"><div style="display:inline-block;animation:marq ${dur} linear infinite">📢 ${esc(txt)} — CEO</div></div><style>@keyframes marq{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}</style>`;
+  } else if(type==='photo_full'){
+    box.innerHTML=imgs[0]?`<img src="${imgs[0].data}" style="max-width:100%;max-height:120px;border-radius:8px"><div style="margin-top:6px">${esc(txt)}</div>`:`🖼️ Photo full width<br>${esc(txt)}`;
+  } else box.textContent=txt;
+  document.getElementById('tColorTxt').value=tc; document.getElementById('bColorTxt').value=bc;
 }
 
-function updatePreview(){
-  if(destination!=='index') return;
-  const text=document.getElementById('msgInput').value || 'Welcome to Love Care Global — CEO Announcement Preview';
-  const textColor=document.getElementById('textColor').value;
-  const bgColor=document.getElementById('bgColor').value;
-  const displayType=document.getElementById('displayType').value;
-  const speed=document.getElementById('speed').value;
-  
-  const preview=document.getElementById('previewContent');
-  preview.style.color=textColor;
-  preview.style.background=bgColor;
-  
-  let speedStyle='';
-  if(displayType.includes('marquee')){
-    let duration='15s';
-    if(speed==='slow') duration='30s';
-    if(speed==='medium') duration='15s';
-    if(speed==='fast') duration='8s';
-    if(speed==='very_fast') duration='4s';
-    if(displayType==='marquee_fast') duration='8s';
-    if(displayType==='marquee_slow') duration='30s';
-    if(displayType==='marquee_medium') duration='15s';
-    
-    preview.innerHTML=`<div style="overflow:hidden;white-space:nowrap"><div style="display:inline-block;animation:marquee ${duration} linear infinite">📢 ${escapeHtml(text)} — CEO: Asabere Peter — ${new Date().toLocaleString()} — 📢 ${escapeHtml(text)}</div></div><style>@keyframes marquee{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}</style>`;
-  } else if(displayType==='static'){
-    preview.innerHTML=`<div style="text-align:center;padding:8px"><b>📢 CEO ANNOUNCEMENT</b><br>${escapeHtml(text)}</div>`;
-  } else if(displayType==='blink'){
-    preview.innerHTML=`<div style="text-align:center;padding:8px;animation:blink 1s infinite"><b>📢 ${escapeHtml(text)}</b></div><style>@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}</style>`;
-  } else if(displayType==='photo_full'){
-    const hasImg=pendingImgs.length>0;
-    if(hasImg){
-      preview.innerHTML=`<div style="text-align:center"><img src="${pendingImgs[0].data}" style="max-width:100%;max-height:200px;border-radius:10px"><br><div style="margin-top:8px">${escapeHtml(text)}</div></div>`;
-    } else {
-      preview.innerHTML=`<div style="text-align:center">🖼️ Photo/Video will display full width across home page<br>${escapeHtml(text)}</div>`;
-    }
-  } else {
-    preview.innerHTML=escapeHtml(text);
-  }
-  
-  document.getElementById('textColorText').value=textColor;
-  document.getElementById('bgColorText').value=bgColor;
+function loadMsgs(){
+  db.ref('nurses_group_chat/messages').limitToLast(40).on('child_added', s=> addMsg(s.val(), s.key, 'nurses'));
+  db.ref('ceoHomePageAnnouncements').limitToLast(20).on('child_added', s=> addMsg(s.val(), s.key, 'home'));
 }
-
-function escapeHtml(t){const d=document.createElement('div'); d.textContent=t; return d.innerHTML;}
-
-function loadMessages(){
-  const paths=['nurseCommunityChat/messages','nurses_group_chat/messages','ceoHomePageAnnouncements'];
-  paths.forEach(path=>{
-    db.ref(path).limitToLast(50).on('child_added', snap=>{
-      const msg=snap.val(); if(!msg) return;
-      addMessage(msg,snap.key,path);
-    });
-  });
-}
-function addMessage(msg,key,path){
+function addMsg(m,k,type){
   const chat=document.getElementById('chat');
-  if(chat.querySelector('div[style*="Select destination"]')) chat.innerHTML='';
-  if(document.getElementById('msg-'+key)) return;
-  
-  const isCEO = msg.senderId && msg.senderId.toString().includes('CEO');
-  const isIndex = path==='ceoHomePageAnnouncements' || msg.destination==='index' || msg.isHomePage;
-  
-  const div=document.createElement('div');
-  div.className='msg '+(isCEO?'me':'')+(isIndex?' indexMsg':'');
-  div.id='msg-'+key;
-  
-  const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-  const nameStr = msg.senderName||'CEO';
-  const destBadge = isIndex ? '<span class="badge badge-index">🏠 HOME PAGE</span>' : '<span class="badge badge-ceo">💬 NURSES</span>';
-  
-  let mediaHtml='';
-  if(msg.images) mediaHtml+=msg.images.map(i=>`<img src="${i.data||i.url}" style="max-width:100%;border-radius:8px;max-height:120px;margin-top:6px">`).join('');
-  if(msg.videos) mediaHtml+=msg.videos.map(v=>`<video src="${v.data||v.url}" controls style="max-width:100%;border-radius:8px;max-height:120px;margin-top:6px"></video>`).join('');
-  
-  div.innerHTML=`<div class="meta"><span class="badge badge-ceo">👑 CEO</span> ${destBadge} <span>${nameStr}</span> <span>${timeStr}</span></div><div style="font-size:12px;margin-top:4px">${escapeHtml(msg.text||'')}${msg.displayType?`<br><small style="font-size:9px;opacity:.7">Display: ${msg.displayType} • Speed: ${msg.speed||'medium'} • Color: ${msg.textColor||'#fff'} on ${msg.bgColor||'#1a1633'}</small>`:''}</div>${mediaHtml}<div class="actions"><button class="actBtn" onclick="editMessage('${key}','${path}')">✏️ Edit</button><button class="actBtn" style="background:rgba(239,68,68,.2);color:#fca5a5" onclick="deleteMessage('${key}','${path}')">🗑️ Delete</button></div>`;
-  chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
+  if(chat.innerHTML.includes('Clean CEO')) chat.innerHTML='';
+  if(document.getElementById('msg-'+k)) return;
+  const div=document.createElement('div'); div.className='msg '+(m.senderId?.includes('CEO')?'me':'')+(type==='home'?' home':''); div.id='msg-'+k;
+  const time=m.createdAt?new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
+  const badge=type==='home'?'<span class="badge" style="background:var(--gold);color:#000">🏠 HOME</span>':'<span class="badge">💬 NURSES</span>';
+  div.innerHTML=`<div class="msgMeta">👑 CEO ${badge} ${esc(m.senderName||'CEO')} ${time}</div><div>${esc(m.text||'')}${m.displayType?`<br><small style="opacity:.6;font-size:10px">${m.displayType} • ${m.speed||''}</small>`:''}</div><div class="actions"><button class="aBtn" onclick="editMsg('${k}','${type}')">Edit</button><button class="aBtn" style="color:#fca5a5" onclick="delMsg('${k}')">Delete</button></div>`;
+  chat.appendChild(div); chat.scrollTop=chat.scrollHeight;
 }
-
-async function sendMessage(){
-  const input=document.getElementById('msgInput');
-  const text=input.value.trim();
-  if(!text && pendingImgs.length===0 && pendingVids.length===0 && pendingDocs.length===0) return;
-  
+async function send(){
+  const inp=document.getElementById('input'); const txt=inp.value.trim();
+  if(!txt && imgs.length===0 && vids.length===0 && !aBlob && !vBlob) return;
+  const id='MSG-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
   const now=Date.now();
-  const id='MSG-CEO-'+now+'-'+Math.random().toString(36).substr(2,5);
-  
-  if(destination==='nurses'){
-    // Send to Nurses Board
-    let msg={
-      messageId:id,
-      senderId: curUser.id,
-      senderName: curUser.name,
-      senderPhoto: curUser.photo,
-      senderRole:'CEO',
-      text:text,
-      createdAt:now,
-      createdAtStr:new Date().toLocaleString('en-GH'),
-      destination:'nurses',
-      isCEO:true
-    };
-    if(pendingImgs.length>0) msg.images=pendingImgs;
-    if(pendingVids.length>0) msg.videos=pendingVids;
-    if(pendingDocs.length>0) msg.files=pendingDocs;
-    if(audioBlob) msg.voice=await toBase64(audioBlob);
-    if(videoBlob) msg.videoMessage=await toBase64(videoBlob);
-    
-    await db.ref('nurseCommunityChat/messages/'+id).set(msg);
-    await db.ref('nurses_group_chat/messages/'+id).set(msg);
-    await db.ref('nurseGroupChat/'+id).set(msg);
-    await db.ref('ceoChats/nurseBoard/'+id).set(msg);
-    toast('✅ Sent to Nurses Group Chat — Nurses see instantly');
-    
-  } else {
-    // Send to Home Page (Index)
-    const textColor=document.getElementById('textColor').value;
-    const bgColor=document.getElementById('bgColor').value;
-    const displayType=document.getElementById('displayType').value;
-    const speed=document.getElementById('speed').value;
-    const position=document.getElementById('position').value;
-    const activeStatus=document.getElementById('activeStatus').value;
-    const showPhoto=document.getElementById('showPhoto').checked;
-    const allowClose=document.getElementById('allowClose').checked;
-    const duration=document.getElementById('duration').value;
-    
-    let homeMsg={
-      announcementId:id,
-      messageId:id,
-      senderId: curUser.id,
-      senderName: curUser.name,
-      senderPhoto: curUser.photo,
-      text:text,
-      textColor:textColor,
-      bgColor:bgColor,
-      displayType:displayType,
-      speed:speed,
-      position:position,
-      active: activeStatus==='active',
-      status:activeStatus,
-      showPhoto:showPhoto,
-      allowClose:allowClose,
-      duration:duration,
-      createdAt:now,
-      createdAtStr:new Date().toLocaleString('en-GH'),
-      destination:'index',
-      isHomePage:true,
-      isCEO:true,
-      type:'ceo_home_announcement'
-    };
-    if(pendingImgs.length>0) homeMsg.images=pendingImgs;
-    if(pendingVids.length>0) homeMsg.videos=pendingVids;
-    if(pendingDocs.length>0) homeMsg.files=pendingDocs;
-    if(audioBlob) homeMsg.voice=await toBase64(audioBlob);
-    if(videoBlob) homeMsg.videoMessage=await toBase64(videoBlob);
-    
-    // Save to home page announcements - multiple paths for redundancy
-    await db.ref('ceoHomePageAnnouncements/'+id).set(homeMsg);
-    await db.ref('homePageAnnouncements/'+id).set(homeMsg);
-    await db.ref('indexAnnouncements/'+id).set(homeMsg);
-    await db.ref('ceoAnnouncements/active/'+id).set(homeMsg);
-    await db.ref('announcements/home/'+id).set(homeMsg);
-    
-    // Also set current active announcement
-    if(activeStatus==='active'){
-      await db.ref('ceoHomePageCurrent').set(homeMsg);
-      await db.ref('homePageBanner/current').set(homeMsg);
-    }
-    
-    toast('✅ Sent to Home Page (Index) — Displays in Welcome banner — Colour: '+textColor+' on '+bgColor+' — Type: '+displayType+' — Speed: '+speed);
-  }
-  
-  input.value=''; autoResize(input);
-  pendingImgs=[]; pendingVids=[]; pendingDocs=[]; audioBlob=null; videoBlob=null;
-  document.getElementById('filePreview').style.display='none';
-  updatePreview();
-}
+  const base={messageId:id, senderId:me.id, senderName:me.name, senderPhoto:me.photo, text:txt, createdAt:now, isCEO:true};
+  if(imgs.length) base.images=imgs;
+  if(vids.length) base.videos=vids;
+  if(docs.length) base.files=docs;
+  if(aBlob) base.voice=await toB64(aBlob);
+  if(vBlob) base.videoMessage=await toB64(vBlob);
 
-function toBase64(blob){return new Promise(r=>{const reader=new FileReader(); reader.onload=e=>r(e.target.result); reader.readAsDataURL(blob);});}
-function handleImgs(files){ for(let f of files){ if(f.size>20*1024*1024)continue; const reader=new FileReader(); reader.onload=e=>{ pendingImgs.push({name:f.name,size:f.size,type:f.type,data:e.target.result}); showPreview(); updatePreview(); }; reader.readAsDataURL(f);} }
-function handleVids(files){ for(let f of files){ if(f.size>50*1024*1024)continue; const reader=new FileReader(); reader.onload=e=>{ pendingVids.push({name:f.name,size:f.size,type:f.type,data:e.target.result}); showPreview(); updatePreview(); }; reader.readAsDataURL(f);} }
-function handleDocs(files){ for(let f of files){ if(f.size>20*1024*1024)continue; const reader=new FileReader(); reader.onload=e=>{ pendingDocs.push({name:f.name,size:f.size,type:f.type,data:e.target.result}); showPreview(); }; reader.readAsDataURL(f);} }
-function showPreview(){
-  const c=document.getElementById('filePreview');
-  if(pendingImgs.length===0&&pendingVids.length===0&&pendingDocs.length===0){c.style.display='none';return;}
-  c.style.display='flex'; c.style.flexDirection='column';
-  c.innerHTML=[...pendingImgs.map((f,i)=>`<div style="background:rgba(12,10,30,.6);padding:6px 10px;border-radius:8px;display:flex;justify-content:space-between;font-size:10px"><span>🖼️ ${f.name}</span><button class="btnTop" onclick="pendingImgs.splice(${i},1);showPreview();updatePreview()">✕</button></div>`),...pendingVids.map((f,i)=>`<div style="background:rgba(12,10,30,.6);padding:6px 10px;border-radius:8px;display:flex;justify-content:space-between;font-size:10px"><span>🎥 ${f.name}</span><button class="btnTop" onclick="pendingVids.splice(${i},1);showPreview();updatePreview()">✕</button></div>`)].join('');
-}
-function startAudio(){ navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{ audioRec=new MediaRecorder(s); const chunks=[]; audioRec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);}; audioRec.onstop=()=>{ audioBlob=new Blob(chunks,{type:'audio/webm'}); showPreview(); toast('✅ Voice ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){}}; audioRec.start(); }).catch(e=>toast(e.message)); }
-function startVideo(){ navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(s=>{ videoStream=s; videoRec=new MediaRecorder(s); const chunks=[]; videoRec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);}; videoRec.onstop=()=>{ videoBlob=new Blob(chunks,{type:'video/webm'}); showPreview(); toast('✅ Video ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){} videoStream=null; }; videoRec.start(); }).catch(e=>toast(e.message)); }
-function editMessage(key,path){ const el=document.getElementById('msg-'+key); if(!el) return; const text=el.textContent; const newText=prompt('Edit:', ''); if(newText===null) return; db.ref(path+'/'+key).update({text:newText, edited:true, editedAt:Date.now()}); toast('Edited'); }
-async function deleteMessage(key,path){
-  if(!confirm('Delete?')) return;
-  await db.ref(path+'/'+key).remove().catch(()=>{});
-  await db.ref('nurseCommunityChat/messages/'+key).remove().catch(()=>{});
-  await db.ref('nurses_group_chat/messages/'+key).remove().catch(()=>{});
-  await db.ref('ceoHomePageAnnouncements/'+key).remove().catch(()=>{});
-  await db.ref('homePageAnnouncements/'+key).remove().catch(()=>{});
-  await db.ref('ceoHomePageCurrent').remove().catch(()=>{});
-  document.getElementById('msg-'+key)?.remove();
-  toast('Deleted');
-}
-function showMasterDelete(){ document.getElementById('masterDeleteModal').classList.add('show'); }
-function closeMasterDelete(){ document.getElementById('masterDeleteModal').classList.remove('show'); }
-async function confirmMasterDelete(){
-  const input=document.getElementById('masterDeleteInput');
-  if(input.value.trim()!=='DELETE'){ toast('Type DELETE'); return; }
-  if(!confirm('Wipe ALL?')) return;
-  const progress=document.getElementById('deleteProgress'); progress.style.display='block'; progress.textContent='Wiping...';
-  try{
-    let deleted=0;
-    const paths=['nurses_group_chat/messages','nurseCommunityChat/messages','nurseGroupChat','ceoChats/nurseBoard','ceoHomePageAnnouncements','homePageAnnouncements','indexAnnouncements','ceoAnnouncements/active','announcements/home'];
-    for(let p of paths){ try{ const snap=await db.ref(p).once('value'); if(snap.exists()){ const val=snap.val(); for(let k in val){ await db.ref(p+'/'+k).remove().catch(()=>{}); deleted++; } } }catch(e){} }
-    try{ await db.ref('ceoHomePageCurrent').remove(); await db.ref('homePageBanner/current').remove(); }catch(e){}
-    progress.textContent='✅ Wiped '+deleted+' messages';
-    toast('✅ Wiped '+deleted);
-    setTimeout(()=>{ closeMasterDelete(); document.getElementById('chat').innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Board wiped clean</div>'; },1500);
-  }catch(e){ progress.textContent='Failed: '+e.message; }
-}
-function showBlockManager(){ document.getElementById('blockManager').classList.add('show'); loadAllNurses(); }
-function closeBlockManager(){ document.getElementById('blockManager').classList.remove('show'); }
-async function loadAllNurses(){
-  const listEl=document.getElementById('blockList'); listEl.innerHTML='Loading...';
-  try{
-    const snap=await db.ref('nurses').once('value');
-    const map=[];
-    if(snap.exists()){ snap.forEach(child=>{ const v=child.val(); map.push({id:child.key, name:v.fullName||v.name||'Nurse', email:v.email||''}); }); }
-    allNursesCache=map;
-    document.getElementById('nurseCount').textContent=map.length+' nurses';
-    renderBlockList();
-    loadBlocked();
-  }catch(e){ listEl.innerHTML='Failed'; }
-}
-async function loadBlocked(){ try{ const snap=await db.ref('nurses_group_chat/blocked_users').once('value'); blockedUsers=[]; blockedMap={}; if(snap.exists()){ const val=snap.val(); for(let k in val){ const v=val[k]; if(v.userId){ blockedUsers.push(v.userId); blockedMap[v.userId]=v; } } } renderBlockList(); }catch(e){} }
-function renderBlockList(){
-  const listEl=document.getElementById('blockList');
-  const search=(document.getElementById('nurseSearch').value||'').toLowerCase();
-  const filtered=allNursesCache.filter(n=>!search || (n.name+' '+n.email).toLowerCase().includes(search));
-  listEl.innerHTML=filtered.slice(0,80).map(n=>{
-    const isBlocked=blockedUsers.includes(n.id);
-    return `<div class="nurseRow" style="${isBlocked?'border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.12)':''}"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;color:#fff;font-weight:900">${n.name.charAt(0)}</div><div style="flex:1"><div style="font-weight:800;font-size:12px">${n.name} ${isBlocked?'<span style="background:rgba(239,68,68,.15);color:#fca5a5;padding:2px 6px;border-radius:999px;font-size:8px">BLOCKED</span>':''}</div><div style="font-size:10px;color:var(--muted)">${n.email}</div></div><button class="btnTop ${isBlocked?'':'btnDelete'}" style="${isBlocked?'background:#22c55e;color:#fff':''}" onclick="toggleBlock('${n.id}','${n.name.replace(/'/g,'')}')">${isBlocked?'✅ Unblock':'🚫 Block'}</button></div>`;
-  }).join('');
-}
-async function toggleBlock(uid,name){
-  const isBlocked=blockedUsers.includes(uid);
-  if(isBlocked){
-    if(!confirm('Unblock '+name+'?')) return;
-    try{ const snap=await db.ref('nurses_group_chat/blocked_users').once('value'); if(snap.exists()){ const val=snap.val(); for(let k in val){ if(val[k].userId===uid){ await db.ref('nurses_group_chat/blocked_users/'+k).remove(); } } } blockedUsers=blockedUsers.filter(x=>x!==uid); toast('Unblocked '+name); renderBlockList(); }catch(e){ toast(e.message); }
+  if(dest==='nurses'){
+    await db.ref('nurses_group_chat/messages/'+id).set({...base, destination:'nurses'});
+    await db.ref('nurseCommunityChat/messages/'+id).set({...base, destination:'nurses'});
+    toast('Sent to nurse-group-chat.html');
   } else {
-    const reason=prompt('Block '+name+'? Reason:', 'Posting meaningless things')||'Misbehaving';
-    try{ await db.ref('nurses_group_chat/blocked_users').push({userId:uid,userName:name,reason:reason,blockedBy:curUser.name,timestamp:Date.now()}); blockedUsers.push(uid); toast('Blocked '+name); renderBlockList(); }catch(e){ toast(e.message); }
+    const home={...base, announcementId:id, textColor:document.getElementById('tColor').value, bgColor:document.getElementById('bColor').value, displayType:document.getElementById('dType').value, speed:document.getElementById('speed').value, active:true, destination:'index', isHomePage:true};
+    await db.ref('ceoHomePageAnnouncements/'+id).set(home);
+    await db.ref('ceoHomePageCurrent').set(home);
+    await db.ref('homePageBanner/current').set(home);
+    toast('Sent to Home Page banner');
   }
+  inp.value=''; autoResize(inp); imgs=[]; vids=[]; docs=[]; aBlob=null; vBlob=null; document.getElementById('fileList').classList.remove('show'); updPrev();
 }
-async function unblockAll(){ if(!confirm('Unblock ALL?')) return; try{ const snap=await db.ref('nurses_group_chat/blocked_users').once('value'); if(snap.exists()){ const val=snap.val(); for(let k in val){ await db.ref('nurses_group_chat/blocked_users/'+k).remove(); } } blockedUsers=[]; blockedMap={}; toast('All unblocked'); renderBlockList(); }catch(e){ toast(e.message); } }
+function toB64(b){ return new Promise(r=>{ const rd=new FileReader(); rd.onload=e=>r(e.target.result); rd.readAsDataURL(b); }); }
+function hImgs(files){ for(let f of files){ const rd=new FileReader(); rd.onload=e=>{ imgs.push({name:f.name, data:e.target.result}); showFiles(); updPrev(); }; rd.readAsDataURL(f); } }
+function hVids(files){ for(let f of files){ const rd=new FileReader(); rd.onload=e=>{ vids.push({name:f.name, data:e.target.result}); showFiles(); }; rd.readAsDataURL(f); } }
+function hDocs(files){ for(let f of files){ const rd=new FileReader(); rd.onload=e=>{ docs.push({name:f.name, data:e.target.result}); showFiles(); }; rd.readAsDataURL(f); } }
+function showFiles(){
+  const el=document.getElementById('fileList');
+  const has=imgs.length||vids.length||docs.length||aBlob||vBlob;
+  if(!has){ el.classList.remove('show'); return; }
+  el.classList.add('show');
+  let h='';
+  h+=imgs.map((f,i)=>`<div class="fileItem">🖼️ ${f.name} <button class="hBtn" onclick="imgs.splice(${i},1);showFiles();updPrev()">✕</button></div>`).join('');
+  h+=vids.map((f,i)=>`<div class="fileItem">🎥 ${f.name} <button class="hBtn" onclick="vids.splice(${i},1);showFiles()">✕</button></div>`).join('');
+  h+=docs.map((f,i)=>`<div class="fileItem">📄 ${f.name} <button class="hBtn" onclick="docs.splice(${i},1);showFiles()">✕</button></div>`).join('');
+  if(aBlob) h+=`<div class="fileItem">🎤 Voice <button class="hBtn" onclick="aBlob=null;showFiles()">✕</button></div>`;
+  if(vBlob) h+=`<div class="fileItem">📹 Video Msg <button class="hBtn" onclick="vBlob=null;showFiles()">✕</button></div>`;
+  el.innerHTML=h;
+}
+function startAudio(){
+  navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{
+    aRec=new MediaRecorder(s); const ch=[]; aRec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data);}; aRec.onstop=()=>{ aBlob=new Blob(ch,{type:'audio/webm'}); showFiles(); toast('Voice ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){} }; aRec.start();
+    document.getElementById('recAudio').classList.add('show'); aSec=0; aInt=setInterval(()=>{ aSec++; const el=document.getElementById('aTimer'); if(el) el.textContent=String(Math.floor(aSec/60)).padStart(2,'0')+':'+String(aSec%60).padStart(2,'0'); },1000);
+  }).catch(e=>toast(e.message));
+}
+function stopAudio(){ if(aRec&&aRec.state!=='inactive') aRec.stop(); clearInterval(aInt); document.getElementById('recAudio').classList.remove('show'); }
+function cancelAudio(){ if(aRec&&aRec.state!=='inactive') aRec.stop(); aBlob=null; clearInterval(aInt); document.getElementById('recAudio').classList.remove('show'); showFiles(); }
+function startVideo(){
+  navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(s=>{
+    vStream=s; const live=document.getElementById('vLive'); if(live) live.srcObject=s;
+    vRec=new MediaRecorder(s); const ch=[]; vRec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data);}; vRec.onstop=()=>{ vBlob=new Blob(ch,{type:'video/webm'}); showFiles(); toast('Video ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){} vStream=null; if(live) live.srcObject=null; }; vRec.start();
+    document.getElementById('recVideo').classList.add('show'); vSec=0; vInt=setInterval(()=>{ vSec++; const el=document.getElementById('vTimer'); if(el) el.textContent=String(Math.floor(vSec/60)).padStart(2,'0')+':'+String(vSec%60).padStart(2,'0'); },1000);
+  }).catch(e=>toast(e.message));
+}
+function stopVideo(){ if(vRec&&vRec.state!=='inactive') vRec.stop(); clearInterval(vInt); document.getElementById('recVideo').classList.remove('show'); }
+function cancelVideo(){ if(vRec&&vRec.state!=='inactive') vRec.stop(); vBlob=null; if(vStream){try{vStream.getTracks().forEach(t=>t.stop());}catch(e){} vStream=null; const live=document.getElementById('vLive'); if(live) live.srcObject=null;} clearInterval(vInt); document.getElementById('recVideo').classList.remove('show'); showFiles(); }
 
-window.onload=()=>{
-  loadMessages();
-  document.getElementById('nurseSearch')?.addEventListener('input', renderBlockList);
-  setTimeout(()=>{ document.getElementById('msgInput')?.focus(); },500);
-};
+const emojis=['😊','😂','❤️','👍','👏','🙏','💪','😍','🥰','😘','😅','🤣','😎','🤩','😭','🥺','😮','😱','🤔','👌','✌️','🤝','💯','🔥','⭐','🌟','💖','💜','👩‍⚕️','👑','📢','🎉'];
+function initEmoji(){ const p=document.getElementById('emojiPanel'); p.innerHTML=emojis.map(e=>`<div style="font-size:20px;cursor:pointer;padding:6px;border-radius:8px;text-align:center" onclick="insEmoji('${e}')">${e}</div>`).join(''); }
+function toggleEmoji(){ const p=document.getElementById('emojiPanel'); p.classList.toggle('show'); }
+function insEmoji(e){ const inp=document.getElementById('input'); inp.value+=e; inp.focus(); autoResize(inp); updPrev(); }
+async function delMsg(k){ if(!confirm('Delete?')) return; await db.ref('nurses_group_chat/messages/'+k).remove().catch(()=>{}); await db.ref('nurseCommunityChat/messages/'+k).remove().catch(()=>{}); await db.ref('ceoHomePageAnnouncements/'+k).remove().catch(()=>{}); await db.ref('ceoHomePageCurrent').remove().catch(()=>{}); document.getElementById('msg-'+k)?.remove(); toast('Deleted'); }
+function editMsg(k,type){ const path=type==='home'?'ceoHomePageAnnouncements/'+k:'nurses_group_chat/messages/'+k; const newT=prompt('Edit message:'); if(newT===null) return; db.ref(path).update({text:newT, edited:true}); toast('Edited'); }
+
+window.onload=()=>{ initEmoji(); loadMsgs(); setDest('nurses'); };
 </script>
 </body></html>
