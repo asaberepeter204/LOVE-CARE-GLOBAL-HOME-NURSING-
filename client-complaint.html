@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Client Complaint — Complain on Nurse — FIXED BUTTON</title>
+<title>Client Complaint — Complain on Nurse — SOFT WORDING</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -29,7 +29,7 @@ header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-f
 .recDot{width:10px;height:10px;border-radius:50%;background:var(--purple);display:inline-block;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.12);padding:12px 16px;border-radius:12px;font-size:12px;font-weight:700;display:none;max-width:300px}
-/* Punishment Modal */
+/* Notice Modal */
 .punishModal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:none;place-items:center;padding:20px;backdrop-filter:blur(12px)}
 .punishModal.active{display:grid}
 .punishModalCard{background:linear-gradient(135deg,#1a1633,#0c0a1e);border:2px solid rgba(239,68,68,.4);border-radius:20px;max-width:620px;width:100%;max-height:90vh;overflow-y:auto}
@@ -49,26 +49,26 @@ header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.96);backdrop-f
 <div class="headerBtns">
 <a href="my-bookings.html" class="btn">📋 My Job Offer</a>
 <a href="client-dashboard.html" class="btn">🏠 Dashboard</a>
-<button id="myPunishBtn" class="btn btnPunish" onclick="openMyPunishments()">⚖️ My Punishments <span id="punishBadge" style="background:#fff;color:#ef4444;padding:2px 6px;border-radius:999px;font-size:9px;display:none">0</span></button>
+<button id="myPunishBtn" class="btn btnPunish" onclick="openMyNotices()">📋 My Work Ethics Notice <span id="punishBadge" style="background:#fff;color:#ef4444;padding:2px 6px;border-radius:999px;font-size:9px;display:none">0</span></button>
 <a href="index.html" class="btn">🏠 Home</a>
 </div>
 </header>
 <div class="wrap">
 <div class="card" style="background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2)">
-<div class="cardTitle">👩‍⚕️ Complaining About Nurse — <span id="clientNameDisplay" style="color:#c4b5fd">Loading...</span></div>
-<div style="font-size:12px;color:var(--muted)">Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700">-</span> • Nurse: <span id="clientNameDisplay">-</span></div>
+<div class="cardTitle">👤 Complaining About Nurse — <span id="clientNameDisplay" style="color:#c4b5fd">Loading...</span></div>
+<div style="font-size:12px;color:var(--muted)">Booking ID: <span id="bookingIdDisplay" style="color:var(--text);font-weight:700">-</span> • Nurse: <span id="nurseNameDisplay">-</span></div>
 </div>
 
 <!-- MY PUNISHMENTS SECTION - HIDDEN UNTIL CLICK -->
-<div id="myPunishmentsSection" style="display:none">
+<div id="myNoticesSection" style="display:none">
 <div class="card" style="background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(250,204,21,.08));border:2px solid rgba(239,68,68,.25)">
 <div class="cardTitle" style="color:#fca5a5;display:flex;justify-content:space-between;align-items:center">
-<span>⚖️ My Punishments — CEO Judgments — Click to Read in Modal</span>
-<button onclick="closeMyPunishments()" style="padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:11px;cursor:pointer">✕ Close</button>
+<span>📋 My Work Ethics Notice — CEO Judgments — Click to Read in Modal</span>
+<button onclick="closeMyNotices()" style="padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:11px;cursor:pointer">✕ Close</button>
 </div>
-<div id="myPunishList">Loading punishments...</div>
+<div id="myPunishList">Loading notices...</div>
 <div style="margin-top:10px;padding:10px;background:rgba(0,0,0,.2);border-radius:10px;font-size:10px;color:#6b6788">
-💡 Click any punishment card to open modal — Read CEO message + Listen CEO voice<br>
+💡 Tap any notice to open — Read CEO feedback + Listen voice message<br>
 Checked IDs: <span id="checkedIds" style="font-size:9px"></span>
 </div>
 </div>
@@ -120,13 +120,13 @@ Checked IDs: <span id="checkedIds" style="font-size:9px"></span>
 <div id="toast" class="toast"></div>
 
 <!-- PUNISHMENT MODAL -->
-<div id="punishmentModal" class="punishModal">
+<div id="noticeModal" class="punishModal">
   <div class="punishModalCard">
     <div class="punishModalHeader">
-      <div><b style="font-family:Fraunces,serif;font-size:16px">⚖️ CEO Punishment — Read & Listen</b><br><small id="punishModalSubtitle" style="font-size:10px;color:#9a95b8">CEO judgment — Immediate effect</small></div>
-      <button onclick="closePunishmentModal()" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;font-size:18px">×</button>
+      <div><b style="font-family:Fraunces,serif;font-size:16px">📋 Professional Conduct Review</b><br><small id="punishModalSubtitle" style="font-size:10px;color:#9a95b8">CEO judgment — Immediate effect</small></div>
+      <button onclick="closeNoticeModal()" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;font-size:18px">×</button>
     </div>
-    <div class="punishModalBody" id="punishmentModalBody"></div>
+    <div class="punishModalBody" id="noticeModalBody"></div>
   </div>
 </div>
 
@@ -134,18 +134,18 @@ Checked IDs: <span id="checkedIds" style="font-size:9px"></span>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
-let bookingId, clientName, clientId, nurseName, clientId, service, amount;
+let bookingId, clientName, clientId, nurseName, nurseId, service, amount;
 let audioRecorder, audioChunks=[], audioBlob=null, audioUrl=null, audioTimerInterval=null, audioSeconds=0;
 let videoRecorder, videoChunks=[], videoBlob=null, videoUrl=null, videoTimerInterval=null, videoSeconds=0, videoStream=null;
 let uploadedFiles=[];
-let _allPunishments={};
+let _allNotices={};
 
 function getParams(){
   const p=new URLSearchParams(location.search);
-  bookingId=p.get('bookingId')||'LCG-DEMO';clientName=p.get('clientName')||'Client';clientId=p.get('clientId')||'client_demo';nurseName=p.get('nurseName')||'Nurse';clientId=p.get('clientId')||'nurse_demo';service=p.get('service')||'Nursing Care';amount=p.get('amount')||'0';
+  bookingId=p.get('bookingId')||'LCG-DEMO';clientName=p.get('clientName')||'Client';clientId=p.get('clientId')||'client_demo';nurseName=p.get('nurseName')||'Nurse';nurseId=p.get('nurseId')||'nurse_demo';service=p.get('service')||'Nursing Care';amount=p.get('amount')||'0';
   document.getElementById('bookingIdDisplay').textContent=bookingId;
   document.getElementById('clientNameDisplay').textContent=clientName;
-  document.getElementById('clientNameDisplay').textContent=nurseName;
+  document.getElementById('nurseNameDisplay').textContent=nurseName;
 }
 function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
 
@@ -183,56 +183,56 @@ async function submitComplaint(){
     uploadedFiles.forEach((f,idx)=>{evidenceUrls.push({id:`FILE-${idx}`,name:f.name,type:f.type,size:f.size,url:f.data});});
     if(audioBlob) evidenceUrls.push({id:'AUDIO-1',name:`audio_${complaintId}.webm`,type:'audio/webm',url:audioUrl});
     if(videoBlob) evidenceUrls.push({id:'VIDEO-1',name:`video_${complaintId}.webm`,type:'video/webm',url:videoUrl});
-    const complaintData={complaintId, bookingId, clientId, clientName, clientId, nurseName, service, amount, complaintType:type, complaintText:text, status:'pending', createdAt:now, time:now, evidenceCount:evidenceUrls.length, evidenceFiles:evidenceUrls, hasAudio:!!audioBlob, hasVideo:!!videoBlob, type:'nurse_complaint', from:'nurse', to:'client', reflectsOnCEO:true};
+    const complaintData={complaintId, bookingId, clientId, clientName, nurseId, nurseName, service, amount, complaintType:type, complaintText:text, status:'pending', createdAt:now, time:now, evidenceCount:evidenceUrls.length, evidenceFiles:evidenceUrls, hasAudio:!!audioBlob, hasVideo:!!videoBlob, type:'nurse_complaint', from:'nurse', to:'client', reflectsOnCEO:true};
     await db.ref('nurseComplaints/'+complaintId).set(complaintData);await db.ref('allComplaints/'+complaintId).set(complaintData);await db.ref('ceoComplaints/'+complaintId).set(complaintData);await db.ref('complaintsByBooking/'+bookingId+'/'+complaintId).set(complaintData);
     toast(`✅ Nurse complaint submitted`);alert(`✅ NURSE COMPLAINT SUBMITTED!\n\nID: ${complaintId}\nClient: ${clientName}\n\nCEO sees it LIVE`);setTimeout(()=>{location.href='my-bookings.html';},1500);
   }catch(e){toast('Error: '+e.message);}
 }
 
 // === PUNISHMENT SYSTEM - FIXED BUTTON ===
-function openMyPunishments(){
-  console.log('Opening My Punishments');
-  const sec=document.getElementById('myPunishmentsSection');
+function openMyNotices(){
+  console.log('Opening My Work Ethics Notice');
+  const sec=document.getElementById('myNoticesSection');
   if(!sec){ alert('Section not found'); return; }
   if(sec.style.display==='none' || sec.style.display===''){
     sec.style.display='block';
     sec.scrollIntoView({behavior:'smooth'});
-    loadMyPunishments();
+    loadMyNotices();
   } else {
     sec.style.display='none';
   }
 }
-function closeMyPunishments(){
-  document.getElementById('myPunishmentsSection').style.display='none';
+function closeMyNotices(){
+  document.getElementById('myNoticesSection').style.display='none';
 }
-async function loadMyPunishments(){
+async function loadMyNotices(){
   const ids=[
-    localStorage.getItem('clientUid'),
-    localStorage.getItem('clientUid'),
-    localStorage.getItem('clientId'),
+    localStorage.getItem('lcg_nurse_uid'),
+    localStorage.getItem('nurseUid'),
+    localStorage.getItem('nurseId'),
     localStorage.getItem('uid'),
-    localStorage.getItem('clientEmail'),
-    localStorage.getItem('clientEmail')? localStorage.getItem('clientEmail').toLowerCase().replace(/[.#$@\[\]]/g,'_') : '',
-    localStorage.getItem('clientPhone'),
-    localStorage.getItem('clientPhone')? localStorage.getItem('clientPhone').replace(/[^0-9]/g,'').slice(-9) : '',
+    localStorage.getItem('nurseEmail'),
+    localStorage.getItem('nurseEmail')? localStorage.getItem('nurseEmail').toLowerCase().replace(/[.#$@\[\]]/g,'_') : '',
+    localStorage.getItem('nursePhone'),
+    localStorage.getItem('nursePhone')? localStorage.getItem('nursePhone').replace(/[^0-9]/g,'').slice(-9) : '',
     localStorage.getItem('email'),
     localStorage.getItem('phone'),
     localStorage.getItem('phone')? localStorage.getItem('phone').replace(/[^0-9]/g,'').slice(-9) : ''
   ].filter(Boolean);
   
   document.getElementById('checkedIds').textContent=ids.join(', ').substring(0,120);
-  console.log('Searching nurse punishments for IDs:', ids);
+  console.log('Searching nurse notices for IDs:', ids);
   
-  let allPunishments={};
+  let allNotices={};
   for(let id of ids){
     try{
-      const paths=['userPunishments/'+id, 'ceoPunishments/'+id, 'nursePunishments/'+id, 'punishments/'+id, 'punishmentsByEmail/'+id, 'punishmentsByPhone/'+id];
+      const paths=['userNotices/'+id, 'ceoNotices/'+id, 'nurseNotices/'+id, 'notices/'+id, 'noticesByEmail/'+id, 'noticesByPhone/'+id];
       for(let path of paths){
         const snap=await db.ref(path).once('value');
         if(snap.exists()){
           const val=snap.val();
           if(typeof val==='object'){
-            Object.values(val).forEach(p=>{ if(p && p.punishmentId) allPunishments[p.punishmentId]=p; });
+            Object.values(val).forEach(p=>{ if(p && p.noticeId) allNotices[p.noticeId]=p; });
           }
         }
       }
@@ -240,56 +240,56 @@ async function loadMyPunishments(){
   }
   
   try{
-    const allSnap=await db.ref('allPunishments').once('value');
+    const allSnap=await db.ref('allNotices').once('value');
     if(allSnap.exists()){
-      const clientEmail=(localStorage.getItem('clientEmail')||localStorage.getItem('email')||'').toLowerCase();
-      const clientPhone=(localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'').replace(/[^0-9]/g,'').slice(-9);
+      const nurseEmail=(localStorage.getItem('nurseEmail')||localStorage.getItem('email')||'').toLowerCase();
+      const nursePhone=(localStorage.getItem('nursePhone')||localStorage.getItem('phone')||'').replace(/[^0-9]/g,'').slice(-9);
       Object.values(allSnap.val()).forEach(p=>{
         if(!p || p.victimType!=='nurse') return;
         const pEmail=(p.victimEmail||'').toLowerCase();
         const pPhone=(p.victimPhone||'').replace(/[^0-9]/g,'').slice(-9);
-        if((clientEmail && pEmail && pEmail===clientEmail) || (clientPhone && pPhone && pPhone===clientPhone) || ids.includes(p.victimId)){
-          allPunishments[p.punishmentId]=p;
+        if((nurseEmail && pEmail && pEmail===nurseEmail) || (nursePhone && pPhone && pPhone===nursePhone) || ids.includes(p.victimId)){
+          allNotices[p.noticeId]=p;
         }
       });
     }
   }catch(e){}
   
-  const list=Object.values(allPunishments).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-  console.log('Found nurse punishments:', list);
+  const list=Object.values(allNotices).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  console.log('Found nurse notices:', list);
   
   const el=document.getElementById('myPunishList');
   const badge=document.getElementById('punishBadge');
   const unread=list.filter(p=>!p.isRead).length;
   if(badge){ badge.textContent=unread>0?unread:''; badge.style.display= unread>0 ? 'inline-block' : 'none'; }
   if(!list.length){ 
-    el.innerHTML='<div style="padding:20px;text-align:center;color:#6b6788">✅ No punishments — Good behavior!<br><small>Checked IDs: '+ids.join(', ').substring(0,100)+'</small><br><br><button onclick="loadMyPunishments()" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer">🔄 Refresh</button></div>'; 
+    el.innerHTML='<div style="padding:20px;text-align:center;color:#6b6788">✅ No notices — Excellent work! Keep it up 🌟<br><small>Checked IDs: '+ids.join(', ').substring(0,100)+'</small><br><br><button onclick="loadMyNotices()" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer">🔄 Refresh</button></div>'; 
     return; 
   }
   el.innerHTML=list.map(p=>{
-    return `<div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="openPunishmentModalById('${p.punishmentId}')"><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="background:${p.isBlocked?'rgba(239,68,68,.15)': p.isSuspended?'rgba(245,158,11,.15)':'rgba(250,204,21,.15)'};color:${p.isBlocked?'#fca5a5': p.isSuspended?'#fcd34d':'#facc15'};padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800">${p.isBlocked?'🚫 BLOCKED': p.isSuspended?'⏸️ SUSPENDED': (p.action||'').toUpperCase()}</span><span style="font-size:10px;color:#6b6788">${p.createdAtStr||''}</span>${p.hasVoice?'<span style="font-size:10px;background:rgba(167,139,250,.12);color:#c4b5fd;padding:3px 6px;border-radius:999px">🎤 Voice</span>':''}</div><div style="font-weight:700;font-size:12px;margin-top:6px">CEO: ${p.action} — Click to read + listen</div><div style="font-size:11px;color:#9a95b8;margin-top:4px">${(p.ceoMessage||'').substring(0,80)}...</div></div>`;
+    return `<div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="openNoticeModalById('${p.noticeId}')"><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="background:${p.isBlocked?'rgba(239,68,68,.15)': p.isSuspended?'rgba(245,158,11,.15)':'rgba(250,204,21,.15)'};color:${p.isBlocked?'#fca5a5': p.isSuspended?'#fcd34d':'#facc15'};padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800">${p.isBlocked?'🚫 Access Restricted': p.isSuspended?'⏸️ Temporarily On Hold': (p.action||'').toUpperCase()}</span><span style="font-size:10px;color:#6b6788">${p.createdAtStr||''}</span>${p.hasVoice?'<span style="font-size:10px;background:rgba(167,139,250,.12);color:#c4b5fd;padding:3px 6px;border-radius:999px">🎤 Voice</span>':''}</div><div style="font-weight:700;font-size:12px;margin-top:6px">CEO: ${p.action} — Tap to read feedback</div><div style="font-size:11px;color:#9a95b8;margin-top:4px">${(p.ceoMessage||'').substring(0,80)}...</div></div>`;
   }).join('');
-  _allPunishments=allPunishments;
+  _allNotices=allNotices;
 }
 
-function openPunishmentModalById(punishmentId){
-  const p=_allPunishments && _allPunishments[punishmentId];
-  if(p) openPunishmentModal(p);
-  else alert('Punishment not found: '+punishmentId+'\nTry refresh');
+function openNoticeModalById(noticeId){
+  const p=_allNotices && _allNotices[noticeId];
+  if(p) openNoticeModal(p);
+  else alert('Notice not found: '+noticeId+'\nTry refresh');
 }
 
-function openPunishmentModal(p){
-  const modal=document.getElementById('punishmentModal');
-  const body=document.getElementById('punishmentModalBody');
+function openNoticeModal(p){
+  const modal=document.getElementById('noticeModal');
+  const body=document.getElementById('noticeModalBody');
   const isBlocked=p.isBlocked, isSuspended=p.isSuspended;
   const badgeClass=isBlocked?'punishBlock': isSuspended?'punishSuspend':'punishWarn';
-  const badgeText=isBlocked?'🚫 BLOCKED PERMANENTLY': isSuspended?'⏸️ SUSPENDED — '+(p.suspendUntilStr||'') : '⚠️ '+(p.action||'').toUpperCase();
+  const badgeText=isBlocked?'🚫 Access Restricted': isSuspended?'⏸️ Temporary Hold — '+(p.suspendUntilStr||'') : '⚠️ '+(p.action||'').toUpperCase();
   const timeStr=p.createdAtStr||new Date(p.createdAt).toLocaleString('en-GH');
   
   body.innerHTML=`
     <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="punishBadge ${badgeClass}">${badgeText}</span><span style="font-size:10px;color:#6b6788">${timeStr}</span></div>
     <div class="punishEffect">
-      <b style="font-size:12px;color:#fca5a5">⚡ Immediate Effect:</b><br>
+      <b style="font-size:12px;color:#fca5a5">📊 Current Status:</b><br>
       <div style="font-size:11px;margin-top:6px;line-height:1.6">
         ${isBlocked ? `🚫 <b style="color:#fca5a5">YOU ARE BLOCKED</b> — Cannot go online, hidden from clients instantly. Must appeal.` : isSuspended ? `⏸️ <b style="color:#fcd34d">SUSPENDED Until ${p.suspendUntilStr||''}</b> — Hidden from clients.` : `⚠️ WARNING — Trust -${p.trustDeduct||5}%`}
       </div>
@@ -299,54 +299,54 @@ function openPunishmentModal(p){
       <div style="margin-top:8px;padding:12px;background:rgba(0,0,0,.3);border-radius:10px;font-size:13px;line-height:1.7;color:#fff">${p.ceoMessage||'No message'}</div>
     </div>
     ${p.hasVoice && p.voiceBase64 ? `<div class="punishVoiceBox"><b style="font-size:11px;color:#a78bfa">🎤 CEO Voice — LISTEN:</b><br><audio controls style="width:100%;margin-top:10px"><source src="${p.voiceBase64}" type="audio/webm"></audio></div>` : p.voiceUrl ? `<div class="punishVoiceBox"><b>🎤 CEO Voice:</b><br><audio controls style="width:100%;margin-top:10px"><source src="${p.voiceUrl}"></audio></div>` : '<div style="padding:10px;background:rgba(255,255,255,.04);border-radius:10px;font-size:11px;color:#6b6788">No voice</div>'}
-    <div style="display:flex;gap:8px"><button onclick="markPunishmentRead('${p.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.25);font-weight:800;cursor:pointer">✅ Mark Read</button><button onclick="appealPunishment('${p.punishmentId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.25);font-weight:800;cursor:pointer">📝 Appeal</button></div>
-    <div style="text-align:center"><button onclick="closePunishmentModal()" style="padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.08);cursor:pointer">Close</button></div>
+    <div style="display:flex;gap:8px"><button onclick="markNoticeRead('${p.noticeId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.25);font-weight:800;cursor:pointer">✅ Mark Read</button><button onclick="appealNotice('${p.noticeId}')" style="flex:1;padding:12px;border-radius:12px;background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.25);font-weight:800;cursor:pointer">📝 Appeal</button></div>
+    <div style="text-align:center"><button onclick="closeNoticeModal()" style="padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.08);cursor:pointer">Close</button></div>
   `;
   modal.classList.add('active');
 }
-function closePunishmentModal(){ document.getElementById('punishmentModal').classList.remove('active'); }
-function markPunishmentRead(id){
+function closeNoticeModal(){ document.getElementById('noticeModal').classList.remove('active'); }
+function markNoticeRead(id){
   const ids=[
-    localStorage.getItem('clientUid'),
-    localStorage.getItem('clientUid'),
+    localStorage.getItem('lcg_nurse_uid'),
+    localStorage.getItem('nurseUid'),
     localStorage.getItem('uid')
   ].filter(Boolean);
   const uid=ids[0]||'';
-  db.ref('userPunishments/'+uid+'/'+id).update({isRead:true, readAt:Date.now()}).then(()=>{ toast('✅ Marked read'); closePunishmentModal(); loadMyPunishments(); });
+  db.ref('userNotices/'+uid+'/'+id).update({isRead:true, readAt:Date.now()}).then(()=>{ toast('✅ Marked read'); closeNoticeModal(); loadMyNotices(); });
 }
-function appealPunishment(id){
+function appealNotice(id){
   const reason=prompt('Appeal to CEO — Explain why should be removed:');
   if(!reason) return;
-  const uid=localStorage.getItem('clientUid')||localStorage.getItem('clientUid')||'';
-  db.ref('punishmentAppeals/'+id).set({punishmentId:id, userId:uid, reason:reason, createdAt:Date.now(), status:'pending'}).then(()=>{ toast('✅ Appeal sent'); closePunishmentModal(); });
+  const uid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||'';
+  db.ref('noticeAppeals/'+id).set({noticeId:id, userId:uid, reason:reason, createdAt:Date.now(), status:'pending'}).then(()=>{ toast('✅ Appeal sent'); closeNoticeModal(); });
 }
 
 function getAllIds(){
   return [
-    localStorage.getItem('clientUid'),
-    localStorage.getItem('clientUid'),
+    localStorage.getItem('lcg_nurse_uid'),
+    localStorage.getItem('nurseUid'),
     localStorage.getItem('uid'),
-    localStorage.getItem('clientEmail'),
-    localStorage.getItem('clientPhone')
+    localStorage.getItem('nurseEmail'),
+    localStorage.getItem('nursePhone')
   ].filter(Boolean);
 }
 
 window.onload=()=>{
   getParams();
-  setTimeout(loadMyPunishments, 1000);
-  // Auto-check for new punishments
+  setTimeout(loadMyNotices, 1000);
+  // Auto-check for new notices
   const ids=getAllIds();
   ids.forEach(uid=>{
-    db.ref('userPunishments/'+uid).on('child_added', snap=>{
+    db.ref('userNotices/'+uid).on('child_added', snap=>{
       const v=snap.val();
       if(!v) return;
       if(v.createdAt && Date.now()-v.createdAt<60000 && !v.isRead){
         setTimeout(()=>{
-          if(confirm(`🚨 NEW PUNISHMENT!\n${(v.action||'').toUpperCase()} — CEO punished you! Read now?`)){
-            _allPunishments[v.punishmentId]=v;
-            openPunishmentModal(v);
+          if(confirm(`🚨 NEW PUNISHMENT!\n${(v.action||'').toUpperCase()} — CEO sent you professional feedback! Read now?`)){
+            _allNotices[v.noticeId]=v;
+            openNoticeModal(v);
           }
-          loadMyPunishments();
+          loadMyNotices();
         }, 1000);
       }
     });
