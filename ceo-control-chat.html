@@ -1,314 +1,358 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CEO Control Chat — Master Delete + Block/Unblock — FINAL FIX</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Control Chat — Send to Nurses Board — Master Delete + Block — FINAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;display:flex;flex-direction:column}
-.top{position:sticky;top:0;z-index:100;background:rgba(14,10,28,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.2);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.top b{font-size:12px;color:#f3e8ff}.top small{display:block;font-size:8px;color:#a78bfa;margin-top:2px}
-.btnTop{padding:7px 12px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(28,18,56,.6);color:#d8b4fe;font-weight:800;font-size:10px;cursor:pointer}
-.btnDeleteAll{background:linear-gradient(135deg,#ef4444,#991b1b);color:white;border-color:#ef4444}
-.btnBlockMgr{background:linear-gradient(135deg,#f59e0b,#d97706);color:white}
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--gold:#facc15;--red:#ef4444;--green:#34d399;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:100;background:rgba(12,10,30,.98);backdrop-filter:blur(20px);border-bottom:1px solid rgba(168,85,247,.2);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:15px}
+.brand small{display:block;font-size:9px;color:var(--muted);margin-top:2px}
+.btnTop{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:10px;font-weight:800;cursor:pointer;text-decoration:none}
+.btnDelete{background:linear-gradient(135deg,#ef4444,#991b1b);color:#fff;border-color:#ef4444}
+.btnBlock{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
+.btnCEO{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border:0}
 .wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-#chat{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,#0e0a1c,#120e26);min-height:400px}
-.msg{max-width:85%;padding:10px 12px;border-radius:16px;background:rgba(28,18,56,.9);border:1px solid rgba(168,85,247,.15);font-size:12px}
-.msg.me{align-self:flex-end;background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3)}
-.msg.ceo{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.25)}
-.msg.blocked{opacity:.5;border-color:#ef4444}
-.meta{font-size:10px;color:#a78bfa;font-weight:800;margin-bottom:4px;display:flex;gap:6px;flex-wrap:wrap}
-.badge{padding:2px 6px;border-radius:999px;font-size:8px;font-weight:900}
-.badge-ceo{background:rgba(245,158,11,.15);color:#fde68a}.badge-nurse{background:rgba(168,85,247,.15);color:#d8b4fe}.badge-blocked{background:rgba(239,68,68,.15);color:#fca5a5}
-.actions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.actBtn{font-size:10px;padding:6px 10px;border-radius:999px;border:1px solid rgba(168,85,247,.15);background:rgba(28,18,56,.6);color:#d8b4fe;cursor:pointer}
-.actBtn.del{color:#fca5a5;background:rgba(239,68,68,.12)}.actBtn.block{color:white;background:#ef4444}.actBtn.unblock{color:white;background:#22c55e}
-.bar{background:rgba(14,10,28,.9);border-top:1px solid rgba(168,85,247,.15);padding:10px;display:flex;gap:8px;align-items:center;position:sticky;bottom:0}
-.bar input{flex:1;padding:12px 14px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(28,18,56,.8);color:#fff}
-.btn{width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;display:grid;place-items:center}
-.send{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a}
-.modal{position:fixed;inset:0;z-index:200;background:rgba(5,3,14,.85);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:16px}
-.modal.show{display:flex}.modalCard{background:rgba(28,18,56,.98);border:1px solid rgba(168,85,247,.25);border-radius:20px;width:100%;max-width:520px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
-.modalHeader{padding:14px;border-bottom:1px solid rgba(168,85,247,.15);display:flex;justify-content:space-between;align-items:center}
-.modalBody{flex:1;overflow:auto;padding:14px;background:rgba(14,10,28,.3)}
-.deleteWarning{background:rgba(239,68,68,.12);border:2px solid rgba(239,68,68,.3);border-radius:12px;padding:12px;margin:10px 0}
-.nurseRow{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid rgba(168,85,247,.12);border-radius:12px;background:rgba(28,18,56,.6);margin-bottom:8px}
-.toast{position:fixed;right:14px;bottom:70px;z-index:300;background:#1e0a3a;border:1px solid rgba(168,85,247,.3);color:#fff;padding:10px 14px;border-radius:10px;font-size:11px;display:none}
+.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:radial-gradient(ellipse at top,rgba(168,85,247,.08),transparent 50%), var(--bg)}
+.msg{max-width:82%;padding:12px 14px;border-radius:18px;background:rgba(26,22,51,.9);border:1px solid var(--line);font-size:12px;position:relative}
+.msg.me{align-self:flex-end;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border-bottom-right-radius:6px}
+.msg.ceo{align-self:flex-end;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border-bottom-right-radius:6px;border:2px solid var(--gold)}
+.msg.nurse{align-self:flex-start;background:rgba(26,22,51,.9)}
+.meta{font-size:10px;font-weight:800;margin-bottom:4px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{padding:2px 7px;border-radius:999px;font-size:8px;font-weight:900}
+.badge-ceo{background:rgba(250,204,21,.2);color:#facc15;border:1px solid rgba(250,204,21,.3)}
+.badge-nurse{background:rgba(167,139,250,.15);color:#c4b5fd}
+.text{font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.media{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.mediaImg{max-width:100%;border-radius:10px;max-height:220px;object-fit:cover;cursor:pointer}
+.mediaVideo{max-width:100%;border-radius:10px;max-height:220px;background:#000}
+.actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.actBtn{font-size:10px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.2);color:#fff;cursor:pointer}
+.actBtn.edit{background:rgba(96,165,250,.15);color:#93c5fd}
+.actBtn.del{background:rgba(239,68,68,.15);color:#fca5a5}
+.bar{background:rgba(12,10,30,.95);border-top:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:10px;position:sticky;bottom:0}
+.barRow{display:flex;gap:8px;align-items:flex-end}
+.bar input[type=text], .bar textarea{flex:1;padding:12px 16px;border-radius:24px;border:1px solid var(--line);background:rgba(26,22,51,.8);color:#fff;font-size:13px;resize:none;outline:none;min-height:44px;max-height:100px}
+.iconBtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer;display:grid;place-items:center;flex-shrink:0}
+.iconBtn.send{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border:0}
+.mediaTools{display:flex;gap:6px;flex-wrap:wrap}
+.toolBtn{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:10px;cursor:pointer}
+.recBox{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:10px;display:none;gap:10px;align-items:center}
+.recBox.active{display:flex}
+.modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);display:none;place-items:center;padding:16px}
+.modal.show{display:grid}
+.modalCard{background:var(--card);border:1px solid rgba(168,85,247,.25);border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.modalHeader{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.modalBody{padding:16px;overflow:auto;display:flex;flex-direction:column;gap:10px;background:rgba(12,10,30,.3)}
+.nurseRow{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:rgba(26,22,51,.6);margin-bottom:8px}
+.toast{position:fixed;right:16px;bottom:80px;z-index:300;background:#1e1a38;border:1px solid rgba(168,85,247,.3);padding:10px 14px;border-radius:10px;font-size:11px;display:none;max-width:300px}
 </style>
-</head>
-<body>
+</head><body>
 <div class="top">
-<div><b>CEO CONTROL CHAT — Master Delete + Block/Unblock — FINAL FIX</b><small>Master Delete wipes ALL — Block/Unblock nurses misbehaving — CEO: Asabere Peter</small></div>
+<div><div class="brand">👑 CEO Control Chat — Master Control 👑<small>CEO: Asabere Peter — Send directly to Nurses Board — Edit/Delete own messages — Wipe All — Block/Unblock</small></div></div>
 <div style="display:flex;gap:6px;flex-wrap:wrap">
-<button class="btnTop btnDeleteAll" onclick="showMasterDelete()">🗑️ Master Delete ALL</button>
-<button class="btnTop btnBlockMgr" onclick="showBlocked()">🚫 Block Manager</button>
+<button class="btnTop btnDelete" onclick="showMasterDelete()">🗑️ Wipe All Messages</button>
+<button class="btnTop btnBlock" onclick="showBlockManager()">🚫 Block Manager</button>
+<button class="btnTop" onclick="toggleView()">👁️ Toggle View</button>
+<a href="nurse-community-chat.html" class="btnTop btnCEO" style="text-decoration:none">💬 Nurses Board</a>
 <a href="ceo-registration-center.html" class="btnTop" style="text-decoration:none">👥 Registration</a>
-<a href="chat-room.html" class="btnTop" style="text-decoration:none">💬 Chat Room</a>
 </div>
 </div>
 <div class="wrap">
-<div id="status"></div>
-<div id="chat"></div>
+<div id="chat" class="chat"><div style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:40px">👑</div><div style="margin-top:10px;font-weight:800">CEO Control Chat — Loading...</div><small>Your messages go straight to Nurses Group Chat Board</small></div></div>
 <div class="bar">
-<input id="msgInput" placeholder="Type as CEO Asabere Peter..." autocomplete="off">
-<button class="btn send" id="sendBtn">➤</button>
+<div id="editBanner" style="display:none;background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.25);border-radius:10px;padding:8px 12px;font-size:11px;display:none;justify-content:space-between;align-items:center"><span>✏️ Editing message — <span id="editText" style="font-weight:700"></span></span><button class="btnTop" onclick="cancelEdit()">✕ Cancel</button></div>
+<div id="recAudio" class="recBox"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block;animation:blink 1s infinite"></span> Recording audio... <span id="audioTimer">00:00</span> <button class="btnTop" onclick="stopAudio()">⏹️ Stop & Send</button><button class="btnTop" onclick="cancelAudio()">✕</button></div>
+<div id="recVideo" class="recBox" style="flex-direction:column"><div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#a78bfa;display:inline-block"></span> Recording video... <span id="videoTimer">00:00</span> <button class="btnTop" onclick="stopVideo()">⏹️ Stop</button><button class="btnTop" onclick="cancelVideo()">✕</button></div><video id="videoLive" autoplay muted style="width:100%;height:150px;background:#000;border-radius:10px;margin-top:8px"></video></div>
+<div id="filePreview" style="display:none;flex-direction:column;gap:6px;max-height:100px;overflow-y:auto"></div>
+<div class="mediaTools">
+<button class="toolBtn" onclick="document.getElementById('imgInput').click()">🖼️ Photo</button>
+<button class="toolBtn" onclick="document.getElementById('vidInput').click()">🎥 Video</button>
+<button class="toolBtn" onclick="document.getElementById('docInput').click()">📄 Doc</button>
+<button class="toolBtn" onclick="startAudio()">🎤 Voice</button>
+<button class="toolBtn" onclick="startVideo()">📹 Video Msg</button>
+<input type="file" id="imgInput" accept="image/*" multiple style="display:none" onchange="handleImgs(this.files)">
+<input type="file" id="vidInput" accept="video/*" multiple style="display:none" onchange="handleVids(this.files)">
+<input type="file" id="docInput" accept=".pdf,.doc,.docx,.txt" multiple style="display:none" onchange="handleDocs(this.files)">
+</div>
+<div class="barRow">
+<textarea id="msgInput" placeholder="Type as CEO — Message goes straight to Nurses Board..." rows="1" oninput="autoResize(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
+<button class="iconBtn send" onclick="sendMessage()">➤</button>
+</div>
+<div style="font-size:9px;color:var(--muted);text-align:center">CEO messages appear in Nurses Group Chat with 👑 badge • CEO can edit/delete own • Can wipe all board • Can block/unblock nurses</div>
 </div>
 </div>
 
-<div id="masterDeleteModal" class="modal">
-<div class="modalCard">
-<div class="modalHeader"><b style="color:#fca5a5">🗑️ MASTER DELETE — Wipe ALL Messages</b><button onclick="closeMasterDelete()" style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer">✕</button></div>
-<div class="modalBody">
-<div class="deleteWarning">
-<b style="color:#ef4444">⚠️ DANGER — DELETE ALL messages — Cannot be undone!</b><br>
-<small>Wipes: nurses_group_chat/messages (100+), ceoChats/*, groupChats, logs<br>Use only for spam / misbehaving nurses / board cleanup</small>
-</div>
-<div style="background:rgba(14,10,28,.6);border-radius:10px;padding:10px;margin:10px 0;font-size:11px;color:#c4b5fd">
-<b>Current:</b> <span id="deleteStats">Loading...</span><br>
-<b>CEO:</b> Asabere Peter<br>
-<b>Action:</b> Master Delete ALL — Wipe board
-</div>
-<label style="font-size:11px;font-weight:800;color:#fca5a5;display:block">Type DELETE exactly to confirm:</label>
-<input id="masterDeleteInput" placeholder="Type DELETE" style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fff;margin-top:6px;font-weight:800">
-<div style="display:flex;gap:8px;margin-top:12px">
-<button onclick="confirmMasterDelete()" style="flex:1;padding:12px;border-radius:10px;background:linear-gradient(135deg,#ef4444,#991b1b);color:white;border:none;font-weight:900;cursor:pointer">🗑️ CONFIRM DELETE ALL — FINAL</button>
-<button onclick="closeMasterDelete()" style="flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.2);color:#fff;cursor:pointer">Cancel</button>
-</div>
-<div id="deleteProgress" style="margin-top:10px;font-size:10px;color:#a78bfa;display:none"></div>
-</div>
-</div>
-</div>
+<!-- Master Delete Modal -->
+<div id="masterDeleteModal" class="modal"><div class="modalCard"><div class="modalHeader"><b style="color:#fca5a5">🗑️ Wipe All Messages — Master Delete</b><button class="btnTop" onclick="closeMasterDelete()">✕</button></div><div class="modalBody"><div style="background:rgba(239,68,68,.12);border:2px solid rgba(239,68,68,.3);border-radius:12px;padding:12px"><b style="color:#ef4444">⚠️ DANGER — Will delete ALL messages from Nurses Board!</b><br><small>Wipes: nurseCommunityChat/messages, nurses_group_chat/messages, nurseGroupChat, ceoChats. Cannot be undone!</small></div><div style="background:rgba(12,10,30,.6);padding:10px;border-radius:10px;font-size:11px"><b>Current:</b> <span id="deleteStats">Loading...</span></div><label style="font-size:11px;font-weight:800;color:#fca5a5">Type DELETE to confirm:</label><input id="masterDeleteInput" placeholder="Type DELETE" style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fff;font-weight:800;margin-top:6px"><div style="display:flex;gap:8px;margin-top:12px"><button onclick="confirmMasterDelete()" style="flex:1;padding:12px;border-radius:10px;background:linear-gradient(135deg,#ef4444,#991b1b);color:#fff;border:none;font-weight:900;cursor:pointer">🗑️ CONFIRM WIPE ALL</button><button onclick="closeMasterDelete()" style="flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#fff;cursor:pointer">Cancel</button></div><div id="deleteProgress" style="margin-top:10px;font-size:10px;color:var(--muted);display:none"></div></div></div></div>
 
-<div id="blockManager" class="modal">
-<div class="modalCard" style="max-width:600px">
-<div class="modalHeader"><b>🚫 Block Manager — Block/Unblock Nurses Misbehaving</b><button onclick="closeBlockManager()" style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer">✕</button></div>
-<div style="padding:12px;display:flex;gap:8px;background:rgba(14,10,28,.6)">
-<input id="nurseSearch" placeholder="Search nurse name, email..." style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(168,85,247,.2);background:rgba(28,18,56,.8);color:#fff">
-<button onclick="loadAllNursesFast()" style="padding:8px 12px;border-radius:10px;border:none;background:#a855f7;color:#1e0a3a;font-weight:800;cursor:pointer">Refresh</button>
-</div>
-<div style="padding:0 12px;display:flex;justify-content:space-between">
-<span id="nurseCount" style="font-size:10px;color:#a78bfa">0 nurses</span>
-<span id="blockedCount" style="font-size:10px;color:#fca5a5">0 blocked</span>
-</div>
-<div id="blockList" class="modalBody">Loading nurses... — Block misbehaving nurses from chatting</div>
-<div style="padding:12px;display:flex;gap:8px;border-top:1px solid rgba(168,85,247,.15)">
-<button onclick="closeBlockManager()" style="flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(168,85,247,.2);cursor:pointer">Close</button>
-<button onclick="unblockAll()" style="padding:10px 14px;border-radius:10px;background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);cursor:pointer;font-weight:800">✅ Unblock ALL</button>
-</div>
-</div>
-</div>
+<!-- Block Manager Modal -->
+<div id="blockManager" class="modal"><div class="modalCard"><div class="modalHeader"><b>🚫 Block Manager — Block/Unblock Nurses</b><button class="btnTop" onclick="closeBlockManager()">✕</button></div><div class="modalBody"><input id="nurseSearch" placeholder="🔍 Search nurse..." style="width:100%;padding:10px;border-radius:999px;border:1px solid var(--line);background:rgba(12,10,30,.7);color:#fff"><div style="display:flex;gap:6px;margin-top:8px"><button class="btnTop" onclick="loadAllNurses()">🔄 Refresh</button><button class="btnTop btnDelete" onclick="unblockAll()">✅ Unblock All</button><span id="nurseCount" style="font-size:10px;color:var(--muted);padding:8px">0 nurses</span></div><div id="blockList" style="margin-top:10px;max-height:400px;overflow-y:auto">Loading...</div></div></div></div>
 
 <div id="toast" class="toast"></div>
-
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js';
-import { getDatabase, ref, push, onChildAdded, onChildRemoved, query, limitToLast, orderByChild, get, remove } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js';
-
+<script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
-const auth=getAuth(app);
-const CEO_EMAILS=['lovecareglobal@gmail.com','ceo@lovecareglobal.com','asaberepeter204@gmail.com'];
-let curUser=null, blockedUsers=[], blockedMap={}, allNursesCache=[];
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
 
-function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
-function getSessionUser(){
-  try{
-    const uid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('currentNurseId')||'ceo_'+Date.now();
-    const email=(localStorage.getItem('lcg_email')||'lovecareglobal@gmail.com').toLowerCase();
-    const name=localStorage.getItem('nurseName')||'CEO Asabere Peter';
-    return {id:uid, name, email, role:'ceo'};
-  }catch(e){ return {id:'ceo_'+Date.now(), name:'CEO Asabere Peter', email:CEO_EMAILS[0], role:'ceo'}; }
-}
-async function ensureAuth(){
-  return new Promise(res=>{
-    const unsub=onAuthStateChanged(auth, async user=>{
-      unsub();
-      if(user) res(user);
-      else { try{ const cred=await signInAnonymously(auth); res(cred.user);}catch{res(null);} }
+const curUser={id:'CEO_ASABERE', name:'Asabere Peter — CEO', email:'ceo@lovecare.global', role:'CEO', photo:'https://ui-avatars.com/api/?name=Asabere+Peter&background=facc15&color=000'};
+let pendingImgs=[], pendingVids=[], pendingDocs=[];
+let audioRec=null, audioChunks=[], audioBlob=null, audioTimer=null, audioSec=0;
+let videoRec=null, videoChunks=[], videoBlob=null, videoStream=null, videoTimer=null, videoSec=0;
+let editingId=null;
+let blockedUsers=[], blockedMap={}, allNursesCache=[];
+
+function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',3000);}
+function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
+
+function loadMessages(){
+  const paths=['nurseCommunityChat/messages','nurses_group_chat/messages','nurseGroupChat','ceoChats/nurseBoard','communityChats/nurses'];
+  paths.forEach(path=>{
+    const ref=db.ref(path).limitToLast(150);
+    ref.on('child_added', snap=>{
+      const msg=snap.val(); if(!msg) return;
+      addMessage(msg, snap.key, path);
     });
-    setTimeout(()=>res(null), 3000);
+    ref.on('child_changed', snap=>{
+      const msg=snap.val(); if(!msg) return;
+      // Update existing
+      const el=document.getElementById('msg-'+snap.key);
+      if(el){ el.remove(); }
+      addMessage(msg, snap.key, path);
+    });
+    ref.on('child_removed', snap=>{
+      const el=document.getElementById('msg-'+snap.key);
+      if(el) el.remove();
+    });
+  });
+  // Extra live listener for any new nurse messages - toast notification
+  db.ref('nurseCommunityChat/messages').limitToLast(1).on('child_added', snap=>{
+    const msg=snap.val();
+    if(msg && msg.senderId && !msg.senderId.includes('CEO')){
+      // New nurse message - notify CEO
+      if(Date.now() - (msg.createdAt||0) < 5000){
+        toast('💬 New message from '+ (msg.senderName||'Nurse') + ': ' + (msg.text||'').substring(0,30));
+      }
+    }
   });
 }
-async function initFast(){
-  curUser=getSessionUser();
-  await ensureAuth();
-  startFastChat();
-  loadBlockedFast();
-  updateDeleteStats();
-}
-function startFastChat(){
-  const chatEl=document.getElementById('chat');
-  chatEl.innerHTML='<div style="text-align:center;color:#a78bfa;padding:20px">⚡ Loading last 100 messages — CEO Control Chat</div>';
-  const chatRef=ref(db,'nurses_group_chat/messages');
-  const q=query(chatRef, orderByChild('timestamp'), limitToLast(100));
-  onChildAdded(q, snap=>{
-    if(chatEl.innerHTML.includes('Loading')) chatEl.innerHTML='';
-    renderMsgFast(snap.key, snap.val());
-  });
-  onChildRemoved(ref(db,'nurses_group_chat/messages'), snap=>{
-    const el=document.getElementById('msg_'+snap.key); if(el) el.remove();
-  });
-}
-function renderMsgFast(id,data){
+
+function addMessage(msg, key, path){
   const chat=document.getElementById('chat');
-  if(document.getElementById('msg_'+id)) return;
-  const isMe=data.userId===curUser.id;
-  const isCEO=data.role==='ceo'||CEO_EMAILS.includes((data.userEmail||'').toLowerCase());
-  const isBlocked=blockedUsers.includes(data.userId);
+  if(chat.querySelector('div[style*="Loading"]')) chat.innerHTML='';
+  
+  // Avoid duplicate - check by messageId
+  if(document.getElementById('msg-'+key)) return;
+  if(msg.messageId && document.getElementById('msg-'+msg.messageId)) return;
+  
+  const isCEO = (msg.senderId && msg.senderId.includes('CEO')) || msg.senderRole==='CEO' || (msg.senderName&&msg.senderName.includes('CEO')) || (msg.senderName&&msg.senderName.includes('Asabere'));
+  const isMe = isCEO;
+  
   const div=document.createElement('div');
-  div.id='msg_'+id;
-  div.className='msg'+(isMe?' me':'')+(isCEO?' ceo':'')+(isBlocked?' blocked':'');
-  const time=new Date(data.timestamp||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  const safeText=(data.text||'').replace(/</g,'&lt;');
-  div.innerHTML=`<div class=meta><span class="badge ${isCEO?'badge-ceo':'badge-nurse'}">${isCEO?'CEO':'NURSE'}</span><b>${data.userName||'User'}</b>${isBlocked?'<span class=badge badge-blocked>BLOCKED</span>':''}<span style="margin-left:auto">${time}</span></div><div>${safeText}</div><div class=actions><button class="actBtn del" data-del="${id}">Del</button>${!isCEO?`<button class="actBtn ${isBlocked?'unblock':'block'}" onclick="toggleBlock('${data.userId}','${(data.userName||'User').replace(/'/g,'')}')">${isBlocked?'✅ Unblock':'🚫 Block'}</button>`:''}</div>`;
+  div.className='msg '+(isMe?'me ceo':'nurse');
+  div.id='msg-'+key;
+  div.dataset.path=path;
+  div.dataset.key=key;
+  
+  const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+  const nameStr = msg.senderName || (isCEO?'Asabere Peter — CEO':'Nurse');
+  
+  let mediaHtml='';
+  if(msg.images) mediaHtml+=msg.images.map(i=>`<img src="${i.data||i.url}" class="mediaImg" onclick="window.open('${i.data||i.url}','_blank')"><a href="${i.data||i.url}" download="${i.name||'photo.jpg'}" style="font-size:10px;color:#fff">⬇️ Download</a>`).join('');
+  if(msg.videos) mediaHtml+=msg.videos.map(v=>`<video src="${v.data||v.url}" controls class="mediaVideo"></video>`).join('');
+  if(msg.voice) mediaHtml+=`<audio controls style="width:100%;margin-top:6px"><source src="${msg.voice}" type="audio/webm"></audio>`;
+  if(msg.videoMessage) mediaHtml+=`<video src="${msg.videoMessage}" controls class="mediaVideo"></video>`;
+  if(msg.files) mediaHtml+=msg.files.map(f=>`<div style="background:rgba(0,0,0,.2);padding:8px;border-radius:8px;display:flex;justify-content:space-between"><span>📄 ${f.name}</span><a href="${f.data}" download="${f.name}" style="color:#fff;font-size:10px">⬇️ Download</a></div>`).join('');
+  
+  let actionsHtml='';
+  if(isMe){
+    actionsHtml=`<div class="actions"><button class="actBtn edit" onclick="editMessage('${key}','${path}')">✏️ Edit</button><button class="actBtn del" onclick="deleteMessage('${key}','${path}')">🗑️ Delete</button></div>`;
+  } else {
+    const uid=msg.senderId||'';
+    const isBlocked=blockedUsers.includes(uid);
+    actionsHtml=`<div class="actions"><button class="actBtn ${isBlocked?'':'del'}" style="${isBlocked?'background:#22c55e;color:#fff':''}" onclick="toggleBlock('${uid}','${(msg.senderName||'Nurse').replace(/'/g,'')}')">${isBlocked?'✅ Unblock':'🚫 Block'} Nurse</button><button class="actBtn del" onclick="deleteMessage('${key}','${path}')">🗑️ Delete Message</button></div>`;
+  }
+  
+  const photoUrl = msg.senderPhoto || (isCEO ? 'https://ui-avatars.com/api/?name=Asabere+Peter&background=facc15&color=000' : 'https://ui-avatars.com/api/?name='+encodeURIComponent(nameStr)+'&background=a78bfa&color=fff');
+  div.innerHTML=`<div class="meta" style="display:flex;align-items:center;gap:8px"><img src="${photoUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid ${isCEO?'#facc15':'#a78bfa'}" onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(nameStr)+'&background=a78bfa&color=fff'"><div style="display:flex;flex-direction:column"><span style="font-weight:800;display:flex;gap:4px;align-items:center"><span class="badge ${isCEO?'badge-ceo':'badge-nurse'}">${isCEO?'👑 CEO':'👩‍⚕️ Nurse'}</span> ${nameStr}</span><span style="font-size:9px;color:var(--muted)">${timeStr}</span></div></div><div class="text" style="margin-top:6px">${escapeHtml(msg.text||'')}</div>${mediaHtml?`<div class="media">${mediaHtml}</div>`:''}${actionsHtml}`;
   chat.appendChild(div);
   chat.scrollTop=chat.scrollHeight;
-  div.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteMsg(b.dataset.del));
 }
-async function loadBlockedFast(){
-  try{
-    const snap=await get(ref(db,'nurses_group_chat/blocked_users'));
-    blockedUsers=[]; blockedMap={};
-    if(snap.exists()){
-      const val=snap.val();
-      for(const k in val){ blockedUsers.push(val[k].userId); blockedMap[val[k].userId]=val[k]; }
-    }
-    document.getElementById('blockedCount').textContent=blockedUsers.length+' blocked';
-  }catch(e){}
-}
-async function sendTextFast(){
+function escapeHtml(t){const d=document.createElement('div'); d.textContent=t; return d.innerHTML;}
+
+async function sendMessage(){
   const input=document.getElementById('msgInput');
   const text=input.value.trim();
-  if(!text) return;
-  if(blockedUsers.includes(curUser.id)){ toast('Blocked by CEO'); return; }
-  input.value='';
+  if(!text && pendingImgs.length===0 && pendingVids.length===0 && pendingDocs.length===0 && !audioBlob && !videoBlob) return;
+  
+  const now=Date.now();
+  const id='MSG-CEO-'+now+'-'+Math.random().toString(36).substr(2,5);
+  
+  let msg={
+    messageId:id,
+    senderId: curUser.id,
+    senderName: curUser.name,
+    senderEmail: curUser.email,
+    senderRole:'CEO',
+    senderPhoto: curUser.photo || 'https://ui-avatars.com/api/?name=Asabere+Peter&background=facc15&color=000',
+    text:text,
+    createdAt:now,
+    createdAtStr:new Date().toLocaleString('en-GH'),
+    isCEO:true,
+    type:'ceo_to_nurses_board'
+  };
+  
+  if(pendingImgs.length>0) msg.images=pendingImgs;
+  if(pendingVids.length>0) msg.videos=pendingVids;
+  if(pendingDocs.length>0) msg.files=pendingDocs;
+  if(audioBlob){ msg.voice=await toBase64(audioBlob); }
+  if(videoBlob){ msg.videoMessage=await toBase64(videoBlob); }
+  
   try{
-    await push(ref(db,'nurses_group_chat/messages'), {userId:curUser.id,userName:curUser.name,userEmail:curUser.email,role:'ceo',timestamp:Date.now(),type:'text',text});
-  }catch(e){ toast(e.message); input.value=text; }
-}
-window.deleteMsg=async(id)=>{
-  if(!confirm('Delete this message? — CEO')) return;
-  try{ await remove(ref(db,`nurses_group_chat/messages/${id}`)); toast('Deleted'); }catch(e){ toast(e.message); }
-}
-window.toggleBlock=async(uid,name)=>{
-  const isBlocked=blockedUsers.includes(uid);
-  if(isBlocked){
-    if(!confirm(`✅ Unblock ${name}?`)) return;
-    try{ 
-      const snap=await get(ref(db,'nurses_group_chat/blocked_users')); 
-      if(snap.exists()){ 
-        const val=snap.val(); 
-        for(const k in val){ if(val[k].userId===uid){ await remove(ref(db,`nurses_group_chat/blocked_users/${k}`)); } } 
-      } 
-      blockedUsers=blockedUsers.filter(x=>x!==uid); 
-      toast(`✅ Unblocked ${name}`);
-      loadBlockedFast(); renderBlockListFast();
-    }catch(e){ toast(e.message); }
-  }else{
-    const reason=prompt(`🚫 Block ${name}? Reason:`, 'Misbehaving — CEO blocked')||'Misbehaving';
-    const duration=prompt(`Block duration for ${name}?`, 'permanent')||'permanent';
-    try{ 
-      await push(ref(db,'nurses_group_chat/blocked_users'), {userId:uid, userName:name, reason, duration, blockedBy:curUser.name, timestamp:Date.now()}); 
-      blockedUsers.push(uid);
-      toast(`🚫 Blocked ${name} — ${reason}`);
-      loadBlockedFast(); renderBlockListFast();
-    }catch(e){ toast(e.message); }
-  }
-}
-async function loadAllNursesFast(){
-  const listEl=document.getElementById('blockList'); 
-  listEl.innerHTML='Loading nurses...';
-  try{
-    const snap=await get(query(ref(db,'nurses'), limitToLast(300)));
-    const map={};
-    if(snap.exists()){
-      snap.forEach(child=>{ const v=child.val(); if(v.fullName||v.name) map[child.key]={id:child.key, name:v.fullName||v.name, email:v.email||'', phone:v.phone||''}; });
+    if(editingId){
+      // Edit existing
+      const editPath=document.getElementById('editBanner').dataset.path || 'nurseCommunityChat/messages';
+      await db.ref(editPath+'/'+editingId).update({text:text, edited:true, editedAt:now, editedBy:curUser.name});
+      await db.ref('nurses_group_chat/messages/'+editingId).update({text:text, edited:true}).catch(()=>{});
+      await db.ref('nurseCommunityChat/messages/'+editingId).update({text:text, edited:true}).catch(()=>{});
+      toast('✅ Message edited');
+      cancelEdit();
+    } else {
+      // Send to ALL boards so nurses see instantly
+      await db.ref('nurseCommunityChat/messages/'+id).set(msg);
+      await db.ref('nurses_group_chat/messages/'+id).set(msg);
+      await db.ref('nurseGroupChat/'+id).set(msg);
+      await db.ref('ceoChats/nurseBoard/'+id).set(msg);
+      await db.ref('communityChats/nurses/'+id).set(msg);
+      toast('✅ CEO message sent to Nurses Board');
     }
-    allNursesCache=Object.values(map).sort((a,b)=>a.name.localeCompare(b.name));
-    document.getElementById('nurseCount').textContent=allNursesCache.length+' nurses';
-    renderBlockListFast();
-  }catch(e){ listEl.innerHTML=`Failed: ${e.message}`; }
+    input.value=''; autoResize(input);
+    pendingImgs=[]; pendingVids=[]; pendingDocs=[]; audioBlob=null; videoBlob=null;
+    document.getElementById('filePreview').style.display='none';
+  }catch(e){ toast('Error: '+e.message); }
 }
-function renderBlockListFast(){
+
+function toBase64(blob){return new Promise(r=>{const reader=new FileReader(); reader.onload=e=>r(e.target.result); reader.readAsDataURL(blob);});}
+
+function handleImgs(files){ for(let f of files){ if(f.size>20*1024*1024)continue; const reader=new FileReader(); reader.onload=e=>{ pendingImgs.push({name:f.name,size:f.size,type:f.type,data:e.target.result}); showPreview(); }; reader.readAsDataURL(f);} }
+function handleVids(files){ for(let f of files){ if(f.size>50*1024*1024)continue; const reader=new FileReader(); reader.onload=e=>{ pendingVids.push({name:f.name,size:f.size,type:f.type,data:e.target.result}); showPreview(); }; reader.readAsDataURL(f);} }
+function handleDocs(files){ for(let f of files){ if(f.size>20*1024*1024)continue; const reader=new FileReader(); reader.onload=e=>{ pendingDocs.push({name:f.name,size:f.size,type:f.type,data:e.target.result}); showPreview(); }; reader.readAsDataURL(f);} }
+function showPreview(){
+  const c=document.getElementById('filePreview');
+  if(pendingImgs.length===0&&pendingVids.length===0&&pendingDocs.length===0&&!audioBlob&&!videoBlob){c.style.display='none';return;}
+  c.style.display='flex'; c.innerHTML=[...pendingImgs.map((f,i)=>`<div style="background:rgba(12,10,30,.6);padding:6px 10px;border-radius:8px;display:flex;justify-content:space-between"><span>🖼️ ${f.name}</span><button class="btnTop" onclick="pendingImgs.splice(${i},1);showPreview()">✕</button></div>`),...pendingVids.map((f,i)=>`<div style="background:rgba(12,10,30,.6);padding:6px 10px;border-radius:8px;display:flex;justify-content:space-between"><span>🎥 ${f.name}</span><button class="btnTop" onclick="pendingVids.splice(${i},1);showPreview()">✕</button></div>`),...pendingDocs.map((f,i)=>`<div style="background:rgba(12,10,30,.6);padding:6px 10px;border-radius:8px;display:flex;justify-content:space-between"><span>📄 ${f.name}</span><button class="btnTop" onclick="pendingDocs.splice(${i},1);showPreview()">✕</button></div>`)].join('');
+}
+
+function startAudio(){ navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{ audioRec=new MediaRecorder(s); audioChunks=[]; audioRec.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data);}; audioRec.onstop=()=>{ audioBlob=new Blob(audioChunks,{type:'audio/webm'}); showPreview(); toast('✅ Voice ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){}}; audioRec.start(); document.getElementById('recAudio').classList.add('active'); audioSec=0; audioTimer=setInterval(()=>{audioSec++; document.getElementById('audioTimer').textContent=String(Math.floor(audioSec/60)).padStart(2,'0')+':'+String(audioSec%60).padStart(2,'0');},1000);}).catch(e=>toast(e.message)); }
+function stopAudio(){ if(audioRec&&audioRec.state!=='inactive') audioRec.stop(); clearInterval(audioTimer); document.getElementById('recAudio').classList.remove('active'); }
+function cancelAudio(){ if(audioRec&&audioRec.state!=='inactive') audioRec.stop(); audioBlob=null; clearInterval(audioTimer); document.getElementById('recAudio').classList.remove('active'); showPreview(); }
+
+function startVideo(){ navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(s=>{ videoStream=s; document.getElementById('videoLive').srcObject=s; videoRec=new MediaRecorder(s); videoChunks=[]; videoRec.ondataavailable=e=>{if(e.data.size>0)videoChunks.push(e.data);}; videoRec.onstop=()=>{ videoBlob=new Blob(videoChunks,{type:'video/webm'}); showPreview(); toast('✅ Video ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){} videoStream=null; document.getElementById('videoLive').srcObject=null; }; videoRec.start(); document.getElementById('recVideo').classList.add('active'); videoSec=0; videoTimer=setInterval(()=>{videoSec++; document.getElementById('videoTimer').textContent=String(Math.floor(videoSec/60)).padStart(2,'0')+':'+String(videoSec%60).padStart(2,'0');},1000);}).catch(e=>toast(e.message)); }
+function stopVideo(){ if(videoRec&&videoRec.state!=='inactive') videoRec.stop(); clearInterval(videoTimer); document.getElementById('recVideo').classList.remove('active'); }
+function cancelVideo(){ if(videoRec&&videoRec.state!=='inactive') videoRec.stop(); videoBlob=null; if(videoStream){try{videoStream.getTracks().forEach(t=>t.stop());}catch(e){} videoStream=null; document.getElementById('videoLive').srcObject=null;} clearInterval(videoTimer); document.getElementById('recVideo').classList.remove('active'); showPreview(); }
+
+function editMessage(key, path){
+  const el=document.getElementById('msg-'+key);
+  if(!el) return;
+  const text=el.querySelector('.text').textContent;
+  document.getElementById('msgInput').value=text;
+  document.getElementById('editBanner').style.display='flex';
+  document.getElementById('editText').textContent=text.substring(0,40)+'...';
+  document.getElementById('editBanner').dataset.path=path;
+  editingId=key;
+  document.getElementById('msgInput').focus();
+}
+function cancelEdit(){ editingId=null; document.getElementById('editBanner').style.display='none'; document.getElementById('msgInput').value=''; }
+
+async function deleteMessage(key, path){
+  if(!confirm('🗑️ Delete this message?')) return;
+  try{
+    await db.ref(path+'/'+key).remove().catch(()=>{});
+    await db.ref('nurseCommunityChat/messages/'+key).remove().catch(()=>{});
+    await db.ref('nurses_group_chat/messages/'+key).remove().catch(()=>{});
+    await db.ref('nurseGroupChat/'+key).remove().catch(()=>{});
+    await db.ref('ceoChats/nurseBoard/'+key).remove().catch(()=>{});
+    document.getElementById('msg-'+key)?.remove();
+    toast('🗑️ Message deleted');
+  }catch(e){ toast(e.message); }
+}
+
+function showMasterDelete(){ document.getElementById('masterDeleteModal').classList.add('show'); updateDeleteStats(); }
+function closeMasterDelete(){ document.getElementById('masterDeleteModal').classList.remove('show'); }
+async function updateDeleteStats(){
+  try{ const snap=await db.ref('nurses_group_chat/messages').once('value'); const count=snap.exists()?Object.keys(snap.val()).length:0; const snap2=await db.ref('nurseCommunityChat/messages').once('value'); const count2=snap2.exists()?Object.keys(snap2.val()).length:0; document.getElementById('deleteStats').textContent=(count+count2)+' messages — Will be wiped'; }catch(e){ document.getElementById('deleteStats').textContent='Unable to load'; }
+}
+async function confirmMasterDelete(){
+  const input=document.getElementById('masterDeleteInput');
+  if(input.value.trim()!=='DELETE'){ toast('Type DELETE exactly'); return; }
+  if(!confirm('FINAL CONFIRM — Wipe ALL nurses board messages? Cannot be undone!')) return;
+  const progress=document.getElementById('deleteProgress'); progress.style.display='block'; progress.textContent='🗑️ Wiping...';
+  try{
+    let deleted=0;
+    const paths=['nurses_group_chat/messages','nurseCommunityChat/messages','nurseGroupChat','ceoChats/nurseBoard','communityChats/nurses','groupChats'];
+    for(let p of paths){
+      try{ const snap=await db.ref(p).once('value'); if(snap.exists()){ const val=snap.val(); for(let k in val){ try{ await db.ref(p+'/'+k).remove(); deleted++; if(deleted%20===0) progress.textContent='🗑️ Deleting... '+deleted+' deleted'; }catch(e){} } } }catch(e){}
+    }
+    progress.textContent='✅ MASTER WIPE COMPLETE — '+deleted+' messages deleted — Board clean';
+    toast('✅ Board wiped — '+deleted+' deleted');
+    setTimeout(()=>{ closeMasterDelete(); document.getElementById('chat').innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Board wiped clean — No messages</div>'; },1500);
+  }catch(e){ progress.textContent='❌ Failed: '+e.message; }
+}
+
+function showBlockManager(){ document.getElementById('blockManager').classList.add('show'); loadAllNurses(); loadBlocked(); }
+function closeBlockManager(){ document.getElementById('blockManager').classList.remove('show'); }
+async function loadBlocked(){
+  try{ const snap=await db.ref('nurses_group_chat/blocked_users').once('value'); blockedUsers=[]; blockedMap={}; if(snap.exists()){ const val=snap.val(); for(let k in val){ const v=val[k]; if(v.userId){ blockedUsers.push(v.userId); blockedMap[v.userId]=v; } } } }catch(e){}
+  renderBlockList();
+}
+async function loadAllNurses(){
+  const listEl=document.getElementById('blockList'); listEl.innerHTML='Loading nurses...';
+  try{
+    const snap=await db.ref('nurses').once('value');
+    const map=[];
+    if(snap.exists()){ snap.forEach(child=>{ const v=child.val(); if(v.fullName||v.name) map.push({id:child.key, name:v.fullName||v.name, email:v.email||'', phone:v.phone||''}); }); }
+    allNursesCache=map.sort((a,b)=>a.name.localeCompare(b.name));
+    document.getElementById('nurseCount').textContent=allNursesCache.length+' nurses';
+    renderBlockList();
+  }catch(e){ listEl.innerHTML='Failed: '+e.message; }
+}
+function renderBlockList(){
   const listEl=document.getElementById('blockList');
   const search=(document.getElementById('nurseSearch').value||'').toLowerCase();
-  const filtered=allNursesCache.filter(n=> !search || (n.name+' '+n.email).toLowerCase().includes(search));
-  if(!filtered.length){ listEl.innerHTML='<div style="text-align:center;color:#a78bfa;padding:20px">No nurses</div>'; return; }
+  const filtered=allNursesCache.filter(n=>!search || (n.name+' '+n.email).toLowerCase().includes(search));
+  if(filtered.length===0){ listEl.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">No nurses</div>'; return; }
   listEl.innerHTML=filtered.slice(0,80).map(n=>{
     const isBlocked=blockedUsers.includes(n.id);
     const info=isBlocked?blockedMap[n.id]:null;
-    return `<div class="nurseRow" style="${isBlocked?'border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.12)':''}"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;color:#fff;font-weight:900">${n.name.charAt(0)}</div><div style="flex:1"><div style="font-weight:800;font-size:12px">${n.name} ${isBlocked?'<span class=badge badge-blocked>BLOCKED</span>':''}</div><div style="font-size:10px;color:#a78bfa">${n.email||'no email'}${isBlocked&&info?`<br><span style="color:#fca5a5">Reason: ${info.reason} • By: ${info.blockedBy}</span>`:''}</div></div><button class="actBtn ${isBlocked?'unblock':'block'}" onclick="toggleBlock('${n.id}','${n.name.replace(/'/g,'')}')">${isBlocked?'✅ Unblock':'🚫 Block'}</button></div>`;
+    return `<div class="nurseRow" style="${isBlocked?'border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.12)':''}"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;color:#fff;font-weight:900">${n.name.charAt(0)}</div><div style="flex:1"><div style="font-weight:800;font-size:12px">${n.name} ${isBlocked?'<span style="background:rgba(239,68,68,.15);color:#fca5a5;padding:2px 6px;border-radius:999px;font-size:8px">BLOCKED</span>':''}</div><div style="font-size:10px;color:var(--muted)">${n.email||'no email'}${isBlocked&&info?`<br><span style="color:#fca5a5">Reason: ${info.reason} • By: ${info.blockedBy}</span>`:''}</div></div><button class="btnTop ${isBlocked?'':'btnDelete'}" style="${isBlocked?'background:#22c55e;color:#fff':''}" onclick="toggleBlock('${n.id}','${n.name.replace(/'/g,'')}')">${isBlocked?'✅ Unblock':'🚫 Block'}</button></div>`;
   }).join('');
 }
-async function updateDeleteStats(){
-  try{
-    const snap=await get(ref(db,'nurses_group_chat/messages'));
-    const count=snap.exists()?Object.keys(snap.val()).length:0;
-    document.getElementById('deleteStats').textContent=`${count} messages in nurses_group_chat/messages — Will be wiped`;
-  }catch(e){ document.getElementById('deleteStats').textContent='Unable to load'; }
-}
-window.showMasterDelete=()=>{
-  updateDeleteStats();
-  document.getElementById('masterDeleteModal').classList.add('show');
-  document.getElementById('masterDeleteInput').value='';
-  document.getElementById('deleteProgress').style.display='none';
-}
-window.closeMasterDelete=()=>{ document.getElementById('masterDeleteModal').classList.remove('show'); }
-window.confirmMasterDelete=async()=>{
-  const input=document.getElementById('masterDeleteInput');
-  const progress=document.getElementById('deleteProgress');
-  if(!input||input.value.trim()!=='DELETE'){ toast('Type DELETE exactly'); return; }
-  if(!confirm('FINAL CONFIRM — Master Delete ALL? Cannot be undone!')) return;
-  progress.style.display='block';
-  progress.innerHTML='🗑️ Master Delete started — Wiping board...';
-  try{
-    let deleted=0;
-    const snap=await get(ref(db,'nurses_group_chat/messages'));
-    if(snap.exists()){
-      const val=snap.val();
-      for(const k in val){
-        try{ await remove(ref(db,`nurses_group_chat/messages/${k}`)); deleted++; 
-          if(deleted%10===0) progress.innerHTML=`🗑️ Deleting... ${deleted} deleted`;
-        }catch(e){}
-      }
-    }
-    try{ const ceoSnap=await get(ref(db,'ceoChats')); if(ceoSnap.exists()){ const ceoVal=ceoSnap.val(); for(const chatId in ceoVal){ try{ await remove(ref(db,`ceoChats/${chatId}`)); deleted++; }catch(e){} } } }catch(e){}
-    try{ await remove(ref(db,'groupChats')); }catch(e){}
-    try{
-      await push(ref(db,'ceoMasterDeletes'), {deletedBy:curUser.name,deletedByEmail:curUser.email,deletedAt:Date.now(),deletedCount:deleted,reason:'Master Delete ALL — CEO Control',timestamp:Date.now()});
-    }catch(e){}
-    progress.innerHTML=`✅ MASTER DELETE COMPLETE — ${deleted} messages wiped — Board clean — ${new Date().toLocaleString()}`;
-    toast(`✅ MASTER DELETE — ${deleted} wiped`);
-    setTimeout(()=>{ closeMasterDelete(); location.reload(); }, 2000);
-  }catch(e){
-    progress.innerHTML=`❌ Failed: ${e.message}`;
-    toast(e.message);
+async function toggleBlock(uid, name){
+  const isBlocked=blockedUsers.includes(uid);
+  if(isBlocked){
+    if(!confirm('✅ Unblock '+name+'?')) return;
+    try{ const snap=await db.ref('nurses_group_chat/blocked_users').once('value'); if(snap.exists()){ const val=snap.val(); for(let k in val){ if(val[k].userId===uid){ await db.ref('nurses_group_chat/blocked_users/'+k).remove(); } } } blockedUsers=blockedUsers.filter(x=>x!==uid); toast('✅ Unblocked '+name); loadBlocked(); renderBlockList(); }catch(e){ toast(e.message); }
+  } else {
+    const reason=prompt('🚫 Block '+name+'? Reason:', 'Posting meaningless things — Blocked by CEO')||'Misbehaving';
+    try{ await db.ref('nurses_group_chat/blocked_users').push({userId:uid,userName:name,reason:reason,blockedBy:curUser.name,timestamp:Date.now(),blockedAt:Date.now()}); blockedUsers.push(uid); toast('🚫 Blocked '+name); loadBlocked(); renderBlockList(); }catch(e){ toast(e.message); }
   }
 }
-window.showBlocked=()=>{ document.getElementById('blockManager').classList.add('show'); loadAllNursesFast(); loadBlockedFast(); }
-window.closeBlockManager=()=>{ document.getElementById('blockManager').classList.remove('show'); }
-window.unblockAll=async()=>{
-  if(!confirm('✅ Unblock ALL nurses?')) return;
-  try{
-    const snap=await get(ref(db,'nurses_group_chat/blocked_users'));
-    if(snap.exists()){
-      const val=snap.val(); let count=0;
-      for(const k in val){ try{ await remove(ref(db,`nurses_group_chat/blocked_users/${k}`)); count++; }catch(e){} }
-      blockedUsers=[]; blockedMap={};
-      toast(`✅ Unblocked ALL — ${count} nurses`);
-      loadBlockedFast(); renderBlockListFast();
-    }else{ toast('No blocked nurses'); }
-  }catch(e){ toast(e.message); }
+async function unblockAll(){ if(!confirm('✅ Unblock ALL nurses?')) return; try{ const snap=await db.ref('nurses_group_chat/blocked_users').once('value'); if(snap.exists()){ const val=snap.val(); for(let k in val){ await db.ref('nurses_group_chat/blocked_users/'+k).remove(); } } blockedUsers=[]; blockedMap={}; toast('✅ All unblocked'); loadBlocked(); renderBlockList(); }catch(e){ toast(e.message); } }
+
+function toggleView(){
+  const chat=document.getElementById('chat');
+  if(chat.style.display==='none'){ chat.style.display='flex'; } else { /* keep */ }
 }
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('sendBtn').onclick=sendTextFast;
-  document.getElementById('msgInput').addEventListener('keypress', e=>{ if(e.key==='Enter') sendTextFast(); });
-  document.getElementById('nurseSearch').addEventListener('input', renderBlockListFast);
-  setTimeout(initFast, 300);
-});
+
+window.onload=()=>{
+  loadMessages();
+  loadBlocked();
+  document.getElementById('msgInput').addEventListener('keypress', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); }});
+  document.getElementById('nurseSearch')?.addEventListener('input', renderBlockList);
+  document.getElementById('sendBtn')?.addEventListener('click', sendMessage);
+  setTimeout(()=>{ document.getElementById('msgInput')?.focus(); },500);
+};
 </script>
-</body>
-</html>
+</body></html>
