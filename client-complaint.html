@@ -273,17 +273,84 @@ function openMyPunishments(){
   if(sec.style.display==='block') loadMyPunishments();
 }
 async function loadMyPunishments(){
-  const clientId=localStorage.getItem('clientUid')||localStorage.getItem('clientId')||localStorage.getItem('uid')||'';
-  if(!clientId) return;
-  const snap=await db.ref('userPunishments/'+clientId).once('value');
-  const list=snap.exists()? Object.values(snap.val()).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)) : [];
+  // Try ALL possible client IDs
+  const ids=[
+    localStorage.getItem('clientUid'),
+    localStorage.getItem('clientId'),
+    localStorage.getItem('uid'),
+    localStorage.getItem('clientUsername'),
+    localStorage.getItem('clientEmail'),
+    localStorage.getItem('clientEmail')? localStorage.getItem('clientEmail').toLowerCase().replace(/[.#$@\[\]]/g,'_') : '',
+    localStorage.getItem('clientPhone'),
+    localStorage.getItem('clientPhone')? localStorage.getItem('clientPhone').replace(/[^0-9]/g,'').slice(-9) : '',
+    localStorage.getItem('phone'),
+    localStorage.getItem('email'),
+    localStorage.getItem('email')? localStorage.getItem('email').toLowerCase().replace(/[.#$@\[\]]/g,'_') : ''
+  ].filter(Boolean);
+  
+  console.log('Searching punishments for client IDs:', ids);
+  
+  let allPunishments={};
+  for(let id of ids){
+    try{
+      const paths=['userPunishments/'+id, 'ceoPunishments/'+id, 'clientPunishments/'+id, 'punishments/'+id, 'punishmentsByEmail/'+id, 'punishmentsByPhone/'+id, 'notifications/'+id];
+      for(let path of paths){
+        const snap=await db.ref(path).once('value');
+        if(snap.exists()){
+          const val=snap.val();
+          // If it's a list of punishments
+          if(typeof val==='object'){
+            Object.values(val).forEach(p=>{
+              if(p && p.punishmentId) allPunishments[p.punishmentId]=p;
+              else if(p && p.type==='punishment' && p.punishmentId) allPunishments[p.punishmentId]=p;
+            });
+          }
+        }
+      }
+    }catch(e){ console.log('Search error for '+id, e); }
+  }
+  
+  // Also search allPunishments for client email/phone
+  try{
+    const allSnap=await db.ref('allPunishments').once('value');
+    if(allSnap.exists()){
+      const clientEmail=(localStorage.getItem('clientEmail')||'').toLowerCase();
+      const clientPhone=(localStorage.getItem('clientPhone')||'').replace(/[^0-9]/g,'').slice(-9);
+      Object.values(allSnap.val()).forEach(p=>{
+        if(!p || !p.victimType) return;
+        if(p.victimType!=='client') return;
+        const pEmail=(p.victimEmail||'').toLowerCase();
+        const pPhone=(p.victimPhone||'').replace(/[^0-9]/g,'').slice(-9);
+        if((clientEmail && pEmail && pEmail===clientEmail) || (clientPhone && pPhone && pPhone===clientPhone) || ids.includes(p.victimId)){
+          allPunishments[p.punishmentId]=p;
+        }
+      });
+    }
+  }catch(e){ console.log('allPunishments search error', e); }
+  
+  const list=Object.values(allPunishments).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  console.log('Found punishments:', list);
+  
   const el=document.getElementById('myPunishList');
   const badge=document.getElementById('punishBadge');
   const unread=list.filter(p=>!p.isRead).length;
   if(badge){ badge.textContent=unread; badge.style.display= unread>0 ? 'inline-block' : 'none'; }
-  if(!list.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:#6b6788">✅ No punishments — Good behavior!</div>'; return; }
-  el.innerHTML=list.map(p=>`<div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer" onclick='openPunishmentModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'><div style="display:flex;gap:6px"><span style="background:${p.isBlocked?'rgba(239,68,68,.15)': p.isSuspended?'rgba(245,158,11,.15)':'rgba(250,204,21,.15)'};color:${p.isBlocked?'#fca5a5': p.isSuspended?'#fcd34d':'#facc15'};padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800">${p.isBlocked?'🚫 BLOCKED': p.isSuspended?'⏸️ SUSPENDED': p.action.toUpperCase()}</span><span style="font-size:10px;color:#6b6788">${p.createdAtStr||''}</span>${p.hasVoice?'<span style="font-size:10px;background:rgba(167,139,250,.12);color:#c4b5fd;padding:3px 6px;border-radius:999px">🎤 Voice</span>':''}</div><div style="font-weight:700;font-size:12px;margin-top:6px">CEO: ${p.action} — Click to read message + listen voice</div><div style="font-size:11px;color:#9a95b8;margin-top:4px">${(p.ceoMessage||'').substring(0,80)}...</div></div>`).join('');
+  if(!list.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:#6b6788">✅ No punishments — Good behavior!<br><small style="font-size:9px">Checked IDs: '+ids.join(', ').substring(0,100)+'</small></div>'; return; }
+  el.innerHTML=list.map(p=>{
+    const pJson=JSON.stringify(p).replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+    return `<div style="background:rgba(12,10,30,.6);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer" onclick="openPunishmentModalById('${p.punishmentId}')"><div style="display:flex;gap:6px"><span style="background:${p.isBlocked?'rgba(239,68,68,.15)': p.isSuspended?'rgba(245,158,11,.15)':'rgba(250,204,21,.15)'};color:${p.isBlocked?'#fca5a5': p.isSuspended?'#fcd34d':'#facc15'};padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800">${p.isBlocked?'🚫 BLOCKED': p.isSuspended?'⏸️ SUSPENDED': (p.action||'').toUpperCase()}</span><span style="font-size:10px;color:#6b6788">${p.createdAtStr||''}</span>${p.hasVoice?'<span style="font-size:10px;background:rgba(167,139,250,.12);color:#c4b5fd;padding:3px 6px;border-radius:999px">🎤 Voice</span>':''}</div><div style="font-weight:700;font-size:12px;margin-top:6px">CEO: ${p.action} — Click to read + listen</div><div style="font-size:11px;color:#9a95b8">${(p.ceoMessage||'').substring(0,80)}...</div></div>`;
+  }).join('');
+  
+  // Store for modal lookup
+  window._allPunishments=allPunishments;
 }
+
+function openPunishmentModalById(punishmentId){
+  const p=window._allPunishments && window._allPunishments[punishmentId];
+  if(p) openPunishmentModal(p);
+  else alert('Punishment not found: '+punishmentId);
+}
+
 
 window.onload=()=>{getClientInfo();getParams(); setTimeout(loadMyPunishments,1500);};
 
@@ -403,7 +470,20 @@ function closePunishmentModal(){
 }
 
 function getUserIdForPunishment(){
-  return localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('clientUid')||localStorage.getItem('clientId')||localStorage.getItem('uid')||localStorage.getItem('clientEmail')||'';
+  return localStorage.getItem('clientUid')||localStorage.getItem('clientId')||localStorage.getItem('uid')||localStorage.getItem('clientEmail')||localStorage.getItem('clientPhone')||'';
+}
+function getAllUserIdsForPunishment(){
+  return [
+    localStorage.getItem('clientUid'),
+    localStorage.getItem('clientId'),
+    localStorage.getItem('uid'),
+    localStorage.getItem('clientEmail'),
+    localStorage.getItem('clientEmail')? localStorage.getItem('clientEmail').toLowerCase().replace(/[.#$@\[\]]/g,'_') : '',
+    localStorage.getItem('clientPhone'),
+    localStorage.getItem('clientPhone')? localStorage.getItem('clientPhone').replace(/[^0-9]/g,'').slice(-9) : '',
+    localStorage.getItem('email'),
+    localStorage.getItem('phone')
+  ].filter(Boolean);
 }
 
 function markPunishmentRead(punishmentId){
@@ -434,21 +514,29 @@ function appealPunishmentFromModal(punishmentId){
   });
 }
 
-// Auto-check for new punishments and open modal automatically
 function autoCheckPunishments(){
-  const uid=getUserIdForPunishment();
-  if(!uid) return;
-  firebase.database().ref('userPunishments/'+uid).on('child_added', snap=>{
-    const v=snap.val();
-    if(!v) return;
-    // If punishment is recent (last 30 seconds) and not read, auto-open modal
-    if(v.createdAt && Date.now()-v.createdAt<30000 && !v.isRead){
-      setTimeout(()=>{
-        if(confirm(`🚨 NEW CEO PUNISHMENT!\n\n${v.action.toUpperCase()} — ${v.victimName||''}\n\nCEO punished you! Do you want to read punishment now?\n\nMessage: ${(v.ceoMessage||'').substring(0,100)}...`)){
-          openPunishmentModal(v);
-        }
-      }, 1000);
-    }
+  const ids=getAllUserIdsForPunishment();
+  ids.forEach(uid=>{
+    firebase.database().ref('userPunishments/'+uid).on('child_added', snap=>{
+      const v=snap.val();
+      if(!v) return;
+      if(v.createdAt && Date.now()-v.createdAt<60000 && !v.isRead){
+        setTimeout(()=>{
+          if(confirm(`🚨 NEW CEO PUNISHMENT!\n\n${(v.action||'').toUpperCase()} — CEO punished you! Do you want to read now?\n\n${(v.ceoMessage||'').substring(0,100)}...`)){
+            openPunishmentModal(v);
+          }
+          loadMyPunishments();
+        }, 1000);
+      }
+    });
+    // Also listen to ceoPunishments
+    firebase.database().ref('ceoPunishments/'+uid).on('child_added', snap=>{
+      const v=snap.val();
+      if(!v) return;
+      if(v.createdAt && Date.now()-v.createdAt<60000 && !v.isRead){
+        setTimeout(()=>{ openPunishmentModal(v); loadMyPunishments(); }, 500);
+      }
+    });
   });
 }
 
