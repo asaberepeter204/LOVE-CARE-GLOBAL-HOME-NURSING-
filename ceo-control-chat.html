@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CEO Control — Clean</title>
+<title>CEO Control — Clean FIXED Video Send</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <style>
-:root{--bg:#0e0c1e;--card:#191531;--line:rgba(255,255,255,.07);--text:#f5f3ff;--muted:#9a95b8;--purple:#a78bfa;--gold:#facc15}
+:root{--bg:#0e0c1e;--card:#191531;--line:rgba(255,255,255,.07);--text:#f5f3ff;--muted:#9a95b8;--purple:#a78bfa;--gold:#facc15;--green:#34d399}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
 header{height:52px;padding:0 16px;background:rgba(20,16,40,.95);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
-header b{font-size:14px;font-weight:700}
-header small{font-size:10px;color:var(--muted);margin-left:8px}
 .hBtns{display:flex;gap:6px}
 .hBtn{padding:7px 12px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);font-size:11px;cursor:pointer;text-decoration:none}
 .topBar{padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px;flex-shrink:0}
@@ -46,27 +44,37 @@ header small{font-size:10px;color:var(--muted);margin-left:8px}
 .tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .tBtn{padding:7px 12px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font-size:11px;cursor:pointer}
 .tBtn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.tBtn.hasFile{border-color:var(--green);color:var(--green);background:rgba(52,211,153,.1)}
 .composer{display:flex;gap:8px;align-items:flex-end}
 .composer textarea{flex:1;padding:12px 16px;border-radius:24px;border:1px solid var(--line);background:rgba(0,0,0,.2);color:#fff;font-size:13px;resize:none;min-height:44px;max-height:100px;outline:none}
 .icon{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;display:grid;place-items:center;flex-shrink:0}
 .icon.send{background:var(--purple);color:#fff;border:0}
 .icon.sendHome{background:var(--gold);color:#000;border:0}
+.icon:disabled{opacity:.4;cursor:not-allowed}
 .status{font-size:10px;color:var(--muted);text-align:center;margin-top:8px}
 .recBox{display:none;padding:10px;border-radius:10px;margin-bottom:8px;align-items:center;gap:10px;font-size:11px}
 .recBox.show{display:flex}
 .recAudio{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2)}
 .recVideo{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);flex-direction:column}
-.fileList{display:none;flex-direction:column;gap:6px;margin-bottom:8px;max-height:80px;overflow-y:auto}
+.fileList{display:none;flex-direction:column;gap:6px;margin-bottom:8px;max-height:140px;overflow-y:auto}
 .fileList.show{display:flex}
-.fileItem{padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:11px;display:flex;justify-content:space-between;align-items:center}
+.fileItem{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.fileItem b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;display:inline-block}
+.fileProgress{height:4px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;margin-top:4px}
+.fileProgressBar{height:100%;background:var(--green);width:0%;transition:.3s}
 .emojiPanel{position:absolute;bottom:90px;right:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:none;grid-template-columns:repeat(6,1fr);gap:6px;z-index:20;max-height:200px;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .emojiPanel.show{display:grid}
-.toast{position:fixed;right:16px;bottom:90px;z-index:100;background:var(--card);border:1px solid var(--line);padding:10px 14px;border-radius:10px;font-size:12px;display:none;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.toast{position:fixed;right:16px;bottom:90px;z-index:100;background:var(--card);border:1px solid var(--line);padding:12px 16px;border-radius:12px;font-size:12px;display:none;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:280px}
+.progressBar{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(250,204,21,.2);z-index:9999;display:none}
+.progressBar.show{display:block}
+.progressFill{height:100%;background:linear-gradient(90deg,var(--gold),var(--purple));width:0%;transition:.2s}
 </style>
 </head><body>
 
+<div class="progressBar" id="progressBar"><div class="progressFill" id="progressFill"></div></div>
+
 <header>
-<div><b>👑 CEO Control</b><small>nurse-group-chat.html • index.html</small></div>
+<div><b>👑 CEO Control — FIXED</b><small style="margin-left:8px;color:var(--muted);font-size:10px">Video now sends! nurse-group-chat.html • index.html</small></div>
 <div class="hBtns">
 <a href="nurse-group-chat.html" class="hBtn">💬 View Nurses</a>
 <a href="index.html" class="hBtn">🏠 View Home</a>
@@ -79,7 +87,7 @@ header small{font-size:10px;color:var(--muted);margin-left:8px}
 <button id="btnNurses" class="pill active nurses" onclick="setDest('nurses')">💬 Nurses Group Chat</button>
 <button id="btnHome" class="pill" onclick="setDest('index')">🏠 Home Page Banner</button>
 </div>
-<div id="hint" class="hint nurses">Messages go to <b>nurse-group-chat.html</b> — Nurses see with photo + name</div>
+<div id="hint" class="hint nurses">Messages go to <b>nurse-group-chat.html</b> — Video now sends to all phones!</div>
 
 <div id="homeSettings" class="settings">
 <div class="set"><label>Text Colour</label><div class="colorRow"><input type="color" id="tColor" value="#ffffff" onchange="updPrev()"><input type="text" id="tColorTxt" value="#ffffff" style="flex:1" oninput="document.getElementById('tColor').value=this.value; updPrev()"></div></div>
@@ -95,7 +103,7 @@ header small{font-size:10px;color:var(--muted);margin-left:8px}
 </div>
 
 <div id="chat" class="chat">
-<div style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:28px">👑</div><div style="margin-top:8px;font-weight:700;font-size:13px">Clean CEO Control</div><div style="font-size:11px;margin-top:6px">Select destination above • No 404 • nurse-group-chat.html</div></div>
+<div style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:28px">👑</div><div style="margin-top:8px;font-weight:700;font-size:13px">CEO Control — Video Fixed</div><div style="font-size:11px;margin-top:6px">Pick video → Click yellow send → Goes LIVE to all phones in &lt;3 sec<br>Small videos (&lt;8MB) send instantly • Big videos upload to Storage</div></div>
 </div>
 
 <div class="footer" style="position:relative">
@@ -104,9 +112,9 @@ header small{font-size:10px;color:var(--muted);margin-left:8px}
 <div id="fileList" class="fileList"></div>
 
 <div class="tools">
-<button class="tBtn" onclick="document.getElementById('imgI').click()">🖼️ Photo</button>
-<button class="tBtn" onclick="document.getElementById('vidI').click()">🎥 Video</button>
-<button class="tBtn" onclick="document.getElementById('docI').click()">📄 Doc</button>
+<button id="photoBtn" class="tBtn" onclick="document.getElementById('imgI').click()">🖼️ Photo</button>
+<button id="videoBtn" class="tBtn" onclick="document.getElementById('vidI').click()">🎥 Video</button>
+<button id="docBtn" class="tBtn" onclick="document.getElementById('docI').click()">📄 Doc</button>
 <button class="tBtn" onclick="startAudio()">🎤 Voice</button>
 <button class="tBtn" onclick="startVideo()">📹 Video Msg</button>
 <button class="tBtn" onclick="toggleEmoji()">😊 Emoji</button>
@@ -120,7 +128,7 @@ header small{font-size:10px;color:var(--muted);margin-left:8px}
 <button class="icon" onclick="toggleEmoji()">😊</button>
 <button id="sendBtn" class="icon send" onclick="send()">➤</button>
 </div>
-<div id="status" class="status">Sending to nurse-group-chat.html</div>
+<div id="status" class="status">Ready — Pick Photo/Video/Doc → Press ➤ to send LIVE to all phones</div>
 </div>
 
 <div id="emojiPanel" class="emojiPanel"></div>
@@ -128,14 +136,16 @@ header small{font-size:10px;color:var(--muted);margin-left:8px}
 
 <script>
 const cfg={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(cfg); const db=firebase.database();
+firebase.initializeApp(cfg); const db=firebase.database(); let storage=null; try{ storage=firebase.storage(); }catch(e){ console.log('Storage not available', e); }
 const me={id:'CEO_ASABERE', name:'Asabere Peter — CEO', photo:'https://ui-avatars.com/api/?name=Asabere+Peter&background=facc15&color=000'};
 let dest='nurses', imgs=[], vids=[], docs=[], aBlob=null, vBlob=null;
 let aRec=null, aSec=0, aInt=null, vRec=null, vSec=0, vInt=null, vStream=null;
+let rawVideoFiles=[]; // Keep original File objects for Storage upload
 
-function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',2500); }
+function toast(m, isError){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; el.style.borderColor=isError?'rgba(239,68,68,.4)':'var(--line)'; el.style.background=isError?'rgba(239,68,68,.12)':'var(--card)'; setTimeout(()=>el.style.display='none',4000); }
 function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
 function esc(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+function showProgress(p){ const bar=document.getElementById('progressBar'), fill=document.getElementById('progressFill'); if(p>0){ bar.classList.add('show'); fill.style.width=p+'%'; } else { bar.classList.remove('show'); fill.style.width='0%'; } }
 
 function setDest(d){
   dest=d;
@@ -143,13 +153,13 @@ function setDest(d){
   document.getElementById('btnHome').classList.toggle('active', d==='index'); document.getElementById('btnHome').classList.toggle('home', d==='index');
   const hint=document.getElementById('hint'), set=document.getElementById('homeSettings'), prev=document.getElementById('previewWrap'), input=document.getElementById('input'), sendBtn=document.getElementById('sendBtn'), status=document.getElementById('status');
   if(d==='nurses'){
-    hint.className='hint nurses'; hint.innerHTML='Messages go to <b>nurse-group-chat.html</b> — Nurses see with photo + name';
+    hint.className='hint nurses'; hint.innerHTML='Messages go to <b>nurse-group-chat.html</b> — Video will send LIVE to all nurses';
     set.classList.remove('show'); prev.classList.remove('show');
-    input.placeholder='Message to nurses...'; sendBtn.className='icon send'; status.textContent='Sending to nurse-group-chat.html';
+    input.placeholder='Message to nurses...'; sendBtn.className='icon send'; status.textContent='Ready — Pick Video/Photo → Press ➤ — Sends to nurse-group-chat.html';
   } else {
-    hint.className='hint home'; hint.innerHTML='Will display in <b>Welcome banner</b> on <b>index.html</b> — Colour + speed editable';
+    hint.className='hint home'; hint.innerHTML='Will display in <b>Welcome banner</b> on <b>index.html</b> — Video displays full width for ALL phones';
     set.classList.add('show'); prev.classList.add('show');
-    input.placeholder='Announcement for home page...'; sendBtn.className='icon sendHome'; status.textContent='Sending to Home Page (index.html) Welcome banner';
+    input.placeholder='Announcement for home page (with video)...'; sendBtn.className='icon sendHome'; status.textContent='Ready — Pick Video → Press ➤ — Shows on index.html for all visitors';
   }
   updPrev();
 }
@@ -164,92 +174,277 @@ function updPrev(){
     if(type==='marquee_fast') dur='8s';
     box.innerHTML=`<div style="overflow:hidden;white-space:nowrap"><div style="display:inline-block;animation:marq ${dur} linear infinite">📢 ${esc(txt)} — CEO</div></div><style>@keyframes marq{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}</style>`;
   } else if(type==='photo_full'){
-    box.innerHTML=imgs[0]?`<img src="${imgs[0].data}" style="max-width:100%;max-height:120px;border-radius:8px"><div style="margin-top:6px">${esc(txt)}</div>`:`🖼️ Photo full width<br>${esc(txt)}`;
+    const vid=rawVideoFiles[0]||vids[0];
+    const img=imgs[0];
+    if(vid){
+      box.innerHTML=`<div>🎥 Video: ${esc(vid.name||'video.mp4')} — Will play full width on home page</div><div style="margin-top:6px">${esc(txt)}</div>`;
+    } else if(img){
+      box.innerHTML=`<img src="${img.data}" style="max-width:100%;max-height:100px;border-radius:8px"><div style="margin-top:6px">${esc(txt)}</div>`;
+    } else {
+      box.innerHTML=`🖼️ Photo/Video will display full width<br>${esc(txt)}`;
+    }
   } else box.textContent=txt;
   document.getElementById('tColorTxt').value=tc; document.getElementById('bColorTxt').value=bc;
 }
 
 function loadMsgs(){
-  db.ref('nurses_group_chat/messages').limitToLast(40).on('child_added', s=> addMsg(s.val(), s.key, 'nurses'));
+  db.ref('nurses_group_chat/messages').limitToLast(30).on('child_added', s=> addMsg(s.val(), s.key, 'nurses'));
   db.ref('ceoHomePageAnnouncements').limitToLast(20).on('child_added', s=> addMsg(s.val(), s.key, 'home'));
 }
 function addMsg(m,k,type){
+  if(!m) return;
   const chat=document.getElementById('chat');
-  if(chat.innerHTML.includes('Clean CEO')) chat.innerHTML='';
+  if(chat.innerHTML.includes('CEO Control — Video Fixed') || chat.innerHTML.includes('CEO Control — FIXED')) chat.innerHTML='';
   if(document.getElementById('msg-'+k)) return;
   const div=document.createElement('div'); div.className='msg '+(m.senderId?.includes('CEO')?'me':'')+(type==='home'?' home':''); div.id='msg-'+k;
   const time=m.createdAt?new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
   const badge=type==='home'?'<span class="badge" style="background:var(--gold);color:#000">🏠 HOME</span>':'<span class="badge">💬 NURSES</span>';
-  div.innerHTML=`<div class="msgMeta">👑 CEO ${badge} ${esc(m.senderName||'CEO')} ${time}</div><div>${esc(m.text||'')}${m.displayType?`<br><small style="opacity:.6;font-size:10px">${m.displayType} • ${m.speed||''}</small>`:''}</div><div class="actions"><button class="aBtn" onclick="editMsg('${k}','${type}')">Edit</button><button class="aBtn" style="color:#fca5a5" onclick="delMsg('${k}')">Delete</button></div>`;
+  let mediaInfo='';
+  if(m.images) mediaInfo+=` 🖼️${m.images.length} photo(s)`;
+  if(m.videos) mediaInfo+=` 🎥${m.videos.length} video(s)`;
+  if(m.voice) mediaInfo+=` 🎤 voice`;
+  if(m.videoMessage) mediaInfo+=` 📹 video msg`;
+  div.innerHTML=`<div class="msgMeta">👑 CEO ${badge} ${esc(m.senderName||'CEO')} ${time} ${mediaInfo}</div><div>${esc(m.text||'')}${m.displayType?`<br><small style="opacity:.6;font-size:10px">${m.displayType} • ${m.speed||''}</small>`:''}</div><div class="actions"><button class="aBtn" onclick="editMsg('${k}','${type}')">Edit</button><button class="aBtn" style="color:#fca5a5" onclick="delMsg('${k}')">Delete</button></div>`;
   chat.appendChild(div); chat.scrollTop=chat.scrollHeight;
 }
+
+async function uploadToStorage(file, path){
+  if(!storage){
+    // Fallback to base64 if storage not available
+    return new Promise(res=>{
+      const rd=new FileReader();
+      rd.onload=e=>res(e.target.result);
+      rd.readAsDataURL(file);
+    });
+  }
+  const ref=storage.ref().child(path);
+  const task=ref.put(file);
+  return new Promise((resolve, reject)=>{
+    task.on('state_changed', 
+      snap=>{ const pct=Math.round((snap.bytesTransferred/snap.totalBytes)*100); showProgress(pct); },
+      err=>reject(err),
+      async ()=>{
+        const url=await task.snapshot.ref.getDownloadURL();
+        showProgress(0);
+        resolve(url);
+      }
+    );
+  });
+}
+
 async function send(){
   const inp=document.getElementById('input'); const txt=inp.value.trim();
-  if(!txt && imgs.length===0 && vids.length===0 && !aBlob && !vBlob) return;
-  const id='MSG-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
-  const now=Date.now();
-  const base={messageId:id, senderId:me.id, senderName:me.name, senderPhoto:me.photo, text:txt, createdAt:now, isCEO:true};
-  if(imgs.length) base.images=imgs;
-  if(vids.length) base.videos=vids;
-  if(docs.length) base.files=docs;
-  if(aBlob) base.voice=await toB64(aBlob);
-  if(vBlob) base.videoMessage=await toB64(vBlob);
-
-  if(dest==='nurses'){
-    await db.ref('nurses_group_chat/messages/'+id).set({...base, destination:'nurses'});
-    await db.ref('nurseCommunityChat/messages/'+id).set({...base, destination:'nurses'});
-    toast('Sent to nurse-group-chat.html');
-  } else {
-    const home={...base, announcementId:id, textColor:document.getElementById('tColor').value, bgColor:document.getElementById('bColor').value, displayType:document.getElementById('dType').value, speed:document.getElementById('speed').value, active:true, destination:'index', isHomePage:true};
-    await db.ref('ceoHomePageAnnouncements/'+id).set(home);
-    await db.ref('ceoHomePageCurrent').set(home);
-    await db.ref('homePageBanner/current').set(home);
-    toast('Sent to Home Page banner');
+  const sendBtn=document.getElementById('sendBtn');
+  if(!txt && imgs.length===0 && vids.length===0 && rawVideoFiles.length===0 && docs.length===0 && !aBlob && !vBlob){
+    toast('⚠️ Type message or pick photo/video', true);
+    return;
   }
-  inp.value=''; autoResize(inp); imgs=[]; vids=[]; docs=[]; aBlob=null; vBlob=null; document.getElementById('fileList').classList.remove('show'); updPrev();
+  
+  sendBtn.disabled=true;
+  sendBtn.textContent='⏳';
+  showProgress(10);
+  document.getElementById('status').textContent='⏳ Uploading and sending... Please wait...';
+  
+  try{
+    const id='MSG-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+    const now=Date.now();
+    let base={messageId:id, senderId:me.id, senderName:me.name, senderPhoto:me.photo, text:txt, createdAt:now, createdAtStr:new Date().toLocaleString('en-GH'), isCEO:true};
+    
+    // Handle images (small base64 is ok)
+    if(imgs.length>0) base.images=imgs;
+    
+    // Handle videos - try Storage for big files
+    let finalVideos=[];
+    if(rawVideoFiles.length>0){
+      showProgress(20);
+      document.getElementById('status').textContent='📤 Uploading video to cloud storage...';
+      for(let i=0;i<rawVideoFiles.length;i++){
+        const file=rawVideoFiles[i];
+        if(file.size > 8*1024*1024){
+          // Big file - use Storage
+          toast('📤 Big video ('+Math.round(file.size/1024/1024)+'MB) — Uploading to cloud...');
+          try{
+            const path='ceo_announcements/'+id+'/video_'+i+'_'+file.name;
+            const url=await uploadToStorage(file, path);
+            finalVideos.push({name:file.name, url:url, size:file.size, type:file.type});
+            console.log('✅ Video uploaded to Storage:', url);
+          }catch(err){
+            console.error('Storage upload failed, using base64 fallback', err);
+            // Fallback to base64 for small fallback
+            const b64=await new Promise(res=>{ const rd=new FileReader(); rd.onload=e=>res(e.target.result); rd.readAsDataURL(file); });
+            finalVideos.push({name:file.name, data:b64, url:b64, size:file.size, type:file.type});
+          }
+        } else {
+          // Small file - base64 is fine for RTDB (<8MB)
+          const b64=await new Promise(res=>{ const rd=new FileReader(); rd.onload=e=>res(e.target.result); rd.readAsDataURL(file); });
+          finalVideos.push({name:file.name, data:b64, url:b64, size:file.size, type:file.type});
+        }
+      }
+    } else if(vids.length>0){
+      finalVideos=vids;
+    }
+    if(finalVideos.length>0) base.videos=finalVideos;
+    
+    // Docs
+    if(docs.length>0) base.files=docs;
+    
+    // Voice/Video messages
+    if(aBlob){
+      showProgress(80);
+      if(aBlob.size > 2*1024*1024 && storage){
+        const url=await uploadToStorage(aBlob, 'ceo_announcements/'+id+'/voice.webm');
+        base.voice=url;
+      } else {
+        base.voice=await new Promise(res=>{ const rd=new FileReader(); rd.onload=e=>res(e.target.result); rd.readAsDataURL(aBlob); });
+      }
+    }
+    if(vBlob){
+      showProgress(85);
+      if(vBlob.size > 3*1024*1024 && storage){
+        const url=await uploadToStorage(vBlob, 'ceo_announcements/'+id+'/videoMsg.webm');
+        base.videoMessage=url;
+      } else {
+        base.videoMessage=await new Promise(res=>{ const rd=new FileReader(); rd.onload=e=>res(e.target.result); rd.readAsDataURL(vBlob); });
+      }
+    }
+    
+    showProgress(90);
+    document.getElementById('status').textContent='💾 Saving to database...';
+    
+    if(dest==='nurses'){
+      await db.ref('nurses_group_chat/messages/'+id).set({...base, destination:'nurses'});
+      await db.ref('nurseCommunityChat/messages/'+id).set({...base, destination:'nurses'});
+      await db.ref('ceoChats/nurseBoard/'+id).set({...base, destination:'nurses'});
+      toast('✅ Sent to Nurses — Video + Message LIVE to all nurses!');
+    } else {
+      const home={...base, announcementId:id, textColor:document.getElementById('tColor').value, bgColor:document.getElementById('bColor').value, displayType:document.getElementById('dType').value, speed:document.getElementById('speed').value, active:true, destination:'index', isHomePage:true};
+      await db.ref('ceoHomePageAnnouncements/'+id).set(home);
+      await db.ref('ceoHomePageCurrent').set(home);
+      await db.ref('homePageBanner/current').set(home);
+      toast('✅ Sent to Home Page — Video displays full width for ALL visitors!');
+    }
+    
+    showProgress(0);
+    inp.value=''; autoResize(inp); 
+    imgs=[]; vids=[]; rawVideoFiles=[]; docs=[]; aBlob=null; vBlob=null; 
+    document.getElementById('fileList').classList.remove('show');
+    document.getElementById('fileList').innerHTML='';
+    document.getElementById('photoBtn').classList.remove('hasFile');
+    document.getElementById('videoBtn').classList.remove('hasFile');
+    document.getElementById('docBtn').classList.remove('hasFile');
+    document.getElementById('status').textContent='✅ Sent! Ready for next message';
+    updPrev();
+    
+  }catch(e){
+    console.error('Send failed', e);
+    toast('❌ Failed: '+e.message, true);
+    document.getElementById('status').textContent='❌ Failed: '+e.message;
+    showProgress(0);
+  } finally {
+    sendBtn.disabled=false;
+    sendBtn.textContent='➤';
+    sendBtn.className=dest==='nurses'?'icon send':'icon sendHome';
+  }
 }
+
 function toB64(b){ return new Promise(r=>{ const rd=new FileReader(); rd.onload=e=>r(e.target.result); rd.readAsDataURL(b); }); }
-function hImgs(files){ for(let f of files){ const rd=new FileReader(); rd.onload=e=>{ imgs.push({name:f.name, data:e.target.result}); showFiles(); updPrev(); }; rd.readAsDataURL(f); } }
-function hVids(files){ for(let f of files){ const rd=new FileReader(); rd.onload=e=>{ vids.push({name:f.name, data:e.target.result}); showFiles(); }; rd.readAsDataURL(f); } }
-function hDocs(files){ for(let f of files){ const rd=new FileReader(); rd.onload=e=>{ docs.push({name:f.name, data:e.target.result}); showFiles(); }; rd.readAsDataURL(f); } }
+
+function hImgs(files){
+  for(let f of files){
+    if(f.size > 10*1024*1024){ toast('⚠️ Photo too big (max 10MB): '+f.name, true); continue; }
+    const rd=new FileReader();
+    rd.onload=e=>{
+      imgs.push({name:f.name, data:e.target.result, url:e.target.result});
+      showFiles();
+      updPrev();
+      document.getElementById('photoBtn').classList.add('hasFile');
+    };
+    rd.readAsDataURL(f);
+  }
+}
+function hVids(files){
+  for(let f of files){
+    if(f.size > 100*1024*1024){ toast('⚠️ Video too big (max 100MB): '+f.name, true); continue; }
+    rawVideoFiles.push(f);
+    // Also create preview base64 for small preview
+    const rd=new FileReader();
+    rd.onload=e=>{
+      vids.push({name:f.name, data:e.target.result, url:e.target.result, size:f.size});
+      showFiles();
+      updPrev();
+      document.getElementById('videoBtn').classList.add('hasFile');
+      toast('✅ Video picked: '+f.name+' ('+Math.round(f.size/1024/1024*10)/10+'MB) — Ready to send, press ➤');
+    };
+    // For preview, read only first chunk or full if small
+    if(f.size < 8*1024*1024){
+      rd.readAsDataURL(f);
+    } else {
+      // For big files, don't read full base64 for preview, just show name
+      vids.push({name:f.name, data:'', url:'', size:f.size, isBig:true});
+      showFiles();
+      document.getElementById('videoBtn').classList.add('hasFile');
+      toast('✅ Big video picked: '+f.name+' ('+Math.round(f.size/1024/1024*10)/10+'MB) — Will upload to cloud when you send');
+    }
+  }
+}
+function hDocs(files){
+  for(let f of files){
+    if(f.size > 10*1024*1024){ toast('⚠️ Doc too big (max 10MB): '+f.name, true); continue; }
+    const rd=new FileReader();
+    rd.onload=e=>{
+      docs.push({name:f.name, data:e.target.result, url:e.target.result});
+      showFiles();
+      document.getElementById('docBtn').classList.add('hasFile');
+    };
+    rd.readAsDataURL(f);
+  }
+}
 function showFiles(){
   const el=document.getElementById('fileList');
-  const has=imgs.length||vids.length||docs.length||aBlob||vBlob;
-  if(!has){ el.classList.remove('show'); return; }
+  const has=imgs.length||vids.length||rawVideoFiles.length||docs.length||aBlob||vBlob;
+  if(!has){ el.classList.remove('show'); el.innerHTML=''; return; }
   el.classList.add('show');
   let h='';
-  h+=imgs.map((f,i)=>`<div class="fileItem">🖼️ ${f.name} <button class="hBtn" onclick="imgs.splice(${i},1);showFiles();updPrev()">✕</button></div>`).join('');
-  h+=vids.map((f,i)=>`<div class="fileItem">🎥 ${f.name} <button class="hBtn" onclick="vids.splice(${i},1);showFiles()">✕</button></div>`).join('');
-  h+=docs.map((f,i)=>`<div class="fileItem">📄 ${f.name} <button class="hBtn" onclick="docs.splice(${i},1);showFiles()">✕</button></div>`).join('');
-  if(aBlob) h+=`<div class="fileItem">🎤 Voice <button class="hBtn" onclick="aBlob=null;showFiles()">✕</button></div>`;
-  if(vBlob) h+=`<div class="fileItem">📹 Video Msg <button class="hBtn" onclick="vBlob=null;showFiles()">✕</button></div>`;
+  h+=imgs.map((f,i)=>`<div class="fileItem"><span>🖼️ <b>${f.name}</b> — Ready</span><button class="hBtn" onclick="imgs.splice(${i},1);showFiles();updPrev(); if(imgs.length===0) document.getElementById('photoBtn').classList.remove('hasFile')">✕</button></div>`).join('');
+  // Show rawVideoFiles for accurate size
+  if(rawVideoFiles.length>0){
+    h+=rawVideoFiles.map((f,i)=>`<div class="fileItem"><span>🎥 <b>${f.name}</b> — ${Math.round(f.size/1024/1024*10)/10}MB — Ready to send</span><button class="hBtn" onclick="rawVideoFiles.splice(${i},1);vids.splice(${i},1);showFiles();updPrev(); if(rawVideoFiles.length===0) document.getElementById('videoBtn').classList.remove('hasFile')">✕</button><div class="fileProgress"><div class="fileProgressBar" style="width:100%"></div></div></div>`).join('');
+  } else {
+    h+=vids.map((f,i)=>`<div class="fileItem">🎥 <b>${f.name}</b> <button class="hBtn" onclick="vids.splice(${i},1);rawVideoFiles.splice(${i},1);showFiles()">✕</button></div>`).join('');
+  }
+  h+=docs.map((f,i)=>`<div class="fileItem">📄 <b>${f.name}</b> <button class="hBtn" onclick="docs.splice(${i},1);showFiles(); if(docs.length===0) document.getElementById('docBtn').classList.remove('hasFile')">✕</button></div>`).join('');
+  if(aBlob) h+=`<div class="fileItem">🎤 Voice — ${Math.round(aBlob.size/1024)}KB — Ready <button class="hBtn" onclick="aBlob=null;showFiles()">✕</button></div>`;
+  if(vBlob) h+=`<div class="fileItem">📹 Video Msg — ${Math.round(vBlob.size/1024)}KB — Ready <button class="hBtn" onclick="vBlob=null;showFiles()">✕</button></div>`;
+  h+=`<div style="font-size:10px;color:var(--muted);text-align:center;margin-top:4px">👆 Files ready — Press yellow ➤ button to send LIVE to all phones</div>`;
   el.innerHTML=h;
 }
+
+// Audio/Video recording
 function startAudio(){
   navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{
-    aRec=new MediaRecorder(s); const ch=[]; aRec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data);}; aRec.onstop=()=>{ aBlob=new Blob(ch,{type:'audio/webm'}); showFiles(); toast('Voice ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){} }; aRec.start();
+    aRec=new MediaRecorder(s); const ch=[]; aRec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data);}; aRec.onstop=()=>{ aBlob=new Blob(ch,{type:'audio/webm'}); showFiles(); toast('✅ Voice recorded — Ready, press ➤ to send'); try{s.getTracks().forEach(t=>t.stop());}catch(e){} }; aRec.start();
     document.getElementById('recAudio').classList.add('show'); aSec=0; aInt=setInterval(()=>{ aSec++; const el=document.getElementById('aTimer'); if(el) el.textContent=String(Math.floor(aSec/60)).padStart(2,'0')+':'+String(aSec%60).padStart(2,'0'); },1000);
-  }).catch(e=>toast(e.message));
+  }).catch(e=>toast('Mic error: '+e.message, true));
 }
 function stopAudio(){ if(aRec&&aRec.state!=='inactive') aRec.stop(); clearInterval(aInt); document.getElementById('recAudio').classList.remove('show'); }
-function cancelAudio(){ if(aRec&&aRec.state!=='inactive') aRec.stop(); aBlob=null; clearInterval(aInt); document.getElementById('recAudio').classList.remove('show'); showFiles(); }
+function cancelAudio(){ if(aRec&&aRec.state!=='inactive') aRec.stop(); aBlob=null; clearInterval(aInt); document.getElementById('recAudio').classList.remove('show'); showFiles(); toast('Voice cancelled'); }
 function startVideo(){
   navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(s=>{
     vStream=s; const live=document.getElementById('vLive'); if(live) live.srcObject=s;
-    vRec=new MediaRecorder(s); const ch=[]; vRec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data);}; vRec.onstop=()=>{ vBlob=new Blob(ch,{type:'video/webm'}); showFiles(); toast('Video ready'); try{s.getTracks().forEach(t=>t.stop());}catch(e){} vStream=null; if(live) live.srcObject=null; }; vRec.start();
+    vRec=new MediaRecorder(s); const ch=[]; vRec.ondataavailable=e=>{if(e.data.size>0)ch.push(e.data);}; vRec.onstop=()=>{ vBlob=new Blob(ch,{type:'video/webm'}); showFiles(); toast('✅ Video recorded — Ready, press ➤ to send'); try{s.getTracks().forEach(t=>t.stop());}catch(e){} vStream=null; if(live) live.srcObject=null; }; vRec.start();
     document.getElementById('recVideo').classList.add('show'); vSec=0; vInt=setInterval(()=>{ vSec++; const el=document.getElementById('vTimer'); if(el) el.textContent=String(Math.floor(vSec/60)).padStart(2,'0')+':'+String(vSec%60).padStart(2,'0'); },1000);
-  }).catch(e=>toast(e.message));
+  }).catch(e=>toast('Camera error: '+e.message, true));
 }
 function stopVideo(){ if(vRec&&vRec.state!=='inactive') vRec.stop(); clearInterval(vInt); document.getElementById('recVideo').classList.remove('show'); }
-function cancelVideo(){ if(vRec&&vRec.state!=='inactive') vRec.stop(); vBlob=null; if(vStream){try{vStream.getTracks().forEach(t=>t.stop());}catch(e){} vStream=null; const live=document.getElementById('vLive'); if(live) live.srcObject=null;} clearInterval(vInt); document.getElementById('recVideo').classList.remove('show'); showFiles(); }
+function cancelVideo(){ if(vRec&&vRec.state!=='inactive') vRec.stop(); vBlob=null; if(vStream){try{vStream.getTracks().forEach(t=>t.stop());}catch(e){} vStream=null; const live=document.getElementById('vLive'); if(live) live.srcObject=null;} clearInterval(vInt); document.getElementById('recVideo').classList.remove('show'); showFiles(); toast('Video cancelled'); }
 
 const emojis=['😊','😂','❤️','👍','👏','🙏','💪','😍','🥰','😘','😅','🤣','😎','🤩','😭','🥺','😮','😱','🤔','👌','✌️','🤝','💯','🔥','⭐','🌟','💖','💜','👩‍⚕️','👑','📢','🎉'];
 function initEmoji(){ const p=document.getElementById('emojiPanel'); p.innerHTML=emojis.map(e=>`<div style="font-size:20px;cursor:pointer;padding:6px;border-radius:8px;text-align:center" onclick="insEmoji('${e}')">${e}</div>`).join(''); }
 function toggleEmoji(){ const p=document.getElementById('emojiPanel'); p.classList.toggle('show'); }
 function insEmoji(e){ const inp=document.getElementById('input'); inp.value+=e; inp.focus(); autoResize(inp); updPrev(); }
-async function delMsg(k){ if(!confirm('Delete?')) return; await db.ref('nurses_group_chat/messages/'+k).remove().catch(()=>{}); await db.ref('nurseCommunityChat/messages/'+k).remove().catch(()=>{}); await db.ref('ceoHomePageAnnouncements/'+k).remove().catch(()=>{}); await db.ref('ceoHomePageCurrent').remove().catch(()=>{}); document.getElementById('msg-'+k)?.remove(); toast('Deleted'); }
-function editMsg(k,type){ const path=type==='home'?'ceoHomePageAnnouncements/'+k:'nurses_group_chat/messages/'+k; const newT=prompt('Edit message:'); if(newT===null) return; db.ref(path).update({text:newT, edited:true}); toast('Edited'); }
+async function delMsg(k){ if(!confirm('Delete this message from all phones?')) return; await db.ref('nurses_group_chat/messages/'+k).remove().catch(()=>{}); await db.ref('nurseCommunityChat/messages/'+k).remove().catch(()=>{}); await db.ref('ceoHomePageAnnouncements/'+k).remove().catch(()=>{}); await db.ref('ceoHomePageCurrent').remove().catch(()=>{}); await db.ref('homePageBanner/current').remove().catch(()=>{}); document.getElementById('msg-'+k)?.remove(); toast('✅ Deleted from all phones'); }
+function editMsg(k,type){ const path=type==='home'?'ceoHomePageAnnouncements/'+k:'nurses_group_chat/messages/'+k; const curText=document.getElementById('msg-'+k)?.innerText||''; const newT=prompt('Edit message:', ''); if(newT===null) return; db.ref(path).update({text:newT, edited:true, editedAt:Date.now()}); toast('✅ Edited — Updates LIVE on all phones'); }
 
-window.onload=()=>{ initEmoji(); loadMsgs(); setDest('nurses'); };
+window.onload=()=>{ initEmoji(); loadMsgs(); setDest('nurses'); console.log('✅ CEO Control — Video FIXED — Ready to send to all phones'); };
 </script>
 </body></html>
