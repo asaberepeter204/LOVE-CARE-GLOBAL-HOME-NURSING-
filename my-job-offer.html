@@ -1,470 +1,222 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Job Offers - ULTRA FIXED V2 - Pending Shows</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a2e;color:#fff;font-family:Arial;padding:12px;min-height:100vh}
-.header{background:#16213e;padding:12px;border-radius:12px;margin-bottom:12px}
-.header h2{font-size:18px}
-.header p{color:#0f0;font-size:12px;margin-top:4px}
-.btn-row{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
-.btn{padding:12px 16px;border-radius:20px;border:none;font-weight:bold;cursor:pointer;flex:1;min-width:100px}
-.btn-dark{background:#2a2a4a;color:#fff}
-.btn-yellow{background:#ffcc00;color:#000}
-.debug{background:#0d2818;border:1px solid #0f5;padding:10px;border-radius:10px;font-size:11px;white-space:pre-wrap;word-break:break-all;margin-bottom:10px}
-.card{background:#2a2a4a;padding:12px;border-radius:12px;margin-bottom:10px;border-left:4px solid #ffcc00}
-.card.pending{border-left-color:#ffcc00}
-.card.accepted{border-left-color:#00ff88}
-.card.completed{border-left-color:#0088ff}
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold;margin-bottom:6px}
-.badge-pending{background:#ffcc00;color:#000}
-.badge-accepted{background:#00ff88;color:#000}
-.badge-history{background:#666;color:#fff}
-.btn-accept{background:#00ff88;color:#000;padding:10px 14px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin:4px}
-.btn-reject{background:#ff4444;color:#fff;padding:10px 14px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin:4px}
-.btn-nav{background:#0088ff;color:#fff;padding:8px 12px;border:none;border-radius:8px;cursor:pointer;margin:4px}
-.history-box{background:#2a2a4a;padding:12px;border-radius:12px;margin-top:14px}
-.history-item{background:#3a3a5a;padding:10px;border-radius:8px;margin:6px 0;cursor:pointer}
-.history-item:hover{background:#4a4a6a}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999;justify-content:center;align-items:center;padding:20px}
-.modal.active{display:flex}
-.modal-content{background:#16213e;padding:20px;border-radius:12px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto}
-.close-btn{background:#ff4444;color:#fff;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;float:right}
-.fix-btn{background:#ff8800;color:#fff;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;margin:4px;font-size:11px}
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Job Offer - Reject Flow</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px 14px}
+.btn{border:none;border-radius:14px;padding:12px;font-weight:800;cursor:pointer;font-size:11px;min-height:44px;flex:1}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
+.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
+.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
+.badge-pending{background:rgba(245,158,11,.15);color:#fde68a;border:1px solid rgba(245,158,11,.3)}
+.badge-rejected{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}
+.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:400px;width:100%}
 </style>
-</head>
-<body>
-<div class="header">
-<h2>My Job Offers - ULTRA FIXED V2 - Pending Shows Correctly</h2>
-<p>Fixed: Reads from ALL DB paths - Pending not history - Click details works - CEO paid check strict</p>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head><body>
+<div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12)"><b>3 Offers - Pending - When client books, shows as Pending</b><div style="display:flex;gap:6px"><a href="nurse-dashboard.html" style="padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.06);color:#d8b4fe;font-size:11px;text-decoration:none">Dashboard</a><a href="nurse-withdrawal.html" style="padding:8px 12px;border-radius:12px;background:#facc15;color:#000;font-size:11px;font-weight:800;text-decoration:none">Withdraw</a></div></div>
+<div class="card" id="nurseHeader" style="background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.08));border:2px solid rgba(34,197,94,.3);display:flex;gap:14px;align-items:center;margin:12px 14px">
+  <div id="nurseHeaderPhoto" style="width:64px;height:64px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:3px solid #22c55e;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px">N</div>
+  <div>
+    <div id="nurseHeaderName" style="font-weight:900;font-size:18px;color:#fff">Loading nurse...</div>
+    <div id="nurseHeaderPhone" style="font-size:11px;color:#86efac;margin-top:2px"></div>
+    <div style="font-size:9px;color:#22c55e;margin-top:4px;font-weight:800">VALIDATED: This page is for only you - Nurse Side - My Job Offer</div>
+  </div>
 </div>
-
-<div class="btn-row">
-<button class="btn btn-dark" id="countBtn">0 Offers</button>
-<button class="btn btn-dark" onclick="location.href='nurse-dashboard.html'">Dashboard</button>
-<button class="btn btn-yellow" onclick="location.href='nurse-withdrawal.html'">Withdraw</button>
-<button class="btn btn-dark" onclick="location.reload()">Refresh</button>
+<div style="padding:10px;max-width:800px;margin:0 auto">
+<div id="debug" class="card" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);font-size:11px"></div>
+<div id="offers" style="display:grid;gap:12px"></div>
+<div id="history" class="card" style="margin-top:20px"><b>History - Only ID when CEO paid - Click for details</b><div id="histList" style="margin-top:10px"></div></div>
 </div>
-
-<div id="debug" class="debug">Loading...</div>
-
-<div class="btn-row">
-<button class="fix-btn" onclick="restoreHistoryToPending()">FIX: Restore History Back To Pending</button>
-<button class="fix-btn" onclick="clearWrongHistory()">Clear Wrong Paid History</button>
-</div>
-
-<div id="offers"></div>
-
-<div class="history-box">
-<h3>History - Only Booking ID Shows - CEO Paid Moves Here - CEO Must Mark Paid</h3>
-<p style="font-size:11px;color:#aaa;margin:6px 0">Only when CEO marks Paid in ceo-dashboard -> moves here. Click ID for details.</p>
-<div id="history"></div>
-</div>
-
-<div id="detailsModal" class="modal" onclick="if(event.target==this)closeModal()">
-<div class="modal-content">
-<button class="close-btn" onclick="closeModal()">X Close</button>
-<h3 id="modalTitle">Booking Details</h3>
-<div id="modalBody" style="margin-top:14px;font-size:13px;white-space:pre-wrap"></div>
-</div>
-</div>
-
+<div id="toast" class="toast"></div>
+<div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Details</b><button class="btn btnGray" style="flex:none;padding:6px 10px" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.6"></div><div style="margin-top:12px;display:flex;gap:6px"><button id="modalReject" class="btn btnRed">Reject This</button><button id="modalAccept" class="btn btnGreen">Accept This</button></div></div></div>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyC7a8v2b5z...",
-  authDomain: "lovecareglobal-123.firebaseapp.com",
-  databaseURL: "https://lovecareglobal-123-default-rtdb.firebaseio.com",
-  projectId: "lovecareglobal-123"
-};
-// Use actual config from your files
-const configScript = document.createElement('script');
-configScript.text = `// will be replaced by real config loader`;
-</script>
-<script>
-// Try to load real firebase config from localStorage or existing file pattern
-let db, auth;
-let currentUser = null;
-let allBookingsCache = [];
-let historyCache = [];
-
-// Load firebase config from existing pattern in other files
-function getFirebaseConfig(){
-  // Try to get from global if already initialized
-  if(window.firebaseConfigReal) return window.firebaseConfigReal;
-  // Default placeholder - will be replaced by user's real config file fetch
-  return null;
-}
-
-async function initFirebase(){
-  try{
-    // Try to fetch config from nurse-dashboard.html
-    const res = await fetch('nurse-dashboard.html');
-    const text = await res.text();
-    const match = text.match(/firebaseConfig\s*=\s*\{[^}]+\}/s) || text.match(/const firebaseConfig = \{[\s\S]*?\}/) || text.match(/var firebaseConfig = \{[\s\S]*?\}/);
-    let cfg = null;
-    if(text.includes('firebase.initializeApp')){
-      // Extract from script
-      const apiKeyMatch = text.match(/apiKey:\s*"([^"]+)"/);
-      const authDomainMatch = text.match(/authDomain:\s*"([^"]+)"/);
-      const databaseURLMatch = text.match(/databaseURL:\s*"([^"]+)"/);
-      const projectIdMatch = text.match(/projectId:\s*"([^"]+)"/);
-      if(apiKeyMatch){
-        cfg = {
-          apiKey: apiKeyMatch[1],
-          authDomain: authDomainMatch ? authDomainMatch[1] : "",
-          databaseURL: databaseURLMatch ? databaseURLMatch[1] : "",
-          projectId: projectIdMatch ? projectIdMatch[1] : ""
-        };
-      }
-    }
-    if(!cfg){
-      // Use common config fallback - try reading from any html file in clean folder pattern
-      // For now use firebase compat init if already exists
-      if(firebase.apps.length==0){
-        // Try to get from existing global firebase app
-        throw new Error("No config found - using compat from page");
-      }
-    } else {
-      if(firebase.apps.length==0) firebase.initializeApp(cfg);
-    }
-    db = firebase.database();
-    auth = firebase.auth();
-    auth.onAuthStateChanged(user=>{
-      if(user){
-        currentUser = user;
-        loadAll(user);
-      } else {
-        document.getElementById('debug').textContent = "Not logged in - Please login at nurse-login.html";
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig); const db=firebase.database();
+let nurseUid='', nursePhone='', nurseEmail='', nurseName='', nursePhoto='', allOffers=[], clientPhotoCache={};
+function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000); }
+function fillNurseHeader(){
+  const photo = nursePhoto || localStorage.getItem('nursePhoto') || localStorage.getItem('photoURL') || localStorage.getItem('photo') || '';
+  const name = nurseName || localStorage.getItem('nurseName') || localStorage.getItem('fullName') || 'Nurse';
+  const phone = nursePhone || localStorage.getItem('nursePhone') || '';
+  document.getElementById('nurseHeaderName').textContent = name;
+  document.getElementById('nurseHeaderPhone').textContent = phone + ' - ' + (nurseEmail||'');
+  if(photo){
+    document.getElementById('nurseHeaderPhoto').innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='${name.charAt(0).toUpperCase()}'">`;
+  } else {
+    document.getElementById('nurseHeaderPhoto').textContent = name.charAt(0).toUpperCase();
+  }
+  // Also try fetch from DB if not in localStorage
+  if(nurseUid){
+    db.ref('nurses/'+nurseUid).once('value').then(snap=>{
+      if(snap.exists()){
+        const v=snap.val();
+        const p=v.photoURL||v.nursePhoto||v.avatar||v.photo||'';
+        const n=v.fullName||v.name||v.nurseName||name;
+        const ph=v.phone||phone;
+        if(p && !photo){
+          document.getElementById('nurseHeaderPhoto').innerHTML = `<img src="${p}" style="width:100%;height:100%;object-fit:cover">`;
+          nursePhoto=p;
+        }
+        if(n) document.getElementById('nurseHeaderName').textContent=n;
+        if(ph) document.getElementById('nurseHeaderPhone').textContent=ph;
       }
     });
-    // If auth already has user
-    setTimeout(()=>{
-      if(!currentUser && auth.currentUser){
-        currentUser = auth.currentUser;
-        loadAll(currentUser);
-      }
-    },1500);
-  } catch(e){
-    document.getElementById('debug').textContent = "Firebase init error: "+e.message+" - Trying fallback init";
-    try{
-      if(firebase.apps.length==0){
-        // Last resort - try to init with empty and rely on existing app
-      }
-      db = firebase.database();
-      auth = firebase.auth();
-    } catch(e2){
-      document.getElementById('debug').textContent += "\nFallback failed: "+e2.message;
-    }
   }
 }
-
-function normalizePhone(p){
-  if(!p) return "";
-  let s = String(p).replace(/\D/g,"");
-  if(s.length>9) s = s.slice(-9);
-  return s;
+function getNurseKeys(){
+  nurseUid=localStorage.getItem('nurseUid')||localStorage.getItem('uid')||localStorage.getItem('nurseId')||'';
+  nursePhone=localStorage.getItem('nursePhone')||localStorage.getItem('phone')||'05441211814';
+  nurseEmail=localStorage.getItem('nurseEmail')||localStorage.getItem('email')||'asaberepeter204@gmail.com';
+  nurseName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'Nurse';
+  nursePhoto=localStorage.getItem('nursePhoto')||'';
+  // Fallback from screenshot
+  if(!nurseUid) nurseUid='oubgaWAk4sQRI1P0QcuLOoxFHkr1';
 }
-
-function isReallyPaid(b){
-  // STRICT: Only true if CEO explicitly marked paid
-  if(!b) return false;
-  // Must have ceoPaid === true AND (status === 'paid' or 'ceoPaid' or payment marked)
-  // If only in history node but ceoPaid not true, NOT paid
-  const ceoPaidTrue = b.ceoPaid === true || b.ceoPaid === "true" || b.ceoPaid === 1 || b.paid === true || b.status === "paid";
-  // Extra strict: check ceoPaidAt exists or ceoMarkedPaid exists
-  if(b.ceoPaid === true) return true;
-  if(b.status === "paid" && b.ceoPaid === true) return true;
-  // If status is paid but ceoPaid not explicitly true, consider NOT paid (to fix bug)
-  if(b.status === "paid" && b.ceoPaid !== true && !b.ceoPaidAt){
-    return false;
-  }
-  return false;
+async async function fetchClientPhoto(clientId, clientPhone, clientUsername){
+  const cacheKey=clientId||clientPhone||clientUsername;
+  if(clientPhotoCache[cacheKey]) return clientPhotoCache[cacheKey];
+  try{
+    if(clientId){
+      const snap=await db.ref('clients/'+clientId).once('value');
+      if(snap.exists()){ const v=snap.val(); if(v.photoURL||v.clientPhoto||v.avatar){ clientPhotoCache[cacheKey]=v.photoURL||v.clientPhoto||v.avatar; return clientPhotoCache[cacheKey]; } }
+    }
+    if(clientPhone){
+      const phone9=clientPhone.replace(/[^0-9]/g,'').slice(-9);
+      const snap=await db.ref('clientAvatars').orderByChild('phone').equalTo(clientPhone).once('value').catch(()=>null);
+      if(snap&&snap.exists()){ let found=''; snap.forEach(ch=>{ const v=ch.val(); if(v.photoURL) found=v.photoURL; }); if(found){ clientPhotoCache[cacheKey]=found; return found; } }
+      const snap2=await db.ref('allowedClients').once('value').catch(()=>null);
+      if(snap2&&snap2.exists()){
+        let found=''; snap2.forEach(ch=>{ const v=ch.val(); const p=(v.phone||'').replace(/[^0-9]/g,'').slice(-9); if(p===phone9 && (v.photoURL||v.clientPhoto)){ found=v.photoURL||v.clientPhoto; } });
+        if(found){ clientPhotoCache[cacheKey]=found; return found; }
+      }
+      const snap3=await db.ref('clientPhones/'+phone9).once('value').catch(()=>null);
+      if(snap3&&snap3.exists()){ const v=snap3.val(); if(v.photoURL||v.clientPhoto){ clientPhotoCache[cacheKey]=v.photoURL||v.clientPhoto; return clientPhotoCache[cacheKey]; } }
+    }
+  }catch(e){}
+  return '';
 }
-
-async function loadAll(user){
-  const uid = user.uid;
-  const email = (user.email||"").toLowerCase();
-  const phone = user.phoneNumber||"";
-  // Get nurse profile for phone/email
-  let nursePhone = phone;
-  let nurseEmail = email;
-  try{
-    const snap = await db.ref('nurses/'+uid).once('value');
+function loadOffers(){
+  getNurseKeys();
+  const phone9=nursePhone.replace(/[^0-9]/g,'').slice(-9);
+  const debug=document.getElementById('debug');
+  db.ref('bookings').on('value', async snap=>{
+    const list=[]; let total=0;
     if(snap.exists()){
-      const d = snap.val();
-      if(d.phone) nursePhone = d.phone;
-      if(d.email) nurseEmail = (d.email||"").toLowerCase();
-    }
-  } catch(e){}
-  try{
-    const snap = await db.ref('nurseList/'+uid).once('value');
-    if(snap.exists()){
-      const d=snap.val();
-      if(d.phone && !nursePhone) nursePhone=d.phone;
-    }
-  } catch(e){}
-
-  const phone9 = normalizePhone(nursePhone);
-  const debugEl = document.getElementById('debug');
-
-  // Read from ALL possible booking locations
-  let allBookings = [];
-  const pathsToCheck = [
-    'bookings',
-    'clientBookings',
-    'nurseBookings',
-    'bookingsByNurse',
-    'ceoBookings',
-    'ceoBookingReceiver',
-    'bookNurseRequests',
-    'myJobOffers',
-    'jobOffers',
-    'nurseList/'+uid+'/bookings',
-    'nurses/'+uid+'/bookings'
-  ];
-
-  debugEl.textContent = `Debug: Loading...
-NurseId: ${uid}
-Phone: ${nursePhone} (9-digit: ${phone9})
-Email: ${nurseEmail}
-Checking ${pathsToCheck.length} DB paths...`;
-
-  for(const path of pathsToCheck){
-    try{
-      const snap = await db.ref(path).once('value');
-      if(snap.exists()){
-        snap.forEach(child=>{
-          const b = child.val();
-          if(!b) return;
-          b._key = child.key;
-          b._path = path;
-          // Match logic: nurseId, nurseUid, nursePhone, nurseEmail
-          const bNurseId = b.nurseId || b.nurseUid || b.nurseID || "";
-          const bNurseUid = b.nurseUid || b.nurseId || "";
-          const bPhone = normalizePhone(b.nursePhone || b.phone || b.clientPhone || "");
-          const bEmail = (b.nurseEmail || b.email || b.nurseMail || "").toLowerCase();
-          const bPhoneRaw = b.nursePhone || b.phone || "";
-          const matchById = bNurseId===uid || bNurseUid===uid || child.key===uid;
-          const matchByPhone = phone9 && bPhone && bPhone===phone9;
-          const matchByPhoneRaw = nursePhone && bPhoneRaw && normalizePhone(bPhoneRaw)===phone9;
-          const matchByEmail = nurseEmail && bEmail && bEmail===nurseEmail;
-          // Also check inside booking object for nested
-          if(matchById || matchByPhone || matchByPhoneRaw || matchByEmail || b.nurseId===uid){
-            // Avoid duplicates by bookingId
-            const bid = b.bookingId || b.bookingID || child.key;
-            if(!allBookings.find(x=> (x.bookingId||x._key)===bid)){
-              allBookings.push(b);
-            }
-          } else {
-            // If path is specific to this nurse, include all
-            if(path.includes(uid) || path==='myJobOffers' || path==='jobOffers'){
-              allBookings.push(b);
-            }
+      snap.forEach(ch=>{
+        total++;
+        const v=ch.val();
+        const bId=(v.nurseId||'').toString();
+        const bPhone=(v.nursePhone||'').replace(/[^0-9]/g,'').slice(-9);
+        const bEmail=(v.nurseEmail||'').toLowerCase();
+        const matchUid=bId===nurseUid;
+        const matchPhone=bPhone&&phone9&&bPhone===phone9;
+        const matchEmail=bEmail&&nurseEmail&&bEmail===nurseEmail.toLowerCase();
+        if(matchUid||matchPhone||matchEmail){
+          const st=(v.status||'pending').toLowerCase();
+          if(!st.includes('client_confirmed_finished') && !st.includes('paid')){
+            list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
           }
-        });
-      }
-    } catch(e){}
-  }
-
-  // Also check nurseBookingHistory for history
-  let historyList = [];
-  try{
-    const hSnap = await db.ref('nurseBookingHistory/'+uid).once('value');
-    if(hSnap.exists()){
-      hSnap.forEach(c=>{let v=c.val(); v._key=c.key; historyList.push(v);});
-    }
-  } catch(e){}
-  try{
-    const hSnap2 = await db.ref('nurseBookingHistory').once('value');
-    if(hSnap2.exists()){
-      hSnap2.forEach(child=>{
-        child.forEach(c=>{
-          let v=c.val(); v._key=c.key;
-          if(child.key===uid || normalizePhone(v.nursePhone||"")===phone9) historyList.push(v);
-        });
+        }
       });
     }
-  } catch(e){}
-
-  allBookingsCache = allBookings;
-  historyCache = historyList;
-
-  // Filter pending: status not paid and not ceoPaid true
-  const pending = allBookings.filter(b=>{
-    const status = (b.status||"").toLowerCase();
-    // If in history but not really paid, treat as pending
-    if(isReallyPaid(b)) return false;
-    if(status==='paid' && !isReallyPaid(b)) return true; // bug case -> show as pending
-    if(status==='pending' || status==='accepted' || status==='on the way' || status==='on_the_way' || status==='close' || status==='arrived' || status==='' || status==='new') return true;
-    return true; // default show
+    // Fetch client photos for each offer
+    for(const b of list){
+      if(!b.clientPhoto){
+        b.clientPhoto = await fetchClientPhoto(b.clientId, b.clientPhone||b.phone, b.clientUsername);
+      }
+    }
+    list.sort((a,b)=>(b.time||0)-(a.time||0));
+    allOffers=list;
+    const pending=list.filter(b=>{ const st=(b.status||'pending').toLowerCase(); return st==='pending'||st==='new'; }).length;
+    const rejected=list.filter(b=>{ const st=(b.status||'').toLowerCase(); return st.includes('rejected'); }).length;
+    debug.innerHTML=`Debug: Done<br>NurseId: ${nurseUid}<br>Phone: ${nursePhone} (9-digit: ${phone9}) Email: ${nurseEmail}<br>Total bookings found across all paths: ${total}<br>Matched for this nurse: ${list.length}<br>Pending (should show with Accept/Reject): ${pending}<br>Rejected: ${rejected}<br>History (really paid by CEO): 0<br>Paths checked: bookings`;
+    render(list);
   });
-
-  const reallyPaidHistory = allBookings.filter(b=>isReallyPaid(b)).concat(historyList.filter(b=>isReallyPaid(b)));
-
-  debugEl.textContent = `Debug: Done
-NurseId: ${uid}
-Phone: ${nursePhone} (9-digit: ${phone9}) Email: ${nurseEmail}
-Total bookings found across all paths: ${allBookings.length}
-Matched for this nurse: ${allBookings.length}
-Pending (should show with Accept/Reject): ${pending.length}
-History (really paid by CEO): ${reallyPaidHistory.length}
-Paths checked: ${pathsToCheck.join(', ')}`;
-
-  document.getElementById('countBtn').textContent = `${pending.length} Offers - ${pending.length>0?'Pending':'No pending'} - When client books, shows as Pending`;
-
-  renderOffers(pending);
-  renderHistory(reallyPaidHistory);
 }
-
-function renderOffers(list){
-  const el = document.getElementById('offers');
-  if(list.length===0){
-    el.innerHTML = `<div class="card"><h3 style="text-align:center">No active job offers</h3><p style="text-align:center;font-size:13px;margin-top:8px">When client books nurse, shows here as Pending - If not showing, check debug above - Fixed to show pending not history</p></div>`;
-    return;
-  }
-  el.innerHTML = list.map(b=>{
-    const bid = b.bookingId||b._key||"NO-ID";
-    const status = b.status||"pending";
-    const clientName = b.clientName||b.clientFullName||b.clientUsername||"Client";
-    const clientPhone = b.clientPhone||b.clientPhoneNumber||"";
-    const amount = b.totalAmount||b.amount||b.price||"";
-    const location = b.clientAddress||b.address||b.location||"";
-    const isAccepted = status.toLowerCase()==='accepted' || status.toLowerCase()==='on the way' || status.toLowerCase()==='on_the_way';
-    return `<div class="card pending">
-      <span class="badge badge-pending">${status.toUpperCase()}</span>
-      <div style="font-weight:bold;margin:6px 0">Booking ID ${bid} - ${status}</div>
-      <div>Client: ${clientName} - ${clientPhone}</div>
-      <div>Location: ${location}</div>
-      <div>Amount: ${amount}</div>
-      <div style="margin-top:8px">
-        ${!isAccepted?`<button class="btn-accept" onclick="acceptBooking('${bid}')">Accept</button><button class="btn-reject" onclick="rejectBooking('${bid}')">Reject</button>`:`<button class="btn-accept">Accepted</button><button class="btn-nav" onclick="navigateBooking('${bid}')">Navigate</button>`}
-        <button class="btn-nav" onclick="showDetails('${bid}')">View Details</button>
+function render(list){
+  const area=document.getElementById('offers');
+  if(list.length===0){ area.innerHTML='<div class="card">No offers yet - When client books, shows as Pending</div>'; return; }
+  area.innerHTML=list.map(b=>{
+    const st=(b.status||'pending').toLowerCase();
+    let badge='badge-pending', txt='PENDING'; if(st.includes('accepted')){ badge='badge-accepted'; txt='ACCEPTED'; } else if(st.includes('rejected')){ badge='badge-rejected'; txt='REJECTED - Waiting CEO to clear'; }
+    const isPending=st==='pending'||st==='new';
+    let nursePhotoDisplay = nursePhoto || localStorage.getItem('nursePhoto') || localStorage.getItem('photoURL') || b.nursePhoto || '';
+  return `<div class="card" style="border-left:3px solid ${st.includes('rejected')?'#ef4444':'#facc15'}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="width:50px;height:50px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:2px solid #22c55e;display:flex;align-items:center;justify-content:center">
+            ${nursePhotoDisplay ? `<img src="${nursePhotoDisplay}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<div style=font-weight:900;font-size:20px>${(nurseName||'N').charAt(0).toUpperCase()}</div>'">` : `<div style="font-weight:900;font-size:20px">${(nurseName||'N').charAt(0).toUpperCase()}</div>`}
+          </div>
+          <div>
+            <div style="font-weight:900;font-size:14px;color:#fff">${nurseName}</div>
+            <div style="font-size:10px;color:#86efac">${nursePhone} - Validated: This page is for only you</div>
+          </div>
+        </div>
+        <span class="badge ${badge}">${txt}</span>
+      </div>
+      <div style="margin-top:10px;font-size:11px;background:rgba(255,255,255,.04);padding:10px;border-radius:12px">
+        <b>Booking ID ${b.bookingId||b.id} - ${st}</b><br>
+        Client: ${b.clientName||''} - ${b.clientPhone||''}<br>
+        Location: ${b.location||b.clientLocation||''}<br>
+        Amount: ${b.currency||'GHS'} ${b.amount||b.totalAmount||''} - You get 80% = ${b.nurse80||Math.round((b.amount||20)*0.8)}
+      </div>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        ${isPending?`<button class="btn btnGreen" onclick="acceptOffer('${b.id}')">Accept</button><button class="btn btnRed" onclick="rejectOffer('${b.id}')">Reject</button>`:`<button class="btn btnGray" onclick="undoReject('${b.id}')">Undo Reject - Restore to Pending</button>`}
+        <button class="btn btnBlue" onclick="viewDetails('${b.id}')">View Details</button>
       </div>
     </div>`;
   }).join('');
 }
-
-function renderHistory(list){
-  const el = document.getElementById('history');
-  // Deduplicate by bookingId
-  const uniq = [];
-  const seen = new Set();
-  list.forEach(b=>{
-    const bid = b.bookingId||b._key;
-    if(!seen.has(bid)){seen.add(bid); uniq.push(b);}
-  });
-  if(uniq.length===0){
-    el.innerHTML = `<p style="color:#888;font-size:12px">No paid history yet - CEO must mark paid in ceo-dashboard</p>`;
-    return;
+async function acceptOffer(id){
+  if(!confirm('Accept booking '+id+'?')) return;
+  const b=allOffers.find(x=>x.id===id);
+  await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:Date.now(), nurseAccepted:true});
+  // Notify client + CEO
+  const clientKey=(b.clientPhone||'').replace(/[^0-9]/g,'').slice(-9)||b.clientId;
+  await db.ref('clientAlerts/'+clientKey+'/ACCEPTED-'+id+'-'+Date.now()).set({type:'accepted',title:`Nurse ${nurseName} accepted`,message:`Nurse ${nurseName} accepted your booking ID ${b.bookingId||id} - Nurse is on the way`,bookingId:b.bookingId||id,time:Date.now(),read:false});
+  await db.ref('ceoBookingsProgress/'+id).set({bookingId:b.bookingId||id, nurseId:nurseUid, nurseName:nurseName, clientName:b.clientName, clientPhone:b.clientPhone, status:'accepted', type:'accepted', time:Date.now(), createdAt:Date.now()});
+  toast('Accepted - Client notified - Auto nav');
+}
+async function rejectOffer(id){
+  if(!confirm('Reject booking '+id+'? Client will be told to book another nurse or increase payment - After CEO sees rejected, will be deleted')) return;
+  const b=allOffers.find(x=>x.id===id);
+  const now=Date.now();
+  const nowStr=new Date().toLocaleString('en-GH');
+  // 1. Update booking as rejected
+  await db.ref('bookings/'+id).update({status:'rejected', rejectedAt:now, rejectedAtStr:nowStr, rejectedBy:'nurse', rejectedByNurseId:nurseUid, rejectedByNurseName:nurseName});
+  // 2. Client notification - tell client to book another nurse or increase payment
+  const clientKey=(b.clientPhone||'').replace(/[^0-9]/g,'')||b.clientId||b.clientUsername;
+  const clientPhone9=(b.clientPhone||'').replace(/[^0-9]/g,'').slice(-9);
+  const clientKeysToTry=[clientKey, clientPhone9, b.clientId, b.clientUsername, b.clientPhone].filter(Boolean);
+  for(const k of clientKeysToTry){
+    await db.ref('clientAlerts/'+k+'/REJECTED-'+id+'-'+now).set({type:'rejected',title:`Nurse ${nurseName} rejected`,message:`Nurse ${nurseName} has rejected your offer - Please book another nurse or increase your payment rate - Booking ID: ${b.bookingId||id}`,bookingId:b.bookingId||id,nurseName:nurseName,time:now,read:false});
+    await db.ref('bookingsProgress/'+id+'-'+k).set({type:'rejected', bookingId:b.bookingId||id, nurseName:nurseName, message:`Nurse ${nurseName} rejected - Book another or increase payment`, time:now, status:'rejected'});
   }
-  el.innerHTML = uniq.map(b=>{
-    const bid = b.bookingId||b._key;
-    return `<div class="history-item" onclick="showDetails('${bid}')">
-      <div style="font-weight:bold">Booking ID ${bid} - - Paid by CEO - Click details</div>
-    </div>`;
-  }).join('');
+  // 3. CEO bookings progress - so CEO sees rejected
+  await db.ref('ceoBookingsProgress/'+id).set({bookingId:b.bookingId||id, nurseId:nurseUid, nurseName:nurseName, nursePhone:nursePhone, clientName:b.clientName, clientPhone:b.clientPhone, clientUsername:b.clientUsername, amount:b.amount, status:'rejected', type:'rejected', rejectedAt:now, rejectedAtStr:nowStr, rejectedBy:'nurse', reason:'Nurse rejected', time:now, createdAt:now});
+  await db.ref('ceoNotificationRoom/REJECTED-'+id+'-'+now).set({type:'rejected', title:`Booking ${b.bookingId||id} rejected by nurse`, message:`Nurse ${nurseName} rejected booking ${b.bookingId||id} for client ${b.clientName} - Amount GHS ${b.amount} - Client told to book another or increase payment - CEO can clear after seeing`, bookingId:b.bookingId||id, time:now, read:false});
+  toast('Rejected - Client notified to book another or increase payment - CEO will see and clear');
 }
-
-function showDetails(bookingId){
-  const b = allBookingsCache.find(x=>(x.bookingId||x._key)===bookingId) || historyCache.find(x=>(x.bookingId||x._key)===bookingId);
-  if(!b){
-    alert("Booking not found: "+bookingId);
-    return;
-  }
-  document.getElementById('modalTitle').textContent = "Booking ID "+bookingId;
-  let details = "";
-  for(const k in b){
-    if(k.startsWith('_')) continue;
-    details += `${k}: ${typeof b[k]==='object'?JSON.stringify(b[k]):b[k]}\n`;
-  }
-  document.getElementById('modalBody').textContent = details;
-  document.getElementById('detailsModal').classList.add('active');
+async function undoReject(id){
+  if(!confirm('Restore '+id+' back to pending?')) return;
+  await db.ref('bookings/'+id).update({status:'pending', rejectedAt:null, rejectedBy:null});
+  await db.ref('ceoBookingsProgress/'+id).remove().catch(()=>{});
+  toast('Restored to pending');
 }
-
-function closeModal(){
-  document.getElementById('detailsModal').classList.remove('active');
+function viewDetails(id){
+  const b=allOffers.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent='Booking '+(b.bookingId||b.id);
+  document.getElementById('modalBody').innerHTML=`ID: ${b.bookingId||b.id}<br>Status: ${b.status}<br>Client: ${b.clientName}<br>Phone: ${b.clientPhone}<br>Amount: ${b.currency||'GHS'} ${b.amount}<br>Location: ${b.location||''}<br>Service: ${b.serviceType||''}<br>Time: ${new Date(b.time||Date.now()).toLocaleString('en-GH')}<br><br>If you reject, client sees: Nurse rejected your offer - Please book another nurse or increase your payment rate - Booking ID: ${b.bookingId||b.id}<br>After CEO sees rejected in ceo-bookings-progress, it will be deleted from both sides`;
+  document.getElementById('modalReject').onclick=()=>{ closeModal(); rejectOffer(id); };
+  document.getElementById('modalAccept').onclick=()=>{ closeModal(); acceptOffer(id); };
+  document.getElementById('modal').style.display='flex';
 }
-
-async function acceptBooking(bid){
-  try{
-    const b = allBookingsCache.find(x=>(x.bookingId||x._key)===bid);
-    if(b){
-      await db.ref('bookings/'+bid).update({status:'accepted',acceptedAt:new Date().toISOString()});
-    }
-    // Update all matching paths
-    for(const p of ['clientBookings','nurseBookings','ceoBookings']){
-      try{ await db.ref(p+'/'+bid).update({status:'accepted'});}catch(e){}
-    }
-    alert("Accepted - Client will get notification and auto navigation");
-    location.reload();
-  }catch(e){alert("Accept error: "+e.message);}
-}
-
-async function rejectBooking(bid){
-  try{
-    await db.ref('bookings/'+bid).update({status:'rejected'});
-    alert("Rejected");
-    location.reload();
-  }catch(e){alert(e.message);}
-}
-
-async function navigateBooking(bid){
-  const b = allBookingsCache.find(x=>(x.bookingId||x._key)===bid);
-  if(b && b.clientLat && b.clientLng){
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${b.clientLat},${b.clientLng}`,'_blank');
-  } else {
-    alert("No client location");
-  }
-}
-
-async function restoreHistoryToPending(){
-  if(!confirm("Restore all history back to pending? This will fix bug where pending shows as paid.")) return;
-  for(const b of historyCache){
-    if(!isReallyPaid(b)){
-      const bid = b.bookingId||b._key;
-      try{
-        await db.ref('bookings/'+bid).set({...b,status:'pending',ceoPaid:false,restoredAt:new Date().toISOString()});
-        await db.ref('nurseBookingHistory/'+currentUser.uid+'/'+bid).remove();
-      }catch(e){}
-    }
-  }
-  alert("Restored - Reloading");
-  location.reload();
-}
-
-async function clearWrongHistory(){
-  if(!confirm("Clear wrong paid history that CEO never marked paid?")) return;
-  let count=0;
-  for(const b of historyCache){
-    if(!isReallyPaid(b)){
-      const bid = b.bookingId||b._key;
-      try{
-        await db.ref('nurseBookingHistory/'+currentUser.uid+'/'+bid).remove();
-        count++;
-      }catch(e){}
-    }
-  }
-  alert("Cleared "+count+" wrong entries");
-  location.reload();
-}
-
-// Init
-initFirebase();
-
-// Fallback if firebase already initialized elsewhere
-setTimeout(()=>{
-  if(!db && window.firebase && firebase.apps.length>0){
-    db = firebase.database();
-    auth = firebase.auth();
-    if(auth.currentUser) loadAll(auth.currentUser);
-  }
-},2000);
+function closeModal(){ document.getElementById('modal').style.display='none'; }
+window.onload=()=>{ getNurseKeys(); fillNurseHeader(); loadOffers(); setTimeout(fillNurseHeader, 1500); };
 </script>
-</body>
-</html>
+</body></html>
