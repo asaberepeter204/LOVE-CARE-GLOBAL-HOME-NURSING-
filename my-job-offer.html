@@ -1,220 +1,157 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Job Offer - Clean - Full Features</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Job Offer - Clean - Auto Delete to History When CEO Paid - Only ID</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;padding-bottom:90px}
+.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.98);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:15px}
+.badge{padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);font-size:11px;font-weight:700;color:#ece8ff;text-decoration:none;cursor:pointer}
+.badgeGold{background:#facc15;color:#000;border-color:#facc15}
+.card{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin:10px}
+.main{max-width:800px;margin:0 auto;padding:10px}
+.offer{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}
+.offer.completed{border:2px solid #22c55e;background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(16,40,20,.6))}
+.btn{padding:9px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#ece8ff;font-size:11px;font-weight:700;cursor:pointer}
+.btnGold{background:#facc15;color:#000;border-color:#facc15}
+.btnGreen{background:#22c55e;color:#fff;border-color:#22c55e}
+.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:400px;width:100%;max-height:80vh;overflow:auto}
+.histId{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.15);margin-bottom:8px;cursor:pointer;font-size:12px;font-weight:700}
+.histId:hover{background:rgba(168,85,247,.15)}
+</style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<style>
-:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.10);--text:#ece8ff;--muted:#9a95b8;--gold:#facc15;--green:#22c55e;--red:#ef4444;--blue:#60a5fa;--purple:#a78bfa}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px}
-.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.98);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.brand{font-family:Fraunces,serif;font-weight:700;font-size:15px}
-.badge{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:11px;font-weight:700;color:var(--text);text-decoration:none;cursor:pointer}
-.badgeGold{background:var(--gold);color:#000;border-color:var(--gold)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px}
-.main{max-width:800px;margin:0 auto;padding:10px}
-.offer{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
-.offer.pending{border-left:3px solid var(--gold)}
-.offer.accepted{border-left:3px solid var(--green)}
-.offer.on_the_way{border-left:3px solid var(--blue)}
-.offer.close{border-left:3px solid var(--purple)}
-.offer.completed{border:2px solid var(--green);background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(16,40,20,.6))}
-.congrats{background:linear-gradient(135deg,rgba(34,197,94,.14),rgba(250,204,21,.09));border:2px solid rgba(34,197,94,.4);border-radius:16px;padding:16px;margin-bottom:12px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.title{font-family:Fraunces,serif;font-weight:700;font-size:14px}
-.small{font-size:11px;color:var(--muted)}
-.btn{padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;font-weight:700;cursor:pointer}
-.btnGold{background:var(--gold);color:#000;border-color:var(--gold)}
-.btnGreen{background:var(--green);color:#fff;border-color:var(--green)}
-.btnRed{background:var(--red);color:#fff;border-color:var(--red)}
-.btnBlue{background:var(--blue);color:#fff;border-color:var(--blue)}
-.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid var(--line);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
-</style>
-</head>
-<body>
-<div class="top">
-<div><div class="brand">My Job Offers - Clean - Full Features</div><small class="small">Accept, On The Way, Close, Completed, Congrats with Booking ID, Withdrawal - No emoji - Pure English</small></div>
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-<span class="badge" id="countBadge">0 Offers</span>
-<a href="nurse-dashboard.html" class="badge">Dashboard</a>
-<a href="nurse-withdrawal.html" class="badge badgeGold">Withdraw Earnings</a>
-<button class="badge" onclick="reloadData()">Refresh</button>
-</div>
-</div>
+</head><body>
+<div class="top"><div><div class="brand">My Job Offers - Clean - Auto Delete History</div><small style="font-size:10px;color:#9a95b8">CEO paid auto delete to history - Only booking ID shows - Click ID for details</small></div><div style="display:flex;gap:8px"><span class="badge" id="countBadge">0 Offers</span><a href="nurse-dashboard.html" class="badge">Dashboard</a><a href="nurse-withdrawal.html" class="badge badgeGold">Withdraw</a><button class="badge" onclick="loadAll()">Refresh</button></div></div>
 
 <div class="main">
-<div class="card" style="display:flex;gap:12px;align-items:center;background:rgba(26,22,51,.9)">
-<img id="nursePhoto" src="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:#12102a" onerror="this.src='https://via.placeholder.com/56?text=Nurse'">
-<div><b id="nurseNameDisplay" style="font-family:Fraunces,serif;font-size:15px">Nurse Name</b><br><small class="small" id="nurseIdDisplay">ID: Loading...</small><br><small class="small" id="nurseEmailDisplay"></small></div>
-<div style="margin-left:auto"><span class="badge badgeGold" id="nurseVerified">Verified Nurse</span></div>
-</div>
-
-<div class="card" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2)">
-<b style="font-size:12px;color:#86efac">Completion Flow - Nurse</b><br>
-<small class="small">1 Client books you - 2 You accept - 3 On the way - 4 Close to client - 5 Complete work - 6 Client confirms completed - 7 Accepted removed, marked completed with date and time - 8 Congrats message with Booking ID sent here - 9 Withdraw</small>
-<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-<span class="badge" style="font-size:9px">Pending: <b id="cPending">0</b></span>
-<span class="badge" style="font-size:9px">Accepted: <b id="cAccepted">0</b></span>
-<span class="badge" style="font-size:9px">Completed: <b id="cCompleted">0</b></span>
-<span class="badge badgeGold" style="font-size:9px">Congrats: <b id="cCongrats">0</b></span>
-</div>
-</div>
-
-<div id="congratsArea"></div>
 <div id="offersArea" style="margin-top:12px"></div>
-<div id="emptyArea" class="card" style="display:none;text-align:center;padding:30px">
-<b>No job offers yet</b><br><small class="small">When client books you, offers appear here. Checks bookings where nurseId equals your UID, also myJobOffers and ceoBookings. When client confirms completed, you get congrats with Booking ID.</small><br>
-<div style="margin-top:12px"><button class="btn btnGold" onclick="reloadData()">Reload Offers</button> <button class="btn" onclick="checkUid()">Check My UID</button></div>
-<div style="margin-top:10px;font-size:10px;color:var(--muted)" id="debugInfo"></div>
-</div>
+<div id="emptyArea" class="card" style="display:none;text-align:center;padding:30px"><b>No active job offers</b><br><small style="color:#9a95b8">After CEO marks paid, booking auto deletes to history - Only ID shows - Empty active</small></div>
+
+<div class="card"><b style="font-size:12px">History - Only Booking ID Shows - Click ID for Details - CEO Paid Moves Here</b><div id="historyList" style="margin-top:10px"><small style="color:#9a95b8">No history yet - When CEO marks paid, booking moves here - Only ID visible</small></div></div>
 </div>
 
 <div id="toast" class="toast"></div>
+<div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Details</b><button class="btn" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.6"></div></div></div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
-
 let nurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
-let nurseName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'Nurse';
-let allOffers=[];
+let nurseName=localStorage.getItem('nurseName')||'Nurse';
+let all=[], historyData=[];
 
 function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',3500);}
-function checkUid(){const info=document.getElementById('debugInfo'); info.innerHTML='UID: '+(nurseId||'NOT FOUND')+'<br>Name: '+nurseName+'<br>LocalStorage lcg_nurse_uid='+(localStorage.getItem('lcg_nurse_uid')||'none')+' nurseUid='+(localStorage.getItem('nurseUid')||'none')+' uid='+(localStorage.getItem('uid')||'none')+'<br>Please login again if blank'; toast('UID: '+(nurseId||'NOT FOUND - Login again')); }
-function reloadData(){ loadAll(); }
-
-function loadNurseProfile(){
-if(!nurseId) return;
-const photoEl=document.getElementById('nursePhoto');
-const nameEl=document.getElementById('nurseNameDisplay');
-const idEl=document.getElementById('nurseIdDisplay');
-const emailEl=document.getElementById('nurseEmailDisplay');
-nameEl.textContent=nurseName||'Nurse';
-idEl.textContent='ID: '+nurseId.substring(0,12)+'... - '+nurseName;
-let photo=localStorage.getItem('nursePhoto')||localStorage.getItem('nurseAvatar')||localStorage.getItem('photoURL')||'';
-if(photo) photoEl.src=photo;
-// Fetch from Firebase nurses
-db.ref('nurses/'+nurseId).once('value').then(s=>{
-  if(s.exists()){
-    const v=s.val();
-    const fullName=v.fullName||v.name||v.displayName||nurseName;
-    const pic=v.photoURL||v.avatar||v.profilePhoto||v.image||photo;
-    if(fullName){ nurseName=fullName; localStorage.setItem('nurseName',fullName); nameEl.textContent=fullName; idEl.textContent='ID: '+nurseId.substring(0,12)+'... - '+fullName; }
-    if(pic){ photoEl.src=pic; localStorage.setItem('nursePhoto',pic); }
-    emailEl.textContent=(v.email||'')+' - '+(v.phone||'')+' - '+(v.verified?'Verified':'');
-  }
-});
-// Also check allowedNurses
-db.ref('allowedNurses').once('value').then(s=>{
-  if(s.exists()){
-    s.forEach(ch=>{
-      const v=ch.val();
-      if((v.uid||'')===nurseId || (v.email||'').toLowerCase()===(localStorage.getItem('nurseEmail')||'').toLowerCase()){
-        const pic=v.photoURL||v.avatar||'';
-        if(pic && !photoEl.src.includes('http')){ photoEl.src=pic; }
-      }
-    });
-  }
-});
-}
 
 function loadAll(){
-loadNurseProfile();
-if(!nurseId){ document.getElementById('emptyArea').style.display='block'; document.getElementById('debugInfo').innerHTML='No nurse UID found - Please login at nurse-login.html'; toast('No nurse ID - Login again'); return; }
-document.getElementById('debugInfo').innerHTML='Loading for UID: '+nurseId+' - Name: '+nurseName+' - Checking bookings and myJobOffers';
+if(!nurseId){ document.getElementById('emptyArea').style.display='block'; return; }
 db.ref('bookings').orderByChild('nurseId').equalTo(nurseId).on('value', snap=>{
   const list=[];
-  if(snap.exists()){ snap.forEach(ch=>{ const v=ch.val(); list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key, source:'bookings'}); }); }
-  db.ref('myJobOffers/'+nurseId).once('value').then(snap2=>{
-    if(snap2.exists()){ snap2.forEach(ch=>{ const v=ch.val(); if(!list.find(x=>x.id===ch.key)){ list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key, source:'myJobOffers'}); } }); }
-    db.ref('ceoBookings').orderByChild('nurseId').equalTo(nurseId).once('value').then(snap3=>{
-      if(snap3.exists()){ snap3.forEach(ch=>{ const v=ch.val(); if(!list.find(x=>x.id===ch.key)){ list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key, source:'ceoBookings'}); } }); }
-      allOffers=list; renderAll();
-    });
+  if(snap.exists()) snap.forEach(ch=>{ list.push({...ch.val(), id:ch.key, bookingId:ch.val().bookingId||ch.key}); });
+  db.ref('myJobOffers/'+nurseId).once('value').then(s2=>{
+    if(s2.exists()) s2.forEach(ch=>{ const v=ch.val(); if(!list.find(x=>x.id===ch.key)) list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key}); });
+    // Filter active vs paid
+    const active=list.filter(b=>{ const st=(b.status||'').toLowerCase(); const paid=b.ceoPaid||b.paid||st.includes('paid')||b.paymentStatus==='paid'; return !paid; });
+    const paidList=list.filter(b=>{ const st=(b.status||'').toLowerCase(); return b.ceoPaid||b.paid||st.includes('paid')||b.paymentStatus==='paid'; });
+    all=active;
+    paidList.forEach(b=> moveToHistory(b));
+    render();
+    loadHistory();
   });
 });
-db.ref('nurseNotifications/'+nurseId).on('value', snap=>{
-  const area=document.getElementById('congratsArea');
-  if(!snap.exists()){ area.innerHTML=''; return; }
-  const congrats=[];
-  snap.forEach(ch=>{ const v=ch.val(); if(v.type==='completed' || v.type==='congrats' || (v.title||'').toLowerCase().includes('congrats') || v.workCompleted || v.clientConfirmed){ congrats.push({...v, id:ch.key}); } });
-  allOffers.forEach(o=>{ if(o.congratsMessage || o.showCongrats || (o.status||'').toLowerCase().includes('client_confirmed') || o.clientConfirmed){ if(!congrats.find(c=>c.bookingId===o.bookingId)){ congrats.push({ id:'congrats_'+o.id, bookingId:o.bookingId, title:'Congratulations - Work Completed - Booking ID '+o.bookingId, message:o.congratsMessage||'Congratulations '+nurseName+' - Work completed for Booking ID '+o.bookingId+' - Client confirmed completed - Amount: '+(o.currency||'GHS')+' '+(o.amount||'')+' - You can withdraw now', time:o.clientConfirmedAt||o.completedAt||Date.now(), clientConfirmedAtStr:o.clientConfirmedAtStr||o.completedAtStr||'', amount:o.amount, currency:o.currency }); } } });
-  area.innerHTML=congrats.map(c=>`
-    <div class="congrats">
-      <div class="row"><b class="title">Congratulations - Work Completed</b><span class="badge badgeGold">Booking ID ${c.bookingId||''}</span></div>
-      <div style="margin-top:8px;font-size:12px;line-height:1.5">${c.title||''}<br>${c.message||''}</div>
-      <div style="margin-top:8px;font-size:10px;color:var(--muted)">Time: ${c.clientConfirmedAtStr||c.completedAtStr||new Date(c.time||Date.now()).toLocaleString('en-GH')} - Booking ID: ${c.bookingId} - Amount: ${c.currency||'GHS'} ${c.amount||''}</div>
+}
+
+function moveToHistory(booking){
+  const id=booking.id;
+  db.ref('nurseBookingHistory/'+nurseId+'/'+id).set({...booking, movedToHistoryAt:Date.now(), movedToHistoryAtStr:new Date().toLocaleString('en-GH')});
+  db.ref('bookings/'+id).remove().catch(()=>{});
+  db.ref('myJobOffers/'+nurseId+'/'+id).remove().catch(()=>{});
+  db.ref('myJobOffers/'+nurseId+'/congrats_'+id).remove().catch(()=>{});
+}
+
+function loadHistory(){
+  db.ref('nurseBookingHistory/'+nurseId).on('value', snap=>{
+    const el=document.getElementById('historyList');
+    if(!snap.exists()){ el.innerHTML='<small style="color:#9a95b8">No history yet - CEO paid moves here - Only ID shows</small>'; return; }
+    const arr=[]; snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); });
+    arr.sort((a,b)=>(b.ceoPaidAt||b.clientConfirmedAt||0)-(a.ceoPaidAt||a.clientConfirmedAt||0));
+    historyData=arr;
+    el.innerHTML=arr.map(b=>`<div class="histId" onclick="showHistory('${b.id}')">Booking ID ${b.bookingId||b.id} - ${b.ceoPaidAtStr||b.clientConfirmedAtStr||''} - Paid - Click for details</div>`).join('');
+  });
+  // Also monitor CEO paid status - auto delete when CEO marks paid
+  db.ref('ceoBookings').orderByChild('nurseId').equalTo(nurseId).on('value', snap=>{
+    if(!snap.exists()) return;
+    snap.forEach(ch=>{
+      const v=ch.val();
+      if(v.ceoPaid||v.paid||v.paymentStatus==='paid'){
+        const id=ch.key;
+        if(all.find(x=>x.id===id)){
+          moveToHistory({...v, id, bookingId:v.bookingId||id});
+          toast('CEO marked paid - Booking ID '+(v.bookingId||id)+' auto deleted to history - Only ID shows');
+          setTimeout(()=>{ loadAll(); }, 500);
+        }
+      }
+    });
+  });
+}
+
+function render(){
+  const area=document.getElementById('offersArea');
+  const empty=document.getElementById('emptyArea');
+  if(all.length===0){ area.innerHTML=''; empty.style.display='block'; document.getElementById('countBadge').textContent='0 Offers'; return; }
+  empty.style.display='none';
+  document.getElementById('countBadge').textContent=all.length+' Offers';
+  area.innerHTML=all.map(b=>{
+    const st=(b.status||'').toLowerCase();
+    const isCompleted=st.includes('completed')||st.includes('client_confirmed')||b.clientConfirmed;
+    return `<div class="offer ${isCompleted?'completed':''}">
+      <div style="display:flex;justify-content:space-between"><b>Booking ID ${b.bookingId||b.id}</b><span class="badge ${isCompleted?'badgeGold':''}">${(b.status||'PENDING').toUpperCase()}</span></div>
+      <div style="margin-top:8px;font-size:11px;color:#9a95b8">Client: ${b.clientName||''} - Your Earnings: ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)} - Time: ${b.clientConfirmedAtStr||b.completedAtStr||''}</div>
       <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btnGold" onclick="shareCongrats('${c.bookingId}')">Share Booking ID</button>
-        <button class="btn btnGreen" onclick="location.href='nurse-withdrawal.html'">Withdraw Earnings</button>
-        <button class="btn" onclick="this.parentElement.parentElement.style.display='none'">Dismiss</button>
+        ${!isCompleted?`<button class="btn btnGreen" onclick="acceptOffer('${b.id}')">Accept - Auto nav + alert</button>`:''}
+        ${isCompleted?`<div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:8px;font-size:11px">Completed - Waiting CEO paid - After CEO marks paid, auto delete to history - Only ID shows</div>`:''}
+        <button class="btn" onclick="showDetails('${b.id}')">View Details - Booking ID ${b.bookingId||b.id}</button>
+        ${b.clientPhone?`<button class="btn" onclick="window.open('tel:${b.clientPhone}')">Call Client</button>`:''}
       </div>
-    </div>
-  `).join('');
-  document.getElementById('cCongrats').textContent=congrats.length;
-});
+    </div>`;
+  }).join('');
 }
 
-function renderAll(){
-const area=document.getElementById('offersArea');
-const empty=document.getElementById('emptyArea');
-if(allOffers.length===0){ area.innerHTML=''; empty.style.display='block'; document.getElementById('countBadge').textContent='0 Offers'; return; }
-empty.style.display='none';
-allOffers.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
-let pending=0, accepted=0, completed=0;
-allOffers.forEach(o=>{ const s=(o.status||'pending').toLowerCase(); if(s.includes('pending')) pending++; else if(s.includes('accepted')||s.includes('on_the_way')||s.includes('close')) accepted++; else if(s.includes('completed')||s.includes('client_confirmed')||o.clientConfirmed) completed++; });
-document.getElementById('cPending').textContent=pending; document.getElementById('cAccepted').textContent=accepted; document.getElementById('cCompleted').textContent=completed;
-document.getElementById('countBadge').textContent=allOffers.length+' Offers';
-area.innerHTML=allOffers.map(o=>{
-  const s=(o.status||'pending').toLowerCase();
-  const isCompleted=s.includes('completed')||s.includes('client_confirmed')||o.clientConfirmed||o.workCompleted;
-  const isAccepted=s.includes('accepted'); const isOnWay=s.includes('on_the_way'); const isClose=s.includes('close'); const isPending=s.includes('pending');
-  const cls=isCompleted?'completed':isClose?'close':isOnWay?'on_the_way':isAccepted?'accepted':'pending';
-  const bookingId=o.bookingId||o.id; 
-  const totalAmount=parseFloat(o.amount||o.price||o.totalAmount||20);
-  const nursePortion=totalAmount*0.8;
-  const platformFee=totalAmount*0.2;
-  const currency=o.currency||'GHS';
-  const amount=currency+' '+nursePortion.toFixed(2);
-  const amountOnly=nursePortion.toFixed(2);
-  const amountDisplay=currency+' '+nursePortion.toFixed(2);
-  const client=o.clientName||o.client||'Client';
-  const timeStr=o.clientConfirmedAtStr||o.completedAtStr||o.acceptedAtStr||o.createdAtStr|| (o.time?new Date(o.time).toLocaleString('en-GH'):'');
-  return `
-  <div class="offer ${cls}">
-    <div class="row"><b class="title">Booking ID ${bookingId}</b><span class="badge" style="${isCompleted?'background:rgba(34,197,94,.15);color:#86efac':''}">${(o.status||'PENDING').toUpperCase()} ${o.clientConfirmed?'- CLIENT CONFIRMED':''}</span></div>
-    <div style="margin-top:8px" class="small">Client: ${client} - Your Earnings: ${amountDisplay} (80%) - Source: ${o.source||'bookings'} - Time: ${timeStr}</div>
-    <div style="margin-top:4px;font-size:10px;color:var(--muted)">Total Paid by Client: ${currency} ${totalAmount.toFixed(2)} - Your Portion 80%: ${currency} ${nursePortion.toFixed(2)} - Platform Fee 20%: ${currency} ${platformFee.toFixed(2)}</div>
-    <div style="margin-top:6px;font-size:11px">Service: ${o.serviceType||o.service||''} - Location: ${o.location||o.address||''} - Phone: ${o.clientPhone||o.phone||''}</div>
-    ${isCompleted?`<div style="margin-top:8px;background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:8px;font-size:11px"><b>Congratulations - Completed</b> - Booking ID ${bookingId} - Date: ${o.clientConfirmedAtStr||o.completedAtStr||''} - Amount: ${amount} - Client confirmed work completed - Accepted removed, marked completed with date and time - You can withdraw now<br><small style="color:var(--muted)">Booking ID: ${bookingId} - CEO received progress</small></div>`:''}
-    <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-      ${isPending?`<button class="btn btnGreen" onclick="acceptOffer('${o.id}')">Accept - Notify Client</button><button class="btn btnRed" onclick="rejectOffer('${o.id}')">Reject</button>`:''}
-      ${isAccepted?`<button class="btn btnBlue" onclick="onTheWay('${o.id}')">On The Way - Notify Client</button><button class="btn" onclick="closeToClient('${o.id}')">Close to Client</button><button class="btn btnGreen" onclick="completeWork('${o.id}')">Complete Work</button>`:''}
-      ${isOnWay?`<button class="btn" onclick="closeToClient('${o.id}')">Close to Client - Notify</button><button class="btn btnGreen" onclick="completeWork('${o.id}')">Complete Work</button>`:''}
-      ${isClose?`<button class="btn btnGreen" onclick="completeWork('${o.id}')">Complete Work - Waiting Client Confirm</button>`:''}
-      ${isCompleted?`<button class="btn btnGold" onclick="location.href='nurse-withdrawal.html'">Withdraw Earnings - ${amount}</button><button class="btn" onclick="shareCongrats('${bookingId}')">Share Booking ID</button>`:''}
-      <button class="btn" onclick="viewDetails('${o.id}')">View Details</button>
-      ${o.clientPhone?`<button class="btn" onclick="window.open('tel:${o.clientPhone}')">Call Client</button>`:''}
-    </div>
-  </div>`;
-}).join('');
+async function acceptOffer(id){
+  const b=all.find(x=>x.id===id); if(!b) return;
+  const now=Date.now();
+  await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:now, acceptedAtStr:new Date().toLocaleString('en-GH')});
+  await db.ref('myJobOffers/'+nurseId+'/'+id).update({status:'accepted'}).catch(()=>{});
+  // System generates message to client alert.html - not hardcoded - monitors actions
+  if(b.clientId){
+    await db.ref('clientAlerts/'+b.clientId+'/ACCEPTED-'+id+'-'+now).set({
+      type:'accepted',
+      title:`Nurse ${nurseName} accepted your booking`,
+      message:`System: Nurse ${nurseName} accepted booking ID ${b.bookingId||id} in my-job-offer - Auto navigation will open to show where nurse reached - Nurse location monitored - You can call nurse - Nurse can call you`,
+      bookingId:b.bookingId||id,
+      time:now,
+      read:false,
+      autoGenerated:true
+    });
+  }
+  toast('Accepted - Auto nav + alert sent - System monitors');
 }
 
-async function acceptOffer(id){const o=allOffers.find(x=>x.id===id); if(!o) return; if(!confirm('Accept booking '+(o.bookingId||id)+'? Client will be notified: Nurse '+nurseName+' accepted booking '+(o.bookingId||id))) return; try{const now=Date.now(); const data={status:'accepted', acceptedAt:now, acceptedAtStr:new Date().toLocaleString('en-GH'), nurseName:nurseName, nurseId:nurseId}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); await db.ref('ceoBookings/'+id).update(data).catch(()=>{}); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/ACCEPTED-'+id+'-'+now).set({type:'accepted', title:'Nurse '+nurseName+' accepted your booking', message:'Nurse '+nurseName+' accepted booking ID '+(o.bookingId||id)+' - Amount '+(o.currency||'GHS')+' '+(o.amount)+' - Nurse is preparing', bookingId:o.bookingId||id, nurseName:nurseName, time:now, read:false}); } toast('Accepted - Client notified - Booking ID '+o.bookingId);}catch(e){toast(e.message);} }
-async function rejectOffer(id){const o=allOffers.find(x=>x.id===id); const reason=prompt('Reason for rejection:','Not available')||'Not available'; if(!reason) return; try{const now=Date.now(); const data={status:'rejected', rejectedAt:now, rejectionReason:reason}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/REJECTED-'+id+'-'+now).set({type:'rejected', title:'Nurse '+nurseName+' rejected your offer', message:'Nurse '+nurseName+' rejected booking ID '+(o.bookingId||id)+' - Reason: '+reason+' - Look for another nurse or increase payment - Booking ID '+(o.bookingId||id), bookingId:o.bookingId||id, time:now, read:false}); } toast('Rejected - Client notified');}catch(e){toast(e.message);} }
-async function onTheWay(id){const o=allOffers.find(x=>x.id===id); if(!o) return; try{const now=Date.now(); const data={status:'on_the_way', onTheWayAt:now, onTheWayAtStr:new Date().toLocaleString('en-GH')}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); await db.ref('ceoBookings/'+id).update(data).catch(()=>{}); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/ONWAY-'+id+'-'+now).set({type:'on_the_way', title:'Nurse '+nurseName+' is on the way', message:'Nurse '+nurseName+' is on the way for booking ID '+(o.bookingId||id)+' - Please get ready - Track live', bookingId:o.bookingId||id, time:now, read:false}); } toast('On the way - Client notified');}catch(e){toast(e.message);} }
-async function closeToClient(id){const o=allOffers.find(x=>x.id===id); if(!o) return; try{const now=Date.now(); const data={status:'close', closeAt:now, closeAtStr:new Date().toLocaleString('en-GH')}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); await db.ref('ceoBookings/'+id).update(data).catch(()=>{}); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/CLOSE-'+id+'-'+now).set({type:'close', title:'Nurse '+nurseName+' is close to you', message:'Nurse '+nurseName+' is close to you - Booking ID '+(o.bookingId||id)+' - Be ready', bookingId:o.bookingId||id, time:now, read:false}); } toast('Close to client - Notified');}catch(e){toast(e.message);} }
-async function completeWork(id){if(!confirm('Mark work as completed? Client will need to confirm completed - Then you get congrats with Booking ID')) return; try{const now=Date.now(); const data={status:'completed', completedAt:now, completedAtStr:new Date().toLocaleString('en-GH'), workCompleted:true, nurseName:nurseName}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); await db.ref('ceoBookings/'+id).update(data).catch(()=>{}); const o=allOffers.find(x=>x.id===id); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/COMPLETED-'+id+'-'+now).set({type:'completed', title:'Nurse '+nurseName+' marked work completed - Please confirm', message:'Nurse '+nurseName+' marked work completed for Booking ID '+(o.bookingId||id)+' - Please confirm work completed - Amount '+(o.currency||'GHS')+' '+(o.amount), bookingId:o.bookingId||id, time:now, read:false}); } toast('Completed - Waiting client confirmation - Then congrats with Booking ID');}catch(e){toast(e.message);} }
-function viewDetails(id){const o=allOffers.find(x=>x.id===id); if(!o){toast('Not found'); return;} alert('Booking Details\n\nBooking ID: '+(o.bookingId||o.id)+'\nID: '+o.id+'\nStatus: '+o.status+'\nClient: '+(o.clientName||'')+'\nClient ID: '+(o.clientId||'')+'\nAmount: '+(o.currency||'GHS')+' '+(o.amount||'')+'\nService: '+(o.serviceType||'')+'\nLocation: '+(o.location||'')+'\nPhone: '+(o.clientPhone||'')+'\nTime: '+(o.createdAtStr||o.time||'')+'\nAccepted: '+(o.acceptedAtStr||'')+'\nCompleted: '+(o.completedAtStr||'')+'\nClient Confirmed: '+(o.clientConfirmedAtStr||'')+'\nSource: '+(o.source||'')+'\n\nCongrats: '+(o.congratsMessage||'When client confirms, congrats with Booking ID appears here')); }
-function shareCongrats(bookingId){if(navigator.share){navigator.share({title:'Work Completed - Booking '+bookingId, text:'Work completed for booking '+bookingId+' - Nurse '+nurseName+' - Congratulations - Booking ID '+bookingId});} else {toast('Booking ID: '+bookingId+' - Share with client'); if(navigator.clipboard){navigator.clipboard.writeText(bookingId);} } }
+function showDetails(id){
+  const b=all.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent='Booking ID '+ (b.bookingId||b.id);
+  document.getElementById('modalBody').innerHTML=`Status: ${b.status}<br>Client: ${b.clientName||''}<br>Amount: Your Earnings ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)} - Total hidden<br>Booking ID: ${b.bookingId||b.id}<br>Time: ${b.clientConfirmedAtStr||''}<br><br>Flow: Accepted auto nav - On Way monitor - Close - Completed - CEO paid auto delete to history`;
+  document.getElementById('modal').style.display='flex';
+}
+function showHistory(id){
+  const b=historyData.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent='History - Booking ID '+ (b.bookingId||b.id);
+  document.getElementById('modalBody').innerHTML=`Booking ID: ${b.bookingId||b.id}<br>Status: ${b.status}<br>Client: ${b.clientName||''}<br>Your Earnings: ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0)).toFixed(2)}<br>CEO Paid: ${b.ceoPaidAtStr||''}<br>Client Confirmed: ${b.clientConfirmedAtStr||''}<br><br>History only shows ID - Click for details popup - Auto deleted from active when CEO marked paid`;
+  document.getElementById('modal').style.display='flex';
+}
+function closeModal(){ document.getElementById('modal').style.display='none'; }
 
 window.onload=()=>{ loadAll(); };
 </script>
-</body>
-</html>
+</body></html>
