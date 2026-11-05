@@ -1,237 +1,211 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Withdrawal - Clean - Card Auto Detect Valid Expired</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Job Offer - Clean - Full Features</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.12);--text:#ece8ff;--muted:#9a95b8;--gold:#facc15;--green:#22c55e;--red:#ef4444}
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.top{position:sticky;top:0;z-index:10;background:rgba(12,10,30,.98);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
-.brand{font-family:Fraunces,serif;font-weight:700;font-size:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin:14px;max-width:640px;margin:auto;margin-top:14px}
-.label{font-size:11px;font-weight:700;color:var(--muted);margin:14px 0 6px;display:block}
-.input{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--line);background:#12102a;color:#fff;font-size:14px;outline:none;transition:.2s}
-.input:focus{border-color:var(--gold)} .input.valid{border-color:var(--green);background:rgba(34,197,94,.08)} .input.invalid{border-color:var(--red);background:rgba(239,68,68,.08)}
-.btn{width:100%;padding:14px;border-radius:14px;border:0;font-weight:700;cursor:pointer;margin-top:16px;font-size:14px}
-.btnGold{background:var(--gold);color:#000} .btnGray{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);margin-top:10px}
-.sel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
-.selBtn{padding:14px;border-radius:14px;border:2px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font-weight:700;cursor:pointer;text-align:center;font-size:13px}
-.selBtn.active{border-color:var(--gold);background:rgba(250,204,21,.15);color:var(--gold)}
-.box{background:rgba(18,16,42,.8);border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
-.hidden{display:none}
-.status{margin-top:8px;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700;display:none}
-.status.valid{display:block;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac}
-.status.invalid{display:block;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
-.status.warn{display:block;background:rgba(250,204,21,.15);border:1px solid rgba(250,204,21,.3);color:#fde68a}
-.cardPreview{background:linear-gradient(135deg,#1e1a38,#2a2255);border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-top:10px;display:none}
-.cardPreview.show{display:block}
-.badge{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:11px;text-decoration:none;color:var(--text)}
-.toast{position:fixed;right:16px;bottom:20px;background:#1e1a38;border:1px solid var(--line);padding:10px 14px;border-radius:10px;font-size:12px;display:none;z-index:99;max-width:300px}
-</style></head><body>
-<div class="top"><div class="brand">Withdrawal - Clean - Card Auto Detect Valid Expired - CEO Can Send</div><div style="display:flex;gap:8px"><a class="badge" href="nurse-dashboard.html">Dashboard</a><button class="badge" onclick="loadData()">Refresh</button></div></div>
-
-<div class="card">
-<div style="display:flex;gap:12px;align-items:center;background:rgba(26,22,51,.9);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px">
-<img id="nursePhotoW" src="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:#12102a" onerror="this.src='https://via.placeholder.com/56?text=Nurse'">
-<div><b id="nurseNameW" style="font-family:Fraunces,serif;font-size:14px">Nurse Name</b><br><small style="color:var(--muted);font-size:10px" id="nurseIdW">ID: Loading...</small><br><small style="color:var(--muted);font-size:9px" id="nurseEmailW"></small></div>
-<div style="margin-left:auto;text-align:right"><small style="font-size:9px;color:var(--muted)">Photo + Name for CEO</small><br><span style="font-size:10px;color:var(--gold);font-weight:700">CEO Can Send Money to This Nurse</span></div>
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.10);--text:#ece8ff;--muted:#9a95b8;--gold:#facc15;--green:#22c55e;--red:#ef4444;--blue:#60a5fa;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px}
+.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.98);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:15px}
+.badge{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:11px;font-weight:700;color:var(--text);text-decoration:none;cursor:pointer}
+.badgeGold{background:var(--gold);color:#000;border-color:var(--gold)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px}
+.main{max-width:800px;margin:0 auto;padding:10px}
+.offer{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.offer.pending{border-left:3px solid var(--gold)}
+.offer.accepted{border-left:3px solid var(--green)}
+.offer.on_the_way{border-left:3px solid var(--blue)}
+.offer.close{border-left:3px solid var(--purple)}
+.offer.completed{border:2px solid var(--green);background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(16,40,20,.6))}
+.congrats{background:linear-gradient(135deg,rgba(34,197,94,.14),rgba(250,204,21,.09));border:2px solid rgba(34,197,94,.4);border-radius:16px;padding:16px;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.title{font-family:Fraunces,serif;font-weight:700;font-size:14px}
+.small{font-size:11px;color:var(--muted)}
+.btn{padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;font-weight:700;cursor:pointer}
+.btnGold{background:var(--gold);color:#000;border-color:var(--gold)}
+.btnGreen{background:var(--green);color:#fff;border-color:var(--green)}
+.btnRed{background:var(--red);color:#fff;border-color:var(--red)}
+.btnBlue{background:var(--blue);color:#fff;border-color:var(--blue)}
+.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid var(--line);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
+</style>
+</head>
+<body>
+<div class="top">
+<div><div class="brand">My Job Offers - Clean - Full Features</div><small class="small">Accept, On The Way, Close, Completed, Congrats with Booking ID, Withdrawal - No emoji - Pure English</small></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<span class="badge" id="countBadge">0 Offers</span>
+<a href="nurse-dashboard.html" class="badge">Dashboard</a>
+<a href="nurse-withdrawal.html" class="badge badgeGold">Withdraw Earnings</a>
+<button class="badge" onclick="reloadData()">Refresh</button>
+</div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
-<div style="background:#12102a;border:1px solid var(--line);border-radius:12px;padding:12px"><small style="color:var(--muted);font-size:10px">GHS Ghana</small><br><b id="ghs">GHS 0.00</b></div>
-<div style="background:#12102a;border:1px solid rgba(250,204,21,.25);border-radius:12px;padding:12px"><small style="color:var(--muted);font-size:10px">USD Outside</small><br><b id="usd" style="color:var(--gold)">$0.00</b></div>
+<div class="main">
+<div class="card" style="display:flex;gap:12px;align-items:center;background:rgba(26,22,51,.9)">
+<img id="nursePhoto" src="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:#12102a" onerror="this.src='https://via.placeholder.com/56?text=Nurse'">
+<div><b id="nurseNameDisplay" style="font-family:Fraunces,serif;font-size:15px">Nurse Name</b><br><small class="small" id="nurseIdDisplay">ID: Loading...</small><br><small class="small" id="nurseEmailDisplay"></small></div>
+<div style="margin-left:auto"><span class="badge badgeGold" id="nurseVerified">Verified Nurse</span></div>
 </div>
 
-<label class="label">Where are you?</label>
-<div class="sel">
-<button class="selBtn active" id="bGHS" onclick="setLoc('GHS')">Ghana - GHS</button>
-<button class="selBtn" id="bUSD" onclick="setLoc('USD')">Outside - USD</button>
+<div class="card" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2)">
+<b style="font-size:12px;color:#86efac">Completion Flow - Nurse</b><br>
+<small class="small">1 Client books you - 2 You accept - 3 On the way - 4 Close to client - 5 Complete work - 6 Client confirms completed - 7 Accepted removed, marked completed with date and time - 8 Congrats message with Booking ID sent here - 9 Withdraw</small>
+<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+<span class="badge" style="font-size:9px">Pending: <b id="cPending">0</b></span>
+<span class="badge" style="font-size:9px">Accepted: <b id="cAccepted">0</b></span>
+<span class="badge" style="font-size:9px">Completed: <b id="cCompleted">0</b></span>
+<span class="badge badgeGold" style="font-size:9px">Congrats: <b id="cCongrats">0</b></span>
+</div>
 </div>
 
-<div id="boxMethod" class="box">
-<label class="label" style="margin-top:0">Method - Ghana</label>
-<select id="method" class="input" onchange="setMethod()"><option value="">Select - Card, MoMo, Bank</option><option value="momo">MoMo</option><option value="bank">Bank</option><option value="card">Card - Auto Detect Valid</option></select>
+<div id="congratsArea"></div>
+<div id="offersArea" style="margin-top:12px"></div>
+<div id="emptyArea" class="card" style="display:none;text-align:center;padding:30px">
+<b>No job offers yet</b><br><small class="small">When client books you, offers appear here. Checks bookings where nurseId equals your UID, also myJobOffers and ceoBookings. When client confirms completed, you get congrats with Booking ID.</small><br>
+<div style="margin-top:12px"><button class="btn btnGold" onclick="reloadData()">Reload Offers</button> <button class="btn" onclick="checkUid()">Check My UID</button></div>
+<div style="margin-top:10px;font-size:10px;color:var(--muted)" id="debugInfo"></div>
+</div>
 </div>
 
-<div id="boxOutsideCard" class="box hidden">
-<label class="label" style="margin-top:0">Method - Outside Ghana - Only Card</label>
-<select id="outsideMethod" class="input"><option value="card" selected>Card Only - Auto Detect Valid</option></select>
-</div>
-
-<div id="boxMomoNet" class="box hidden">
-<label class="label" style="margin-top:0">MoMo Network</label>
-<select id="momoNet" class="input" onchange="setMomoNet()"><option value="">Select Network</option><option value="MTN">MTN MoMo</option><option value="Vodafone">Vodafone Cash</option><option value="Telecel">Telecel Cash</option><option value="AirtelTigo">AirtelTigo Money</option></select>
-</div>
-
-<div id="boxBank" class="box hidden">
-<label class="label" style="margin-top:0">Bank</label>
-<select id="bankName" class="input" onchange="setBank()"><option value="">Select Bank</option><option value="GCB">GCB</option><option value="Fidelity">Fidelity</option><option value="Absa">Absa</option><option value="Stanbic">Stanbic</option><option value="Zenith">Zenith</option><option value="CalBank">CalBank</option><option value="GTBank">GTBank</option><option value="Access">Access</option><option value="Other">Other</option></select>
-</div>
-
-<div id="boxCardGhana" class="box hidden">
-<label class="label" style="margin-top:0">Card Type - Ghana - Auto Detect</label>
-<select id="cardG" class="input" onchange="setCardG()"><option value="">Select Card</option><option value="Visa">Visa</option><option value="Mastercard">Mastercard</option><option value="GhanaCard">Ghana Card linked</option></select>
-</div>
-
-<div id="boxCardOutside" class="box hidden">
-<label class="label" style="margin-top:0">Card Type - Outside Ghana - Auto Detect</label>
-<select id="cardO" class="input" onchange="setCardO()"><option value="">Select Card</option><option value="Visa USD">Visa USD</option><option value="Mastercard USD">Mastercard USD</option><option value="Visa">Visa Global</option><option value="Mastercard">Mastercard Global</option></select>
-</div>
-
-<div id="boxMomoDetails" class="box hidden">
-<b style="font-size:13px">MoMo Details - <span id="spanMomo">MTN</span></b>
-<label class="label">MoMo Number - Full</label><input id="momoNum" class="input" placeholder="0544121814" inputmode="numeric" oninput="validateMomo()"><div id="momoStatus" class="status"></div>
-<label class="label">MoMo Name - Full</label><input id="momoName" class="input" placeholder="Full name on MoMo">
-<label class="label">Amount - GHS</label><input id="momoAmt" class="input" type="number" placeholder="e.g., 500">
-</div>
-
-<div id="boxBankDetails" class="box hidden">
-<b style="font-size:13px">Bank Details - <span id="spanBank">GCB</span></b>
-<label class="label">Account Number - Full</label><input id="bankAcc" class="input" placeholder="Account number" inputmode="numeric" oninput="validateBank()"><div id="bankStatus" class="status"></div>
-<label class="label">Account Name - Full</label><input id="bankAccName" class="input" placeholder="Full name on account">
-<label class="label">Branch</label><input id="bankBranch" class="input" placeholder="Branch">
-<label class="label">Amount - GHS</label><input id="bankAmt" class="input" type="number" placeholder="e.g., 500">
-</div>
-
-<div id="boxCardGhanaDetails" class="box hidden" style="border-color:rgba(168,85,247,.3)">
-<b style="font-size:13px">Card Details - <span id="spanCardG">Visa</span> - Ghana - Auto Detect Valid</b>
-<label class="label">Card Number - Full 16 digits - System will auto detect if good card</label>
-<input id="cardNumG" class="input" placeholder="4111 1111 1111 1111 - Enter full card number for auto detect" maxlength="19" inputmode="numeric" oninput="validateCardGhana()"><div id="cardGStatus" class="status"></div>
-<div id="cardGPreview" class="cardPreview"><div style="display:flex;justify-content:space-between"><div><small style="color:var(--muted);font-size:9px">CARD TYPE</small><br><b id="cardGTypeText">Detecting...</b></div><div><small style="color:var(--muted);font-size:9px">VALID</small><br><b id="cardGValidText">Checking...</b></div><div><small style="color:var(--muted);font-size:9px">CEO CAN SEND</small><br><b id="cardGCanSend" style="color:var(--gold)">No</b></div></div><div style="margin-top:8px;font-size:10px;color:var(--muted)" id="cardGNumberPreview">**** **** **** ****</div></div>
-<label class="label">Expiry Date - MM/YY - Auto check not expired</label><input id="cardExpG" class="input" placeholder="MM/YY - e.g., 12/28 - Auto detect expired" maxlength="5" inputmode="numeric" oninput="validateCardGhana()"><div id="cardGExpStatus" class="status"></div>
-<label class="label">Name on Card - Full</label><input id="cardNameG" class="input" placeholder="Full name on card">
-<label class="label">Country</label><input id="cardCountryG" class="input" value="Ghana">
-<label class="label">Amount - GHS</label><input id="cardAmtG" class="input" type="number" placeholder="e.g., 500">
-</div>
-
-<div id="boxCardOutsideDetails" class="box hidden" style="border-color:rgba(250,204,21,.4)">
-<b style="font-size:13px">Card Details - <span id="spanCardO">Visa USD</span> - Outside Ghana - Auto Detect Valid</b>
-<label class="label">Card Number - Full 16 digits - System will auto detect if good card</label>
-<input id="cardNumO" class="input" placeholder="4111 1111 1111 1111 - Full card for auto detect" maxlength="19" inputmode="numeric" oninput="validateCardOutside()"><div id="cardOStatus" class="status"></div>
-<div id="cardOPreview" class="cardPreview"><div style="display:flex;justify-content:space-between"><div><small style="color:var(--muted);font-size:9px">TYPE</small><br><b id="cardOTypeText">Detecting...</b></div><div><small style="color:var(--muted);font-size:9px">VALID</small><br><b id="cardOValidText">Checking...</b></div><div><small style="color:var(--muted);font-size:9px">CEO CAN SEND USD</small><br><b id="cardOCanSend" style="color:var(--gold)">No</b></div></div><div style="margin-top:8px;font-size:10px;color:var(--muted)" id="cardONumberPreview">**** **** **** ****</div></div>
-<label class="label">Expiry Date - MM/YY - Auto check not expired</label><input id="cardExpO" class="input" placeholder="MM/YY - e.g., 12/28 - Auto detect expired" maxlength="5" inputmode="numeric" oninput="validateCardOutside()"><div id="cardOExpStatus" class="status"></div>
-<label class="label">Name on Card - Full</label><input id="cardNameO" class="input" placeholder="Full name on international card">
-<label class="label">Country - Outside Ghana</label><input id="cardCountryO" class="input" placeholder="Nigeria, USA, UK">
-<label class="label">Amount - USD - Outside</label><input id="cardAmtO" class="input" type="number" placeholder="e.g., 100">
-</div>
-
-<label class="label">Notes</label><textarea id="notes" class="input" rows="2" placeholder="Optional"></textarea>
-<button class="btn btnGold" onclick="submitW()" id="submitBtn">Submit Withdrawal - Card Auto Validated - Clean</button>
-<button class="btn btnGray" onclick="location.href='nurse-dashboard.html'">Back</button>
-</div>
-
-<div class="card"><h3 style="font-family:Fraunces,serif;font-size:14px">History - Card Validation Status</h3><div id="hist" style="margin-top:10px;color:var(--muted);font-size:12px">Loading...</div></div>
 <div id="toast" class="toast"></div>
+
 <script>
-const cfg={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(cfg);const db=firebase.database();
-let nid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
-let nName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'Nurse';
-let nEmail=localStorage.getItem('nurseEmail')||'';
-let loc='GHS', mth='', mNet='', bName='', cG='', cO='', totalG=0,totalU=0;
-let cardGValid=false, cardGExpired=false, cardOValid=false, cardOExpired=false;
-function toast(m){const e=document.getElementById('toast');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3500);}
-function luhnCheck(num){const clean=num.replace(/\s+/g,''); if(clean.length<13||clean.length>19) return false; if(!/^\d+$/.test(clean)) return false; let sum=0,alt=false; for(let i=clean.length-1;i>=0;i--){let n=parseInt(clean.charAt(i),10); if(alt){n*=2; if(n>9)n-=9;} sum+=n; alt=!alt;} return sum%10===0;}
-function detectCardType(num){const clean=num.replace(/\s+/g,''); if(/^4/.test(clean)) return 'Visa'; if(/^5[1-5]/.test(clean)||/^222[1-9]|22[3-9]\d|2[3-6]\d\d|27[0-1]\d|2720/.test(clean)) return 'Mastercard'; if(/^3[47]/.test(clean)) return 'Amex'; return clean.length>=4?'Unknown':'Detecting...';}
-function formatCardNumber(input){let v=input.value.replace(/\D/g,'').substring(0,19); let formatted=v.replace(/(.{4})/g,'$1 ').trim(); input.value=formatted; return v;}
-function checkExpiry(exp){if(!exp||exp.length<5) return {valid:false, expired:true, msg:'Enter MM/YY'}; const parts=exp.split('/'); if(parts.length!==2) return {valid:false, expired:true, msg:'Invalid format MM/YY'}; let mm=parseInt(parts[0],10), yy=parseInt(parts[1],10); if(isNaN(mm)||isNaN(yy)||mm<1||mm>12) return {valid:false, expired:true, msg:'Invalid month'}; let fullYear=yy<100?2000+yy:yy; const now=new Date(); const expDate=new Date(fullYear, mm, 0); if(expDate<now) return {valid:false, expired:true, msg:'Expired '+exp+' - Card expired - CEO cannot send money to expired card'}; const twoMonthsFromNow=new Date(); twoMonthsFromNow.setMonth(twoMonthsFromNow.getMonth()+2); if(expDate<twoMonthsFromNow) return {valid:true, expired:false, soon:true, msg:'Warning: Card expires soon '+exp+' - Valid but expiring - CEO can still send'}; return {valid:true, expired:false, msg:'Good card - Not expired - Valid until '+exp+' - CEO can send money'}; }
-function setLoc(l){loc=l; document.getElementById('bGHS').classList.toggle('active',l==='GHS'); document.getElementById('bUSD').classList.toggle('active',l==='USD'); ['boxMomoNet','boxBank','boxCardGhana','boxCardOutside','boxMomoDetails','boxBankDetails','boxCardGhanaDetails','boxCardOutsideDetails'].forEach(id=>document.getElementById(id).classList.add('hidden')); if(l==='GHS'){document.getElementById('boxMethod').classList.remove('hidden'); document.getElementById('boxOutsideCard').classList.add('hidden'); document.getElementById('method').value='';}else{document.getElementById('boxMethod').classList.add('hidden'); document.getElementById('boxOutsideCard').classList.remove('hidden'); document.getElementById('boxCardOutside').classList.remove('hidden');}}
-function setMethod(){mth=document.getElementById('method').value; ['boxMomoNet','boxBank','boxCardGhana','boxMomoDetails','boxBankDetails','boxCardGhanaDetails'].forEach(id=>document.getElementById(id).classList.add('hidden')); if(mth==='momo'){document.getElementById('boxMomoNet').classList.remove('hidden');}else if(mth==='bank'){document.getElementById('boxBank').classList.remove('hidden');}else if(mth==='card'){document.getElementById('boxCardGhana').classList.remove('hidden');}}
-function setMomoNet(){mNet=document.getElementById('momoNet').value; if(!mNet)return; document.getElementById('spanMomo').textContent=mNet; document.getElementById('boxMomoDetails').classList.remove('hidden');}
-function setBank(){bName=document.getElementById('bankName').value; if(!bName)return; document.getElementById('spanBank').textContent=bName; document.getElementById('boxBankDetails').classList.remove('hidden');}
-function setCardG(){cG=document.getElementById('cardG').value; if(!cG)return; document.getElementById('spanCardG').textContent=cG; document.getElementById('boxCardGhanaDetails').classList.remove('hidden');}
-function setCardO(){cO=document.getElementById('cardO').value; if(!cO)return; document.getElementById('spanCardO').textContent=cO; document.getElementById('boxCardOutsideDetails').classList.remove('hidden');}
-function validateMomo(){const num=document.getElementById('momoNum').value.trim(); const status=document.getElementById('momoStatus'); const input=document.getElementById('momoNum'); if(num.length===10 && /^0(2|5)/.test(num)){input.classList.add('valid');input.classList.remove('invalid');status.className='status valid';status.textContent='Good MoMo number - Valid Ghana number - 10 digits - CEO can send to this MoMo';}else if(num.length>0){input.classList.add('invalid');input.classList.remove('valid');status.className='status invalid';status.textContent='Invalid MoMo - Must be 10 digits starting with 0 - Ghana MoMo';}else{input.classList.remove('valid','invalid');status.className='status';}}
-function validateBank(){const num=document.getElementById('bankAcc').value.trim(); const status=document.getElementById('bankStatus'); const input=document.getElementById('bankAcc'); if(num.length>=10 && num.length<=16 && /^\d+$/.test(num)){input.classList.add('valid');input.classList.remove('invalid');status.className='status valid';status.textContent='Good Bank Account - Valid - '+num.length+' digits - CEO can send to this Bank';}else if(num.length>0){input.classList.add('invalid');input.classList.remove('valid');status.className='status invalid';status.textContent='Invalid Bank Account - Must be 10-16 digits';}else{input.classList.remove('valid','invalid');status.className='status';}}
-function validateCardGhana(){
-const input=document.getElementById('cardNumG'); const clean=formatCardNumber(input); const status=document.getElementById('cardGStatus'); const preview=document.getElementById('cardGPreview'); const typeText=document.getElementById('cardGTypeText'); const validText=document.getElementById('cardGValidText'); const canSend=document.getElementById('cardGCanSend'); const numPreview=document.getElementById('cardGNumberPreview'); const expInput=document.getElementById('cardExpG'); const type=detectCardType(clean); typeText.textContent=type; const isLuhn=luhnCheck(clean); numPreview.textContent= clean ? clean.replace(/(.{4})/g,'$1 ').trim().replace(/\d(?=\d{4})/g,'*') : '**** **** **** ****';
-if(clean.length===0){input.classList.remove('valid','invalid'); status.className='status'; preview.classList.remove('show'); cardGValid=false; return;}
-if(clean.length < 13){input.classList.add('invalid'); input.classList.remove('valid'); status.className='status invalid'; status.textContent='Card number too short - Enter 13-19 digits - Auto detecting...'; preview.classList.add('show'); validText.textContent='Too short'; canSend.textContent='No'; canSend.style.color='#ef4444'; cardGValid=false;} else if(isLuhn){input.classList.add('valid'); input.classList.remove('invalid'); status.className='status valid'; status.textContent='Good card - Valid '+type+' - Luhn check passed - Good card - Not fake - CEO can use it to send money'; preview.classList.add('show'); validText.textContent='Good card - Valid'; canSend.textContent='Yes - CEO Can Send'; canSend.style.color='#22c55e'; cardGValid=true;} else {input.classList.add('invalid'); input.classList.remove('valid'); status.className='status invalid'; status.textContent='Bad card - Invalid '+type+' - Luhn check failed - Not a good card - Maybe typo - CEO cannot send to invalid card'; preview.classList.add('show'); validText.textContent='Bad card - Invalid'; canSend.textContent='No - Invalid'; canSend.style.color='#ef4444'; cardGValid=false;}
-const expVal=document.getElementById('cardExpG').value; const expStatusEl=document.getElementById('cardGExpStatus'); const expCheck=checkExpiry(expVal); if(expVal.length>0){if(expCheck.expired){expInput.classList.add('invalid'); expInput.classList.remove('valid'); expStatusEl.className='status invalid'; expStatusEl.textContent=expCheck.msg; cardGExpired=true; if(cardGValid) { canSend.textContent='No - Expired'; canSend.style.color='#ef4444'; }} else if(expCheck.soon){expInput.classList.add('valid'); expInput.classList.remove('invalid'); expStatusEl.className='status warn'; expStatusEl.textContent=expCheck.msg; cardGExpired=false;} else if(expCheck.valid){expInput.classList.add('valid'); expInput.classList.remove('invalid'); expStatusEl.className='status valid'; expStatusEl.textContent=expCheck.msg; cardGExpired=false;}} else {expStatusEl.className='status'; cardGExpired=false;} if(expInput.value.length===2 && !expInput.value.includes('/')){expInput.value=expInput.value+'/';}
-}
-function validateCardOutside(){
-const input=document.getElementById('cardNumO'); const clean=formatCardNumber(input); const status=document.getElementById('cardOStatus'); const preview=document.getElementById('cardOPreview'); const typeText=document.getElementById('cardOTypeText'); const validText=document.getElementById('cardOValidText'); const canSend=document.getElementById('cardOCanSend'); const numPreview=document.getElementById('cardONumberPreview'); const type=detectCardType(clean); typeText.textContent=type; const isLuhn=luhnCheck(clean); numPreview.textContent= clean ? clean.replace(/(.{4})/g,'$1 ').trim().replace(/\d(?=\d{4})/g,'*') : '**** **** **** ****';
-if(clean.length===0){input.classList.remove('valid','invalid'); status.className='status'; preview.classList.remove('show'); cardOValid=false; return;}
-if(clean.length < 13){input.classList.add('invalid'); input.classList.remove('valid'); status.className='status invalid'; status.textContent='Card too short - 13-19 digits - Auto detecting...'; preview.classList.add('show'); validText.textContent='Too short'; canSend.textContent='No'; canSend.style.color='#ef4444'; cardOValid=false;} else if(isLuhn){input.classList.add('valid'); input.classList.remove('invalid'); status.className='status valid'; status.textContent='Good card - Valid '+type+' - International - Luhn passed - Good card - CEO can use it to send USD'; preview.classList.add('show'); validText.textContent='Good - Valid - International'; canSend.textContent='Yes - CEO Can Send USD'; canSend.style.color='#22c55e'; cardOValid=true;} else {input.classList.add('invalid'); input.classList.remove('valid'); status.className='status invalid'; status.textContent='Bad card - Invalid '+type+' - Luhn failed - Not good card - CEO cannot send USD to invalid card'; preview.classList.add('show'); validText.textContent='Bad - Invalid'; canSend.textContent='No - Invalid'; canSend.style.color='#ef4444'; cardOValid=false;}
-const expVal=document.getElementById('cardExpO').value; const expStatusEl=document.getElementById('cardOExpStatus'); const expInput=document.getElementById('cardExpO'); const expCheck=checkExpiry(expVal); if(expVal.length>0){if(expCheck.expired){expInput.classList.add('invalid'); expInput.classList.remove('valid'); expStatusEl.className='status invalid'; expStatusEl.textContent=expCheck.msg; cardOExpired=true; if(cardOValid) { canSend.textContent='No - Expired'; }} else if(expCheck.soon){expInput.classList.add('valid'); expInput.classList.remove('invalid'); expStatusEl.className='status warn'; expStatusEl.textContent=expCheck.msg; cardOExpired=false;} else if(expCheck.valid){expInput.classList.add('valid'); expInput.classList.remove('invalid'); expStatusEl.className='status valid'; expStatusEl.textContent=expCheck.msg; cardOExpired=false;}} else {expStatusEl.className='status'; cardOExpired=false;} if(expInput.value.length===2 && !expInput.value.includes('/')){expInput.value=expInput.value+'/';}
-}
-function loadNurseProfileW(){
-if(!nid) return;
-const photoEl=document.getElementById('nursePhotoW');
-const nameEl=document.getElementById('nurseNameW');
-const idEl=document.getElementById('nurseIdW');
-const emailEl=document.getElementById('nurseEmailW');
-nameEl.textContent=nName||'Nurse';
-idEl.textContent='ID: '+nid.substring(0,12)+'... - '+nName;
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+
+let nurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
+let nurseName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'Nurse';
+let allOffers=[];
+
+function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',3500);}
+function checkUid(){const info=document.getElementById('debugInfo'); info.innerHTML='UID: '+(nurseId||'NOT FOUND')+'<br>Name: '+nurseName+'<br>LocalStorage lcg_nurse_uid='+(localStorage.getItem('lcg_nurse_uid')||'none')+' nurseUid='+(localStorage.getItem('nurseUid')||'none')+' uid='+(localStorage.getItem('uid')||'none')+'<br>Please login again if blank'; toast('UID: '+(nurseId||'NOT FOUND - Login again')); }
+function reloadData(){ loadAll(); }
+
+function loadNurseProfile(){
+if(!nurseId) return;
+const photoEl=document.getElementById('nursePhoto');
+const nameEl=document.getElementById('nurseNameDisplay');
+const idEl=document.getElementById('nurseIdDisplay');
+const emailEl=document.getElementById('nurseEmailDisplay');
+nameEl.textContent=nurseName||'Nurse';
+idEl.textContent='ID: '+nurseId.substring(0,12)+'... - '+nurseName;
 let photo=localStorage.getItem('nursePhoto')||localStorage.getItem('nurseAvatar')||localStorage.getItem('photoURL')||'';
 if(photo) photoEl.src=photo;
-db.ref('nurses/'+nid).once('value').then(s=>{
+// Fetch from Firebase nurses
+db.ref('nurses/'+nurseId).once('value').then(s=>{
   if(s.exists()){
     const v=s.val();
-    const fullName=v.fullName||v.name||v.displayName||nName;
+    const fullName=v.fullName||v.name||v.displayName||nurseName;
     const pic=v.photoURL||v.avatar||v.profilePhoto||v.image||photo;
-    if(fullName){ nName=fullName; nameEl.textContent=fullName; idEl.textContent='ID: '+nid.substring(0,12)+'... - '+fullName; }
+    if(fullName){ nurseName=fullName; localStorage.setItem('nurseName',fullName); nameEl.textContent=fullName; idEl.textContent='ID: '+nurseId.substring(0,12)+'... - '+fullName; }
     if(pic){ photoEl.src=pic; localStorage.setItem('nursePhoto',pic); }
-    emailEl.textContent=(v.email||nEmail||'')+' - '+(v.phone||'') ;
+    emailEl.textContent=(v.email||'')+' - '+(v.phone||'')+' - '+(v.verified?'Verified':'');
+  }
+});
+// Also check allowedNurses
+db.ref('allowedNurses').once('value').then(s=>{
+  if(s.exists()){
+    s.forEach(ch=>{
+      const v=ch.val();
+      if((v.uid||'')===nurseId || (v.email||'').toLowerCase()===(localStorage.getItem('nurseEmail')||'').toLowerCase()){
+        const pic=v.photoURL||v.avatar||'';
+        if(pic && !photoEl.src.includes('http')){ photoEl.src=pic; }
+      }
+    });
   }
 });
 }
 
-function loadData(){
-loadNurseProfileW();
-if(!nid){document.getElementById('ghs').textContent='GHS 0.00';document.getElementById('usd').textContent='$0.00';return;}
-db.ref('bookings').orderByChild('nurseId').equalTo(nid).once('value').then(s=>{let g=0,u=0;if(s.exists())s.forEach(c=>{const b=c.val();const st=(b.status||'').toLowerCase();if(st.includes('completed')||st.includes('client_confirmed')){if(b.clientConfirmed||st.includes('client_confirmed')){const cur=(b.currency||'GHS').toUpperCase();const a=parseFloat(b.livelyAmount||b.amount||0*0.8);if(cur==='USD'||cur==='$')u+=a;else g+=a;}}});db.ref('nurseWithdrawals').orderByChild('nurseId').equalTo(nid).once('value').then(w=>{let wg=0,wu=0;if(w.exists())w.forEach(c=>{const d=c.val();const cur=(d.currency||'GHS').toUpperCase();const a=parseFloat(d.amount||0);if(d.status==='approved'||d.status==='completed'){if(cur==='USD')wu+=a;else wg+=a;}});totalG=g-wg;totalU=u-wu;document.getElementById('ghs').textContent='GHS '+totalG.toFixed(2);document.getElementById('usd').textContent='$'+totalU.toFixed(2);});});
-db.ref('nurseWithdrawals').orderByChild('nurseId').equalTo(nid).on('value',snap=>{const el=document.getElementById('hist');if(!snap.exists()){el.innerHTML='No withdrawals';return;}const arr=[];snap.forEach(c=>arr.push({...c.val(),id:c.key}));arr.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));el.innerHTML=arr.map(w=>{const cur=(w.currency||'GHS').toUpperCase();const sym=cur==='USD'?'$':'GHS';let d='';if(w.method==='momo')d='MoMo '+(w.momoNetwork||'')+' '+(w.momoNumber||'')+' '+(w.cardValidation||'');else if(w.method==='bank')d='Bank '+(w.bankName||'')+' '+(w.bankAccount||'')+' '+(w.cardValidation||'');else d='Card '+(w.cardType||'')+' ****'+(w.cardNumber||'').slice(-4)+' '+(w.cardValidation||'')+' '+(w.isExpired?'EXPIRED':'')+' '+(w.isValid?'VALID':'');const statusColor=w.isValid && !w.isExpired ? '#86efac' : '#fca5a5';return '<div style="background:#12102a;border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px"><div style="display:flex;justify-content:space-between"><b>'+sym+' '+parseFloat(w.amount||0).toFixed(2)+' '+cur+'</b><small style="color:'+statusColor+'">'+(w.status||'pending').toUpperCase()+' '+(w.isValid?'VALID':'')+' '+(w.isExpired?'EXPIRED':'')+'</small></div><div style="font-size:11px;margin-top:4px">'+d+'</div><div style="font-size:9px;color:var(--muted);margin-top:4px">'+(w.cardValidation||'')+' '+(w.expiryValidation||'')+'</div></div>';}).join('');});}
-async function submitW(){
-let amount=0,method='',cur=loc,sym=cur==='GHS'?'GHS':'$',details={}, isValid=false, isExpired=false, validationMsg='', expiryMsg='';
-if(cur==='GHS'){
-method=mth;if(!method){toast('Select Card, MoMo, Bank');return;}
-if(method==='momo'){
-if(!mNet){toast('Select MTN Vodafone Telecel');return;}
-const num=document.getElementById('momoNum').value.trim();const name=document.getElementById('momoName').value.trim();amount=parseFloat(document.getElementById('momoAmt').value||0);
-if(!num||!name){toast('Fill '+mNet+' MoMo details');return;}
-details={momoNetwork:mNet,momoNumber:num,momoName:name,cardValidation:'MoMo Valid - Ghana', isValid:true, isExpired:false};
-}else if(method==='bank'){
-if(!bName){toast('Select Bank');return;}const acc=document.getElementById('bankAcc').value.trim();const accName=document.getElementById('bankAccName').value.trim();amount=parseFloat(document.getElementById('bankAmt').value||0);
-if(!acc||!accName){toast('Fill '+bName+' details');return;}details={bankName:bName,bankAccount:acc,bankAccountName:accName,bankBranch:document.getElementById('bankBranch').value.trim(),cardValidation:'Bank Account Valid - Ghana', isValid:true, isExpired:false};
-}else{
-if(!cG){toast('Select Card type Ghana');return;}
-const cnRaw=document.getElementById('cardNumG').value.replace(/\s/g,'');const cname=document.getElementById('cardNameG').value.trim();amount=parseFloat(document.getElementById('cardAmtG').value||0);
-const exp=document.getElementById('cardExpG').value.trim();
-if(!cnRaw||!cname){toast('Fill '+cG+' card details - Full number + name');return;}
-if(!luhnCheck(cnRaw)){toast('Bad card - Invalid card number - Not a good card - Check number - Luhn failed');return;}
-const expCheck=checkExpiry(exp);
-if(expCheck.expired){toast('Expired card - CEO cannot send money to expired card - Enter valid expiry MM/YY');return;}
-if(!exp){toast('Enter expiry date MM/YY - Auto check if expired');return;}
-isValid=true; isExpired=expCheck.expired;
-validationMsg='Good card - Valid '+detectCardType(cnRaw)+' - Luhn passed - Good card - CEO can use it to send money';
-expiryMsg=expCheck.msg;
-details={cardType:cG,cardNumber:cnRaw,cardLast4:cnRaw.slice(-4),cardName:cname,cardCountry:document.getElementById('cardCountryG').value.trim(),cardExpiry:exp,cardValidation:validationMsg,expiryValidation:expiryMsg,isValid:isValid,isExpired:isExpired,cardNumberMasked:cnRaw.replace(/\d(?=\d{4})/g,'*')};
+function loadAll(){
+loadNurseProfile();
+if(!nurseId){ document.getElementById('emptyArea').style.display='block'; document.getElementById('debugInfo').innerHTML='No nurse UID found - Please login at nurse-login.html'; toast('No nurse ID - Login again'); return; }
+document.getElementById('debugInfo').innerHTML='Loading for UID: '+nurseId+' - Name: '+nurseName+' - Checking bookings and myJobOffers';
+db.ref('bookings').orderByChild('nurseId').equalTo(nurseId).on('value', snap=>{
+  const list=[];
+  if(snap.exists()){ snap.forEach(ch=>{ const v=ch.val(); list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key, source:'bookings'}); }); }
+  db.ref('myJobOffers/'+nurseId).once('value').then(snap2=>{
+    if(snap2.exists()){ snap2.forEach(ch=>{ const v=ch.val(); if(!list.find(x=>x.id===ch.key)){ list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key, source:'myJobOffers'}); } }); }
+    db.ref('ceoBookings').orderByChild('nurseId').equalTo(nurseId).once('value').then(snap3=>{
+      if(snap3.exists()){ snap3.forEach(ch=>{ const v=ch.val(); if(!list.find(x=>x.id===ch.key)){ list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key, source:'ceoBookings'}); } }); }
+      allOffers=list; renderAll();
+    });
+  });
+});
+db.ref('nurseNotifications/'+nurseId).on('value', snap=>{
+  const area=document.getElementById('congratsArea');
+  if(!snap.exists()){ area.innerHTML=''; return; }
+  const congrats=[];
+  snap.forEach(ch=>{ const v=ch.val(); if(v.type==='completed' || v.type==='congrats' || (v.title||'').toLowerCase().includes('congrats') || v.workCompleted || v.clientConfirmed){ congrats.push({...v, id:ch.key}); } });
+  allOffers.forEach(o=>{ if(o.congratsMessage || o.showCongrats || (o.status||'').toLowerCase().includes('client_confirmed') || o.clientConfirmed){ if(!congrats.find(c=>c.bookingId===o.bookingId)){ congrats.push({ id:'congrats_'+o.id, bookingId:o.bookingId, title:'Congratulations - Work Completed - Booking ID '+o.bookingId, message:o.congratsMessage||'Congratulations '+nurseName+' - Work completed for Booking ID '+o.bookingId+' - Client confirmed completed - Amount: '+(o.currency||'GHS')+' '+(o.amount||'')+' - You can withdraw now', time:o.clientConfirmedAt||o.completedAt||Date.now(), clientConfirmedAtStr:o.clientConfirmedAtStr||o.completedAtStr||'', amount:o.amount, currency:o.currency }); } } });
+  area.innerHTML=congrats.map(c=>`
+    <div class="congrats">
+      <div class="row"><b class="title">Congratulations - Work Completed</b><span class="badge badgeGold">Booking ID ${c.bookingId||''}</span></div>
+      <div style="margin-top:8px;font-size:12px;line-height:1.5">${c.title||''}<br>${c.message||''}</div>
+      <div style="margin-top:8px;font-size:10px;color:var(--muted)">Time: ${c.clientConfirmedAtStr||c.completedAtStr||new Date(c.time||Date.now()).toLocaleString('en-GH')} - Booking ID: ${c.bookingId} - Amount: ${c.currency||'GHS'} ${c.amount||''}</div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btnGold" onclick="shareCongrats('${c.bookingId}')">Share Booking ID</button>
+        <button class="btn btnGreen" onclick="location.href='nurse-withdrawal.html'">Withdraw Earnings</button>
+        <button class="btn" onclick="this.parentElement.parentElement.style.display='none'">Dismiss</button>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('cCongrats').textContent=congrats.length;
+});
 }
-}else{
-method='card';cur='USD';sym='$';
-if(!cO){toast('Select Card - Outside Ghana - International');return;}
-const cnRaw=document.getElementById('cardNumO').value.replace(/\s/g,'');const cname=document.getElementById('cardNameO').value.trim();const cc=document.getElementById('cardCountryO').value.trim();amount=parseFloat(document.getElementById('cardAmtO').value||0);
-const exp=document.getElementById('cardExpO').value.trim();
-if(!cnRaw||!cname||!cc){toast('Fill '+cO+' card details - Full number + name + country');return;}
-if(!luhnCheck(cnRaw)){toast('Bad card - Invalid international card - Not good card - CEO cannot send USD to invalid card');return;}
-const expCheck=checkExpiry(exp);
-if(expCheck.expired){toast('Expired international card - CEO cannot send USD to expired card');return;}
-if(!exp){toast('Enter expiry MM/YY - Auto check expired');return;}
-isValid=true; isExpired=expCheck.expired;
-validationMsg='Good card - Valid '+detectCardType(cnRaw)+' - International - Luhn passed - Good card - CEO can use it to send USD money';
-expiryMsg=expCheck.msg;
-details={cardType:cO,cardNumber:cnRaw,cardLast4:cnRaw.slice(-4),cardName:cname,cardCountry:cc,cardCurrency:'USD',cardExpiry:exp,cardValidation:validationMsg,expiryValidation:expiryMsg,isValid:isValid,isExpired:isExpired,cardNumberMasked:cnRaw.replace(/\d(?=\d{4})/g,'*')};
+
+function renderAll(){
+const area=document.getElementById('offersArea');
+const empty=document.getElementById('emptyArea');
+if(allOffers.length===0){ area.innerHTML=''; empty.style.display='block'; document.getElementById('countBadge').textContent='0 Offers'; return; }
+empty.style.display='none';
+allOffers.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
+let pending=0, accepted=0, completed=0;
+allOffers.forEach(o=>{ const s=(o.status||'pending').toLowerCase(); if(s.includes('pending')) pending++; else if(s.includes('accepted')||s.includes('on_the_way')||s.includes('close')) accepted++; else if(s.includes('completed')||s.includes('client_confirmed')||o.clientConfirmed) completed++; });
+document.getElementById('cPending').textContent=pending; document.getElementById('cAccepted').textContent=accepted; document.getElementById('cCompleted').textContent=completed;
+document.getElementById('countBadge').textContent=allOffers.length+' Offers';
+area.innerHTML=allOffers.map(o=>{
+  const s=(o.status||'pending').toLowerCase();
+  const isCompleted=s.includes('completed')||s.includes('client_confirmed')||o.clientConfirmed||o.workCompleted;
+  const isAccepted=s.includes('accepted'); const isOnWay=s.includes('on_the_way'); const isClose=s.includes('close'); const isPending=s.includes('pending');
+  const cls=isCompleted?'completed':isClose?'close':isOnWay?'on_the_way':isAccepted?'accepted':'pending';
+  const bookingId=o.bookingId||o.id; const amount=(o.currency||'GHS')+' '+(o.amount||o.price||''); const client=o.clientName||o.client||'Client';
+  const timeStr=o.clientConfirmedAtStr||o.completedAtStr||o.acceptedAtStr||o.createdAtStr|| (o.time?new Date(o.time).toLocaleString('en-GH'):'');
+  return `
+  <div class="offer ${cls}">
+    <div class="row"><b class="title">Booking ID ${bookingId}</b><span class="badge" style="${isCompleted?'background:rgba(34,197,94,.15);color:#86efac':''}">${(o.status||'PENDING').toUpperCase()} ${o.clientConfirmed?'- CLIENT CONFIRMED':''}</span></div>
+    <div style="margin-top:8px" class="small">Client: ${client} - Amount: ${amount} - Source: ${o.source||'bookings'} - Time: ${timeStr}</div>
+    <div style="margin-top:6px;font-size:11px">Service: ${o.serviceType||o.service||''} - Location: ${o.location||o.address||''} - Phone: ${o.clientPhone||o.phone||''}</div>
+    ${isCompleted?`<div style="margin-top:8px;background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:8px;font-size:11px"><b>Congratulations - Completed</b> - Booking ID ${bookingId} - Date: ${o.clientConfirmedAtStr||o.completedAtStr||''} - Amount: ${amount} - Client confirmed work completed - Accepted removed, marked completed with date and time - You can withdraw now<br><small style="color:var(--muted)">Booking ID: ${bookingId} - CEO received progress</small></div>`:''}
+    <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+      ${isPending?`<button class="btn btnGreen" onclick="acceptOffer('${o.id}')">Accept - Notify Client</button><button class="btn btnRed" onclick="rejectOffer('${o.id}')">Reject</button>`:''}
+      ${isAccepted?`<button class="btn btnBlue" onclick="onTheWay('${o.id}')">On The Way - Notify Client</button><button class="btn" onclick="closeToClient('${o.id}')">Close to Client</button><button class="btn btnGreen" onclick="completeWork('${o.id}')">Complete Work</button>`:''}
+      ${isOnWay?`<button class="btn" onclick="closeToClient('${o.id}')">Close to Client - Notify</button><button class="btn btnGreen" onclick="completeWork('${o.id}')">Complete Work</button>`:''}
+      ${isClose?`<button class="btn btnGreen" onclick="completeWork('${o.id}')">Complete Work - Waiting Client Confirm</button>`:''}
+      ${isCompleted?`<button class="btn btnGold" onclick="location.href='nurse-withdrawal.html'">Withdraw Earnings - ${amount}</button><button class="btn" onclick="shareCongrats('${bookingId}')">Share Booking ID</button>`:''}
+      <button class="btn" onclick="viewDetails('${o.id}')">View Details</button>
+      ${o.clientPhone?`<button class="btn" onclick="window.open('tel:${o.clientPhone}')">Call Client</button>`:''}
+    </div>
+  </div>`;
+}).join('');
 }
-if(!amount||amount<5){toast('Enter amount');return;}
-if(!confirm('Confirm?\n'+sym+amount+' '+cur+'\n'+method+' -> '+(mNet||bName||cG||cO)+'\nCard Valid: '+(isValid ? 'Good card - CEO can send money' : 'Check')+'\nExpired: '+(isExpired ? 'Expired - CEO cannot send' : 'Not expired - Good')+'\nSubmit?'))return;
-try{
-const now=Date.now();const id='WTH-'+now+'-'+Math.random().toString(36).substr(2,4);
-const data={withdrawalId:id,nurseId:nid,nurseName:nName,nurseEmail:nEmail,amount:amount,currency:cur,symbol:sym,method:method,...details,notes:document.getElementById('notes').value.trim(),status:'pending',createdAt:now,createdAtStr:new Date().toLocaleString('en-GH'),isGhana:cur==='GHS',isInternational:cur==='USD',cardAutoDetect:true,ceoCanSendMoney: isValid && !isExpired};
-await db.ref('nurseWithdrawals/'+id).set(data);await db.ref('ceoWithdrawals/'+id).set(data);await db.ref('withdrawalRequests/'+id).set(data);await db.ref('ceoHRPage/withdrawals/'+id).set(data);await db.ref('ceoNotifications/'+id).set({type:'withdrawal_request',title:'Withdrawal '+nName+' '+sym+amount+' '+cur+' '+method+' -> '+(mNet||bName||cG||cO)+' '+(isValid?'VALID GOOD CARD':'INVALID')+' '+(isExpired?'EXPIRED':'')+' CEO '+(isValid && !isExpired ? 'CAN SEND' : 'CANNOT SEND'),message:nName+' '+sym+amount+' '+cur+' '+method+' '+JSON.stringify(details)+' ID '+id+' Card Valid: '+isValid+' Expired: '+isExpired+' CEO Can Send: '+(isValid && !isExpired),nurseId:nid,amount:amount,currency:cur,method:method,withdrawalId:id,createdAt:now,read:false,isValid:isValid,isExpired:isExpired,ceoCanSend:isValid && !isExpired});
-toast('Sent '+sym+amount+' '+cur+' - '+(isValid && !isExpired ? 'Good card - CEO can send money' : 'Check card')+' - Validated');loadData();
-}catch(e){toast('Error: '+e.message);}
-}
-window.onload=()=>{setLoc('GHS');loadData();};
-</script></body></html>
+
+async function acceptOffer(id){const o=allOffers.find(x=>x.id===id); if(!o) return; if(!confirm('Accept booking '+(o.bookingId||id)+'? Client will be notified: Nurse '+nurseName+' accepted booking '+(o.bookingId||id))) return; try{const now=Date.now(); const data={status:'accepted', acceptedAt:now, acceptedAtStr:new Date().toLocaleString('en-GH'), nurseName:nurseName, nurseId:nurseId}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); await db.ref('ceoBookings/'+id).update(data).catch(()=>{}); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/ACCEPTED-'+id+'-'+now).set({type:'accepted', title:'Nurse '+nurseName+' accepted your booking', message:'Nurse '+nurseName+' accepted booking ID '+(o.bookingId||id)+' - Amount '+(o.currency||'GHS')+' '+(o.amount)+' - Nurse is preparing', bookingId:o.bookingId||id, nurseName:nurseName, time:now, read:false}); } toast('Accepted - Client notified - Booking ID '+o.bookingId);}catch(e){toast(e.message);} }
+async function rejectOffer(id){const o=allOffers.find(x=>x.id===id); const reason=prompt('Reason for rejection:','Not available')||'Not available'; if(!reason) return; try{const now=Date.now(); const data={status:'rejected', rejectedAt:now, rejectionReason:reason}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/REJECTED-'+id+'-'+now).set({type:'rejected', title:'Nurse '+nurseName+' rejected your offer', message:'Nurse '+nurseName+' rejected booking ID '+(o.bookingId||id)+' - Reason: '+reason+' - Look for another nurse or increase payment - Booking ID '+(o.bookingId||id), bookingId:o.bookingId||id, time:now, read:false}); } toast('Rejected - Client notified');}catch(e){toast(e.message);} }
+async function onTheWay(id){const o=allOffers.find(x=>x.id===id); if(!o) return; try{const now=Date.now(); const data={status:'on_the_way', onTheWayAt:now, onTheWayAtStr:new Date().toLocaleString('en-GH')}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); await db.ref('ceoBookings/'+id).update(data).catch(()=>{}); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/ONWAY-'+id+'-'+now).set({type:'on_the_way', title:'Nurse '+nurseName+' is on the way', message:'Nurse '+nurseName+' is on the way for booking ID '+(o.bookingId||id)+' - Please get ready - Track live', bookingId:o.bookingId||id, time:now, read:false}); } toast('On the way - Client notified');}catch(e){toast(e.message);} }
+async function closeToClient(id){const o=allOffers.find(x=>x.id===id); if(!o) return; try{const now=Date.now(); const data={status:'close', closeAt:now, closeAtStr:new Date().toLocaleString('en-GH')}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); await db.ref('ceoBookings/'+id).update(data).catch(()=>{}); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/CLOSE-'+id+'-'+now).set({type:'close', title:'Nurse '+nurseName+' is close to you', message:'Nurse '+nurseName+' is close to you - Booking ID '+(o.bookingId||id)+' - Be ready', bookingId:o.bookingId||id, time:now, read:false}); } toast('Close to client - Notified');}catch(e){toast(e.message);} }
+async function completeWork(id){if(!confirm('Mark work as completed? Client will need to confirm completed - Then you get congrats with Booking ID')) return; try{const now=Date.now(); const data={status:'completed', completedAt:now, completedAtStr:new Date().toLocaleString('en-GH'), workCompleted:true, nurseName:nurseName}; await db.ref('bookings/'+id).update(data); await db.ref('myJobOffers/'+nurseId+'/'+id).update(data).catch(()=>{}); await db.ref('ceoBookings/'+id).update(data).catch(()=>{}); const o=allOffers.find(x=>x.id===id); if(o.clientId||o.clientUid){ await db.ref('clientAlerts/'+(o.clientId||o.clientUid)+'/COMPLETED-'+id+'-'+now).set({type:'completed', title:'Nurse '+nurseName+' marked work completed - Please confirm', message:'Nurse '+nurseName+' marked work completed for Booking ID '+(o.bookingId||id)+' - Please confirm work completed - Amount '+(o.currency||'GHS')+' '+(o.amount), bookingId:o.bookingId||id, time:now, read:false}); } toast('Completed - Waiting client confirmation - Then congrats with Booking ID');}catch(e){toast(e.message);} }
+function viewDetails(id){const o=allOffers.find(x=>x.id===id); if(!o){toast('Not found'); return;} alert('Booking Details\n\nBooking ID: '+(o.bookingId||o.id)+'\nID: '+o.id+'\nStatus: '+o.status+'\nClient: '+(o.clientName||'')+'\nClient ID: '+(o.clientId||'')+'\nAmount: '+(o.currency||'GHS')+' '+(o.amount||'')+'\nService: '+(o.serviceType||'')+'\nLocation: '+(o.location||'')+'\nPhone: '+(o.clientPhone||'')+'\nTime: '+(o.createdAtStr||o.time||'')+'\nAccepted: '+(o.acceptedAtStr||'')+'\nCompleted: '+(o.completedAtStr||'')+'\nClient Confirmed: '+(o.clientConfirmedAtStr||'')+'\nSource: '+(o.source||'')+'\n\nCongrats: '+(o.congratsMessage||'When client confirms, congrats with Booking ID appears here')); }
+function shareCongrats(bookingId){if(navigator.share){navigator.share({title:'Work Completed - Booking '+bookingId, text:'Work completed for booking '+bookingId+' - Nurse '+nurseName+' - Congratulations - Booking ID '+bookingId});} else {toast('Booking ID: '+bookingId+' - Share with client'); if(navigator.clipboard){navigator.clipboard.writeText(bookingId);} } }
+
+window.onload=()=>{ loadAll(); };
+</script>
+</body>
+</html>
