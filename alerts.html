@@ -1,514 +1,66 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Alerts — LOVE CARE GLOBAL</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alerts - Written Notifications - LoveCare</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="icon-transparent-512.png">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px;overflow-x:hidden}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-.logoBox{display:flex;align-items:center;gap:10px}.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}
-.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}
-.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;text-decoration:none}
-.card{background:rgba(28,18,56,.88);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px;backdrop-filter:blur(14px);animation:fadeIn .3s}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.badge{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:900;display:inline-block}
-.badge-new{background:rgba(34,197,94,.2);color:#86efac;border:1px solid rgba(34,197,94,.3)}
-.badge-read{background:rgba(255,255,255,.08);color:#a78bfa;border:1px solid rgba(168,85,247,.15)}
-.btn{border:none;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;font-size:11px;pointer-events:auto;touch-action:manipulation;min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.btnGreen{background:linear-gradient(135deg,#22c55e,#86efac);color:#0a1a0f}
-.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
-.btnYellow{background:linear-gradient(135deg,#f59e0b,#facc15);color:#1e0a3a}
-.btnGray{background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.15);color:#d8b4fe}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.95);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.card{background:rgba(28,18,56,.9);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px}
+.btn{border:none;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:11px;display:inline-flex;gap:6px;align-items:center;justify-content:center}
+.btnGold{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}
+.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
+.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+.alertCard{background:rgba(26,22,51,.9);border:1px solid rgba(168,85,247,.15);border-radius:16px;padding:14px;margin-bottom:10px}
+.alertCard.unread{border-left:4px solid #facc15;background:linear-gradient(135deg,rgba(26,22,51,.9),rgba(45,30,10,.3))}
+.icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.icon.accepted{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.icon.rejected{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.icon.onway{background:linear-gradient(135deg,#60a5fa,#3b82f6)}
+.icon.close{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.icon.completed{background:linear-gradient(135deg,#a78bfa,#7c3aed)}
+.icon.rating{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}
 .bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0;z-index:60}
-.btab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:800;color:#a78bfa;cursor:pointer;padding:6px}
-.btab.active{color:#d8b4fe;background:rgba(245,158,11,.15);border-radius:12px;margin:0 4px;border:1px solid rgba(245,158,11,.2)}
-.dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:blink 1.5s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.alertIcon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
-.alertIcon.accepted{background:linear-gradient(135deg,#22c55e,#16a34a);box-shadow:0 4px 12px rgba(34,197,94,.3)}
-.alertIcon.rejected{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 4px 12px rgba(239,68,68,.3)}
-.alertIcon.pending{background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 12px rgba(245,158,11,.3)}
-.alertIcon.tracking{background:linear-gradient(135deg,#2563eb,#1d4ed8);box-shadow:0 4px 12px rgba(37,99,235,.3)}
-.alertIcon.system{background:rgba(76,29,149,.3);border:1px solid rgba(168,85,247,.2)}
-.historyCard{background:rgba(14,10,28,.6);border:1px solid rgba(168,85,247,.12);border-radius:16px;padding:14px;animation:fadeIn .3s;position:relative}
-.historyCard .delBtn{position:absolute;top:8px;right:8px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:8px;padding:4px 8px;font-size:10px;font-weight:800;cursor:pointer}
-.historyBadge{background:rgba(168,85,247,.15);color:#a78bfa;border:1px solid rgba(168,85,247,.2);padding:2px 6px;border-radius:999px;font-size:8px;font-weight:800}
-.tabActive{border-color:#facc15 !important;background:rgba(245,158,11,.15) !important;color:#facc15 !important}
-</style></head><body><div class="bg"></div>
-
-<div class="topbar"><div class="logoBox"><img src="icon-transparent-512.png" class="logoImg"><div class="brand">LOVE CARE GLOBAL<br>HOME NURSING<br><span style="font-size:9px;color:#facc15"><span class="dot"></span> ALERTS — LIVE</span></div></div><a href="sos.html" class="sosBtn">SOS</a></div>
-
-<div style="max-width:820px;margin:0 auto;padding:10px">
+.btab{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:700;color:#a78bfa;cursor:pointer;padding:6px}
+.btab.active{color:#d8b4fe;background:rgba(245,158,11,.15);border-radius:12px;margin:0 4px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+</style></head><body>
+<div class="topbar"><div style="display:flex;align-items:center;gap:10px"><div style="width:42px;height:42px;border-radius:50%;background:#3b0f6e;border:1px solid rgba(168,85,247,.18);display:grid;place-items:center">A</div><div><b style="font-size:13px">ALERTS - Written Notifications</b><br><small style="font-size:9px;color:#facc15">Live - Progress of your bookings</small></div></div><a href="sos.html" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:700;font-size:11px;text-decoration:none">SOS</a></div>
+<div style="max-width:800px;margin:0 auto;padding:10px">
 <div class="card" style="padding:12px;background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)">
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-<b style="font-size:12px;color:#facc15">🔔 ALERTS — Nurse Accept / Reject / Tracking Notifications</b>
-<div style="display:flex;gap:6px">
-<button type="button" class="btn btnGray" style="padding:8px 12px;font-size:10px" onclick="loadAlerts()">🔄 Refresh</button>
-<button type="button" class="btn btnGray" style="padding:8px 12px;font-size:10px" onclick="markAllRead()">✅ Mark All Read</button>
-<button type="button" class="btn btnGray" style="padding:8px 12px;font-size:10px" onclick="clearAlerts()">🗑️ Clear</button>
+<b style="font-size:12px;color:#facc15">Written Notifications - Your Booking Progress</b>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<button class="btn btnGray" style="padding:8px 10px" onclick="loadAlerts()">Refresh</button>
+<button class="btn btnGray" style="padding:8px 10px" onclick="markAllRead()">Read All</button>
+<button class="btn btnRed" style="padding:8px 10px" onclick="deleteAllAlerts()">Delete All Alerts</button>
 </div>
 </div>
-<div id="countInfo" style="font-size:10px;color:#6b7280;margin-top:6px">Loading alerts...</div>
-<div id="liveInfo" style="font-size:9px;color:#22c55e;margin-top:4px"><span class="dot"></span> Real-time — When nurse accepts/rejects, alert appears here + vibration + sound — Auto-refresh on</div>
+<div id="countInfo" style="font-size:10px;color:#9ca3af;margin-top:6px">Loading...</div>
+<div style="font-size:9px;color:#22c55e;margin-top:4px">Real-time - Accept, Reject, On the way, Close, Completed, Rate</div>
 </div>
-
-<div style="display:flex;gap:8px;margin:10px 0">
-<button id="tabActive" class="btn btnYellow" style="flex:1" onclick="switchTab('active')">🔔 Active Alerts (<span id="activeCount">0</span>)</button>
-<button id="tabHistory" class="btn btnGray" style="flex:1" onclick="switchTab('history')">📚 History (<span id="historyCount">0</span>)</button>
+<div id="alertsList" style="display:grid;gap:10px;margin-top:12px"></div>
+<div id="emptyAlerts" class="card" style="display:none;text-align:center;padding:30px"><div style="font-size:40px">A</div><b>No alerts yet</b><br><small style="color:#a78bfa">When nurse accepts, rejects, on the way, close, completed - you will see written notification here</small><br><button class="btn btnGold" style="margin-top:12px" onclick="loadAlerts()">Check Now</button></div>
 </div>
-
-<div id="alertsList" style="display:grid;gap:10px"></div>
-
-<div id="historyList" style="display:none;gap:10px"></div>
-
-<div id="emptyHistory" class="card" style="display:none;text-align:center;padding:30px">
-<div style="font-size:40px">📚</div><b>No history yet</b><br><small style="color:#a78bfa">Completed bookings will appear here.<br>Old bookings move here so they don't confuse new ones.</small>
-</div>
-
-<div id="emptyAlerts" class="card" style="display:none;text-align:center;padding:30px">
-<div style="font-size:40px">🔔</div><b>No alerts yet</b><br><small style="color:#a78bfa">When nurse accepts or rejects your booking, alert appears here<br>Book a nurse to get alerts</small><br><br><a href="book-nurse.html" class="btn btnYellow">➕ Book Nurse</a> <a href="my-bookings.html" class="btn btnBlue">📅 My Bookings</a>
-</div>
-
-<div class="card" style="background:rgba(14,10,28,.5);border:1px dashed rgba(168,85,247,.2)">
-<b style="font-size:11px;color:#86efac">💡 How Alerts Work:</b><br>
-<small style="font-size:10px;color:#a78bfa;line-height:1.6">
-1. Client books nurse → book-nurse.html → Paystack → Booking saved<br>
-2. Nurse gets notification in my-job-offer.html → Taps ✅ Accept or ❌ Reject<br>
-3. <b>Instantly:</b><br>
-&nbsp;&nbsp;• Client gets notification in my-bookings.html (auto Google Maps opens if accepted)<br>
-&nbsp;&nbsp;• Client gets alert here in alerts.html with vibration<br>
-&nbsp;&nbsp;• CEO Dashboard also updates<br>
-4. If Accepted: Alerts show "Nurse coming — Track live" + Google Maps tracking<br>
-5. If Rejected: Alerts show "Book another nurse" + Refund info
-</small>
-</div>
-</div>
-
-<div class="bottom-tabs">
-<div class="btab" onclick="location.href='my-bookings.html'">📅 My<br>Bookings</div>
-<div class="btab" onclick="location.href='book-nurse.html'">➕ Book</div>
-<div class="btab active">🔔 Alerts</div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
+<div class="bottom-tabs"><div class="btab" onclick="location.href='client-dashboard.html'">Home</div><div class="btab" onclick="location.href='my-bookings.html'">Bookings</div><div class="btab active">Alerts</div></div>
+<div id="toast" class="toast"></div>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
-const auth=getAuth(app);
-
-let allAlerts = [];
-let clientPhone = null;
-let clientId = null;
-let previousStatuses = {};
-let alertSound = null;
-
-function getClientInfo(){
-  clientId = localStorage.getItem('lcg_client_uid') || localStorage.getItem('currentClientId') || localStorage.getItem('lcg_uid') || null;
-  clientPhone = localStorage.getItem('lcg_client_phone') || localStorage.getItem('clientPhone') || localStorage.getItem('phone') || localStorage.getItem('client_phone') || '+233544121814';
-  return {clientId, clientPhone};
-}
-
-async function ensureAuth(){
-  return new Promise(res=>{
-    const unsub=onAuthStateChanged(auth, async user=>{
-      unsub();
-      if(user) res(user);
-      else {
-        try{ const cred=await signInAnonymously(auth); res(cred.user); }catch{ res(null); }
-      }
-    });
-    setTimeout(()=>res(null), 2500);
-  });
-}
-
-function playAlertSound(type){
-  try{
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if(!AudioContext) return;
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = type==='accepted'? 800 : type==='rejected'? 300 : 600;
-    gain.gain.value = 0.1;
-    osc.start();
-    setTimeout(()=>{ osc.stop(); ctx.close(); }, 400);
-  }catch(e){}
-}
-
-function addAlert(alert){
-  // Check duplicate
-  const exists = allAlerts.find(a=>a.id===alert.id && a.type===alert.type && a.bookingId===alert.bookingId);
-  if(exists) return;
-  
-  allAlerts.unshift(alert);
-  // Save to localStorage
-  try{ localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50))); }catch(e){}
-  
-  // Vibration + Sound
-  if(navigator.vibrate) navigator.vibrate(type=>{ if(alert.type==='accepted') return [200,100,200,100,400]; if(alert.type==='rejected') return [400,100,400]; return [200]; }(alert.type));
-  playAlertSound(alert.type);
-  
-  // Notification API if permitted
-  if(window.Notification && Notification.permission==='granted'){
-    new Notification(alert.title, {body: alert.message, icon:'icon-transparent-512.png'});
-  }
-  
-  renderAlerts();
-}
-
-function renderAlerts(){
-  // Update counts
-  updateHistoryCount();
-
-  const list=document.getElementById('alertsList');
-  const countInfo=document.getElementById('countInfo');
-  const empty=document.getElementById('emptyAlerts');
-  const unread = allAlerts.filter(a=>!a.read).length;
-  
-  countInfo.textContent = `${allAlerts.length} alerts — ${unread} unread — Tap to view booking / track nurse — Real-time`;
-  
-  if(!allAlerts.length){
-    list.innerHTML='';
-    empty.style.display='block';
-    return;
-  }
-  empty.style.display='none';
-  
-  list.innerHTML = allAlerts.map(a=>{
-    const iconClass = a.type==='accepted'?'accepted':a.type==='rejected'?'rejected':a.type==='tracking'?'tracking':a.type==='pending'?'pending':'system';
-    const iconEmoji = a.type==='accepted'?'✅':a.type==='rejected'?'❌':a.type==='tracking'?'📍':a.type==='pending'?'⏳':'🔔';
-    const timeAgo = (()=>{ const diff=Date.now()-(a.time||Date.now()); const mins=Math.floor(diff/60000); if(mins<1) return 'Just now'; if(mins<60) return mins+'m ago'; const hrs=Math.floor(mins/60); if(hrs<24) return hrs+'h ago'; return Math.floor(hrs/24)+'d ago'; })();
-    return `<div class="card" style="border-color:${a.type==='accepted'?'rgba(34,197,94,.3)':a.type==='rejected'?'rgba(239,68,68,.25)':a.type==='tracking'?'rgba(37,99,235,.3)':'rgba(168,85,247,.15)'};${!a.read?'background:rgba(34,197,94,.06);border-width:2px':''}">
-      <div style="display:flex;gap:12px;align-items:start">
-        <div class="alertIcon ${iconClass}">${iconEmoji}</div>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;justify-content:space-between;gap:8px;align-items:start">
-            <b style="font-size:13px;color:#f3e8ff;word-break:break-word">${a.title}</b>
-            <div style="display:flex;gap:4px;align-items:center;flex-shrink:0"><span class="badge ${!a.read?'badge-new':'badge-read'}">${!a.read?'NEW':'READ'}</span><small style="font-size:9px;color:#6b7280;white-space:nowrap">${timeAgo}</small></div>
-          </div>
-          <div style="font-size:11px;color:#c4b5fd;margin-top:4px;word-break:break-word">${a.message}</div>
-          ${a.bookingId?`<div style="font-size:9px;color:#6b7280;margin-top:6px">Booking: ${a.bookingId} • ${a.currency||'GHS'} ${a.amount||''} • ${a.nurseName||''}</div>`:''}
-          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-            ${a.type==='accepted'?`<a href="my-bookings.html" class="btn btnGreen" style="flex:1;text-decoration:none">🗺️ Track Nurse Live</a><a href="https://www.google.com/maps?q=${a.clientLat||5.6037},${a.clientLng||-0.1870}" target="_blank" class="btn btnBlue" style="flex:1;text-decoration:none">📍 Google Maps</a>`:
-              a.type==='rejected'?`<a href="book-nurse.html" class="btn btnYellow" style="flex:1;text-decoration:none">➕ Book Another Nurse</a><a href="my-bookings.html" class="btn btnGray" style="flex:1;text-decoration:none">📅 My Bookings</a>`:
-              a.type==='tracking'?`<a href="my-bookings.html" class="btn btnBlue" style="flex:1;text-decoration:none">📍 Live Tracking</a>`:
-              `<a href="my-bookings.html" class="btn btnGray" style="flex:1;text-decoration:none">📅 View Bookings</a>`}
-            <button type="button" class="btn btnGray" style="padding:8px 12px" onclick="markRead('${a.id}')">✅ Read</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-window.loadAlerts = async function(){
-  await ensureAuth();
-  const {clientPhone} = getClientInfo();
-  
-  // Load from localStorage first
-  try{
-    const saved = JSON.parse(localStorage.getItem('lcg_alerts')||'[]');
-    if(saved.length){ allAlerts = saved; renderAlerts(); }
-  }catch(e){}
-  
-  // Load bookings and generate alerts from status
-  try{
-    const snap = await get(ref(db, 'bookings'));
-    if(snap.exists()){
-      snap.forEach(child=>{
-        const b = child.val();
-        const id = child.key;
-        const phoneMatch = b.phone && clientPhone && b.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
-        if(!phoneMatch && !id.startsWith('LCG')) return;
-        
-        const status = (b.status||'pending').toLowerCase();
-        const prev = previousStatuses[id];
-        
-        if(!prev){
-          // First load, create alert based on status
-          if(status==='accepted'){
-            addAlert({id:'alert_'+id+'_accepted_'+Date.now(), bookingId:b.bookingId||id, type:'accepted', title:`✅ ${b.nurseName||'Nurse'} Accepted — ${b.bookingId||id}`, message:`${b.nurseName||'Nurse'} accepted your booking. Nurse is coming — Track live below + Google Maps auto opens. Client: ${b.clientLat?.toFixed(4)||''}, ${b.clientLng?.toFixed(4)||''} | Nurse: ${b.nurseName||''} is on the way. ETA: Calculating... Distance: Auto. Paystack Ref: ${b.paystackRef||''} | ${b.currency||'GHS'} — CEO + Nurse + Client all have this booking`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', clientLat:b.clientLat, clientLng:b.clientLng, time:b.acceptedAt||b.time||Date.now(), read:false});
-          } else if(status==='rejected'){
-            addAlert({id:'alert_'+id+'_rejected_'+Date.now(), bookingId:b.bookingId||id, type:'rejected', title:`❌ Booking Rejected — ${b.bookingId||id}`, message:`${b.nurseName||'Nurse'} rejected ${b.bookingId||id}. Reason: ${b.rejectReason||'Not available'}. You can book another nurse. Refund per policy.`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', time:b.rejectedAt||b.time||Date.now(), read:false});
-          } else if(status==='pending'){
-            addAlert({id:'alert_'+id+'_pending_'+Date.now(), bookingId:b.bookingId||id, type:'pending', title:`⏳ Pending — Waiting for nurse — ${b.bookingId||id}`, message:`Booking ${b.bookingId||id} is pending. Waiting for ${b.nurseName||'nurse'} to accept/reject. You will get instant notification here. Amount: ${b.currency||'GHS'} ${b.amount||0} | Patient: ${b.patientName||''}`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', time:b.time||Date.now(), read:true});
-          }
-        } else if(prev!==status){
-          // Status changed
-          if(status==='accepted'){
-            addAlert({id:'alert_'+id+'_accepted_'+Date.now(), bookingId:b.bookingId||id, type:'accepted', title:`✅ ACCEPTED — Nurse accepted! Nurse is coming — Track live below + Google Maps auto opens`, message:`Client: ${b.clientLat?.toFixed(4)||'undefined'}, ${b.clientLng?.toFixed(4)||'undefined'} | Nurse: ${b.nurseName||'undefined'} is on the way<br>ETA: Calculating... | Distance: Auto<br>Paystack Ref: ${b.paystackRef||''} | ${b.currency||'GHS'} | CEO + Nurse + Client all have this booking — LIVE TRACKING MAP BELOW`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', clientLat:b.clientLat, clientLng:b.clientLng, time:Date.now(), read:false});
-          } else if(status==='rejected'){
-            addAlert({id:'alert_'+id+'_rejected_'+Date.now(), bookingId:b.bookingId||id, type:'rejected', title:`❌ Rejected — ${b.nurseName||'Nurse'} rejected`, message:`Booking ${b.bookingId||id} rejected. ${b.rejectReason||''}. Book another nurse.`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', time:Date.now(), read:false});
-          }
-        }
-        previousStatuses[id]=status;
-      });
-    }
-  }catch(e){ console.log('Load alerts error', e.message); }
-  
-  renderAlerts();
-}
-
-function startRealtimeAlerts(){
-  const {clientPhone} = getClientInfo();
-  onValue(ref(db, 'bookings'), (snap)=>{
-    if(!snap.exists()) return;
-    let hasNew = false;
-    snap.forEach(child=>{
-      const b = child.val();
-      const id = child.key;
-      const phoneMatch = b.phone && clientPhone && b.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
-      if(!phoneMatch && !id.startsWith('LCG')) return;
-      const status = (b.status||'pending').toLowerCase();
-      const prev = previousStatuses[id];
-      if(prev && prev!==status){
-        if(status==='accepted'){
-          addAlert({id:'alert_'+id+'_accepted_'+Date.now(), bookingId:b.bookingId||id, type:'accepted', title:`✅ ACCEPTED — Nurse accepted! Nurse is coming — Track live below + Google Maps auto opens`, message:`Client: ${b.clientLat||5.6037}, ${b.clientLng||-0.1870} | Nurse: ${b.nurseName||''} is on the way — ETA: Calculating... | Distance: Auto — Paystack Ref: ${b.paystackRef||''} | ${b.currency||'GHS'} | CEO + Nurse + Client all have this booking`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', clientLat:b.clientLat, clientLng:b.clientLng, time:Date.now(), read:false});
-          hasNew=true;
-        } else if(status==='rejected'){
-          addAlert({id:'alert_'+id+'_rejected_'+Date.now(), bookingId:b.bookingId||id, type:'rejected', title:`❌ Booking Rejected — ${b.bookingId||id}`, message:`${b.nurseName||'Nurse'} rejected. Reason: ${b.rejectReason||'Not available'}. Book another nurse.`, nurseName:b.nurseName, amount:b.amount, currency:b.currency||'GHS', time:Date.now(), read:false});
-          hasNew=true;
-        }
-        previousStatuses[id]=status;
-      } else if(!prev){
-        previousStatuses[id]=status;
-      }
-    });
-    if(hasNew) renderAlerts();
-  });
-}
-
-window.markRead = function(alertId){
-  const idx = allAlerts.findIndex(a=>a.id===alertId);
-  if(idx!==-1){ allAlerts[idx].read=true; try{ localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50))); }catch(e){} renderAlerts(); }
-}
-window.markAllRead = function(){
-  allAlerts.forEach(a=>a.read=true);
-  try{ localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50))); }catch(e){}
-  renderAlerts();
-}
-window.clearAlerts = function(){
-  if(!confirm('Clear all alerts?')) return;
-  allAlerts=[];
-  try{ localStorage.removeItem('lcg_alerts'); }catch(e){}
-  previousStatuses={};
-  renderAlerts();
-  document.getElementById('alertsList').innerHTML='';
-  document.getElementById('emptyAlerts').style.display='block';
-}
-
-let bookingHistory=[];
-let currentTab='active';
-
-window.switchTab = function(tab){
-  currentTab=tab;
-  const activeList=document.getElementById('alertsList');
-  const historyList=document.getElementById('historyList');
-  const emptyAlerts=document.getElementById('emptyAlerts');
-  const emptyHistory=document.getElementById('emptyHistory');
-  const tabActiveBtn=document.getElementById('tabActive');
-  const tabHistoryBtn=document.getElementById('tabHistory');
-  
-  if(tab==='active'){
-    activeList.style.display='grid';
-    historyList.style.display='none';
-    emptyHistory.style.display='none';
-    tabActiveBtn.classList.add('tabActive');
-    tabHistoryBtn.classList.remove('tabActive');
-    tabActiveBtn.classList.remove('btnGray'); tabActiveBtn.classList.add('btnYellow');
-    tabHistoryBtn.classList.add('btnGray'); tabHistoryBtn.classList.remove('btnYellow');
-    renderAlerts();
-  } else {
-    activeList.style.display='none';
-    historyList.style.display='grid';
-    emptyAlerts.style.display='none';
-    tabActiveBtn.classList.remove('tabActive');
-    tabHistoryBtn.classList.add('tabActive');
-    tabHistoryBtn.classList.remove('btnGray'); tabHistoryBtn.classList.add('btnYellow');
-    tabActiveBtn.classList.add('btnGray'); tabActiveBtn.classList.remove('btnYellow');
-    renderHistory();
-  }
-};
-
-function loadHistory(){
-  try{
-    const saved=localStorage.getItem('lcg_booking_history');
-    if(saved) bookingHistory=JSON.parse(saved);
-  }catch(e){ bookingHistory=[]; }
-  // Also try Firebase if available
-  updateHistoryCount();
-}
-
-function saveHistory(){
-  try{
-    localStorage.setItem('lcg_booking_history', JSON.stringify(bookingHistory.slice(0,100)));
-  }catch(e){}
-  updateHistoryCount();
-  // Save to Firebase for backup
-  try{
-    const clientInfo=getClientInfo();
-    const uid=clientInfo.uid||clientInfo.clientPhone||'anon';
-    if(uid && typeof firebase!=='undefined'){
-      // Use module import version if available, else skip
-    }
-  }catch(e){}
-}
-
-function updateHistoryCount(){
-  const hCount=document.getElementById('historyCount');
-  const aCount=document.getElementById('activeCount');
-  if(hCount) hCount.textContent=bookingHistory.length;
-  if(aCount) aCount.textContent=allAlerts.length;
-}
-
-window.moveToHistory = function(bookingId, alertId){
-  if(!confirm('Move this booking to History?\n\nIt will be removed from Active Alerts and saved in History so new bookings won\'t confuse you.')) return;
-  
-  // Find alert/booking
-  let alertData=null;
-  let bookingData=null;
-  if(alertId){
-    alertData=allAlerts.find(a=>a.id===alertId);
-  }
-  if(!alertData && bookingId){
-    alertData=allAlerts.find(a=>a.bookingId===bookingId);
-  }
-  
-  // Create history entry
-  const historyItem={
-    id:'hist_'+Date.now()+'_'+(bookingId||Math.random().toString(36).substr(2,9)),
-    bookingId: bookingId||alertData?.bookingId||'Unknown',
-    originalAlertId: alertId||'',
-    nurseName: alertData?.nurseName||'Nurse',
-    title: alertData?.title||'Booking',
-    message: alertData?.message||'',
-    amount: alertData?.amount||'',
-    currency: alertData?.currency||'GHS',
-    time: alertData?.time||Date.now(),
-    movedToHistoryAt: Date.now(),
-    type: alertData?.type||'completed'
-  };
-  
-  // Try to get full booking data from Firebase for more details
-  bookingHistory.unshift(historyItem);
-  saveHistory();
-  
-  // Remove from active alerts
-  if(alertId){
-    allAlerts=allAlerts.filter(a=>a.id!==alertId);
-  } else if(bookingId){
-    allAlerts=allAlerts.filter(a=>a.bookingId!==bookingId);
-  }
-  try{ localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50))); }catch(e){}
-  
-  renderAlerts();
-  renderHistory();
-  toast('✅ Moved to History! Check History tab');
-  
-  // If in active tab, show hint
-  if(currentTab==='active'){
-    setTimeout(()=>{ if(confirm('Moved to History! View History now?')) switchTab('history'); }, 500);
-  }
-};
-
-window.deleteHistoryItem = function(historyId){
-  if(!confirm('Delete this history item permanently?\n\nThis will remove it from your history. You can\'t undo.')) return;
-  bookingHistory=bookingHistory.filter(h=>h.id!==historyId);
-  saveHistory();
-  renderHistory();
-  toast('🗑️ History item deleted');
-};
-
-window.clearHistory = function(){
-  if(bookingHistory.length===0){ toast('History already empty'); return; }
-  if(!confirm('Clear ALL history?\n\nThis will delete all '+bookingHistory.length+' history items permanently.')) return;
-  bookingHistory=[];
-  saveHistory();
-  renderHistory();
-  toast('🗑️ All history cleared');
-};
-
-function renderHistory(){
-  const list=document.getElementById('historyList');
-  const empty=document.getElementById('emptyHistory');
-  if(!list) return;
-  
-  if(bookingHistory.length===0){
-    list.innerHTML='';
-    if(empty) empty.style.display='block';
-    updateHistoryCount();
-    return;
-  }
-  if(empty) empty.style.display='none';
-  
-  list.innerHTML=bookingHistory.map(h=>{
-    const date=new Date(h.movedToHistoryAt||h.time).toLocaleString('en-GH', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    const originalDate=new Date(h.time).toLocaleDateString();
-    return `
-    <div class="historyCard">
-      <button class="delBtn" onclick="deleteHistoryItem('${h.id}')">🗑️ Delete</button>
-      <div style="display:flex;gap:10px;align-items:flex-start">
-        <div style="width:40px;height:40px;border-radius:10px;background:rgba(168,85,247,.15);display:grid;place-items:center;font-size:18px">📚</div>
-        <div style="flex:1;min-width:0">
-          <b style="font-size:12px;color:#f3e8ff">${h.title||'Completed Booking'}</b><br>
-          <span class="historyBadge">Booking: ${h.bookingId}</span> <span class="historyBadge">${originalDate}</span><br>
-          <small style="font-size:11px;color:#a78bfa;margin-top:6px;display:block">Nurse: ${h.nurseName||'Nurse'} • ${h.currency||''} ${h.amount||''}</small>
-          <small style="font-size:10px;color:#6b7280">Moved to history: ${date}</small>
-          <div style="font-size:10px;color:#e8e0ff;margin-top:8px;background:rgba(14,10,28,.5);padding:8px;border-radius:8px;max-height:60px;overflow:auto">${(h.message||'').substring(0,150)}</div>
-          <div style="display:flex;gap:6px;margin-top:10px">
-            <button class="btn btnBlue" style="flex:1;padding:8px;font-size:10px" onclick="alert('Booking Details:\\nID: ${h.bookingId}\\nNurse: ${h.nurseName}\\nDate: ${originalDate}\\nMoved: ${date}')">📄 Details</button>
-            <button class="btn btnGray" style="flex:1;padding:8px;font-size:10px;background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.2);color:#fca5a5" onclick="deleteHistoryItem('${h.id}')">🗑️ Delete This History</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    `;
-  }).join('')+`
-  <div class="card" style="text-align:center;padding:16px;background:rgba(239,68,68,.05);border:1px dashed rgba(239,68,68,.15)">
-    <button class="btn btnGray" style="background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.2)" onclick="clearHistory()">🗑️ Clear All History (${bookingHistory.length})</button>
-    <div style="font-size:10px;color:#6b7280;margin-top:6px">History is saved in your phone. Deleting frees space.</div>
-  </div>
-  `;
-  updateHistoryCount();
-}
-
-function toast(m){
-  let t=document.getElementById('_toast');
-  if(!t){
-    t=document.createElement('div');
-    t.id='_toast';
-    t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)';
-    document.body.appendChild(t);
-  }
-  t.textContent=m;
-  t.style.display='block';
-  setTimeout(()=>t.style.display='none', 3000);
-}
-
-window.addEventListener('DOMContentLoaded', async ()=>{
-  await ensureAuth();
-  getClientInfo();
-  loadHistory();
-  if(window.Notification && Notification.permission==='default'){
-    Notification.requestPermission();
-  }
-  loadAlerts();
-  startRealtimeAlerts();
-  setInterval(()=>loadAlerts(), 20000);
-  setTimeout(()=>loadAlerts(), 2000);
-  // Auto-move old alerts (older than 7 days) suggestion
-  setTimeout(()=>{
-    const oldAlerts=allAlerts.filter(a=> Date.now()-a.time > 7*24*60*60*1000 );
-    if(oldAlerts.length>0 && bookingHistory.length===0){
-      console.log('Found old alerts, suggest moving to history');
-    }
-  }, 3000);
-});
-</script>
-</body></html>
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const auth=firebase.auth();
+let currentUid='', currentEmail='', allAlerts=[];
+function toastM(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',3000);}
+function getClientInfo(){currentUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||localStorage.getItem('uid')||''; currentEmail=localStorage.getItem('clientEmail')||localStorage.getItem('lcg_client_email')||localStorage.getItem('email')||'';}
+async function ensureAuth(){return new Promise(res=>{auth.onAuthStateChanged(user=>{if(user){currentUid=user.uid; currentEmail=user.email||currentEmail; localStorage.setItem('lcg_client_uid', user.uid);} res();}); setTimeout(res,1500);});}
+function generateWrittenAlert(booking, type){const bookingId=booking.bookingId||booking.id||'Unknown'; const nurseName=booking.nurseName||'Nurse'; const amount=booking.amount||''; const currency=booking.currency||'GHS'; let title='', message='', icon='accepted'; if(type==='accepted'){title=`Nurse ${nurseName} has accepted your booking`; message=`Nurse ${nurseName} has accepted your booking ID ${bookingId}. Amount: ${currency} ${amount}. Nurse is preparing to come to you. You will receive notification when nurse is on the way.`; icon='accepted';} else if(type==='rejected'){title=`Nurse ${nurseName} has rejected your offer`; message=`Nurse ${nurseName} has rejected your booking ID ${bookingId}. Reason: ${booking.rejectionReason||'Not available'}. Look for another nurse or increase your payment rate. Booking ID: ${bookingId}`; icon='rejected';} else if(type==='on_the_way'){title=`Nurse ${nurseName} is on the way coming`; message=`Nurse ${nurseName} is on the way coming for booking ID ${bookingId}. Please get ready. Track nurse live on My Bookings. Booking: ${bookingId}`; icon='onway';} else if(type==='close'){title=`Nurse ${nurseName} is just close to you`; message=`Nurse ${nurseName} is just close to you! Booking ID ${bookingId}. Please be ready at your location. Nurse will arrive soon.`; icon='close';} else if(type==='completed'){title=`You have confirmed work is completed - Booking ${bookingId}`; message=`You have confirmed work is completed for booking ID ${bookingId} with Nurse ${nurseName}. Amount: ${currency} ${amount}. Thank you! You can now rate your nurse. Booking completed on ${new Date().toLocaleString('en-GH')}.`; icon='completed';} else if(type==='rating'){title=`You can rate your nurse ${nurseName}`; message=`Work completed for booking ID ${bookingId}. You can rate your nurse ${nurseName} now. Your rating helps other clients. Click to rate.`; icon='rating';} return {title,message,icon,bookingId,nurseName,type,time:Date.now()};}
+async function loadAlerts(){getClientInfo(); const list=document.getElementById('alertsList'); const empty=document.getElementById('emptyAlerts'); const countInfo=document.getElementById('countInfo'); let alerts=[]; try{if(currentUid){const snap=await db.ref('clientAlerts/'+currentUid).once('value'); if(snap.exists()){snap.forEach(ch=>{const v=ch.val(); alerts.push({...v,id:ch.key,source:'firebase'});});} const snap2=await db.ref('clientBookings/'+currentUid).once('value'); if(snap2.exists()){snap2.forEach(ch=>{const b=ch.val(); const s=(b.status||'').toLowerCase(); if(s==='accepted'||s.includes('on_the_way')||s.includes('close')||s.includes('rejected')||s.includes('completed')||s.includes('client_confirmed')){let type=s; if(s==='accepted') type='accepted'; else if(s.includes('on_the_way')) type='on_the_way'; else if(s.includes('close')) type='close'; else if(s.includes('rejected')) type='rejected'; else if(s.includes('client_confirmed')||s.includes('completed')) type='completed'; const written=generateWrittenAlert({...b,id:ch.key,bookingId:b.bookingId||ch.key}, type); if(!alerts.find(a=>a.bookingId===written.bookingId && a.type===type)){alerts.push({...written,id:'local_'+ch.key+'_'+type,source:'local'});}}});} try{const local=JSON.parse(localStorage.getItem('lcg_alerts')||'[]'); local.forEach(l=>{if(!alerts.find(a=>a.bookingId===l.bookingId && a.type===l.type)){alerts.push({...l,source:'localStorage'});}});}catch(e){}}catch(e){console.log(e);} allAlerts=alerts.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0)); if(allAlerts.length===0){list.style.display='none'; empty.style.display='block'; countInfo.textContent='No alerts - 0 written notifications'; return;} empty.style.display='none'; list.style.display='grid'; countInfo.textContent=`${allAlerts.length} written notifications - Real-time booking progress`; list.innerHTML=allAlerts.map(a=>{const timeStr=a.time?new Date(a.time).toLocaleString('en-GH'):(a.createdAt?new Date(a.createdAt).toLocaleString('en-GH'):''); let iconClass='accepted', iconEmoji='OK'; if(a.type==='rejected'){iconClass='rejected'; iconEmoji='X';} else if(a.type==='on_the_way'){iconClass='onway'; iconEmoji='->';} else if(a.type==='close'){iconClass='close'; iconEmoji='@';} else if(a.type==='completed'){iconClass='completed'; iconEmoji='OK';} else if(a.type==='rating'){iconClass='rating'; iconEmoji='*';} const isUnread=!a.read; return `<div class="alertCard ${isUnread?'unread':''}"><div style="display:flex;gap:12px"><div class="icon ${iconClass}">${iconEmoji}</div><div style="flex:1;min-width:0"><b style="font-size:12px">${a.title||''}</b><div style="font-size:11px;color:#e8e0ff;margin-top:6px;line-height:1.5">${a.message||a.title||''}</div><div style="font-size:9px;color:#9ca3af;margin-top:8px">Booking ID: <b>${a.bookingId||'N/A'}</b> - Nurse: ${a.nurseName||'Nurse'} - ${timeStr}</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">${a.bookingId?`<button class="btn btnGold" style="padding:6px 10px;font-size:10px" onclick="viewBooking('${a.bookingId}')">View Booking</button>`:''}${a.type==='completed'||a.type==='rating'?`<button class="btn btnGold" style="padding:6px 10px;font-size:10px" onclick="rateNurse('${a.bookingId||''}','${a.nurseName||''}')">Rate Nurse</button>`:''}<button class="btn btnGray" style="padding:6px 10px;font-size:10px" onclick="markRead('${a.id}')">Mark Read</button><button class="btn btnGray" style="padding:6px 10px;font-size:10px;background:rgba(239,68,68,.1);color:#fca5a5" onclick="deleteAlert('${a.id}')">Delete</button></div></div></div></div>`;}).join('');}
+async function deleteAlert(id){if(!confirm('Delete this alert?')) return; try{if(currentUid){await db.ref('clientAlerts/'+currentUid+'/'+id).remove().catch(()=>{});} allAlerts=allAlerts.filter(a=>a.id!==id); try{localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50)));}catch(e){} loadAlerts(); toastM('Deleted');}catch(e){toastM(e.message);}}
+async function deleteAllAlerts(){if(allAlerts.length===0){toastM('No alerts to delete'); return;} if(!confirm(`Delete ALL ${allAlerts.length} alerts? This will delete all written notifications. Cannot be undone.`)) return; const c=prompt('Type DELETE to confirm:'); if(c!=='DELETE'){toastM('Cancelled'); return;} try{if(currentUid){await db.ref('clientAlerts/'+currentUid).remove();} localStorage.removeItem('lcg_alerts'); allAlerts=[]; loadAlerts(); toastM('All alerts deleted');}catch(e){toastM(e.message);}}
+async function markRead(id){const a=allAlerts.find(x=>x.id===id); if(!a) return; a.read=true; try{if(currentUid && a.source==='firebase'){await db.ref('clientAlerts/'+currentUid+'/'+id).update({read:true});} localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50)));}catch(e){} loadAlerts();}
+async function markAllRead(){allAlerts.forEach(a=>a.read=true); try{if(currentUid){const snap=await db.ref('clientAlerts/'+currentUid).once('value'); if(snap.exists()){const updates={}; snap.forEach(ch=>{updates[ch.key+'/read']=true;}); await db.ref('clientAlerts/'+currentUid).update(updates);}} localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts));}catch(e){} loadAlerts(); toastM('All marked read');}
+function viewBooking(bookingId){location.href='my-bookings.html#'+bookingId;}
+function rateNurse(bookingId, nurseName){location.href=`rating.html?bookingId=${bookingId}&nurseName=${encodeURIComponent(nurseName||'Nurse')}`;}
+window.addEventListener('DOMContentLoaded', async()=>{getClientInfo(); await ensureAuth(); loadAlerts(); setInterval(loadAlerts, 10000);});
+</script></body></html>
