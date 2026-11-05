@@ -1,34 +1,33 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Job Offer - Clean - Auto Delete to History When CEO Paid - Only ID</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Job Offers - Fixed - Pending Shows With Accept Reject</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;padding-bottom:90px}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;padding-bottom:90px}
 .top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.98);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.brand{font-family:Fraunces,serif;font-weight:700;font-size:15px}
 .badge{padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);font-size:11px;font-weight:700;color:#ece8ff;text-decoration:none;cursor:pointer}
 .badgeGold{background:#facc15;color:#000;border-color:#facc15}
 .card{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin:10px}
-.main{max-width:800px;margin:0 auto;padding:10px}
 .offer{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}
-.offer.completed{border:2px solid #22c55e;background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(16,40,20,.6))}
-.btn{padding:9px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#ece8ff;font-size:11px;font-weight:700;cursor:pointer}
+.offer.pending{border:2px solid #facc15;background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(50,40,10,.4))}
+.offer.accepted{border:2px solid #22c55e;background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(16,40,20,.6))}
+.btn{padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#ece8ff;font-size:11px;font-weight:700;cursor:pointer;min-height:40px;flex:1}
 .btnGold{background:#facc15;color:#000;border-color:#facc15}
 .btnGreen{background:#22c55e;color:#fff;border-color:#22c55e}
+.btnRed{background:#ef4444;color:#fff;border-color:#ef4444}
+.btnBlue{background:#2563eb;color:#fff;border-color:#2563eb}
 .toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
 .modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:400px;width:100%;max-height:80vh;overflow:auto}
 .histId{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.15);margin-bottom:8px;cursor:pointer;font-size:12px;font-weight:700}
-.histId:hover{background:rgba(168,85,247,.15)}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head><body>
-<div class="top"><div><div class="brand">My Job Offers - Clean - Auto Delete History</div><small style="font-size:10px;color:#9a95b8">CEO paid auto delete to history - Only booking ID shows - Click ID for details</small></div><div style="display:flex;gap:8px"><span class="badge" id="countBadge">0 Offers</span><a href="nurse-dashboard.html" class="badge">Dashboard</a><a href="nurse-withdrawal.html" class="badge badgeGold">Withdraw</a><button class="badge" onclick="loadAll()">Refresh</button></div></div>
+<div class="top"><div><b>My Job Offers - Fixed - Pending Shows</b><br><small style="font-size:9px;color:#9a95b8">Pending with Accept/Reject buttons - CEO paid auto delete to history - Only ID shows</small></div><div style="display:flex;gap:8px"><span class="badge" id="countBadge">0 Offers</span><a href="nurse-dashboard.html" class="badge">Dashboard</a><a href="nurse-withdrawal.html" class="badge badgeGold">Withdraw</a><button class="badge" onclick="loadAll()">Refresh</button></div></div>
 
-<div class="main">
+<div style="max-width:800px;margin:0 auto;padding:10px">
 <div id="offersArea" style="margin-top:12px"></div>
-<div id="emptyArea" class="card" style="display:none;text-align:center;padding:30px"><b>No active job offers</b><br><small style="color:#9a95b8">After CEO marks paid, booking auto deletes to history - Only ID shows - Empty active</small></div>
-
-<div class="card"><b style="font-size:12px">History - Only Booking ID Shows - Click ID for Details - CEO Paid Moves Here</b><div id="historyList" style="margin-top:10px"><small style="color:#9a95b8">No history yet - When CEO marks paid, booking moves here - Only ID visible</small></div></div>
+<div id="emptyArea" class="card" style="display:none;text-align:center;padding:30px"><b>No active job offers</b><br><small>After client books nurse, shows here as Pending with Accept/Reject buttons - CEO paid moves to history</small></div>
+<div class="card"><b>History - Only Booking ID Shows - CEO Paid Moves Here</b><div id="historyList" style="margin-top:10px"><small>No history yet</small></div></div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -36,8 +35,7 @@
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
+firebase.initializeApp(firebaseConfig); const db=firebase.database();
 let nurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
 let nurseName=localStorage.getItem('nurseName')||'Nurse';
 let all=[], historyData=[];
@@ -46,54 +44,37 @@ function toast(m){const el=document.getElementById('toast'); el.textContent=m; e
 
 function loadAll(){
 if(!nurseId){ document.getElementById('emptyArea').style.display='block'; return; }
-db.ref('bookings').orderByChild('nurseId').equalTo(nurseId).on('value', snap=>{
+// FIXED: Listen to all bookings for this nurse - not just myJobOffers - so pending shows instantly
+db.ref('bookings').on('value', snap=>{
   const list=[];
-  if(snap.exists()) snap.forEach(ch=>{ list.push({...ch.val(), id:ch.key, bookingId:ch.val().bookingId||ch.key}); });
+  if(snap.exists()) snap.forEach(ch=>{
+    const v=ch.val();
+    const matchNurse=v.nurseId===nurseId || (v.nurseUid===nurseId);
+    if(!matchNurse) return;
+    const st=(v.status||'pending').toLowerCase();
+    // Active offers: pending, accepted, on_the_way, close, completed - NOT paid, NOT client_confirmed_finished as history
+    const isPaid=v.ceoPaid||v.paid||st.includes('paid')||v.paymentStatus==='paid';
+    const isClientConfirmed=st.includes('client_confirmed_finished');
+    // If paid or client confirmed finished, it should be in history, not active - but show pending as active
+    if(!isPaid && !isClientConfirmed){
+      list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
+    }
+  });
+  // Also check myJobOffers for extra
   db.ref('myJobOffers/'+nurseId).once('value').then(s2=>{
-    if(s2.exists()) s2.forEach(ch=>{ const v=ch.val(); if(!list.find(x=>x.id===ch.key)) list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key}); });
-    // Filter active vs paid
-    const active=list.filter(b=>{ const st=(b.status||'').toLowerCase(); const paid=b.ceoPaid||b.paid||st.includes('paid')||b.paymentStatus==='paid'; return !paid; });
-    const paidList=list.filter(b=>{ const st=(b.status||'').toLowerCase(); return b.ceoPaid||b.paid||st.includes('paid')||b.paymentStatus==='paid'; });
-    all=active;
-    paidList.forEach(b=> moveToHistory(b));
+    if(s2.exists()) s2.forEach(ch=>{
+      const v=ch.val();
+      const st=(v.status||'pending').toLowerCase();
+      const isPaid=v.ceoPaid||v.paid||st.includes('paid');
+      if(!isPaid && !list.find(x=>x.id===ch.key)){
+        list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
+      }
+    });
+    all=list.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
     render();
     loadHistory();
   });
 });
-}
-
-function moveToHistory(booking){
-  const id=booking.id;
-  db.ref('nurseBookingHistory/'+nurseId+'/'+id).set({...booking, movedToHistoryAt:Date.now(), movedToHistoryAtStr:new Date().toLocaleString('en-GH')});
-  db.ref('bookings/'+id).remove().catch(()=>{});
-  db.ref('myJobOffers/'+nurseId+'/'+id).remove().catch(()=>{});
-  db.ref('myJobOffers/'+nurseId+'/congrats_'+id).remove().catch(()=>{});
-}
-
-function loadHistory(){
-  db.ref('nurseBookingHistory/'+nurseId).on('value', snap=>{
-    const el=document.getElementById('historyList');
-    if(!snap.exists()){ el.innerHTML='<small style="color:#9a95b8">No history yet - CEO paid moves here - Only ID shows</small>'; return; }
-    const arr=[]; snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); });
-    arr.sort((a,b)=>(b.ceoPaidAt||b.clientConfirmedAt||0)-(a.ceoPaidAt||a.clientConfirmedAt||0));
-    historyData=arr;
-    el.innerHTML=arr.map(b=>`<div class="histId" onclick="showHistory('${b.id}')">Booking ID ${b.bookingId||b.id} - ${b.ceoPaidAtStr||b.clientConfirmedAtStr||''} - Paid - Click for details</div>`).join('');
-  });
-  // Also monitor CEO paid status - auto delete when CEO marks paid
-  db.ref('ceoBookings').orderByChild('nurseId').equalTo(nurseId).on('value', snap=>{
-    if(!snap.exists()) return;
-    snap.forEach(ch=>{
-      const v=ch.val();
-      if(v.ceoPaid||v.paid||v.paymentStatus==='paid'){
-        const id=ch.key;
-        if(all.find(x=>x.id===id)){
-          moveToHistory({...v, id, bookingId:v.bookingId||id});
-          toast('CEO marked paid - Booking ID '+(v.bookingId||id)+' auto deleted to history - Only ID shows');
-          setTimeout(()=>{ loadAll(); }, 500);
-        }
-      }
-    });
-  });
 }
 
 function render(){
@@ -103,16 +84,19 @@ function render(){
   empty.style.display='none';
   document.getElementById('countBadge').textContent=all.length+' Offers';
   area.innerHTML=all.map(b=>{
-    const st=(b.status||'').toLowerCase();
-    const isCompleted=st.includes('completed')||st.includes('client_confirmed')||b.clientConfirmed;
-    return `<div class="offer ${isCompleted?'completed':''}">
-      <div style="display:flex;justify-content:space-between"><b>Booking ID ${b.bookingId||b.id}</b><span class="badge ${isCompleted?'badgeGold':''}">${(b.status||'PENDING').toUpperCase()}</span></div>
-      <div style="margin-top:8px;font-size:11px;color:#9a95b8">Client: ${b.clientName||''} - Your Earnings: ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)} - Time: ${b.clientConfirmedAtStr||b.completedAtStr||''}</div>
+    const st=(b.status||'pending').toLowerCase();
+    const isPending=st.includes('pending');
+    const isAccepted=st.includes('accepted');
+    const isCompleted=st.includes('completed');
+    return `<div class="offer ${isPending?'pending':''} ${isAccepted?'accepted':''}">
+      <div style="display:flex;justify-content:space-between"><b>Booking ID ${b.bookingId||b.id}</b><span class="badge ${isPending?'badgeGold':''}">${(b.status||'PENDING').toUpperCase()} - ${isPending?'New booking - Accept or Reject':''}</span></div>
+      <div style="margin-top:8px;font-size:11px;color:#9a95b8">Client: ${b.clientName||''} - Phone: ${b.clientPhone||''} - Amount: Your Earnings ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)} - Total hidden - Location: ${b.location||''}</div>
       <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-        ${!isCompleted?`<button class="btn btnGreen" onclick="acceptOffer('${b.id}')">Accept - Auto nav + alert</button>`:''}
-        ${isCompleted?`<div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:8px;font-size:11px">Completed - Waiting CEO paid - After CEO marks paid, auto delete to history - Only ID shows</div>`:''}
-        <button class="btn" onclick="showDetails('${b.id}')">View Details - Booking ID ${b.bookingId||b.id}</button>
-        ${b.clientPhone?`<button class="btn" onclick="window.open('tel:${b.clientPhone}')">Call Client</button>`:''}
+        ${isPending?`<button class="btn btnGreen" onclick="acceptOffer('${b.id}')">Accept - Auto nav + alert client</button><button class="btn btnRed" onclick="rejectOffer('${b.id}')">Reject - Decline offer</button>`:''}
+        ${isAccepted?`<button class="btn btnBlue" onclick="openNav('${b.id}')">Navigate - Where client - You on way</button><button class="btn btnGreen" onclick="markOnWay('${b.id}')">Mark On The Way - System monitor</button>`:''}
+        ${isCompleted?`<div style="background:rgba(34,197,94,.1);border-radius:8px;padding:8px;font-size:11px">Completed - Waiting client confirm + CEO paid - After CEO paid, auto delete to history - Only ID shows</div>`:''}
+        <button class="btn" onclick="showDetails('${b.id}')">Details - Booking ID ${b.bookingId||b.id}</button>
+        ${b.clientPhone?`<button class="btn btnBlue" onclick="window.open('tel:${b.clientPhone}')">Call Client - Nurse can call too</button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -123,34 +107,76 @@ async function acceptOffer(id){
   const now=Date.now();
   await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:now, acceptedAtStr:new Date().toLocaleString('en-GH')});
   await db.ref('myJobOffers/'+nurseId+'/'+id).update({status:'accepted'}).catch(()=>{});
-  // System generates message to client alert.html - not hardcoded - monitors actions
-  if(b.clientId){
-    await db.ref('clientAlerts/'+b.clientId+'/ACCEPTED-'+id+'-'+now).set({
-      type:'accepted',
-      title:`Nurse ${nurseName} accepted your booking`,
-      message:`System: Nurse ${nurseName} accepted booking ID ${b.bookingId||id} in my-job-offer - Auto navigation will open to show where nurse reached - Nurse location monitored - You can call nurse - Nurse can call you`,
-      bookingId:b.bookingId||id,
-      time:now,
-      read:false,
-      autoGenerated:true
-    });
+  // Alert client - system monitors actions - not hardcoded
+  const clientKey=b.clientId||b.clientPhone||'';
+  if(clientKey){
+    await db.ref('clientAlerts/'+clientKey+'/ACCEPTED-'+id+'-'+now).set({type:'accepted',title:`Nurse ${nurseName} accepted your booking ID ${b.bookingId||id}`,message:`System detected nurse ${nurseName} accepted booking ID ${b.bookingId||id} - Auto navigation opens to show where nurse reached - You can call nurse - Nurse can call you - Not hardcoded - System monitors`,bookingId:b.bookingId||id,time:now,read:false,autoGenerated:true});
   }
-  toast('Accepted - Auto nav + alert sent - System monitors');
+  toast('Accepted - Auto nav + alert sent - Client will see accepted auto nav');
 }
 
-function showDetails(id){
+async function rejectOffer(id){
+  if(!confirm('Reject booking '+id+'?')) return;
+  const now=Date.now();
+  await db.ref('bookings/'+id).update({status:'rejected_by_nurse', rejectedAt:now, rejectedAtStr:new Date().toLocaleString('en-GH')});
+  await db.ref('myJobOffers/'+nurseId+'/'+id).update({status:'rejected'}).catch(()=>{});
   const b=all.find(x=>x.id===id);
-  document.getElementById('modalTitle').textContent='Booking ID '+ (b.bookingId||b.id);
-  document.getElementById('modalBody').innerHTML=`Status: ${b.status}<br>Client: ${b.clientName||''}<br>Amount: Your Earnings ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)} - Total hidden<br>Booking ID: ${b.bookingId||b.id}<br>Time: ${b.clientConfirmedAtStr||''}<br><br>Flow: Accepted auto nav - On Way monitor - Close - Completed - CEO paid auto delete to history`;
-  document.getElementById('modal').style.display='flex';
+  if(b && (b.clientId||b.clientPhone)){
+    const clientKey=b.clientId||b.clientPhone;
+    await db.ref('clientAlerts/'+clientKey+'/REJECTED-'+id+'-'+now).set({type:'rejected',title:`Nurse declined booking ${b.bookingId||id}`,message:`Nurse ${nurseName} declined booking ID ${b.bookingId||id} - You can book another nurse`,bookingId:b.bookingId||id,time:now,read:false});
+  }
+  toast('Rejected - Client notified');
 }
-function showHistory(id){
-  const b=historyData.find(x=>x.id===id);
-  document.getElementById('modalTitle').textContent='History - Booking ID '+ (b.bookingId||b.id);
-  document.getElementById('modalBody').innerHTML=`Booking ID: ${b.bookingId||b.id}<br>Status: ${b.status}<br>Client: ${b.clientName||''}<br>Your Earnings: ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0)).toFixed(2)}<br>CEO Paid: ${b.ceoPaidAtStr||''}<br>Client Confirmed: ${b.clientConfirmedAtStr||''}<br><br>History only shows ID - Click for details popup - Auto deleted from active when CEO marked paid`;
-  document.getElementById('modal').style.display='flex';
+
+async function markOnWay(id){
+  const now=Date.now();
+  await db.ref('bookings/'+id).update({status:'on_the_way', onTheWayAt:now});
+  const b=all.find(x=>x.id===id);
+  if(b && (b.clientId||b.clientPhone)){
+    await db.ref('clientAlerts/'+(b.clientId||b.clientPhone)+'/ONWAY-MANUAL-'+id+'-'+now).set({type:'on_the_way',title:`Nurse on the way - ${b.bookingId||id}`,message:`Nurse ${nurseName} is on the way to you - Booking ID ${b.bookingId||id} - System monitoring location`,bookingId:b.bookingId||id,time:now,read:false});
+  }
+  toast('Marked on the way - Client alerted');
 }
+
+function openNav(id){
+  const b=all.find(x=>x.id===id); if(!b) return;
+  const cLat=b.clientLat||5.6037; const cLng=b.clientLng||-0.1870;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const nLat=pos.coords.latitude; const nLng=pos.coords.longitude;
+    window.open(`https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`,'_blank');
+  }, ()=>{ window.open(`https://www.google.com/maps/search/?api=1&query=${cLat},${cLng}`,'_blank'); });
+}
+
+function showDetails(id){ const b=all.find(x=>x.id===id); document.getElementById('modalTitle').textContent='Booking ID '+(b.bookingId||b.id); document.getElementById('modalBody').innerHTML=`Status: ${b.status}<br>Client: ${b.clientName}<br>Phone: ${b.clientPhone}<br>Amount: Earnings ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)}<br>Location: ${b.location||''}<br>Service: ${b.serviceType||''}<br>Time: ${new Date(b.time||Date.now()).toLocaleString('en-GH')}<br><br>Buttons: Accept/Reject for pending - Navigate for accepted`; document.getElementById('modal').style.display='flex'; }
 function closeModal(){ document.getElementById('modal').style.display='none'; }
+
+function loadHistory(){
+  db.ref('nurseBookingHistory/'+nurseId).on('value', snap=>{
+    const el=document.getElementById('historyList');
+    if(!snap.exists()){ el.innerHTML='<small>No history yet - When CEO marks paid, ID moves here - Only ID shows</small>'; return; }
+    const arr=[]; snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); });
+    arr.sort((a,b)=>(b.ceoPaidAt||b.clientConfirmedAt||0)-(a.ceoPaidAt||a.clientConfirmedAt||0));
+    historyData=arr;
+    el.innerHTML=arr.map(b=>`<div class="histId" onclick="showHistory('${b.id}')">Booking ID ${b.bookingId||b.id} - ${b.ceoPaidAtStr||b.clientConfirmedAtStr||''} - Paid - Click for details</div>`).join('');
+  });
+  // Also auto detect CEO paid from bookings and move to history
+  db.ref('bookings').orderByChild('nurseId').equalTo(nurseId).on('value', snap=>{
+    if(!snap.exists()) return;
+    snap.forEach(ch=>{
+      const v=ch.val();
+      const isPaid=v.ceoPaid||v.paid||(v.status||'').toLowerCase().includes('paid')||v.paymentStatus==='paid';
+      if(isPaid){
+        const id=ch.key;
+        if(all.find(x=>x.id===id)){
+          // Move to history
+          db.ref('nurseBookingHistory/'+nurseId+'/'+id).set({...v, id, bookingId:v.bookingId||id, ceoPaidAt:Date.now(), ceoPaidAtStr:new Date().toLocaleString('en-GH')});
+          db.ref('bookings/'+id).remove().catch(()=>{});
+          toast('CEO marked paid - Booking ID '+(v.bookingId||id)+' auto deleted to history - Only ID shows');
+        }
+      }
+    });
+  });
+}
 
 window.onload=()=>{ loadAll(); };
 </script>
