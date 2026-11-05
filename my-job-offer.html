@@ -181,7 +181,7 @@ area.innerHTML=allOffers.map(o=>{
   const nursePortion=totalAmount*0.8;
   const platformFee=totalAmount*0.2;
   const currency=o.currency||'GHS';
-  const amount=currency+' '+nursePortion.toFixed(2)+' (80% of '+currency+' '+totalAmount.toFixed(2)+')';
+  const amount=currency+' '+nursePortion.toFixed(2);
   const amountOnly=nursePortion.toFixed(2);
   const amountDisplay=currency+' '+nursePortion.toFixed(2);
   const client=o.clientName||o.client||'Client';
