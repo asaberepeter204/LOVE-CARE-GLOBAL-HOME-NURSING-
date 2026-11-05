@@ -1,4 +1,3 @@
-
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>My Bookings - Rejected Flow Fixed</title>
 <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
@@ -25,7 +24,7 @@
 
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-const PAYSTACK_KEY = 'pk_live_f17ae09bf855010825cbfccdda8e724553ab747b'; // FULL PRODUCTION - User provided // Will use your existing key from book-nurse.html if found
+const PAYSTACK_KEY = 'pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -53,24 +52,7 @@ function getKeys(){
   const info=document.getElementById('info'); info.style.display='block';
   info.innerHTML='Client: '+clientName+' - Phone: '+(clientPhone||'No phone')+' - Username: '+(clientUsername||'No username')+' - UID: '+(clientUid||'No UID')+' - Matched by phone 9-digit + username';
 }
-function haversine(lat1,lon1,lat2,lon2){ const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c; }
-async function fetchClientPhotoForBooking(clientId, clientPhone){
-  try{
-    if(clientId){
-      const snap=await db.ref('clients/'+clientId).once('value');
-      if(snap.exists()){ const v=snap.val(); if(v.photoURL||v.clientPhoto||v.avatar) return v.photoURL||v.clientPhoto||v.avatar; }
-    }
-    if(clientPhone){
-      const phone9=clientPhone.replace(/[^0-9]/g,'').slice(-9);
-      const snap=await db.ref('allowedClients').once('value').catch(()=>null);
-      if(snap&&snap.exists()){
-        let found=''; snap.forEach(ch=>{ const v=ch.val(); const p=(v.phone||'').replace(/[^0-9]/g,'').slice(-9); if(p===phone9 && (v.photoURL||v.clientPhoto)){ found=v.photoURL||v.clientPhoto; } });
-        if(found) return found;
-      }
-    }
-  }catch(e){}
-  return localStorage.getItem('clientPhoto')||localStorage.getItem('photoURL')||'';
-}
+function haversine(lat1,lon1,lat2,lon2){ const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return 2*R*Math.asin(Math.sqrt(a)); }
 async function fetchNursePhoto(nurseId, nursePhone, nurseEmail){
   const cacheKey=nurseId||nursePhone||nurseEmail;
   if(nursePhotoCache[cacheKey]) return nursePhotoCache[cacheKey];
@@ -91,6 +73,12 @@ async function fetchNursePhoto(nurseId, nursePhone, nurseEmail){
     }
   }catch(e){}
   return '';
+}
+async function fetchClientPhotoForBooking(clientId, clientPhone){
+  try{
+    if(clientId){ const s=await db.ref('clients/'+clientId).once('value').catch(()=>null); if(s&&s.exists()){ const v=s.val(); if(v.photoURL||v.clientPhoto) return v.photoURL||v.clientPhoto; } }
+  }catch(e){}
+  return localStorage.getItem('clientPhoto')||localStorage.getItem('photoURL')||'';
 }
 function loadBookings(){
   getKeys();
@@ -113,14 +101,9 @@ function loadBookings(){
         }
       });
     }
-    // Fetch both client and nurse photos
     for(const b of list){
-      if(!b.nursePhoto){
-        b.nursePhoto = await fetchNursePhoto(b.nurseId, b.nursePhone, b.nurseEmail);
-      }
-      if(!b.clientPhoto){
-        b.clientPhoto = await fetchClientPhotoForBooking(b.clientId, b.clientPhone||b.phone);
-      }
+      if(!b.nursePhoto){ b.nursePhoto = await fetchNursePhoto(b.nurseId, b.nursePhone, b.nurseEmail); }
+      if(!b.clientPhoto){ b.clientPhoto = await fetchClientPhotoForBooking(b.clientId, b.clientPhone||b.phone); }
     }
     if(list.length===0 && total>0 && !clientPhone && !clientUsername && !clientUid){
       let debugList=[]; snap.forEach(ch=>{ const v=ch.val(); const st=(v.status||'pending').toLowerCase(); if(!st.includes('client_confirmed_finished') && !st.includes('paid')){ debugList.push({...v, id:ch.key, bookingId:v.bookingId||ch.key}); } }); debugList.sort((a,b)=>(b.time||0)-(a.time||0)); list.push(...debugList.slice(0,5));
@@ -132,13 +115,11 @@ function loadBookings(){
     list.forEach(b=>{ const st=(b.status||'').toLowerCase(); if(st.includes('rejected')){ checkIfCeoCleared(b); } });
     document.getElementById('info').innerHTML+='<br>Total DB: '+total+' - Matched: '+list.length;
   });
-  // Also listen for clientAlerts rejected
   const key=clientPhone.replace(/[^0-9]/g,'').slice(-9)||clientUid||clientUsername;
   if(key){
     db.ref('clientAlerts/'+key).on('child_added', snap=>{
       const v=snap.val(); if(!v) return; if((v.type||'').toLowerCase().includes('rejected')){
         toast(v.message||'Nurse rejected your offer - Book another nurse or increase payment - ID: '+v.bookingId);
-        // Vibrate + sound if available
         if(navigator.vibrate) navigator.vibrate([300,100,300]);
       }
     });
@@ -147,12 +128,10 @@ function loadBookings(){
 function checkIfCeoCleared(booking){
   db.ref('ceoBookingsProgress/'+booking.id).on('value', snap=>{
     if(!snap.exists()){
-      // CEO deleted rejected - so delete from client side too
       db.ref('bookings/'+booking.id).once('value').then(s=>{
         if(s.exists()){
           const v=s.val(); const st=(v.status||'').toLowerCase();
           if(st.includes('rejected')){
-            // Move to history as rejected then remove
             const key=clientUid||clientPhone||clientUsername;
             if(key){
               db.ref('clientBookingHistory/'+key+'/'+booking.id).set({...v, status:'rejected_cleared_by_ceo', clearedAt:Date.now(), clearedAtStr:new Date().toLocaleString('en-GH')}).then(()=>{
@@ -181,8 +160,8 @@ function render(list){
     else if(st.includes('completed')){ badge='badge-completed'; text='COMPLETED - Confirm to finish'; }
     const isCompleted=st.includes('completed');
     let nursePhoto = b.nursePhoto || b.nurseAvatar || b.nursePhotoURL || b.photoURL || '';
-let clientPhoto = b.clientPhoto || b.clientAvatar || localStorage.getItem('clientPhoto') || localStorage.getItem('photoURL') || '';
-  return `<div class="card" style="border-left:3px solid ${st.includes('rejected')?'#ef4444':'#facc15'}">
+    let clientPhoto = b.clientPhoto || b.clientAvatar || localStorage.getItem('clientPhoto') || localStorage.getItem('photoURL') || '';
+    return `<div class="card" style="border-left:3px solid ${st.includes('rejected')?'#ef4444':'#facc15'}">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div style="display:flex;gap:10px;align-items:center">
           <div style="width:50px;height:50px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:2px solid #a78bfa;display:flex;align-items:center;justify-content:center">
@@ -213,14 +192,15 @@ let clientPhoto = b.clientPhoto || b.clientAvatar || localStorage.getItem('clien
   }).join('');
 }
 function bookAnother(){ window.location.href='book-nurse.html'; }
-function increasePayment(id){ const b=all.find(x=>x.id===id); const cur=b.amount||20; const newAmt=prompt('Current amount GHS '+cur+' - Enter increased payment amount:', Math.round(cur*1.25)); if(!newAmt) return; const amt=parseFloat(newAmt); if(isNaN(amt)||amt<=cur){ alert('Please enter amount higher than current'); return; } db.ref('bookings/'+id).update({amount:amt, nurse80:Math.round(amt*0.8), ceo20:Math.round(amt*0.2), paymentIncreased:true, previousAmount:cur, increasedAt:Date.now(), status:'pending', rejectedAt:null, rejectedBy:null}).then(()=>{ toast('Payment increased to GHS '+amt+' - Booking restored to pending - Nurses will see new rate'); db.ref('ceoBookingsProgress/'+id).remove().catch(()=>{}); }); }
+// ✅ NEW - NO PROMPT, NO DIRECT AMOUNT CHANGE - GOES TO increase-payment.html
+function increasePayment(id){ const b=all.find(x=>x.id===id); const bid=(b&&(b.bookingId||b.id))||id; window.location.href='increase-payment.html?id='+encodeURIComponent(id)+'&bookingId='+encodeURIComponent(bid)+'&v='+Date.now(); }
 async function dismissRejected(id){ if(!confirm('Dismiss rejected booking '+id+'? It will be removed after CEO sees it')) return; const key=clientUid||clientPhone||clientUsername; if(key){ const b=all.find(x=>x.id===id); await db.ref('clientBookingHistory/'+key+'/'+id).set({...b, status:'rejected_dismissed_by_client', dismissedAt:Date.now()}); } await db.ref('bookings/'+id).update({dismissedByClient:true, dismissedAt:Date.now()}); toast('Dismissed - CEO will clear it'); }
 function openNav(id){ const b=all.find(x=>x.id===id); if(!b) return; db.ref('nurseLocations/'+b.nurseId).once('value').then(s=>{ let nLat=5.6137,nLng=-0.1770; if(s.exists()){ const v=s.val(); nLat=v.lat||nLat; nLng=v.lng||nLng; } const cLat=b.clientLat||5.6037; const cLng=b.clientLng||-0.1870; window.open(`https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`,'_blank'); }); }
 async function confirmDone(id){ const b=all.find(x=>x.id===id); if(!confirm(`Confirm work done for ${b.bookingId||id}?`)) return; const now=Date.now(); const nowStr=new Date().toLocaleString('en-GH'); const key=clientUid||clientPhone||clientUsername; await db.ref('clientBookingHistory/'+key+'/'+id).set({...b, status:'client_confirmed_finished', clientConfirmed:true, clientConfirmedAt:now, clientConfirmedAtStr:nowStr}); await db.ref('bookings/'+id).update({status:'client_confirmed_finished', clientConfirmed:true, clientConfirmedAt:now, clientConfirmedAtStr:nowStr}); setTimeout(()=>{ db.ref('bookings/'+id).remove().catch(()=>{}); toast('Confirmed - Moved to history ID only'); loadHistory(); }, 1000); }
 async function cancelBooking(id){ if(!confirm('Cancel '+id+'?')) return; await db.ref('bookings/'+id).update({status:'cancelled_by_client', cancelledAt:Date.now()}); toast('Cancelled'); }
 function showDetails(id){ const b=all.find(x=>x.id===id); document.getElementById('modalTitle').textContent='Booking ID '+(b.bookingId||b.id); document.getElementById('modalBody').innerHTML=`ID: ${b.bookingId||b.id}<br>Status: ${b.status}<br>Client: ${b.clientName}<br>Phone: ${b.clientPhone}<br>Nurse: ${b.nurseName}<br>Amount: ${b.currency||'GHS'} ${b.amount}<br>Location: ${b.location||''}<br>Time: ${new Date(b.time||Date.now()).toLocaleString('en-GH')}`; document.getElementById('modal').style.display='flex'; }
 function closeModal(){ document.getElementById('modal').style.display='none'; }
-function loadHistory(){ const key=clientUid||clientPhone||clientUsername; if(!key) return; db.ref('clientBookingHistory/'+key).on('value', snap=>{ const el=document.getElementById('historyList'); if(!snap.exists()){ el.innerHTML='<small>No history yet</small>'; return; } const arr=[]; snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); }); arr.sort((a,b)=>(b.clientConfirmedAt||b.dismissedAt||0)-(a.clientConfirmedAt||a.dismissedAt||0)); el.innerHTML=arr.map(b=>`<div class="histId" onclick="showHistory('${b.id}')">Booking ID ${b.bookingId||b.id} - ${b.clientConfirmedAtStr||b.clearedAtStr||''} - ${b.status} - Click details</div>`).join(''); window.historyData=arr; }); }
+function loadHistory(){ const key=clientUid||clientPhone||clientUsername; if(!key) return; db.ref('clientBookingHistory/'+key).on('value', snap=>{ const el=document.getElementById('historyList'); if(!snap.exists()){ el.innerHTML='<small>No history yet</small>'; return; } const arr=[]; snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); }); arr.sort((a,b)=>(b.clientConfirmedAt||b.dismissedAt||0)-(a.clientConfirmedAt||a.clientConfirmedAt||0)); el.innerHTML=arr.map(b=>`<div class="histId" onclick="showHistory('${b.id}')">Booking ID ${b.bookingId||b.id} - ${b.clientConfirmedAtStr||b.clearedAtStr||''} - ${b.status} - Click details</div>`).join(''); window.historyData=arr; }); }
 function showHistory(id){ const b=window.historyData.find(x=>x.id===id); document.getElementById('modalTitle').textContent='History - '+(b.bookingId||b.id); document.getElementById('modalBody').innerHTML=`ID: ${b.bookingId||b.id}<br>Status: ${b.status}<br>Nurse: ${b.nurseName}<br>Amount: ${b.currency||'GHS'} ${b.amount}<br>Confirmed: ${b.clientConfirmedAtStr||b.clearedAtStr||''}`; document.getElementById('modal').style.display='flex'; }
 window.onload=()=>{ getKeys(); loadBookings(); loadHistory(); };
 </script>
