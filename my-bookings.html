@@ -1,6 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Bookings - Clean - Pending to Completion - Listener from My Job Offer - Full Flow</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<title>My Bookings - Clean - Auto Nav - Monitor - Auto Delete to History</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
@@ -12,7 +11,7 @@
 .badge-close{background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.3)}
 .badge-completed{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff}
 .badge-confirmed{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
-.btn{border:none;border-radius:14px;padding:14px 12px;font-weight:900;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;min-height:48px;flex:1}
+.btn{border:none;border-radius:14px;padding:12px;font-weight:800;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;min-height:44px;flex:1}
 .btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
 .btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
 .btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
@@ -21,401 +20,287 @@
 .bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0;z-index:60}
 .btab{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:800;color:#a78bfa;cursor:pointer;padding:6px}
 .btab.active{color:#d8b4fe;background:rgba(168,85,247,.12);border-radius:12px;margin:0 4px}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}
-.flowCard{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:14px;padding:10px;margin:8px 0;display:flex;gap:6px;flex-wrap:wrap}
-.flowStep{padding:6px 10px;border-radius:999px;font-size:9px;font-weight:800;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05)}
-.flowStep.active{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.3)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:400px;width:100%;max-height:80vh;overflow:auto}
+.histId{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.15);margin-bottom:8px;cursor:pointer;font-size:12px;font-weight:700}
+.histId:hover{background:rgba(168,85,247,.15)}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head><body>
-<div class="topbar"><div><b style="font-size:13px">My Bookings - Clean - Pending to Completion Flow</b><br><small style="font-size:9px;color:#22c55e">LIVE - Pending - Accepted (listener from my-job-offer) - On The Way - Close - Completed - Client Confirmed Finished - Full Part</small></div><a href="alerts.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-size:11px;text-decoration:none">Alerts</a></div>
+<div class="topbar"><div><b style="font-size:13px">My Bookings - Clean - Auto Monitor</b><br><small style="font-size:9px;color:#22c55e">Pending - Accepted auto nav - On Way monitor - Close - Completed - Auto delete to history</small></div><a href="alerts.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-size:11px;text-decoration:none">Alerts</a></div>
 
 <div style="max-width:800px;margin:0 auto;padding:10px">
-<div class="card" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2);padding:12px">
-<b style="font-size:12px;color:#86efac">Full Flow - Client Side - Listener from My Job Offer</b><br>
-<small style="font-size:10px;color:#a78bfa">1. Client books - Pending - 2. Nurse accepts in my-job-offer.html - Listener updates here to Accepted instantly with loud sound - 3. On The Way - 4. Close to Client - 5. Completed by Nurse - 6. Client Confirms Finished - 7. Congrats sent to nurse - 8. Rate nurse - CEO receives progress</small>
-<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-<span style="font-size:10px;color:#9ca3af" id="countInfo">Loading...</span>
-<button style="padding:6px 10px;border-radius:999px;border:1px solid rgba(168,85,247,.18);background:rgba(255,255,255,.06);color:#d8b4fe;font-size:10px" onclick="location.reload()">Refresh</button>
-</div>
+<div id="bookingsList" style="display:grid;gap:12px"></div>
+<div id="emptyBookings" class="card" style="display:none;text-align:center;padding:30px"><b>No active bookings</b><br><small style="color:#a78bfa">After client confirms finished, booking auto deletes to history - Only booking ID shows - Click ID for details</small></div>
+
+<div class="card"><b style="font-size:12px">History - Only Booking ID Shows - Click ID for Details Popup</b><div id="historyList" style="margin-top:10px"><small style="color:#a78bfa">No history yet - After client confirms, booking moves here - Only ID visible</small></div></div>
 </div>
 
-<div id="bookingsList" style="display:grid;gap:12px;margin-top:12px"></div>
-<div id="emptyBookings" class="card" style="display:none;text-align:center;padding:30px"><b>No bookings yet</b><br><small style="color:#a78bfa">Your bookings will appear here - Pending to Completion is part - When nurse accepts in my-job-offer, this page updates instantly via listener</small></div>
-</div>
-
-<div class="bottom-tabs"><div class="btab" onclick="location.href='client-dashboard.html'"><span>Home</span></div><div class="btab active"><span>Bookings</span></div><div class="btab" onclick="location.href='alerts.html'"><span>Alerts</span></div></div>
+<div class="bottom-tabs"><div class="btab" onclick="location.href='client-dashboard.html'">Home</div><div class="btab active">Bookings</div><div class="btab" onclick="location.href='alerts.html'">Alerts</div></div>
 <div id="toast" class="toast"></div>
+<div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Booking Details</b><button class="btn btnGray" style="flex:none;padding:6px 10px" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.6"></div></div></div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
-const auth=firebase.auth();
-
-let all=[], clientUid='', clientEmail='', clientPhone='', clientName='', prev={};
-let audioCtx=null;
-function initAudio(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
-function playLoudSound(type){
-  try{
-    if(!audioCtx) initAudio();
-    if(!audioCtx) return;
-    if(audioCtx.state==='suspended') audioCtx.resume();
-    const now=audioCtx.currentTime; const vol=0.9;
-    if(type==='accepted'){
-      for(let i=0;i<3;i++){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=800+i*100;g.gain.setValueAtTime(0,now+i*0.25);g.gain.linearRampToValueAtTime(vol,now+i*0.25+0.05);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.25+0.4);o.start(now+i*0.25);o.stop(now+i*0.25+0.5);}
-    }
-    if(navigator.vibrate){ if(type==='accepted') navigator.vibrate([200,100,200,100,400]); else navigator.vibrate([200,100,200]); }
-  }catch(e){}
-}
+const db=firebase.database(); const auth=firebase.auth();
+let all=[], clientUid='', clientEmail='', clientPhone='', clientName='', prev={}, historyData=[], monitorIntervals={};
 
 function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000);}
-function getKeys(){
-  clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||localStorage.getItem('uid')||'';
-  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('lcg_client_email')||'';
-  clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'';
-  clientName=localStorage.getItem('clientName')||localStorage.getItem('lcg_client_name')||'Client';
+function getKeys(){ clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||localStorage.getItem('uid')||''; clientEmail=localStorage.getItem('clientEmail')||''; clientPhone=localStorage.getItem('clientPhone')||''; clientName=localStorage.getItem('clientName')||'Client'; }
+async function ensureAuth(){ try{ if(!auth.currentUser) await auth.signInAnonymously(); }catch(e){} }
+
+function haversine(lat1,lon1,lat2,lon2){ const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c; }
+
+function getNavUrl(booking, nLat, nLng){
+  const cLat=booking.clientLat||5.6037; const cLng=booking.clientLng||-0.1870;
+  return `https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;
 }
 
-async function ensureAuth(){
-  try{ if(!auth.currentUser){ await auth.signInAnonymously(); } }catch(e){}
+function autoOpenNav(booking, nLat, nLng){
+  const url=getNavUrl(booking, nLat, nLng);
+  window.open(url,'_blank');
+}
+
+function monitorNurseMovement(booking){
+  const id=booking.id;
+  if(monitorIntervals[id]) clearInterval(monitorIntervals[id]);
+  let lastDist=null, hasSentComing=false, hasSentClose=false, hasSentReached=false;
+  
+  monitorIntervals[id]=setInterval(()=>{
+    const nurseId=booking.nurseId;
+    if(!nurseId) return;
+    db.ref('nurseLocations/'+nurseId).once('value').then(s=>{
+      if(!s.exists()) return db.ref('onlineNurses/'+nurseId).once('value');
+      return s;
+    }).then(s=>{
+      if(!s || !s.exists()) return;
+      const v=s.val();
+      const nLat=v.lat||v.latitude;
+      const nLng=v.lng||v.longitude;
+      if(!nLat||!nLng) return;
+      const cLat=booking.clientLat||5.6037;
+      const cLng=booking.clientLng||-0.1870;
+      const dist=haversine(nLat,nLng,cLat,cLng);
+      
+      if(lastDist===null || dist < lastDist - 0.05){ // nurse moving closer
+        const now=Date.now();
+        const nowStr=new Date().toLocaleString('en-GH');
+        
+        if(!hasSentComing && dist > 0.5){
+          hasSentComing=true;
+          // System generates message to client alert.html
+          db.ref('clientAlerts/'+clientUid+'/ONWAY-AUTO-'+id+'-'+now).set({
+            type:'on_the_way',
+            title:`Nurse ${booking.nurseName||'Nurse'} is on the way coming`,
+            message:`System detected nurse ${booking.nurseName||'Nurse'} is on the way to your location - Distance: ${dist.toFixed(2)}km - Nurse location: ${nLat.toFixed(5)}, ${nLng.toFixed(5)} - Booking ID ${booking.bookingId||id} - You can call nurse ${booking.nursePhone||''} - Nurse can call you`,
+            bookingId:booking.bookingId||id,
+            nurseName:booking.nurseName,
+            nursePhone:booking.nursePhone,
+            distance:dist.toFixed(2),
+            nurseLat:nLat,
+            nurseLng:nLng,
+            time:now,
+            read:false,
+            autoGenerated:true
+          });
+          toast(`Nurse is on the way - ${dist.toFixed(2)}km away - Auto message sent to alerts`);
+        }
+        else if(!hasSentClose && dist <= 1.0 && dist > 0.1){
+          hasSentClose=true;
+          db.ref('clientAlerts/'+clientUid+'/CLOSE-AUTO-'+id+'-'+now).set({
+            type:'close',
+            title:`Nurse ${booking.nurseName||'Nurse'} is closer to you - ${dist.toFixed(2)}km`,
+            message:`System detected nurse ${booking.nurseName||'Nurse'} is closer - Distance: ${dist.toFixed(2)}km - Very close - You can call nurse now ${booking.nursePhone||''} - Nurse can call you ${clientPhone||''} - Booking ID ${booking.bookingId||id} - Auto navigation updated - Nurse reached close`,
+            bookingId:booking.bookingId||id,
+            nurseName:booking.nurseName,
+            nursePhone:booking.nursePhone,
+            distance:dist.toFixed(2),
+            nurseLat:nLat,
+            nurseLng:nLng,
+            time:now,
+            read:false,
+            autoGenerated:true,
+            canCall:true
+          });
+          toast(`Nurse closer - ${dist.toFixed(2)}km - You can call now`);
+        }
+        else if(!hasSentReached && dist <= 0.1){
+          hasSentReached=true;
+          db.ref('clientAlerts/'+clientUid+'/REACHED-AUTO-'+id+'-'+now).set({
+            type:'reached',
+            title:`Nurse ${booking.nurseName||'Nurse'} has reached your location`,
+            message:`System detected nurse ${booking.nurseName||'Nurse'} has reached - Distance: ${dist.toFixed(2)}km - Nurse is at your location - Please be ready - Call nurse ${booking.nursePhone||''} - Booking ID ${booking.bookingId||id}`,
+            bookingId:booking.bookingId||id,
+            nurseName:booking.nurseName,
+            time:now,
+            read:false,
+            autoGenerated:true
+          });
+          toast(`Nurse reached your location - Call now`);
+          clearInterval(monitorIntervals[id]);
+        }
+      }
+      lastDist=dist;
+    });
+  }, 5000); // check every 5 seconds - monitors actions, not hardcoded
 }
 
 function loadBookings(){
-  if(!clientUid){ document.getElementById('emptyBookings').style.display='block'; document.getElementById('countInfo').textContent='No client UID - Login again'; return; }
-  // Primary: bookings where phone/email matches or clientId matches
+  if(!clientUid){ document.getElementById('emptyBookings').style.display='block'; return; }
   db.ref('bookings').orderByChild('clientId').equalTo(clientUid).on('value', snap=>{
     const list=[];
-    if(snap.exists()){ snap.forEach(ch=>{ list.push({...ch.val(), id:ch.key, bookingId:ch.val().bookingId||ch.key}); }); }
-    // Also check by phone
+    if(snap.exists()) snap.forEach(ch=>{ list.push({...ch.val(), id:ch.key, bookingId:ch.val().bookingId||ch.key}); });
     db.ref('bookings').once('value').then(s=>{
-      if(s.exists()){
-        s.forEach(ch=>{
-          const v=ch.val();
-          const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
-          const emailMatch=v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase();
-          if((phoneMatch||emailMatch) && !list.find(x=>x.id===ch.key)){
-            list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
-          }
-        });
-      }
-      all=list;
-      all.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
+      if(s.exists()) s.forEach(ch=>{
+        const v=ch.val();
+        const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
+        const emailMatch=v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase();
+        if((phoneMatch||emailMatch) && !list.find(x=>x.id===ch.key)) list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
+      });
+      // Filter out confirmed finished that should be in history
+      const active=list.filter(b=>{ const st=(b.status||'').toLowerCase(); return !st.includes('client_confirmed_finished'); });
+      const finished=list.filter(b=>{ const st=(b.status||'').toLowerCase(); return st.includes('client_confirmed_finished'); });
+      all=active;
+      // Move finished to history automatically
+      finished.forEach(b=>{ moveToHistory(b); });
       render();
+      loadHistory();
     });
   });
 }
 
-function getFlowSteps(currentStatus){
-  const steps=['pending','accepted','on_the_way','close','completed','client_confirmed_finished'];
-  const status=(currentStatus||'pending').toLowerCase();
-  return steps.map(step=>{
-    let label=step.replace(/_/g,' ').toUpperCase();
-    let isActive=false;
-    if(status.includes('pending') && step==='pending') isActive=true;
-    if(status.includes('accepted') && (step==='pending'||step==='accepted')) isActive=true;
-    if(status.includes('on_the_way') && ['pending','accepted','on_the_way'].includes(step)) isActive=true;
-    if(status.includes('close') && ['pending','accepted','on_the_way','close'].includes(step)) isActive=true;
-    if(status.includes('completed') && ['pending','accepted','on_the_way','close','completed'].includes(step)) isActive=true;
-    if(status.includes('client_confirmed') && steps.includes(step)) isActive=true;
-    return `<span class="flowStep ${isActive?'active':''}">${label}${isActive?' - Done':''}</span>`;
-  }).join('');
+function moveToHistory(booking){
+  // Save to history collection and delete from active view
+  const id=booking.id;
+  db.ref('clientBookingHistory/'+clientUid+'/'+id).set({...booking, movedToHistoryAt:Date.now(), movedToHistoryAtStr:new Date().toLocaleString('en-GH')});
+  db.ref('bookings/'+id).remove().catch(()=>{});
+  // Also remove from clientBookings
+  db.ref('clientBookings/'+clientUid+'/'+id).remove().catch(()=>{});
+  // Clear monitor
+  if(monitorIntervals[id]){ clearInterval(monitorIntervals[id]); delete monitorIntervals[id]; }
+}
+
+function loadHistory(){
+  db.ref('clientBookingHistory/'+clientUid).on('value', snap=>{
+    const el=document.getElementById('historyList');
+    if(!snap.exists()){ el.innerHTML='<small style="color:#a78bfa">No history yet - After client confirms, booking ID moves here</small>'; return; }
+    const arr=[];
+    snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); });
+    arr.sort((a,b)=>(b.clientConfirmedAt||0)-(a.clientConfirmedAt||0));
+    historyData=arr;
+    el.innerHTML=arr.map(b=>`<div class="histId" onclick="showHistory('${b.id}')">Booking ID ${b.bookingId||b.id} - ${b.clientConfirmedAtStr||''} - Click for details</div>`).join('');
+  });
 }
 
 function render(){
   const area=document.getElementById('bookingsList');
   const empty=document.getElementById('emptyBookings');
-  const count=document.getElementById('countInfo');
-  // Separate active (pending to accepted) and history (client_confirmed_finished)
-  const active=all.filter(b=>{
-    const s=(b.status||'').toLowerCase();
-    return !s.includes('client_confirmed');
-  });
-  const history=all.filter(b=>{
-    const s=(b.status||'').toLowerCase();
-    return s.includes('client_confirmed');
-  });
-  // Active count for dashboard - when confirmed, goes to history and active becomes empty
-  count.textContent=active.length+' active - '+history.length+' history';
-  if(active.length===0 && history.length===0){ area.innerHTML=''; empty.style.display='block'; return; }
+  if(all.length===0){ area.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
-  // Show active first, then history
-  const sortedActive=active.sort((a,b)=>(b.time||0)-(a.time||0));
-  const sortedHistory=history.sort((a,b)=>(b.clientConfirmedAt||0)-(a.clientConfirmedAt||0));
-  const allSorted=[...sortedActive, ...sortedHistory];
-  // Save history to localStorage for persistence
-  if(history.length>0){
-    localStorage.setItem('lcg_client_history', JSON.stringify(history));
-  }
-
-  area.innerHTML=allSorted.map(b=>{
-    const status=(b.status||'pending').toLowerCase();
-    let badgeClass='badge-pending';
-    let badgeText=(b.status||'PENDING').toUpperCase();
-    if(status.includes('accepted')){ badgeClass='badge-accepted'; badgeText='ACCEPTED - Nurse accepted in my-job-offer'; }
-    else if(status.includes('on_the_way')){ badgeClass='badge-ontheway'; badgeText='ON THE WAY - Nurse is on the way'; }
-    else if(status.includes('close')){ badgeClass='badge-close'; badgeText='CLOSE - Nurse is close to you'; }
-    else if(status.includes('completed') && !status.includes('client_confirmed')){ badgeClass='badge-completed'; badgeText='COMPLETED - Waiting your confirmation'; }
-    else if(status.includes('client_confirmed')){ badgeClass='badge-confirmed'; badgeText='DONE - CLIENT CONFIRMED'; }
-    else if(status.includes('rejected')){ badgeClass='badge-rejected'; badgeText='REJECTED'; }
-
-    const isAccepted=status.includes('accepted');
-    const isOnWay=status.includes('on_the_way');
-    const isClose=status.includes('close');
-    const isCompleted=status.includes('completed') && !status.includes('client_confirmed');
-    const isClientConfirmed=status.includes('client_confirmed');
-    const isPending=status.includes('pending');
-
-    // Client sees only total amount, NOT nurse 80% share
-    const totalAmount=b.amount||b.price||0;
-    const currency=b.currency||'GHS';
-    const displayAmount=currency+' '+parseFloat(totalAmount).toFixed(2)+' - Total Paid by Client - Nurse share hidden';
-
-    return `
-    <div class="card" style="${isClientConfirmed?'border:2px solid #22c55e':''}">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-        <b style="font-size:13px">Booking ID ${b.bookingId||b.id}</b>
-        <span class="badge ${badgeClass}">${badgeText}</span>
+  area.innerHTML=all.map(b=>{
+    const st=(b.status||'pending').toLowerCase();
+    let badge='badge-pending', text=(b.status||'PENDING').toUpperCase();
+    if(st.includes('accepted')){ badge='badge-accepted'; text='ACCEPTED - Auto nav opens - Nurse on way'; }
+    else if(st.includes('on_the_way')){ badge='badge-ontheway'; text='ON THE WAY - System monitoring'; }
+    else if(st.includes('close')){ badge='badge-close'; text='CLOSE - System detected close - Can call'; }
+    else if(st.includes('completed')){ badge='badge-completed'; text='COMPLETED - Confirm to auto delete to history'; }
+    return `<div class="card">
+      <div style="display:flex;justify-content:space-between"><b>Booking ID ${b.bookingId||b.id}</b><span class="badge ${badge}">${text}</span></div>
+      <div style="margin-top:8px;font-size:11px">Client: ${b.clientName||clientName} - Nurse: ${b.nurseName||''} - Amount: ${b.currency||'GHS'} ${b.amount||''} - Total only - Nurse share hidden</div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        ${st.includes('completed')?`<button class="btn btnGreen" onclick="confirmDone('${b.id}')">Confirm Work Done - Auto delete to history</button>`:''}
+        <button class="btn btnGray" onclick="showDetails('${b.id}')">View Details</button>
+        ${b.nursePhone?`<button class="btn btnBlue" onclick="window.open('tel:${b.nursePhone}')">Call Nurse</button>`:''}
+        ${st.includes('accepted')||st.includes('on_the_way')||st.includes('close')?`<button class="btn btnYellow" onclick="openNav('${b.id}')">Open Navigation - Where nurse reached</button>`:''}
       </div>
-      <div style="margin-top:8px;font-size:11px;color:#a78bfa">Client: ${b.clientName||clientName||'You'} - Nurse: ${b.nurseName||'Nurse'} - Amount: ${displayAmount} - Time: ${b.createdAtStr||(b.time?new Date(b.time).toLocaleString('en-GH'): '')}</div>
-      <div style="margin-top:6px;font-size:11px">Service: ${b.serviceType||b.service||''} - Location: ${b.location||b.address||''} - Nurse Phone: ${b.nursePhone||''}</div>
-
-      <div class="flowCard">
-        ${getFlowSteps(b.status)}
-      </div>
-      <div style="margin-top:8px;font-size:10px;color:#9ca3af">
-        Flow: Pending -> Accepted (listener from my-job-offer.html when nurse accepts) -> On The Way -> Close -> Completed -> Client Confirmed Finished -> Is Part
-      </div>
-
-      ${isPending?`<div style="margin-top:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:8px;font-size:11px">Pending - Waiting for nurse to accept in my-job-offer.html - Listener active - When nurse accepts, this will update instantly to Accepted</div>`:''}
-      ${isAccepted?`<div style="margin-top:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:8px;font-size:11px">Accepted - Nurse ${b.nurseName||''} accepted your booking in my-job-offer.html - Listener detected - Amount: ${displayAmount} - Nurse is preparing to come - You will get loud sound alert</div>`:''}
-      ${isOnWay?`<div style="margin-top:10px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:10px;padding:8px;font-size:11px">On The Way - Nurse is on the way coming - Booking ID ${b.bookingId||b.id} - Track live</div>`:''}
-      ${isClose?`<div style="margin-top:10px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:8px;font-size:11px">Close - Nurse is just close to you - Please be ready - Booking ID ${b.bookingId||b.id}</div>`:''}
-      ${isCompleted?`<div style="margin-top:10px;background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(34,197,94,.08));border:1px solid rgba(168,85,247,.25);border-radius:10px;padding:8px;font-size:11px">Completed - Nurse marked work completed - Please confirm work completed - Amount: ${displayAmount} - Click Confirm Work Completed below</div>`:''}
-      ${isClientConfirmed?`<div style="margin-top:10px;background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(168,85,247,.1));border:2px solid rgba(34,197,94,.4);border-radius:12px;padding:10px;font-size:11px"><b>DONE - CLIENT CONFIRMED</b><br>Booking ID ${b.bookingId||b.id} - Date: ${b.clientConfirmedAtStr||''} - Amount: ${displayAmount} - You confirmed work completed - Accepted removed, marked completed with date and time - CEO received progress - Congrats sent to nurse - You can rate nurse now</div>`:''}
-
-      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
-        ${isPending?`<button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel</button>`:''}
-        ${isAccepted?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Done</button><button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel</button><button class="btn btnBlue" onclick="autoOpenNavigation(all.find(x=>x.id==='${b.id}'))">Navigate</button>`:''}
-        ${isOnWay?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Done</button><button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel</button><button class="btn btnBlue" onclick="autoOpenNavigation(all.find(x=>x.id==='${b.id}'))">Navigate</button>`:''}
-        ${isClose?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Done</button><button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel</button><button class="btn btnBlue" onclick="autoOpenNavigation(all.find(x=>x.id==='${b.id}'))">Navigate</button>`:''}
-        ${isCompleted?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Done</button><button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel Progress</button>`:''}
-        ${isClientConfirmed?`<div style="width:100%;background:rgba(34,197,94,.15);border-radius:8px;padding:6px;font-size:11px;color:#86efac">Done - ${b.bookingId||b.id} - In History</div><button class="btn btnYellow" onclick="rateNurse('${b.id}')">Rate ${b.nurseName||''}</button><button class="btn btnGray" onclick="viewHistory('${b.id}')">History</button>`:''}
-        <button class="btn btnGray" onclick="viewDetails('${b.id}')">Details</button>
-        ${b.nursePhone?`<button class="btn btnBlue" onclick="window.open('tel:${b.nursePhone}')">Call</button>`:''}
-      </div>
-    </div>
-    `;
+    </div>`;
   }).join('');
 }
 
-async function confirmCompleted(id){
+function openNav(id){
   const b=all.find(x=>x.id===id);
   if(!b) return;
-  if(!confirm(`Confirm work completed for Booking ID ${b.bookingId||id}?\n\nAmount: ${b.currency||'GHS'} ${b.amount}\nNurse: ${b.nurseName}\n\nThis will:\n- Remove Accepted from My Bookings and My Job Offer\n- Mark as Work Completed with Date/Time\n- CEO receives progress\n- Congrats message sent to nurse with Booking ID\n- You can rate nurse\n\nConfirm?`)) return;
-  try{
-    const now=Date.now();
-    const nowStr=new Date().toLocaleString('en-GH');
-    const totalAmount=parseFloat(b.amount||0);
-    const nursePortion=totalAmount*0.8;
-    const completedData={
-      status:'client_confirmed_finished',
-      clientConfirmed:true,
-      clientConfirmedAt:now,
-      clientConfirmedAtStr:nowStr,
-      livelyAmount:nursePortion,
-      totalAmount:totalAmount,
-      clientConfirmedFinished:true,
-      movedToHistory:true,
-      historyAt:now,
-      historyAtStr:nowStr
-    };
-    // Update bookings - client side
-    await db.ref('bookings/'+id).update(completedData);
-    // Reflect on CEO booking progress - CEO sees progress
-    await db.ref('ceoBookings/'+id).update(completedData).catch(()=>{});
-    await db.ref('ceoBookingsProgress/'+id).update({...completedData, type:'client_confirmed_finished', title:`Client Confirmed Finished - Booking ${b.bookingId||id}`, message:`Client ${b.clientName||clientName} confirmed work completed for Booking ID ${b.bookingId||id} - Nurse ${b.nurseName} - Amount ${b.currency||'GHS'} ${b.amount} - Completed on ${nowStr} - Moved to history - Active empty`, clientId:b.clientId||clientUid, nurseId:b.nurseId, createdAt:now}).catch(()=>{});
-    await db.ref('ceoNotificationRoom/'+id+'_client_confirmed_'+now).set({type:'client_confirmed', title:`Client Confirmed Work Done - Booking ${b.bookingId||id}`, message:`Client confirmed work is done - Booking ID ${b.bookingId||id} - Nurse ${b.nurseName} - Amount ${b.currency||'GHS'} ${b.amount} - Goes to history - Booking page emptying from pending to accepted`, bookingId:b.bookingId||id, nurseId:b.nurseId, clientId:b.clientId||clientUid, createdAt:now, read:false}).catch(()=>{});
-    // Move to client history - so booking page emptying from pending to accepted
-    await db.ref('clientHistory/'+(b.clientId||clientUid)+'/'+id).set({...b, ...completedData}).catch(()=>{});
-    await db.ref('clientBookingsHistory/'+(b.clientId||clientUid)+'/'+id).set({...b, ...completedData}).catch(()=>{});
-
-    await db.ref('myJobOffers/'+b.nurseId+'/'+id).update({
-      status:'client_confirmed_finished',
-      clientConfirmed:true,
-      clientConfirmedAt:now,
-      clientConfirmedAtStr:nowStr,
-      congratsMessage:`Congratulations ${b.nurseName} - Work completed for Booking ID ${b.bookingId||id} - Client confirmed completed - Date: ${nowStr} - Your Earnings: ${b.currency||'GHS'} ${nursePortion.toFixed(2)} - You can withdraw now`,
-      showCongrats:true
-    }).catch(()=>{});
-    await db.ref('nurseNotifications/'+b.nurseId+'/'+'CONGRATS-'+id+'-'+now).set({
-      type:'completed',
-      title:`Congratulations - Work Completed - Booking ID ${b.bookingId||id}`,
-      message:`Congratulations ${b.nurseName} - Work completed for Booking ID ${b.bookingId||id} - Client ${b.clientName||clientName} confirmed completed on ${nowStr} - Amount: ${b.currency||'GHS'} ${nursePortion.toFixed(2)} - You can withdraw now - Booking ID: ${b.bookingId||id}`,
-      bookingId:b.bookingId||id,
-      amount:nursePortion,
-      currency:b.currency,
-      time:now,
-      createdAt:now,
-      read:false,
-      isCongrats:true,
-      clientConfirmedAtStr:nowStr
-    });
-    toast('Work Completed Confirmed - Booking ID '+(b.bookingId||id)+' - Congrats sent to nurse - CEO received progress');
-    loadBookings();
-  }catch(e){ toast('Error: '+e.message); }
+  const nurseId=b.nurseId;
+  db.ref('nurseLocations/'+nurseId).once('value').then(s=>{
+    let nLat=5.6137, nLng=-0.1770;
+    if(s.exists()){ const v=s.val(); nLat=v.lat||nLat; nLng=v.lng||nLng; }
+    const cLat=b.clientLat||5.6037; const cLng=b.clientLng||-0.1870;
+    const url=`https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;
+    window.open(url,'_blank');
+  });
 }
 
-function viewDetails(id){ const b=all.find(x=>x.id===id); alert(`Booking Details\n\nBooking ID: ${b.bookingId||b.id}\nStatus: ${b.status}\nNurse: ${b.nurseName}\nTotal Paid by Client: ${b.currency||'GHS'} ${b.amount} - Nurse share hidden - Client only sees total\nTime: ${b.time?new Date(b.time).toLocaleString('en-GH'):''}\nCompleted: ${b.clientConfirmedAtStr||'Not yet'}\n\nFlow: Pending -> Accepted (listener from my-job-offer) -> On The Way -> Close -> Completed -> Client Confirmed Finished - Is Part`); }
-function rateNurse(id){ const b=all.find(x=>x.id===id); location.href=`rating.html?bookingId=${b.bookingId||b.id}&nurseName=${encodeURIComponent(b.nurseName||'Nurse')}&nurseId=${b.nurseId||''}`; }
-async function cancelBooking(id){ 
+async function confirmDone(id){
   const b=all.find(x=>x.id===id);
-  const reason=prompt('Why cancel? This will reflect on CEO booking progress:', 'Change of plans')||'Client cancelled';
-  if(!confirm('Cancel booking '+(b?b.bookingId||id:id)+'? This will reflect on CEO booking progress - CEO will see cancellation - Confirm cancel?')) return; 
-  try{ 
-    const now=Date.now();
-    const nowStr=new Date().toLocaleString('en-GH');
-    const cancelData={status:'cancelled_by_client', cancelledAt:now, cancelledAtStr:nowStr, cancellationReason:reason, cancelledBy:'client'};
-    await db.ref('bookings/'+id).update(cancelData);
-    await db.ref('ceoBookings/'+id).update(cancelData).catch(()=>{});
-    await db.ref('ceoBookingsProgress/'+id).update({...cancelData, type:'cancelled_by_client', title:`Cancelled by Client - Booking ${b?b.bookingId||id:id}`, message:`Client cancelled booking ID ${b?b.bookingId||id:id} - Reason: ${reason} - Time: ${nowStr} - Reflect on CEO booking progress`, clientId:b?b.clientId||clientUid:'', nurseId:b?b.nurseId:'', createdAt:now}).catch(()=>{});
-    await db.ref('clientBookings/'+(b?b.clientId||clientUid:'')+'/'+id).update(cancelData).catch(()=>{});
-    if(b && b.nurseId){
-      await db.ref('nurseNotifications/'+b.nurseId+'/'+'CANCELLED-'+id+'-'+now).set({type:'cancelled', title:`Client cancelled booking ${b.bookingId||id}`, message:`Client ${b.clientName||clientName} cancelled booking ID ${b.bookingId||id} - Reason: ${reason} - Reflect on CEO progress`, bookingId:b.bookingId||id, time:now, createdAt:now, read:false}).catch(()=>{});
-    }
-    toast('Cancelled - Reflect on CEO booking progress - ID '+(b?b.bookingId||id:id)+' - CEO will see');
-    loadBookings(); 
-  }catch(e){ toast(e.message); } 
-}
-function viewHistory(id){ const b=all.find(x=>x.id===id); alert(`History - Booking ID ${b.bookingId||b.id}\nStatus: DONE\nClient confirmed work done - Moved to history - Active booking page empty\nDate: ${b.clientConfirmedAtStr||''}\nNurse: ${b.nurseName}\nAmount: ${b.currency||'GHS'} ${b.amount}\n\nCEO progress updated - CEO received completion`); }
-
-
-function getNavUrl(booking, nurseLat, nurseLng){
-  const cLat=booking.clientLat||booking.lat||5.6037;
-  const cLng=booking.clientLng||booking.lng||-0.1870;
-  const nLat=nurseLat||booking.nurseLat||cLat+0.01;
-  const nLng=nurseLng||booking.nurseLng||cLng+0.01;
-  // Google Maps directions from nurse to client
-  return `https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;
+  if(!confirm(`Confirm work done for Booking ID ${b.bookingId||id}? Auto delete from active to history - Only ID shows in history`)) return;
+  const now=Date.now(); const nowStr=new Date().toLocaleString('en-GH');
+  await db.ref('bookings/'+id).update({status:'client_confirmed_finished', clientConfirmed:true, clientConfirmedAt:now, clientConfirmedAtStr:nowStr});
+  // Move to history and auto delete from active - so emptying, not pop up again
+  setTimeout(()=>{ moveToHistory({...b, clientConfirmedAt:now, clientConfirmedAtStr:nowStr, status:'client_confirmed_finished'}); render(); loadHistory(); toast('Confirmed - Booking auto deleted to history - Only ID shows - Empty active'); }, 500);
 }
 
-function autoOpenNavigation(booking){
-  try{
-    const cLat=booking.clientLat||booking.lat||5.6037;
-    const cLng=booking.clientLng||booking.lng||-0.1870;
-    let nLat=booking.nurseLat||booking.nurseCurrentLat||null;
-    let nLng=booking.nurseLng||booking.nurseCurrentLng||null;
-    
-    // Try to get live nurse location from multiple paths
-    const nurseId=booking.nurseId||'';
-    if(nurseId){
-      // Check live locations
-      db.ref('nurseLocations/'+nurseId).once('value').then(s=>{
-        if(s.exists()){
-          const v=s.val();
-          nLat=v.lat||v.latitude||nLat;
-          nLng=v.lng||v.longitude||nLng;
-        }
-        // Also check onlineNurses
-        return db.ref('onlineNurses/'+nurseId).once('value');
-      }).then(s=>{
-        if(s && s.exists()){
-          const v=s.val();
-          nLat=v.lat||v.latitude||nLat;
-          nLng=v.lng||v.longitude||nLng;
-        }
-        // Also check nurseLocations path
-        return db.ref('liveNurses/'+nurseId).once('value');
-      }).then(s=>{
-        if(s && s.exists()){
-          const v=s.val();
-          nLat=v.lat||v.latitude||nLat;
-          nLng=v.lng||v.longitude||nLng;
-        }
-        const url=getNavUrl(booking, nLat, nLng);
-        // Show confirm to open navigation
-        if(confirm(`Nurse ${booking.nurseName||'Nurse'} ACCEPTED your booking ${booking.bookingId||booking.id}\n\nNurse Location: ${nLat? nLat.toFixed(5): 'Loading...'}, ${nLng? nLng.toFixed(5): ''}\nYour Location: ${cLat.toFixed(5)}, ${cLng.toFixed(5)}\n\nAuto open navigation to show where nurse has reached?\n\nClick OK to open Google Maps navigation - You will see where nurse is and route to you`)){
-          window.open(url, '_blank');
-        } else {
-          // Still show navigation link in toast
-          toast(`Navigation ready: Nurse at ${nLat? nLat.toFixed(4): ''} to you - Tap to open Maps`);
-        }
-      }).catch(()=>{
-        const url=getNavUrl(booking, nLat, nLng);
-        if(confirm(`Nurse ${booking.nurseName||'Nurse'} ACCEPTED\n\nOpen navigation to see where nurse reached?\nBooking ID ${booking.bookingId||booking.id}`)){
-          window.open(url, '_blank');
-        }
-      });
-    } else {
-      const url=getNavUrl(booking, nLat, nLng);
-      if(confirm(`Nurse ACCEPTED - Open navigation to show where nurse reached? Booking ${booking.bookingId||booking.id}`)){
-        window.open(url, '_blank');
-      }
-    }
-  }catch(e){ console.log(e); }
+function showDetails(id){
+  const b=all.find(x=>x.id===id);
+  if(!b) return;
+  document.getElementById('modalTitle').textContent='Booking ID '+ (b.bookingId||b.id);
+  document.getElementById('modalBody').innerHTML=`Status: ${b.status}<br>Nurse: ${b.nurseName||''}<br>Nurse Phone: ${b.nursePhone||''}<br>Amount: ${b.currency||'GHS'} ${b.amount||''} - Total only<br>Service: ${b.serviceType||''}<br>Location: ${b.location||''}<br>Time: ${b.time?new Date(b.time).toLocaleString('en-GH'):''}<br>Completed: ${b.clientConfirmedAtStr||''}<br><br>Flow: Pending - Accepted auto nav - On Way monitor - Close - Completed - Auto delete to history`;
+  document.getElementById('modal').style.display='flex';
 }
+function showHistory(id){
+  const b=historyData.find(x=>x.id===id);
+  if(!b) return;
+  document.getElementById('modalTitle').textContent='History - Booking ID '+ (b.bookingId||b.id);
+  document.getElementById('modalBody').innerHTML=`Booking ID: ${b.bookingId||b.id}<br>Status: ${b.status}<br>Nurse: ${b.nurseName||''}<br>Amount: ${b.currency||'GHS'} ${b.amount||''}<br>Client Confirmed: ${b.clientConfirmedAtStr||''}<br>Service: ${b.serviceType||''}<br><br>History only shows ID - Click for details popup - Active empty after confirm`;
+  document.getElementById('modal').style.display='flex';
+}
+function closeModal(){ document.getElementById('modal').style.display='none'; }
 
-function startRealtimeLive(){
+function startLive(){
   if(!clientUid) return;
-  // Listen to bookings for instant updates when nurse accepts in my-job-offer.html
   db.ref('bookings').on('value', snap=>{
     if(!snap.exists()) return;
-    let changed=false;
     snap.forEach(ch=>{
       const v=ch.val(); const id=ch.key;
-      const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
-      const emailMatch=v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase();
-      const idMatch=v.clientId===clientUid;
-      if(phoneMatch||emailMatch||idMatch){
-        const curr=(v.status||'').toLowerCase();
-        const prevStatus=prev[id];
-        if(prevStatus && prevStatus!==curr){
-          if(curr==='accepted'){ 
-            playLoudSound('accepted'); 
-            toast('Nurse '+ (v.nurseName||'Nurse')+' ACCEPTED your booking '+ (v.bookingId||id)+' - Listener from my-job-offer - Auto opening navigation where nurse reached');
-            // Auto navigation opens to show where nurse has reached
-            autoOpenNavigation(v);
-          }
-          else if(curr==='on_the_way'){ playLoudSound('accepted'); toast('Nurse is on the way - Booking '+(v.bookingId||id)+' - Auto navigation updating where nurse reached'); autoOpenNavigation(v); }
-          else if(curr==='close'){ playLoudSound('accepted'); toast('Nurse is close to you - Booking '+(v.bookingId||id)+' - Auto navigation - Nurse reached close'); autoOpenNavigation(v); }
-          else if(curr==='completed'){ playLoudSound('accepted'); toast('Nurse marked work completed - Please confirm - Booking '+(v.bookingId||id)); }
+      const match=v.clientId===clientUid || (v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9));
+      if(!match) return;
+      const curr=(v.status||'').toLowerCase();
+      const prevStatus=prev[id];
+      if(prevStatus && prevStatus!==curr){
+        if(curr==='accepted'){
+          // Auto nav opens itself when accepted
+          const nLat=v.nurseLat||5.6137; const nLng=v.nurseLng||-0.1770;
+          const cLat=v.clientLat||5.6037; const cLng=v.clientLng||-0.1870;
+          const url=`https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;
+          toast('Accepted - Auto opening navigation - Where nurse reached');
+          window.open(url,'_blank');
+          // Start monitoring nurse movement
+          monitorNurseMovement({...v, id});
+          // System generates message to alerts
+          db.ref('clientAlerts/'+clientUid+'/ACCEPTED-AUTO-'+id+'-'+Date.now()).set({
+            type:'accepted',
+            title:`Nurse ${v.nurseName||'Nurse'} accepted - Auto nav opened`,
+            message:`System detected nurse ${v.nurseName||'Nurse'} accepted booking ID ${v.bookingId||id} in my-job-offer - Auto navigation opened to show where nurse reached - You can call nurse ${v.nursePhone||''} - Nurse can call you - Not hardcoded - System monitors actions`,
+            bookingId:v.bookingId||id,
+            time:Date.now(),
+            read:false,
+            autoGenerated:true
+          });
         }
-        prev[id]=curr;
-        const idx=all.findIndex(x=>x.id===id);
-        if(idx===-1){ all.unshift({...v, id}); changed=true; } else { all[idx]={...v, id}; changed=true; }
+      }
+      prev[id]=curr;
+      if(curr.includes('accepted')||curr.includes('on_the_way')||curr.includes('close')){
+        if(!monitorIntervals[id]) monitorNurseMovement({...v, id});
       }
     });
-    if(changed){ all.sort((a,b)=>(b.time||0)-(a.time||0)); render(); }
-  });
-
-  // Also listen clientBookings
-  db.ref('clientBookings/'+clientUid).on('value', snap=>{
-    if(!snap.exists()) return;
-    let changed=false;
-    snap.forEach(ch=>{
-      const v=ch.val(); const id=ch.key;
-      const idx=all.findIndex(x=>x.id===id);
-      if(idx!==-1){
-        const curr=(v.status||'').toLowerCase();
-        const prevStatus=prev[id];
-        if(prevStatus && prevStatus!==curr && curr==='accepted'){ playLoudSound('accepted'); }
-        prev[id]=curr;
-        all[idx]={...v, id};
-        changed=true;
-      }
-    });
-    if(changed) render();
   });
 }
 
 window.addEventListener('DOMContentLoaded', async ()=>{
-  getKeys();
-  await ensureAuth();
-  getKeys();
-  loadBookings();
-  startRealtimeLive();
+  getKeys(); await ensureAuth(); getKeys(); loadBookings(); loadHistory(); startLive();
 });
 </script>
 </body></html>
