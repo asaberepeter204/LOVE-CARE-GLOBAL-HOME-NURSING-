@@ -185,6 +185,8 @@ if(bossApp){
 <a class="item" href="contact.html">Contact</a>
 <a class="item consent" href="consent-form.html">Consent Form</a>
 <a class="item sos" href="sos.html">SOS</a>
+<a href="nurse-withdrawal.html" class="item" style="background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(245,158,11,.1));border:1px solid rgba(250,204,21,.3);color:#facc15;font-weight:800">Withdraw Earnings - NEW</a>
+<a href="my-job-offer.html" class="item" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2)">My Job Offers - Completed + Congrats</a>
 </div>
 <div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
 </div>
@@ -676,5 +678,12 @@ function openD(){ document.getElementById('drawer').classList.add('open'); docum
 function closeD(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
 window.addEventListener('load', loadNurse);
 </script>
+
+<style>
+.withdrawFloat{position:fixed;right:16px;bottom:100px;z-index:50;background:linear-gradient(135deg,#facc15,#f59e0b);color:#000;padding:12px 18px;border-radius:999px;font-weight:800;font-size:13px;box-shadow:0 8px 30px rgba(250,204,21,.4);cursor:pointer;border:2px solid #fde68a;display:flex;align-items:center;gap:8px;animation:pulseGold 2s infinite;text-decoration:none}
+@keyframes pulseGold{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+</style>
+<a href="nurse-withdrawal.html" class="withdrawFloat">Withdraw Earnings</a>
+
 </body>
 </html>
