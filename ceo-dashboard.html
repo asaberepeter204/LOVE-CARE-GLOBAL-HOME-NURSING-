@@ -1,201 +1,140 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nurse Withdrawal - Clean - No Ecobank Text</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Dashboard - 14 Pages - LOVE CARE GLOBAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.12);--text:#ece8ff;--muted:#9a95b8;--gold:#facc15}
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.top{position:sticky;top:0;z-index:10;background:rgba(12,10,30,.98);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
-.brand{font-family:Fraunces,serif;font-weight:700;font-size:15px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin:14px;max-width:640px;margin:auto;margin-top:14px}
-.label{font-size:11px;font-weight:700;color:var(--muted);margin:14px 0 6px;display:block}
-.input{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--line);background:#12102a;color:#fff;font-size:14px;outline:none}
-.input:focus{border-color:var(--gold)}
-.btn{width:100%;padding:14px;border-radius:14px;border:0;font-weight:700;cursor:pointer;margin-top:16px;font-size:14px}
-.btnGold{background:var(--gold);color:#000}
-.btnGray{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);margin-top:10px}
-.sel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
-.selBtn{padding:16px;border-radius:14px;border:2px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font-weight:700;cursor:pointer;text-align:center;font-size:13px}
-.selBtn.active{border-color:var(--gold);background:rgba(250,204,21,.15);color:var(--gold)}
-.box{background:rgba(18,16,42,.8);border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
-.hidden{display:none}
-.toast{position:fixed;right:16px;bottom:20px;background:#1e1a38;border:1px solid var(--line);padding:10px 14px;border-radius:10px;font-size:12px;display:none;z-index:99;max-width:300px}
-.badge{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:11px;text-decoration:none;color:var(--text)}
-</style></head><body>
-<div class="top"><div class="brand">Withdrawal</div><div style="display:flex;gap:8px"><a class="badge" href="nurse-dashboard.html">Dashboard</a><button class="badge" onclick="loadData()">Refresh</button></div></div>
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--gold:#facc15}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.98);border-bottom:1px solid var(--line);padding:16px 20px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:18px;letter-spacing:-0.3px}
+.main{max-width:1200px;margin:0 auto;padding:24px 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px}
+.btn{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;text-decoration:none;color:var(--text);display:flex;gap:14px;transition:.2s}
+.btn:hover{border-color:rgba(255,255,255,.18);transform:translateY(-2px)}
+.icon{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:800;flex-shrink:0;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}
+.num{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.5px}
+.title{font-weight:700;font-size:14px;font-family:Fraunces,serif}
+.file{font-size:10px;color:var(--muted);font-family:monospace;margin-top:2px;background:rgba(12,10,30,.6);border:1px solid var(--line);padding:2px 6px;border-radius:999px;display:inline-block}
+.desc{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
+.badge{font-size:10px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text)}
+.badgeGold{color:var(--gold);border-color:rgba(250,204,21,.25);background:rgba(250,204,21,.08)}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+<div class="brand">CEO Dashboard - 14 Pages</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<span class="badge" id="refundBadge">0 Refunds</span>
+<span class="badge badgeGold">14 Pages</span>
+<a href="index.html" class="badge" style="text-decoration:none">Home</a>
+</div>
+</div>
+</header>
 
-<div class="card">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
-<div style="background:#12102a;border:1px solid var(--line);border-radius:12px;padding:12px"><small style="color:var(--muted);font-size:10px">GHS Ghana</small><br><b id="ghs">GHS 0.00</b></div>
-<div style="background:#12102a;border:1px solid rgba(250,204,21,.25);border-radius:12px;padding:12px"><small style="color:var(--muted);font-size:10px">USD Outside</small><br><b id="usd" style="color:var(--gold)">$0.00</b></div>
+<div class="main">
+<div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px">
+<b style="font-family:Fraunces,serif;font-size:15px">CEO Control - 14 Pages</b>
+<p style="font-size:11px;color:var(--muted);margin-top:6px">Clean - No duplicate - Chat Room replaced with CEO Notifications - Live Monitoring removed - GHS and USD supported - No emoji - Pure English</p>
 </div>
 
-<label class="label">Where are you?</label>
-<div class="sel">
-<button class="selBtn active" id="bGHS" onclick="setLoc('GHS')">🇬🇭 Ghana<br>GHS</button>
-<button class="selBtn" id="bUSD" onclick="setLoc('USD')">🌍 Outside<br>USD</button>
+<div class="grid">
+
+<a href="ceo-complainant.html" class="btn">
+<div class="icon">01</div>
+<div><div class="num">01</div><div class="title">CEO Complainant</div><div class="file">ceo-complainant.html</div><div class="desc">Client and nurse complaints</div></div>
+</a>
+
+<a href="ceo-control-chat.html" class="btn">
+<div class="icon">02</div>
+<div><div class="num">02</div><div class="title">Control Chat</div><div class="file">ceo-control-chat.html</div><div class="desc">Block and delete nurses</div></div>
+</a>
+
+<a href="ceo-notification-room.html" class="btn" style="border-color:rgba(168,85,247,.25)">
+<div class="icon">03</div>
+<div><div class="num">03</div><div class="title">CEO Notifications</div><div class="file">ceo-notification-room.html</div><div class="desc">All bookings progress and withdrawals - Replaces chat-room</div></div>
+</a>
+
+<a href="nurse-group-chat.html" class="btn">
+<div class="icon">04</div>
+<div><div class="num">04</div><div class="title">Nurses Group Chat</div><div class="file">nurse-group-chat.html</div><div class="desc">Staff chat in own name</div></div>
+</a>
+
+<a href="ceo-control-pricing.html" class="btn">
+<div class="icon">05</div>
+<div><div class="num">05</div><div class="title">Control Pricing</div><div class="file">ceo-control-pricing.html</div><div class="desc">Control pricing live</div></div>
+</a>
+
+<a href="ceo-finance.html" class="btn">
+<div class="icon">06</div>
+<div><div class="num">06</div><div class="title">Finance</div><div class="file">ceo-finance.html</div><div class="desc">Payments and earnings</div></div>
+</a>
+
+<a href="ceo-live-tracking-map.html" class="btn">
+<div class="icon">07</div>
+<div><div class="num">07</div><div class="title">Live Tracking Map</div><div class="file">ceo-live-tracking-map.html</div><div class="desc">Track nurses GPS live</div></div>
+</a>
+
+<a href="ceo-penalize.html" class="btn">
+<div class="icon">08</div>
+<div><div class="num">08</div><div class="title">Penalize</div><div class="file">ceo-penalize.html</div><div class="desc">Warn, block, delete account</div></div>
+</a>
+
+<a href="ceo-registration-center.html" class="btn">
+<div class="icon">09</div>
+<div><div class="num">09</div><div class="title">Registration Center</div><div class="file">ceo-registration-center.html</div><div class="desc">Approve or reject registrations</div></div>
+</a>
+
+<a href="ceo-refund-management.html" class="btn">
+<div class="icon">10</div>
+<div><div class="num">10</div><div class="title">Refund Management</div><div class="file">ceo-refund-management.html</div><div class="desc">Approve refund requests</div></div>
+</a>
+
+<a href="delete-nurse-all-paths.html" class="btn">
+<div class="icon">11</div>
+<div><div class="num">11</div><div class="title">Delete Nurse</div><div class="file">delete-nurse-all-paths.html</div><div class="desc">Delete by UID, email, phone - All paths</div></div>
+</a>
+
+<a href="ceo-bookings-progress.html" class="btn" style="border-color:rgba(34,197,94,.2)">
+<div class="icon">12</div>
+<div><div class="num">12</div><div class="title">Bookings Progress</div><div class="file">ceo-bookings-progress.html</div><div class="desc">All bookings status and date time</div></div>
+</a>
+
+<a href="hr-page-GHS-USD.html" class="btn" style="border-color:rgba(250,204,21,.25)">
+<div class="icon">13</div>
+<div><div class="num">13</div><div class="title">HR Page - GHS and USD</div><div class="file">hr-page-GHS-USD.html</div><div class="desc">Card Global GHS Ghana plus USD outside Ghana</div></div>
+</a>
+
+<a href="home-banner-control.html" class="btn">
+<div class="icon">14</div>
+<div><div class="num">14</div><div class="title">Home Banner</div><div class="file">home-banner-control.html</div><div class="desc">Control home page banner image and text</div></div>
+</a>
+
+</div>
 </div>
 
-<div id="boxMethod" class="box">
-<label class="label" style="margin-top:0">Method</label>
-<select id="method" class="input" onchange="setMethod()">
-<option value="">Select — Card, MoMo, Bank</option>
-<option value="momo">MoMo</option>
-<option value="bank">Bank</option>
-<option value="card">Card</option>
-</select>
-</div>
-
-<div id="boxOutsideCard" class="box hidden">
-<label class="label" style="margin-top:0">Method — Outside Ghana</label>
-<select id="outsideMethod" class="input">
-<option value="card" selected>Card Only</option>
-</select>
-</div>
-
-<div id="boxMomoNet" class="box hidden">
-<label class="label" style="margin-top:0">MoMo Network</label>
-<select id="momoNet" class="input" onchange="setMomoNet()">
-<option value="">Select Network</option>
-<option value="MTN">MTN MoMo</option>
-<option value="Vodafone">Vodafone Cash</option>
-<option value="Telecel">Telecel Cash</option>
-<option value="AirtelTigo">AirtelTigo Money</option>
-</select>
-</div>
-
-<div id="boxBank" class="box hidden">
-<label class="label" style="margin-top:0">Bank</label>
-<select id="bankName" class="input" onchange="setBank()">
-<option value="">Select Bank</option>
-<option value="GCB">GCB Bank</option>
-<option value="Ecobank">Ecobank</option>
-<option value="Fidelity">Fidelity Bank</option>
-<option value="Absa">Absa Bank</option>
-<option value="Stanbic">Stanbic Bank</option>
-<option value="Zenith">Zenith Bank</option>
-<option value="CalBank">CalBank</option>
-<option value="GTBank">GTBank</option>
-<option value="Access">Access Bank</option>
-<option value="Other">Other</option>
-</select>
-</div>
-
-<div id="boxCardGhana" class="box hidden">
-<label class="label" style="margin-top:0">Card Type — Ghana</label>
-<select id="cardG" class="input" onchange="setCardG()">
-<option value="">Select Card</option>
-<option value="Visa">Visa</option>
-<option value="Mastercard">Mastercard</option>
-<option value="GhanaCard">Ghana Card linked</option>
-</select>
-</div>
-
-<div id="boxCardOutside" class="box hidden">
-<label class="label" style="margin-top:0">Card Type — Outside Ghana</label>
-<select id="cardO" class="input" onchange="setCardO()">
-<option value="">Select Card</option>
-<option value="Visa USD">Visa USD</option>
-<option value="Mastercard USD">Mastercard USD</option>
-<option value="Visa">Visa Global</option>
-<option value="Mastercard">Mastercard Global</option>
-</select>
-</div>
-
-<div id="boxMomoDetails" class="box hidden">
-<b style="font-size:13px" id="titleMomo">MoMo Details — <span id="spanMomo">MTN</span></b>
-<label class="label">MoMo Number</label><input id="momoNum" class="input" placeholder="0544121814" inputmode="numeric">
-<label class="label">MoMo Name</label><input id="momoName" class="input" placeholder="Full name on MoMo">
-<label class="label">Amount</label><input id="momoAmt" class="input" type="number" placeholder="e.g., 500">
-</div>
-
-<div id="boxBankDetails" class="box hidden">
-<b style="font-size:13px" id="titleBank">Bank Details — <span id="spanBank">GCB</span></b>
-<label class="label">Account Number</label><input id="bankAcc" class="input" placeholder="Account number" inputmode="numeric">
-<label class="label">Account Name</label><input id="bankAccName" class="input" placeholder="Full name on account">
-<label class="label">Branch</label><input id="bankBranch" class="input" placeholder="Branch">
-<label class="label">Amount</label><input id="bankAmt" class="input" type="number" placeholder="e.g., 500">
-</div>
-
-<div id="boxCardGhanaDetails" class="box hidden">
-<b style="font-size:13px" id="titleCardG">Card Details — <span id="spanCardG">Visa</span> — Ghana</b>
-<label class="label">Last 4 digits</label><input id="cardNumG" class="input" placeholder="1234" maxlength="4" inputmode="numeric">
-<label class="label">Name on Card</label><input id="cardNameG" class="input" placeholder="Full name on card">
-<label class="label">Country</label><input id="cardCountryG" class="input" value="Ghana">
-<label class="label">Amount</label><input id="cardAmtG" class="input" type="number" placeholder="e.g., 500">
-</div>
-
-<div id="boxCardOutsideDetails" class="box hidden">
-<b style="font-size:13px" id="titleCardO">Card Details — <span id="spanCardO">Visa USD</span> — Outside Ghana</b>
-<label class="label">Last 4 digits</label><input id="cardNumO" class="input" placeholder="1234" maxlength="4" inputmode="numeric">
-<label class="label">Name on Card</label><input id="cardNameO" class="input" placeholder="Full name on card">
-<label class="label">Country</label><input id="cardCountryO" class="input" placeholder="Nigeria, USA, UK">
-<label class="label">Amount</label><input id="cardAmtO" class="input" type="number" placeholder="e.g., 100">
-</div>
-
-<label class="label">Notes</label><textarea id="notes" class="input" rows="2" placeholder="Optional"></textarea>
-
-<button class="btn btnGold" onclick="submitW()">Submit Withdrawal</button>
-<button class="btn btnGray" onclick="location.href='nurse-dashboard.html'">Back</button>
-</div>
-
-<div class="card"><h3 style="font-family:Fraunces,serif;font-size:14px">History</h3><div id="hist" style="margin-top:10px;color:var(--muted);font-size:12px">Loading...</div></div>
-<div id="toast" class="toast"></div>
 <script>
-const cfg={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(cfg);const db=firebase.database();
-let nid=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
-let nName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'Nurse';
-let nEmail=localStorage.getItem('nurseEmail')||'';
-let loc='GHS', mth='', mNet='', bName='', cG='', cO='', totalG=0,totalU=0;
-function toast(m){const e=document.getElementById('toast');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3000);}
-function setLoc(l){
-loc=l;
-document.getElementById('bGHS').classList.toggle('active',l==='GHS');
-document.getElementById('bUSD').classList.toggle('active',l==='USD');
-['boxMomoNet','boxBank','boxCardGhana','boxCardOutside','boxMomoDetails','boxBankDetails','boxCardGhanaDetails','boxCardOutsideDetails'].forEach(id=>document.getElementById(id).classList.add('hidden'));
-if(l==='GHS'){
-document.getElementById('boxMethod').classList.remove('hidden');
-document.getElementById('boxOutsideCard').classList.add('hidden');
-document.getElementById('method').value='';
-}else{
-document.getElementById('boxMethod').classList.add('hidden');
-document.getElementById('boxOutsideCard').classList.remove('hidden');
-document.getElementById('boxCardOutside').classList.remove('hidden');
-}
-}
-function setMethod(){
-mth=document.getElementById('method').value;
-['boxMomoNet','boxBank','boxCardGhana','boxMomoDetails','boxBankDetails','boxCardGhanaDetails'].forEach(id=>document.getElementById(id).classList.add('hidden'));
-if(mth==='momo'){document.getElementById('boxMomoNet').classList.remove('hidden');}
-else if(mth==='bank'){document.getElementById('boxBank').classList.remove('hidden');}
-else if(mth==='card'){document.getElementById('boxCardGhana').classList.remove('hidden');}
-}
-function setMomoNet(){mNet=document.getElementById('momoNet').value;if(!mNet)return;document.getElementById('spanMomo').textContent=mNet;document.getElementById('boxMomoDetails').classList.remove('hidden');}
-function setBank(){bName=document.getElementById('bankName').value;if(!bName)return;document.getElementById('spanBank').textContent=bName;document.getElementById('boxBankDetails').classList.remove('hidden');}
-function setCardG(){cG=document.getElementById('cardG').value;if(!cG)return;document.getElementById('spanCardG').textContent=cG;document.getElementById('boxCardGhanaDetails').classList.remove('hidden');}
-function setCardO(){cO=document.getElementById('cardO').value;if(!cO)return;document.getElementById('spanCardO').textContent=cO;document.getElementById('boxCardOutsideDetails').classList.remove('hidden');}
-function loadData(){
-if(!nid){document.getElementById('ghs').textContent='GHS 0.00';document.getElementById('usd').textContent='$0.00';return;}
-db.ref('bookings').orderByChild('nurseId').equalTo(nid).once('value').then(s=>{let g=0,u=0;if(s.exists())s.forEach(c=>{const b=c.val();const st=(b.status||'').toLowerCase();if(st.includes('completed')||st.includes('client_confirmed')){if(b.clientConfirmed||st.includes('client_confirmed')){const cur=(b.currency||'GHS').toUpperCase();const a=parseFloat(b.livelyAmount||b.amount||0*0.8);if(cur==='USD'||cur==='$')u+=a;else g+=a;}}});db.ref('nurseWithdrawals').orderByChild('nurseId').equalTo(nid).once('value').then(w=>{let wg=0,wu=0;if(w.exists())w.forEach(c=>{const d=c.val();const cur=(d.currency||'GHS').toUpperCase();const a=parseFloat(d.amount||0);if(d.status==='approved'||d.status==='completed'){if(cur==='USD')wu+=a;else wg+=a;}});totalG=g-wg;totalU=u-wu;document.getElementById('ghs').textContent='GHS '+totalG.toFixed(2);document.getElementById('usd').textContent='$'+totalU.toFixed(2);});});
-db.ref('nurseWithdrawals').orderByChild('nurseId').equalTo(nid).on('value',snap=>{const el=document.getElementById('hist');if(!snap.exists()){el.innerHTML='No withdrawals';return;}const arr=[];snap.forEach(c=>arr.push({...c.val(),id:c.key}));arr.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));el.innerHTML=arr.map(w=>{const cur=(w.currency||'GHS').toUpperCase();const sym=cur==='USD'?'$':'GHS';let d='';if(w.method==='momo')d=`MoMo ${w.momoNetwork||''} ${w.momoNumber||''}`;else if(w.method==='bank')d=`Bank ${w.bankName||''} ${w.bankAccount||''}`;else d=`Card ${w.cardType||''} ****${w.cardNumber||''}`;return `<div style="background:#12102a;border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px"><div style="display:flex;justify-content:space-between"><b>${sym} ${parseFloat(w.amount||0).toFixed(2)} ${cur}</b><small>${(w.status||'pending').toUpperCase()}</small></div><div style="font-size:11px;margin-top:4px">${d}</div></div>`}).join('');});}
-async function submitW(){
-let amount=0,method='',cur=loc,sym=cur==='GHS'?'GHS':'$',details={};
-if(cur==='GHS'){
-method=mth;if(!method){toast('Select Card, MoMo, Bank');return;}
-if(method==='momo'){if(!mNet){toast('Select MTN, Vodafone, Telecel');return;}const num=document.getElementById('momoNum').value.trim();const name=document.getElementById('momoName').value.trim();amount=parseFloat(document.getElementById('momoAmt').value||0);if(!num||!name){toast('Fill '+mNet+' MoMo details');return;}details={momoNetwork:mNet,momoNumber:num,momoName:name};}
-else if(method==='bank'){if(!bName){toast('Select Bank');return;}const acc=document.getElementById('bankAcc').value.trim();const accName=document.getElementById('bankAccName').value.trim();amount=parseFloat(document.getElementById('bankAmt').value||0);if(!acc||!accName){toast('Fill '+bName+' details');return;}details={bankName:bName,bankAccount:acc,bankAccountName:accName,bankBranch:document.getElementById('bankBranch').value.trim()};}
-else{if(!cG){toast('Select Card type');return;}const cn=document.getElementById('cardNumG').value.trim();const cname=document.getElementById('cardNameG').value.trim();amount=parseFloat(document.getElementById('cardAmtG').value||0);if(!cn||!cname){toast('Fill '+cG+' card details');return;}details={cardType:cG,cardNumber:cn,cardName:cname,cardCountry:document.getElementById('cardCountryG').value.trim()};}
-}else{
-method='card';cur='USD';sym='$';if(!cO){toast('Select Card — Outside Ghana');return;}const cn=document.getElementById('cardNumO').value.trim();const cname=document.getElementById('cardNameO').value.trim();const cc=document.getElementById('cardCountryO').value.trim();amount=parseFloat(document.getElementById('cardAmtO').value||0);if(!cn||!cname||!cc){toast('Fill '+cO+' card details');return;}details={cardType:cO,cardNumber:cn,cardName:cname,cardCountry:cc,cardCurrency:'USD'};}
-if(!amount||amount<5){toast('Enter amount');return;}
-if(!confirm(`Confirm?
-${sym}${amount} ${cur}
-${method} → ${mNet||bName||cG||cO}`))return;
-try{const now=Date.now();const id='WTH-'+now+'-'+Math.random().toString(36).substr(2,4);const data={withdrawalId:id,nurseId:nid,nurseName:nName,nurseEmail:nEmail,amount:amount,currency:cur,symbol:sym,method:method,...details,notes:document.getElementById('notes').value.trim(),status:'pending',createdAt:now,createdAtStr:new Date().toLocaleString('en-GH'),isGhana:cur==='GHS',isInternational:cur==='USD'};
-await db.ref('nurseWithdrawals/'+id).set(data);await db.ref('ceoWithdrawals/'+id).set(data);await db.ref('withdrawalRequests/'+id).set(data);await db.ref('ceoHRPage/withdrawals/'+id).set(data);await db.ref('ceoNotifications/'+id).set({type:'withdrawal_request',title:`Withdrawal ${nName} ${sym}${amount} ${cur} ${method} → ${mNet||bName||cG||cO}`,message:`${nName} ${sym}${amount} ${cur} ${method} → ${mNet||bName||cG||cO} ${JSON.stringify(details)} ID ${id}`,nurseId:nid,amount:amount,currency:cur,method:method,withdrawalId:id,createdAt:now,read:false});
-toast(`Sent ${sym}${amount} ${cur}`);loadData();}catch(e){toast('Error: '+e.message);}
-}
-window.onload=()=>{setLoc('GHS');loadData();};
-</script></body></html>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const auth=firebase.auth();
+auth.onAuthStateChanged(async user=>{
+  if(!user){ try{ await auth.signInAnonymously(); }catch(e){} return; }
+});
+db.ref('ceoRefundManagement').on('value', snap=>{
+  if(!snap.exists()){ document.getElementById('refundBadge').textContent='0 Refunds'; return; }
+  const pending=Object.values(snap.val()).filter(r=>r.status==='pending').length;
+  document.getElementById('refundBadge').textContent=pending+' Refunds';
+});
+</script>
+</body>
+</html>
