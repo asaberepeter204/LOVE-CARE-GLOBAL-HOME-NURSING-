@@ -32,7 +32,7 @@ function openBothPhotosModal(bookingId){
           </div>
           <div class="photoRow">
             <div class="photoBox client">
-              ${cUrl?`<img src="${cUrl}">`:`<div style="width:90px;height:90px;border-radius:50%;background:#333;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>`}
+              ${cUrl?`<img src="${cUrl}">`:`<div style="width:90px;height:90px;border-radius:50%;background:#333;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:40px">ðŸ‘¤</div>`}
               <div style="font-size:12px;color:#b39ddb;font-weight:bold">CLIENT</div>
               <div style="font-size:13px;color:#fff;font-weight:bold;margin-top:4px">${b.clientName||b.clientUsername||'Client'}</div>
               <div style="font-size:11px;color:#ccc">${b.clientPhone||''}</div>
@@ -40,7 +40,7 @@ function openBothPhotosModal(bookingId){
               <div style="font-size:10px;color:#aaa">Location: ${b.clientLocation||b.location||'-'}</div>
             </div>
             <div class="photoBox nurse">
-              ${nUrl?`<img src="${nUrl}">`:`<div style="width:90px;height:90px;border-radius:50%;background:#333;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:40px">👩‍⚕️</div>`}
+              ${nUrl?`<img src="${nUrl}">`:`<div style="width:90px;height:90px;border-radius:50%;background:#333;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:40px">ðŸ‘©â€âš•ï¸</div>`}
               <div style="font-size:12px;color:#a5d6a7;font-weight:bold">NURSE</div>
               <div style="font-size:13px;color:#fff;font-weight:bold;margin-top:4px">${b.nurseName||'Nurse'}</div>
               <div style="font-size:11px;color:#ccc">${b.nursePhone||''}</div>
@@ -69,7 +69,7 @@ function openBothPhotosModal(bookingId){
 </head><body>
 <div style="padding:12px 16px;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12);display:flex;justify-content:space-between"><b>CEO Bookings Progress - Rejected Flow Fixed</b><small style="color:#22c55e">Live - Shows rejected - CEO clears after seeing</small></div>
 <div style="max-width:900px;margin:0 auto;padding:10px">
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 14px"><button class="btn btnGray" onclick="filter='all';load()">All</button><button class="btn btnRed" style="flex:none" onclick="filter='rejected';load()">Rejected Only - CEO must see then clear</button><button class="btn btnGray" onclick="filter='accepted';load()">Accepted</button></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 14px"><button class="btn btnGray" onclick="filter='all';load()">All</button><button class="btn btnRed" style="flex:none" onclick="filter='rejected';load()">ALL Progress - Pending, Accepted, Rejected, Completed - CEO View Both Photos</button><button class="btn btnGray" onclick="filter='accepted';load()">Accepted</button></div>
 <div id="list" style="display:grid;gap:12px"></div>
 </div>
 <div id="toast" class="toast"></div>
@@ -79,7 +79,21 @@ firebase.initializeApp(firebaseConfig); const db=firebase.database();
 let filter='all'; let all=[];
 function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000); }
 function load(){
+  // Load from BOTH ceoBookingsProgress AND bookings (so CEO sees ALL even if progress node empty)
+  db.ref('bookings').on('value', snapBookings=>{
+    const bookingsList=[];
+    if(snapBookings.exists()){
+      snapBookings.forEach(ch=>{
+        const v=ch.val();
+        v.id=ch.key;
+        bookingsList.push(v);
+      });
+    }
+    window._bookingsAll=bookingsList;
+    combineAndRender();
+  });
   db.ref('ceoBookingsProgress').on('value', snap=>{
+
     const arr=[]; if(snap.exists()){ snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); }); }
     // Also check bookings with rejected status that CEO hasn't seen
     db.ref('bookings').once('value').then(bSnap=>{
