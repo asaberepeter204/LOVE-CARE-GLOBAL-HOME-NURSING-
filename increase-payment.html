@@ -1,270 +1,69 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Increase Payment - ULTRA FIXED - Paystack Real Payment Only</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
-.top{position:sticky;top:0;z-index:20;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
-.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px auto;max-width:600px}
-.btn{border:none;border-radius:14px;padding:14px;font-weight:800;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;min-height:48px;width:100%;margin-bottom:10px}
-.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
-.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
-.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
-.input{width:100%;padding:14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.18);color:#fff;font-size:14px;margin-bottom:12px}
-.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none}
-.alertBox{padding:12px;border-radius:12px;margin-bottom:10px;font-size:11px}
-.alertRed{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
-.alertGreen{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac}
-.alertYellow{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fde68a}
+<title>Increase Payment - LoveCareGlobal</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px 14px}
+.btn{border:none;border-radius:14px;padding:14px;font-weight:800;cursor:pointer;font-size:13px;min-height:48px;width:100%}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff}.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
+.chip{padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.3);color:#fff;font-weight:800;cursor:pointer}
+.chip.on{background:#facc15;color:#000;border-color:#facc15}
+input{width:100%;padding:14px;border-radius:14px;border:1px solid rgba(168,85,247,.3);background:rgba(255,255,255,.06);color:#fff;font-size:18px;font-weight:800;outline:none}
+label{font-size:11px;color:#d8b4fe;font-weight:800} .row{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.1)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none;max-width:90%;text-align:center}
 </style>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head><body>
-<div class="top"><div><b>Increase Payment - ULTRA FIXED V2</b><br><small style="font-size:9px;color:#22c55e">Fixed: Paystack popup shows - No update without valid Paystack payment - Real payment only</small></div><a href="my-bookings.html" style="color:#d8b4fe;text-decoration:none;font-size:11px">My Bookings</a></div>
-
-<div style="max-width:600px;margin:0 auto;padding:10px">
-<div class="card" style="border:1px solid rgba(245,158,11,.3)">
-<b>SET YOUR PAYSTACK PUBLIC KEY - REQUIRED FOR POPUP</b><br>
-<small style="font-size:10px;color:#fde68a">Go to paystack.com Dashboard - Settings - API Keys - Copy Public Key pk_live_ or pk_test_ - Paste below - Popup will show only if key valid</small>
-<div style="margin-top:10px">
-<label style="font-size:10px;color:#d8b4fe">Paystack Public Key (pk_live_... or pk_test_...)</label>
-<input id="paystackKeyInput" class="input" placeholder="pk_live_xxxxxxxxxxxxxxxx or pk_test_xxxxxxxx" value="pk_live_f17ae09bf855010825cbfccdda8e724553ab747b">
-</div>
-<button class="btn btnYellow" style="padding:10px" onclick="saveKey()">Save Paystack Key - Then Paystack Popup Will Show</button>
-<div id="keyStatus" style="font-size:10px;color:#facc15">Live key embedded: pk_live_f17ae09bf855... - Popup ready</div>
-</div>
-
-<div class="card" id="bookingCard">
-<b>Booking Details - Rejected Offer - Increase Payment</b>
-<div id="bookingInfo" style="margin-top:10px;font-size:12px;color:#a78bfa">Loading...</div>
-</div>
-
-<div class="card">
-<b>Increase Payment - Pay Extra via Paystack - Continue Booking Nurse</b><br>
-<small style="font-size:10px;color:#a78bfa">Nurse rejected because rate low - Increase rate - Extra must be paid via Paystack valid payment - No update without valid Paystack transaction</small>
-
-<div style="margin-top:14px">
-<label style="font-size:11px;color:#d8b4fe">Current Amount: GHS</label>
-<input id="currentAmount" class="input" type="number" readonly>
-</div>
-
-<div>
-<label style="font-size:11px;color:#d8b4fe">Extra Amount to Add - GHS - Min 5</label>
-<input id="extraAmount" class="input" type="number" placeholder="e.g., 20" value="20" min="5">
-</div>
-
-<div style="margin-top:10px;padding:10px;border-radius:12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);font-size:11px">
-<div>Current: <b id="currDisplay">GHS 0</b></div>
-<div>Extra: <b id="extraDisplay">GHS 0</b></div>
-<div style="margin-top:6px;font-size:13px">New Total: <b id="newTotal" style="color:#22c55e">GHS 0</b></div>
-<div style="margin-top:4px;font-size:10px;color:#a78bfa">Nurse gets 80% of new total - After valid Paystack payment, booking pending again</div>
-</div>
-
-<div id="paystackStatus" class="alertBox alertYellow" style="display:none"></div>
-
-<button id="payBtn" class="btn btnBlue" onclick="payWithPaystack()">Pay Rest via Paystack - Popup Must Show - Valid Payment Required</button>
-<button class="btn btnYellow" onclick="location.href='book-nurse.html'">Book Another Nurse</button>
-<button class="btn" style="background:rgba(255,255,255,.06);color:#d8b4fe" onclick="location.href='my-bookings.html'">Dismiss</button>
-
-<div style="margin-top:12px;font-size:9px;color:#6b7280;text-align:center">Fixed: No extra added without valid Paystack payment - Popup must show - Only after Paystack success callback will amount update - Before was bug: extra added without Paystack</div>
-</div>
-</div>
-
-<div id="toast" class="toast"></div>
-
+<div style="padding:12px 16px;display:flex;justify-content:space-between;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12)"><b>Increase Payment</b><a href="my-bookings.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-size:11px;text-decoration:none">Back</a></div>
+<div style="max-width:600px;margin:0 auto;padding:6px">
+<div class="card" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3)"><b style="color:#fca5a5">Nurse rejected your offer</b><br><small>Add extra money to convince the nurse to accept this same booking. You only pay the <b>EXTRA</b> now via Paystack - not the full amount again.</small></div>
+<div class="card"><b>Booking Details</b><div id="details" style="margin-top:8px">Loading booking...</div></div>
+<div class="card"><label>EXTRA AMOUNT TO ADD (GHS) - This is what Paystack will charge</label><input id="extraInput" type="number" min="1" step="1" placeholder="e.g. 20" style="margin-top:8px"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="chip" onclick="setExtra(10)">+ GHS 10</button><button class="chip" onclick="setExtra(20)">+ GHS 20</button><button class="chip" onclick="setExtra(50)">+ GHS 50</button><button class="chip" onclick="setExtra(100)">+ GHS 100</button></div><small style="color:#fca5a5">Must be more than 0. New total must be higher than current amount.</small></div>
+<div class="card"><b>Summary</b><div class="row"><span>Current / Old Amount</span><b id="curAmt">GHS 0</b></div><div class="row"><span>Extra You Will Pay Now</span><b id="extraAmt" style="color:#facc15">GHS 0</b></div><div class="row"><span>New Total for Booking</span><b id="newTotal" style="color:#86efac">GHS 0</b></div><div class="row"><span>Nurse Gets (80% of New Total)</span><b id="nurseShare">GHS 0</b></div><div class="row"><span>CEO Gets (20% of New Total)</span><b id="ceoShare">GHS 0</b></div><div class="row"><span>Total You Have Paid For This Booking (after this)</span><b id="totalPaidEl">GHS 0</b></div></div>
+<div class="card"><button class="btn btnBlue" id="payBtn" onclick="payExtra()">Pay Extra GHS <span id="payBtnAmt">0</span> via Paystack</button><br><br><button class="btn btnGray" onclick="window.location.href='my-bookings.html'">Cancel - Go Back</button><small style="display:block;text-align:center;margin-top:10px;color:#d8b4fe">Secure payment via Paystack • Booking ID: <span id="bidEl">-</span></small></div>
+</div><div id="toast" class="toast"></div>
 <script>
+const PAYSTACK_KEY='pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig); const db=firebase.database();
-
-let bookingId='', bookingData=null;
-let clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'client@example.com';
-let clientName=localStorage.getItem('clientName')||localStorage.getItem('clientUsername')||'Client';
-let clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||'';
-let savedKey=localStorage.getItem('paystackPublicKey')||'pk_live_f17ae09bf855010825cbfccdda8e724553ab747b';
-
-function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',5000); }
-
-function saveKey(){
-  const k=document.getElementById('paystackKeyInput').value.trim();
-  if(!k){ toast('Enter Paystack key'); return; }
-  if(!k.startsWith('pk_')){ toast('Key must start with pk_live_ or pk_test_'); return; }
-  localStorage.setItem('paystackPublicKey', k);
-  savedKey=k;
-  document.getElementById('keyStatus').innerHTML='<span style="color:#86efac">Key saved: '+k.substring(0,15)+'... - Paystack popup will now show</span>';
-  toast('Paystack key saved - Now click Pay');
-  // Load Paystack script dynamically
-  loadPaystackScript();
-}
-
-function loadPaystackScript(){
-  // Remove old
-  const old=document.getElementById('paystackScript');
-  if(old) old.remove();
-  const script=document.createElement('script');
-  script.id='paystackScript';
-  script.src='https://js.paystack.co/v1/inline.js';
-  script.onload=()=>{ console.log('Paystack loaded'); document.getElementById('paystackStatus').style.display='block'; document.getElementById('paystackStatus').innerHTML='Paystack script loaded - Ready to show popup - Key: '+(savedKey?savedKey.substring(0,20)+'...':'No key'); document.getElementById('paystackStatus').className='alertBox alertGreen'; };
-  script.onerror=()=>{ document.getElementById('paystackStatus').style.display='block'; document.getElementById('paystackStatus').innerHTML='Failed to load Paystack - Check internet - https://js.paystack.co/v1/inline.js blocked?'; document.getElementById('paystackStatus').className='alertBox alertRed'; };
-  document.head.appendChild(script);
-}
-
-function getBookingId(){
-  const urlParams=new URLSearchParams(window.location.search);
-  bookingId=urlParams.get('bookingId')||urlParams.get('id')||localStorage.getItem('lastRejectedBookingId')||'';
-  if(savedKey){ document.getElementById('paystackKeyInput').value=savedKey; document.getElementById('keyStatus').innerHTML='<span style="color:#86efac">Saved key: '+savedKey.substring(0,15)+'... - Popup ready</span>'; }
-  loadPaystackScript();
-  if(!bookingId){ document.getElementById('bookingInfo').innerHTML='<small>No booking ID - Open from my-bookings.html Increase Payment button</small>'; return; }
-  loadBooking();
-}
-
-async function loadBooking(){
-  const snap=await db.ref('bookings/'+bookingId).once('value');
-  if(!snap.exists()){
-    document.getElementById('bookingInfo').innerHTML='Booking not found: '+bookingId+' - May already deleted by CEO after rejected';
-    return;
-  }
-  bookingData=snap.val(); bookingData.id=bookingId;
-  const curr=parseFloat(bookingData.amount||40);
-  document.getElementById('currentAmount').value=curr;
-  document.getElementById('bookingInfo').innerHTML=`
-    Booking ID: <b>${bookingData.bookingId||bookingId}</b><br>
-    Nurse: <b>${bookingData.nurseName||''} - ${bookingData.nursePhone||''}</b><br>
-    Amount: <b>GHS ${curr}</b> - Status: <span style="color:#facc15">${bookingData.status||'rejected'}</span><br>
-    Service: ${bookingData.serviceType||''}<br>
-    <small>After CEO sees rejected, will be deleted - Increase now to continue</small>
-  `;
-  updateTotals();
-}
-
-function updateTotals(){
-  const curr=parseFloat(document.getElementById('currentAmount').value||0);
-  const extra=parseFloat(document.getElementById('extraAmount').value||0);
-  const newTotal=curr+extra;
-  document.getElementById('currDisplay').textContent='GHS '+curr.toFixed(2);
-  document.getElementById('extraDisplay').textContent='GHS '+extra.toFixed(2);
-  document.getElementById('newTotal').textContent='GHS '+newTotal.toFixed(2);
-}
-document.getElementById('extraAmount').addEventListener('input', updateTotals);
-
-function payWithPaystack(){
-  const extra=parseFloat(document.getElementById('extraAmount').value||0);
-  const curr=parseFloat(document.getElementById('currentAmount').value||0);
-  const newTotal=curr+extra;
-  const key=document.getElementById('paystackKeyInput').value.trim()||savedKey;
-
-  if(!key){ toast('Set Paystack public key first - Enter pk_live_ key'); document.getElementById('paystackStatus').style.display='block'; document.getElementById('paystackStatus').innerHTML='No Paystack key - Enter key at top - Popup will not show without valid key'; document.getElementById('paystackStatus').className='alertBox alertRed'; return; }
-  if(!key.startsWith('pk_')){ toast('Invalid key - Must start pk_live_ or pk_test_'); return; }
-  if(extra<5){ toast('Extra min GHS 5'); return; }
-  if(typeof PaystackPop === 'undefined'){ toast('Paystack script not loaded - Check internet - Retrying load'); loadPaystackScript(); setTimeout(()=>{ if(typeof PaystackPop !== 'undefined') payWithPaystack(); }, 1500); return; }
-
-  const amountKobo=Math.round(extra*100); // GHS pesewas
-  const btn=document.getElementById('payBtn');
-  btn.textContent='Opening Paystack Popup - Wait...';
-  btn.disabled=true;
-
-  try{
-    const handler=PaystackPop.setup({
-      key: key,
-      email: clientEmail && clientEmail.includes('@') ? clientEmail : 'client@lovecareglobal.com',
-      amount: amountKobo,
-      currency: 'GHS',
-      ref: 'INCREASE-'+bookingId+'-'+Date.now(),
-      metadata: {
-        custom_fields: [
-          {display_name: "Booking ID", variable_name: "booking_id", value: bookingId},
-          {display_name: "Extra Amount", variable_name: "extra_amount", value: extra},
-          {display_name: "Client Name", variable_name: "client_name", value: clientName}
-        ]
-      },
-      callback: function(response){
-        // ONLY HERE - Real valid Paystack payment - Then update
-        console.log('Paystack success', response);
-        if(!response || !response.reference){ toast('Paystack payment failed - No reference'); btn.textContent='Pay Rest via Paystack - Popup Must Show'; btn.disabled=false; return; }
-        toast('Paystack SUCCESS - Ref: '+response.reference+' - Verifying and updating booking - Valid payment confirmed');
-        document.getElementById('paystackStatus').style.display='block';
-        document.getElementById('paystackStatus').className='alertBox alertGreen';
-        document.getElementById('paystackStatus').innerHTML='Paystack VALID payment - Ref: '+response.reference+' - Extra GHS '+extra+' confirmed - Updating booking to GHS '+newTotal+' - No update without valid payment was bug - Now fixed';
-        handlePaymentSuccess(extra, newTotal, response.reference);
-        btn.textContent='Payment Success - Updating...';
-      },
-      onClose: function(){
-        toast('Paystack popup closed - No payment - Extra NOT added - Must pay to continue');
-        btn.textContent='Pay Rest via Paystack - Popup Must Show - Valid Payment Required';
-        btn.disabled=false;
-        document.getElementById('paystackStatus').style.display='block';
-        document.getElementById('paystackStatus').className='alertBox alertYellow';
-        document.getElementById('paystackStatus').innerHTML='Paystack closed - No valid payment - Extra amount NOT added - Old rate stays - Must complete Paystack to increase';
-      }
-    });
-    handler.openIframe();
-  }catch(e){
-    toast('Paystack error: '+e.message+' - Check key');
-    btn.textContent='Pay Rest via Paystack - Popup Must Show';
-    btn.disabled=false;
-    console.error(e);
-  }
-}
-
-async function handlePaymentSuccess(extra, newTotal, paystackRef){
-  // REAL PAYMENT ONLY - This function only called after valid Paystack callback - No simulation
-  const now=Date.now(); const nowStr=new Date().toLocaleString('en-GH');
-  const nurseShare=newTotal*0.8; const ceoShare=newTotal*0.2;
-  
-  const updateData={
-    amount: newTotal,
-    livelyAmount: nurseShare,
-    ceoShare: ceoShare,
-    previousAmount: parseFloat(bookingData.amount||0),
-    extraAmountPaid: extra,
-    extraPaidAt: now,
-    extraPaidAtStr: nowStr,
-    paystackRef: paystackRef,
-    paystackVerified: true, // Valid Paystack payment
-    status: 'pending', // Back to pending - continue booking nurse
-    increasedPayment: true,
-    increasedAt: now,
-    increasedAtStr: nowStr,
-    paymentMethod: 'paystack_increase_valid',
-    rejectedStatusCleared: true
-  };
-  
-  await db.ref('bookings/'+bookingId).update(updateData);
-  await db.ref('ceoBookings/'+bookingId).update(updateData).catch(()=>{});
-  if(bookingData.clientId) await db.ref('clientBookings/'+bookingData.clientId+'/'+bookingId).update(updateData).catch(()=>{});
-  if(bookingData.nurseId) await db.ref('myJobOffers/'+bookingData.nurseId+'/'+bookingId).update(updateData).catch(()=>{});
-  
-  const nurseId=bookingData.nurseId||'';
-  if(nurseId){
-    await db.ref('nurseAlerts/'+nurseId+'/INCREASED-PAYMENT-'+bookingId+'-'+now).set({
-      type: 'payment_increased',
-      title: `Client increased payment VALID - Booking ID ${bookingData.bookingId||bookingId}`,
-      message: `Client increased payment from GHS ${bookingData.amount} to GHS ${newTotal} - Extra GHS ${extra} PAID via Paystack Valid - Ref: ${paystackRef} - Please accept now - Booking ID ${bookingData.bookingId||bookingId} - Continue booking - Valid payment confirmed`,
-      bookingId: bookingData.bookingId||bookingId,
-      extraAmount: extra,
-      newTotal: newTotal,
-      nurseShare: nurseShare,
-      paystackRef: paystackRef,
-      paystackVerified: true,
-      time: now,
-      read: false
-    });
-  }
-  
-  await db.ref('ceoNotificationRoom/INCREASED-VALID-'+bookingId+'-'+now).set({
-    type: 'payment_increased_valid',
-    title: `VALID Paystack - Client increased payment - Booking ${bookingData.bookingId||bookingId}`,
-    message: `VALID Paystack payment - Client increased rejected Booking ID ${bookingData.bookingId||bookingId} - From GHS ${bookingData.amount} to GHS ${newTotal} - Extra GHS ${extra} via Paystack VALID Ref ${paystackRef} - Will be deleted from rejected and continue as pending`,
-    bookingId: bookingData.bookingId||bookingId,
-    extraAmount: extra,
-    newTotal: newTotal,
-    paystackRef: paystackRef,
-    paystackVerified: true,
-    time: now,
-    read: false
-  });
-  
-  toast(`VALID Paystack Success! Extra GHS ${extra} paid - New total GHS ${newTotal} - Booking pending again - Nurse notified`);
-  setTimeout(()=>{ location.href='my-bookings.html'; }, 2000);
-}
-
-window.onload=()=>{ getBookingId(); };
-</script>
-</body></html>
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
+const params=new URLSearchParams(location.search);
+const bookingKey=params.get('id')||params.get('bookingId')||'';
+const bookingIdLabel=params.get('bookingId')||bookingKey;
+document.getElementById('bidEl').textContent=bookingIdLabel;
+let booking=null, currentAmount=0, alreadyPaid=0;
+function money(n){return 'GHS '+Number(n||0).toFixed(2);}
+function calc(){ const extra=parseFloat(document.getElementById('extraInput').value||0)||0; const newTotal=currentAmount+extra; const totalPaid=alreadyPaid+extra;
+ document.getElementById('extraAmt').textContent=money(extra); document.getElementById('newTotal').textContent=money(newTotal);
+ document.getElementById('nurseShare').textContent=money(Math.round(newTotal*0.8)); document.getElementById('ceoShare').textContent=money(Math.round(newTotal*0.2));
+ document.getElementById('totalPaidEl').textContent=money(totalPaid); document.getElementById('payBtnAmt').textContent=extra.toFixed(2); return {extra,newTotal,totalPaid}; }
+function setExtra(v){ document.getElementById('extraInput').value=v; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); event.target.classList.add('on'); calc(); }
+document.getElementById('extraInput').addEventListener('input',calc);
+async function loadBooking(){ if(!bookingKey){ document.getElementById('details').innerHTML='No booking id found. Go back to My Bookings and tap Increase Payment again.'; return; }
+ const snap=await db.ref('bookings/'+bookingKey).once('value');
+ if(!snap.exists()){ document.getElementById('details').innerHTML='Booking '+bookingIdLabel+' not found / already cleared by CEO. Please book another nurse.'; return; }
+ booking=snap.val(); booking.id=bookingKey;
+ currentAmount=parseFloat(booking.amount||0)||0;
+ alreadyPaid=parseFloat(booking.totalPaid ?? booking.totalPayments ?? booking.amountPaid ?? booking.amount ?? 0)||0;
+ document.getElementById('curAmt').textContent=money(currentAmount);
+ document.getElementById('details').innerHTML='<b>Booking ID '+ (booking.bookingId||bookingKey) +'</b><br>Nurse: '+(booking.rejectedByNurseName||booking.nurseName||'Any nurse')+' - '+(booking.nursePhone||'')+'<br>Service: '+(booking.serviceType||'')+'<br>Location: '+(booking.location||'')+'<br>Status: '+(booking.status||'')+'<br>Already paid for this booking: '+money(alreadyPaid);
+ calc(); }
+function payExtra(){ const {extra,newTotal,totalPaid}=calc(); if(!booking) return toast('Booking not loaded yet'); if(!extra||extra<=0) return toast('Enter extra amount more than 0');
+ const email=booking.clientEmail||booking.email||localStorage.getItem('clientEmail')||localStorage.getItem('email')||'client@lovecareglobal.com';
+ const btn=document.getElementById('payBtn'); btn.disabled=true; btn.textContent='Opening Paystack...';
+ const handler=PaystackPop.setup({key:PAYSTACK_KEY,email:email,amount:Math.round(extra*100),currency:'GHS',ref:'LCG-INC-'+bookingKey+'-'+Date.now(),metadata:{bookingId:booking.bookingId||bookingKey,bookingKey:bookingKey,clientName:booking.clientName||'',nurseName:booking.nurseName||'',extraAmount:extra,newTotal:newTotal,custom_fields:[{display_name:'Booking ID',variable_name:'booking_id',value:booking.bookingId||bookingKey},{display_name:'Extra Amount',variable_name:'extra_amount',value:String(extra)},{display_name:'New Total',variable_name:'new_total',value:String(newTotal)}]},
+ callback:async function(res){ try{ await onPaymentSuccess(res,extra,newTotal,totalPaid); }catch(e){ toast('Payment succeeded but update failed: '+e.message+' - Show this ref to CEO: '+res.reference); btn.disabled=false; } },
+ onClose:function(){ btn.disabled=false; btn.textContent='Pay Extra via Paystack'; toast('Paystack closed - payment not completed'); } });
+ handler.openIframe(); }
+async function onPaymentSuccess(res,extra,newTotal,totalPaid){ const ref=res.reference||res.trxref||'';
+ const now=Date.now(); const nowStr=new Date().toLocaleString('en-GH');
+ const clientKey=(booking.clientId||booking.clientUid||booking.clientPhone||localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientPhone')||'').toString();
+ const updates={previousAmount:currentAmount,amount:newTotal,totalPaid:totalPaid,totalPayments:totalPaid,amountPaid:totalPaid,extraPaid:extra,lastExtraPaid:extra,lastIncreaseRef:ref,paymentIncreased:true,increasedAt:now,increasedAtStr:nowStr,status:'pending',rejectedAt:null,rejectedBy:null,rejectedByNurseName:null,rejectedByNurseId:null,nurse80:Math.round(newTotal*0.8),ceo20:Math.round(newTotal*0.2)};
+ await db.ref('bookings/'+bookingKey).update(updates);
+ await db.ref('paymentIncreases/'+bookingKey).push({bookingId:booking.bookingId||bookingKey,bookingKey:bookingKey,previousAmount:currentAmount,extraPaid:extra,newTotal:newTotal,totalPaid:totalPaid,paystackRef:ref,clientName:booking.clientName||'',nurseName:booking.nurseName||'',createdAt:now,createdAtStr:nowStr});
+ await db.ref('ceoBookingsProgress/'+bookingKey).remove().catch(()=>{});
+ if(clientKey){ const csnap=await db.ref('clientPayments/'+clientKey).once('value'); const cur=csnap.exists()?(parseFloat(csnap.val().totalPaid||0)||0):0; await db.ref('clientPayments/'+clientKey).update({totalPaid:cur+extra,lastBookingId:booking.bookingId||bookingKey,lastIncrease:extra,updatedAt:now,updatedAtStr:nowStr}); }
+ toast('Success! Extra GHS '+extra+' paid. New total GHS '+newTotal+' - Booking back to PENDING');
+ setTimeout(()=>{ window.location.href='my-bookings.html?increased='+encodeURIComponent(bookingKey); },2500); }
+window.onload=loadBooking;
+</script></body></html>
