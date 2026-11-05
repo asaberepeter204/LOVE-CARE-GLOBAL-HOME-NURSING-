@@ -22,6 +22,12 @@
 .histId{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.15);margin-bottom:8px;cursor:pointer;font-size:12px;font-weight:700}
 .rejectedBox{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:16px;padding:12px;margin-top:10px}
 </style>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+const PAYSTACK_KEY = 'pk_live_f17ae09bf855010825cbfccdda8e724553ab747b'; // Will use your existing key from book-nurse.html if found
+</script>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head><body>
@@ -168,7 +174,7 @@ function render(list){
   area.innerHTML=list.map(b=>{
     const st=(b.status||'pending').toLowerCase();
     let badge='badge-pending', text='PENDING - Waiting nurse accept'; let extra='';
-    if(st.includes('rejected')){ badge='badge-rejected'; text='REJECTED by nurse - '+ (b.rejectedByNurseName||b.nurseName||'Nurse') +' rejected your offer'; extra=`<div class="rejectedBox"><b style="color:#fca5a5">Nurse ${b.rejectedByNurseName||b.nurseName||''} has rejected your offer</b><br><br>Please book another nurse or increase your payment rate to get accepted<br><br>Booking ID: ${b.bookingId||b.id}<br><small>After CEO sees that booking ID ${b.bookingId||b.id} is rejected, it will be deleted automatically from your list and nurse list</small><br><br><button class="btn btnYellow" onclick="bookAnother()">Book Another Nurse</button> <button class="btn btnBlue" onclick="increasePayment('${b.id}')">Increase Payment</button> <button class="btn btnGray" onclick="dismissRejected('${b.id}')">Dismiss</button></div>`; }
+    if(st.includes('rejected')){ badge='badge-rejected'; text='REJECTED by nurse - '+ (b.rejectedByNurseName||b.nurseName||'Nurse') +' rejected your offer'; extra=`<div class="rejectedBox"><b style="color:#fca5a5">Nurse ${b.rejectedByNurseName||b.nurseName||''} has rejected your offer</b><br><br>Please book another nurse or increase your payment rate to get accepted<br><br>Booking ID: ${b.bookingId||b.id}<br><small>After CEO sees that booking ID ${b.bookingId||b.id} is rejected, it will be deleted automatically from your list and nurse list</small><br><br><button class="btn btnYellow" onclick="bookAnother()">Book Another Nurse</button> <button class="btn btnBlue" onclick="increasePayment('${b.id}')">Increase Payment - Pay Rest via Paystack</button> <button class="btn btnGray" onclick="dismissRejected('${b.id}')">Dismiss</button></div>`; }
     else if(st.includes('accepted')){ badge='badge-accepted'; text='ACCEPTED - Auto nav'; }
     else if(st.includes('on_the_way')){ badge='badge-ontheway'; text='ON THE WAY'; }
     else if(st.includes('close')){ badge='badge-close'; text='CLOSE - Can call'; }
