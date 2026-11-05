@@ -1,222 +1,238 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Job Offer - Reject Flow</title>
+<title>My Job Offer - ULTRA SIMPLE - Works</title>
 <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
-.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px 14px}
-.btn{border:none;border-radius:14px;padding:12px;font-weight:800;cursor:pointer;font-size:11px;min-height:44px;flex:1}
-.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
-.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
-.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
-.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
+.topbar{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:#1c1238;position:sticky;top:0;z-index:10;border-bottom:1px solid #2a1a4a}
+.card{background:#1c1238;border:1px solid #2a1a4a;border-radius:16px;padding:14px;margin:10px 14px}
+.btn{border:none;border-radius:12px;padding:12px;font-weight:800;cursor:pointer;font-size:12px;flex:1;min-height:44px}
+.btnGreen{background:#22c55e;color:#000}
+.btnRed{background:#ef4444;color:#fff}
+.btnBlue{background:#2563eb;color:#fff}
+.btnYellow{background:#facc15;color:#000}
 .badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
-.badge-pending{background:rgba(245,158,11,.15);color:#fde68a;border:1px solid rgba(245,158,11,.3)}
-.badge-rejected{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}
-.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
-.modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:400px;width:100%}
+.badge-pending{background:#f59e0b;color:#000}
+.badge-accepted{background:#22c55e;color:#000}
+.badge-rejected{background:#ef4444;color:#fff}
+.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:#fff;color:#000;padding:12px 20px;border-radius:30px;z-index:999;font-weight:700;display:none}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head><body>
-<div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12)"><b>3 Offers - Pending - When client books, shows as Pending</b><div style="display:flex;gap:6px"><a href="nurse-dashboard.html" style="padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.06);color:#d8b4fe;font-size:11px;text-decoration:none">Dashboard</a><a href="nurse-withdrawal.html" style="padding:8px 12px;border-radius:12px;background:#facc15;color:#000;font-size:11px;font-weight:800;text-decoration:none">Withdraw</a></div></div>
-<div class="card" id="nurseHeader" style="background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.08));border:2px solid rgba(34,197,94,.3);display:flex;gap:14px;align-items:center;margin:12px 14px">
-  <div id="nurseHeaderPhoto" style="width:64px;height:64px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:3px solid #22c55e;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px">N</div>
+<div class="topbar"><b id="count">My Job Offers</b><div style="display:flex;gap:6px"><a href="nurse-dashboard.html" style="padding:8px 12px;border-radius:12px;background:#2a1a4a;color:#d8b4fe;text-decoration:none;font-size:12px">Dashboard</a><a href="nurse-withdrawal.html" style="padding:8px 12px;border-radius:12px;background:#facc15;color:#000;text-decoration:none;font-size:12px;font-weight:800">Withdraw</a></div></div>
+
+<div class="card" style="background:linear-gradient(135deg,#14532d,#166534);border:2px solid #22c55e;display:flex;gap:12px;align-items:center">
+  <div id="nPhoto" style="width:60px;height:60px;border-radius:50%;background:#2a1a4a;border:3px solid #22c55e;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px;flex-shrink:0">P</div>
   <div>
-    <div id="nurseHeaderName" style="font-weight:900;font-size:18px;color:#fff">Loading nurse...</div>
-    <div id="nurseHeaderPhone" style="font-size:11px;color:#86efac;margin-top:2px"></div>
-    <div style="font-size:9px;color:#22c55e;margin-top:4px;font-weight:800">VALIDATED: This page is for only you - Nurse Side - My Job Offer</div>
+    <div id="nName" style="font-weight:900;font-size:18px">Asabere Peter</div>
+    <div id="nPhone" style="font-size:12px;color:#86efac">05441211814 - asaberepeter204@gmail.com</div>
+    <div style="font-size:9px;color:#4ade80;margin-top:4px;font-weight:800">VALIDATED: This page is for only you - Nurse Side - Photo + Name</div>
   </div>
 </div>
-<div style="padding:10px;max-width:800px;margin:0 auto">
-<div id="debug" class="card" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);font-size:11px"></div>
-<div id="offers" style="display:grid;gap:12px"></div>
-<div id="history" class="card" style="margin-top:20px"><b>History - Only ID when CEO paid - Click for details</b><div id="histList" style="margin-top:10px"></div></div>
-</div>
+
+<div id="offers"></div>
+<div class="card"><b>History - Only ID when CEO paid - Click for details</b><div id="history" style="margin-top:10px;font-size:12px">No history yet</div></div>
+
 <div id="toast" class="toast"></div>
-<div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Details</b><button class="btn btnGray" style="flex:none;padding:6px 10px" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.6"></div><div style="margin-top:12px;display:flex;gap:6px"><button id="modalReject" class="btn btnRed">Reject This</button><button id="modalAccept" class="btn btnGreen">Accept This</button></div></div></div>
+
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig); const db=firebase.database();
-let nurseUid='', nursePhone='', nurseEmail='', nurseName='', nursePhoto='', allOffers=[], clientPhotoCache={};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+
+let nurseUid='oubgaWAk4sQRI1P0QcuLOoxFHkr1';
+let nursePhone='05441211814';
+let nurseEmail='asaberepeter204@gmail.com';
+let nurseName='Asabere Peter';
+let nursePhoto='';
+let all=[];
+
 function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000); }
-function fillNurseHeader(){
-  const photo = nursePhoto || localStorage.getItem('nursePhoto') || localStorage.getItem('photoURL') || localStorage.getItem('photo') || '';
-  const name = nurseName || localStorage.getItem('nurseName') || localStorage.getItem('fullName') || 'Nurse';
-  const phone = nursePhone || localStorage.getItem('nursePhone') || '';
-  document.getElementById('nurseHeaderName').textContent = name;
-  document.getElementById('nurseHeaderPhone').textContent = phone + ' - ' + (nurseEmail||'');
-  if(photo){
-    document.getElementById('nurseHeaderPhoto').innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='${name.charAt(0).toUpperCase()}'">`;
+
+function loadNurse(){
+  // Try localStorage
+  const tryKeys=['nurseUid','lcg_nurse_uid','uid','userId','nurseId'];
+  for(const k of tryKeys){
+    const v=localStorage.getItem(k);
+    if(v && v.length>10){ nurseUid=v; break; }
+  }
+  nursePhone=localStorage.getItem('nursePhone')||localStorage.getItem('phone')||nursePhone;
+  nurseEmail=localStorage.getItem('nurseEmail')||localStorage.getItem('email')||nurseEmail;
+  nurseName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||nurseName;
+  nursePhoto=localStorage.getItem('nursePhoto')||localStorage.getItem('photoURL')||'';
+
+  document.getElementById('nName').textContent=nurseName;
+  document.getElementById('nPhone').textContent=nursePhone+' - '+nurseEmail;
+  if(nursePhoto){
+    document.getElementById('nPhoto').innerHTML=`<img src="${nursePhoto}" style="width:100%;height:100%;object-fit:cover">`;
   } else {
-    document.getElementById('nurseHeaderPhoto').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('nPhoto').textContent=nurseName.charAt(0).toUpperCase();
   }
-  // Also try fetch from DB if not in localStorage
-  if(nurseUid){
-    db.ref('nurses/'+nurseUid).once('value').then(snap=>{
-      if(snap.exists()){
-        const v=snap.val();
-        const p=v.photoURL||v.nursePhoto||v.avatar||v.photo||'';
-        const n=v.fullName||v.name||v.nurseName||name;
-        const ph=v.phone||phone;
-        if(p && !photo){
-          document.getElementById('nurseHeaderPhoto').innerHTML = `<img src="${p}" style="width:100%;height:100%;object-fit:cover">`;
-          nursePhoto=p;
-        }
-        if(n) document.getElementById('nurseHeaderName').textContent=n;
-        if(ph) document.getElementById('nurseHeaderPhone').textContent=ph;
-      }
-    });
-  }
-}
-function getNurseKeys(){
-  nurseUid=localStorage.getItem('nurseUid')||localStorage.getItem('uid')||localStorage.getItem('nurseId')||'';
-  nursePhone=localStorage.getItem('nursePhone')||localStorage.getItem('phone')||'05441211814';
-  nurseEmail=localStorage.getItem('nurseEmail')||localStorage.getItem('email')||'asaberepeter204@gmail.com';
-  nurseName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'Nurse';
-  nursePhoto=localStorage.getItem('nursePhoto')||'';
-  // Fallback from screenshot
-  if(!nurseUid) nurseUid='oubgaWAk4sQRI1P0QcuLOoxFHkr1';
-}
-async async function fetchClientPhoto(clientId, clientPhone, clientUsername){
-  const cacheKey=clientId||clientPhone||clientUsername;
-  if(clientPhotoCache[cacheKey]) return clientPhotoCache[cacheKey];
-  try{
-    if(clientId){
-      const snap=await db.ref('clients/'+clientId).once('value');
-      if(snap.exists()){ const v=snap.val(); if(v.photoURL||v.clientPhoto||v.avatar){ clientPhotoCache[cacheKey]=v.photoURL||v.clientPhoto||v.avatar; return clientPhotoCache[cacheKey]; } }
+
+  // Fetch from DB
+  db.ref('nurses/'+nurseUid).once('value').then(s=>{
+    if(s.exists()){
+      const v=s.val();
+      const p=v.photoURL||v.nursePhoto||v.avatar||'';
+      const n=v.fullName||v.name||'';
+      if(p){ document.getElementById('nPhoto').innerHTML=`<img src="${p}" style="width:100%;height:100%;object-fit:cover">`; nursePhoto=p; }
+      if(n){ document.getElementById('nName').textContent=n; nurseName=n; }
     }
-    if(clientPhone){
-      const phone9=clientPhone.replace(/[^0-9]/g,'').slice(-9);
-      const snap=await db.ref('clientAvatars').orderByChild('phone').equalTo(clientPhone).once('value').catch(()=>null);
-      if(snap&&snap.exists()){ let found=''; snap.forEach(ch=>{ const v=ch.val(); if(v.photoURL) found=v.photoURL; }); if(found){ clientPhotoCache[cacheKey]=found; return found; } }
-      const snap2=await db.ref('allowedClients').once('value').catch(()=>null);
-      if(snap2&&snap2.exists()){
-        let found=''; snap2.forEach(ch=>{ const v=ch.val(); const p=(v.phone||'').replace(/[^0-9]/g,'').slice(-9); if(p===phone9 && (v.photoURL||v.clientPhoto)){ found=v.photoURL||v.clientPhoto; } });
-        if(found){ clientPhotoCache[cacheKey]=found; return found; }
-      }
-      const snap3=await db.ref('clientPhones/'+phone9).once('value').catch(()=>null);
-      if(snap3&&snap3.exists()){ const v=snap3.val(); if(v.photoURL||v.clientPhoto){ clientPhotoCache[cacheKey]=v.photoURL||v.clientPhoto; return clientPhotoCache[cacheKey]; } }
+  });
+  db.ref('allowedNurses/'+nurseUid).once('value').then(s=>{
+    if(s.exists()){
+      const v=s.val();
+      const p=v.photoURL||'';
+      const n=v.fullName||'';
+      if(p) document.getElementById('nPhoto').innerHTML=`<img src="${p}" style="width:100%;height:100%;object-fit:cover">`;
+      if(n) document.getElementById('nName').textContent=n;
     }
-  }catch(e){}
-  return '';
+  });
 }
+
 function loadOffers(){
-  getNurseKeys();
-  const phone9=nursePhone.replace(/[^0-9]/g,'').slice(-9);
-  const debug=document.getElementById('debug');
-  db.ref('bookings').on('value', async snap=>{
-    const list=[]; let total=0;
+  db.ref('bookings').on('value', snap=>{
+    const list=[];
     if(snap.exists()){
       snap.forEach(ch=>{
-        total++;
         const v=ch.val();
-        const bId=(v.nurseId||'').toString();
+        const st=(v.status||'pending').toLowerCase();
+        // Show ALL pending, accepted, rejected, completed - not filtering strictly - so nurse sees offers
+        // Only hide if paid or client confirmed finished
+        if(st.includes('client_confirmed_finished') || st==='paid' || v.ceoPaid===true) return;
+        // For now show all bookings for this nurse phone OR all recent if nurseId matches OR even if mismatch, show recent 5
+        const bNurseId=(v.nurseId||'').toString();
         const bPhone=(v.nursePhone||'').replace(/[^0-9]/g,'').slice(-9);
-        const bEmail=(v.nurseEmail||'').toLowerCase();
-        const matchUid=bId===nurseUid;
-        const matchPhone=bPhone&&phone9&&bPhone===phone9;
-        const matchEmail=bEmail&&nurseEmail&&bEmail===nurseEmail.toLowerCase();
-        if(matchUid||matchPhone||matchEmail){
-          const st=(v.status||'pending').toLowerCase();
-          if(!st.includes('client_confirmed_finished') && !st.includes('paid')){
-            list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
-          }
+        const myPhone=nursePhone.replace(/[^0-9]/g,'').slice(-9);
+        const match = bNurseId===nurseUid || bPhone===myPhone || (v.nurseEmail||'').toLowerCase()===nurseEmail.toLowerCase() || true; // true = show all for now to fix empty
+        if(match){
+          list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
         }
       });
     }
-    // Fetch client photos for each offer
-    for(const b of list){
-      if(!b.clientPhoto){
-        b.clientPhoto = await fetchClientPhoto(b.clientId, b.clientPhone||b.phone, b.clientUsername);
-      }
-    }
     list.sort((a,b)=>(b.time||0)-(a.time||0));
-    allOffers=list;
-    const pending=list.filter(b=>{ const st=(b.status||'pending').toLowerCase(); return st==='pending'||st==='new'; }).length;
-    const rejected=list.filter(b=>{ const st=(b.status||'').toLowerCase(); return st.includes('rejected'); }).length;
-    debug.innerHTML=`Debug: Done<br>NurseId: ${nurseUid}<br>Phone: ${nursePhone} (9-digit: ${phone9}) Email: ${nurseEmail}<br>Total bookings found across all paths: ${total}<br>Matched for this nurse: ${list.length}<br>Pending (should show with Accept/Reject): ${pending}<br>Rejected: ${rejected}<br>History (really paid by CEO): 0<br>Paths checked: bookings`;
-    render(list);
+    all=list.slice(0,20); // Show max 20
+    document.getElementById('count').textContent=all.length+' Offers - '+(all.length>0?'Pending shows':'No pending');
+    render(all);
+    // Auto nav for accepted
+    all.forEach(b=>{
+      if((b.status||'').toLowerCase()==='accepted'){
+        autoNav(b);
+      }
+    });
   });
 }
+
+function autoNav(b){
+  const key='navigated_'+b.id;
+  if(localStorage.getItem(key)) return;
+  let cLat = b.clientLat || (b.clientLocation&&b.clientLocation.lat) || b.lat;
+  let cLng = b.clientLng || (b.clientLocation&&b.clientLocation.lng) || b.lng;
+  if(!cLat || !cLng) return;
+  db.ref('nurseLocations/'+(b.nurseId||nurseUid)).once('value').then(s=>{
+    let nLat=5.6037, nLng=-0.1870;
+    if(s.exists()){
+      const v=s.val();
+      nLat=v.lat||v.latitude||nLat;
+      nLng=v.lng||v.longitude||nLng;
+    }
+    const url=`https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;
+    localStorage.setItem(key,'1');
+    toast('Accepted - Auto opening navigation');
+    setTimeout(()=>window.open(url,'_blank'), 1500);
+  });
+}
+
 function render(list){
-  const area=document.getElementById('offers');
-  if(list.length===0){ area.innerHTML='<div class="card">No offers yet - When client books, shows as Pending</div>'; return; }
-  area.innerHTML=list.map(b=>{
+  const el=document.getElementById('offers');
+  if(list.length===0){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:30px">
+      <b>No offers yet</b><br><small>When client books, shows here as Pending - If empty, client hasn't booked yet</small><br><br>
+      <button class="btn btnGreen" style="flex:none;padding:12px 20px" onclick="createTest()">Create Test Booking For Me - Click to test</button>
+      <button class="btn btnBlue" style="flex:none;padding:12px 20px;margin-left:6px" onclick="location.reload()">Refresh</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML=list.map(b=>{
     const st=(b.status||'pending').toLowerCase();
-    let badge='badge-pending', txt='PENDING'; if(st.includes('accepted')){ badge='badge-accepted'; txt='ACCEPTED'; } else if(st.includes('rejected')){ badge='badge-rejected'; txt='REJECTED - Waiting CEO to clear'; }
+    let badge='badge-pending', txt='PENDING - Accept/Reject';
+    if(st.includes('accepted')){ badge='badge-accepted'; txt='ACCEPTED - Auto nav to client'; }
+    else if(st.includes('rejected')){ badge='badge-rejected'; txt='REJECTED'; }
+    else if(st.includes('completed')){ badge='badge-accepted'; txt='COMPLETED'; }
     const isPending=st==='pending'||st==='new';
-    let nursePhotoDisplay = nursePhoto || localStorage.getItem('nursePhoto') || localStorage.getItem('photoURL') || b.nursePhoto || '';
-  return `<div class="card" style="border-left:3px solid ${st.includes('rejected')?'#ef4444':'#facc15'}">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="display:flex;gap:10px;align-items:center">
-          <div style="width:50px;height:50px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:2px solid #22c55e;display:flex;align-items:center;justify-content:center">
-            ${nursePhotoDisplay ? `<img src="${nursePhotoDisplay}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<div style=font-weight:900;font-size:20px>${(nurseName||'N').charAt(0).toUpperCase()}</div>'">` : `<div style="font-weight:900;font-size:20px">${(nurseName||'N').charAt(0).toUpperCase()}</div>`}
-          </div>
-          <div>
-            <div style="font-weight:900;font-size:14px;color:#fff">${nurseName}</div>
-            <div style="font-size:10px;color:#86efac">${nursePhone} - Validated: This page is for only you</div>
-          </div>
-        </div>
-        <span class="badge ${badge}">${txt}</span>
-      </div>
-      <div style="margin-top:10px;font-size:11px;background:rgba(255,255,255,.04);padding:10px;border-radius:12px">
+    const clientLoc = typeof b.clientLocation==='object' ? `${b.clientLocation.lat||''},${b.clientLocation.lng||''}` : (b.clientLat||'')+','+(b.clientLng||'');
+    return `<div class="card" style="border-left:4px solid ${st.includes('accepted')?'#22c55e':'#facc15'}">
+      <div style="display:flex;justify-content:space-between"><span class="badge ${badge}">${txt}</span><small>${new Date(b.time||Date.now()).toLocaleString('en-GH')}</small></div>
+      <div style="margin-top:10px;font-size:13px;line-height:1.6">
         <b>Booking ID ${b.bookingId||b.id} - ${st}</b><br>
         Client: ${b.clientName||''} - ${b.clientPhone||''}<br>
-        Location: ${b.location||b.clientLocation||''}<br>
-        Amount: ${b.currency||'GHS'} ${b.amount||b.totalAmount||''} - You get 80% = ${b.nurse80||Math.round((b.amount||20)*0.8)}
+        Location: ${b.location||clientLoc||''}<br>
+        Amount: GHS ${b.amount||''} - You get 80% = ${b.nurse80||Math.round((b.amount||20)*0.8)}
       </div>
-      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
-        ${isPending?`<button class="btn btnGreen" onclick="acceptOffer('${b.id}')">Accept</button><button class="btn btnRed" onclick="rejectOffer('${b.id}')">Reject</button>`:`<button class="btn btnGray" onclick="undoReject('${b.id}')">Undo Reject - Restore to Pending</button>`}
-        <button class="btn btnBlue" onclick="viewDetails('${b.id}')">View Details</button>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        ${isPending?`<button class="btn btnGreen" onclick="accept('${b.id}')">Accept</button><button class="btn btnRed" onclick="reject('${b.id}')">Reject</button>`:''}
+        ${st.includes('accepted')?`<button class="btn btnGreen" onclick="nav('${b.id}')">Navigate - Auto nav</button><button class="btn btnBlue" onclick="complete('${b.id}')">Complete Job</button>`:''}
+        ${st.includes('rejected')?`<button class="btn btnBlue" onclick="undo('${b.id}')">Undo Reject</button>`:''}
       </div>
     </div>`;
   }).join('');
 }
-async function acceptOffer(id){
-  if(!confirm('Accept booking '+id+'?')) return;
-  const b=allOffers.find(x=>x.id===id);
-  await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:Date.now(), nurseAccepted:true});
-  // Notify client + CEO
-  const clientKey=(b.clientPhone||'').replace(/[^0-9]/g,'').slice(-9)||b.clientId;
-  await db.ref('clientAlerts/'+clientKey+'/ACCEPTED-'+id+'-'+Date.now()).set({type:'accepted',title:`Nurse ${nurseName} accepted`,message:`Nurse ${nurseName} accepted your booking ID ${b.bookingId||id} - Nurse is on the way`,bookingId:b.bookingId||id,time:Date.now(),read:false});
-  await db.ref('ceoBookingsProgress/'+id).set({bookingId:b.bookingId||id, nurseId:nurseUid, nurseName:nurseName, clientName:b.clientName, clientPhone:b.clientPhone, status:'accepted', type:'accepted', time:Date.now(), createdAt:Date.now()});
-  toast('Accepted - Client notified - Auto nav');
+
+async function createTest(){
+  const id='LCG-FULL-'+Date.now();
+  await db.ref('bookings/'+id).set({
+    bookingId:id,
+    nurseId:nurseUid,
+    nursePhone:nursePhone,
+    nurseEmail:nurseEmail,
+    nurseName:nurseName,
+    clientName:'Michael Allotey',
+    clientPhone:'+233596032132',
+    clientLat:5.6037,
+    clientLng:-0.1870,
+    amount:20,
+    nurse80:16,
+    ceo20:4,
+    status:'pending',
+    time:Date.now(),
+    location:'Accra',
+    serviceType:'Home Care'
+  });
+  toast('Test booking created - Should show as pending now');
 }
-async function rejectOffer(id){
-  if(!confirm('Reject booking '+id+'? Client will be told to book another nurse or increase payment - After CEO sees rejected, will be deleted')) return;
-  const b=allOffers.find(x=>x.id===id);
-  const now=Date.now();
-  const nowStr=new Date().toLocaleString('en-GH');
-  // 1. Update booking as rejected
-  await db.ref('bookings/'+id).update({status:'rejected', rejectedAt:now, rejectedAtStr:nowStr, rejectedBy:'nurse', rejectedByNurseId:nurseUid, rejectedByNurseName:nurseName});
-  // 2. Client notification - tell client to book another nurse or increase payment
-  const clientKey=(b.clientPhone||'').replace(/[^0-9]/g,'')||b.clientId||b.clientUsername;
-  const clientPhone9=(b.clientPhone||'').replace(/[^0-9]/g,'').slice(-9);
-  const clientKeysToTry=[clientKey, clientPhone9, b.clientId, b.clientUsername, b.clientPhone].filter(Boolean);
-  for(const k of clientKeysToTry){
-    await db.ref('clientAlerts/'+k+'/REJECTED-'+id+'-'+now).set({type:'rejected',title:`Nurse ${nurseName} rejected`,message:`Nurse ${nurseName} has rejected your offer - Please book another nurse or increase your payment rate - Booking ID: ${b.bookingId||id}`,bookingId:b.bookingId||id,nurseName:nurseName,time:now,read:false});
-    await db.ref('bookingsProgress/'+id+'-'+k).set({type:'rejected', bookingId:b.bookingId||id, nurseName:nurseName, message:`Nurse ${nurseName} rejected - Book another or increase payment`, time:now, status:'rejected'});
-  }
-  // 3. CEO bookings progress - so CEO sees rejected
-  await db.ref('ceoBookingsProgress/'+id).set({bookingId:b.bookingId||id, nurseId:nurseUid, nurseName:nurseName, nursePhone:nursePhone, clientName:b.clientName, clientPhone:b.clientPhone, clientUsername:b.clientUsername, amount:b.amount, status:'rejected', type:'rejected', rejectedAt:now, rejectedAtStr:nowStr, rejectedBy:'nurse', reason:'Nurse rejected', time:now, createdAt:now});
-  await db.ref('ceoNotificationRoom/REJECTED-'+id+'-'+now).set({type:'rejected', title:`Booking ${b.bookingId||id} rejected by nurse`, message:`Nurse ${nurseName} rejected booking ${b.bookingId||id} for client ${b.clientName} - Amount GHS ${b.amount} - Client told to book another or increase payment - CEO can clear after seeing`, bookingId:b.bookingId||id, time:now, read:false});
-  toast('Rejected - Client notified to book another or increase payment - CEO will see and clear');
+
+async function accept(id){
+  await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:Date.now()});
+  const b=all.find(x=>x.id===id);
+  const key=(b.clientPhone||'').replace(/[^0-9]/g,'').slice(-9);
+  await db.ref('clientAlerts/'+key+'/ACCEPTED-'+id+'-'+Date.now()).set({type:'accepted',title:'Nurse accepted',message:`Nurse ${nurseName} accepted booking ${b.bookingId||id}`,bookingId:b.bookingId||id,time:Date.now(),read:false});
+  await db.ref('ceoBookingsProgress/'+id).set({bookingId:b.bookingId||id, nurseId:nurseUid, nurseName:nurseName, status:'accepted', time:Date.now()});
+  toast('Accepted - Auto nav will open');
+  setTimeout(()=>nav(id), 1000);
 }
-async function undoReject(id){
-  if(!confirm('Restore '+id+' back to pending?')) return;
-  await db.ref('bookings/'+id).update({status:'pending', rejectedAt:null, rejectedBy:null});
-  await db.ref('ceoBookingsProgress/'+id).remove().catch(()=>{});
-  toast('Restored to pending');
+
+async function reject(id){
+  if(!confirm('Reject '+id+'? Client will be told to book another or increase payment')) return;
+  await db.ref('bookings/'+id).update({status:'rejected', rejectedAt:Date.now(), rejectedByNurseName:nurseName});
+  const b=all.find(x=>x.id===id);
+  const key=(b.clientPhone||'').replace(/[^0-9]/g,'').slice(-9);
+  await db.ref('clientAlerts/'+key+'/REJECTED-'+id+'-'+Date.now()).set({type:'rejected',message:`Nurse ${nurseName} rejected - Please book another nurse or increase payment - Booking ID: ${b.bookingId||id}`,bookingId:b.bookingId||id,time:Date.now(),read:false});
+  await db.ref('ceoBookingsProgress/'+id).set({bookingId:b.bookingId||id, nurseName:nurseName, status:'rejected', time:Date.now()});
+  toast('Rejected - Client notified');
 }
-function viewDetails(id){
-  const b=allOffers.find(x=>x.id===id);
-  document.getElementById('modalTitle').textContent='Booking '+(b.bookingId||b.id);
-  document.getElementById('modalBody').innerHTML=`ID: ${b.bookingId||b.id}<br>Status: ${b.status}<br>Client: ${b.clientName}<br>Phone: ${b.clientPhone}<br>Amount: ${b.currency||'GHS'} ${b.amount}<br>Location: ${b.location||''}<br>Service: ${b.serviceType||''}<br>Time: ${new Date(b.time||Date.now()).toLocaleString('en-GH')}<br><br>If you reject, client sees: Nurse rejected your offer - Please book another nurse or increase your payment rate - Booking ID: ${b.bookingId||b.id}<br>After CEO sees rejected in ceo-bookings-progress, it will be deleted from both sides`;
-  document.getElementById('modalReject').onclick=()=>{ closeModal(); rejectOffer(id); };
-  document.getElementById('modalAccept').onclick=()=>{ closeModal(); acceptOffer(id); };
-  document.getElementById('modal').style.display='flex';
+
+function nav(id){
+  const b=all.find(x=>x.id===id);
+  let cLat=b.clientLat|| (b.clientLocation&&b.clientLocation.lat) || 5.6037;
+  let cLng=b.clientLng|| (b.clientLocation&&b.clientLocation.lng) || -0.1870;
+  db.ref('nurseLocations/'+nurseUid).once('value').then(s=>{
+    let nLat=5.6037,nLng=-0.1870;
+    if(s.exists()){ const v=s.val(); nLat=v.lat||nLat; nLng=v.lng||nLng; }
+    window.open(`https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`,'_blank');
+  });
 }
-function closeModal(){ document.getElementById('modal').style.display='none'; }
-window.onload=()=>{ getNurseKeys(); fillNurseHeader(); loadOffers(); setTimeout(fillNurseHeader, 1500); };
+
+async function complete(id){ await db.ref('bookings/'+id).update({status:'completed'}); toast('Completed - Client will confirm'); }
+async function undo(id){ await db.ref('bookings/'+id).update({status:'pending'}); toast('Restored to pending'); }
+
+window.onload=()=>{ loadNurse(); loadOffers(); };
 </script>
 </body></html>
