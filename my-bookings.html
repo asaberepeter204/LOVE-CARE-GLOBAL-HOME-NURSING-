@@ -128,10 +128,29 @@ function render(){
   const area=document.getElementById('bookingsList');
   const empty=document.getElementById('emptyBookings');
   const count=document.getElementById('countInfo');
-  count.textContent=all.length+' bookings - Flow: Pending to Completion is part - Listener from my-job-offer active';
-  if(all.length===0){ area.innerHTML=''; empty.style.display='block'; return; }
+  // Separate active (pending to accepted) and history (client_confirmed_finished)
+  const active=all.filter(b=>{
+    const s=(b.status||'').toLowerCase();
+    return !s.includes('client_confirmed');
+  });
+  const history=all.filter(b=>{
+    const s=(b.status||'').toLowerCase();
+    return s.includes('client_confirmed');
+  });
+  // Active count for dashboard - when confirmed, goes to history and active becomes empty
+  count.textContent=active.length+' active - '+history.length+' history';
+  if(active.length===0 && history.length===0){ area.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
-  area.innerHTML=all.map(b=>{
+  // Show active first, then history
+  const sortedActive=active.sort((a,b)=>(b.time||0)-(a.time||0));
+  const sortedHistory=history.sort((a,b)=>(b.clientConfirmedAt||0)-(a.clientConfirmedAt||0));
+  const allSorted=[...sortedActive, ...sortedHistory];
+  // Save history to localStorage for persistence
+  if(history.length>0){
+    localStorage.setItem('lcg_client_history', JSON.stringify(history));
+  }
+
+  area.innerHTML=allSorted.map(b=>{
     const status=(b.status||'pending').toLowerCase();
     let badgeClass='badge-pending';
     let badgeText=(b.status||'PENDING').toUpperCase();
@@ -139,7 +158,7 @@ function render(){
     else if(status.includes('on_the_way')){ badgeClass='badge-ontheway'; badgeText='ON THE WAY - Nurse is on the way'; }
     else if(status.includes('close')){ badgeClass='badge-close'; badgeText='CLOSE - Nurse is close to you'; }
     else if(status.includes('completed') && !status.includes('client_confirmed')){ badgeClass='badge-completed'; badgeText='COMPLETED - Waiting your confirmation'; }
-    else if(status.includes('client_confirmed')){ badgeClass='badge-confirmed'; badgeText='CLIENT_CONFIRMED_FINISHED - CLIENT CONFIRMED'; }
+    else if(status.includes('client_confirmed')){ badgeClass='badge-confirmed'; badgeText='DONE - CLIENT CONFIRMED'; }
     else if(status.includes('rejected')){ badgeClass='badge-rejected'; badgeText='REJECTED'; }
 
     const isAccepted=status.includes('accepted');
@@ -175,14 +194,17 @@ function render(){
       ${isOnWay?`<div style="margin-top:10px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:10px;padding:8px;font-size:11px">On The Way - Nurse is on the way coming - Booking ID ${b.bookingId||b.id} - Track live</div>`:''}
       ${isClose?`<div style="margin-top:10px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:8px;font-size:11px">Close - Nurse is just close to you - Please be ready - Booking ID ${b.bookingId||b.id}</div>`:''}
       ${isCompleted?`<div style="margin-top:10px;background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(34,197,94,.08));border:1px solid rgba(168,85,247,.25);border-radius:10px;padding:8px;font-size:11px">Completed - Nurse marked work completed - Please confirm work completed - Amount: ${displayAmount} - Click Confirm Work Completed below</div>`:''}
-      ${isClientConfirmed?`<div style="margin-top:10px;background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(168,85,247,.1));border:2px solid rgba(34,197,94,.4);border-radius:12px;padding:10px;font-size:11px"><b>CLIENT_CONFIRMED_FINISHED - CLIENT CONFIRMED</b><br>Booking ID ${b.bookingId||b.id} - Date: ${b.clientConfirmedAtStr||''} - Amount: ${displayAmount} - You confirmed work completed - Accepted removed, marked completed with date and time - CEO received progress - Congrats sent to nurse - You can rate nurse now</div>`:''}
+      ${isClientConfirmed?`<div style="margin-top:10px;background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(168,85,247,.1));border:2px solid rgba(34,197,94,.4);border-radius:12px;padding:10px;font-size:11px"><b>DONE - CLIENT CONFIRMED</b><br>Booking ID ${b.bookingId||b.id} - Date: ${b.clientConfirmedAtStr||''} - Amount: ${displayAmount} - You confirmed work completed - Accepted removed, marked completed with date and time - CEO received progress - Congrats sent to nurse - You can rate nurse now</div>`:''}
 
       <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
-        ${isCompleted?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Work Completed - Mark Finished</button>`:''}
-        ${isClientConfirmed?`<button class="btn btnYellow" onclick="rateNurse('${b.id}')">Rate Nurse - ${b.nurseName||''}</button>`:''}
-        <button class="btn btnGray" onclick="viewDetails('${b.id}')">View Details</button>
-        ${b.nursePhone?`<button class="btn btnBlue" onclick="window.open('tel:${b.nursePhone}')">Call Nurse</button>`:''}
-        ${isPending?`<button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel Booking</button>`:''}
+        ${isPending?`<button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel</button>`:''}
+        ${isAccepted?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Done</button><button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel</button><button class="btn btnBlue" onclick="autoOpenNavigation(all.find(x=>x.id==='${b.id}'))">Navigate</button>`:''}
+        ${isOnWay?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Done</button><button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel</button><button class="btn btnBlue" onclick="autoOpenNavigation(all.find(x=>x.id==='${b.id}'))">Navigate</button>`:''}
+        ${isClose?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Done</button><button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel</button><button class="btn btnBlue" onclick="autoOpenNavigation(all.find(x=>x.id==='${b.id}'))">Navigate</button>`:''}
+        ${isCompleted?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Done</button><button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel Progress</button>`:''}
+        ${isClientConfirmed?`<div style="width:100%;background:rgba(34,197,94,.15);border-radius:8px;padding:6px;font-size:11px;color:#86efac">Done - ${b.bookingId||b.id} - In History</div><button class="btn btnYellow" onclick="rateNurse('${b.id}')">Rate ${b.nurseName||''}</button><button class="btn btnGray" onclick="viewHistory('${b.id}')">History</button>`:''}
+        <button class="btn btnGray" onclick="viewDetails('${b.id}')">Details</button>
+        ${b.nursePhone?`<button class="btn btnBlue" onclick="window.open('tel:${b.nursePhone}')">Call</button>`:''}
       </div>
     </div>
     `;
@@ -204,10 +226,22 @@ async function confirmCompleted(id){
       clientConfirmedAt:now,
       clientConfirmedAtStr:nowStr,
       livelyAmount:nursePortion,
-      totalAmount:totalAmount
+      totalAmount:totalAmount,
+      clientConfirmedFinished:true,
+      movedToHistory:true,
+      historyAt:now,
+      historyAtStr:nowStr
     };
+    // Update bookings - client side
     await db.ref('bookings/'+id).update(completedData);
+    // Reflect on CEO booking progress - CEO sees progress
     await db.ref('ceoBookings/'+id).update(completedData).catch(()=>{});
+    await db.ref('ceoBookingsProgress/'+id).update({...completedData, type:'client_confirmed_finished', title:`Client Confirmed Finished - Booking ${b.bookingId||id}`, message:`Client ${b.clientName||clientName} confirmed work completed for Booking ID ${b.bookingId||id} - Nurse ${b.nurseName} - Amount ${b.currency||'GHS'} ${b.amount} - Completed on ${nowStr} - Moved to history - Active empty`, clientId:b.clientId||clientUid, nurseId:b.nurseId, createdAt:now}).catch(()=>{});
+    await db.ref('ceoNotificationRoom/'+id+'_client_confirmed_'+now).set({type:'client_confirmed', title:`Client Confirmed Work Done - Booking ${b.bookingId||id}`, message:`Client confirmed work is done - Booking ID ${b.bookingId||id} - Nurse ${b.nurseName} - Amount ${b.currency||'GHS'} ${b.amount} - Goes to history - Booking page emptying from pending to accepted`, bookingId:b.bookingId||id, nurseId:b.nurseId, clientId:b.clientId||clientUid, createdAt:now, read:false}).catch(()=>{});
+    // Move to client history - so booking page emptying from pending to accepted
+    await db.ref('clientHistory/'+(b.clientId||clientUid)+'/'+id).set({...b, ...completedData}).catch(()=>{});
+    await db.ref('clientBookingsHistory/'+(b.clientId||clientUid)+'/'+id).set({...b, ...completedData}).catch(()=>{});
+
     await db.ref('myJobOffers/'+b.nurseId+'/'+id).update({
       status:'client_confirmed_finished',
       clientConfirmed:true,
@@ -236,7 +270,27 @@ async function confirmCompleted(id){
 
 function viewDetails(id){ const b=all.find(x=>x.id===id); alert(`Booking Details\n\nBooking ID: ${b.bookingId||b.id}\nStatus: ${b.status}\nNurse: ${b.nurseName}\nTotal Paid by Client: ${b.currency||'GHS'} ${b.amount} - Nurse share hidden - Client only sees total\nTime: ${b.time?new Date(b.time).toLocaleString('en-GH'):''}\nCompleted: ${b.clientConfirmedAtStr||'Not yet'}\n\nFlow: Pending -> Accepted (listener from my-job-offer) -> On The Way -> Close -> Completed -> Client Confirmed Finished - Is Part`); }
 function rateNurse(id){ const b=all.find(x=>x.id===id); location.href=`rating.html?bookingId=${b.bookingId||b.id}&nurseName=${encodeURIComponent(b.nurseName||'Nurse')}&nurseId=${b.nurseId||''}`; }
-async function cancelBooking(id){ if(!confirm('Cancel booking '+id+'?')) return; try{ await db.ref('bookings/'+id).update({status:'cancelled_by_client', cancelledAt:Date.now(), cancelledAtStr:new Date().toLocaleString('en-GH')}); toast('Cancelled'); loadBookings(); }catch(e){ toast(e.message); } }
+async function cancelBooking(id){ 
+  const b=all.find(x=>x.id===id);
+  const reason=prompt('Why cancel? This will reflect on CEO booking progress:', 'Change of plans')||'Client cancelled';
+  if(!confirm('Cancel booking '+(b?b.bookingId||id:id)+'? This will reflect on CEO booking progress - CEO will see cancellation - Confirm cancel?')) return; 
+  try{ 
+    const now=Date.now();
+    const nowStr=new Date().toLocaleString('en-GH');
+    const cancelData={status:'cancelled_by_client', cancelledAt:now, cancelledAtStr:nowStr, cancellationReason:reason, cancelledBy:'client'};
+    await db.ref('bookings/'+id).update(cancelData);
+    await db.ref('ceoBookings/'+id).update(cancelData).catch(()=>{});
+    await db.ref('ceoBookingsProgress/'+id).update({...cancelData, type:'cancelled_by_client', title:`Cancelled by Client - Booking ${b?b.bookingId||id:id}`, message:`Client cancelled booking ID ${b?b.bookingId||id:id} - Reason: ${reason} - Time: ${nowStr} - Reflect on CEO booking progress`, clientId:b?b.clientId||clientUid:'', nurseId:b?b.nurseId:'', createdAt:now}).catch(()=>{});
+    await db.ref('clientBookings/'+(b?b.clientId||clientUid:'')+'/'+id).update(cancelData).catch(()=>{});
+    if(b && b.nurseId){
+      await db.ref('nurseNotifications/'+b.nurseId+'/'+'CANCELLED-'+id+'-'+now).set({type:'cancelled', title:`Client cancelled booking ${b.bookingId||id}`, message:`Client ${b.clientName||clientName} cancelled booking ID ${b.bookingId||id} - Reason: ${reason} - Reflect on CEO progress`, bookingId:b.bookingId||id, time:now, createdAt:now, read:false}).catch(()=>{});
+    }
+    toast('Cancelled - Reflect on CEO booking progress - ID '+(b?b.bookingId||id:id)+' - CEO will see');
+    loadBookings(); 
+  }catch(e){ toast(e.message); } 
+}
+function viewHistory(id){ const b=all.find(x=>x.id===id); alert(`History - Booking ID ${b.bookingId||b.id}\nStatus: DONE\nClient confirmed work done - Moved to history - Active booking page empty\nDate: ${b.clientConfirmedAtStr||''}\nNurse: ${b.nurseName}\nAmount: ${b.currency||'GHS'} ${b.amount}\n\nCEO progress updated - CEO received completion`); }
+
 
 function getNavUrl(booking, nurseLat, nurseLng){
   const cLat=booking.clientLat||booking.lat||5.6037;
