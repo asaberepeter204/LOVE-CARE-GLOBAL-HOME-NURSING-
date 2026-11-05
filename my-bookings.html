@@ -37,7 +37,7 @@
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig); const db=firebase.database();
-let all=[], clientUid='', clientPhone='', clientUsername='', clientName='', historyData=[], monitorIntervals={}, prev={};
+let all=[], clientUid='', clientPhone='', clientUsername='', clientName='', historyData=[], monitorIntervals={}, prev={}, nursePhotoCache={};
 function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',5000);}
 function getKeys(){
   clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||localStorage.getItem('uid')||localStorage.getItem('clientId')||'';
@@ -48,9 +48,47 @@ function getKeys(){
   info.innerHTML='Client: '+clientName+' - Phone: '+(clientPhone||'No phone')+' - Username: '+(clientUsername||'No username')+' - UID: '+(clientUid||'No UID')+' - Matched by phone 9-digit + username';
 }
 function haversine(lat1,lon1,lat2,lon2){ const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c; }
+async function fetchClientPhotoForBooking(clientId, clientPhone){
+  try{
+    if(clientId){
+      const snap=await db.ref('clients/'+clientId).once('value');
+      if(snap.exists()){ const v=snap.val(); if(v.photoURL||v.clientPhoto||v.avatar) return v.photoURL||v.clientPhoto||v.avatar; }
+    }
+    if(clientPhone){
+      const phone9=clientPhone.replace(/[^0-9]/g,'').slice(-9);
+      const snap=await db.ref('allowedClients').once('value').catch(()=>null);
+      if(snap&&snap.exists()){
+        let found=''; snap.forEach(ch=>{ const v=ch.val(); const p=(v.phone||'').replace(/[^0-9]/g,'').slice(-9); if(p===phone9 && (v.photoURL||v.clientPhoto)){ found=v.photoURL||v.clientPhoto; } });
+        if(found) return found;
+      }
+    }
+  }catch(e){}
+  return localStorage.getItem('clientPhoto')||localStorage.getItem('photoURL')||'';
+}
+async function fetchNursePhoto(nurseId, nursePhone, nurseEmail){
+  const cacheKey=nurseId||nursePhone||nurseEmail;
+  if(nursePhotoCache[cacheKey]) return nursePhotoCache[cacheKey];
+  try{
+    if(nurseId){
+      const snap=await db.ref('nurses/'+nurseId).once('value');
+      if(snap.exists()){ const v=snap.val(); if(v.photoURL||v.nursePhoto||v.avatar||v.photo){ nursePhotoCache[cacheKey]=v.photoURL||v.nursePhoto||v.avatar||v.photo; return nursePhotoCache[cacheKey]; } }
+      const snap2=await db.ref('nurseList/'+nurseId).once('value').catch(()=>null);
+      if(snap2&&snap2.exists()){ const v=snap2.val(); if(v.photoURL||v.nursePhoto){ nursePhotoCache[cacheKey]=v.photoURL||v.nursePhoto; return nursePhotoCache[cacheKey]; } }
+    }
+    if(nursePhone){
+      const phone9=nursePhone.replace(/[^0-9]/g,'').slice(-9);
+      const snap=await db.ref('allowedNurses').once('value').catch(()=>null);
+      if(snap&&snap.exists()){
+        let found=''; snap.forEach(ch=>{ const v=ch.val(); const p=(v.phone||'').replace(/[^0-9]/g,'').slice(-9); if(p===phone9 && (v.photoURL||v.nursePhoto||v.avatar)){ found=v.photoURL||v.nursePhoto||v.avatar; } });
+        if(found){ nursePhotoCache[cacheKey]=found; return found; }
+      }
+    }
+  }catch(e){}
+  return '';
+}
 function loadBookings(){
   getKeys();
-  db.ref('bookings').on('value', snap=>{
+  db.ref('bookings').on('value', async snap=>{
     const list=[]; let total=0;
     if(snap.exists()){
       snap.forEach(ch=>{
@@ -68,6 +106,15 @@ function loadBookings(){
           }
         }
       });
+    }
+    // Fetch both client and nurse photos
+    for(const b of list){
+      if(!b.nursePhoto){
+        b.nursePhoto = await fetchNursePhoto(b.nurseId, b.nursePhone, b.nurseEmail);
+      }
+      if(!b.clientPhoto){
+        b.clientPhoto = await fetchClientPhotoForBooking(b.clientId, b.clientPhone||b.phone);
+      }
     }
     if(list.length===0 && total>0 && !clientPhone && !clientUsername && !clientUid){
       let debugList=[]; snap.forEach(ch=>{ const v=ch.val(); const st=(v.status||'pending').toLowerCase(); if(!st.includes('client_confirmed_finished') && !st.includes('paid')){ debugList.push({...v, id:ch.key, bookingId:v.bookingId||ch.key}); } }); debugList.sort((a,b)=>(b.time||0)-(a.time||0)); list.push(...debugList.slice(0,5));
@@ -127,9 +174,27 @@ function render(list){
     else if(st.includes('close')){ badge='badge-close'; text='CLOSE - Can call'; }
     else if(st.includes('completed')){ badge='badge-completed'; text='COMPLETED - Confirm to finish'; }
     const isCompleted=st.includes('completed');
-    return `<div class="card" style="border-left:3px solid ${st.includes('rejected')?'#ef4444':'#facc15'}">
-      <div style="display:flex;justify-content:space-between"><b>Booking ID ${b.bookingId||b.id}</b><span class="badge ${badge}">${text}</span></div>
-      <div style="margin-top:8px;font-size:11px">Client: ${b.clientName||clientName} - Nurse: ${b.nurseName||''} - Amount: ${b.currency||'GHS'} ${b.amount||''}</div>
+    let nursePhoto = b.nursePhoto || b.nurseAvatar || b.nursePhotoURL || b.photoURL || '';
+let clientPhoto = b.clientPhoto || b.clientAvatar || localStorage.getItem('clientPhoto') || localStorage.getItem('photoURL') || '';
+  return `<div class="card" style="border-left:3px solid ${st.includes('rejected')?'#ef4444':'#facc15'}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="width:50px;height:50px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:2px solid #a78bfa;display:flex;align-items:center;justify-content:center">
+            ${clientPhoto ? `<img src="${clientPhoto}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<div style=font-weight:900;font-size:20px>${(b.clientName||clientName||'C').charAt(0).toUpperCase()}</div>'">` : `<div style="font-weight:900;font-size:20px">${(b.clientName||clientName||'C').charAt(0).toUpperCase()}</div>`}
+          </div>
+          <div>
+            <div style="font-weight:900;font-size:14px;color:#fff">${b.clientName||clientName}</div>
+            <div style="font-size:10px;color:#d8b4fe">${b.clientPhone||clientPhone} - Validated: This page is for only you</div>
+          </div>
+        </div>
+        <span class="badge ${badge}">${text}</span>
+      </div>
+      <div style="margin-top:10px;font-size:11px;background:rgba(255,255,255,.04);padding:10px;border-radius:12px">
+        <b>Booking ID ${b.bookingId||b.id}</b><br>
+        Nurse Booked: ${b.nurseName||'Any nurse'} - ${b.nursePhone||''}<br>
+        Service: ${b.serviceType||''}<br>
+        Amount: ${b.currency||'GHS'} ${b.amount||''} - Location: ${b.location||''}
+      </div>
       ${extra}
       <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
         ${isCompleted?`<button class="btn btnGreen" onclick="confirmDone('${b.id}')">Confirm Work Done</button>`:''}
