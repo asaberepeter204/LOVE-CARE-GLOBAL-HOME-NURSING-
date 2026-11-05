@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HR Page - Nurse Withdrawals - GHS & USD - CEO</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--gold:#facc15;--green:#22c55e;--red:#ef4444;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.brand{font-family:Fraunces,serif;font-weight:800;font-size:18px}
+.badge{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:11px;font-weight:700}
+.tabs{display:flex;gap:8px;padding:12px 18px;background:rgba(26,22,51,.5);border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.tab.active{background:var(--gold);color:#000}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:14px 18px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.list{padding:0 18px 100px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.btn{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;font-weight:700;cursor:pointer}
+.btnApprove{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:0}
+.btnReject{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:0}
+.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid var(--line);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
+</style></head><body>
+<div class="top"><div><div class="brand">HR Page - Nurse Withdrawals - GHS & USD - Global Nurses</div><small style="color:var(--muted);font-size:10px">Ghana nurses GHS, Outside Ghana nurses USD - MoMo, Ghana Bank, International Bank, PayPal, Wise, WU, MoneyGram, Card</small></div><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="badge" id="totalBadge">0 Requests</span><span class="badge" id="currencyBadge">GHS 0 + $0</span><a href="ceo-dashboard.html" class="badge" style="text-decoration:none;color:var(--text)">CEO Dashboard</a><a href="ceo-bookings-progress.html" class="badge" style="text-decoration:none;background:rgba(34,197,94,.15);color:#86efac">Bookings Progress</a><button class="badge" onclick="location.reload()">Refresh</button></div></div>
+<div class="tabs"><button class="tab active" onclick="filterStatus('all')" id="tab-all">All (<span id="c-all">0</span>)</button><button class="tab" onclick="filterStatus('pending')" id="tab-pending">Pending (<span id="c-pending">0</span>)</button><button class="tab" onclick="filterStatus('approved')" id="tab-approved">Approved (<span id="c-approved">0</span>)</button><button class="tab" onclick="filterStatus('GHS')" id="tab-GHS">GHS Ghana (<span id="c-GHS">0</span>)</button><button class="tab" onclick="filterStatus('USD')" id="tab-USD">USD Intl (<span id="c-USD">0</span>)</button><button class="tab" onclick="filterStatus('momo')" id="tab-momo">MoMo</button><button class="tab" onclick="filterStatus('paypal')" id="tab-paypal">PayPal</button><button class="tab" onclick="filterStatus('bank_intl')" id="tab-bank_intl">Intl Bank</button></div>
+<div class="stats"><div class="stat"><small>Pending GHS</small><b id="s-pending-ghs">GHS 0</b><small id="s-pending-count">0 pending</small></div><div class="stat"><small>Pending USD</small><b id="s-pending-usd">$0</b><small>Outside Ghana</small></div><div class="stat"><small>Approved GHS</small><b id="s-approved-ghs">GHS 0</b></div><div class="stat"><small>Approved USD</small><b id="s-approved-usd">$0</b></div><div class="stat"><small>Total GHS</small><b id="s-total-ghs">GHS 0</b><small>Ghana nurses</small></div><div class="stat"><small>Total USD</small><b id="s-total-usd">$0</b><small>Outside Ghana</small></div></div>
+<div id="list" class="list"><div style="text-align:center;padding:40px;color:var(--muted)">Loading withdrawals GHS & USD...</div></div>
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+let all=[]; let currentFilter='all';
+function toastM(m){const e=document.getElementById('toast'); e.textContent=m; e.style.display='block'; setTimeout(()=>e.style.display='none',4000);}
+function filterStatus(s){currentFilter=s; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('tab-'+s)?.classList.add('active'); if(s==='momo'||s==='paypal'||s==='bank_intl'){/* method filter */} render();}
+function loadAll(){db.ref('ceoWithdrawals').on('value', snap=>{if(!snap.exists()){all=[]; updateCounts(); render(); return;} const list=[]; snap.forEach(ch=>{list.push({...ch.val(),id:ch.key});}); all=list; updateCounts(); render();});}
+function updateCounts(){
+  let pendingGHS=0, pendingUSD=0, approvedGHS=0, approvedUSD=0, totalGHS=0, totalUSD=0, countPending=0;
+  let countGHS=0, countUSD=0;
+  all.forEach(w=>{
+    const cur=(w.currency||'GHS').toUpperCase(); const amt=parseFloat(w.amount||0);
+    const status=(w.status||'pending').toLowerCase();
+    if(cur==='USD'||cur==='$'){ totalUSD+=amt; countUSD++; if(status==='pending'){pendingUSD+=amt; countPending++;} if(status==='approved'||status==='completed') approvedUSD+=amt; }
+    else { totalGHS+=amt; countGHS++; if(status==='pending'){pendingGHS+=amt; countPending++;} if(status==='approved'||status==='completed') approvedGHS+=amt; }
+  });
+  document.getElementById('c-all').textContent=all.length;
+  document.getElementById('c-GHS').textContent=countGHS;
+  document.getElementById('c-USD').textContent=countUSD;
+  document.getElementById('c-pending').textContent=all.filter(w=>(w.status||'pending').toLowerCase()==='pending').length;
+  document.getElementById('c-approved').textContent=all.filter(w=>['approved','completed'].includes((w.status||'').toLowerCase())).length;
+  document.getElementById('s-pending-ghs').textContent='GHS '+pendingGHS.toFixed(2);
+  document.getElementById('s-pending-usd').textContent='$'+pendingUSD.toFixed(2);
+  document.getElementById('s-approved-ghs').textContent='GHS '+approvedGHS.toFixed(2);
+  document.getElementById('s-approved-usd').textContent='$'+approvedUSD.toFixed(2);
+  document.getElementById('s-total-ghs').textContent='GHS '+totalGHS.toFixed(2);
+  document.getElementById('s-total-usd').textContent='$'+totalUSD.toFixed(2);
+  document.getElementById('s-pending-count').textContent=countPending+' pending';
+  document.getElementById('totalBadge').textContent=all.length+' Requests';
+  document.getElementById('currencyBadge').textContent=`GHS ${totalGHS.toFixed(2)} + $${totalUSD.toFixed(2)}`;
+}
+function render(){
+  const list=document.getElementById('list');
+  let filtered=all;
+  if(currentFilter==='GHS') filtered=all.filter(w=>(w.currency||'GHS').toUpperCase()!=='USD');
+  else if(currentFilter==='USD') filtered=all.filter(w=>(w.currency||'').toUpperCase()==='USD'||(w.currency||'').toUpperCase()==='$');
+  else if(currentFilter==='pending'||currentFilter==='approved'||currentFilter==='rejected') filtered=all.filter(w=>(w.status||'pending').toLowerCase()===currentFilter);
+  else if(currentFilter==='momo'||currentFilter==='paypal'||currentFilter==='bank_intl') filtered=all.filter(w=>w.method===currentFilter);
+  filtered.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(filtered.length===0){list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted)">No ${currentFilter} withdrawals - GHS & USD</div>`; return;}
+  list.innerHTML=filtered.map(w=>{
+    const cur=(w.currency||'GHS').toUpperCase(); const symbol=cur==='USD'?'$':'GHS'; const isUSD=cur==='USD';
+    let statusClass='pending', statusText='PENDING'; if(w.status==='approved'){statusClass='approved'; statusText='APPROVED';} else if(w.status==='completed'){statusClass='approved'; statusText='COMPLETED';} else if(w.status==='rejected'){statusClass='rejected'; statusText='REJECTED';}
+    let methodDetails='';
+    if(w.method==='momo') methodDetails=`MoMo ${w.momoNetwork||''} - ${w.momoNumber||''} - ${w.momoName||''} - Ghana`;
+    else if(w.method==='bank_ghana'||w.method==='bank_ghana_usd') methodDetails=`Ghana Bank ${w.bankNameGhana||w.bankName||''} - Acc: ${w.bankAccountGhana||w.bankAccount||''} - Name: ${w.bankAccountNameGhana||w.bankAccountName||''} - Currency: ${w.bankCurrencyGhana||cur}`;
+    else if(w.method==='bank_intl') methodDetails=`Intl Bank - Country: ${w.bankCountryIntl||''} - Bank: ${w.bankNameIntl||''} - Acc/IBAN: ${w.bankAccountIntl||''} - SWIFT: ${w.bankSwiftIntl||''} - Name: ${w.bankAccountNameIntl||''} - Addr: ${w.bankAddressIntl||''} - Outside Ghana`;
+    else if(w.method==='paypal') methodDetails=`PayPal Email: ${w.paypalEmail||''} - Name: ${w.paypalName||''} - USD Outside Ghana`;
+    else if(w.method==='wise') methodDetails=`Wise Email: ${w.wiseEmail||''} - Name: ${w.wiseName||''} - Currency: ${w.wiseCurrency||'USD'} - Global`;
+    else if(w.method==='western_union') methodDetails=`Western Union - Name: ${w.wuName||''} - Country: ${w.wuCountry||''} - Phone: ${w.wuPhone||''}`;
+    else if(w.method==='moneygram') methodDetails=`MoneyGram - Name: ${w.mgName||''} - Country: ${w.mgCountry||''} - Phone: ${w.mgPhone||''}`;
+    else if(w.method==='card') methodDetails=`Card ${w.cardType||''} - ****${w.cardNumber||''} - Name: ${w.cardName||''} - Currency: ${w.cardCurrency||cur}`;
+    else methodDetails=`${w.method} - ${cur}`;
+    const timeStr=w.createdAt?new Date(w.createdAt).toLocaleString('en-GH'):'';
+    return `<div class="card" style="border-left:4px solid ${isUSD?'#facc15':'#22c55e'}"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b style="font-size:16px">${symbol} ${parseFloat(w.amount||0).toFixed(2)} ${cur} ${isUSD?'🌍 Outside Ghana':'🇬🇭 Ghana'}</b> - ${w.method?.toUpperCase()||''} <span style="margin-left:8px;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;background:${w.status==='pending'?'rgba(245,158,11,.15)':w.status==='approved'?'rgba(34,197,94,.15)':'rgba(239,68,68,.15)'}">${statusText}</span><div style="margin-top:8px;font-size:12px"><div>Nurse: <b>${w.nurseName||'Unknown'}</b> (${w.nurseEmail||''}) - ${cur} - ${w.isInternational?'Outside Ghana':w.isGhana?'Ghana':'Ghana/Intl'}</div><div>ID: <small>${w.nurseId||''}</small></div><div>Requested: ${timeStr} - Currency: <b>${cur}</b></div><div style="background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px"><b style="font-size:11px;color:var(--muted)">WITHDRAWAL DETAILS - CEO RECEIVES - ${cur}:</b><div style="margin-top:6px;font-size:12px;line-height:1.6">${methodDetails}${w.notes?`<div style="margin-top:8px;background:rgba(250,204,21,.1);padding:8px;border-radius:8px">Notes: ${w.notes} - Country: ${w.notes.includes('Nigeria')||w.notes.includes('USA')||w.notes.includes('UK')? 'Outside Ghana':''}</div>`:''}</div></div></div></div></div><div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${w.status==='pending'?`<button class="btn btnApprove" onclick="approveWithdrawal('${w.id}')">Approve - Send ${symbol} ${parseFloat(w.amount||0).toFixed(2)} ${cur}</button><button class="btn btnReject" onclick="rejectWithdrawal('${w.id}')">Reject</button>`:''}<button class="btn" onclick="viewDetails('${w.id}')">Full Details - ${cur}</button><button class="btn" onclick="copyDetails('${w.id}')" style="background:rgba(250,204,21,.1);color:#facc15">Copy ${cur} Details</button></div></div>`;
+  }).join('');
+}
+async function approveWithdrawal(id){const w=all.find(x=>x.id===id); if(!w) return; const cur=(w.currency||'GHS').toUpperCase(); const symbol=cur==='USD'?'$':'GHS'; const note=prompt(`Approve this ${cur} withdrawal? Enter note:`,`Approved - Sent ${symbol} ${w.amount} ${cur} via ${w.method} - ${cur==='GHS'?'Ghana':'Outside Ghana'}`); if(note===null) return; if(!confirm(`Approve ${symbol} ${w.amount} ${cur} - ${w.nurseName} - ${w.method} - ${cur==='GHS'?'Ghana':'Outside Ghana'}?`)) return; try{const now=Date.now(); const upd={status:'approved',approved:true,approvedAt:now,approvedAtStr:new Date().toLocaleString('en-GH'),ceoNote:note,approvedBy:'CEO Asabere Peter'}; await db.ref('nurseWithdrawals/'+id).update(upd); await db.ref('ceoWithdrawals/'+id).update(upd); await db.ref('hrWithdrawals/'+id).update(upd); await db.ref('withdrawalRequests/'+id).update(upd); await db.ref('ceoHRPage/withdrawals/'+id).update(upd); if(w.nurseId){await db.ref('nurseNotifications/'+w.nurseId+'/'+id).set({type:'withdrawal_approved',title:`Withdrawal Approved - ${symbol}${w.amount} ${cur} - ${cur==='GHS'?'Ghana':'Outside Ghana'}`,message:`Your withdrawal of ${symbol}${w.amount} ${cur} via ${w.method} approved. ${note} - ${cur==='GHS'?'Ghana - GHS will be sent via '+w.method:'Outside Ghana - USD will be sent via '+w.method}`,amount:w.amount,currency:cur,method:w.method,createdAt:now,read:false});} toastM(`Approved ${symbol}${w.amount} ${cur}`);}catch(e){toastM(e.message);}}
+async function rejectWithdrawal(id){const w=all.find(x=>x.id===id); const reason=prompt('Reject? Enter reason:','Insufficient details'); if(reason===null) return; if(!confirm('Reject?')) return; try{const now=Date.now(); const upd={status:'rejected',approved:false,rejectedAt:now,rejectedAtStr:new Date().toLocaleString('en-GH'),ceoNote:reason,rejectedBy:'CEO'}; await db.ref('nurseWithdrawals/'+id).update(upd); await db.ref('ceoWithdrawals/'+id).update(upd); await db.ref('hrWithdrawals/'+id).update(upd); toastM('Rejected');}catch(e){toastM(e.message);}}
+function viewDetails(id){const w=all.find(x=>x.id===id); if(!w) return; const cur=(w.currency||'GHS'); alert(`Withdrawal Details - ${cur}:\nID: ${w.withdrawalId||w.id}\nNurse: ${w.nurseName}\nAmount: ${w.currency==='USD'?'$':'GHS'} ${w.amount} ${cur}\nMethod: ${w.method}\nCurrency: ${cur} - ${w.isInternational?'Outside Ghana':'Ghana'}\nStatus: ${w.status}\nTime: ${new Date(w.createdAt).toLocaleString('en-GH')}\n\nDetails: ${w.method==='momo'?`MoMo ${w.momoNumber}`:w.method==='paypal'?`PayPal ${w.paypalEmail}`:w.method==='bank_intl'?`Intl Bank ${w.bankNameIntl} ${w.bankAccountIntl} SWIFT ${w.bankSwiftIntl}`:JSON.stringify(w)}`);}
+function copyDetails(id){const w=all.find(x=>x.id===id); if(!w) return; const cur=w.currency||'GHS'; const symbol=cur==='USD'?'$':'GHS'; let text=`Withdrawal ID: ${w.withdrawalId||w.id}\nNurse: ${w.nurseName} (${w.nurseId})\nAmount: ${symbol} ${w.amount} ${cur} - ${cur==='GHS'?'Ghana':'Outside Ghana'}\nMethod: ${w.method}`; if(w.method==='bank_intl') text+=`\nIntl: ${w.bankCountryIntl} - ${w.bankNameIntl} - ${w.bankAccountIntl} - SWIFT ${w.bankSwiftIntl}`; else if(w.method==='paypal') text+=`\nPayPal: ${w.paypalEmail}`; navigator.clipboard.writeText(text).then(()=>toastM('Copied '+cur)).catch(()=>{prompt('Copy:',text);});}
+window.onload=()=>{loadAll();};
+</script></body></html>

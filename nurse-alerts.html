@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nurse Alerts - Loud Sound - LoveCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;padding-bottom:90px}
+.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.card{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:16px;margin:12px}
+.btn{padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#ece8ff;font-weight:700;font-size:11px;cursor:pointer}
+.btnGold{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000;border:0}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:0}
+.alertCard{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin-bottom:10px}
+.alertCard.unread{border-left:4px solid #facc15;background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(45,30,10,.4));animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(250,204,21,.2)}50%{box-shadow:0 0 0 8px rgba(250,204,21,0)}}
+.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
+.toggle{width:50px;height:26px;border-radius:999px;background:rgba(255,255,255,.2);position:relative;cursor:pointer}
+.toggle.on{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.toggleKnob{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.3s}
+.toggle.on .toggleKnob{left:26px}
+</style></head><body>
+<div class="top"><div><b>🔔 Nurse Alerts - Loud Sound Even Far From Phone</b><br><small style="color:#9a95b8;font-size:10px">New bookings, Completed, Withdrawal approved - Phone RINGS loudly!</small></div><div style="display:flex;gap:8px"><span id="countBadge" style="padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);font-size:11px">0 Alerts</span><a href="nurse-dashboard.html" style="padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);color:#ece8ff;text-decoration:none;font-size:11px">Dashboard</a></div></div>
+
+<div style="max-width:800px;margin:0 auto;padding:10px">
+<div class="card" style="background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(168,85,247,.12));border:2px solid rgba(250,204,21,.4)">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><b style="color:#facc15">🔔 Loud Sound - Even Far From Phone</b><br><small style="font-size:10px;color:#a78bfa">When client books you or confirms work completed, phone RINGS loudly + vibrates + notification even if far away</small></div>
+<div style="display:flex;gap:10px;align-items:center"><span id="soundStatus" style="font-size:11px">OFF</span><div id="soundToggle" class="toggle" onclick="toggleSound()"><div class="toggleKnob"></div></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+<button class="btn btnGold" style="font-size:10px" onclick="testSound('new_booking')">🔊 Test New Booking</button>
+<button class="btn btnGold" style="font-size:10px" onclick="testSound('completed')">🔊 Test Completed</button>
+<button class="btn btnGold" style="font-size:10px" onclick="testSound('withdrawal')">🔊 Test Withdrawal</button>
+</div>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button class="btn" style="flex:1" onclick="requestNotif()">🔔 Enable Notifications</button>
+<button class="btn" style="flex:1" onclick="enableVib()">📳 Enable Vibration</button>
+<button class="btn btnGold" style="flex:1" onclick="enableSound()">🔊 Enable Loud Sound</button>
+</div>
+</div>
+
+<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+<b style="font-size:12px">Written Notifications - Your Jobs</b>
+<div style="display:flex;gap:6px"><button class="btn" onclick="loadAlerts()">Refresh</button><button class="btn" onclick="markAllRead()">Read All</button><button class="btn" style="background:rgba(239,68,68,.15);color:#fca5a5" onclick="deleteAll()">Delete All</button></div>
+</div>
+
+<div id="list" style="display:grid;gap:10px;margin-top:12px"><div style="text-align:center;padding:40px;color:#9a95b8">Loading nurse alerts...</div></div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+let nurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
+let nurseName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'Nurse';
+let all=[], prevIds=new Set(), audioCtx=null;
+
+function initAudio(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+function getSound(){return localStorage.getItem('nurse_alerts_sound')==='true';}
+function saveSound(v){localStorage.setItem('nurse_alerts_sound', v?'true':'false'); updateUI();}
+function updateUI(){const on=getSound();const t=document.getElementById('soundToggle');const s=document.getElementById('soundStatus');if(on){t.classList.add('on');s.textContent='ON - Loud';s.style.color='#22c55e';}else{t.classList.remove('on');s.textContent='OFF';s.style.color='#facc15';}}
+function toggleSound(){const cur=getSound();saveSound(!cur);if(!cur) enableSound();}
+function enableSound(){try{if(!audioCtx)initAudio();if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();saveSound(true);toastM('🔊 Nurse Sound ON - Loud even far!');if(Notification&&Notification.permission==='default')Notification.requestPermission();}catch(e){saveSound(true);}}
+function toastM(m){const e=document.getElementById('toast');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',4000);}
+function playLoud(type){
+  if(!getSound()) return;
+  try{
+    if(!audioCtx)initAudio(); if(!audioCtx)return; if(audioCtx.state==='suspended')audioCtx.resume();
+    const now=audioCtx.currentTime; const vol=0.9;
+    if(type==='new_booking'){for(let i=0;i<3;i++){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=800+i*150;g.gain.setValueAtTime(0,now+i*0.3);g.gain.linearRampToValueAtTime(vol,now+i*0.3+0.05);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.3+0.5);o.start(now+i*0.3);o.stop(now+i*0.3+0.6);}}
+    else if(type==='completed'){const notes=[523,659,784,1046];notes.forEach((f,i)=>{const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=f;g.gain.setValueAtTime(0,now+i*0.15);g.gain.linearRampToValueAtTime(vol,now+i*0.15+0.05);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.15+0.4);o.start(now+i*0.15);o.stop(now+i*0.15+0.5);});}
+    else if(type==='withdrawal'){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=1000;o.type='sine';g.gain.setValueAtTime(vol,now);g.gain.exponentialRampToValueAtTime(0.01,now+1);o.start(now);o.stop(now+1);}
+    if(navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+    if(Notification&&Notification.permission==='granted'){let title='',body='';if(type==='new_booking'){title='🔔 NEW BOOKING!';body='Client booked you - Check My Job Offer!';}else if(type==='completed'){title='🎉 Work Completed!';body='Client confirmed work - Booking ID: Congrats!';}else if(type==='withdrawal'){title='💸 Withdrawal Approved!';body='Your withdrawal approved - Check wallet!';}try{const n=new Notification(title,{body,requireInteraction:true});setTimeout(()=>n.close(),10000);}catch(e){}}
+  }catch(e){console.log(e);}
+}
+function testSound(t){enableSound(); setTimeout(()=>playLoud(t),400); toastM('🔊 Playing '+t+' sound - Loud even far!');}
+function requestNotif(){if(!('Notification'in window)){toastM('Not supported');return;} Notification.requestPermission().then(p=>{if(p==='granted'){toastM('✅ Notifications ON - Far away you will hear!'); testSound('new_booking');}});}
+function enableVib(){if(!('vibrate'in navigator)){toastM('No vibration');return;} navigator.vibrate([200,100,200,100,400]); toastM('📳 Vibration ON!');}
+
+function loadAlerts(){
+  if(!nurseId){document.getElementById('list').innerHTML='<div style="text-align:center;padding:40px;color:#9a95b8">No nurse ID - Login again</div>';return;}
+  db.ref('nurseNotifications/'+nurseId).limitToLast(50).on('value', snap=>{
+    if(!snap.exists()){document.getElementById('list').innerHTML='<div style="text-align:center;padding:40px;color:#9a95b8">No alerts yet - When client books you, loud sound + written notification here even far from phone</div>';return;}
+    const list=[]; snap.forEach(ch=>{list.push({...ch.val(),id:ch.key});});
+    list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    // Detect new and play sound
+    const curIds=new Set(list.map(l=>l.id));
+    if(prevIds.size>0){
+      for(const item of list){
+        if(!prevIds.has(item.id)){
+          let type='new_booking'; if(item.type==='congratulation'||item.isCongrats||(item.title||'').includes('Congratulations')) type='completed'; else if((item.type||'').includes('withdrawal')) type='withdrawal';
+          setTimeout(()=>playLoud(type),300);
+          toastM(`🔔 NEW: ${item.title||'New alert'} - Loud!`);
+        }
+      }
+    }
+    prevIds=curIds;
+    all=list;
+    document.getElementById('countBadge').textContent=list.length+' Alerts - '+list.filter(a=>!a.read).length+' New';
+    document.getElementById('list').innerHTML=list.map(n=>{
+      const isUnread=!n.read; let icon='🔔', cls=''; if(n.type==='congratulation'||n.isCongrats){icon='🎉';} else if((n.type||'').includes('withdrawal')){icon='💸';} const time=n.createdAt?new Date(n.createdAt).toLocaleString('en-GH'):''; 
+      return `<div class="alertCard ${isUnread?'unread':''}"><div style="display:flex;gap:12px"><div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#facc15,#f59e0b);display:grid;place-items:center;font-size:20px">${icon}</div><div style="flex:1"><b style="font-size:13px">${n.title||'Notification'} ${isUnread?'🔔':''}</b><div style="font-size:11px;margin-top:6px;white-space:pre-line">${n.message||''}</div><div style="font-size:9px;color:#9a95b8;margin-top:8px">Booking ID: <b>${n.bookingId||'N/A'}</b> - ${time} - ${n.amount?'GHS '+n.amount:''}</div><div style="display:flex;gap:6px;margin-top:10px"><button class="btn btnGold" style="padding:6px 10px;font-size:10px" onclick="playLoud('${n.type==='congratulation'?'completed':n.type}')">${'🔊 Play Sound'}</button><button class="btn" style="padding:6px 10px;font-size:10px" onclick="markRead('${n.id}')">Read</button><button class="btn" style="padding:6px 10px;font-size:10px;background:rgba(239,68,68,.1);color:#fca5a5" onclick="delOne('${n.id}')">Delete</button></div></div></div></div>`;
+    }).join('');
+  });
+}
+
+function markRead(id){db.ref('nurseNotifications/'+nurseId+'/'+id).update({read:true}).then(()=>toastM('Read'));}
+function delOne(id){if(!confirm('Delete?'))return; db.ref('nurseNotifications/'+nurseId+'/'+id).remove().then(()=>toastM('Deleted'));}
+function markAllRead(){all.forEach(a=>{db.ref('nurseNotifications/'+nurseId+'/'+a.id).update({read:true}).catch(()=>{});}); toastM('All read');}
+function deleteAll(){if(!confirm('Delete ALL '+all.length+'?'))return; const c=prompt('Type DELETE:'); if(c!=='DELETE')return; db.ref('nurseNotifications/'+nurseId).remove().then(()=>{toastM('All deleted'); prevIds=new Set();});}
+
+window.onload=()=>{initAudio(); updateUI(); loadAlerts(); document.addEventListener('click',()=>{if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();},{once:true});};
+</script></body></html>
