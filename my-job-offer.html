@@ -95,8 +95,6 @@ function loadOffers(){
       snap.forEach(ch=>{
         const v=ch.val();
         const st=(v.status||'pending').toLowerCase();
-        // Show ALL pending, accepted, rejected, completed - not filtering strictly - so nurse sees offers
-        // Only hide if paid or client confirmed finished
         if(st.includes('client_confirmed_finished') || st==='paid' || v.ceoPaid===true) return;
         // For now show all bookings for this nurse phone OR all recent if nurseId matches OR even if mismatch, show recent 5
         const bNurseId=(v.nurseId||'').toString();
@@ -156,8 +154,9 @@ function render(list){
     let badge='badge-pending', txt='PENDING - Accept/Reject';
     if(st.includes('accepted')){ badge='badge-accepted'; txt='ACCEPTED - Auto nav to client'; }
     else if(st.includes('rejected')){ badge='badge-rejected'; txt='REJECTED'; }
+    else if(st.includes('cancelled_by_client')){ badge='badge-pending'; txt='PENDING - Client cancelled - Accept/Reject to restore'; }
     else if(st.includes('completed')){ badge='badge-accepted'; txt='COMPLETED'; }
-    const isPending=st==='pending'||st==='new';
+    const isPending=st==='pending'||st==='new'||st.includes('cancelled')||st==='';
     const clientLoc = typeof b.clientLocation==='object' ? `${b.clientLocation.lat||''},${b.clientLocation.lng||''}` : (b.clientLat||'')+','+(b.clientLng||'');
     return `<div class="card" style="border-left:4px solid ${st.includes('accepted')?'#22c55e':'#facc15'}">
       <div style="display:flex;justify-content:space-between"><span class="badge ${badge}">${txt}</span><small>${new Date(b.time||Date.now()).toLocaleString('en-GH')}</small></div>
@@ -168,7 +167,7 @@ function render(list){
         Amount: GHS ${b.amount||''} - You get 80% = ${b.nurse80||Math.round((b.amount||20)*0.8)}
       </div>
       <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-        ${isPending?`<button class="btn btnGreen" onclick="accept('${b.id}')">Accept</button><button class="btn btnRed" onclick="reject('${b.id}')">Reject</button>`:''}
+        ${isPending?`<div style="display:flex;gap:8px;width:100%"><button class="btn btnGreen" style="flex:1;padding:14px" onclick="accept('${b.id}')">Accept Offer</button><button class="btn btnRed" style="flex:1;padding:14px" onclick="reject('${b.id}')">Reject Offer</button></div>`:''}
         ${st.includes('accepted')?`<button class="btn btnGreen" onclick="nav('${b.id}')">Navigate - Auto nav</button><button class="btn btnBlue" onclick="complete('${b.id}')">Complete Job</button>`:''}
         ${st.includes('rejected')?`<button class="btn btnBlue" onclick="undo('${b.id}')">Undo Reject</button>`:''}
       </div>
