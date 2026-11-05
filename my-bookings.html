@@ -1,35 +1,64 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Bookings - REAL DATE Follows Device - LOVE CARE GLOBAL</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Bookings - Clean - Pending to Completion - Listener from My Job Offer - Full Flow</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),linear-gradient(180deg,#0e0a1c 0%, #120e26 100%)}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
 .card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px 14px}
-.clientHeader{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#2d1c4e 0%, #1c1238 100%);border:2px solid rgba(168,85,247,.35);border-radius:20px;padding:16px;margin:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.4)}
-.clientPhotoBig{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #d8b4fe;background:#2d1c4e;display:block}
-.realDateCard{background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.1));border:2px solid rgba(250,204,21,.3);border-radius:16px;padding:12px 16px;margin:12px 14px;display:flex;justify-content:space-between;align-items:center}
-.dateBoxBig{background:white;color:#2563eb;border-radius:12px;padding:8px 14px;font-weight:900;line-height:1.1;min-width:72px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}.badge-pending{background:rgba(245,158,11,.15);color:#fde68a;border:1px solid rgba(245,158,11,.3)}.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}.badge-rejected{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
-.btn{border:none;border-radius:14px;padding:14px 12px;font-weight:900;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;min-height:48px;flex:1}.btn:active{transform:scale(.97)}.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
-.mapWrap{width:100%;height:300px;border-radius:14px;overflow:hidden;border:2px solid rgba(34,197,94,.3);margin-top:12px;position:relative}.mapWrap::before{content:'[RED] LIVE TRACKING';position:absolute;top:8px;left:8px;z-index:500;background:rgba(34,197,94,.9);color:white;font-size:9px;font-weight:900;padding:4px 8px;border-radius:99px}
-.followBox{padding:12px;border-radius:12px;margin-top:12px;font-size:11px;line-height:1.6}.followPending{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}.followAccepted{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:#86efac}.followRejected{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
-.bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0;z-index:60}.btab{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:800;color:#a78bfa;cursor:pointer;padding:6px}.btab.active{color:#d8b4fe;background:rgba(168,85,247,.12);border-radius:12px;margin:0 4px}
-.notification{position:fixed;top:70px;left:12px;right:12px;z-index:1000;padding:16px;border-radius:16px;display:none}.notification.show{display:block}.notifAccept{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.notifReject{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
-</style></head><body><div class="bg"></div>
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
+.badge-pending{background:rgba(245,158,11,.15);color:#fde68a;border:1px solid rgba(245,158,11,.3)}
+.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}
+.badge-ontheway{background:rgba(37,99,235,.15);color:#93c5fd;border:1px solid rgba(37,99,235,.3)}
+.badge-close{background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.3)}
+.badge-completed{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff}
+.badge-confirmed{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+.btn{border:none;border-radius:14px;padding:14px 12px;font-weight:900;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;min-height:48px;flex:1}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
+.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
+.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
+.bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0;z-index:60}
+.btab{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:800;color:#a78bfa;cursor:pointer;padding:6px}
+.btab.active{color:#d8b4fe;background:rgba(168,85,247,.12);border-radius:12px;margin:0 4px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.flowCard{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:14px;padding:10px;margin:8px 0;display:flex;gap:6px;flex-wrap:wrap}
+.flowStep{padding:6px 10px;border-radius:999px;font-size:9px;font-weight:800;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05)}
+.flowStep.active{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.3)}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</head><body>
+<div class="topbar"><div><b style="font-size:13px">My Bookings - Clean - Pending to Completion Flow</b><br><small style="font-size:9px;color:#22c55e">LIVE - Pending - Accepted (listener from my-job-offer) - On The Way - Close - Completed - Client Confirmed Finished - Full Part</small></div><a href="alerts.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-size:11px;text-decoration:none">Alerts</a></div>
+
+<div style="max-width:800px;margin:0 auto;padding:10px">
+<div class="card" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2);padding:12px">
+<b style="font-size:12px;color:#86efac">Full Flow - Client Side - Listener from My Job Offer</b><br>
+<small style="font-size:10px;color:#a78bfa">1. Client books - Pending - 2. Nurse accepts in my-job-offer.html - Listener updates here to Accepted instantly with loud sound - 3. On The Way - 4. Close to Client - 5. Completed by Nurse - 6. Client Confirms Finished - 7. Congrats sent to nurse - 8. Rate nurse - CEO receives progress</small>
+<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+<span style="font-size:10px;color:#9ca3af" id="countInfo">Loading...</span>
+<button style="padding:6px 10px;border-radius:999px;border:1px solid rgba(168,85,247,.18);background:rgba(255,255,255,.06);color:#d8b4fe;font-size:10px" onclick="location.reload()">Refresh</button>
+</div>
+</div>
+
+<div id="bookingsList" style="display:grid;gap:12px;margin-top:12px"></div>
+<div id="emptyBookings" class="card" style="display:none;text-align:center;padding:30px"><b>No bookings yet</b><br><small style="color:#a78bfa">Your bookings will appear here - Pending to Completion is part - When nurse accepts in my-job-offer, this page updates instantly via listener</small></div>
+</div>
+
+<div class="bottom-tabs"><div class="btab" onclick="location.href='client-dashboard.html'"><span>Home</span></div><div class="btab active"><span>Bookings</span></div><div class="btab" onclick="location.href='alerts.html'"><span>Alerts</span></div></div>
+<div id="toast" class="toast"></div>
 
 <script>
-// === IMMEDIATE SYNC - Shows photo + date even before Firebase loads ===
-(function(){
-  // 1. REAL DATE IMMEDIATE - works offline
-  
-// === LOUD SOUND SYSTEM FOR CLIENT - EVEN FAR FROM PHONE ===
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const auth=firebase.auth();
+
+let all=[], clientUid='', clientEmail='', clientPhone='', clientName='', prev={};
 let audioCtx=null;
 function initAudio(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
-function getSoundEnabled(){return localStorage.getItem('alerts_sound_enabled')==='true';}
 function playLoudSound(type){
-  if(!getSoundEnabled()) return;
   try{
     if(!audioCtx) initAudio();
     if(!audioCtx) return;
@@ -37,679 +66,302 @@ function playLoudSound(type){
     const now=audioCtx.currentTime; const vol=0.9;
     if(type==='accepted'){
       for(let i=0;i<3;i++){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=800+i*100;g.gain.setValueAtTime(0,now+i*0.25);g.gain.linearRampToValueAtTime(vol,now+i*0.25+0.05);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.25+0.4);o.start(now+i*0.25);o.stop(now+i*0.25+0.5);}
-    } else if(type==='rejected'){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=200;o.type='sawtooth';g.gain.setValueAtTime(vol*0.6,now);g.gain.linearRampToValueAtTime(0.01,now+0.8);o.start(now);o.stop(now+0.8);}
-    else if(type==='on_the_way'){for(let i=0;i<2;i++){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=1000;g.gain.setValueAtTime(0,now+i*0.6);g.gain.linearRampToValueAtTime(vol,now+i*0.6+0.05);g.gain.linearRampToValueAtTime(0.01,now+i*0.6+0.4);o.start(now+i*0.6);o.stop(now+i*0.6+0.45);}}
-    else if(type==='close'){for(let i=0;i<4;i++){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=1200;g.gain.setValueAtTime(0,now+i*0.2);g.gain.linearRampToValueAtTime(vol,now+i*0.2+0.02);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.2+0.15);o.start(now+i*0.2);o.stop(now+i*0.2+0.2);}}
-    else if(type==='completed'){const notes=[523,659,784,1046];notes.forEach((freq,i)=>{const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=freq;g.gain.setValueAtTime(0,now+i*0.15);g.gain.linearRampToValueAtTime(vol*0.8,now+i*0.15+0.05);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.15+0.4);o.start(now+i*0.15);o.stop(now+i*0.15+0.5);});}
-    if(navigator.vibrate){if(type==='accepted') navigator.vibrate([200,100,200,100,400]); else if(type==='close') navigator.vibrate([100,50,100,50,100,50,300]); else navigator.vibrate([200,100,200]);}
-    if(Notification&&Notification.permission==='granted'){let title='',body='';if(type==='accepted'){title='✅ Nurse Accepted!';body='Nurse accepted - Check My Bookings!';}else if(type==='rejected'){title='❌ Rejected';body='Nurse rejected your booking';}else if(type==='on_the_way'){title='🚗 On The Way!';body='Nurse is on the way!';}else if(type==='close'){title='📍 Close!';body='Nurse is close!';}try{const n=new Notification(title,{body,icon:'icon-transparent-512.png',requireInteraction:true});setTimeout(()=>n.close(),10000);}catch(e){}}
-  }catch(e){console.log(e);}
-}
-function enableSound(){try{if(!audioCtx)initAudio();if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();localStorage.setItem('alerts_sound_enabled','true');alert('🔊 Sound Enabled - Loud alerts even far from phone!');if(Notification&&Notification.permission==='default')Notification.requestPermission();}catch(e){}}
-
-function setRealDateNow(){
-    try{
-      const now = new Date();
-      // Ghana time
-      const opts = {timeZone:'Africa/Accra'};
-      const monthNames=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-      const dayNames=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
-      // Get Ghana parts via Intl
-      const ghanaStr = now.toLocaleString('en-US', {timeZone:'Africa/Accra', year:'numeric', month:'numeric', day:'numeric', weekday:'short', hour:'numeric', minute:'numeric', second:'numeric', hour12:true});
-      // Use Intl to get parts
-      const m = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', month:'short'}).format(now).toUpperCase();
-      const d = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', day:'numeric'}).format(now);
-      const y = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', year:'numeric'}).format(now);
-      const wd = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', weekday:'long'}).format(now).toUpperCase();
-      const full = new Intl.DateTimeFormat('en-GH',{timeZone:'Africa/Accra', weekday:'long', year:'numeric', month:'long', day:'numeric'}).format(now);
-      const shortDate = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', month:'long', day:'numeric', year:'numeric'}).format(now);
-      const time = new Intl.DateTimeFormat('en-GH',{timeZone:'Africa/Accra', hour:'numeric', minute:'2-digit', second:'2-digit', hour12:true}).format(now);
-      
-      const elM=document.getElementById('realMonth'); if(elM) elM.textContent=m;
-      const elD=document.getElementById('realDay'); if(elD) elD.textContent=d;
-      const elY=document.getElementById('realYear'); if(elY) elY.textContent=y;
-      const elW=document.getElementById('realWeekday'); if(elW) elW.textContent=wd;
-      const elF=document.getElementById('realFullDate'); if(elF) elF.textContent=shortDate+' - Real Ghana Date (Auto-updates daily)';
-      const elT=document.getElementById('realTime'); if(elT) elT.textContent=time+' - Live';
-      const emptyEl=document.getElementById('emptyRealDate'); if(emptyEl) emptyEl.textContent=full;
-    }catch(e){
-      console.log('date error',e);
-      // Fallback simple date
-      const now=new Date();
-      const elM=document.getElementById('realMonth'); if(elM) elM.textContent=now.toLocaleString('en-US',{month:'short'}).toUpperCase();
-      const elD=document.getElementById('realDay'); if(elD) elD.textContent=now.getDate();
-      const elY=document.getElementById('realYear'); if(elY) elY.textContent=now.getFullYear();
-      const elW=document.getElementById('realWeekday'); if(elW) elW.textContent=now.toLocaleString('en-US',{weekday:'long'}).toUpperCase();
-      const elF=document.getElementById('realFullDate'); if(elF) elF.textContent=now.toLocaleDateString('en-GH');
-      const elT=document.getElementById('realTime'); if(elT) elT.textContent=now.toLocaleTimeString('en-GH')+' - Live';
     }
-  }
-  setRealDateNow();
-  setInterval(setRealDateNow,1000);
-  window.setRealDateNow = setRealDateNow;
-
-  // 2. CLIENT PHOTO IMMEDIATE - from localStorage without waiting for Firebase
-  function loadClientImmediate(){
-    try{
-      let cName='Client', cEmail='', cPhone='', cPhoto='';
-      const keysName=['clientName','fullName','displayName','pendingGoogleName','clientNameBig'];
-      const keysEmail=['clientEmail','pendingGoogleEmail','email'];
-      const keysPhone=['clientPhone','phone'];
-      const keysPhoto=['clientPhoto','clientPhotoUrl','photoUrl','pendingGooglePhoto','client_photo','avatar'];
-      for(const k of keysName){ const v=localStorage.getItem(k)||sessionStorage.getItem(k); if(v && v.length>2){ cName=v; break; } }
-      for(const k of keysEmail){ const v=localStorage.getItem(k)||sessionStorage.getItem(k); if(v && v.includes('@')){ cEmail=v.toLowerCase(); break; } }
-      for(const k of keysPhone){ const v=localStorage.getItem(k)||sessionStorage.getItem(k); if(v && v.replace(/\D/g,'').length>=9){ cPhone=v; break; } }
-      for(const k of keysPhoto){ const v=localStorage.getItem(k)||sessionStorage.getItem(k); if(v && (v.startsWith('http')||v.startsWith('data:'))){ cPhoto=v; break; } }
-
-      const nameEl=document.getElementById('clientNameBig');
-      const emailEl=document.getElementById('clientEmailBig');
-      const phoneEl=document.getElementById('clientPhoneBig');
-      const photoEl=document.getElementById('clientPhotoBig');
-      const badgeEl=document.getElementById('clientStatusBadge');
-      if(nameEl) nameEl.textContent=cName||'Client';
-      if(emailEl) emailEl.textContent=cEmail||'Email not set';
-      if(phoneEl) phoneEl.textContent=cPhone||'Phone not set';
-      if(badgeEl){
-        if(cEmail){ badgeEl.textContent='* '+cName+' - '+cEmail.split('@')[0]; badgeEl.style.background='rgba(34,197,94,.15)'; badgeEl.style.color='#86efac'; }
-        else { badgeEl.textContent='* Loading...'; }
-      }
-      if(photoEl){
-        if(cPhoto){
-          photoEl.src=cPhoto;
-          photoEl.onerror=function(){ this.src=''; this.style.background='#2d1c4e'; this.alt=cName.charAt(0); };
-        }else{
-          // initials avatar
-          const initial=(cName?cName.charAt(0):'C').toUpperCase();
-          const canvas=document.createElement('canvas'); canvas.width=120; canvas.height=120;
-          const ctx=canvas.getContext('2d'); ctx.fillStyle='#2d1c4e'; ctx.fillRect(0,0,120,120);
-          ctx.fillStyle='#d8b4fe'; ctx.font='bold 60px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-          ctx.fillText(initial,60,60);
-          photoEl.src=canvas.toDataURL();
-        }
-      }
-    }catch(e){ console.log('immediate load error',e); }
-  }
-  loadClientImmediate();
-  // retry after 500ms in case storage not yet ready
-  setTimeout(loadClientImmediate, 500);
-  setTimeout(loadClientImmediate, 1500);
-})();
-</script>
-
-
-<div class="topbar"><div><b style="font-size:13px">[DATE] My Bookings - REAL DATE [DATE]</b><br><small style="font-size:9px;color:#facc15">* REAL DATE - Follows Device Date</small></div><a href="client-dashboard.html" style="text-decoration:none;padding:8px 12px;border-radius:99px;background:rgba(255,255,255,.06);color:#9a95b8;font-size:11px;border:1px solid rgba(255,255,255,.1)"><- Dashboard</a></div>
-
-<!-- REAL DATE HEADER - AUTO UPDATES EVERY DAY -->
-<div class="realDateCard">
-<div style="display:flex;gap:12px;align-items:center">
-<div class="dateBoxBig"><div id="realMonth" style="font-size:14px">---</div><div id="realDay" style="font-size:22px">--</div><div id="realYear" style="font-size:10px;color:#6b7280">----</div></div>
-<div><b id="realWeekday" style="font-size:14px;color:#fff">LOADING...</b><br><small id="realFullDate" style="font-size:11px;color:#facc15">Loading real date...</small><br><small id="realTime" style="font-size:10px;color:#a78bfa">--:-- -- Live</small></div>
-</div>
-<div style="text-align:right"><span style="font-size:9px;background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);padding:4px 8px;border-radius:99px">[DATE] REAL DATE</span><br><small style="font-size:9px;color:#6b7280" id="countInfo">0 bookings</small></div>
-</div>
-
-<div class="clientHeader" id="clientHeader">
-  <img id="clientPhotoBig" class="clientPhotoBig" src="" alt="Client">
-  <div style="flex:1;min-width:0">
-    <b id="clientNameBig" style="font-size:15px;color:#f3e8ff">Loading...</b><br>
-    <small id="clientEmailBig" style="font-size:10px;color:#a78bfa;word-break:break-all">...</small><br>
-    <small id="clientPhoneBig" style="font-size:10px;color:#86efac">...</small>
-    <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
-      <span id="clientStatusBadge" style="font-size:9px;padding:4px 10px;border-radius:99px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac">* Loading Client...</span>
-    </div>
-    <div id="emailInputBox" style="display:none;margin-top:10px">
-      <div style="font-size:10px;color:#fca5a5;margin-bottom:4px">! Enter client email to load bookings:</div>
-      <div style="display:flex;gap:6px">
-        <input id="manualEmailInput" type="email" placeholder="Enter client email" style="flex:1;padding:10px;border-radius:10px;background:#0e0a1c;border:1px solid rgba(168,85,247,.3);color:white;font-size:11px">
-        <button onclick="loadClientByEmail()" style="padding:10px 14px;border-radius:10px;background:#d8b4fe;color:#1e0a3a;border:none;font-weight:900;font-size:11px">Load</button>
-      </div>
-    </div>
-  </div>
-  <button onclick="loadBookings()" style="padding:10px 14px;border-radius:99px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:12px">RELOAD</button>
-</div>
-
-<div id="notifAccept" class="notification notifAccept"><div style="display:flex;justify-content:space-between;gap:10px"><div><b id="notifTitleA">[OK] Nurse Accepted!</b><br><small id="notifMsgA">Navigation opened</small></div><button onclick="document.getElementById('notifAccept').classList.remove('show')" style="background:rgba(255,255,255,.2);border:none;color:white;padding:4px 8px;border-radius:8px">X</button></div><div style="margin-top:10px"><a id="notifNavA" href="#" target="_blank" class="btn" style="background:white;color:#16a34a;width:100%">MAP Open Google Maps - Track Nurse</a></div></div>
-<div id="notifReject" class="notification notifReject"><div style="display:flex;justify-content:space-between;gap:10px"><div><b>[X] Nurse Rejected</b><br><small id="notifMsgR">Book another or increase rate</small></div><button onclick="document.getElementById('notifReject').classList.remove('show')" style="background:rgba(255,255,255,.2);border:none;color:white;padding:4px 8px;border-radius:8px">X</button></div><div style="margin-top:10px;display:flex;gap:8px"><a href="book-nurse.html" class="btn" style="background:white;color:#dc2626">+ Book Another</a><a href="book-nurse.html?increaseRate=true" class="btn" style="background:#facc15;color:#1e0a3a"> Increase Rate</a></div></div>
-
-<div style="padding:0 14px">
-<div class="card" style="margin:0 0 12px 0;background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25)">
-  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b style="font-size:11px;color:#86efac">[RED] LIVE - Real Date Follows Device - Client Photo Saved</b></div>
-  <div style="font-size:9px;color:#9a95b8;margin-top:6px">- Top date auto-updates daily - Client photo from registration - Booking dates show real booking time</div>
-  <select id="filterStatus" onchange="render()" onchange="render()" style="margin-top:8px;padding:10px;border-radius:10px;background:#0e0a1c;color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:11px;width:100%"><option value="all">All - Live - Real Date</option><option value="pending" selected>Pending - Live</option><option value="accepted">Accepted - Live Tracking</option><option value="rejected">Rejected - Live</option></select>
-</div>
-<div id="list"></div>
-<div id="emptyState" class="card" style="display:none;text-align:center;padding:24px"><div style="font-size:36px">[DATE]</div><b>No live bookings yet</b><br><small style="color:#9a95b8">Real Date: <span id="emptyRealDate">-</span> - Only real bookings - No demo<br>Your profile is shown above [OK]</small><br><br><a href="book-nurse.html" class="btn btnYellow" style="flex:none;padding:14px 24px">+ Book Nurse Now - Real Date</a></div>
-</div>
-
-<div class="bottom-tabs"><div class="btab active">[DATE] My Bookings<br><small style="font-size:8px;color:#22c55e">REAL DATE</small></div><div class="btab" onclick="location.href='book-nurse.html'">+ Book</div><div class="btab" onclick="location.href='client-alerts.html'"> Alerts</div></div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
-let all=[];let prev={};let maps={};let markers={};
-let clientEmail='';let clientPhone='';let clientName='Client';let clientUid='';let clientPhoto='';
-
-// ===== REAL DATE - FOLLOWS REAL CALENDAR (GHANA TIME) =====
-function setRealDate(){ if(window.setRealDateNow){ window.setRealDateNow(); return; }
-  // Use Ghana timezone so date is correct in Accra
-  const now = new Date();
-  const ghanaNow = new Date(now.toLocaleString('en-US', {timeZone: 'Africa/Accra'}));
-  
-  const months=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-  const weekdays=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
-  
-  const month = months[ghanaNow.getMonth()];
-  const day = ghanaNow.getDate();
-  const year = ghanaNow.getFullYear();
-  const weekday = weekdays[ghanaNow.getDay()];
-  
-  // Full readable date in Ghana locale
-  const fullDate = ghanaNow.toLocaleDateString('en-GH',{weekday:'long', year:'numeric', month:'long', day:'numeric', timeZone:'Africa/Accra'});
-  const shortDate = ghanaNow.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric', timeZone:'Africa/Accra'});
-  const time = ghanaNow.toLocaleTimeString('en-GH',{hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true, timeZone:'Africa/Accra'});
-
-  const elM = document.getElementById('realMonth');
-  const elD = document.getElementById('realDay');
-  const elY = document.getElementById('realYear');
-  const elW = document.getElementById('realWeekday');
-  const elF = document.getElementById('realFullDate');
-  const elT = document.getElementById('realTime');
-  if(elM) elM.textContent=month;
-  if(elD) elD.textContent=day;
-  if(elY) elY.textContent=year;
-  if(elW) elW.textContent=weekday;
-  if(elF) elF.textContent=shortDate + ' - Real Ghana Date';
-  if(elT) elT.textContent=time + ' - Live';
-
-  const emptyEl=document.getElementById('emptyRealDate'); if(emptyEl) emptyEl.textContent=fullDate;
-}
-
-// ===== CREATE LOCAL INITIAL AVATAR (no external URL) =====
-function makeInitialAvatar(name){
-  const initial = (name && name.trim()? name.trim().charAt(0) : 'C').toUpperCase();
-  const canvas = document.createElement('canvas');
-  canvas.width=120; canvas.height=120;
-  const ctx=canvas.getContext('2d');
-  // background
-  ctx.fillStyle='#2d1c4e';
-  ctx.fillRect(0,0,120,120);
-  // text
-  ctx.fillStyle='#d8b4fe';
-  ctx.font='bold 60px Inter, sans-serif';
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText(initial,60,60);
-  return canvas.toDataURL();
-}
-
-function sanitizeEmailKey(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
-
-function getAllClientKeys(){
-  const stores=[localStorage,sessionStorage];
-  const emailKeys=['clientEmail','lcg_client_email','email','userEmail','client_email','pendingGoogleEmail'];
-  const phoneKeys=['clientPhone','lcg_client_phone','phone','client_phone','userPhone','clientPhoneBig'];
-  const nameKeys=['clientName','fullName','displayName','client_fullName','userName','name','client_name','pendingGoogleName','clientNameBig'];
-  const uidKeys=['clientUid','lcg_client_uid','currentClientId','lcg_uid','uid','clientId','clientUidBig'];
-  const photoKeys=['clientPhoto','clientPhotoUrl','photoUrl','client_photo','avatar','profilePhoto','clientPhotoBig','pendingGooglePhoto','photo'];
-  for(const store of stores){
-    try{
-      for(const k of emailKeys){ const v=store.getItem(k); if(v&&v.includes('@')&&!clientEmail) clientEmail=v.trim().toLowerCase(); }
-      for(const k of phoneKeys){ const v=store.getItem(k); if(v&&v.replace(/\D/g,'').length>=9&&!clientPhone) clientPhone=v; }
-      for(const k of nameKeys){ const v=store.getItem(k); if(v&&v.length>2&&(!clientName||clientName==='Client')) clientName=v; }
-      for(const k of uidKeys){ const v=store.getItem(k); if(v&&!clientUid) clientUid=v; }
-      for(const k of photoKeys){ const v=store.getItem(k); if(v&&(v.startsWith('http')||v.startsWith('data:'))&&!clientPhoto) clientPhoto=v; }
-    }catch(e){}
-  }
-  const user=auth.currentUser;
-  if(user){
-    if(user.email&&!clientEmail) clientEmail=user.email.toLowerCase();
-    if(user.displayName&&(!clientName||clientName==='Client')) clientName=user.displayName;
-    if(user.uid&&!clientUid) clientUid=user.uid;
-    if(user.photoURL&&!clientPhoto) clientPhoto=user.photoURL;
-  }
-}
-
-async function fetchClientFromFirebase(){
-  try{
-    // Try by UID
-    if(clientUid){
-      try{
-        const snap=await get(ref(db,'clients/'+clientUid));
-        if(snap.exists()){
-          const v=snap.val(); const real=v.profile||v;
-          if(real.fullName||real.name||v.fullName||v.name) clientName=real.fullName||real.name||v.fullName||v.name||clientName;
-          if(real.email||v.email) clientEmail=(real.email||v.email||clientEmail).toLowerCase();
-          if(real.phone||v.phone) clientPhone=real.phone||v.phone||clientPhone;
-          if(real.photoUrl||real.photo||v.photoUrl||real.clientPhotoUrl||v.clientPhotoUrl) clientPhoto=real.photoUrl||real.photo||v.photoUrl||real.clientPhotoUrl||v.clientPhotoUrl||clientPhoto;
-          if(clientPhoto) return true;
-        }
-      }catch(e){}
-    }
-    // Try allowedClients by sanitized email
-    if(clientEmail){
-      const key=sanitizeEmailKey(clientEmail);
-      const paths=[
-        'allowedClients/'+key,
-        'clientRegistrations/'+key,
-        'client_registrations/'+key,
-        'clients/'+key
-      ];
-      for(const p of paths){
-        try{
-          const s=await get(ref(db,p));
-          if(s.exists()){
-            const v=s.val(); const real=v.profile||v;
-            if(real.fullName||real.name||v.fullName||v.name) clientName=real.fullName||real.name||v.fullName||v.name||clientName;
-            if(real.phone||v.phone) clientPhone=real.phone||v.phone||clientPhone;
-            if(real.photoUrl||real.photo||v.photoUrl||real.clientPhotoUrl||v.clientPhotoUrl||v.photo) clientPhoto=real.photoUrl||real.photo||v.photoUrl||real.clientPhotoUrl||v.clientPhotoUrl||v.photo||clientPhoto;
-            if(real.email) clientEmail=real.email.toLowerCase()||clientEmail;
-            return true;
-          }
-        }catch(e){}
-      }
-      // Search by email in clients node
-      try{
-        const snap=await get(ref(db,'clients'));
-        if(snap.exists()){
-          let found=false;
-          snap.forEach(ch=>{
-            const v=ch.val()||{}; const real=v.profile||v;
-            const em=(real.email||v.email||real.clientEmail||'').toLowerCase();
-            if(em===clientEmail){
-              if(real.fullName||real.name||v.fullName) clientName=real.fullName||real.name||v.fullName||clientName;
-              if(real.phone||v.phone) clientPhone=real.phone||v.phone||clientPhone;
-              if(real.photoUrl||real.photo||v.photoUrl||v.clientPhotoUrl) clientPhoto=real.photoUrl||real.photo||v.photoUrl||v.clientPhotoUrl||clientPhoto;
-              found=true;
-            }
-          });
-          if(found) return true;
-        }
-      }catch(e){}
-    }
+    if(navigator.vibrate){ if(type==='accepted') navigator.vibrate([200,100,200,100,400]); else navigator.vibrate([200,100,200]); }
   }catch(e){}
-  return false;
 }
 
-window.loadClientByEmail=async function(){
-  const input=document.getElementById('manualEmailInput');
-  const email=input.value.trim().toLowerCase();
-  if(!email||!email.includes('@')){ alert('Enter valid email'); return; }
-  clientEmail=email;
-  localStorage.setItem('clientEmail',email);
-  document.getElementById('clientEmailBig').textContent='Loading '+email+'...';
-  const ok=await fetchClientFromFirebase();
-  renderClientHeader();
-  if(ok){ alert('[OK] Loaded: '+clientName); loadBookings(); }else{ alert('[X] Not found in database, but email saved. Try booking.'); }
+function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000);}
+function getKeys(){
+  clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||localStorage.getItem('uid')||'';
+  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('lcg_client_email')||'';
+  clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'';
+  clientName=localStorage.getItem('clientName')||localStorage.getItem('lcg_client_name')||'Client';
 }
 
-function renderClientHeader(){
-  const nameEl=document.getElementById('clientNameBig');
-  const emailEl=document.getElementById('clientEmailBig');
-  const phoneEl=document.getElementById('clientPhoneBig');
-  const photoEl=document.getElementById('clientPhotoBig');
-  const statusEl=document.getElementById('clientStatusBadge');
-  const inputBox=document.getElementById('emailInputBox');
-  nameEl.textContent=clientName||'Client';
-  if(clientEmail){
-    emailEl.textContent=clientEmail;
-    statusEl.textContent='* Verified - Photo Email Phone Saved - '+clientEmail.split('@')[0];
-    statusEl.style.background='rgba(34,197,94,.15)';statusEl.style.color='#86efac';
-    inputBox.style.display='none';
-  }else{
-    emailEl.textContent='Email not set';
-    statusEl.textContent='* Enter email below';
-    statusEl.style.background='rgba(239,68,68,.15)';statusEl.style.color='#fca5a5';
-    inputBox.style.display='block';
-  }
-  phoneEl.textContent=clientPhone||'Phone not set';
-  if(clientPhoto && (clientPhoto.startsWith('http')||clientPhoto.startsWith('data:'))){
-    photoEl.src=clientPhoto;
-  }else{
-    // Always show something - local avatar
-    photoEl.src=makeInitialAvatar(clientName);
-  }
-  // If image fails to load, fallback to initials
-  photoEl.onerror=()=>{ photoEl.src=makeInitialAvatar(clientName); photoEl.onerror=null; };
+async function ensureAuth(){
+  try{ if(!auth.currentUser){ await auth.signInAnonymously(); } }catch(e){}
 }
 
-async function ensureAuth(){return new Promise(r=>{const u=onAuthStateChanged(auth,async usr=>{u();if(usr){r(usr);}else{try{const c=await signInAnonymously(auth);r(c.user);}catch{r(null);}}});setTimeout(()=>r(null),3000);});}
-function getNavUrl(b,nLat,nLng){const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;return `https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;}
-function showToast(m){const n=document.getElementById('notifAccept');if(n){document.getElementById('notifTitleA').textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),4000);}else{alert(m);}}
-function showAccept(b,gmaps){playLoudSound('accepted');const n=document.getElementById('notifAccept');document.getElementById('notifTitleA').textContent=`[OK] ${b.nurseName||'Nurse'} Accepted! Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifMsgA').textContent=`${b.nurseName||'Nurse'} accepted ${b.bookingId||b.id} on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifNavA').href=gmaps;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),15000);}
-function showReject(b){playLoudSound('rejected');const n=document.getElementById('notifReject');document.getElementById('notifMsgR').textContent=`Booking ${b.bookingId||b.id} rejected on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}. Reason: ${b.rejectReason||'Not available'}. Book another or increase rate.`;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),15000);}
-function initMapLive(id,booking){
-  const el=document.getElementById('mapInner_'+id);if(!el)return;if(maps[id]){try{maps[id].remove();}catch(e){}}
-  const cLat=booking.clientLat||5.6037;const cLng=booking.clientLng||-0.1870;
-  const map=L.map('mapInner_'+id,{zoomControl:true}).setView([cLat,cLng],14);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:' OSM'}).addTo(map);maps[id]=map;
-  const cIcon=L.divIcon({className:'',html:'<div style="width:20px;height:20px;background:#2563eb;border:3px solid white;border-radius:50%"></div>',iconSize:[20,20],iconAnchor:[10,10]});
-  L.marker([cLat,cLng],{icon:cIcon}).addTo(map).bindPopup(` ${booking.clientName||clientName} - Your Location - Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}`).openPopup();
-  const nurseId=booking.nurseId;
-  const updateNurse=(nLat,nLng,isLive)=>{
-    if(markers[id]){try{map.removeLayer(markers[id]);}catch(e){}}
-    const html=isLive?`<div style="position:relative;width:30px;height:30px"><div style="position:absolute;top:50%;left:50%;width:30px;height:30px;background:rgba(34,197,94,.3);border-radius:50%;transform:translate(-50%,-50%)"></div><div style="position:absolute;top:50%;left:50%;width:16px;height:16px;background:#22c55e;border:2px solid white;border-radius:50%;transform:translate(-50%,-50%)"></div></div>`:`<div style="width:16px;height:16px;background:#22c55e;border:2px solid white;border-radius:50%"></div>`;
-    const icon=L.divIcon({className:'',html,iconSize:[30,30],iconAnchor:[15,15]});
-    markers[id]=L.marker([nLat,nLng],{icon}).addTo(map).bindPopup(`Nurse ${booking.nurseName||'Nurse'} ${isLive?'- LIVE - '+new Date().toLocaleTimeString('en-GH',{timeZone:'Africa/Accra'}):''}`);
-    try{map.fitBounds([[nLat,nLng],[cLat,cLng]],{padding:[40,40]});}catch(e){}
-  };
-  get(ref(db,'nurses/'+nurseId)).then(s=>{if(s.exists()){const v=s.val();if(v.lat&&v.lng) updateNurse(v.lat,v.lng,false);else if(v.latitude&&v.longitude) updateNurse(v.latitude,v.longitude,false);}});
-  onValue(ref(db,'nurseLocations/'+nurseId),(snap)=>{if(snap.exists()){const v=snap.val();const lat=v.lat||v.latitude;const lng=v.lng||v.longitude;if(lat&&lng) updateNurse(lat,lng,true);}});
-}
-
-window.loadBookings=async function(){
-  getAllClientKeys();renderClientHeader();setRealDate();
-  await ensureAuth();getAllClientKeys();await fetchClientFromFirebase();renderClientHeader();
-  const list=document.getElementById('list');list.innerHTML='<div class="card" style="text-align:center;color:#a78bfa">[RED] Loading LIVE bookings for '+(clientName||'Client')+' on '+new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})+'...<br><small>'+(clientEmail||'No email')+' | '+(clientPhone||'No phone')+' | '+(clientUid||'No UID')+'</small></div>';
-  let map={};
-  // FIX: Check ALL possible booking locations including clientBookings/{uid}
-  const paths=['bookings','ceoBookings','allBookings','nurseBookings'];
-  for(const p of paths){try{const snap=await get(ref(db,p));if(snap.exists()){snap.forEach(ch=>{const v=ch.val();const id=ch.key;if(id==='LCG-20251016-ABC123'||v.bookingId==='LCG-20251016-ABC123'||v.paystackRef==='DEMO-REF') return;const phoneA=(v.phone||v.clientPhone||'').replace(/[^0-9]/g,'').slice(-9);const phoneB=(clientPhone||'').replace(/[^0-9]/g,'').slice(-9);const phoneMatch=phoneA&&phoneB&&phoneA===phoneB;const emailMatch=(v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase())||(v.clientEmail&&clientEmail&&v.clientEmail.toLowerCase()===clientEmail.toLowerCase());const uidMatch=(v.clientId&&clientUid&&v.clientId===clientUid)||(v.clientUid&&clientUid&&v.clientUid===clientUid);if(phoneMatch||emailMatch||uidMatch){if(!map[id]||(v.time||0)>(map[id].time||0)) map[id]={...v,id};}});}}catch(e){console.log('load path err',p,e);}}
-  // FIX: Directly check clientBookings/{uid} - most reliable
-  if(clientUid){
-    try{
-      const snap=await get(ref(db,'clientBookings/'+clientUid));
-      if(snap.exists()){
-        snap.forEach(ch=>{const v=ch.val();const id=ch.key;if(!map[id]||(v.time||0)>(map[id].time||0)) map[id]={...v,id};});
+function loadBookings(){
+  if(!clientUid){ document.getElementById('emptyBookings').style.display='block'; document.getElementById('countInfo').textContent='No client UID - Login again'; return; }
+  // Primary: bookings where phone/email matches or clientId matches
+  db.ref('bookings').orderByChild('clientId').equalTo(clientUid).on('value', snap=>{
+    const list=[];
+    if(snap.exists()){ snap.forEach(ch=>{ list.push({...ch.val(), id:ch.key, bookingId:ch.val().bookingId||ch.key}); }); }
+    // Also check by phone
+    db.ref('bookings').once('value').then(s=>{
+      if(s.exists()){
+        s.forEach(ch=>{
+          const v=ch.val();
+          const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
+          const emailMatch=v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase();
+          if((phoneMatch||emailMatch) && !list.find(x=>x.id===ch.key)){
+            list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
+          }
+        });
       }
-    }catch(e){}
-    // Also check by emailKey
-    if(clientEmail){
-      try{
-        const key=clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
-        const snap2=await get(ref(db,'clientBookings/'+key));
-        if(snap2.exists()){
-          snap2.forEach(ch=>{const v=ch.val();const id=ch.key;if(!map[id]) map[id]={...v,id};});
-        }
-      }catch(e){}
-    }
-  }
-  let arr=Object.values(map);
-  if(arr.length===0){all=[];render();return;}
-  arr.forEach(b=>{const curr=(b.status||'pending').toLowerCase();const previous=prev[b.id];if(previous&&previous!==curr){const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;if(curr==='accepted'){playLoudSound('accepted');get(ref(db,'nurses/'+b.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const v=s.val();nLat=v.lat||v.latitude||nLat;nLng=v.lng||v.longitude||nLng;}const gmaps=getNavUrl(b,nLat,nLng);showAccept(b,gmaps);if(confirm(`[OK] ${b.nurseName||'Nurse'} ACCEPTED ${b.bookingId||b.id}! Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nOpen Google Maps now?`)){window.open(gmaps,'_blank');}});}else if(curr==='rejected'){playLoudSound('rejected');showReject(b);}}prev[b.id]=curr;});
-  if(all.length===0) arr.forEach(b=>prev[b.id]=(b.status||'pending').toLowerCase());
-  all=arr.sort((a,b)=>(b.time||0)-(a.time||0));
-  // Save client photo into booking so nurse can see it
-  for(const b of all){if(!b.clientName||!b.clientPhotoUrl){const upd={clientName:clientName||b.clientName||'Client',clientPhotoUrl:clientPhoto||'',hasClientPhoto:!!clientPhoto,clientVisibleToNurse:true};try{await update(ref(db,'bookings/'+b.id),upd);}catch(e){}}}
-  render();
-};
+      all=list;
+      all.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
+      render();
+    });
+  });
+}
+
+function getFlowSteps(currentStatus){
+  const steps=['pending','accepted','on_the_way','close','completed','client_confirmed_finished'];
+  const status=(currentStatus||'pending').toLowerCase();
+  return steps.map(step=>{
+    let label=step.replace(/_/g,' ').toUpperCase();
+    let isActive=false;
+    if(status.includes('pending') && step==='pending') isActive=true;
+    if(status.includes('accepted') && (step==='pending'||step==='accepted')) isActive=true;
+    if(status.includes('on_the_way') && ['pending','accepted','on_the_way'].includes(step)) isActive=true;
+    if(status.includes('close') && ['pending','accepted','on_the_way','close'].includes(step)) isActive=true;
+    if(status.includes('completed') && ['pending','accepted','on_the_way','close','completed'].includes(step)) isActive=true;
+    if(status.includes('client_confirmed') && steps.includes(step)) isActive=true;
+    return `<span class="flowStep ${isActive?'active':''}">${label}${isActive?' - Done':''}</span>`;
+  }).join('');
+}
 
 function render(){
-  const filter=document.getElementById('filterStatus').value;
-  const list=document.getElementById('list');const count=document.getElementById('countInfo');const empty=document.getElementById('emptyState');
-  let filtered=all;if(filter!=='all') filtered=all.filter(b=>(b.status||'pending').toLowerCase()===filter);
-  const todayStr=new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'});
-  count.textContent=`${filtered.length} ${filter} - LIVE - ${todayStr} - ${clientName}`;
-  if(!filtered.length){list.innerHTML='';empty.style.display='block';return;}
+  const area=document.getElementById('bookingsList');
+  const empty=document.getElementById('emptyBookings');
+  const count=document.getElementById('countInfo');
+  count.textContent=all.length+' bookings - Flow: Pending to Completion is part - Listener from my-job-offer active';
+  if(all.length===0){ area.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
-  list.innerHTML=filtered.map(b=>{
-    const status=(b.status||'pending').toLowerCase();const isAccepted=status==='accepted';const isRejected=status==='rejected';const isCompleted=status.includes('client_confirmed')||status==='completed'||status==='finished'||status==='work_completed_by_client'||b.clientConfirmed||b.workCompleted;
-    const badgeClass=isAccepted?'badge-accepted':isRejected?'badge-rejected':'badge-pending';
-    const payType = (b.paymentType||b.paymentMethod||'').toLowerCase();
-    const isHalf = payType.includes('50') || (b.status||'').includes('50');
-    const payBadge = isHalf ? '50% HALF' : '100% FULL';
-    const payColor = isHalf ? 'rgba(250,204,21,.15)' : 'rgba(34,197,94,.15)';
+  area.innerHTML=all.map(b=>{
+    const status=(b.status||'pending').toLowerCase();
+    let badgeClass='badge-pending';
+    let badgeText=(b.status||'PENDING').toUpperCase();
+    if(status.includes('accepted')){ badgeClass='badge-accepted'; badgeText='ACCEPTED - Nurse accepted in my-job-offer'; }
+    else if(status.includes('on_the_way')){ badgeClass='badge-ontheway'; badgeText='ON THE WAY - Nurse is on the way'; }
+    else if(status.includes('close')){ badgeClass='badge-close'; badgeText='CLOSE - Nurse is close to you'; }
+    else if(status.includes('completed') && !status.includes('client_confirmed')){ badgeClass='badge-completed'; badgeText='COMPLETED - Waiting your confirmation'; }
+    else if(status.includes('client_confirmed')){ badgeClass='badge-confirmed'; badgeText='CLIENT_CONFIRMED_FINISHED - CLIENT CONFIRMED'; }
+    else if(status.includes('rejected')){ badgeClass='badge-rejected'; badgeText='REJECTED'; }
 
-    const curr=b.currency||'GHS';
-    // Client photo - priority: booking photo > global clientPhoto > initials
-    const rawPhoto=b.clientPhotoUrl||b.clientPhoto||clientPhoto||'';
-    const cPhoto=rawPhoto||makeInitialAvatar(b.clientName||clientName);
-    const cName=b.clientName||clientName||'Client';
-    const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;
-    const bookingRealDate=new Date(b.time||Date.now()).toLocaleDateString('en-GH',{timeZone:'Africa/Accra'});
-    const bookingRealTime=new Date(b.time||Date.now()).toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Africa/Accra'});
-    const gmapsUrl=`https://www.google.com/maps/dir/?api=1&origin=${cLat+0.01},${cLng+0.01}&destination=${cLat},${cLng}&travelmode=driving`;
-    const clientGmaps=`https://www.google.com/maps?q=${cLat},${cLng}`;
-    const follow=isAccepted?`<div class="followBox followAccepted">[OK] LIVE Accepted - ${b.nurseName||'Nurse'} is coming - Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}<br> Client: ${cName} - Photo saved [OK]</div>`:isRejected?`<div class="followBox followRejected">[X] Rejected on ${bookingRealDate} - Reason: ${b.rejectReason||'Not available'} - Try increase rate</div>`:`<div class="followBox followPending"> Pending - Waiting for nurse - Real Date: ${todayStr} - Client photo visible to nurse: ${rawPhoto?'[OK] Yes':'[X] No'}</div>`;
-    return `<div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <div style="display:flex;gap:10px;align-items:center">
-          <img src="${cPhoto}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(168,85,247,.3)" onerror="this.src='${makeInitialAvatar(cName)}'">
-          <div><b style="font-size:13px">${b.bookingId||b.id} <span style="font-size:8px;color:#22c55e">LIVE REAL DATE</span></b><br><span class="badge ${badgeClass}">${status.toUpperCase()} - ${bookingRealDate}</span><br><span style="font-size:10px;color:#a78bfa"> ${cName} - ${bookingRealTime} - Real Time</span></div>
-        </div>
-        <div style="text-align:right"><small style="color:#86efac;font-weight:900">${curr} ${b.amount||0}</small><br><small style="font-size:8px;color:#facc15">[DATE] ${bookingRealDate}</small><br><small style="font-size:8px;color:#6b7280">${bookingRealTime}</small></div>
+    const isAccepted=status.includes('accepted');
+    const isOnWay=status.includes('on_the_way');
+    const isClose=status.includes('close');
+    const isCompleted=status.includes('completed') && !status.includes('client_confirmed');
+    const isClientConfirmed=status.includes('client_confirmed');
+    const isPending=status.includes('pending');
+
+    // Client sees only total amount, NOT nurse 80% share
+    const totalAmount=b.amount||b.price||0;
+    const currency=b.currency||'GHS';
+    const displayAmount=currency+' '+parseFloat(totalAmount).toFixed(2)+' - Total Paid by Client - Nurse share hidden';
+
+    return `
+    <div class="card" style="${isClientConfirmed?'border:2px solid #22c55e':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <b style="font-size:13px">Booking ID ${b.bookingId||b.id}</b>
+        <span class="badge ${badgeClass}">${badgeText}</span>
       </div>
-      ${follow}
-      <div id="map_${b.id}" class="mapWrap" style="display:${isAccepted?'block':'none'}"><div id="mapInner_${b.id}" style="width:100%;height:100%"></div></div>
-      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        ${isCompleted ? `<div style="background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(168,85,247,.1));border:2px solid rgba(34,197,94,.4);border-radius:14px;padding:12px;margin-top:12px"><b style="font-size:12px;color:#86efac">WORK COMPLETED with Date/Time</b><br><small>Completed on: <b>${b.clientConfirmedAtStr||b.completedAtStr||b.workCompletedAtStr||new Date(b.clientConfirmedAt||b.completedAt||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'})}</b></small><br><small style="font-size:10px;color:#a78bfa">Booking ID: <b>${b.bookingId||b.id}</b><br>Accepted removed from My Bookings and My Job Offer<br>Marked as Work Completed<br>CEO received progress<br>Congrats sent to nurse with Booking ID</small><div style="display:flex;gap:8px;margin-top:10px"><a href="rating.html?bookingId=${b.bookingId||b.id}&nurseName=${encodeURIComponent(b.nurseName||'Nurse')}&nurseId=${b.nurseId||''}" class="btn" style="background:linear-gradient(135deg,#facc15,#f59e0b);color:#000;font-weight:900">⭐ Rate Nurse ${b.nurseName||''}</a><button class="btn btnBlue" onclick="viewDetails('${b.id}')">Details</button></div></div>` : ''}
-        ${!isAccepted && !isRejected && !isCompleted ? `<button class="btn btnRed" onclick="cancelBooking('${b.id}')" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;font-weight:900">❌ CANCEL Booking — Before Nurse Accepts</button><button class="btn btnBlue" onclick="loadBookings()">🔄 RELOAD — Check Accept/Reject</button>` : ''}
-        ${isAccepted && !isCompleted ? `<a href="${gmapsUrl}" target="_blank" class="btn btnGreen">🗺️ MAP Open Maps - Track Nurse</a><button class="btn btnBlue" onclick="initMapLive('${b.id}',all.find(x=>x.id==='${b.id}'))">🔄 RELOAD Refresh Live</button><a href="tel:${b.nursePhone||''}" class="btn" style="background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe">📞 Call Nurse</a><a href="${clientGmaps}" target="_blank" class="btn btnBlue" style="background:#3b82f6">📍 Client Location</a>` : ''}
-        ${isRejected ? `<div style="background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);padding:10px;border-radius:10px;font-size:12px;font-weight:700;text-align:center">❌ REJECTED by ${b.nurseName||'Nurse'} on ${new Date(b.rejectedAt||Date.now()).toLocaleString('en-GH')} — Book another nurse</div>` : ''}
+      <div style="margin-top:8px;font-size:11px;color:#a78bfa">Client: ${b.clientName||clientName||'You'} - Nurse: ${b.nurseName||'Nurse'} - Amount: ${displayAmount} - Time: ${b.createdAtStr||(b.time?new Date(b.time).toLocaleString('en-GH'): '')}</div>
+      <div style="margin-top:6px;font-size:11px">Service: ${b.serviceType||b.service||''} - Location: ${b.location||b.address||''} - Nurse Phone: ${b.nursePhone||''}</div>
+
+      <div class="flowCard">
+        ${getFlowSteps(b.status)}
       </div>
-      ${isAccepted ? `<div style="margin-top:10px;display:grid;gap:10px"><div style="background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);padding:12px;border-radius:12px;font-size:12px;font-weight:800;text-align:center">✅ ACCEPTED by ${b.nurseName||'Nurse'} on ${new Date(b.acceptedAt||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'})} — Nurse is coming! Track on map below</div><button class="btn btnYellow" onclick="confirmFinished('${b.id}')">[OK] Confirm Nurse Finished — Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}</button><button class="btn btnRed" onclick="complainNurse('${b.id}')">! Complain About ONLY This Nurse ${b.nurseName||'Nurse'}</button></div>` : ''}
-      ${!isAccepted && !isRejected ? `<div style="margin-top:10px;display:grid;gap:10px"><div style="background:rgba(245,158,11,.12);color:#fde68a;border:1px solid rgba(245,158,11,.3);padding:10px;border-radius:10px;font-size:11px;text-align:center">⏳ PENDING — Waiting for ${b.nurseName||'Nurse'} to ACCEPT or REJECT — You can CANCEL now before nurse accepts — Auto-refreshes every 5 sec</div></div>` : ''}
-      ${isRejected?`<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><a href="book-nurse.html" class="btn btnYellow">+ Book Another Nurse</a><a href="book-nurse.html?increaseRate=true" class="btn btnGreen">💰 Increase Rate & Book Again</a><a href="refund-query.html?bookingId=${b.id}" class="btn" style="background:rgba(250,204,21,.15);color:#facc15;border:1px solid rgba(250,204,21,.3)">💸 Refund Query</a></div>`:''}
-    </div>`;
+      <div style="margin-top:8px;font-size:10px;color:#9ca3af">
+        Flow: Pending -> Accepted (listener from my-job-offer.html when nurse accepts) -> On The Way -> Close -> Completed -> Client Confirmed Finished -> Is Part
+      </div>
+
+      ${isPending?`<div style="margin-top:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:8px;font-size:11px">Pending - Waiting for nurse to accept in my-job-offer.html - Listener active - When nurse accepts, this will update instantly to Accepted</div>`:''}
+      ${isAccepted?`<div style="margin-top:10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:8px;font-size:11px">Accepted - Nurse ${b.nurseName||''} accepted your booking in my-job-offer.html - Listener detected - Amount: ${displayAmount} - Nurse is preparing to come - You will get loud sound alert</div>`:''}
+      ${isOnWay?`<div style="margin-top:10px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:10px;padding:8px;font-size:11px">On The Way - Nurse is on the way coming - Booking ID ${b.bookingId||b.id} - Track live</div>`:''}
+      ${isClose?`<div style="margin-top:10px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:8px;font-size:11px">Close - Nurse is just close to you - Please be ready - Booking ID ${b.bookingId||b.id}</div>`:''}
+      ${isCompleted?`<div style="margin-top:10px;background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(34,197,94,.08));border:1px solid rgba(168,85,247,.25);border-radius:10px;padding:8px;font-size:11px">Completed - Nurse marked work completed - Please confirm work completed - Amount: ${displayAmount} - Click Confirm Work Completed below</div>`:''}
+      ${isClientConfirmed?`<div style="margin-top:10px;background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(168,85,247,.1));border:2px solid rgba(34,197,94,.4);border-radius:12px;padding:10px;font-size:11px"><b>CLIENT_CONFIRMED_FINISHED - CLIENT CONFIRMED</b><br>Booking ID ${b.bookingId||b.id} - Date: ${b.clientConfirmedAtStr||''} - Amount: ${displayAmount} - You confirmed work completed - Accepted removed, marked completed with date and time - CEO received progress - Congrats sent to nurse - You can rate nurse now</div>`:''}
+
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        ${isCompleted?`<button class="btn btnGreen" onclick="confirmCompleted('${b.id}')">Confirm Work Completed - Mark Finished</button>`:''}
+        ${isClientConfirmed?`<button class="btn btnYellow" onclick="rateNurse('${b.id}')">Rate Nurse - ${b.nurseName||''}</button>`:''}
+        <button class="btn btnGray" onclick="viewDetails('${b.id}')">View Details</button>
+        ${b.nursePhone?`<button class="btn btnBlue" onclick="window.open('tel:${b.nursePhone}')">Call Nurse</button>`:''}
+        ${isPending?`<button class="btn btnRed" onclick="cancelBooking('${b.id}')">Cancel Booking</button>`:''}
+      </div>
+    </div>
+    `;
   }).join('');
-  setTimeout(()=>{filtered.filter(b=>(b.status||'').toLowerCase()==='accepted').forEach(b=>initMapLive(b.id,b));},500);
 }
 
-
-window.viewDetails=function(id){const b=all.find(x=>x.id===id); if(!b){alert('Booking not found'); return;} alert(`Booking Details:
-ID: ${b.bookingId||b.id}
-Status: ${b.status}
-Nurse: ${b.nurseName}
-Amount: ${b.currency||'GHS'} ${b.amount}
-Booked: ${new Date(b.time||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'})}
-Completed: ${b.clientConfirmedAtStr||'Not yet'}`);};
-
-window.cancelBooking=async function(id){
+async function confirmCompleted(id){
   const b=all.find(x=>x.id===id);
-  if(!b){alert('Booking not found');return;}
-  const s=(b.status||'pending').toLowerCase();
-  if(s==='accepted'){alert('❌ Cannot cancel — Already ACCEPTED by nurse. Nurse is coming. If emergency, call nurse or complain.');return;}
-  if(s==='rejected'){alert('Already rejected');return;}
-  if(!confirm(`CANCEL this booking?\n\nNurse: ${b.nurseName||'Nurse'}\nAmount: ${b.currency||'GHS'} ${b.amount}\nPatient: ${b.patientName||''}\n\nReal Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nThis will set status to CANCELLED and nurse will see it.`)) return;
-  if(!confirm('Are you SURE you want to CANCEL? This cannot be undone. Nurse will be notified.')) return;
+  if(!b) return;
+  if(!confirm(`Confirm work completed for Booking ID ${b.bookingId||id}?\n\nAmount: ${b.currency||'GHS'} ${b.amount}\nNurse: ${b.nurseName}\n\nThis will:\n- Remove Accepted from My Bookings and My Job Offer\n- Mark as Work Completed with Date/Time\n- CEO receives progress\n- Congrats message sent to nurse with Booking ID\n- You can rate nurse\n\nConfirm?`)) return;
   try{
     const now=Date.now();
-    const cancelData={status:'cancelled_by_client', cancelledAt:now, cancelledAtStr:new Date().toLocaleString('en-GH'), cancelledBy:'client', clientCancelled:true};
-    await update(ref(db,'bookings/'+id),cancelData);
-    try{await update(ref(db,'ceoBookings/'+id),cancelData);}catch(e){}
-    try{await update(ref(db,'allBookings/'+id),cancelData);}catch(e){}
-    try{await update(ref(db,'myJobOffers/'+b.nurseId+'/'+id),cancelData);}catch(e){}
-    try{await update(ref(db,'nurseBookings/'+b.nurseId+'/'+id),cancelData);}catch(e){}
-    if(clientUid){
-      try{await update(ref(db,'clientBookings/'+clientUid+'/'+id),cancelData);}catch(e){}
-    }
-    if(clientEmail){
-      try{
-        const key=clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
-        await update(ref(db,'clientBookings/'+key+'/'+id),cancelData);
-      }catch(e){}
-    }
-    alert('✅ CANCELLED on '+new Date().toLocaleString('en-GH')+' — Nurse will see CANCELLED in My Job Offers');
-    loadBookings();
-  }catch(e){alert('Cancel error: '+e.message);}
-};
-
-window.confirmFinished=async function(id){
-  const b=all.find(x=>x.id===id);if(!b){alert('Booking not found');return;}
-  if(b.clientConfirmed){alert('Already confirmed on '+new Date(b.clientConfirmedAt||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'}));return;}
-  if(!confirm(`CONFIRM WORK COMPLETED?
-
-Booking ID: ${b.bookingId||id}
-Nurse: ${b.nurseName}
-Amount: ${b.currency||'GHS'} ${b.amount}
-Client: ${b.clientName||clientName}
-Booking Date: ${new Date(b.time||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'})}
-
-This will:
-1. Remove Accepted notification from My Bookings and My Job Offer
-2. Mark as Work Completed with Date/Time: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}
-3. CEO receives progress (completed)
-4. Send congrats message to nurse with Booking ID
-5. You can rate nurse
-
-Confirm?`))return;
-  const c=prompt('Type CONFIRM to confirm work is completed:');if(c!=='CONFIRM'&&c!=='confirm'){alert('Cancelled - Type CONFIRM');return;}
-  try{
-    const now=Date.now();
-    const nowStr=new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'});
-    const payType=b.paymentType||(b.paymentMethod&&b.paymentMethod.includes('50')?'50_percent':'full');
-    const lively=payType.includes('50')?parseFloat(b.amount||0)*0.3:parseFloat(b.amount||0)*0.8;
-    // Enhanced completed data with date/time
-    const upd={
+    const nowStr=new Date().toLocaleString('en-GH');
+    const totalAmount=parseFloat(b.amount||0);
+    const nursePortion=totalAmount*0.8;
+    const completedData={
+      status:'client_confirmed_finished',
       clientConfirmed:true,
       clientConfirmedAt:now,
       clientConfirmedAtStr:nowStr,
-      completedAt:now,
-      completedAtStr:nowStr,
-      workCompleted:true,
-      workCompletedAt:now,
-      workCompletedAtStr:nowStr,
-      status:'client_confirmed_finished',
-      finished:true,
-      acceptedRemoved:true,
-      livelyAmount:lively
+      livelyAmount:nursePortion,
+      totalAmount:totalAmount
     };
-    // Update all booking locations
-    await update(ref(db,'bookings/'+id),upd);
-    try{await update(ref(db,'ceoBookings/'+id),upd);}catch(e){}
-    try{await update(ref(db,'allBookings/'+id),upd);}catch(e){}
-    try{await update(ref(db,'myJobOffers/'+b.nurseId+'/'+id),{...upd,status:'work_completed_by_client',showCongrats:true,congratsAt:now,congratsAtStr:nowStr,congratsMessage:`Congratulations Nurse ${b.nurseName}! Client ${b.clientName||clientName} confirmed work completed for Booking ID: ${b.bookingId||id} on ${nowStr}. Amount: ${b.currency||'GHS'} ${b.amount}. Accepted removed, marked completed. CEO received progress.`});}catch(e){}
-    try{await update(ref(db,'nurseBookings/'+b.nurseId+'/'+id),upd);}catch(e){}
-    try{await update(ref(db,'myJobOffer/'+b.nurseId+'/'+id),upd);}catch(e){}
-    if(clientUid){try{await update(ref(db,'clientBookings/'+clientUid+'/'+id),upd);}catch(e){}}
-    if(clientEmail){try{const key=clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); await update(ref(db,'clientBookings/'+key+'/'+id),upd);}catch(e){}}
-    // CEO receives progress - completed
-    try{await set(ref(db,'ceoNotifications/'+id+'_completed'),{type:'completed',title:`Work Completed - Booking ${b.bookingId||id} - ${b.nurseName}`,message:`Client ${b.clientName||clientName} confirmed work completed for Booking ID ${b.bookingId||id} - Nurse: ${b.nurseName} - Amount: ${b.currency||'GHS'} ${b.amount} - Completed on: ${nowStr} - Accepted removed - Marked completed with date/time`,bookingId:b.bookingId||id,nurseId:b.nurseId,nurseName:b.nurseName,clientName:b.clientName||clientName,amount:b.amount,completedAt:now,completedAtStr:nowStr,createdAt:now,read:false});}catch(e){}
-    try{await set(ref(db,'ceoNotificationRoom/'+id+'_completed'),{type:'completed',title:`WORK COMPLETED - Booking ${b.bookingId||id}`,message:`Client confirmed work completed - Booking ID: ${b.bookingId||id} - Nurse: ${b.nurseName} - Client: ${b.clientName||clientName} - Amount: ${b.currency||'GHS'} ${b.amount} - Completed: ${nowStr}`,bookingId:b.bookingId||id,nurseId:b.nurseId,createdAt:now});}catch(e){}
-    // Congrats message to nurse on my-job-offer with Booking ID
-    if(b.nurseId){
-      const congratsId='CONGRATS-'+id+'-'+now;
-      const congratsMsg={
-        type:'congratulation',
-        title:`Congratulations! Work Completed - Booking ${b.bookingId||id}`,
-        message:`Congratulations Nurse ${b.nurseName}!
-
-Client ${b.clientName||clientName} confirmed work completed for Booking ID: ${b.bookingId||id}
-
-Booking ID: ${b.bookingId||id}
-Completed on: ${nowStr}
-Amount: ${b.currency||'GHS'} ${b.amount}
-Client: ${b.clientName||clientName}
-
-Accepted removed from My Bookings and My Job Offer
-Marked as Work Completed with Date/Time: ${nowStr}
-CEO received progress
-
-Thank you for excellent service! You can request withdrawal.
-- LoveCare Global CEO`,
-        bookingId:b.bookingId||id,
-        bookingIdFull:b.bookingId||id,
-        nurseId:b.nurseId,
-        nurseName:b.nurseName,
-        clientName:b.clientName||clientName,
-        amount:b.amount,
-        currency:b.currency||'GHS',
-        completedAt:now,
-        completedAtStr:nowStr,
-        createdAt:now,
-        read:false,
-        isCongrats:true
-      };
-      try{await set(ref(db,'nurseNotifications/'+b.nurseId+'/'+congratsId),congratsMsg);}catch(e){}
-      try{await set(ref(db,'nurseJobOfferNotifications/'+b.nurseId+'/'+congratsId),congratsMsg);}catch(e){}
-      try{await set(ref(db,'myJobOffer/'+b.nurseId+'/congrats_'+id),congratsMsg);}catch(e){}
-    }
-    // Client alerts - written notifications
-    if(clientUid){
-      try{await set(ref(db,'clientAlerts/'+clientUid+'/COMPLETED-'+id+'-'+now),{type:'completed',title:`You confirmed work completed - Booking ${b.bookingId||id}`,message:`You confirmed work completed for Booking ID ${b.bookingId||id} with Nurse ${b.nurseName}. Amount: ${b.currency||'GHS'} ${b.amount}. Completed on: ${nowStr}. Accepted removed and marked completed with date/time. You can rate your nurse now.`,bookingId:b.bookingId||id,nurseName:b.nurseName,time:now,createdAt:now,read:false,canRate:true});}catch(e){}
-      try{await set(ref(db,'clientAlerts/'+clientUid+'/RATING-'+id+'-'+now),{type:'rating',title:`Rate your nurse ${b.nurseName}`,message:`Work completed for Booking ID ${b.bookingId||id}. Rate your nurse ${b.nurseName} now. Completed on ${nowStr}.`,bookingId:b.bookingId||id,nurseName:b.nurseName,time:now+1000,createdAt:now+1000,read:false});}catch(e){}
-    }
-    alert(`LIVE Confirmed on ${nowStr}! ${b.currency||'GHS'} ${lively.toFixed(2)} released to ${b.nurseName}
-
-Booking ID: ${b.bookingId||id}
-Completed: ${nowStr}
-
-Accepted removed from My Bookings and My Job Offer
-Marked as Work Completed with Date/Time
-CEO received progress
-Congrats sent to nurse with Booking ID`);
+    await db.ref('bookings/'+id).update(completedData);
+    await db.ref('ceoBookings/'+id).update(completedData).catch(()=>{});
+    await db.ref('myJobOffers/'+b.nurseId+'/'+id).update({
+      status:'client_confirmed_finished',
+      clientConfirmed:true,
+      clientConfirmedAt:now,
+      clientConfirmedAtStr:nowStr,
+      congratsMessage:`Congratulations ${b.nurseName} - Work completed for Booking ID ${b.bookingId||id} - Client confirmed completed - Date: ${nowStr} - Your Earnings: ${b.currency||'GHS'} ${nursePortion.toFixed(2)} - You can withdraw now`,
+      showCongrats:true
+    }).catch(()=>{});
+    await db.ref('nurseNotifications/'+b.nurseId+'/'+'CONGRATS-'+id+'-'+now).set({
+      type:'completed',
+      title:`Congratulations - Work Completed - Booking ID ${b.bookingId||id}`,
+      message:`Congratulations ${b.nurseName} - Work completed for Booking ID ${b.bookingId||id} - Client ${b.clientName||clientName} confirmed completed on ${nowStr} - Amount: ${b.currency||'GHS'} ${nursePortion.toFixed(2)} - You can withdraw now - Booking ID: ${b.bookingId||id}`,
+      bookingId:b.bookingId||id,
+      amount:nursePortion,
+      currency:b.currency,
+      time:now,
+      createdAt:now,
+      read:false,
+      isCongrats:true,
+      clientConfirmedAtStr:nowStr
+    });
+    toast('Work Completed Confirmed - Booking ID '+(b.bookingId||id)+' - Congrats sent to nurse - CEO received progress');
     loadBookings();
-    setTimeout(()=>{if(confirm(`Work completed confirmed! Booking ID: ${b.bookingId||id}
-Completed: ${nowStr}
+  }catch(e){ toast('Error: '+e.message); }
+}
 
-Rate Nurse ${b.nurseName} now?`)){location.href=`rating.html?bookingId=${b.bookingId||id}&nurseName=${encodeURIComponent(b.nurseName||'Nurse')}&nurseId=${b.nurseId||''}`;}},1200);
-  }catch(e){alert('Error: '+e.message);}
-};
+function viewDetails(id){ const b=all.find(x=>x.id===id); alert(`Booking Details\n\nBooking ID: ${b.bookingId||b.id}\nStatus: ${b.status}\nNurse: ${b.nurseName}\nTotal Paid by Client: ${b.currency||'GHS'} ${b.amount} - Nurse share hidden - Client only sees total\nTime: ${b.time?new Date(b.time).toLocaleString('en-GH'):''}\nCompleted: ${b.clientConfirmedAtStr||'Not yet'}\n\nFlow: Pending -> Accepted (listener from my-job-offer) -> On The Way -> Close -> Completed -> Client Confirmed Finished - Is Part`); }
+function rateNurse(id){ const b=all.find(x=>x.id===id); location.href=`rating.html?bookingId=${b.bookingId||b.id}&nurseName=${encodeURIComponent(b.nurseName||'Nurse')}&nurseId=${b.nurseId||''}`; }
+async function cancelBooking(id){ if(!confirm('Cancel booking '+id+'?')) return; try{ await db.ref('bookings/'+id).update({status:'cancelled_by_client', cancelledAt:Date.now(), cancelledAtStr:new Date().toLocaleString('en-GH')}); toast('Cancelled'); loadBookings(); }catch(e){ toast(e.message); } }
 
-window.complainNurse=function(id){
-  const b=all.find(x=>x.id===id);if(!b){alert('Booking not found');return;}
-  const p=new URLSearchParams({bookingId:b.id,bookingIdFull:b.bookingId||b.id,nurseName:b.nurseName||'Nurse',nurseId:b.nurseId||'',nursePhone:b.nursePhone||'',nursePhotoUrl:b.nursePhotoUrl||'',clientName:b.clientName||clientName||'Client',clientId:b.clientId||clientUid||'',clientPhone:b.phone||clientPhone||'',clientEmail:b.clientEmail||clientEmail||'',clientPhotoUrl:b.clientPhotoUrl||clientPhoto||'',amount:b.amount||0,currency:b.currency||'GHS',patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||'',paystackRef:b.paystackRef||'',bookingTime:b.time||Date.now(),realDate:new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})});
-  if(confirm(`Complain about ${b.nurseName}? Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})} - Go to client-complaint.html LIVE with Photo Email Phone + Time?`)){location.href=`client-complaint.html?${p.toString()}`;}
-};
-function startRealtimeLive(){
-  // FIX: Also listen to clientBookings for instant accept/reject updates
-  if(clientUid){
-    try{
-      onValue(ref(db,'clientBookings/'+clientUid),(snap)=>{
-        if(!snap.exists()) return;
-        let changed=false;
-        snap.forEach(ch=>{
-          const v=ch.val(); const id=ch.key;
-          const idx=all.findIndex(x=>x.id===id);
-          if(idx!==-1){
-            const curr=(v.status||'').toLowerCase();
-            const prevStatus=prev[id];
-            if(prevStatus && prevStatus!==curr){
-              if(curr==='accepted'){playLoudSound('accepted');
-                const cLat=v.clientLat||5.6037;const cLng=v.clientLng||-0.1870;
-                get(ref(db,'nurses/'+v.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const vv=s.val();nLat=vv.lat||vv.latitude||nLat;nLng=vv.lng||vv.longitude||nLng;}const gmaps=getNavUrl(v,nLat,nLng);showAccept({...v,id},gmaps);});
-              }else if(curr==='rejected'){playLoudSound('rejected');showReject({...v,id});}
-              else if(curr==='cancelled_by_client'){showToast('Booking cancelled');}
-            }
-            prev[id]=curr;
-            all[idx]={...v,id};
-            changed=true;
-          }
-        });
-        if(changed){render();}
-      });
-    }catch(e){}
-  }
-  
-  onValue(ref(db,'bookings'),(snap)=>{
-    if(!snap.exists())return;let changed=false;
-    snap.forEach(ch=>{
-      const v=ch.val();const id=ch.key;if(id==='LCG-20251016-ABC123'||v.bookingId==='LCG-20251016-ABC123') return;
-      const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
-      const emailMatch=(v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase())||(v.clientEmail&&clientEmail&&v.clientEmail.toLowerCase()===clientEmail.toLowerCase());
-      if(phoneMatch||emailMatch){
-        const curr=(v.status||'').toLowerCase();const prevStatus=prev[id];
-        if(prevStatus&&prevStatus!==curr){
-          const cLat=v.clientLat||5.6037;const cLng=v.clientLng||-0.1870;
-          if(curr==='accepted'){playLoudSound('accepted');
-            get(ref(db,'nurses/'+v.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const vv=s.val();nLat=vv.lat||vv.latitude||nLat;nLng=vv.lng||vv.longitude||nLng;}const gmaps=getNavUrl(v,nLat,nLng);showAccept({...v,id},gmaps);if(confirm(`[OK] ${v.nurseName||'Nurse'} ACCEPTED on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}!\n\nOpen Google Maps now?`)){window.open(gmaps,'_blank');}});
-          }else if(curr==='rejected'){playLoudSound('rejected');showReject({...v,id});}
+function getNavUrl(booking, nurseLat, nurseLng){
+  const cLat=booking.clientLat||booking.lat||5.6037;
+  const cLng=booking.clientLng||booking.lng||-0.1870;
+  const nLat=nurseLat||booking.nurseLat||cLat+0.01;
+  const nLng=nurseLng||booking.nurseLng||cLng+0.01;
+  // Google Maps directions from nurse to client
+  return `https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;
+}
+
+function autoOpenNavigation(booking){
+  try{
+    const cLat=booking.clientLat||booking.lat||5.6037;
+    const cLng=booking.clientLng||booking.lng||-0.1870;
+    let nLat=booking.nurseLat||booking.nurseCurrentLat||null;
+    let nLng=booking.nurseLng||booking.nurseCurrentLng||null;
+    
+    // Try to get live nurse location from multiple paths
+    const nurseId=booking.nurseId||'';
+    if(nurseId){
+      // Check live locations
+      db.ref('nurseLocations/'+nurseId).once('value').then(s=>{
+        if(s.exists()){
+          const v=s.val();
+          nLat=v.lat||v.latitude||nLat;
+          nLng=v.lng||v.longitude||nLng;
         }
-        prev[id]=curr;const idx=all.findIndex(x=>x.id===id);if(idx===-1){all.unshift({...v,id});changed=true;}else{all[idx]={...v,id};changed=true;}
+        // Also check onlineNurses
+        return db.ref('onlineNurses/'+nurseId).once('value');
+      }).then(s=>{
+        if(s && s.exists()){
+          const v=s.val();
+          nLat=v.lat||v.latitude||nLat;
+          nLng=v.lng||v.longitude||nLng;
+        }
+        // Also check nurseLocations path
+        return db.ref('liveNurses/'+nurseId).once('value');
+      }).then(s=>{
+        if(s && s.exists()){
+          const v=s.val();
+          nLat=v.lat||v.latitude||nLat;
+          nLng=v.lng||v.longitude||nLng;
+        }
+        const url=getNavUrl(booking, nLat, nLng);
+        // Show confirm to open navigation
+        if(confirm(`Nurse ${booking.nurseName||'Nurse'} ACCEPTED your booking ${booking.bookingId||booking.id}\n\nNurse Location: ${nLat? nLat.toFixed(5): 'Loading...'}, ${nLng? nLng.toFixed(5): ''}\nYour Location: ${cLat.toFixed(5)}, ${cLng.toFixed(5)}\n\nAuto open navigation to show where nurse has reached?\n\nClick OK to open Google Maps navigation - You will see where nurse is and route to you`)){
+          window.open(url, '_blank');
+        } else {
+          // Still show navigation link in toast
+          toast(`Navigation ready: Nurse at ${nLat? nLat.toFixed(4): ''} to you - Tap to open Maps`);
+        }
+      }).catch(()=>{
+        const url=getNavUrl(booking, nLat, nLng);
+        if(confirm(`Nurse ${booking.nurseName||'Nurse'} ACCEPTED\n\nOpen navigation to see where nurse reached?\nBooking ID ${booking.bookingId||booking.id}`)){
+          window.open(url, '_blank');
+        }
+      });
+    } else {
+      const url=getNavUrl(booking, nLat, nLng);
+      if(confirm(`Nurse ACCEPTED - Open navigation to show where nurse reached? Booking ${booking.bookingId||booking.id}`)){
+        window.open(url, '_blank');
+      }
+    }
+  }catch(e){ console.log(e); }
+}
+
+function startRealtimeLive(){
+  if(!clientUid) return;
+  // Listen to bookings for instant updates when nurse accepts in my-job-offer.html
+  db.ref('bookings').on('value', snap=>{
+    if(!snap.exists()) return;
+    let changed=false;
+    snap.forEach(ch=>{
+      const v=ch.val(); const id=ch.key;
+      const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
+      const emailMatch=v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase();
+      const idMatch=v.clientId===clientUid;
+      if(phoneMatch||emailMatch||idMatch){
+        const curr=(v.status||'').toLowerCase();
+        const prevStatus=prev[id];
+        if(prevStatus && prevStatus!==curr){
+          if(curr==='accepted'){ 
+            playLoudSound('accepted'); 
+            toast('Nurse '+ (v.nurseName||'Nurse')+' ACCEPTED your booking '+ (v.bookingId||id)+' - Listener from my-job-offer - Auto opening navigation where nurse reached');
+            // Auto navigation opens to show where nurse has reached
+            autoOpenNavigation(v);
+          }
+          else if(curr==='on_the_way'){ playLoudSound('accepted'); toast('Nurse is on the way - Booking '+(v.bookingId||id)+' - Auto navigation updating where nurse reached'); autoOpenNavigation(v); }
+          else if(curr==='close'){ playLoudSound('accepted'); toast('Nurse is close to you - Booking '+(v.bookingId||id)+' - Auto navigation - Nurse reached close'); autoOpenNavigation(v); }
+          else if(curr==='completed'){ playLoudSound('accepted'); toast('Nurse marked work completed - Please confirm - Booking '+(v.bookingId||id)); }
+        }
+        prev[id]=curr;
+        const idx=all.findIndex(x=>x.id===id);
+        if(idx===-1){ all.unshift({...v, id}); changed=true; } else { all[idx]={...v, id}; changed=true; }
       }
     });
-    if(changed){all.sort((a,b)=>(b.time||0)-(a.time||0));render();}
+    if(changed){ all.sort((a,b)=>(b.time||0)-(a.time||0)); render(); }
+  });
+
+  // Also listen clientBookings
+  db.ref('clientBookings/'+clientUid).on('value', snap=>{
+    if(!snap.exists()) return;
+    let changed=false;
+    snap.forEach(ch=>{
+      const v=ch.val(); const id=ch.key;
+      const idx=all.findIndex(x=>x.id===id);
+      if(idx!==-1){
+        const curr=(v.status||'').toLowerCase();
+        const prevStatus=prev[id];
+        if(prevStatus && prevStatus!==curr && curr==='accepted'){ playLoudSound('accepted'); }
+        prev[id]=curr;
+        all[idx]={...v, id};
+        changed=true;
+      }
+    });
+    if(changed) render();
   });
 }
-window.addEventListener('DOMContentLoaded',async()=>{
-  setRealDate();
-  getAllClientKeys();renderClientHeader();
-  await ensureAuth();getAllClientKeys();await fetchClientFromFirebase();renderClientHeader();
-  loadBookings();startRealtimeLive();
-  setTimeout(()=>{getAllClientKeys();renderClientHeader();},1500);
-  // REAL DATE auto-updates every second + every day automatically
-  setInterval(setRealDate,1000);
-  // Extra safety: also check at midnight
-  setInterval(()=>{
-    const now=new Date();
-    if(now.getHours()===0 && now.getMinutes()===0 && now.getSeconds()<2){
-      setRealDate(); loadBookings();
-    }
-  },1000);
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+  getKeys();
+  await ensureAuth();
+  getKeys();
+  loadBookings();
+  startRealtimeLive();
 });
-window.initMapLive=initMapLive;
 </script>
 </body></html>
