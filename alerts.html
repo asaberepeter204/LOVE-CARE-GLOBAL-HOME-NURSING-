@@ -1,66 +1,115 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Alerts - Written Notifications - LoveCare</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<title>Nurse Alerts - Loud Sound - LoveCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database-compat.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.95);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
-.card{background:rgba(28,18,56,.9);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px}
-.btn{border:none;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:11px;display:inline-flex;gap:6px;align-items:center;justify-content:center}
-.btnGold{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}
-.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
-.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
-.alertCard{background:rgba(26,22,51,.9);border:1px solid rgba(168,85,247,.15);border-radius:16px;padding:14px;margin-bottom:10px}
-.alertCard.unread{border-left:4px solid #facc15;background:linear-gradient(135deg,rgba(26,22,51,.9),rgba(45,30,10,.3))}
-.icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
-.icon.accepted{background:linear-gradient(135deg,#22c55e,#16a34a)}
-.icon.rejected{background:linear-gradient(135deg,#ef4444,#dc2626)}
-.icon.onway{background:linear-gradient(135deg,#60a5fa,#3b82f6)}
-.icon.close{background:linear-gradient(135deg,#f59e0b,#d97706)}
-.icon.completed{background:linear-gradient(135deg,#a78bfa,#7c3aed)}
-.icon.rating{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000}
-.bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0;z-index:60}
-.btab{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:700;color:#a78bfa;cursor:pointer;padding:6px}
-.btab.active{color:#d8b4fe;background:rgba(245,158,11,.15);border-radius:12px;margin:0 4px}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;padding-bottom:90px}
+.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.card{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:16px;margin:12px}
+.btn{padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#ece8ff;font-weight:700;font-size:11px;cursor:pointer}
+.btnGold{background:linear-gradient(135deg,#facc15,#f59e0b);color:#000;border:0}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:0}
+.alertCard{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin-bottom:10px}
+.alertCard.unread{border-left:4px solid #facc15;background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(45,30,10,.4));animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(250,204,21,.2)}50%{box-shadow:0 0 0 8px rgba(250,204,21,0)}}
+.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
+.toggle{width:50px;height:26px;border-radius:999px;background:rgba(255,255,255,.2);position:relative;cursor:pointer}
+.toggle.on{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.toggleKnob{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:.3s}
+.toggle.on .toggleKnob{left:26px}
 </style></head><body>
-<div class="topbar"><div style="display:flex;align-items:center;gap:10px"><div style="width:42px;height:42px;border-radius:50%;background:#3b0f6e;border:1px solid rgba(168,85,247,.18);display:grid;place-items:center">A</div><div><b style="font-size:13px">ALERTS - Written Notifications</b><br><small style="font-size:9px;color:#facc15">Live - Progress of your bookings</small></div></div><a href="sos.html" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:700;font-size:11px;text-decoration:none">SOS</a></div>
+<div class="top"><div><b>ðŸ”” Nurse Alerts - Loud Sound Even Far From Phone</b><br><small style="color:#9a95b8;font-size:10px">New bookings, Completed, Withdrawal approved - Phone RINGS loudly!</small></div><div style="display:flex;gap:8px"><span id="countBadge" style="padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);font-size:11px">0 Alerts</span><a href="nurse-dashboard.html" style="padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);color:#ece8ff;text-decoration:none;font-size:11px">Dashboard</a></div></div>
+
 <div style="max-width:800px;margin:0 auto;padding:10px">
-<div class="card" style="padding:12px;background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-<b style="font-size:12px;color:#facc15">Written Notifications - Your Booking Progress</b>
-<div style="display:flex;gap:6px;flex-wrap:wrap">
-<button class="btn btnGray" style="padding:8px 10px" onclick="loadAlerts()">Refresh</button>
-<button class="btn btnGray" style="padding:8px 10px" onclick="markAllRead()">Read All</button>
-<button class="btn btnRed" style="padding:8px 10px" onclick="deleteAllAlerts()">Delete All Alerts</button>
+<div class="card" style="background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(168,85,247,.12));border:2px solid rgba(250,204,21,.4)">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><b style="color:#facc15">ðŸ”” Loud Sound - Even Far From Phone</b><br><small style="font-size:10px;color:#a78bfa">When client books you or confirms work completed, phone RINGS loudly + vibrates + notification even if far away</small></div>
+<div style="display:flex;gap:10px;align-items:center"><span id="soundStatus" style="font-size:11px">OFF</span><div id="soundToggle" class="toggle" onclick="toggleSound()"><div class="toggleKnob"></div></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+<button class="btn btnGold" style="font-size:10px" onclick="testSound('new_booking')">ðŸ”Š Test New Booking</button>
+<button class="btn btnGold" style="font-size:10px" onclick="testSound('completed')">ðŸ”Š Test Completed</button>
+<button class="btn btnGold" style="font-size:10px" onclick="testSound('withdrawal')">ðŸ”Š Test Withdrawal</button>
+</div>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button class="btn" style="flex:1" onclick="requestNotif()">ðŸ”” Enable Notifications</button>
+<button class="btn" style="flex:1" onclick="enableVib()">ðŸ“³ Enable Vibration</button>
+<button class="btn btnGold" style="flex:1" onclick="enableSound()">ðŸ”Š Enable Loud Sound</button>
 </div>
 </div>
-<div id="countInfo" style="font-size:10px;color:#9ca3af;margin-top:6px">Loading...</div>
-<div style="font-size:9px;color:#22c55e;margin-top:4px">Real-time - Accept, Reject, On the way, Close, Completed, Rate</div>
+
+<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+<b style="font-size:12px">Written Notifications - Your Jobs</b>
+<div style="display:flex;gap:6px"><button class="btn" onclick="loadAlerts()">Refresh</button><button class="btn" onclick="markAllRead()">Read All</button><button class="btn" style="background:rgba(239,68,68,.15);color:#fca5a5" onclick="deleteAll()">Delete All</button></div>
 </div>
-<div id="alertsList" style="display:grid;gap:10px;margin-top:12px"></div>
-<div id="emptyAlerts" class="card" style="display:none;text-align:center;padding:30px"><div style="font-size:40px">A</div><b>No alerts yet</b><br><small style="color:#a78bfa">When nurse accepts, rejects, on the way, close, completed - you will see written notification here</small><br><button class="btn btnGold" style="margin-top:12px" onclick="loadAlerts()">Check Now</button></div>
+
+<div id="list" style="display:grid;gap:10px;margin-top:12px"><div style="text-align:center;padding:40px;color:#9a95b8">Loading nurse alerts...</div></div>
 </div>
-<div class="bottom-tabs"><div class="btab" onclick="location.href='client-dashboard.html'">Home</div><div class="btab" onclick="location.href='my-bookings.html'">Bookings</div><div class="btab active">Alerts</div></div>
+
 <div id="toast" class="toast"></div>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
-const auth=firebase.auth();
-let currentUid='', currentEmail='', allAlerts=[];
-function toastM(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',3000);}
-function getClientInfo(){currentUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||localStorage.getItem('uid')||''; currentEmail=localStorage.getItem('clientEmail')||localStorage.getItem('lcg_client_email')||localStorage.getItem('email')||'';}
-async function ensureAuth(){return new Promise(res=>{auth.onAuthStateChanged(user=>{if(user){currentUid=user.uid; currentEmail=user.email||currentEmail; localStorage.setItem('lcg_client_uid', user.uid);} res();}); setTimeout(res,1500);});}
-function generateWrittenAlert(booking, type){const bookingId=booking.bookingId||booking.id||'Unknown'; const nurseName=booking.nurseName||'Nurse'; const amount=booking.amount||''; const currency=booking.currency||'GHS'; let title='', message='', icon='accepted'; if(type==='accepted'){title=`Nurse ${nurseName} has accepted your booking`; message=`Nurse ${nurseName} has accepted your booking ID ${bookingId}. Amount: ${currency} ${amount}. Nurse is preparing to come to you. You will receive notification when nurse is on the way.`; icon='accepted';} else if(type==='rejected'){title=`Nurse ${nurseName} has rejected your offer`; message=`Nurse ${nurseName} has rejected your booking ID ${bookingId}. Reason: ${booking.rejectionReason||'Not available'}. Look for another nurse or increase your payment rate. Booking ID: ${bookingId}`; icon='rejected';} else if(type==='on_the_way'){title=`Nurse ${nurseName} is on the way coming`; message=`Nurse ${nurseName} is on the way coming for booking ID ${bookingId}. Please get ready. Track nurse live on My Bookings. Booking: ${bookingId}`; icon='onway';} else if(type==='close'){title=`Nurse ${nurseName} is just close to you`; message=`Nurse ${nurseName} is just close to you! Booking ID ${bookingId}. Please be ready at your location. Nurse will arrive soon.`; icon='close';} else if(type==='completed'){title=`You have confirmed work is completed - Booking ${bookingId}`; message=`You have confirmed work is completed for booking ID ${bookingId} with Nurse ${nurseName}. Amount: ${currency} ${amount}. Thank you! You can now rate your nurse. Booking completed on ${new Date().toLocaleString('en-GH')}.`; icon='completed';} else if(type==='rating'){title=`You can rate your nurse ${nurseName}`; message=`Work completed for booking ID ${bookingId}. You can rate your nurse ${nurseName} now. Your rating helps other clients. Click to rate.`; icon='rating';} return {title,message,icon,bookingId,nurseName,type,time:Date.now()};}
-async function loadAlerts(){getClientInfo(); const list=document.getElementById('alertsList'); const empty=document.getElementById('emptyAlerts'); const countInfo=document.getElementById('countInfo'); let alerts=[]; try{if(currentUid){const snap=await db.ref('clientAlerts/'+currentUid).once('value'); if(snap.exists()){snap.forEach(ch=>{const v=ch.val(); alerts.push({...v,id:ch.key,source:'firebase'});});} const snap2=await db.ref('clientBookings/'+currentUid).once('value'); if(snap2.exists()){snap2.forEach(ch=>{const b=ch.val(); const s=(b.status||'').toLowerCase(); if(s==='accepted'||s.includes('on_the_way')||s.includes('close')||s.includes('rejected')||s.includes('completed')||s.includes('client_confirmed')){let type=s; if(s==='accepted') type='accepted'; else if(s.includes('on_the_way')) type='on_the_way'; else if(s.includes('close')) type='close'; else if(s.includes('rejected')) type='rejected'; else if(s.includes('client_confirmed')||s.includes('completed')) type='completed'; const written=generateWrittenAlert({...b,id:ch.key,bookingId:b.bookingId||ch.key}, type); if(!alerts.find(a=>a.bookingId===written.bookingId && a.type===type)){alerts.push({...written,id:'local_'+ch.key+'_'+type,source:'local'});}}});} try{const local=JSON.parse(localStorage.getItem('lcg_alerts')||'[]'); local.forEach(l=>{if(!alerts.find(a=>a.bookingId===l.bookingId && a.type===l.type)){alerts.push({...l,source:'localStorage'});}});}catch(e){}}catch(e){console.log(e);} allAlerts=alerts.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0)); if(allAlerts.length===0){list.style.display='none'; empty.style.display='block'; countInfo.textContent='No alerts - 0 written notifications'; return;} empty.style.display='none'; list.style.display='grid'; countInfo.textContent=`${allAlerts.length} written notifications - Real-time booking progress`; list.innerHTML=allAlerts.map(a=>{const timeStr=a.time?new Date(a.time).toLocaleString('en-GH'):(a.createdAt?new Date(a.createdAt).toLocaleString('en-GH'):''); let iconClass='accepted', iconEmoji='OK'; if(a.type==='rejected'){iconClass='rejected'; iconEmoji='X';} else if(a.type==='on_the_way'){iconClass='onway'; iconEmoji='->';} else if(a.type==='close'){iconClass='close'; iconEmoji='@';} else if(a.type==='completed'){iconClass='completed'; iconEmoji='OK';} else if(a.type==='rating'){iconClass='rating'; iconEmoji='*';} const isUnread=!a.read; return `<div class="alertCard ${isUnread?'unread':''}"><div style="display:flex;gap:12px"><div class="icon ${iconClass}">${iconEmoji}</div><div style="flex:1;min-width:0"><b style="font-size:12px">${a.title||''}</b><div style="font-size:11px;color:#e8e0ff;margin-top:6px;line-height:1.5">${a.message||a.title||''}</div><div style="font-size:9px;color:#9ca3af;margin-top:8px">Booking ID: <b>${a.bookingId||'N/A'}</b> - Nurse: ${a.nurseName||'Nurse'} - ${timeStr}</div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">${a.bookingId?`<button class="btn btnGold" style="padding:6px 10px;font-size:10px" onclick="viewBooking('${a.bookingId}')">View Booking</button>`:''}${a.type==='completed'||a.type==='rating'?`<button class="btn btnGold" style="padding:6px 10px;font-size:10px" onclick="rateNurse('${a.bookingId||''}','${a.nurseName||''}')">Rate Nurse</button>`:''}<button class="btn btnGray" style="padding:6px 10px;font-size:10px" onclick="markRead('${a.id}')">Mark Read</button><button class="btn btnGray" style="padding:6px 10px;font-size:10px;background:rgba(239,68,68,.1);color:#fca5a5" onclick="deleteAlert('${a.id}')">Delete</button></div></div></div></div>`;}).join('');}
-async function deleteAlert(id){if(!confirm('Delete this alert?')) return; try{if(currentUid){await db.ref('clientAlerts/'+currentUid+'/'+id).remove().catch(()=>{});} allAlerts=allAlerts.filter(a=>a.id!==id); try{localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50)));}catch(e){} loadAlerts(); toastM('Deleted');}catch(e){toastM(e.message);}}
-async function deleteAllAlerts(){if(allAlerts.length===0){toastM('No alerts to delete'); return;} if(!confirm(`Delete ALL ${allAlerts.length} alerts? This will delete all written notifications. Cannot be undone.`)) return; const c=prompt('Type DELETE to confirm:'); if(c!=='DELETE'){toastM('Cancelled'); return;} try{if(currentUid){await db.ref('clientAlerts/'+currentUid).remove();} localStorage.removeItem('lcg_alerts'); allAlerts=[]; loadAlerts(); toastM('All alerts deleted');}catch(e){toastM(e.message);}}
-async function markRead(id){const a=allAlerts.find(x=>x.id===id); if(!a) return; a.read=true; try{if(currentUid && a.source==='firebase'){await db.ref('clientAlerts/'+currentUid+'/'+id).update({read:true});} localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts.slice(0,50)));}catch(e){} loadAlerts();}
-async function markAllRead(){allAlerts.forEach(a=>a.read=true); try{if(currentUid){const snap=await db.ref('clientAlerts/'+currentUid).once('value'); if(snap.exists()){const updates={}; snap.forEach(ch=>{updates[ch.key+'/read']=true;}); await db.ref('clientAlerts/'+currentUid).update(updates);}} localStorage.setItem('lcg_alerts', JSON.stringify(allAlerts));}catch(e){} loadAlerts(); toastM('All marked read');}
-function viewBooking(bookingId){location.href='my-bookings.html#'+bookingId;}
-function rateNurse(bookingId, nurseName){location.href=`rating.html?bookingId=${bookingId}&nurseName=${encodeURIComponent(nurseName||'Nurse')}`;}
-window.addEventListener('DOMContentLoaded', async()=>{getClientInfo(); await ensureAuth(); loadAlerts(); setInterval(loadAlerts, 10000);});
+let nurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
+let nurseName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'Nurse';
+let all=[], prevIds=new Set(), audioCtx=null;
+
+function initAudio(){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+function getSound(){return localStorage.getItem('nurse_alerts_sound')==='true';}
+function saveSound(v){localStorage.setItem('nurse_alerts_sound', v?'true':'false'); updateUI();}
+function updateUI(){const on=getSound();const t=document.getElementById('soundToggle');const s=document.getElementById('soundStatus');if(on){t.classList.add('on');s.textContent='ON - Loud';s.style.color='#22c55e';}else{t.classList.remove('on');s.textContent='OFF';s.style.color='#facc15';}}
+function toggleSound(){const cur=getSound();saveSound(!cur);if(!cur) enableSound();}
+function enableSound(){try{if(!audioCtx)initAudio();if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();saveSound(true);toastM('ðŸ”Š Nurse Sound ON - Loud even far!');if(Notification&&Notification.permission==='default')Notification.requestPermission();}catch(e){saveSound(true);}}
+function toastM(m){const e=document.getElementById('toast');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',4000);}
+function playLoud(type){
+  if(!getSound()) return;
+  try{
+    if(!audioCtx)initAudio(); if(!audioCtx)return; if(audioCtx.state==='suspended')audioCtx.resume();
+    const now=audioCtx.currentTime; const vol=0.9;
+    if(type==='new_booking'){for(let i=0;i<3;i++){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=800+i*150;g.gain.setValueAtTime(0,now+i*0.3);g.gain.linearRampToValueAtTime(vol,now+i*0.3+0.05);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.3+0.5);o.start(now+i*0.3);o.stop(now+i*0.3+0.6);}}
+    else if(type==='completed'){const notes=[523,659,784,1046];notes.forEach((f,i)=>{const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=f;g.gain.setValueAtTime(0,now+i*0.15);g.gain.linearRampToValueAtTime(vol,now+i*0.15+0.05);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.15+0.4);o.start(now+i*0.15);o.stop(now+i*0.15+0.5);});}
+    else if(type==='withdrawal'){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=1000;o.type='sine';g.gain.setValueAtTime(vol,now);g.gain.exponentialRampToValueAtTime(0.01,now+1);o.start(now);o.stop(now+1);}
+    if(navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+    if(Notification&&Notification.permission==='granted'){let title='',body='';if(type==='new_booking'){title='ðŸ”” NEW BOOKING!';body='Client booked you - Check My Job Offer!';}else if(type==='completed'){title='ðŸŽ‰ Work Completed!';body='Client confirmed work - Booking ID: Congrats!';}else if(type==='withdrawal'){title='ðŸ’¸ Withdrawal Approved!';body='Your withdrawal approved - Check wallet!';}try{const n=new Notification(title,{body,requireInteraction:true});setTimeout(()=>n.close(),10000);}catch(e){}}
+  }catch(e){console.log(e);}
+}
+function testSound(t){enableSound(); setTimeout(()=>playLoud(t),400); toastM('ðŸ”Š Playing '+t+' sound - Loud even far!');}
+function requestNotif(){if(!('Notification'in window)){toastM('Not supported');return;} Notification.requestPermission().then(p=>{if(p==='granted'){toastM('âœ… Notifications ON - Far away you will hear!'); testSound('new_booking');}});}
+function enableVib(){if(!('vibrate'in navigator)){toastM('No vibration');return;} navigator.vibrate([200,100,200,100,400]); toastM('ðŸ“³ Vibration ON!');}
+
+function loadAlerts(){
+  if(!nurseId){document.getElementById('list').innerHTML='<div style="text-align:center;padding:40px;color:#9a95b8">No nurse ID - Login again</div>';return;}
+  db.ref('nurseNotifications/'+nurseId).limitToLast(50).on('value', snap=>{
+    if(!snap.exists()){document.getElementById('list').innerHTML='<div style="text-align:center;padding:40px;color:#9a95b8">No alerts yet - When client books you, loud sound + written notification here even far from phone</div>';return;}
+    const list=[]; snap.forEach(ch=>{list.push({...ch.val(),id:ch.key});});
+    list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    // Detect new and play sound
+    const curIds=new Set(list.map(l=>l.id));
+    if(prevIds.size>0){
+      for(const item of list){
+        if(!prevIds.has(item.id)){
+          let type='new_booking'; if(item.type==='congratulation'||item.isCongrats||(item.title||'').includes('Congratulations')) type='completed'; else if((item.type||'').includes('withdrawal')) type='withdrawal';
+          setTimeout(()=>playLoud(type),300);
+          toastM(`ðŸ”” NEW: ${item.title||'New alert'} - Loud!`);
+        }
+      }
+    }
+    prevIds=curIds;
+    all=list;
+    document.getElementById('countBadge').textContent=list.length+' Alerts - '+list.filter(a=>!a.read).length+' New';
+    document.getElementById('list').innerHTML=list.map(n=>{
+      const isUnread=!n.read; let icon='ðŸ””', cls=''; if(n.type==='congratulation'||n.isCongrats){icon='ðŸŽ‰';} else if((n.type||'').includes('withdrawal')){icon='ðŸ’¸';} const time=n.createdAt?new Date(n.createdAt).toLocaleString('en-GH'):''; 
+      return `<div class="alertCard ${isUnread?'unread':''}"><div style="display:flex;gap:12px"><div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#facc15,#f59e0b);display:grid;place-items:center;font-size:20px">${icon}</div><div style="flex:1"><b style="font-size:13px">${n.title||'Notification'} ${isUnread?'ðŸ””':''}</b><div style="font-size:11px;margin-top:6px;white-space:pre-line">${n.message||''}</div><div style="font-size:9px;color:#9a95b8;margin-top:8px">Booking ID: <b>${n.bookingId||'N/A'}</b> - ${time} - ${n.amount?'GHS '+n.amount:''}</div><div style="display:flex;gap:6px;margin-top:10px"><button class="btn btnGold" style="padding:6px 10px;font-size:10px" onclick="playLoud('${n.type==='congratulation'?'completed':n.type}')">${'ðŸ”Š Play Sound'}</button><button class="btn" style="padding:6px 10px;font-size:10px" onclick="markRead('${n.id}')">Read</button><button class="btn" style="padding:6px 10px;font-size:10px;background:rgba(239,68,68,.1);color:#fca5a5" onclick="delOne('${n.id}')">Delete</button></div></div></div></div>`;
+    }).join('');
+  });
+}
+
+function markRead(id){db.ref('nurseNotifications/'+nurseId+'/'+id).update({read:true}).then(()=>toastM('Read'));}
+function delOne(id){if(!confirm('Delete?'))return; db.ref('nurseNotifications/'+nurseId+'/'+id).remove().then(()=>toastM('Deleted'));}
+function markAllRead(){all.forEach(a=>{db.ref('nurseNotifications/'+nurseId+'/'+a.id).update({read:true}).catch(()=>{});}); toastM('All read');}
+function deleteAll(){if(!confirm('Delete ALL '+all.length+'?'))return; const c=prompt('Type DELETE:'); if(c!=='DELETE')return; db.ref('nurseNotifications/'+nurseId).remove().then(()=>{toastM('All deleted'); prevIds=new Set();});}
+
+window.onload=()=>{initAudio(); updateUI(); loadAlerts(); document.addEventListener('click',()=>{if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();},{once:true});};
 </script></body></html>
