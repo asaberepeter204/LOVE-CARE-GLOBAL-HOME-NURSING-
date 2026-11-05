@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Bookings - REAL DATE Follows Device - LOVE CARE GLOBAL</title>
+<title>My Bookings - COMPLETED FLOW FIXED — LOVE CARE GLOBAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -7,571 +7,396 @@
 .bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),linear-gradient(180deg,#0e0a1c 0%, #120e26 100%)}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
 .card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px 14px}
-.clientHeader{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#2d1c4e 0%, #1c1238 100%);border:2px solid rgba(168,85,247,.35);border-radius:20px;padding:16px;margin:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.4)}
-.clientPhotoBig{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #d8b4fe;background:#2d1c4e;display:block}
-.realDateCard{background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(34,197,94,.1));border:2px solid rgba(250,204,21,.3);border-radius:16px;padding:12px 16px;margin:12px 14px;display:flex;justify-content:space-between;align-items:center}
-.dateBoxBig{background:white;color:#2563eb;border-radius:12px;padding:8px 14px;font-weight:900;line-height:1.1;min-width:72px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}.badge-pending{background:rgba(245,158,11,.15);color:#fde68a;border:1px solid rgba(245,158,11,.3)}.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}.badge-rejected{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
-.btn{border:none;border-radius:14px;padding:14px 12px;font-weight:900;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;min-height:48px;flex:1}.btn:active{transform:scale(.97)}.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
-.mapWrap{width:100%;height:300px;border-radius:14px;overflow:hidden;border:2px solid rgba(34,197,94,.3);margin-top:12px;position:relative}.mapWrap::before{content:'[RED] LIVE TRACKING';position:absolute;top:8px;left:8px;z-index:500;background:rgba(34,197,94,.9);color:white;font-size:9px;font-weight:900;padding:4px 8px;border-radius:99px}
-.followBox{padding:12px;border-radius:12px;margin-top:12px;font-size:11px;line-height:1.6}.followPending{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fde68a}.followAccepted{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:#86efac}.followRejected{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
-.bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0;z-index:60}.btab{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:800;color:#a78bfa;cursor:pointer;padding:6px}.btab.active{color:#d8b4fe;background:rgba(168,85,247,.12);border-radius:12px;margin:0 4px}
-.notification{position:fixed;top:70px;left:12px;right:12px;z-index:1000;padding:16px;border-radius:16px;display:none}.notification.show{display:block}.notifAccept{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.notifReject{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
+.badge-pending{background:rgba(245,158,11,.15);color:#fde68a;border:1px solid rgba(245,158,11,.3)}
+.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}
+.badge-rejected{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.badge-completed{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border:1px solid #a78bfa}
+.badge-confirmed{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+.btn{border:none;border-radius:14px;padding:14px 12px;font-weight:900;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;min-height:48px;flex:1}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
+.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
+.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
+.btnPurple{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff}
+.bottom-tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(18,12,36,.98);border-top:1px solid rgba(168,85,247,.12);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0;z-index:60}
+.btab{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:800;color:#a78bfa;cursor:pointer;padding:6px}
+.btab.active{color:#d8b4fe;background:rgba(168,85,247,.12);border-radius:12px;margin:0 4px}
+.completedBox{background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(168,85,247,.1));border:2px solid rgba(34,197,94,.4);border-radius:16px;padding:12px;margin-top:12px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 </style></head><body><div class="bg"></div>
+<div class="topbar"><div style="display:flex;align-items:center;gap:10px"><div style="width:42px;height:42px;border-radius:50%;background:#3b0f6e;display:grid;place-items:center">📋</div><div><b style="font-size:13px">My Bookings — Completion Fixed</b><br><small style="font-size:9px;color:#22c55e">● LIVE — Confirm → Removes Accepted → Marks Completed with Date/Time</small></div></div><a href="alerts.html" style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.18);color:#d8b4fe;font-size:11px;text-decoration:none">🔔 Alerts</a></div>
 
-<script>
-// === IMMEDIATE SYNC - Shows photo + date even before Firebase loads ===
-(function(){
-  // 1. REAL DATE IMMEDIATE - works offline
-  function setRealDateNow(){
-    try{
-      const now = new Date();
-      // Ghana time
-      const opts = {timeZone:'Africa/Accra'};
-      const monthNames=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-      const dayNames=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
-      // Get Ghana parts via Intl
-      const ghanaStr = now.toLocaleString('en-US', {timeZone:'Africa/Accra', year:'numeric', month:'numeric', day:'numeric', weekday:'short', hour:'numeric', minute:'numeric', second:'numeric', hour12:true});
-      // Use Intl to get parts
-      const m = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', month:'short'}).format(now).toUpperCase();
-      const d = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', day:'numeric'}).format(now);
-      const y = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', year:'numeric'}).format(now);
-      const wd = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', weekday:'long'}).format(now).toUpperCase();
-      const full = new Intl.DateTimeFormat('en-GH',{timeZone:'Africa/Accra', weekday:'long', year:'numeric', month:'long', day:'numeric'}).format(now);
-      const shortDate = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Accra', month:'long', day:'numeric', year:'numeric'}).format(now);
-      const time = new Intl.DateTimeFormat('en-GH',{timeZone:'Africa/Accra', hour:'numeric', minute:'2-digit', second:'2-digit', hour12:true}).format(now);
-      
-      const elM=document.getElementById('realMonth'); if(elM) elM.textContent=m;
-      const elD=document.getElementById('realDay'); if(elD) elD.textContent=d;
-      const elY=document.getElementById('realYear'); if(elY) elY.textContent=y;
-      const elW=document.getElementById('realWeekday'); if(elW) elW.textContent=wd;
-      const elF=document.getElementById('realFullDate'); if(elF) elF.textContent=shortDate+' - Real Ghana Date (Auto-updates daily)';
-      const elT=document.getElementById('realTime'); if(elT) elT.textContent=time+' - Live';
-      const emptyEl=document.getElementById('emptyRealDate'); if(emptyEl) emptyEl.textContent=full;
-    }catch(e){
-      console.log('date error',e);
-      // Fallback simple date
-      const now=new Date();
-      const elM=document.getElementById('realMonth'); if(elM) elM.textContent=now.toLocaleString('en-US',{month:'short'}).toUpperCase();
-      const elD=document.getElementById('realDay'); if(elD) elD.textContent=now.getDate();
-      const elY=document.getElementById('realYear'); if(elY) elY.textContent=now.getFullYear();
-      const elW=document.getElementById('realWeekday'); if(elW) elW.textContent=now.toLocaleString('en-US',{weekday:'long'}).toUpperCase();
-      const elF=document.getElementById('realFullDate'); if(elF) elF.textContent=now.toLocaleDateString('en-GH');
-      const elT=document.getElementById('realTime'); if(elT) elT.textContent=now.toLocaleTimeString('en-GH')+' - Live';
-    }
-  }
-  setRealDateNow();
-  setInterval(setRealDateNow,1000);
-  window.setRealDateNow = setRealDateNow;
-
-  // 2. CLIENT PHOTO IMMEDIATE - from localStorage without waiting for Firebase
-  function loadClientImmediate(){
-    try{
-      let cName='Client', cEmail='', cPhone='', cPhoto='';
-      const keysName=['clientName','fullName','displayName','pendingGoogleName','clientNameBig'];
-      const keysEmail=['clientEmail','pendingGoogleEmail','email'];
-      const keysPhone=['clientPhone','phone'];
-      const keysPhoto=['clientPhoto','clientPhotoUrl','photoUrl','pendingGooglePhoto','client_photo','avatar'];
-      for(const k of keysName){ const v=localStorage.getItem(k)||sessionStorage.getItem(k); if(v && v.length>2){ cName=v; break; } }
-      for(const k of keysEmail){ const v=localStorage.getItem(k)||sessionStorage.getItem(k); if(v && v.includes('@')){ cEmail=v.toLowerCase(); break; } }
-      for(const k of keysPhone){ const v=localStorage.getItem(k)||sessionStorage.getItem(k); if(v && v.replace(/\D/g,'').length>=9){ cPhone=v; break; } }
-      for(const k of keysPhoto){ const v=localStorage.getItem(k)||sessionStorage.getItem(k); if(v && (v.startsWith('http')||v.startsWith('data:'))){ cPhoto=v; break; } }
-
-      const nameEl=document.getElementById('clientNameBig');
-      const emailEl=document.getElementById('clientEmailBig');
-      const phoneEl=document.getElementById('clientPhoneBig');
-      const photoEl=document.getElementById('clientPhotoBig');
-      const badgeEl=document.getElementById('clientStatusBadge');
-      if(nameEl) nameEl.textContent=cName||'Client';
-      if(emailEl) emailEl.textContent=cEmail||'Email not set';
-      if(phoneEl) phoneEl.textContent=cPhone||'Phone not set';
-      if(badgeEl){
-        if(cEmail){ badgeEl.textContent='* '+cName+' - '+cEmail.split('@')[0]; badgeEl.style.background='rgba(34,197,94,.15)'; badgeEl.style.color='#86efac'; }
-        else { badgeEl.textContent='* Loading...'; }
-      }
-      if(photoEl){
-        if(cPhoto){
-          photoEl.src=cPhoto;
-          photoEl.onerror=function(){ this.src=''; this.style.background='#2d1c4e'; this.alt=cName.charAt(0); };
-        }else{
-          // initials avatar
-          const initial=(cName?cName.charAt(0):'C').toUpperCase();
-          const canvas=document.createElement('canvas'); canvas.width=120; canvas.height=120;
-          const ctx=canvas.getContext('2d'); ctx.fillStyle='#2d1c4e'; ctx.fillRect(0,0,120,120);
-          ctx.fillStyle='#d8b4fe'; ctx.font='bold 60px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-          ctx.fillText(initial,60,60);
-          photoEl.src=canvas.toDataURL();
-        }
-      }
-    }catch(e){ console.log('immediate load error',e); }
-  }
-  loadClientImmediate();
-  // retry after 500ms in case storage not yet ready
-  setTimeout(loadClientImmediate, 500);
-  setTimeout(loadClientImmediate, 1500);
-})();
-</script>
-
-
-<div class="topbar"><div><b style="font-size:13px">[DATE] My Bookings - REAL DATE [DATE]</b><br><small style="font-size:9px;color:#facc15">* REAL DATE - Follows Device Date</small></div><a href="client-dashboard.html" style="text-decoration:none;padding:8px 12px;border-radius:99px;background:rgba(255,255,255,.06);color:#9a95b8;font-size:11px;border:1px solid rgba(255,255,255,.1)"><- Dashboard</a></div>
-
-<!-- REAL DATE HEADER - AUTO UPDATES EVERY DAY -->
-<div class="realDateCard">
-<div style="display:flex;gap:12px;align-items:center">
-<div class="dateBoxBig"><div id="realMonth" style="font-size:14px">---</div><div id="realDay" style="font-size:22px">--</div><div id="realYear" style="font-size:10px;color:#6b7280">----</div></div>
-<div><b id="realWeekday" style="font-size:14px;color:#fff">LOADING...</b><br><small id="realFullDate" style="font-size:11px;color:#facc15">Loading real date...</small><br><small id="realTime" style="font-size:10px;color:#a78bfa">--:-- -- Live</small></div>
+<div style="max-width:800px;margin:0 auto;padding:10px">
+<div class="card" style="background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.2);padding:12px">
+<b style="font-size:12px;color:#86efac">✅ Completion Flow — How it works:</b><br>
+<small style="font-size:10px;color:#a78bfa">1. Client clicks "Confirm Work Completed" → 2. Accepted notification removed from My Bookings + My Job Offer → 3. Marked as Work Completed with Date/Time → 4. CEO receives progress → 5. Congrats message sent to nurse with Booking ID → 6. Client can rate nurse</small>
+<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+<button class="btn btnGray" style="padding:8px 10px;min-height:32px;flex:none" onclick="location.reload()">🔄 Refresh</button>
+<span id="countInfo" style="font-size:10px;color:#9ca3af;padding:8px">Loading...</span>
 </div>
-<div style="text-align:right"><span style="font-size:9px;background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);padding:4px 8px;border-radius:99px">[DATE] REAL DATE</span><br><small style="font-size:9px;color:#6b7280" id="countInfo">0 bookings</small></div>
 </div>
 
-<div class="clientHeader" id="clientHeader">
-  <img id="clientPhotoBig" class="clientPhotoBig" src="" alt="Client">
-  <div style="flex:1;min-width:0">
-    <b id="clientNameBig" style="font-size:15px;color:#f3e8ff">Loading...</b><br>
-    <small id="clientEmailBig" style="font-size:10px;color:#a78bfa;word-break:break-all">...</small><br>
-    <small id="clientPhoneBig" style="font-size:10px;color:#86efac">...</small>
-    <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
-      <span id="clientStatusBadge" style="font-size:9px;padding:4px 10px;border-radius:99px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac">* Loading Client...</span>
-    </div>
-    <div id="emailInputBox" style="display:none;margin-top:10px">
-      <div style="font-size:10px;color:#fca5a5;margin-bottom:4px">! Enter client email to load bookings:</div>
-      <div style="display:flex;gap:6px">
-        <input id="manualEmailInput" type="email" placeholder="Enter client email" style="flex:1;padding:10px;border-radius:10px;background:#0e0a1c;border:1px solid rgba(168,85,247,.3);color:white;font-size:11px">
-        <button onclick="loadClientByEmail()" style="padding:10px 14px;border-radius:10px;background:#d8b4fe;color:#1e0a3a;border:none;font-weight:900;font-size:11px">Load</button>
-      </div>
-    </div>
-  </div>
-  <button onclick="loadBookings()" style="padding:10px 14px;border-radius:99px;background:rgba(255,255,255,.08);color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:12px">RELOAD</button>
+<div id="bookingsList" style="display:grid;gap:12px;margin-top:12px"></div>
+<div id="emptyBookings" class="card" style="display:none;text-align:center;padding:30px"><div style="font-size:40px">📋</div><b>No bookings yet</b><br><small style="color:#a78bfa">Your bookings will appear here. When nurse accepts, you will see Accept notification. After you confirm work completed, it will be marked completed with date/time.</small></div>
 </div>
 
-<div id="notifAccept" class="notification notifAccept"><div style="display:flex;justify-content:space-between;gap:10px"><div><b id="notifTitleA">[OK] Nurse Accepted!</b><br><small id="notifMsgA">Navigation opened</small></div><button onclick="document.getElementById('notifAccept').classList.remove('show')" style="background:rgba(255,255,255,.2);border:none;color:white;padding:4px 8px;border-radius:8px">X</button></div><div style="margin-top:10px"><a id="notifNavA" href="#" target="_blank" class="btn" style="background:white;color:#16a34a;width:100%">MAP Open Google Maps - Track Nurse</a></div></div>
-<div id="notifReject" class="notification notifReject"><div style="display:flex;justify-content:space-between;gap:10px"><div><b>[X] Nurse Rejected</b><br><small id="notifMsgR">Book another or increase rate</small></div><button onclick="document.getElementById('notifReject').classList.remove('show')" style="background:rgba(255,255,255,.2);border:none;color:white;padding:4px 8px;border-radius:8px">X</button></div><div style="margin-top:10px;display:flex;gap:8px"><a href="book-nurse.html" class="btn" style="background:white;color:#dc2626">+ Book Another</a><a href="book-nurse.html?increaseRate=true" class="btn" style="background:#facc15;color:#1e0a3a"> Increase Rate</a></div></div>
-
-<div style="padding:0 14px">
-<div class="card" style="margin:0 0 12px 0;background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25)">
-  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b style="font-size:11px;color:#86efac">[RED] LIVE - Real Date Follows Device - Client Photo Saved</b></div>
-  <div style="font-size:9px;color:#9a95b8;margin-top:6px">- Top date auto-updates daily - Client photo from registration - Booking dates show real booking time</div>
-  <select id="filterStatus" onchange="render()" onchange="render()" style="margin-top:8px;padding:10px;border-radius:10px;background:#0e0a1c;color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-size:11px;width:100%"><option value="all">All - Live - Real Date</option><option value="pending" selected>Pending - Live</option><option value="accepted">Accepted - Live Tracking</option><option value="rejected">Rejected - Live</option></select>
-</div>
-<div id="list"></div>
-<div id="emptyState" class="card" style="display:none;text-align:center;padding:24px"><div style="font-size:36px">[DATE]</div><b>No live bookings yet</b><br><small style="color:#9a95b8">Real Date: <span id="emptyRealDate">-</span> - Only real bookings - No demo<br>Your profile is shown above [OK]</small><br><br><a href="book-nurse.html" class="btn btnYellow" style="flex:none;padding:14px 24px">+ Book Nurse Now - Real Date</a></div>
-</div>
-
-<div class="bottom-tabs"><div class="btab active">[DATE] My Bookings<br><small style="font-size:8px;color:#22c55e">REAL DATE</small></div><div class="btab" onclick="location.href='book-nurse.html'">+ Book</div><div class="btab" onclick="location.href='client-alerts.html'"> Alerts</div></div>
+<div class="bottom-tabs"><div class="btab" onclick="location.href='client-dashboard.html'"><span>🏠</span>Home</div><div class="btab active"><span>📋</span>Bookings</div><div class="btab" onclick="location.href='alerts.html'"><span>🔔</span>Alerts</div></div>
+<div id="toast" class="toast"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getDatabase, ref, get, update, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
-let all=[];let prev={};let maps={};let markers={};
-let clientEmail='';let clientPhone='';let clientName='Client';let clientUid='';let clientPhoto='';
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+const auth=getAuth(app);
 
-// ===== REAL DATE - FOLLOWS REAL CALENDAR (GHANA TIME) =====
-function setRealDate(){ if(window.setRealDateNow){ window.setRealDateNow(); return; }
-  // Use Ghana timezone so date is correct in Accra
-  const now = new Date();
-  const ghanaNow = new Date(now.toLocaleString('en-US', {timeZone: 'Africa/Accra'}));
-  
-  const months=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-  const weekdays=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
-  
-  const month = months[ghanaNow.getMonth()];
-  const day = ghanaNow.getDate();
-  const year = ghanaNow.getFullYear();
-  const weekday = weekdays[ghanaNow.getDay()];
-  
-  // Full readable date in Ghana locale
-  const fullDate = ghanaNow.toLocaleDateString('en-GH',{weekday:'long', year:'numeric', month:'long', day:'numeric', timeZone:'Africa/Accra'});
-  const shortDate = ghanaNow.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric', timeZone:'Africa/Accra'});
-  const time = ghanaNow.toLocaleTimeString('en-GH',{hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true, timeZone:'Africa/Accra'});
+let all=[], clientUid='', clientEmail='', clientName='', clientPhone='', clientPhoto='';
+let prev={};
 
-  const elM = document.getElementById('realMonth');
-  const elD = document.getElementById('realDay');
-  const elY = document.getElementById('realYear');
-  const elW = document.getElementById('realWeekday');
-  const elF = document.getElementById('realFullDate');
-  const elT = document.getElementById('realTime');
-  if(elM) elM.textContent=month;
-  if(elD) elD.textContent=day;
-  if(elY) elY.textContent=year;
-  if(elW) elW.textContent=weekday;
-  if(elF) elF.textContent=shortDate + ' - Real Ghana Date';
-  if(elT) elT.textContent=time + ' - Live';
-
-  const emptyEl=document.getElementById('emptyRealDate'); if(emptyEl) emptyEl.textContent=fullDate;
+function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000);}
+function getKeys(){
+  clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||localStorage.getItem('uid')||'';
+  clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('lcg_client_email')||localStorage.getItem('email')||'';
+  clientName=localStorage.getItem('clientName')||localStorage.getItem('lcg_client_name')||'Client';
+  clientPhone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'';
+  clientPhoto=localStorage.getItem('clientPhoto')||'';
 }
 
-// ===== CREATE LOCAL INITIAL AVATAR (no external URL) =====
-function makeInitialAvatar(name){
-  const initial = (name && name.trim()? name.trim().charAt(0) : 'C').toUpperCase();
-  const canvas = document.createElement('canvas');
-  canvas.width=120; canvas.height=120;
-  const ctx=canvas.getContext('2d');
-  // background
-  ctx.fillStyle='#2d1c4e';
-  ctx.fillRect(0,0,120,120);
-  // text
-  ctx.fillStyle='#d8b4fe';
-  ctx.font='bold 60px Inter, sans-serif';
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText(initial,60,60);
-  return canvas.toDataURL();
-}
-
-function sanitizeEmailKey(email){ return email.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_'); }
-
-function getAllClientKeys(){
-  const stores=[localStorage,sessionStorage];
-  const emailKeys=['clientEmail','lcg_client_email','email','userEmail','client_email','pendingGoogleEmail'];
-  const phoneKeys=['clientPhone','lcg_client_phone','phone','client_phone','userPhone','clientPhoneBig'];
-  const nameKeys=['clientName','fullName','displayName','client_fullName','userName','name','client_name','pendingGoogleName','clientNameBig'];
-  const uidKeys=['clientUid','lcg_client_uid','currentClientId','lcg_uid','uid','clientId','clientUidBig'];
-  const photoKeys=['clientPhoto','clientPhotoUrl','photoUrl','client_photo','avatar','profilePhoto','clientPhotoBig','pendingGooglePhoto','photo'];
-  for(const store of stores){
-    try{
-      for(const k of emailKeys){ const v=store.getItem(k); if(v&&v.includes('@')&&!clientEmail) clientEmail=v.trim().toLowerCase(); }
-      for(const k of phoneKeys){ const v=store.getItem(k); if(v&&v.replace(/\D/g,'').length>=9&&!clientPhone) clientPhone=v; }
-      for(const k of nameKeys){ const v=store.getItem(k); if(v&&v.length>2&&(!clientName||clientName==='Client')) clientName=v; }
-      for(const k of uidKeys){ const v=store.getItem(k); if(v&&!clientUid) clientUid=v; }
-      for(const k of photoKeys){ const v=store.getItem(k); if(v&&(v.startsWith('http')||v.startsWith('data:'))&&!clientPhoto) clientPhoto=v; }
-    }catch(e){}
-  }
-  const user=auth.currentUser;
-  if(user){
-    if(user.email&&!clientEmail) clientEmail=user.email.toLowerCase();
-    if(user.displayName&&(!clientName||clientName==='Client')) clientName=user.displayName;
-    if(user.uid&&!clientUid) clientUid=user.uid;
-    if(user.photoURL&&!clientPhoto) clientPhoto=user.photoURL;
-  }
-}
-
-async function fetchClientFromFirebase(){
-  try{
-    // Try by UID
-    if(clientUid){
-      try{
-        const snap=await get(ref(db,'clients/'+clientUid));
-        if(snap.exists()){
-          const v=snap.val(); const real=v.profile||v;
-          if(real.fullName||real.name||v.fullName||v.name) clientName=real.fullName||real.name||v.fullName||v.name||clientName;
-          if(real.email||v.email) clientEmail=(real.email||v.email||clientEmail).toLowerCase();
-          if(real.phone||v.phone) clientPhone=real.phone||v.phone||clientPhone;
-          if(real.photoUrl||real.photo||v.photoUrl||real.clientPhotoUrl||v.clientPhotoUrl) clientPhoto=real.photoUrl||real.photo||v.photoUrl||real.clientPhotoUrl||v.clientPhotoUrl||clientPhoto;
-          if(clientPhoto) return true;
-        }
-      }catch(e){}
-    }
-    // Try allowedClients by sanitized email
-    if(clientEmail){
-      const key=sanitizeEmailKey(clientEmail);
-      const paths=[
-        'allowedClients/'+key,
-        'clientRegistrations/'+key,
-        'client_registrations/'+key,
-        'clients/'+key
-      ];
-      for(const p of paths){
-        try{
-          const s=await get(ref(db,p));
-          if(s.exists()){
-            const v=s.val(); const real=v.profile||v;
-            if(real.fullName||real.name||v.fullName||v.name) clientName=real.fullName||real.name||v.fullName||v.name||clientName;
-            if(real.phone||v.phone) clientPhone=real.phone||v.phone||clientPhone;
-            if(real.photoUrl||real.photo||v.photoUrl||real.clientPhotoUrl||v.clientPhotoUrl||v.photo) clientPhoto=real.photoUrl||real.photo||v.photoUrl||real.clientPhotoUrl||v.clientPhotoUrl||v.photo||clientPhoto;
-            if(real.email) clientEmail=real.email.toLowerCase()||clientEmail;
-            return true;
-          }
-        }catch(e){}
-      }
-      // Search by email in clients node
-      try{
-        const snap=await get(ref(db,'clients'));
-        if(snap.exists()){
-          let found=false;
-          snap.forEach(ch=>{
-            const v=ch.val()||{}; const real=v.profile||v;
-            const em=(real.email||v.email||real.clientEmail||'').toLowerCase();
-            if(em===clientEmail){
-              if(real.fullName||real.name||v.fullName) clientName=real.fullName||real.name||v.fullName||clientName;
-              if(real.phone||v.phone) clientPhone=real.phone||v.phone||clientPhone;
-              if(real.photoUrl||real.photo||v.photoUrl||v.clientPhotoUrl) clientPhoto=real.photoUrl||real.photo||v.photoUrl||v.clientPhotoUrl||clientPhoto;
-              found=true;
-            }
-          });
-          if(found) return true;
-        }
-      }catch(e){}
-    }
-  }catch(e){}
-  return false;
-}
-
-window.loadClientByEmail=async function(){
-  const input=document.getElementById('manualEmailInput');
-  const email=input.value.trim().toLowerCase();
-  if(!email||!email.includes('@')){ alert('Enter valid email'); return; }
-  clientEmail=email;
-  localStorage.setItem('clientEmail',email);
-  document.getElementById('clientEmailBig').textContent='Loading '+email+'...';
-  const ok=await fetchClientFromFirebase();
-  renderClientHeader();
-  if(ok){ alert('[OK] Loaded: '+clientName); loadBookings(); }else{ alert('[X] Not found in database, but email saved. Try booking.'); }
-}
-
-function renderClientHeader(){
-  const nameEl=document.getElementById('clientNameBig');
-  const emailEl=document.getElementById('clientEmailBig');
-  const phoneEl=document.getElementById('clientPhoneBig');
-  const photoEl=document.getElementById('clientPhotoBig');
-  const statusEl=document.getElementById('clientStatusBadge');
-  const inputBox=document.getElementById('emailInputBox');
-  nameEl.textContent=clientName||'Client';
-  if(clientEmail){
-    emailEl.textContent=clientEmail;
-    statusEl.textContent='* Verified - Photo Email Phone Saved - '+clientEmail.split('@')[0];
-    statusEl.style.background='rgba(34,197,94,.15)';statusEl.style.color='#86efac';
-    inputBox.style.display='none';
-  }else{
-    emailEl.textContent='Email not set';
-    statusEl.textContent='* Enter email below';
-    statusEl.style.background='rgba(239,68,68,.15)';statusEl.style.color='#fca5a5';
-    inputBox.style.display='block';
-  }
-  phoneEl.textContent=clientPhone||'Phone not set';
-  if(clientPhoto && (clientPhoto.startsWith('http')||clientPhoto.startsWith('data:'))){
-    photoEl.src=clientPhoto;
-  }else{
-    // Always show something - local avatar
-    photoEl.src=makeInitialAvatar(clientName);
-  }
-  // If image fails to load, fallback to initials
-  photoEl.onerror=()=>{ photoEl.src=makeInitialAvatar(clientName); photoEl.onerror=null; };
-}
-
-async function ensureAuth(){return new Promise(r=>{const u=onAuthStateChanged(auth,async usr=>{u();if(usr){r(usr);}else{try{const c=await signInAnonymously(auth);r(c.user);}catch{r(null);}}});setTimeout(()=>r(null),3000);});}
-function getNavUrl(b,nLat,nLng){const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;return `https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;}
-function showToast(m){const n=document.getElementById('notifAccept');if(n){document.getElementById('notifTitleA').textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),4000);}else{alert(m);}}
-function showAccept(b,gmaps){const n=document.getElementById('notifAccept');document.getElementById('notifTitleA').textContent=`[OK] ${b.nurseName||'Nurse'} Accepted! Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifMsgA').textContent=`${b.nurseName||'Nurse'} accepted ${b.bookingId||b.id} on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}`;document.getElementById('notifNavA').href=gmaps;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),15000);}
-function showReject(b){const n=document.getElementById('notifReject');document.getElementById('notifMsgR').textContent=`Booking ${b.bookingId||b.id} rejected on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}. Reason: ${b.rejectReason||'Not available'}. Book another or increase rate.`;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),15000);}
-function initMapLive(id,booking){
-  const el=document.getElementById('mapInner_'+id);if(!el)return;if(maps[id]){try{maps[id].remove();}catch(e){}}
-  const cLat=booking.clientLat||5.6037;const cLng=booking.clientLng||-0.1870;
-  const map=L.map('mapInner_'+id,{zoomControl:true}).setView([cLat,cLng],14);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:' OSM'}).addTo(map);maps[id]=map;
-  const cIcon=L.divIcon({className:'',html:'<div style="width:20px;height:20px;background:#2563eb;border:3px solid white;border-radius:50%"></div>',iconSize:[20,20],iconAnchor:[10,10]});
-  L.marker([cLat,cLng],{icon:cIcon}).addTo(map).bindPopup(` ${booking.clientName||clientName} - Your Location - Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}`).openPopup();
-  const nurseId=booking.nurseId;
-  const updateNurse=(nLat,nLng,isLive)=>{
-    if(markers[id]){try{map.removeLayer(markers[id]);}catch(e){}}
-    const html=isLive?`<div style="position:relative;width:30px;height:30px"><div style="position:absolute;top:50%;left:50%;width:30px;height:30px;background:rgba(34,197,94,.3);border-radius:50%;transform:translate(-50%,-50%)"></div><div style="position:absolute;top:50%;left:50%;width:16px;height:16px;background:#22c55e;border:2px solid white;border-radius:50%;transform:translate(-50%,-50%)"></div></div>`:`<div style="width:16px;height:16px;background:#22c55e;border:2px solid white;border-radius:50%"></div>`;
-    const icon=L.divIcon({className:'',html,iconSize:[30,30],iconAnchor:[15,15]});
-    markers[id]=L.marker([nLat,nLng],{icon}).addTo(map).bindPopup(`Nurse ${booking.nurseName||'Nurse'} ${isLive?'- LIVE - '+new Date().toLocaleTimeString('en-GH',{timeZone:'Africa/Accra'}):''}`);
-    try{map.fitBounds([[nLat,nLng],[cLat,cLng]],{padding:[40,40]});}catch(e){}
-  };
-  get(ref(db,'nurses/'+nurseId)).then(s=>{if(s.exists()){const v=s.val();if(v.lat&&v.lng) updateNurse(v.lat,v.lng,false);else if(v.latitude&&v.longitude) updateNurse(v.latitude,v.longitude,false);}});
-  onValue(ref(db,'nurseLocations/'+nurseId),(snap)=>{if(snap.exists()){const v=snap.val();const lat=v.lat||v.latitude;const lng=v.lng||v.longitude;if(lat&&lng) updateNurse(lat,lng,true);}});
-}
-
-window.loadBookings=async function(){
-  getAllClientKeys();renderClientHeader();setRealDate();
-  await ensureAuth();getAllClientKeys();await fetchClientFromFirebase();renderClientHeader();
-  const list=document.getElementById('list');list.innerHTML='<div class="card" style="text-align:center;color:#a78bfa">[RED] Loading LIVE bookings for '+(clientName||'Client')+' on '+new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})+'...<br><small>'+(clientEmail||'No email')+' | '+(clientPhone||'No phone')+' | '+(clientUid||'No UID')+'</small></div>';
-  let map={};
-  // FIX: Check ALL possible booking locations including clientBookings/{uid}
-  const paths=['bookings','ceoBookings','allBookings','nurseBookings'];
-  for(const p of paths){try{const snap=await get(ref(db,p));if(snap.exists()){snap.forEach(ch=>{const v=ch.val();const id=ch.key;if(id==='LCG-20251016-ABC123'||v.bookingId==='LCG-20251016-ABC123'||v.paystackRef==='DEMO-REF') return;const phoneA=(v.phone||v.clientPhone||'').replace(/[^0-9]/g,'').slice(-9);const phoneB=(clientPhone||'').replace(/[^0-9]/g,'').slice(-9);const phoneMatch=phoneA&&phoneB&&phoneA===phoneB;const emailMatch=(v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase())||(v.clientEmail&&clientEmail&&v.clientEmail.toLowerCase()===clientEmail.toLowerCase());const uidMatch=(v.clientId&&clientUid&&v.clientId===clientUid)||(v.clientUid&&clientUid&&v.clientUid===clientUid);if(phoneMatch||emailMatch||uidMatch){if(!map[id]||(v.time||0)>(map[id].time||0)) map[id]={...v,id};}});}}catch(e){console.log('load path err',p,e);}}
-  // FIX: Directly check clientBookings/{uid} - most reliable
-  if(clientUid){
-    try{
-      const snap=await get(ref(db,'clientBookings/'+clientUid));
-      if(snap.exists()){
-        snap.forEach(ch=>{const v=ch.val();const id=ch.key;if(!map[id]||(v.time||0)>(map[id].time||0)) map[id]={...v,id};});
-      }
-    }catch(e){}
-    // Also check by emailKey
-    if(clientEmail){
-      try{
-        const key=clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
-        const snap2=await get(ref(db,'clientBookings/'+key));
-        if(snap2.exists()){
-          snap2.forEach(ch=>{const v=ch.val();const id=ch.key;if(!map[id]) map[id]={...v,id};});
-        }
-      }catch(e){}
-    }
-  }
-  let arr=Object.values(map);
-  if(arr.length===0){all=[];render();return;}
-  arr.forEach(b=>{const curr=(b.status||'pending').toLowerCase();const previous=prev[b.id];if(previous&&previous!==curr){const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;if(curr==='accepted'){get(ref(db,'nurses/'+b.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const v=s.val();nLat=v.lat||v.latitude||nLat;nLng=v.lng||v.longitude||nLng;}const gmaps=getNavUrl(b,nLat,nLng);showAccept(b,gmaps);if(confirm(`[OK] ${b.nurseName||'Nurse'} ACCEPTED ${b.bookingId||b.id}! Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nOpen Google Maps now?`)){window.open(gmaps,'_blank');}});}else if(curr==='rejected'){showReject(b);}}prev[b.id]=curr;});
-  if(all.length===0) arr.forEach(b=>prev[b.id]=(b.status||'pending').toLowerCase());
-  all=arr.sort((a,b)=>(b.time||0)-(a.time||0));
-  // Save client photo into booking so nurse can see it
-  for(const b of all){if(!b.clientName||!b.clientPhotoUrl){const upd={clientName:clientName||b.clientName||'Client',clientPhotoUrl:clientPhoto||'',hasClientPhoto:!!clientPhoto,clientVisibleToNurse:true};try{await update(ref(db,'bookings/'+b.id),upd);}catch(e){}}}
-  render();
-};
-
-function render(){
-  const filter=document.getElementById('filterStatus').value;
-  const list=document.getElementById('list');const count=document.getElementById('countInfo');const empty=document.getElementById('emptyState');
-  let filtered=all;if(filter!=='all') filtered=all.filter(b=>(b.status||'pending').toLowerCase()===filter);
-  const todayStr=new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'});
-  count.textContent=`${filtered.length} ${filter} - LIVE - ${todayStr} - ${clientName}`;
-  if(!filtered.length){list.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-  list.innerHTML=filtered.map(b=>{
-    const status=(b.status||'pending').toLowerCase();const isAccepted=status==='accepted';const isRejected=status==='rejected';
-    const badgeClass=isAccepted?'badge-accepted':isRejected?'badge-rejected':'badge-pending';
-    const payType = (b.paymentType||b.paymentMethod||'').toLowerCase();
-    const isHalf = payType.includes('50') || (b.status||'').includes('50');
-    const payBadge = isHalf ? '50% HALF' : '100% FULL';
-    const payColor = isHalf ? 'rgba(250,204,21,.15)' : 'rgba(34,197,94,.15)';
-
-    const curr=b.currency||'GHS';
-    // Client photo - priority: booking photo > global clientPhoto > initials
-    const rawPhoto=b.clientPhotoUrl||b.clientPhoto||clientPhoto||'';
-    const cPhoto=rawPhoto||makeInitialAvatar(b.clientName||clientName);
-    const cName=b.clientName||clientName||'Client';
-    const cLat=b.clientLat||5.6037;const cLng=b.clientLng||-0.1870;
-    const bookingRealDate=new Date(b.time||Date.now()).toLocaleDateString('en-GH',{timeZone:'Africa/Accra'});
-    const bookingRealTime=new Date(b.time||Date.now()).toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Africa/Accra'});
-    const gmapsUrl=`https://www.google.com/maps/dir/?api=1&origin=${cLat+0.01},${cLng+0.01}&destination=${cLat},${cLng}&travelmode=driving`;
-    const clientGmaps=`https://www.google.com/maps?q=${cLat},${cLng}`;
-    const follow=isAccepted?`<div class="followBox followAccepted">[OK] LIVE Accepted - ${b.nurseName||'Nurse'} is coming - Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}<br> Client: ${cName} - Photo saved [OK]</div>`:isRejected?`<div class="followBox followRejected">[X] Rejected on ${bookingRealDate} - Reason: ${b.rejectReason||'Not available'} - Try increase rate</div>`:`<div class="followBox followPending"> Pending - Waiting for nurse - Real Date: ${todayStr} - Client photo visible to nurse: ${rawPhoto?'[OK] Yes':'[X] No'}</div>`;
-    return `<div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <div style="display:flex;gap:10px;align-items:center">
-          <img src="${cPhoto}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(168,85,247,.3)" onerror="this.src='${makeInitialAvatar(cName)}'">
-          <div><b style="font-size:13px">${b.bookingId||b.id} <span style="font-size:8px;color:#22c55e">LIVE REAL DATE</span></b><br><span class="badge ${badgeClass}">${status.toUpperCase()} - ${bookingRealDate}</span><br><span style="font-size:10px;color:#a78bfa"> ${cName} - ${bookingRealTime} - Real Time</span></div>
-        </div>
-        <div style="text-align:right"><small style="color:#86efac;font-weight:900">${curr} ${b.amount||0}</small><br><small style="font-size:8px;color:#facc15">[DATE] ${bookingRealDate}</small><br><small style="font-size:8px;color:#6b7280">${bookingRealTime}</small></div>
-      </div>
-      ${follow}
-      <div id="map_${b.id}" class="mapWrap" style="display:${isAccepted?'block':'none'}"><div id="mapInner_${b.id}" style="width:100%;height:100%"></div></div>
-      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        ${!isAccepted && !isRejected ? `<button class="btn btnRed" onclick="cancelBooking('${b.id}')" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:white;font-weight:900">❌ CANCEL Booking — Before Nurse Accepts</button><button class="btn btnBlue" onclick="loadBookings()">🔄 RELOAD — Check Accept/Reject</button>` : ''}
-        ${isAccepted ? `<a href="${gmapsUrl}" target="_blank" class="btn btnGreen">🗺️ MAP Open Maps - Track Nurse</a><button class="btn btnBlue" onclick="initMapLive('${b.id}',all.find(x=>x.id==='${b.id}'))">🔄 RELOAD Refresh Live</button><a href="tel:${b.nursePhone||''}" class="btn" style="background:rgba(255,255,255,.08);border:1px solid rgba(168,85,247,.2);color:#d8b4fe">📞 Call Nurse</a><a href="${clientGmaps}" target="_blank" class="btn btnBlue" style="background:#3b82f6">📍 Client Location</a>` : ''}
-        ${isRejected ? `<div style="background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);padding:10px;border-radius:10px;font-size:12px;font-weight:700;text-align:center">❌ REJECTED by ${b.nurseName||'Nurse'} on ${new Date(b.rejectedAt||Date.now()).toLocaleString('en-GH')} — Book another nurse</div>` : ''}
-      </div>
-      ${isAccepted ? `<div style="margin-top:10px;display:grid;gap:10px"><div style="background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3);padding:12px;border-radius:12px;font-size:12px;font-weight:800;text-align:center">✅ ACCEPTED by ${b.nurseName||'Nurse'} on ${new Date(b.acceptedAt||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'})} — Nurse is coming! Track on map below</div><button class="btn btnYellow" onclick="confirmFinished('${b.id}')">[OK] Confirm Nurse Finished — Real Date: ${new Date().toLocaleDateString('en-GH',{timeZone:'Africa/Accra'})}</button><button class="btn btnRed" onclick="complainNurse('${b.id}')">! Complain About ONLY This Nurse ${b.nurseName||'Nurse'}</button></div>` : ''}
-      ${!isAccepted && !isRejected ? `<div style="margin-top:10px;display:grid;gap:10px"><div style="background:rgba(245,158,11,.12);color:#fde68a;border:1px solid rgba(245,158,11,.3);padding:10px;border-radius:10px;font-size:11px;text-align:center">⏳ PENDING — Waiting for ${b.nurseName||'Nurse'} to ACCEPT or REJECT — You can CANCEL now before nurse accepts — Auto-refreshes every 5 sec</div></div>` : ''}
-      ${isRejected?`<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><a href="book-nurse.html" class="btn btnYellow">+ Book Another Nurse</a><a href="book-nurse.html?increaseRate=true" class="btn btnGreen">💰 Increase Rate & Book Again</a><a href="refund-query.html?bookingId=${b.id}" class="btn" style="background:rgba(250,204,21,.15);color:#facc15;border:1px solid rgba(250,204,21,.3)">💸 Refund Query</a></div>`:''}
-    </div>`;
-  }).join('');
-  setTimeout(()=>{filtered.filter(b=>(b.status||'').toLowerCase()==='accepted').forEach(b=>initMapLive(b.id,b));},500);
-}
-
-
-window.cancelBooking=async function(id){
-  const b=all.find(x=>x.id===id);
-  if(!b){alert('Booking not found');return;}
-  const s=(b.status||'pending').toLowerCase();
-  if(s==='accepted'){alert('❌ Cannot cancel — Already ACCEPTED by nurse. Nurse is coming. If emergency, call nurse or complain.');return;}
-  if(s==='rejected'){alert('Already rejected');return;}
-  if(!confirm(`CANCEL this booking?\n\nNurse: ${b.nurseName||'Nurse'}\nAmount: ${b.currency||'GHS'} ${b.amount}\nPatient: ${b.patientName||''}\n\nReal Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nThis will set status to CANCELLED and nurse will see it.`)) return;
-  if(!confirm('Are you SURE you want to CANCEL? This cannot be undone. Nurse will be notified.')) return;
-  try{
-    const now=Date.now();
-    const cancelData={status:'cancelled_by_client', cancelledAt:now, cancelledAtStr:new Date().toLocaleString('en-GH'), cancelledBy:'client', clientCancelled:true};
-    await update(ref(db,'bookings/'+id),cancelData);
-    try{await update(ref(db,'ceoBookings/'+id),cancelData);}catch(e){}
-    try{await update(ref(db,'allBookings/'+id),cancelData);}catch(e){}
-    try{await update(ref(db,'myJobOffers/'+b.nurseId+'/'+id),cancelData);}catch(e){}
-    try{await update(ref(db,'nurseBookings/'+b.nurseId+'/'+id),cancelData);}catch(e){}
-    if(clientUid){
-      try{await update(ref(db,'clientBookings/'+clientUid+'/'+id),cancelData);}catch(e){}
-    }
-    if(clientEmail){
-      try{
-        const key=clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
-        await update(ref(db,'clientBookings/'+key+'/'+id),cancelData);
-      }catch(e){}
-    }
-    alert('✅ CANCELLED on '+new Date().toLocaleString('en-GH')+' — Nurse will see CANCELLED in My Job Offers');
-    loadBookings();
-  }catch(e){alert('Cancel error: '+e.message);}
-};
-
-window.confirmFinished=async function(id){
-  const b=all.find(x=>x.id===id);if(!b){alert('Booking not found');return;}
-  if(b.clientConfirmed){alert('Already confirmed on '+new Date(b.clientConfirmedAt||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'}));return;}
-  if(!confirm(`CONFIRM FINISHED? Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}\n\nNurse: ${b.nurseName}\nAmount: ${b.currency||'GHS'} ${b.amount}\nClient: ${b.clientName||clientName}\nBooking Date: ${new Date(b.time||Date.now()).toLocaleString('en-GH',{timeZone:'Africa/Accra'})}`))return;
-  const c=prompt('Type CONFIRM to release payment:');if(c!=='CONFIRM'&&c!=='confirm'){alert('Cancelled');return;}
-  try{const now=Date.now();const payType=b.paymentType||(b.paymentMethod&&b.paymentMethod.includes('50')?'50_percent':'full');const lively=payType.includes('50')?parseFloat(b.amount||0)*0.3:parseFloat(b.amount||0)*0.8;const upd={clientConfirmed:true,clientConfirmedAt:now,clientConfirmedAtStr:new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'}),status:'client_confirmed_finished',finished:true,livelyAmount:lively};await update(ref(db,'bookings/'+id),upd);try{await update(ref(db,'ceoBookings/'+id),upd);}catch(e){}alert(`[OK] LIVE Confirmed on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}! ${b.currency||'GHS'} ${lively.toFixed(2)} released to ${b.nurseName}`);loadBookings();}catch(e){alert('Error: '+e.message);}
-};
-window.complainNurse=function(id){
-  const b=all.find(x=>x.id===id);if(!b){alert('Booking not found');return;}
-  const p=new URLSearchParams({bookingId:b.id,bookingIdFull:b.bookingId||b.id,nurseName:b.nurseName||'Nurse',nurseId:b.nurseId||'',nursePhone:b.nursePhone||'',nursePhotoUrl:b.nursePhotoUrl||'',clientName:b.clientName||clientName||'Client',clientId:b.clientId||clientUid||'',clientPhone:b.phone||clientPhone||'',clientEmail:b.clientEmail||clientEmail||'',clientPhotoUrl:b.clientPhotoUrl||clientPhoto||'',amount:b.amount||0,currency:b.currency||'GHS',patientName:b.patientName||'',patientPhone:b.patientPhone||'',patientLocation:b.patientLocation||'',paystackRef:b.paystackRef||'',bookingTime:b.time||Date.now(),realDate:new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})});
-  if(confirm(`Complain about ${b.nurseName}? Real Date: ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})} - Go to client-complaint.html LIVE with Photo Email Phone + Time?`)){location.href=`client-complaint.html?${p.toString()}`;}
-};
-function startRealtimeLive(){
-  // FIX: Also listen to clientBookings for instant accept/reject updates
-  if(clientUid){
-    try{
-      onValue(ref(db,'clientBookings/'+clientUid),(snap)=>{
-        if(!snap.exists()) return;
-        let changed=false;
-        snap.forEach(ch=>{
-          const v=ch.val(); const id=ch.key;
-          const idx=all.findIndex(x=>x.id===id);
-          if(idx!==-1){
-            const curr=(v.status||'').toLowerCase();
-            const prevStatus=prev[id];
-            if(prevStatus && prevStatus!==curr){
-              if(curr==='accepted'){
-                const cLat=v.clientLat||5.6037;const cLng=v.clientLng||-0.1870;
-                get(ref(db,'nurses/'+v.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const vv=s.val();nLat=vv.lat||vv.latitude||nLat;nLng=vv.lng||vv.longitude||nLng;}const gmaps=getNavUrl(v,nLat,nLng);showAccept({...v,id},gmaps);});
-              }else if(curr==='rejected'){showReject({...v,id});}
-              else if(curr==='cancelled_by_client'){showToast('Booking cancelled');}
-            }
-            prev[id]=curr;
-            all[idx]={...v,id};
-            changed=true;
-          }
-        });
-        if(changed){render();}
-      });
-    }catch(e){}
-  }
-  
-  onValue(ref(db,'bookings'),(snap)=>{
-    if(!snap.exists())return;let changed=false;
-    snap.forEach(ch=>{
-      const v=ch.val();const id=ch.key;if(id==='LCG-20251016-ABC123'||v.bookingId==='LCG-20251016-ABC123') return;
-      const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
-      const emailMatch=(v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase())||(v.clientEmail&&clientEmail&&v.clientEmail.toLowerCase()===clientEmail.toLowerCase());
-      if(phoneMatch||emailMatch){
-        const curr=(v.status||'').toLowerCase();const prevStatus=prev[id];
-        if(prevStatus&&prevStatus!==curr){
-          const cLat=v.clientLat||5.6037;const cLng=v.clientLng||-0.1870;
-          if(curr==='accepted'){
-            get(ref(db,'nurses/'+v.nurseId)).then(s=>{let nLat=cLat+0.01,nLng=cLng+0.01;if(s.exists()){const vv=s.val();nLat=vv.lat||vv.latitude||nLat;nLng=vv.lng||vv.longitude||nLng;}const gmaps=getNavUrl(v,nLat,nLng);showAccept({...v,id},gmaps);if(confirm(`[OK] ${v.nurseName||'Nurse'} ACCEPTED on ${new Date().toLocaleString('en-GH',{timeZone:'Africa/Accra'})}!\n\nOpen Google Maps now?`)){window.open(gmaps,'_blank');}});
-          }else if(curr==='rejected'){showReject({...v,id});}
-        }
-        prev[id]=curr;const idx=all.findIndex(x=>x.id===id);if(idx===-1){all.unshift({...v,id});changed=true;}else{all[idx]={...v,id};changed=true;}
-      }
+async function ensureAuth(){
+  return new Promise(res=>{
+    onAuthStateChanged(auth, user=>{
+      if(user){ clientUid=user.uid; clientEmail=user.email||clientEmail; localStorage.setItem('lcg_client_uid', user.uid); }
+      res();
     });
-    if(changed){all.sort((a,b)=>(b.time||0)-(a.time||0));render();}
+    setTimeout(res,1500);
   });
 }
-window.addEventListener('DOMContentLoaded',async()=>{
-  setRealDate();
-  getAllClientKeys();renderClientHeader();
-  await ensureAuth();getAllClientKeys();await fetchClientFromFirebase();renderClientHeader();
-  loadBookings();startRealtimeLive();
-  setTimeout(()=>{getAllClientKeys();renderClientHeader();},1500);
-  // REAL DATE auto-updates every second + every day automatically
-  setInterval(setRealDate,1000);
-  // Extra safety: also check at midnight
-  setInterval(()=>{
-    const now=new Date();
-    if(now.getHours()===0 && now.getMinutes()===0 && now.getSeconds()<2){
-      setRealDate(); loadBookings();
+
+function render(){
+  const list=document.getElementById('bookingsList');
+  const empty=document.getElementById('emptyBookings');
+  const countInfo=document.getElementById('countInfo');
+  
+  // Filter out completed that are older than needed? No, show completed with date/time
+  const activeBookings=all.filter(b=>{
+    const s=(b.status||'').toLowerCase();
+    // Show all except cancelled that are very old? Actually show all, but completed marked differently
+    return true;
+  });
+  
+  countInfo.textContent=`${activeBookings.length} bookings — ${all.filter(b=> (b.status||'').toLowerCase().includes('client_confirmed')|| (b.status||'').toLowerCase()==='completed').length} completed`;
+  
+  if(activeBookings.length===0){
+    list.style.display='none';
+    empty.style.display='block';
+    return;
+  }
+  empty.style.display='none';
+  list.style.display='grid';
+  
+  list.innerHTML=activeBookings.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0)).map(b=>{
+    const s=(b.status||'pending').toLowerCase();
+    let badgeClass='badge-pending', badgeText='⏳ PENDING';
+    if(s==='accepted'){ badgeClass='badge-accepted'; badgeText='✅ ACCEPTED'; }
+    else if(s.includes('on_the_way')){ badgeClass='badge-accepted'; badgeText='🚗 ON THE WAY'; }
+    else if(s.includes('close')){ badgeClass='badge-accepted'; badgeText='📍 CLOSE'; }
+    else if(s==='rejected'){ badgeClass='badge-rejected'; badgeText='❌ REJECTED'; }
+    else if(s.includes('client_confirmed')||s==='completed'||s==='finished'){ badgeClass='badge-confirmed'; badgeText='✅ WORK COMPLETED'; }
+    else if(s.includes('cancelled')){ badgeClass='badge-rejected'; badgeText='🚫 CANCELLED'; }
+    
+    const timeStr=b.time?new Date(b.time).toLocaleString('en-GH'): (b.createdAt?new Date(b.createdAt).toLocaleString('en-GH'):'');
+    const completedTime=b.clientConfirmedAt?new Date(b.clientConfirmedAt).toLocaleString('en-GH'): (b.completedAt?new Date(b.completedAt).toLocaleString('en-GH'):'');
+    const isCompleted=s.includes('client_confirmed')||s==='completed'||s==='finished';
+    const isAccepted=s==='accepted'||s.includes('on_the_way')||s.includes('close');
+    
+    return `<div class="card" style="${isCompleted?'border:2px solid #22c55e;background:linear-gradient(135deg,rgba(28,18,56,.92),rgba(20,40,20,.5))':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+        <div><b style="font-size:13px">Booking: ${b.bookingId||b.id}</b><br><span class="badge ${badgeClass}" style="margin-top:6px">${badgeText}</span></div>
+        <div style="text-align:right"><small style="font-size:10px;color:#a78bfa">${timeStr}</small><br><small style="font-size:9px;color:#6b7280">ID: ${(b.bookingId||b.id).slice(-8)}</small></div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;line-height:1.6">
+        <div>👩‍⚕️ Nurse: <b>${b.nurseName||'Nurse'}</b> ${b.nursePhone?`• <a href="tel:${b.nursePhone}" style="color:#60a5fa">${b.nursePhone}</a>`:''}</div>
+        <div>📍 Location: ${b.patientLocation||b.clientLocation||'N/A'}</div>
+        <div>💰 Amount: <b>${b.currency||'GHS'} ${b.amount||0}</b> • ${b.paymentType||b.paymentMethod||'Full'}</div>
+        ${isCompleted?`<div class="completedBox"><div style="font-size:11px;color:#86efac">✅ <b>Work Completed with Date/Time</b></div><div style="font-size:12px;margin-top:4px">📅 Completed on: <b>${b.clientConfirmedAtStr||completedTime}</b></div><div style="font-size:10px;color:#a78bfa;margin-top:2px">Accepted notification removed • Marked as completed • Nurse notified with congrats message • CEO received progress</div><div style="margin-top:8px;display:flex;gap:6px"><button class="btn btnYellow" style="flex:none;padding:8px 12px;min-height:36px" onclick="rateNurse('${b.id}')">⭐ Rate Nurse ${b.nurseName||''}</button><button class="btn btnGray" style="flex:none;padding:8px 12px;min-height:36px" onclick="viewCompletedDetails('${b.id}')">📄 Details</button></div></div>`:''}
+      </div>
+      ${!isCompleted?`<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        ${isAccepted?`<button class="btn btnGreen" onclick="confirmWorkCompleted('${b.id}')">✅ Confirm Work Completed</button><button class="btn btnBlue" onclick="nurseOnTheWay('${b.id}')">🚗 Nurse On The Way?</button>`:''}
+        ${s==='pending'?`<button class="btn btnRed" onclick="cancelBooking('${b.id}')">❌ Cancel</button><span style="font-size:10px;color:#a78bfa;padding:12px">Waiting for nurse to accept...</span>`:''}
+        ${s==='rejected'?`<div style="background:rgba(239,68,68,.1);padding:8px 12px;border-radius:10px;font-size:11px;color:#fca5a5">❌ Nurse rejected — Look for another nurse or increase payment rate<br><button class="btn btnYellow" style="margin-top:6px" onclick="rebook('${b.id}')">🔄 Rebook</button></div>`:''}
+        <button class="btn btnGray" onclick="viewBooking('${b.id}')">📄 View</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function loadBookings(){
+  getKeys();
+  all=[];
+  try{
+    // Load from bookings where phone/email matches
+    const snap=await get(ref(db,'bookings'));
+    if(snap.exists()){
+      snap.forEach(ch=>{
+        const v=ch.val();
+        const id=ch.key;
+        if(id==='LCG-20251016-ABC123') return;
+        const phoneMatch=v.phone&&clientPhone&&v.phone.replace(/[^0-9]/g,'').slice(-9)===clientPhone.replace(/[^0-9]/g,'').slice(-9);
+        const emailMatch=(v.email&&clientEmail&&v.email.toLowerCase()===clientEmail.toLowerCase())||(v.clientEmail&&clientEmail&&v.clientEmail.toLowerCase()===clientEmail.toLowerCase());
+        const uidMatch=v.clientId&&clientUid&&v.clientId===clientUid;
+        if(phoneMatch||emailMatch||uidMatch){
+          all.push({...v, id, bookingId:v.bookingId||id});
+        }
+      });
     }
-  },1000);
+    // Also load from clientBookings
+    if(clientUid){
+      const snap2=await get(ref(db,'clientBookings/'+clientUid));
+      if(snap2.exists()){
+        snap2.forEach(ch=>{
+          const v=ch.val();
+          const id=ch.key;
+          if(!all.find(b=>b.id===id)){
+            all.push({...v, id, bookingId:v.bookingId||id});
+          } else {
+            const idx=all.findIndex(b=>b.id===id);
+            all[idx]={...all[idx], ...v};
+          }
+        });
+      }
+    }
+  }catch(e){ console.log('Load error', e); }
+  render();
+}
+
+window.confirmWorkCompleted=async function(id){
+  const b=all.find(x=>x.id===id);
+  if(!b){ toast('Booking not found'); return; }
+  if(b.clientConfirmed){ toast('Already confirmed on '+(b.clientConfirmedAtStr||new Date(b.clientConfirmedAt).toLocaleString('en-GH'))); return; }
+  
+  if(!confirm(`✅ CONFIRM WORK COMPLETED?\n\nBooking ID: ${b.bookingId||id}\nNurse: ${b.nurseName}\nAmount: ${b.currency||'GHS'} ${b.amount}\n\nThis will:\n1. Remove Accepted notification from My Bookings & My Job Offer\n2. Mark as Work Completed with Date/Time: ${new Date().toLocaleString('en-GH')}\n3. CEO will receive progress (completed)\n4. Send congrats message to nurse with Booking ID\n5. You can rate nurse\n\nConfirm?`)) return;
+  
+  const c=prompt('Type CONFIRM to confirm work is completed:');
+  if(c!=='CONFIRM' && c!=='confirm'){ toast('Cancelled — Type CONFIRM'); return; }
+  
+  try{
+    const now=Date.now();
+    const nowStr=new Date().toLocaleString('en-GH');
+    
+    // 1. Update booking as completed with date/time
+    const completedData={
+      status:'client_confirmed_finished',
+      clientConfirmed:true,
+      clientConfirmedAt:now,
+      clientConfirmedAtStr:nowStr,
+      completedAt:now,
+      completedAtStr:nowStr,
+      workCompleted:true,
+      workCompletedAt:now,
+      workCompletedAtStr:nowStr,
+      finished:true,
+      acceptedRemoved:true, // Flag that accepted notification should be removed
+      livelyAmount: b.livelyAmount || (parseFloat(b.amount||0)*0.8)
+    };
+    
+    // Update in all locations
+    await update(ref(db,'bookings/'+id), completedData);
+    await update(ref(db,'ceoBookings/'+id), completedData).catch(()=>{});
+    await update(ref(db,'allBookings/'+id), completedData).catch(()=>{});
+    
+    if(b.nurseId){
+      await update(ref(db,'myJobOffers/'+b.nurseId+'/'+id), {...completedData, status:'work_completed_by_client', clientConfirmed:true}).catch(()=>{});
+      await update(ref(db,'nurseBookings/'+b.nurseId+'/'+id), completedData).catch(()=>{});
+      await update(ref(db,'myJobOffer/'+b.nurseId+'/'+id), completedData).catch(()=>{});
+    }
+    
+    if(clientUid){
+      await update(ref(db,'clientBookings/'+clientUid+'/'+id), completedData).catch(()=>{});
+    }
+    if(clientEmail){
+      const key=clientEmail.toLowerCase().trim().replace(/[.#$@\[\]]/g,'_');
+      await update(ref(db,'clientBookings/'+key+'/'+id), completedData).catch(()=>{});
+    }
+    
+    // 2. Remove accepted notification - by updating status, UI will hide accepted
+    // Also remove from alerts accepted
+    if(clientUid){
+      try{
+        const alertsSnap=await get(ref(db,'clientAlerts/'+clientUid));
+        if(alertsSnap.exists()){
+          alertsSnap.forEach(ch=>{
+            const a=ch.val();
+            if(a.bookingId===id || a.bookingId===b.bookingId){
+              if((a.type||'').includes('accepted') || (a.title||'').includes('accepted')){
+                // Don't delete, but mark as completed
+                update(ref(db,'clientAlerts/'+clientUid+'/'+ch.key), {status:'completed_removed', read:true}).catch(()=>{});
+              }
+            }
+          });
+        }
+      }catch(e){}
+    }
+    
+    // 3. CEO receives progress - ceoBookings and ceoNotifications
+    await set(ref(db,'ceoNotifications/'+id+'_completed'), {
+      type:'completed',
+      title:`✅ Work Completed — Booking ${b.bookingId||id} — ${b.nurseName}`,
+      message:`Client ${b.clientName||clientName} confirmed work completed for booking ID ${b.bookingId||id} — Nurse: ${b.nurseName} — Amount: ${b.currency||'GHS'} ${b.amount} — Completed on: ${nowStr} — Accepted notification removed — Marked as completed with date/time`,
+      bookingId:b.bookingId||id,
+      nurseId:b.nurseId,
+      nurseName:b.nurseName,
+      clientName:b.clientName||clientName,
+      clientId:clientUid,
+      amount:b.amount,
+      currency:b.currency,
+      completedAt:now,
+      completedAtStr:nowStr,
+      createdAt:now,
+      read:false
+    });
+    
+    await set(ref(db,'ceoNotificationRoom/'+id+'_completed'), {
+      type:'completed',
+      title:`✅ WORK COMPLETED — Booking ${b.bookingId||id} — Client Confirmed`,
+      message:`Client confirmed work completed — Booking ID: ${b.bookingId||id} — Nurse: ${b.nurseName} — Client: ${b.clientName||clientName} — Amount: ${b.currency||'GHS'} ${b.amount} — Completed: ${nowStr} — Work marked completed with date/time — CEO received progress`,
+      bookingId:b.bookingId||id,
+      nurseId:b.nurseId,
+      createdAt:now
+    });
+    
+    // 4. Congrats message to nurse on my-job-offer with booking ID
+    if(b.nurseId){
+      const congratsId='CONGRATS-'+id+'-'+now;
+      const congratsMessage={
+        type:'congratulation',
+        title:`🎉 Congratulations! Work Completed — Booking ${b.bookingId||id}`,
+        message:`🎉 Congratulations Nurse ${b.nurseName}! 🎉\n\nClient ${b.clientName||clientName} has confirmed that work is completed for booking ID: ${b.bookingId||id}\n\n✅ Booking ID: ${b.bookingId||id}\n📅 Completed on: ${nowStr}\n💰 Amount: ${b.currency||'GHS'} ${b.amount}\n👤 Client: ${b.clientName||clientName}\n\n✅ Accepted notification removed from My Bookings & My Job Offer\n✅ Marked as Work Completed with Date/Time: ${nowStr}\n✅ CEO received progress\n\nThank you for your excellent service! You can now request withdrawal.\n\n- LoveCare Global CEO`,
+        bookingId:b.bookingId||id,
+        bookingIdFull:b.bookingId||id,
+        nurseId:b.nurseId,
+        nurseName:b.nurseName,
+        clientName:b.clientName||clientName,
+        amount:b.amount,
+        currency:b.currency,
+        completedAt:now,
+        completedAtStr:nowStr,
+        createdAt:now,
+        read:false,
+        isCongrats:true
+      };
+      
+      // Send to nurse's job offer as congrats
+      await set(ref(db,'nurseNotifications/'+b.nurseId+'/'+congratsId), congratsMessage);
+      await set(ref(db,'nurseJobOfferNotifications/'+b.nurseId+'/'+congratsId), congratsMessage);
+      await set(ref(db,'myJobOffer/'+b.nurseId+'/congrats_'+id), congratsMessage).catch(()=>{});
+      await set(ref(db,'myJobOffers/'+b.nurseId+'/'+id+'/congrats'), congratsMessage).catch(()=>{});
+      
+      // Also update the job offer itself with congrats
+      await update(ref(db,'myJobOffers/'+b.nurseId+'/'+id), {
+        congratsMessage:congratsMessage.message,
+        congratsAt:now,
+        congratsAtStr:nowStr,
+        workCompleted:true,
+        clientConfirmed:true,
+        showCongrats:true
+      }).catch(()=>{});
+      
+      // Send written notification to CEO about congrats sent
+      await set(ref(db,'ceoNotifications/'+congratsId), {
+        type:'congrats_sent',
+        title:`💌 Congrats Sent to Nurse — Booking ${b.bookingId||id}`,
+        message:`Congrats message sent to Nurse ${b.nurseName} for booking ID ${b.bookingId||id} — Work completed on ${nowStr} — Message: Congratulations! Work completed for booking ${b.bookingId||id}`,
+        bookingId:b.bookingId||id,
+        nurseId:b.nurseId,
+        nurseName:b.nurseName,
+        createdAt:now,
+        read:false
+      });
+    }
+    
+    // 5. Client alerts - written notifications
+    if(clientUid){
+      const alertId='COMPLETED-'+id+'-'+now;
+      await set(ref(db,'clientAlerts/'+clientUid+'/'+alertId), {
+        type:'completed',
+        title:`✅ You have confirmed work is completed — Booking ${b.bookingId||id}`,
+        message:`You have confirmed work is completed for booking Id ${b.bookingId||id} with Nurse ${b.nurseName}. Amount: ${b.currency||'GHS'} ${b.amount}. Completed on: ${nowStr}. Accepted notification removed and marked as work completed with date/time. You can rate your nurse now.`,
+        bookingId:b.bookingId||id,
+        nurseName:b.nurseName,
+        amount:b.amount,
+        currency:b.currency,
+        time:now,
+        createdAt:now,
+        read:false,
+        canRate:true
+      });
+      
+      const ratingAlertId='RATING-'+id+'-'+now;
+      await set(ref(db,'clientAlerts/'+clientUid+'/'+ratingAlertId), {
+        type:'rating',
+        title:`⭐ You can rate your nurse ${b.nurseName}`,
+        message:`Work completed for booking Id ${b.bookingId||id}. You can rate your nurse ${b.nurseName} now. Your rating helps other clients. Booking completed on ${nowStr}.`,
+        bookingId:b.bookingId||id,
+        nurseName:b.nurseName,
+        time:now+1000,
+        createdAt:now+1000,
+        read:false
+      });
+    }
+    
+    // 6. Update local
+    const idx=all.findIndex(x=>x.id===id);
+    if(idx!==-1){
+      all[idx]={...all[idx], ...completedData};
+    }
+    
+    render();
+    
+    toast(`✅ Work Completed Confirmed on ${nowStr}! Accepted removed, marked completed, CEO notified, congrats sent to nurse with Booking ID ${b.bookingId||id}`);
+    
+    setTimeout(()=>{
+      if(confirm(`✅ Work completed confirmed!\n\nBooking ID: ${b.bookingId||id}\nCompleted: ${nowStr}\n\nAccepted notification removed from My Bookings & My Job Offer\nMarked as Work Completed with Date/Time\nCEO received progress\nCongrats message sent to nurse with Booking ID\n\nDo you want to rate Nurse ${b.nurseName} now?`)){
+        location.href=`rating.html?bookingId=${b.bookingId||id}&nurseName=${encodeURIComponent(b.nurseName||'Nurse')}&nurseId=${b.nurseId||''}`;
+      }
+    },1000);
+    
+  }catch(e){
+    toast('Error: '+e.message);
+    console.error(e);
+  }
+};
+
+window.viewBooking=function(id){ const b=all.find(x=>x.id===id); alert(`Booking: ${b.bookingId||b.id}\nStatus: ${b.status}\nNurse: ${b.nurseName}\nAmount: ${b.currency||'GHS'} ${b.amount}\nTime: ${new Date(b.time||b.createdAt).toLocaleString('en-GH')}\nCompleted: ${b.clientConfirmedAtStr||'Not yet'}`); };
+window.viewCompletedDetails=function(id){ const b=all.find(x=>x.id===id); alert(`✅ WORK COMPLETED DETAILS\n\nBooking ID: ${b.bookingId||b.id}\nNurse: ${b.nurseName}\nClient: ${b.clientName||clientName}\nAmount: ${b.currency||'GHS'} ${b.amount}\nBooked: ${new Date(b.time||b.createdAt).toLocaleString('en-GH')}\nCompleted: ${b.clientConfirmedAtStr||new Date(b.clientConfirmedAt).toLocaleString('en-GH')}\n\nAccepted notification removed from My Bookings & My Job Offer\nMarked as Work Completed with Date/Time\nCEO received progress\nCongrats sent to nurse with Booking ID`); };
+window.rateNurse=function(id){ const b=all.find(x=>x.id===id); location.href=`rating.html?bookingId=${b.bookingId||b.id}&nurseName=${encodeURIComponent(b.nurseName||'Nurse')}&nurseId=${b.nurseId||''}`; };
+window.cancelBooking=async function(id){
+  const b=all.find(x=>x.id===id);
+  if(!b) return;
+  if((b.status||'').toLowerCase()==='accepted'){ toast('Cannot cancel — Already accepted'); return; }
+  if(!confirm(`Cancel booking ${b.bookingId||id}?`)) return;
+  try{
+    const now=Date.now();
+    const cancelData={status:'cancelled_by_client', cancelledAt:now, cancelledAtStr:new Date().toLocaleString('en-GH')};
+    await update(ref(db,'bookings/'+id), cancelData);
+    await update(ref(db,'ceoBookings/'+id), cancelData).catch(()=>{});
+    toast('Cancelled');
+    loadBookings();
+  }catch(e){ toast(e.message); }
+};
+window.nurseOnTheWay=function(id){ toast('Nurse on the way status will be updated by nurse'); };
+window.rebook=function(id){ location.href='book-nurse.html'; };
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+  getKeys();
+  await ensureAuth();
+  getKeys();
+  loadBookings();
+  setInterval(loadBookings, 10000);
 });
-window.initMapLive=initMapLive;
 </script>
 </body></html>
