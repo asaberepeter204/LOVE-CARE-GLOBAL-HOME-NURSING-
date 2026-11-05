@@ -1,0 +1,243 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Increase Payment - Pay Rest via Paystack - Continue Booking Nurse</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:20px}
+.top{position:sticky;top:0;z-index:20;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px auto;max-width:600px}
+.badge{padding:6px 12px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
+.badge-yellow{background:#facc15;color:#000}
+.badge-green{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+.btn{border:none;border-radius:14px;padding:14px;font-weight:800;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;width:100%;margin-bottom:10px}
+.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}
+.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}
+.btnYellow{background:linear-gradient(135deg,#facc15,#f59e0b);color:#1e0a3a}
+.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.input{width:100%;padding:14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.18);color:#fff;font-size:14px;margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none}
+</style>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head><body>
+<div class="top"><div><b>Increase Payment - Pay Rest via Paystack</b><br><small style="font-size:9px;color:#facc15">When nurse rejects - Increase payment rate to get accepted - Pay via Paystack</small></div><a href="my-bookings.html" style="color:#d8b4fe;text-decoration:none;font-size:11px">My Bookings</a></div>
+
+<div style="max-width:600px;margin:0 auto;padding:10px">
+<div class="card" id="bookingCard">
+<b style="font-size:13px">Booking Details - Rejected Offer - Increase Payment to Continue</b>
+<div id="bookingInfo" style="margin-top:10px;font-size:12px;color:#a78bfa">Loading booking...</div>
+</div>
+
+<div class="card">
+<b>Increase Payment - Pay Extra to Nurse via Paystack</b><br>
+<small style="font-size:10px;color:#a78bfa">Nurse rejected because payment rate low - Increase your payment rate to get accepted - Extra payment goes to nurse - CEO 20% / Nurse 80% applies</small>
+
+<div style="margin-top:14px">
+<label style="font-size:11px;color:#d8b4fe">Current Amount Paid: GHS</label>
+<input id="currentAmount" class="input" type="number" readonly style="opacity:.6">
+</div>
+
+<div>
+<label style="font-size:11px;color:#d8b4fe">Extra Amount to Add - Increase Payment - GHS</label>
+<input id="extraAmount" class="input" type="number" placeholder="Enter extra amount - e.g., 20" value="20" min="5">
+<small style="font-size:9px;color:#facc15">Min GHS 5 - Extra goes to nurse - Pay via Paystack</small>
+</div>
+
+<div style="margin-top:10px;padding:10px;border-radius:12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);font-size:11px">
+<div>Current: <b id="currDisplay">GHS 0</b></div>
+<div>Extra: <b id="extraDisplay">GHS 0</b></div>
+<div style="margin-top:6px;font-size:13px">New Total: <b id="newTotal" style="color:#22c55e">GHS 0</b></div>
+<div style="margin-top:4px;font-size:10px;color:#a78bfa">Nurse will get 80% of new total - Platform 20% - After payment, booking status back to Pending - Nurse can Accept</div>
+</div>
+
+<button class="btn btnBlue" onclick="payWithPaystack()">Pay Rest via Paystack - Continue Booking Nurse</button>
+<button class="btn btnYellow" onclick="location.href='book-nurse.html'">Book Another Nurse</button>
+<button class="btn btnRed" onclick="location.href='my-bookings.html'" style="background:rgba(255,255,255,.06);color:#d8b4fe">Dismiss - Go to My Bookings</button>
+
+<div style="margin-top:12px;font-size:9px;color:#6b7280;text-align:center">Paystack secure - Extra payment continues booking - After CEO sees rejected is increased, it will be deleted from rejected list and nurse list - Then pending again</div>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig); const db=firebase.database();
+
+let bookingId='', bookingData=null;
+let clientEmail=localStorage.getItem('clientEmail')||localStorage.getItem('email')||'client@example.com';
+let clientName=localStorage.getItem('clientName')||'Client';
+let clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||'';
+
+// Paystack public key - REPLACE WITH YOUR LIVE KEY pk_live_xxxx
+const PAYSTACK_PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxx'; // TODO: Replace with your Paystack live key pk_live_...
+
+function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000); }
+
+function getBookingId(){
+  const urlParams=new URLSearchParams(window.location.search);
+  bookingId=urlParams.get('bookingId')||urlParams.get('id')||localStorage.getItem('lastRejectedBookingId')||'';
+  if(!bookingId){ document.getElementById('bookingInfo').innerHTML='<small>No booking ID - Go to my-bookings.html and click Increase Payment</small>'; return; }
+  loadBooking();
+}
+
+async function loadBooking(){
+  const snap=await db.ref('bookings/'+bookingId).once('value');
+  if(!snap.exists()){
+    // Try myJobOffers or bookingsByClient
+    const snap2=await db.ref('clientBookings/'+clientUid+'/'+bookingId).once('value');
+    if(snap2.exists()){ bookingData=snap2.val(); bookingData.id=bookingId; }
+    else { document.getElementById('bookingInfo').innerHTML='Booking not found: '+bookingId; return; }
+  } else {
+    bookingData=snap.val(); bookingData.id=bookingId;
+  }
+  const curr=parseFloat(bookingData.amount||bookingData.livelyAmount||40);
+  document.getElementById('currentAmount').value=curr;
+  document.getElementById('bookingInfo').innerHTML=`
+    Booking ID: <b>${bookingData.bookingId||bookingId}</b><br>
+    Nurse Booked: <b>${bookingData.nurseName||''} - ${bookingData.nursePhone||''}</b><br>
+    Service: ${bookingData.serviceType||''}<br>
+    Amount: <b>GHS ${curr}</b> - Location: ${bookingData.location||''}<br>
+    Status: <span class="badge badge-yellow">${bookingData.status||'rejected_by_nurse'}</span> - Nurse rejected your offer<br>
+    <small style="color:#a78bfa">After CEO sees rejected, it will be deleted from your list and nurse list when increased</small>
+  `;
+  updateTotals();
+}
+
+function updateTotals(){
+  const curr=parseFloat(document.getElementById('currentAmount').value||0);
+  const extra=parseFloat(document.getElementById('extraAmount').value||0);
+  const newTotal=curr+extra;
+  document.getElementById('currDisplay').textContent='GHS '+curr.toFixed(2);
+  document.getElementById('extraDisplay').textContent='GHS '+extra.toFixed(2);
+  document.getElementById('newTotal').textContent='GHS '+newTotal.toFixed(2);
+}
+
+document.getElementById('extraAmount').addEventListener('input', updateTotals);
+
+function payWithPaystack(){
+  const extra=parseFloat(document.getElementById('extraAmount').value||0);
+  const curr=parseFloat(document.getElementById('currentAmount').value||0);
+  if(extra<5){ toast('Extra min GHS 5'); return; }
+  const newTotal=curr+extra;
+  const amountKobo=Math.round(extra*100); // Paystack amount in kobo (GHS pesewas)
+
+  // Check Paystack key
+  if(PAYSTACK_PUBLIC_KEY.includes('xxxx')){
+    if(!confirm('Paystack public key not set - pk_test_xxxx placeholder - Replace with your pk_live_ key in code - For demo, will simulate payment success - Continue?')) return;
+    // Simulate success for demo
+    simulateSuccess(extra, newTotal);
+    return;
+  }
+
+  const handler=PaystackPop.setup({
+    key: PAYSTACK_PUBLIC_KEY,
+    email: clientEmail,
+    amount: amountKobo,
+    currency: 'GHS',
+    ref: 'INCREASE-'+bookingId+'-'+Date.now(),
+    metadata: {
+      custom_fields: [
+        {display_name: "Booking ID", variable_name: "booking_id", value: bookingId},
+        {display_name: "Nurse Name", variable_name: "nurse_name", value: bookingData.nurseName||''},
+        {display_name: "Extra Amount", variable_name: "extra_amount", value: extra},
+        {display_name: "Client Name", variable_name: "client_name", value: clientName}
+      ]
+    },
+    callback: function(response){
+      // Payment successful
+      toast('Paystack payment successful - Ref: '+response.reference+' - Updating booking');
+      handlePaymentSuccess(extra, newTotal, response.reference);
+    },
+    onClose: function(){
+      toast('Paystack closed - Payment not completed');
+    }
+  });
+  handler.openIframe();
+}
+
+function simulateSuccess(extra, newTotal){
+  const fakeRef='SIM-'+Date.now();
+  handlePaymentSuccess(extra, newTotal, fakeRef);
+}
+
+async function handlePaymentSuccess(extra, newTotal, paystackRef){
+  const now=Date.now(); const nowStr=new Date().toLocaleString('en-GH');
+  const nurseShare=newTotal*0.8; const ceoShare=newTotal*0.2;
+  
+  // Update booking - increase payment - back to pending so nurse can accept
+  const updateData={
+    amount: newTotal,
+    livelyAmount: nurseShare,
+    ceoShare: ceoShare,
+    previousAmount: parseFloat(bookingData.amount||0),
+    extraAmountPaid: extra,
+    extraPaidAt: now,
+    extraPaidAtStr: nowStr,
+    paystackRef: paystackRef,
+    status: 'pending', // Back to pending - continue booking nurse
+    increasedPayment: true,
+    increasedAt: now,
+    increasedAtStr: nowStr,
+    paymentMethod: 'paystack_increase',
+    rejectedStatusCleared: true,
+    lastRejectionCleared: true
+  };
+  
+  await db.ref('bookings/'+bookingId).update(updateData);
+  await db.ref('ceoBookings/'+bookingId).update(updateData).catch(()=>{});
+  await db.ref('clientBookings/'+(bookingData.clientId||clientUid)+'/'+bookingId).update(updateData).catch(()=>{});
+  await db.ref('myJobOffers/'+(bookingData.nurseId||'')+'/'+bookingId).update(updateData).catch(()=>{});
+  await db.ref('nurseBookings/'+(bookingData.nurseId||'')+'/'+bookingId).update(updateData).catch(()=>{});
+  
+  // Notify nurse that client increased payment
+  const nurseId=bookingData.nurseId||'';
+  if(nurseId){
+    await db.ref('nurseAlerts/'+nurseId+'/INCREASED-PAYMENT-'+bookingId+'-'+now).set({
+      type: 'payment_increased',
+      title: `Client increased payment for Booking ID ${bookingData.bookingId||bookingId}`,
+      message: `Client ${clientName} increased payment from GHS ${bookingData.amount} to GHS ${newTotal} - Extra GHS ${extra} paid via Paystack - Ref: ${paystackRef} - Please accept your offer now - Booking ID ${bookingData.bookingId||bookingId} - Continue booking`,
+      bookingId: bookingData.bookingId||bookingId,
+      extraAmount: extra,
+      newTotal: newTotal,
+      nurseShare: nurseShare,
+      paystackRef: paystackRef,
+      time: now,
+      read: false,
+      autoGenerated: true
+    });
+    await db.ref('myJobOffers/'+nurseId+'/'+bookingId+'/notification').set({type:'increase', extra, newTotal, time:now}).catch(()=>{});
+  }
+  
+  // Notify CEO
+  await db.ref('ceoNotificationRoom/INCREASED-'+bookingId+'-'+now).set({
+    type: 'payment_increased',
+    title: `Client increased payment - Booking ${bookingData.bookingId||bookingId}`,
+    message: `Client increased payment for rejected Booking ID ${bookingData.bookingId||bookingId} - From GHS ${bookingData.amount} to GHS ${newTotal} - Extra GHS ${extra} via Paystack Ref ${paystackRef} - After CEO sees that booking ID ${bookingData.bookingId||bookingId} is rejected and increased, it will be deleted from rejected list and continue as pending - Nurse list updated`,
+    bookingId: bookingData.bookingId||bookingId,
+    extraAmount: extra,
+    newTotal: newTotal,
+    time: now,
+    read: false
+  });
+  
+  // Client alert
+  const clientKey=bookingData.clientId||clientUid||clientEmail;
+  if(clientKey){
+    await db.ref('clientAlerts/'+clientKey+'/INCREASED-SUCCESS-'+bookingId+'-'+now).set({
+      type: 'payment_increased_success',
+      title: `Payment increased - Booking ID ${bookingData.bookingId||bookingId} - Continue booking nurse`,
+      message: `You increased payment from GHS ${bookingData.amount} to GHS ${newTotal} via Paystack - Extra GHS ${extra} - Ref: ${paystackRef} - Booking ID ${bookingData.bookingId||bookingId} is now pending again - Nurse ${bookingData.nurseName} can accept now - Please wait for nurse acceptance`,
+      bookingId: bookingData.bookingId||bookingId,
+      time: now,
+      read: false
+    });
+  }
+  
+  toast(`Success! Extra GHS ${extra} paid via Paystack - New total GHS ${newTotal} - Booking pending again - Nurse notified - Continue booking`);
+  
+  setTimeout(()=>{ location.href='my-bookings.html'; }, 2000);
+}
+
+window.onload=()=>{ getBookingId(); };
+</script>
+</body></html>
