@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script src="onesignal-setup.js" defer></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="onesignal-setup.js" defer></script>
+<script src="lovecare-alerts.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CEO Bookings Progress - Rejected Flow</title>
 <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;padding-bottom:90px}
 .card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px 14px}
@@ -177,5 +178,39 @@ async function clearRejected(id, bookingId){
 async function clearAny(id){ if(!confirm('Clear '+id+'?')) return; await db.ref('ceoBookingsProgress/'+id).remove(); toast('Cleared'); }
 function viewRaw(id){ const b=all.find(x=>x.id===id); alert(JSON.stringify(b,null,2)); }
 window.onload=()=>{ load(); };
+<script>
+// CEO: Ring for new booking + new payment
+try {
+  if (window.db || window.firebase) {
+    const db = window.db || firebase.firestore();
+    
+    // 1. New Booking
+    db.collection('bookings').onSnapshot((snap) => {
+      snap.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          playLoveCareAlert('new_booking');
+          if (Notification.permission === 'granted') {
+            new Notification('💰 CEO: New Booking!', {
+              body: 'New booking don enter! Check dashboard.',
+              icon: '/icon-192.png'
+            });
+          }
+        }
+        if (change.type === 'modified') {
+          const data = change.doc.data();
+          if (data.status === 'paid' || data.paymentStatus === 'paid') {
+            playLoveCareAlert('paid');
+            if (Notification.permission === 'granted') {
+              new Notification('💰 CEO: Payment Don Come!', {
+                body: 'Client don pay! Check am.',
+                icon: '/icon-192.png'
+              });
+            }
+          }
+        }
+      });
+    });
+  }
+} catch(e) { console.log('CEO listener:', e); }
 </script>
 </body></html>
