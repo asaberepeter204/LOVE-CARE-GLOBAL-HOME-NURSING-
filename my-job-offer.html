@@ -1,238 +1,133 @@
 <!DOCTYPE html><html lang="en"><head><script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script src="onesignal-setup.js" defer></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Job Offer - ULTRA SIMPLE - Works</title>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh}
-.topbar{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:#1c1238;position:sticky;top:0;z-index:10;border-bottom:1px solid #2a1a4a}
-.card{background:#1c1238;border:1px solid #2a1a4a;border-radius:16px;padding:14px;margin:10px 14px}
-.btn{border:none;border-radius:12px;padding:12px;font-weight:800;cursor:pointer;font-size:12px;flex:1;min-height:44px}
-.btnGreen{background:#22c55e;color:#000}
-.btnRed{background:#ef4444;color:#fff}
-.btnBlue{background:#2563eb;color:#fff}
-.btnYellow{background:#facc15;color:#000}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
-.badge-pending{background:#f59e0b;color:#000}
-.badge-accepted{background:#22c55e;color:#000}
-.badge-rejected{background:#ef4444;color:#fff}
-.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:#fff;color:#000;padding:12px 20px;border-radius:30px;z-index:999;font-weight:700;display:none}
+<title>My Job Offers - Clean - No Test Mode - Pending Shows</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;padding-bottom:90px}
+.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.98);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.badge{padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);font-size:11px;font-weight:700;color:#ece8ff;text-decoration:none;cursor:pointer}
+.badgeGold{background:#facc15;color:#000;border-color:#facc15}
+.card{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin:10px}
+.offer{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}
+.offer.pending{border:2px solid #facc15;background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(50,40,10,.4))}
+.offer.accepted{border:2px solid #22c55e}
+.btn{padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#ece8ff;font-size:11px;font-weight:700;cursor:pointer;min-height:40px;flex:1}
+.btnGreen{background:#22c55e;color:#fff;border-color:#22c55e}
+.btnRed{background:#ef4444;color:#fff;border-color:#ef4444}
+.btnBlue{background:#2563eb;color:#fff;border-color:#2563eb}
+.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:400px;width:100%;max-height:80vh;overflow:auto}
+.histId{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.15);margin-bottom:8px;cursor:pointer;font-size:12px;font-weight:700}
+.avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #22c55e}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head><body>
-<div class="topbar"><b id="count">My Job Offers</b><div style="display:flex;gap:6px"><a href="nurse-dashboard.html" style="padding:8px 12px;border-radius:12px;background:#2a1a4a;color:#d8b4fe;text-decoration:none;font-size:12px">Dashboard</a><a href="nurse-withdrawal.html" style="padding:8px 12px;border-radius:12px;background:#facc15;color:#000;text-decoration:none;font-size:12px;font-weight:800">Withdraw</a></div></div>
+<div class="top"><div><b>My Job Offers</b><br><small style="font-size:9px;color:#22c55e">Pending - Accepted - On Way - Completed - History only when CEO paid</small></div><div style="display:flex;gap:8px"><span class="badge" id="countBadge">0 Offers</span><a href="nurse-dashboard.html" class="badge">Dashboard</a><a href="nurse-withdrawal.html" class="badge badgeGold">Withdraw</a><button class="badge" onclick="loadAll()">Refresh</button></div></div>
 
-<div class="card" style="background:linear-gradient(135deg,#14532d,#166534);border:2px solid #22c55e;display:flex;gap:12px;align-items:center">
-  <div id="nPhoto" style="width:60px;height:60px;border-radius:50%;background:#2a1a4a;border:3px solid #22c55e;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px;flex-shrink:0">P</div>
-  <div>
-    <div id="nName" style="font-weight:900;font-size:18px">Asabere Peter</div>
-    <div id="nPhone" style="font-size:12px;color:#86efac">05441211814 - asaberepeter204@gmail.com</div>
-    <div style="font-size:9px;color:#4ade80;margin-top:4px;font-weight:800">VALIDATED: This page is for only you - Nurse Side - Photo + Name</div>
-  </div>
+<div style="max-width:800px;margin:0 auto;padding:10px">
+<div id="offersArea" style="margin-top:12px"></div>
+<div id="emptyArea" class="card" style="display:none;text-align:center;padding:30px"><b>No active job offers</b><br><small>When client books you, it shows here as Pending with Accept/Reject buttons</small></div>
+<div class="card"><b>History - Only ID when CEO paid - Click for details</b><div id="historyList" style="margin-top:10px"><small>No history yet</small></div></div>
 </div>
 
-<div id="offers"></div>
-<div class="card"><b>History - Only ID when CEO paid - Click for details</b><div id="history" style="margin-top:10px;font-size:12px">No history yet</div></div>
-
 <div id="toast" class="toast"></div>
+<div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Details</b><button class="btn" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.6"></div></div></div>
 
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
+firebase.initializeApp(firebaseConfig); const db=firebase.database();
+let nurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
+let nurseEmail=localStorage.getItem('nurseEmail')||''; let nursePhone=localStorage.getItem('nursePhone')||''; let nurseName=localStorage.getItem('nurseName')||'Nurse';
+let all=[], historyData=[];
 
-let nurseUid='oubgaWAk4sQRI1P0QcuLOoxFHkr1';
-let nursePhone='05441211814';
-let nurseEmail='asaberepeter204@gmail.com';
-let nurseName='Asabere Peter';
-let nursePhoto='';
-let all=[];
+function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000);}
 
-function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000); }
-
-function loadNurse(){
-  // Try localStorage
-  const tryKeys=['nurseUid','lcg_nurse_uid','uid','userId','nurseId'];
-  for(const k of tryKeys){
-    const v=localStorage.getItem(k);
-    if(v && v.length>10){ nurseUid=v; break; }
-  }
-  nursePhone=localStorage.getItem('nursePhone')||localStorage.getItem('phone')||nursePhone;
-  nurseEmail=localStorage.getItem('nurseEmail')||localStorage.getItem('email')||nurseEmail;
-  nurseName=localStorage.getItem('nurseName')||localStorage.getItem('fullName')||nurseName;
-  nursePhoto=localStorage.getItem('nursePhoto')||localStorage.getItem('photoURL')||'';
-
-  document.getElementById('nName').textContent=nurseName;
-  document.getElementById('nPhone').textContent=nursePhone+' - '+nurseEmail;
-  if(nursePhoto){
-    document.getElementById('nPhoto').innerHTML=`<img src="${nursePhoto}" style="width:100%;height:100%;object-fit:cover">`;
-  } else {
-    document.getElementById('nPhoto').textContent=nurseName.charAt(0).toUpperCase();
-  }
-
-  // Fetch from DB
-  db.ref('nurses/'+nurseUid).once('value').then(s=>{
-    if(s.exists()){
-      const v=s.val();
-      const p=v.photoURL||v.nursePhoto||v.avatar||'';
-      const n=v.fullName||v.name||'';
-      if(p){ document.getElementById('nPhoto').innerHTML=`<img src="${p}" style="width:100%;height:100%;object-fit:cover">`; nursePhoto=p; }
-      if(n){ document.getElementById('nName').textContent=n; nurseName=n; }
-    }
-  });
-  db.ref('allowedNurses/'+nurseUid).once('value').then(s=>{
-    if(s.exists()){
-      const v=s.val();
-      const p=v.photoURL||'';
-      const n=v.fullName||'';
-      if(p) document.getElementById('nPhoto').innerHTML=`<img src="${p}" style="width:100%;height:100%;object-fit:cover">`;
-      if(n) document.getElementById('nName').textContent=n;
-    }
-  });
-}
-
-function loadOffers(){
-  db.ref('bookings').on('value', snap=>{
-    const list=[];
-    if(snap.exists()){
-      snap.forEach(ch=>{
-        const v=ch.val();
-        const st=(v.status||'pending').toLowerCase();
-        if(st.includes('client_confirmed_finished') || st==='paid' || v.ceoPaid===true) return;
-        // For now show all bookings for this nurse phone OR all recent if nurseId matches OR even if mismatch, show recent 5
-        const bNurseId=(v.nurseId||'').toString();
-        const bPhone=(v.nursePhone||'').replace(/[^0-9]/g,'').slice(-9);
-        const myPhone=nursePhone.replace(/[^0-9]/g,'').slice(-9);
-        const match = bNurseId===nurseUid || bPhone===myPhone || (v.nurseEmail||'').toLowerCase()===nurseEmail.toLowerCase() || true; // true = show all for now to fix empty
-        if(match){
-          list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
-        }
-      });
-    }
-    list.sort((a,b)=>(b.time||0)-(a.time||0));
-    all=list.slice(0,20); // Show max 20
-    document.getElementById('count').textContent=all.length+' Offers - '+(all.length>0?'Pending shows':'No pending');
-    render(all);
-    // Auto nav for accepted
-    all.forEach(b=>{
-      if((b.status||'').toLowerCase()==='accepted'){
-        autoNav(b);
+function loadAll(){
+if(!nurseId && !nursePhone){ document.getElementById('emptyArea').style.display='block'; return; }
+db.ref('bookings').on('value', snap=>{
+  const list=[];
+  if(!snap.exists()){ render([]); return; }
+  snap.forEach(ch=>{
+    const v=ch.val();
+    const matchById=v.nurseId===nurseId;
+    const matchByUid=v.nurseUid===nurseId;
+    const matchByPhone=v.nursePhone&&nursePhone&&v.nursePhone.replace(/[^0-9]/g,'').slice(-9)===nursePhone.replace(/[^0-9]/g,'').slice(-9);
+    const matchByEmail=v.nurseEmail&&nurseEmail&&v.nurseEmail.toLowerCase()===nurseEmail.toLowerCase();
+    const isMatch=matchById||matchByUid||matchByPhone||matchByEmail;
+    if(!isMatch) return;
+    const st=(v.status||'pending').toLowerCase();
+    const ceoPaid=v.ceoPaid===true;
+    const statusPaid=st==='paid' || st==='ceo_paid';
+    const isPaid=ceoPaid && statusPaid;
+    if(!isPaid){
+      if(!st.includes('client_confirmed_finished')){
+        list.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
       }
-    });
-  });
-}
-
-function autoNav(b){
-  const key='navigated_'+b.id;
-  if(localStorage.getItem(key)) return;
-  let cLat = b.clientLat || (b.clientLocation&&b.clientLocation.lat) || b.lat;
-  let cLng = b.clientLng || (b.clientLocation&&b.clientLocation.lng) || b.lng;
-  if(!cLat || !cLng) return;
-  db.ref('nurseLocations/'+(b.nurseId||nurseUid)).once('value').then(s=>{
-    let nLat=5.6037, nLng=-0.1870;
-    if(s.exists()){
-      const v=s.val();
-      nLat=v.lat||v.latitude||nLat;
-      nLng=v.lng||v.longitude||nLng;
     }
-    const url=`https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`;
-    localStorage.setItem(key,'1');
-    toast('Accepted - Auto opening navigation');
-    setTimeout(()=>window.open(url,'_blank'), 1500);
   });
+  all=list.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
+  render();
+});
 }
 
-function render(list){
-  const el=document.getElementById('offers');
-  if(list.length===0){
-    el.innerHTML=`<div class="card" style="text-align:center;padding:30px">
-      <b>No offers yet</b><br><small>When client books, shows here as Pending - If empty, client hasn't booked yet</small><br><br>
-      <button class="btn btnGreen" style="flex:none;padding:12px 20px" onclick="createTest()">Create Test Booking For Me - Click to test</button>
-      <button class="btn btnBlue" style="flex:none;padding:12px 20px;margin-left:6px" onclick="location.reload()">Refresh</button>
-    </div>`;
-    return;
-  }
-  el.innerHTML=list.map(b=>{
+function render(){
+  const area=document.getElementById('offersArea');
+  const empty=document.getElementById('emptyArea');
+  if(all.length===0){ area.innerHTML=''; empty.style.display='block'; document.getElementById('countBadge').textContent='0 Offers'; return; }
+  empty.style.display='none';
+  document.getElementById('countBadge').textContent=all.length+' Offers - '+all.filter(b=>(b.status||'pending').toLowerCase().includes('pending')).length+' Pending';
+  area.innerHTML=all.map(b=>{
     const st=(b.status||'pending').toLowerCase();
-    let badge='badge-pending', txt='PENDING - Accept/Reject';
-    if(st.includes('accepted')){ badge='badge-accepted'; txt='ACCEPTED - Auto nav to client'; }
-    else if(st.includes('rejected')){ badge='badge-rejected'; txt='REJECTED'; }
-    else if(st.includes('cancelled_by_client')){ badge='badge-pending'; txt='PENDING - Client cancelled - Accept/Reject to restore'; }
-    else if(st.includes('completed')){ badge='badge-accepted'; txt='COMPLETED'; }
-    const isPending=st==='pending'||st==='new'||st.includes('cancelled')||st==='';
-    const clientLoc = typeof b.clientLocation==='object' ? `${b.clientLocation.lat||''},${b.clientLocation.lng||''}` : (b.clientLat||'')+','+(b.clientLng||'');
-    return `<div class="card" style="border-left:4px solid ${st.includes('accepted')?'#22c55e':'#facc15'}">
-      <div style="display:flex;justify-content:space-between"><span class="badge ${badge}">${txt}</span><small>${new Date(b.time||Date.now()).toLocaleString('en-GH')}</small></div>
-      <div style="margin-top:10px;font-size:13px;line-height:1.6">
-        <b>Booking ID ${b.bookingId||b.id} - ${st}</b><br>
-        Client: ${b.clientName||''} - ${b.clientPhone||''}<br>
-        Location: ${b.location||clientLoc||''}<br>
-        Amount: GHS ${b.amount||''} - You get 80% = ${b.nurse80||Math.round((b.amount||20)*0.8)}
-      </div>
+    const isPending=st.includes('pending')||st===''||st==='new';
+    const isAccepted=st.includes('accepted');
+    const isCompleted=st.includes('completed');
+    return `<div class="offer ${isPending?'pending':''} ${isAccepted?'accepted':''}">
+      <div style="display:flex;justify-content:space-between"><b>Booking ID ${b.bookingId||b.id}</b><span class="badge ${isPending?'badgeGold':''}">${(b.status||'PENDING').toUpperCase()}</span></div>
+      <div style="margin-top:8px;font-size:11px;color:#9a95b8">Client: ${b.clientName||''} - Phone: ${b.clientPhone||''} - Amount: Earnings ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)} - Location: ${b.location||''}</div>
       <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-        ${isPending?`<div style="display:flex;gap:8px;width:100%"><button class="btn btnGreen" style="flex:1;padding:14px" onclick="accept('${b.id}')">Accept Offer</button><button class="btn btnRed" style="flex:1;padding:14px" onclick="reject('${b.id}')">Reject Offer</button></div>`:''}
-        ${st.includes('accepted')?`<button class="btn btnGreen" onclick="nav('${b.id}')">Navigate - Auto nav</button><button class="btn btnBlue" onclick="complete('${b.id}')">Complete Job</button>`:''}
-        ${st.includes('rejected')?`<button class="btn btnBlue" onclick="undo('${b.id}')">Undo Reject</button>`:''}
+        ${isPending?`<button class="btn btnGreen" onclick="acceptOffer('${b.id}')">Accept</button><button class="btn btnRed" onclick="rejectOffer('${b.id}')">Reject</button>`:''}
+        ${isAccepted?`<button class="btn btnBlue" onclick="openNav('${b.id}')">Navigate</button><button class="btn btnGreen" onclick="markOnWay('${b.id}')">On The Way</button>`:''}
+        ${isCompleted?`<div style="background:rgba(34,197,94,.1);border-radius:8px;padding:8px;font-size:11px">Completed - Waiting CEO paid</div>`:''}
+        <button class="btn" onclick="showDetails('${b.id}')">Details</button>
+        ${b.clientPhone?`<button class="btn btnBlue" onclick="window.open('tel:${b.clientPhone}')">Call Client</button>`:''}
       </div>
     </div>`;
   }).join('');
 }
 
-async function createTest(){
-  const id='LCG-FULL-'+Date.now();
-  await db.ref('bookings/'+id).set({
-    bookingId:id,
-    nurseId:nurseUid,
-    nursePhone:nursePhone,
-    nurseEmail:nurseEmail,
-    nurseName:nurseName,
-    clientName:'Michael Allotey',
-    clientPhone:'+233596032132',
-    clientLat:5.6037,
-    clientLng:-0.1870,
-    amount:20,
-    nurse80:16,
-    ceo20:4,
-    status:'pending',
-    time:Date.now(),
-    location:'Accra',
-    serviceType:'Home Care'
+async function acceptOffer(id){ const b=all.find(x=>x.id===id); const now=Date.now(); await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:now, acceptedAtStr:new Date().toLocaleString('en-GH')}); const clientKey=b.clientId||b.clientPhone||''; if(clientKey){ await db.ref('clientAlerts/'+clientKey+'/ACCEPTED-'+id+'-'+now).set({type:'accepted',title:`Nurse ${nurseName} accepted ${b.bookingId||id}`,message:`Nurse accepted - Auto nav opens`,bookingId:b.bookingId||id,time:now,read:false}); } toast('Accepted'); }
+async function rejectOffer(id){ if(!confirm('Reject booking '+id+'?')) return; await db.ref('bookings/'+id).update({status:'rejected_by_nurse', rejectedAt:Date.now()}); toast('Rejected'); }
+async function markOnWay(id){ await db.ref('bookings/'+id).update({status:'on_the_way', onTheWayAt:Date.now()}); toast('On the way'); }
+function openNav(id){ const b=all.find(x=>x.id===id); const cLat=b.clientLat||5.6037; const cLng=b.clientLng||-0.1870; navigator.geolocation.getCurrentPosition(p=>{ window.open(`https://www.google.com/maps/dir/?api=1&origin=${p.coords.latitude},${p.coords.longitude}&destination=${cLat},${cLng}&travelmode=driving`,'_blank'); }, ()=>{ window.open(`https://www.google.com/maps/search/?api=1&query=${cLat},${cLng}`,'_blank'); }); }
+function showDetails(id){ const b=all.find(x=>x.id===id); document.getElementById('modalTitle').textContent='Booking ID '+(b.bookingId||b.id); document.getElementById('modalBody').innerHTML=`ID: ${b.bookingId||b.id}<br>Status: ${b.status}<br>Client: ${b.clientName}<br>Phone: ${b.clientPhone}<br>Amount: Earnings ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)}<br>Location: ${b.location||''}<br>Service: ${b.serviceType||''}<br>Time: ${new Date(b.time||Date.now()).toLocaleString('en-GH')}<br>CEO Paid: ${b.ceoPaid?'YES':'NO - CEO hasnt marked paid'}`; document.getElementById('modal').style.display='flex'; }
+function closeModal(){ document.getElementById('modal').style.display='none'; }
+function loadHistory(){
+  db.ref('nurseBookingHistory/'+nurseId).on('value', snap=>{
+    const el=document.getElementById('historyList');
+    if(!snap.exists()){ el.innerHTML='<small>No history yet - When CEO marks paid, ID moves here</small>'; return; }
+    const arr=[]; snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); });
+    arr.sort((a,b)=>(b.ceoPaidAt||0)-(a.ceoPaidAt||0));
+    el.innerHTML=arr.map(b=>`<div class="histId" onclick="showHistory('${b.id}')">Booking ID ${b.bookingId||b.id} - ${b.ceoPaidAtStr||''} - Paid - Click details</div>`).join('');
+    window.historyData=arr;
   });
-  toast('Test booking created - Should show as pending now');
-}
-
-async function accept(id){
-  await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:Date.now()});
-  const b=all.find(x=>x.id===id);
-  const key=(b.clientPhone||'').replace(/[^0-9]/g,'').slice(-9);
-  await db.ref('clientAlerts/'+key+'/ACCEPTED-'+id+'-'+Date.now()).set({type:'accepted',title:'Nurse accepted',message:`Nurse ${nurseName} accepted booking ${b.bookingId||id}`,bookingId:b.bookingId||id,time:Date.now(),read:false});
-  await db.ref('ceoBookingsProgress/'+id).set({bookingId:b.bookingId||id, nurseId:nurseUid, nurseName:nurseName, status:'accepted', time:Date.now()});
-  toast('Accepted - Auto nav will open');
-  setTimeout(()=>nav(id), 1000);
-}
-
-async function reject(id){
-  if(!confirm('Reject '+id+'? Client will be told to book another or increase payment')) return;
-  await db.ref('bookings/'+id).update({status:'rejected', rejectedAt:Date.now(), rejectedByNurseName:nurseName});
-  const b=all.find(x=>x.id===id);
-  const key=(b.clientPhone||'').replace(/[^0-9]/g,'').slice(-9);
-  await db.ref('clientAlerts/'+key+'/REJECTED-'+id+'-'+Date.now()).set({type:'rejected',message:`Nurse ${nurseName} rejected - Please book another nurse or increase payment - Booking ID: ${b.bookingId||id}`,bookingId:b.bookingId||id,time:Date.now(),read:false});
-  await db.ref('ceoBookingsProgress/'+id).set({bookingId:b.bookingId||id, nurseName:nurseName, status:'rejected', time:Date.now()});
-  toast('Rejected - Client notified');
-}
-
-function nav(id){
-  const b=all.find(x=>x.id===id);
-  let cLat=b.clientLat|| (b.clientLocation&&b.clientLocation.lat) || 5.6037;
-  let cLng=b.clientLng|| (b.clientLocation&&b.clientLocation.lng) || -0.1870;
-  db.ref('nurseLocations/'+nurseUid).once('value').then(s=>{
-    let nLat=5.6037,nLng=-0.1870;
-    if(s.exists()){ const v=s.val(); nLat=v.lat||nLat; nLng=v.lng||nLng; }
-    window.open(`https://www.google.com/maps/dir/?api=1&origin=${nLat},${nLng}&destination=${cLat},${cLng}&travelmode=driving`,'_blank');
+  db.ref('bookings').orderByChild('nurseId').equalTo(nurseId).on('value', snap=>{
+    if(!snap.exists()) return;
+    snap.forEach(ch=>{
+      const v=ch.val();
+      const ceoPaid=v.ceoPaid===true;
+      const statusPaid=(v.status||'').toLowerCase().includes('paid');
+      if(ceoPaid && statusPaid){
+        const id=ch.key;
+        if(all.find(x=>x.id===id)){
+          db.ref('nurseBookingHistory/'+nurseId+'/'+id).set({...v, id, ceoPaidAt:Date.now(), ceoPaidAtStr:new Date().toLocaleString('en-GH')});
+          db.ref('bookings/'+id).remove().catch(()=>{});
+          toast('CEO marked paid - ID '+(v.bookingId||id)+' moved to history');
+        }
+      }
+    });
   });
 }
-
-async function complete(id){ await db.ref('bookings/'+id).update({status:'completed'}); toast('Completed - Client will confirm'); }
-async function undo(id){ await db.ref('bookings/'+id).update({status:'pending'}); toast('Restored to pending'); }
-
-window.onload=()=>{ loadNurse(); loadOffers(); };
+window.onload=()=>{ loadAll(); loadHistory(); };
 </script>
 </body></html>
