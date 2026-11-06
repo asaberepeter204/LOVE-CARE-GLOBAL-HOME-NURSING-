@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Job Offers - ULTRA FIXED - Pending Shows - Not Paid Wrongly</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;padding-bottom:90px}
+.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.98);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.badge{padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);font-size:11px;font-weight:700;color:#ece8ff;text-decoration:none;cursor:pointer}
+.badgeGold{background:#facc15;color:#000;border-color:#facc15}
+.card{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin:10px}
+.offer{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}
+.offer.pending{border:2px solid #facc15;background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(50,40,10,.4))}
+.offer.accepted{border:2px solid #22c55e}
+.btn{padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#ece8ff;font-size:11px;font-weight:700;cursor:pointer;min-height:40px;flex:1}
+.btnGold{background:#facc15;color:#000;border-color:#facc15}
+.btnGreen{background:#22c55e;color:#fff;border-color:#22c55e}
+.btnRed{background:#ef4444;color:#fff;border-color:#ef4444}
+.btnBlue{background:#2563eb;color:#fff;border-color:#2563eb}
+.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:12px;font-size:12px;display:none;max-width:90%}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:400px;width:100%;max-height:80vh;overflow:auto}
+.histId{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.15);margin-bottom:8px;cursor:pointer;font-size:12px;font-weight:700}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head><body>
+<div class="top"><div><b>My Job Offers - ULTRA FIXED - Pending Shows Correctly</b><br><small style="font-size:9px;color:#22c55e">Fixed: New booking shows as Pending - Not history - Accept/Reject buttons - CEO not marked paid won't show as paid</small></div><div style="display:flex;gap:8px"><span class="badge" id="countBadge">0 Offers</span><a href="nurse-dashboard.html" class="badge">Dashboard</a><a href="nurse-withdrawal.html" class="badge badgeGold">Withdraw</a><button class="badge" onclick="loadAll()">Refresh</button></div></div>
+
+<div style="max-width:800px;margin:0 auto;padding:10px">
+<div id="debug" class="card" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);font-size:10px">Debug: Loading... Check nurseId matching</div>
+<div id="offersArea" style="margin-top:12px"></div>
+<div id="emptyArea" class="card" style="display:none;text-align:center;padding:30px"><b>No active job offers</b><br><small>When client books nurse, shows here as Pending - If not showing, check debug above - Fixed to show pending not history</small></div>
+<div class="card"><b>History - Only Booking ID Shows - CEO Paid Moves Here - CEO Must Mark Paid</b><div id="historyList" style="margin-top:10px"><small>No history yet - CEO hasn't marked paid yet - History only when CEO marks paid</small></div></div>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Details</b><button class="btn" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.6"></div></div></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
+firebase.initializeApp(firebaseConfig); const db=firebase.database();
+let nurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
+let nurseEmail=localStorage.getItem('nurseEmail')||localStorage.getItem('email')||'';
+let nursePhone=localStorage.getItem('nursePhone')||localStorage.getItem('phone')||'';
+let nurseName=localStorage.getItem('nurseName')||'Nurse';
+let all=[], historyData=[];
+
+function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',5000);}
+function debug(msg){ const el=document.getElementById('debug'); el.innerHTML+='<br>'+msg; console.log(msg); }
+
+function loadAll(){
+debug('NurseId: '+nurseId+' Phone: '+nursePhone+' Email: '+nurseEmail);
+if(!nurseId && !nursePhone){ document.getElementById('emptyArea').style.display='block'; debug('No nurse ID - Login again'); return; }
+
+// ULTRA FIXED: Listen to ALL bookings, not just nurseId equal - check multiple fields - so pending shows
+db.ref('bookings').on('value', snap=>{
+  const list=[];
+  const allBookings=[];
+  if(snap.exists()) snap.forEach(ch=>{ allBookings.push({key:ch.key, val:ch.val()}); });
+  debug('Total bookings in DB: '+allBookings.length);
+  
+  allBookings.forEach(item=>{
+    const v=item.val;
+    const key=item.key;
+    // Match nurse by multiple ways - FIXED for pending not showing
+    const matchById=v.nurseId===nurseId;
+    const matchByUid=v.nurseUid===nurseId;
+    const matchByPhone=v.nursePhone&&nursePhone&&v.nursePhone.replace(/[^0-9]/g,'').slice(-9)===nursePhone.replace(/[^0-9]/g,'').slice(-9);
+    const matchByEmail=v.nurseEmail&&nurseEmail&&v.nurseEmail.toLowerCase()===nurseEmail.toLowerCase();
+    const matchByNurseIdField=v.nurseId&&nurseId&&v.nurseId===nurseId;
+    const isMatch=matchById||matchByUid||matchByPhone||matchByEmail||matchByNurseIdField;
+    
+    if(!isMatch) return;
+    
+    const st=(v.status||'pending').toLowerCase();
+    // FIXED: Only consider paid if CEO explicitly marked paid - not automatically
+    // Check ceoPaid must be true AND status paid - not just field exists
+    const ceoExplicitPaid=v.ceoPaid===true || v.ceoPaid==='true';
+    const statusIsPaid=st==='paid' || st==='ceo_paid' || st==='ceo_marked_paid';
+    const isPaid=ceoExplicitPaid && statusIsPaid; // Both must be true - CEO hasn't marked paid won't show as paid
+    
+    // For pending, accepted, on_the_way, close, completed - show as active offer with buttons
+    // Only paid with ceoExplicitPaid goes to history
+    if(!isPaid){
+      // Exclude only client_confirmed_finished that is also ceo paid? No, pending should show
+      if(!st.includes('client_confirmed_finished') || !ceoExplicitPaid){
+        list.push({...v, id:key, bookingId:v.bookingId||key, matchReason:(matchById?'id':matchByPhone?'phone':matchByEmail?'email':'uid')});
+      }
+    } else {
+      // Paid - should be in history, not active - but we will handle in history loader
+      debug('Booking '+ (v.bookingId||key) +' is PAID - ceoPaid:true + status paid - Will go to history - Not active');
+    }
+  });
+  
+  debug('Matched bookings for this nurse: '+list.length+' - Pending should show here');
+  all=list.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
+  render();
+  
+  // Also check myJobOffers for any extra that bookings missed
+  if(nurseId){
+    db.ref('myJobOffers/'+nurseId).once('value').then(s2=>{
+      if(s2.exists()){
+        let extra=0;
+        s2.forEach(ch=>{
+          const v=ch.val();
+          const st=(v.status||'pending').toLowerCase();
+          const ceoPaid=v.ceoPaid===true;
+          const isPaid=ceoPaid && (st==='paid');
+          if(!isPaid && !list.find(x=>x.id===ch.key)){
+            all.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
+            extra++;
+          }
+        });
+        if(extra>0){ debug('Found '+extra+' extra in myJobOffers'); all.sort((a,b)=>(b.time||0)-(a.time||0)); render(); }
+      }
+    });
+  }
+});
+}
+
+function render(){
+  const area=document.getElementById('offersArea');
+  const empty=document.getElementById('emptyArea');
+  if(all.length===0){ area.innerHTML=''; empty.style.display='block'; document.getElementById('countBadge').textContent='0 Offers - No pending - When client books, shows as Pending'; return; }
+  empty.style.display='none';
+  document.getElementById('countBadge').textContent=all.length+' Offers - '+all.filter(b=>(b.status||'pending').toLowerCase().includes('pending')).length+' Pending';
+  area.innerHTML=all.map(b=>{
+    const st=(b.status||'pending').toLowerCase();
+    const isPending=st.includes('pending')||st===''||st==='new';
+    const isAccepted=st.includes('accepted');
+    const isCompleted=st.includes('completed');
+    const isRejected=st.includes('rejected');
+    return `<div class="offer ${isPending?'pending':''} ${isAccepted?'accepted':''}">
+      <div style="display:flex;justify-content:space-between"><b>Booking ID ${b.bookingId||b.id}</b><span class="badge ${isPending?'badgeGold':''}">${(b.status||'PENDING').toUpperCase()} - ${isPending?'NEW BOOKING - Accept or Reject - Nurse hasn\'t decided yet':''}</span></div>
+      <div style="margin-top:8px;font-size:11px;color:#9a95b8">Client: ${b.clientName||''} - Phone: ${b.clientPhone||''} - Amount: Earnings ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)} - Total hidden - Location: ${b.location||''} - Match: ${b.matchReason||''}</div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        ${isPending?`<button class="btn btnGreen" onclick="acceptOffer('${b.id}')">Accept - Nurse accepts - Auto nav + alert client</button><button class="btn btnRed" onclick="rejectOffer('${b.id}')">Reject - Nurse rejects offer</button>`:''}
+        ${isAccepted?`<button class="btn btnBlue" onclick="openNav('${b.id}')">Navigate - Client location - You on way</button><button class="btn btnGreen" onclick="markOnWay('${b.id}')">Mark On The Way - System monitor</button>`:''}
+        ${isCompleted?`<div style="background:rgba(34,197,94,.1);border-radius:8px;padding:8px;font-size:11px">Completed - Waiting client confirm + CEO mark paid - CEO hasn't marked paid yet - Not paid wrongly</div>`:''}
+        ${isRejected?`<div style="background:rgba(239,68,68,.1);border-radius:8px;padding:8px;font-size:11px">Rejected by you - Client will book another nurse</div>`:''}
+        <button class="btn" onclick="showDetails('${b.id}')">Details - ID ${b.bookingId||b.id}</button>
+        ${b.clientPhone?`<button class="btn btnBlue" onclick="window.open('tel:${b.clientPhone}')">Call Client</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function acceptOffer(id){
+  const b=all.find(x=>x.id===id); if(!b) return;
+  const now=Date.now();
+  await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:now, acceptedAtStr:new Date().toLocaleString('en-GH'), acceptedByNurse:true});
+  await db.ref('myJobOffers/'+nurseId+'/'+id).update({status:'accepted'}).catch(()=>{});
+  const clientKey=b.clientId||b.clientPhone||'';
+  if(clientKey){
+    await db.ref('clientAlerts/'+clientKey+'/ACCEPTED-'+id+'-'+now).set({type:'accepted',title:`Nurse ${nurseName} accepted booking ${b.bookingId||id}`,message:`Nurse accepted - Auto nav opens - Where nurse reached`,bookingId:b.bookingId||id,time:now,read:false});
+  }
+  toast('Accepted - Client will see accepted - Not paid - CEO must mark paid later');
+}
+
+async function rejectOffer(id){
+  if(!confirm('Reject booking '+id+'? Nurse rejects - Client will book another')) return;
+  const now=Date.now();
+  await db.ref('bookings/'+id).update({status:'rejected_by_nurse', rejectedAt:now, rejectedByNurse:true});
+  await db.ref('myJobOffers/'+nurseId+'/'+id).update({status:'rejected'}).catch(()=>{});
+  const b=all.find(x=>x.id===id);
+  if(b && (b.clientId||b.clientPhone)){
+    await db.ref('clientAlerts/'+(b.clientId||b.clientPhone)+'/REJECTED-'+id+'-'+now).set({type:'rejected',title:`Nurse declined ${b.bookingId||id}`,message:`Nurse declined - Book another nurse`,bookingId:b.bookingId||id,time:now,read:false});
+  }
+  toast('Rejected - Client notified - Not paid');
+}
+
+async function markOnWay(id){ await db.ref('bookings/'+id).update({status:'on_the_way', onTheWayAt:Date.now()}); toast('On the way - Client alerted'); }
+
+function openNav(id){ const b=all.find(x=>x.id===id); if(!b) return; const cLat=b.clientLat||5.6037; const cLng=b.clientLng||-0.1870; navigator.geolocation.getCurrentPosition(p=>{ window.open(`https://www.google.com/maps/dir/?api=1&origin=${p.coords.latitude},${p.coords.longitude}&destination=${cLat},${cLng}&travelmode=driving`,'_blank'); }, ()=>{ window.open(`https://www.google.com/maps/search/?api=1&query=${cLat},${cLng}`,'_blank'); }); }
+
+function showDetails(id){ 
+  let b=all.find(x=>x.id===id);
+  if(!b){ 
+    // Try fetch from bookings
+    db.ref('bookings/'+id).once('value').then(s=>{ if(s.exists()){ const v=s.val(); showModalDetails(v, id); } else { toast('No details found for '+id); } });
+    return;
+  }
+  showModalDetails(b, id);
+}
+function showModalDetails(b, id){
+  const earnings = (parseFloat(b.livelyAmount||b.amount||0)*0.8).toFixed(2);
+  document.getElementById('modalTitle').textContent='Booking ID '+(b.bookingId||id);
+  document.getElementById('modalBody').innerHTML=`ID: ${b.bookingId||id}<br>Status: ${b.status||'pending'}<br>Client: ${b.clientName||''}<br>Client Phone: ${b.clientPhone||''}<br>Amount: Earnings ${b.currency||'GHS'} ${earnings} - Total hidden<br>Service: ${b.serviceType||''}<br>Location: ${b.location||''}<br>Time: ${new Date(b.time||b.createdAt||Date.now()).toLocaleString('en-GH')}<br>CEO Paid: ${b.ceoPaid?'YES - CEO marked paid':'NO - CEO hasnt marked paid yet'}<br>Match: ${b.matchReason||''}<br><br>Click Close to close`;
+  const m=document.getElementById('modal'); m.style.display='flex'; m.style.zIndex='9999';
+}
+function showHistory(id){
+  // FIXED: Always fetch from nurseBookingHistory, not just memory - so click shows details even if list not loaded
+  db.ref('nurseBookingHistory/'+nurseId+'/'+id).once('value').then(s=>{
+    let b=null;
+    if(s.exists()) b=s.val();
+    else if(window.historyData) b=window.historyData.find(x=>x.id===id);
+    else if(historyData) b=historyData.find(x=>x.id===id);
+    if(!b){
+      // Try bookings
+      db.ref('bookings/'+id).once('value').then(s2=>{
+        if(s2.exists()) showModalDetails(s2.val(), id);
+        else toast('No history details for '+id+' - Try refresh');
+      });
+      return;
+    }
+    // Show history details popup
+    const earnings=(parseFloat(b.livelyAmount||b.amount||0)*0.8).toFixed(2);
+    document.getElementById('modalTitle').textContent='History - Booking ID '+(b.bookingId||id);
+    document.getElementById('modalBody').innerHTML=`<b>History - Booking ID ${b.bookingId||id}</b><br>Status: ${b.status||'paid'}<br>Client: ${b.clientName||''}<br>Client Phone: ${b.clientPhone||''}<br>Amount: Earnings ${b.currency||'GHS'} ${earnings}<br>Service: ${b.serviceType||''}<br>Location: ${b.location||''}<br>CEO Paid: ${b.ceoPaidAtStr||b.ceoPaidAt||'Paid'}<br>Client Confirmed: ${b.clientConfirmedAtStr||''}<br>Time: ${new Date(b.time||b.createdAt||Date.now()).toLocaleString('en-GH')}<br><br>Only ID shows in history - Click for details popup - This is details<br><br><button onclick="deleteHistory('${id}')" style="background:#ef4444;color:#fff;border:none;padding:10px 16px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;width:100%">Delete This History</button>`;
+    const m=document.getElementById('modal'); m.style.display='flex'; m.style.zIndex='9999';
+    console.log('History details opened for', id);
+  });
+}
+
+
+async function deleteAllHistory(){ if(!confirm('Delete ALL history? This cannot be undone.')) return; await db.ref('nurseBookingHistory/'+nurseId).remove(); toast('All history deleted'); }
+async function deleteHistory(id){
+  if(!confirm('Delete this history? Booking ID ' + id + ' will be removed from your history only.')) return;
+  try{
+    await db.ref('nurseBookingHistory/'+nurseId+'/'+id).remove();
+    // Also try by bookingId if key was different
+    const snap = await db.ref('nurseBookingHistory/'+nurseId).once('value');
+    if(snap.exists()){
+      snap.forEach(ch=>{ const v=ch.val(); if((v.bookingId||ch.key)===id){ db.ref('nurseBookingHistory/'+nurseId+'/'+ch.key).remove(); } });
+    }
+    toast('History deleted - Booking ID ' + id);
+    closeModal();
+  }catch(e){ alert('Delete failed: ' + e.message); }
+}
+function closeModal(){ document.getElementById('modal').style.display='none'; } window.closeModal=closeModal; window.deleteHistory=deleteHistory;
+ window.showHistory=showHistory; window.showDetails=showDetails;
+
+function loadHistory(){
+  db.ref('nurseBookingHistory/'+nurseId).on('value', snap=>{
+    const el=document.getElementById('historyList');
+    if(!snap.exists()){ el.innerHTML='<small>No history yet - CEO hasnt marked paid - When CEO marks paid, ID moves here - Not before</small>'; return; }
+    const arr=[]; snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); });
+    arr.sort((a,b)=>(b.ceoPaidAt||0)-(a.ceoPaidAt||0));
+    historyData=arr; window.historyData=arr;
+    el.innerHTML=arr.map(b=>`<div class="histId" style="display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer" onclick="showHistory('${b.id}')"><div style="flex:1" onclick="showHistory('${b.id}')">Booking ID ${b.bookingId||b.id} - ${b.ceoPaidAtStr||b.clientConfirmedAtStr||''} - Paid - Click for details</div><button onclick="event.stopPropagation(); deleteHistory('${b.id}')" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer;min-width:60px">Delete</button></div>`).join('');
+    // Also add fallback click handler
+    setTimeout(()=>{ document.querySelectorAll('.histId').forEach(el2=>{ el2.addEventListener('click', ()=>{ console.log('History clicked', el2.textContent); }); }); }, 100);
+  });
+  
+  // Auto move to history ONLY when CEO explicitly marks paid - ceoPaid===true AND status paid
+  db.ref('bookings').orderByChild('nurseId').equalTo(nurseId).on('value', snap=>{
+    if(!snap.exists()) return;
+    snap.forEach(ch=>{
+      const v=ch.val();
+      const ceoPaid=v.ceoPaid===true;
+      const statusPaid=(v.status||'').toLowerCase().includes('paid');
+      if(ceoPaid && statusPaid){
+        const id=ch.key;
+        if(all.find(x=>x.id===id)){
+          db.ref('nurseBookingHistory/'+nurseId+'/'+id).set({...v, id, ceoPaidAt:Date.now(), ceoPaidAtStr:new Date().toLocaleString('en-GH')});
+          db.ref('bookings/'+id).remove().catch(()=>{});
+          toast('CEO marked paid - ID '+(v.bookingId||id)+' moved to history - CEO did mark paid');
+        }
+      }
+    });
+  });
+}
+
+window.onload=()=>{ loadAll(); loadHistory(); };
+</script>
+</body></html>
