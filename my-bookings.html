@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script src="onesignal-setup.js" defer></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="onesignal-setup.js" defer></script>
+<script src="lovecare-alerts.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>My Bookings - Fixed - Pending Shows - Clean</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}
@@ -216,5 +217,36 @@ async function deleteAllClientHistory(){
 window.deleteClientHistory = deleteClientHistory;
 window.deleteAllClientHistory = deleteAllClientHistory;
 window.deleteHistory = deleteClientHistory;
+<script>
+// CLIENT: Ring when nurse reply
+try {
+  // Find current user bookings - adjust if your code uses different name
+  const userPhone = localStorage.getItem('userPhone') || localStorage.getItem('phone') || '';
+  const userEmail = localStorage.getItem('userEmail') || localStorage.getItem('email') || '';
+
+  // If your page already get Firebase db, we go listen
+  if (window.db || window.firebase) {
+    const db = window.db || firebase.firestore();
+    
+    db.collection('bookings')
+      .where('clientPhone', '==', userPhone)
+      .onSnapshot((snap) => {
+        snap.docChanges().forEach((change) => {
+          if (change.type === 'modified') {
+            const data = change.doc.data();
+            if (data.status === 'accepted') {
+              playLoveCareAlert('accepted');
+              if (Notification.permission === 'granted') {
+                new Notification('✅ Nurse Don Accept!', {
+                  body: (data.nurseName || 'Nurse') + ' don accept your booking. Open app to see!',
+                  icon: '/icon-192.png'
+                });
+              }
+            }
+          }
+        });
+      });
+  }
+} catch(e) { console.log('Alert listener:', e); }
 </script>
 </body></html>
