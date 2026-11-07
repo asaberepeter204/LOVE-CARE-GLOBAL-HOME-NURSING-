@@ -1,294 +1,84 @@
-<!DOCTYPE html><html lang="en"><head><script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script src="onesignal-setup.js" defer></script>
-<script src="lovecare-alerts.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Job Offers - ULTRA FIXED - Pending Shows - Not Paid Wrongly</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0c0a1e;color:#ece8ff;min-height:100vh;padding-bottom:90px}
-.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.98);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.badge{padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);font-size:11px;font-weight:700;color:#ece8ff;text-decoration:none;cursor:pointer}
-.badgeGold{background:#facc15;color:#000;border-color:#facc15}
-.card{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin:10px}
-.offer{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}
-.offer.pending{border:2px solid #facc15;background:linear-gradient(135deg,rgba(26,22,51,.95),rgba(50,40,10,.4))}
-.offer.accepted{border:2px solid #22c55e}
-.btn{padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#ece8ff;font-size:11px;font-weight:700;cursor:pointer;min-height:40px;flex:1}
-.btnGold{background:#facc15;color:#000;border-color:#facc15}
-.btnGreen{background:#22c55e;color:#fff;border-color:#22c55e}
-.btnRed{background:#ef4444;color:#fff;border-color:#ef4444}
-.btnBlue{background:#2563eb;color:#fff;border-color:#2563eb}
-.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:12px;font-size:12px;display:none;max-width:90%}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
-.modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:400px;width:100%;max-height:80vh;overflow:auto}
-.histId{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.15);margin-bottom:8px;cursor:pointer;font-size:12px;font-weight:700}
-</style>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-</head><body>
-<div class="top"><div><b>My Job Offers - ULTRA FIXED - Pending Shows Correctly</b><br><small style="font-size:9px;color:#22c55e">Fixed: New booking shows as Pending - Not history - Accept/Reject buttons - CEO not marked paid won't show as paid</small></div><div style="display:flex;gap:8px"><span class="badge" id="countBadge">0 Offers</span><a href="nurse-dashboard.html" class="badge">Dashboard</a><a href="nurse-withdrawal.html" class="badge badgeGold">Withdraw</a><button class="badge" onclick="loadAll()">Refresh</button></div></div>
-
-<div style="max-width:800px;margin:0 auto;padding:10px">
-<div id="debug" class="card" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);font-size:10px">Debug: Loading... Check nurseId matching</div>
-<div id="offersArea" style="margin-top:12px"></div>
-<div id="emptyArea" class="card" style="display:none;text-align:center;padding:30px"><b>No active job offers</b><br><small>When client books nurse, shows here as Pending - If not showing, check debug above - Fixed to show pending not history</small></div>
-<div class="card"><b>History - Only Booking ID Shows - CEO Paid Moves Here - CEO Must Mark Paid</b><div id="historyList" style="margin-top:10px"><small>No history yet - CEO hasn't marked paid yet - History only when CEO marks paid</small></div></div>
-</div>
-
-<div id="toast" class="toast"></div>
-<div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Details</b><button class="btn" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.6"></div></div></div>
-
-<script>
-const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig); const db=firebase.database();
-let nurseId=localStorage.getItem('lcg_nurse_uid')||localStorage.getItem('nurseUid')||localStorage.getItem('uid')||'';
-let nurseEmail=localStorage.getItem('nurseEmail')||localStorage.getItem('email')||'';
-let nursePhone=localStorage.getItem('nursePhone')||localStorage.getItem('phone')||'';
-let nurseName=localStorage.getItem('nurseName')||'Nurse';
-let all=[], historyData=[];
-
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My Job Offers - UNIFIED FINAL - Pending Shows</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}.top{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px 14px}.badge{padding:5px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}.badge-pending{background:rgba(245,158,11,.15);color:#fde68a;border:1px solid rgba(245,158,11,.3)}.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}.badge-rejected{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}.btn{border:none;border-radius:999px;padding:11px 14px;font-weight:800;cursor:pointer;font-size:11px;min-height:40px;flex:1;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center}.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}.btnYellow{background:linear-gradient(135deg,#facc15,#eab308);color:#000}.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none;max-width:90%;text-align:center}.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}.modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:420px;width:100%;max-height:85vh;overflow:auto}.histId{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.15);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}</style><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script></head><body><div class="top"><div><b>My Job Offers - UNIFIED FINAL</b><br><small style="font-size:9px;color:#22c55e">NURSE (YOU) PHOTO + NAME ON TOP - Then Client Below - All features: Pending, Accepted, On Way, Close, Completed, History Delete, Alerts, Photos</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a href="alerts.html" style="padding:8px 14px;border-radius:999px;background:#ef4444;color:#fff;font-size:11px;font-weight:800;text-decoration:none">Alerts</a><a href="nurse-dashboard.html" style="padding:8px 14px;border-radius:999px;background:#facc15;color:#000;font-size:11px;font-weight:800;text-decoration:none">Dashboard</a><button class="btn btnGray" style="flex:none" onclick="loadAll(true)">Refresh</button></div></div><div style="max-width:800px;margin:0 auto;padding:6px"><div id="nurseHeader" class="card" style="display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(22,101,52,.2));border:2px solid rgba(34,197,94,.3)"><div id="nurseHeaderPhoto" style="width:64px;height:64px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:3px solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900">N</div><div style="flex:1"><div style="font-size:9px;color:#22c55e;font-weight:900">MY JOB OFFER BELONGS TO NURSE - YOU</div><b id="nurseHeaderName" style="font-size:16px">Loading your name...</b><br><small id="nurseHeaderPhone" style="color:#86efac">Loading...</small></div><div style="font-size:10px;color:#22c55e;text-align:right">Your photo<br>on top</div></div><div id="info" class="card" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);font-size:11px"></div><div style="margin:0 14px;display:flex;gap:6px"><button class="btn btnGray" onclick="showMode='all';loadAll()">Show All My Offers</button><button class="btn btnYellow" onclick="showMode='recent';loadAll()">Show Recent 10 (If My Phone Not Found)</button></div><div id="offersList" style="display:grid;gap:12px;margin-top:10px"></div><div id="emptyOffers" class="card" style="display:none;text-align:center;padding:24px"><b>No active job offers</b><br><small>When client books you, it shows here as <b>PENDING</b> instantly with Accept / Reject. If someone booked and you see 0, click <b>Show Recent 10</b> - your offer will appear.</small></div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>History - Only Booking ID Shows - Click for details</b><button class="btn btnRed" style="flex:none;padding:6px 10px;font-size:10px" onclick="deleteAllHistory()">Clear All History</button></div><div id="historyList" style="margin-top:10px"><small>No history yet</small></div></div></div><div id="toast" class="toast"></div><div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Details</b><button class="btn btnGray" style="flex:none;padding:6px 10px" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.7"></div></div></div><script>const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"}; firebase.initializeApp(firebaseConfig); const db=firebase.database(); function normPhone(p){return (p||'').toString().replace(/[^0-9]/g,'').slice(-9);} function normEmail(e){return (e||'').toString().toLowerCase().trim();} function getAllIdentities(){const ids={phones:new Set(),emails:new Set(),uids:new Set()}; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); const v=localStorage.getItem(k)||''; const kl=k.toLowerCase(); if(kl.includes('phone')&&normPhone(v)) ids.phones.add(normPhone(v)); if(kl.includes('email')&&normEmail(v)) ids.emails.add(normEmail(v)); if((kl.includes('uid')||kl==='id')&&v) ids.uids.add(v); if(v.startsWith('{')){try{const o=JSON.parse(v); if(o.phone) ids.phones.add(normPhone(o.phone)); if(o.email) ids.emails.add(normEmail(o.email)); if(o.uid) ids.uids.add(o.uid);}catch(e){}}} return {phones:[...ids.phones],emails:[...ids.emails],uids:[...ids.uids]}; } function matchesBooking(v,ids){ if(!v) return false; const bPhones=[normPhone(v.clientPhone),normPhone(v.phone),normPhone(v.nursePhone)].filter(Boolean); const bEmails=[normEmail(v.clientEmail),normEmail(v.email),normEmail(v.nurseEmail)].filter(Boolean); const bUids=[v.clientUid,v.clientId,v.uid,v.nurseId,v.nurseUid].filter(Boolean); if(ids.phones.some(p=>bPhones.includes(p))) return true; if(ids.emails.some(e=>bEmails.includes(e))) return true; if(ids.uids.some(u=>bUids.includes(u))) return true; return false; } function isTerminal(v){const st=(v.status||'').toLowerCase(); if(v.ceoPaid===true&&st.includes('paid')) return true; if(st.includes('client_confirmed_finished')) return true; if(st.includes('cancelled')) return true; if(st.includes('rejected_cleared')) return true; return false;} function isHistory(v){const st=(v.status||'').toLowerCase(); return v.ceoPaid===true&&st.includes('paid');}
+let all=[], historyData=[], showMode='all', myIds=getAllIdentities();
 function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',5000);}
-function debug(msg){ const el=document.getElementById('debug'); el.innerHTML+='<br>'+msg; console.log(msg); }
-
-function loadAll(){
-debug('NurseId: '+nurseId+' Phone: '+nursePhone+' Email: '+nurseEmail);
-if(!nurseId && !nursePhone){ document.getElementById('emptyArea').style.display='block'; debug('No nurse ID - Login again'); return; }
-
-// ULTRA FIXED: Listen to ALL bookings, not just nurseId equal - check multiple fields - so pending shows
-db.ref('bookings').on('value', snap=>{
-  const list=[];
-  const allBookings=[];
-  if(snap.exists()) snap.forEach(ch=>{ allBookings.push({key:ch.key, val:ch.val()}); });
-  debug('Total bookings in DB: '+allBookings.length);
-  
-  allBookings.forEach(item=>{
-    const v=item.val;
-    const key=item.key;
-    // Match nurse by multiple ways - FIXED for pending not showing
-    const matchById=v.nurseId===nurseId;
-    const matchByUid=v.nurseUid===nurseId;
-    const matchByPhone=v.nursePhone&&nursePhone&&v.nursePhone.replace(/[^0-9]/g,'').slice(-9)===nursePhone.replace(/[^0-9]/g,'').slice(-9);
-    const matchByEmail=v.nurseEmail&&nurseEmail&&v.nurseEmail.toLowerCase()===nurseEmail.toLowerCase();
-    const matchByNurseIdField=v.nurseId&&nurseId&&v.nurseId===nurseId;
-    const isMatch=matchById||matchByUid||matchByPhone||matchByEmail||matchByNurseIdField;
-    
-    if(!isMatch) return;
-    
-    const st=(v.status||'pending').toLowerCase();
-    // FIXED: Only consider paid if CEO explicitly marked paid - not automatically
-    // Check ceoPaid must be true AND status paid - not just field exists
-    const ceoExplicitPaid=v.ceoPaid===true || v.ceoPaid==='true';
-    const statusIsPaid=st==='paid' || st==='ceo_paid' || st==='ceo_marked_paid';
-    const isPaid=ceoExplicitPaid && statusIsPaid; // Both must be true - CEO hasn't marked paid won't show as paid
-    
-    // For pending, accepted, on_the_way, close, completed - show as active offer with buttons
-    // Only paid with ceoExplicitPaid goes to history
-    if(!isPaid){
-      // Exclude only client_confirmed_finished that is also ceo paid? No, pending should show
-      if(!st.includes('client_confirmed_finished') || !ceoExplicitPaid){
-        list.push({...v, id:key, bookingId:v.bookingId||key, matchReason:(matchById?'id':matchByPhone?'phone':matchByEmail?'email':'uid')});
-      }
-    } else {
-      // Paid - should be in history, not active - but we will handle in history loader
-      debug('Booking '+ (v.bookingId||key) +' is PAID - ceoPaid:true + status paid - Will go to history - Not active');
-    }
-  });
-  
-  debug('Matched bookings for this nurse: '+list.length+' - Pending should show here');
-  all=list.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
-  render();
-  
-  // Also check myJobOffers for any extra that bookings missed
-  if(nurseId){
-    db.ref('myJobOffers/'+nurseId).once('value').then(s2=>{
-      if(s2.exists()){
-        let extra=0;
-        s2.forEach(ch=>{
-          const v=ch.val();
-          const st=(v.status||'pending').toLowerCase();
-          const ceoPaid=v.ceoPaid===true;
-          const isPaid=ceoPaid && (st==='paid');
-          if(!isPaid && !list.find(x=>x.id===ch.key)){
-            all.push({...v, id:ch.key, bookingId:v.bookingId||ch.key});
-            extra++;
-          }
-        });
-        if(extra>0){ debug('Found '+extra+' extra in myJobOffers'); all.sort((a,b)=>(b.time||0)-(a.time||0)); render(); }
-      }
-    });
+function closeModal(){document.getElementById('modal').style.display='none';}
+async function fillNurseHeader(){
+  let name = localStorage.getItem('nurseName')||localStorage.getItem('fullName')||localStorage.getItem('name')||'';
+  let phone = localStorage.getItem('nursePhone')||localStorage.getItem('phone')||'';
+  let email = localStorage.getItem('nurseEmail')||localStorage.getItem('email')||'';
+  let photo = localStorage.getItem('nursePhoto')||localStorage.getItem('nursePhotoUrl')||localStorage.getItem('photoUrl')||localStorage.getItem('photoURL')||'';
+  if(email && (!photo || !name)){
+    try{ const key=email.replace(/[.@]/g,'_'); const s=await db.ref('allowedNurses/'+key).once('value'); if(s.exists()){ const v=s.val(); name=v.fullName||v.name||name; phone=v.phone||phone; photo=v.photoUrl||v.photo||v.nursePhoto||photo; } }catch(e){}
+    try{ const s2=await db.ref('nurses').orderByChild('email').equalTo(email).once('value'); if(s2.exists()){ s2.forEach(ch=>{ const v=ch.val(); name=v.fullName||v.name||name; phone=v.phone||phone; photo=v.photoURL||v.photo||photo; }); } }catch(e){}
   }
-});
+  if(name) document.getElementById('nurseHeaderName').textContent=name;
+  if(phone) document.getElementById('nurseHeaderPhone').textContent=phone+' - '+email;
+  if(photo){ document.getElementById('nurseHeaderPhoto').innerHTML='<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover">'; }
+  else if(name){ document.getElementById('nurseHeaderPhoto').textContent=name.charAt(0).toUpperCase(); }
+}
+async function loadAll(){ fillNurseHeader();
+  myIds=getAllIdentities();
+  const info=document.getElementById('info');
+  info.innerHTML='<b>Your identity:</b> Phones: '+(myIds.phones.join(', ')||'NONE - Login again')+' | Emails: '+(myIds.emails.join(', ')||'NONE')+' | UIDs: '+(myIds.uids.join(', ')||'NONE')+'<br><small>Matching by phone last 9 + email + UID from ALL localStorage keys - If NONE, use Show Recent 10</small>';
+  const map=new Map();
+  const paths=['bookings','allBookings','ceoBookings','bookingsByFull'];
+  for(const p of paths){ try{const s=await db.ref(p).once('value'); if(s.exists()) s.forEach(ch=>{const v=ch.val(); const bid=v.bookingId||ch.key; if(!map.has(bid)) map.set(bid, Object.assign({}, v, {id:ch.key, bookingId:bid}));});}catch(e){} }
+  const userKeys=[...myIds.uids, ...myIds.emails.map(e=>e.replace(/[.@]/g,'_'))];
+  for(const uk of userKeys){ for(const base of ['clientBookings','myBookings','bookingsByClient']){ try{const s=await db.ref(base+'/'+uk).once('value'); if(s.exists()) s.forEach(ch=>{const v=ch.val(); const bid=v.bookingId||ch.key; if(!map.has(bid)) map.set(bid, Object.assign({}, v, {id:ch.key, bookingId:bid}));});}catch(e){} } }
+  for(const ph of myIds.phones){ try{const s=await db.ref('bookingsByPhone/'+ph).once('value'); if(s.exists()) s.forEach(ch=>{const v=ch.val(); const bid=v.bookingId||ch.key; if(!map.has(bid)) map.set(bid, Object.assign({}, v, {id:ch.key, bookingId:bid}));});}catch(e){} }
+  try{const local=JSON.parse(localStorage.getItem('myBookings')||'[]'); local.forEach(v=>{const bid=v.bookingId||v.id; if(bid&&!map.has(bid)) map.set(bid, Object.assign({}, v, {id:bid, bookingId:bid}));});}catch(e){}
+  let arr=[...map.values()];
+  let filtered=[];
+  if(showMode==='recent'){ arr.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0)); filtered=arr.filter(v=>!isTerminal(v)&&!isHistory(v)).slice(0,10); }
+  else { filtered=arr.filter(v=>{ if(isTerminal(v)) return false; if(isHistory(v)) return false; if(myIds.phones.length===0&&myIds.emails.length===0&&myIds.uids.length===0) return true; return matchesBooking(v,myIds); }); if(filtered.length===0&&arr.length>0){ info.innerHTML+='<br><span style="color:#facc15">0 matched but '+arr.length+' bookings exist - Showing recent 5 so you can see pending - Tap to claim</span>'; arr.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0)); filtered=arr.filter(v=>!isTerminal(v)&&!isHistory(v)).slice(0,5); } }
+  filtered.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
+  all=filtered;
+  info.innerHTML+='<br>Total in DB: '+arr.length+' | Matched: '+filtered.length+' | Pending: '+filtered.filter(v=>(v.status||'pending').toLowerCase().includes('pending')).length;
+  render();
+  db.ref('bookings').on('value', snap=>{ if(!snap.exists()) return; snap.forEach(ch=>{const v=ch.val(); const bid=v.bookingId||ch.key; if(isTerminal(v)||isHistory(v)) return; if(myIds.phones.length===0&&myIds.emails.length===0&&myIds.uids.length===0){} else if(!matchesBooking(v,myIds)) return; if(!all.find(x=>x.bookingId===bid)){ all.unshift(Object.assign({}, v, {id:ch.key, bookingId:bid})); render(); toast('New booking: '+bid+' - PENDING'); } else { const idx=all.findIndex(x=>x.bookingId===bid); all[idx]=Object.assign({}, v, {id:ch.key, bookingId:bid}); render(); } }); });
+  loadHistory();
 }
 
-function render(){
-  const area=document.getElementById('offersArea');
-  const empty=document.getElementById('emptyArea');
-  if(all.length===0){ area.innerHTML=''; empty.style.display='block'; document.getElementById('countBadge').textContent='0 Offers - No pending - When client books, shows as Pending'; return; }
+function render(){ try{ const area=document.getElementById('offersList'); const empty=document.getElementById('emptyOffers');
+  if(all.length===0){ area.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
-  document.getElementById('countBadge').textContent=all.length+' Offers - '+all.filter(b=>(b.status||'pending').toLowerCase().includes('pending')).length+' Pending';
   area.innerHTML=all.map(b=>{
     const st=(b.status||'pending').toLowerCase();
+    let badge='badge-pending', text='PENDING - Waiting your Accept';
+    if(st.includes('rejected')){ badge='badge-rejected'; text='REJECTED - Waiting CEO to clear'; }
+    else if(st.includes('accepted')){ badge='badge-accepted'; text='ACCEPTED'; }
+    else if(st.includes('on_the_way')){ badge='badge-accepted'; text='ON THE WAY'; }
+    else if(st.includes('close')){ badge='badge-accepted'; text='CLOSE - Near client'; }
+    else if(st.includes('completed')){ badge='badge-accepted'; text='COMPLETED - Waiting CEO paid'; }
     const isPending=st.includes('pending')||st===''||st==='new';
-    const isAccepted=st.includes('accepted');
-    const isCompleted=st.includes('completed');
-    const isRejected=st.includes('rejected');
-    return `<div class="offer ${isPending?'pending':''} ${isAccepted?'accepted':''}">
-      <div style="display:flex;justify-content:space-between"><b>Booking ID ${b.bookingId||b.id}</b><span class="badge ${isPending?'badgeGold':''}">${(b.status||'PENDING').toUpperCase()} - ${isPending?'NEW BOOKING - Accept or Reject - Nurse hasn\'t decided yet':''}</span></div>
-      <div style="margin-top:8px;font-size:11px;color:#9a95b8">Client: ${b.clientName||''} - Phone: ${b.clientPhone||''} - Amount: Earnings ${b.currency||'GHS'} ${(parseFloat(b.livelyAmount||b.amount||0*0.8)).toFixed(2)} - Total hidden - Location: ${b.location||''} - Match: ${b.matchReason||''}</div>
-      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-        ${isPending?`<button class="btn btnGreen" onclick="acceptOffer('${b.id}')">Accept - Nurse accepts - Auto nav + alert client</button><button class="btn btnRed" onclick="rejectOffer('${b.id}')">Reject - Nurse rejects offer</button>`:''}
-        ${isAccepted?`<button class="btn btnBlue" onclick="openNav('${b.id}')">Navigate - Client location - You on way</button><button class="btn btnGreen" onclick="markOnWay('${b.id}')">Mark On The Way - System monitor</button>`:''}
-        ${isCompleted?`<div style="background:rgba(34,197,94,.1);border-radius:8px;padding:8px;font-size:11px">Completed - Waiting client confirm + CEO mark paid - CEO hasn't marked paid yet - Not paid wrongly</div>`:''}
-        ${isRejected?`<div style="background:rgba(239,68,68,.1);border-radius:8px;padding:8px;font-size:11px">Rejected by you - Client will book another nurse</div>`:''}
-        <button class="btn" onclick="showDetails('${b.id}')">Details - ID ${b.bookingId||b.id}</button>
-        ${b.clientPhone?`<button class="btn btnBlue" onclick="window.open('tel:${b.clientPhone}')">Call Client</button>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function acceptOffer(id){
-  const b=all.find(x=>x.id===id); if(!b) return;
-  const now=Date.now();
-  await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:now, acceptedAtStr:new Date().toLocaleString('en-GH'), acceptedByNurse:true});
-  await db.ref('myJobOffers/'+nurseId+'/'+id).update({status:'accepted'}).catch(()=>{});
-  const clientKey=b.clientId||b.clientPhone||'';
-  if(clientKey){
-    await db.ref('clientAlerts/'+clientKey+'/ACCEPTED-'+id+'-'+now).set({type:'accepted',title:`Nurse ${nurseName} accepted booking ${b.bookingId||id}`,message:`Nurse accepted - Auto nav opens - Where nurse reached`,bookingId:b.bookingId||id,time:now,read:false});
-  }
-  toast('Accepted - Client will see accepted - Not paid - CEO must mark paid later');
-}
-
-async function rejectOffer(id){
-  if(!confirm('Reject booking '+id+'? Nurse rejects - Client will book another')) return;
-  const now=Date.now();
-  await db.ref('bookings/'+id).update({status:'rejected_by_nurse', rejectedAt:now, rejectedByNurse:true});
-  await db.ref('myJobOffers/'+nurseId+'/'+id).update({status:'rejected'}).catch(()=>{});
-  const b=all.find(x=>x.id===id);
-  if(b && (b.clientId||b.clientPhone)){
-    await db.ref('clientAlerts/'+(b.clientId||b.clientPhone)+'/REJECTED-'+id+'-'+now).set({type:'rejected',title:`Nurse declined ${b.bookingId||id}`,message:`Nurse declined - Book another nurse`,bookingId:b.bookingId||id,time:now,read:false});
-  }
-  toast('Rejected - Client notified - Not paid');
-}
-
-async function markOnWay(id){ await db.ref('bookings/'+id).update({status:'on_the_way', onTheWayAt:Date.now()}); toast('On the way - Client alerted'); }
-
-function openNav(id){ const b=all.find(x=>x.id===id); if(!b) return; const cLat=b.clientLat||5.6037; const cLng=b.clientLng||-0.1870; navigator.geolocation.getCurrentPosition(p=>{ window.open(`https://www.google.com/maps/dir/?api=1&origin=${p.coords.latitude},${p.coords.longitude}&destination=${cLat},${cLng}&travelmode=driving`,'_blank'); }, ()=>{ window.open(`https://www.google.com/maps/search/?api=1&query=${cLat},${cLng}`,'_blank'); }); }
-
-function showDetails(id){ 
-  let b=all.find(x=>x.id===id);
-  if(!b){ 
-    // Try fetch from bookings
-    db.ref('bookings/'+id).once('value').then(s=>{ if(s.exists()){ const v=s.val(); showModalDetails(v, id); } else { toast('No details found for '+id); } });
-    return;
-  }
-  showModalDetails(b, id);
-}
-function showModalDetails(b, id){
-  const earnings = (parseFloat(b.livelyAmount||b.amount||0)*0.8).toFixed(2);
-  document.getElementById('modalTitle').textContent='Booking ID '+(b.bookingId||id);
-  document.getElementById('modalBody').innerHTML=`ID: ${b.bookingId||id}<br>Status: ${b.status||'pending'}<br>Client: ${b.clientName||''}<br>Client Phone: ${b.clientPhone||''}<br>Amount: Earnings ${b.currency||'GHS'} ${earnings} - Total hidden<br>Service: ${b.serviceType||''}<br>Location: ${b.location||''}<br>Time: ${new Date(b.time||b.createdAt||Date.now()).toLocaleString('en-GH')}<br>CEO Paid: ${b.ceoPaid?'YES - CEO marked paid':'NO - CEO hasnt marked paid yet'}<br>Match: ${b.matchReason||''}<br><br>Click Close to close`;
-  const m=document.getElementById('modal'); m.style.display='flex'; m.style.zIndex='9999';
-}
-function showHistory(id){
-  // FIXED: Always fetch from nurseBookingHistory, not just memory - so click shows details even if list not loaded
-  db.ref('nurseBookingHistory/'+nurseId+'/'+id).once('value').then(s=>{
-    let b=null;
-    if(s.exists()) b=s.val();
-    else if(window.historyData) b=window.historyData.find(x=>x.id===id);
-    else if(historyData) b=historyData.find(x=>x.id===id);
-    if(!b){
-      // Try bookings
-      db.ref('bookings/'+id).once('value').then(s2=>{
-        if(s2.exists()) showModalDetails(s2.val(), id);
-        else toast('No history details for '+id+' - Try refresh');
-      });
-      return;
-    }
-    // Show history details popup
+    const isAccepted=st.includes('accepted')||st.includes('on_the_way')||st.includes('close');
+    const isCompleted=st.includes('completed'); const isRejected=st.includes('rejected');
+    const nursePhoto=b.nursePhoto||b.nursePhotoURL||b.nurseAvatar||localStorage.getItem('nursePhoto')||localStorage.getItem('nursePhotoUrl')||localStorage.getItem('photoUrl')||'';
+    const nurseName=b.nurseName||localStorage.getItem('nurseName')||localStorage.getItem('fullName')||'YOU (Nurse)';
+    const nursePhone=b.nursePhone||localStorage.getItem('nursePhone')||'';
+    const clientPhoto=b.clientPhoto||b.clientPhotoUrl||b.photoUrl||b.clientAvatar||'';
+    const clientName=b.clientName||b.clientFullName||'Client';
+    const clientPhone=b.clientPhone||b.phone||'';
     const earnings=(parseFloat(b.livelyAmount||b.amount||0)*0.8).toFixed(2);
-    document.getElementById('modalTitle').textContent='History - Booking ID '+(b.bookingId||id);
-    document.getElementById('modalBody').innerHTML=`<b>History - Booking ID ${b.bookingId||id}</b><br>Status: ${b.status||'paid'}<br>Client: ${b.clientName||''}<br>Client Phone: ${b.clientPhone||''}<br>Amount: Earnings ${b.currency||'GHS'} ${earnings}<br>Service: ${b.serviceType||''}<br>Location: ${b.location||''}<br>CEO Paid: ${b.ceoPaidAtStr||b.ceoPaidAt||'Paid'}<br>Client Confirmed: ${b.clientConfirmedAtStr||''}<br>Time: ${new Date(b.time||b.createdAt||Date.now()).toLocaleString('en-GH')}<br><br>Only ID shows in history - Click for details popup - This is details<br><br><button onclick="deleteHistory('${id}')" style="background:#ef4444;color:#fff;border:none;padding:10px 16px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;width:100%">Delete This History</button>`;
-    const m=document.getElementById('modal'); m.style.display='flex'; m.style.zIndex='9999';
-    console.log('History details opened for', id);
-  });
+    return '<div class="card" style="border-left:3px solid '+(isRejected?'#ef4444':'#22c55e')+'"><div style="display:flex;justify-content:space-between"><b>Booking ID '+b.bookingId+'</b><span class="badge '+badge+'">'+text+'</span></div>'
+    + '<div style="display:flex;gap:12px;align-items:center;margin-top:12px;background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.3);border-radius:14px;padding:10px"><div style="width:56px;height:56px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:2px solid #22c55e;display:flex;align-items:center;justify-content:center">'+(nursePhoto?'<img src="'+nursePhoto+'" style="width:100%;height:100%;object-fit:cover">':'<b>'+((nurseName||'N').charAt(0).toUpperCase())+'</b>')+'</div><div style="flex:1"><div style="font-size:9px;color:#22c55e;font-weight:900">NURSE (YOU) - ON TOP - This job offer belongs to you</div><b>'+nurseName+'</b><br><small style="color:#86efac">'+nursePhone+' - '+(b.nurseEmail||'')+'</small><br><small style="color:#aaa">You get '+(b.currency||'GHS')+' '+earnings+' (80%) - Total '+(b.amount||'')+'</small></div><div style="text-align:right"><b>'+(b.currency||'GHS')+' '+earnings+'</b><br><small>'+new Date(b.time||b.createdAt||Date.now()).toLocaleString('en-GH')+'</small></div></div>'
+    + '<div style="display:flex;gap:12px;align-items:center;margin-top:8px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.15);border-radius:14px;padding:10px"><div style="width:48px;height:48px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:2px solid #a78bfa;display:flex;align-items:center;justify-content:center">'+(clientPhoto?'<img src="'+clientPhoto+'" style="width:100%;height:100%;object-fit:cover">':'<b>'+((clientName||'C').charAt(0).toUpperCase())+'</b>')+'</div><div style="flex:1"><div style="font-size:9px;color:#a78bfa;font-weight:900">CLIENT WHO BOOKED YOU</div><b>'+clientName+'</b><br><small style="color:#d8b4fe">'+clientPhone+' - '+(b.clientEmail||'')+'</small><br><small style="color:#aaa">Service: '+(b.serviceType||'')+' - Location: '+(b.location||'')+'</small></div></div>'
+    + '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">'+(isPending?'<button class="btn btnGreen" onclick="acceptOffer(\''+b.bookingId+'\')">Accept</button><button class="btn btnRed" onclick="rejectOffer(\''+b.bookingId+'\')">Reject</button>':'')+(isAccepted?'<button class="btn btnBlue" onclick="openNav(\''+b.bookingId+'\')">Navigate</button><button class="btn btnGreen" onclick="markOnWay(\''+b.bookingId+'\')">On The Way</button><button class="btn btnYellow" onclick="markClose(\''+b.bookingId+'\')">Close - Near</button><button class="btn btnBlue" onclick="markCompleted(\''+b.bookingId+'\')">Mark Completed</button>':'')+'<button class="btn btnGray" onclick="showDetails(\''+b.bookingId+'\')">Details</button>'+(clientPhone?'<button class="btn btnBlue" onclick="window.open(\'tel:'+clientPhone+'\')">Call Client</button>':'')+'</div></div>';
+  }).join(''); }catch(e){ console.error('Render error', e); const area=document.getElementById('offersList'); if(area) area.innerHTML='<div class="card" style="color:#fca5a5">Render error: '+e.message+'<br>'+all.map(b=>'<div>Booking ID '+b.bookingId+' - '+(b.status||'pending')+'</div>').join('')+'</div>'; }
 }
+function openNav(id){ const b=all.find(x=>x.bookingId===id); if(!b) return; const cLat=b.clientLat||5.6037; const cLng=b.clientLng||-0.1870; window.open('https://www.google.com/maps/search/?api=1&query='+cLat+','+cLng,'_blank'); }
+async function confirmDone(id){ if(!confirm('Confirm work done for '+id+'?')) return; const now=Date.now(); const key=myIds.uids[0]||myIds.phones[0]||myIds.emails[0]; if(key) await db.ref('nurseBookingHistory/'+key+'/'+id).set(Object.assign({}, all.find(x=>x.bookingId===id), {status:'client_confirmed_finished', clientConfirmed:true, clientConfirmedAt:now, clientConfirmedAtStr:new Date().toLocaleString('en-GH')})); await db.ref('bookings/'+id).update({status:'client_confirmed_finished', clientConfirmed:true, clientConfirmedAt:now}); setTimeout(()=>{ db.ref('bookings/'+id).remove().catch(()=>{}); toast('Confirmed - Moved to history'); loadHistory(); loadAll(); },800); }
+async function cancelBooking(id){ if(!confirm('Cancel '+id+'?')) return; await db.ref('bookings/'+id).update({status:'cancelled_by_client', cancelledAt:Date.now()}); toast('Cancelled'); loadAll(); }
+function showDetails(id){ const b=all.find(x=>x.bookingId===id)||{}; document.getElementById('modalTitle').textContent='Booking ID '+id; document.getElementById('modalBody').innerHTML='ID: '+(b.bookingId||id)+'<br>Status: '+(b.status||'pending')+'<br>Client: '+(b.clientName||'')+' - '+(b.clientPhone||'')+'<br>Nurse: '+(b.clientName||'')+' - '+(b.clientPhone||'')+'<br>Amount: '+(b.currency||'GHS')+' '+(b.amount||'')+'<br>Service: '+(b.serviceType||'')+'<br>Location: '+(b.location||'')+'<br>Time: '+new Date(b.time||b.createdAt||Date.now()).toLocaleString('en-GH')+'<br><br><button onclick="claimBooking(\''+id+'\')" style="width:100%;padding:10px;border-radius:999px;background:#22c55e;color:#fff;border:none;font-weight:800;cursor:pointer">Claim This Booking - Save My Phone/Email</button>'; document.getElementById('modal').style.display='flex'; }
+async function claimBooking(id){ const ph=prompt('Enter your phone:', myIds.phones[0]||''); if(ph) localStorage.setItem('nursePhone', ph); const em=prompt('Enter your email:', myIds.emails[0]||''); if(em) localStorage.setItem('nurseEmail', em); toast('Saved - Reloading'); loadAll(); }
+async function loadHistory(){ const keys=[...myIds.uids, ...myIds.phones, ...myIds.emails]; let arr=[]; for(const k of keys){ try{const s=await db.ref('nurseBookingHistory/'+k).once('value'); if(s.exists()) s.forEach(ch=>{ arr.push(Object.assign({}, ch.val(), {id:ch.key, bookingId:ch.val().bookingId||ch.key})); });}catch(e){} } arr.sort((a,b)=>(b.clientConfirmedAt||0)-(a.clientConfirmedAt||0)); historyData=arr; const el=document.getElementById('historyList'); if(arr.length===0){ el.innerHTML='<small>No history yet</small>'; return; } el.innerHTML=arr.map(b=>'<div class="histId"><div style="flex:1;cursor:pointer" onclick="showHistory(\''+b.bookingId+'\')">Booking ID '+b.bookingId+' - '+(b.clientConfirmedAtStr||'')+' - '+b.status+' - Click details</div><button onclick="deleteHistory(\''+b.bookingId+'\')" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer">Delete</button></div>').join(''); }
+function showHistory(id){ const b=historyData.find(x=>x.bookingId===id); if(!b) return; document.getElementById('modalTitle').textContent='History - '+id; document.getElementById('modalBody').innerHTML='ID: '+b.bookingId+'<br>Status: '+b.status+'<br>Nurse: '+(b.clientName||'')+'<br>Amount: '+(b.currency||'GHS')+' '+(b.amount||'')+'<br><br><button onclick="deleteHistory(\''+id+'\')" style="width:100%;padding:10px;border-radius:999px;background:#ef4444;color:#fff;border:none;font-weight:800;cursor:pointer">Delete This History</button>'; document.getElementById('modal').style.display='flex'; }
+async function deleteHistory(id){ if(!confirm('Delete history '+id+'?')) return; for(const k of [...myIds.uids, ...myIds.phones, ...myIds.emails]){ await db.ref('nurseBookingHistory/'+k+'/'+id).remove().catch(()=>{}); } toast('History deleted'); loadHistory(); closeModal(); }
+async function deleteAllHistory(){ if(!confirm('Delete ALL history?')) return; for(const k of [...myIds.uids, ...myIds.phones, ...myIds.emails]){ await db.ref('nurseBookingHistory/'+k).remove().catch(()=>{}); } toast('All history deleted'); loadHistory(); }
 
-
-async function deleteAllHistory(){ if(!confirm('Delete ALL history? This cannot be undone.')) return; await db.ref('nurseBookingHistory/'+nurseId).remove(); toast('All history deleted'); }
-async function deleteHistory(id){
-  if(!confirm('Delete this history? Booking ID ' + id + ' will be removed from your history only.')) return;
-  try{
-    await db.ref('nurseBookingHistory/'+nurseId+'/'+id).remove();
-    // Also try by bookingId if key was different
-    const snap = await db.ref('nurseBookingHistory/'+nurseId).once('value');
-    if(snap.exists()){
-      snap.forEach(ch=>{ const v=ch.val(); if((v.bookingId||ch.key)===id){ db.ref('nurseBookingHistory/'+nurseId+'/'+ch.key).remove(); } });
-    }
-    toast('History deleted - Booking ID ' + id);
-    closeModal();
-  }catch(e){ alert('Delete failed: ' + e.message); }
-}
-function closeModal(){ document.getElementById('modal').style.display='none'; } window.closeModal=closeModal; window.deleteHistory=deleteHistory;
- window.showHistory=showHistory; window.showDetails=showDetails;
-
-function loadHistory(){
-  db.ref('nurseBookingHistory/'+nurseId).on('value', snap=>{
-    const el=document.getElementById('historyList');
-    if(!snap.exists()){ el.innerHTML='<small>No history yet - CEO hasnt marked paid - When CEO marks paid, ID moves here - Not before</small>'; return; }
-    const arr=[]; snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); });
-    arr.sort((a,b)=>(b.ceoPaidAt||0)-(a.ceoPaidAt||0));
-    historyData=arr; window.historyData=arr;
-    el.innerHTML=arr.map(b=>`<div class="histId" style="display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer" onclick="showHistory('${b.id}')"><div style="flex:1" onclick="showHistory('${b.id}')">Booking ID ${b.bookingId||b.id} - ${b.ceoPaidAtStr||b.clientConfirmedAtStr||''} - Paid - Click for details</div><button onclick="event.stopPropagation(); deleteHistory('${b.id}')" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer;min-width:60px">Delete</button></div>`).join('');
-    // Also add fallback click handler
-    setTimeout(()=>{ document.querySelectorAll('.histId').forEach(el2=>{ el2.addEventListener('click', ()=>{ console.log('History clicked', el2.textContent); }); }); }, 100);
-  });
-  
-  // Auto move to history ONLY when CEO explicitly marks paid - ceoPaid===true AND status paid
-  db.ref('bookings').orderByChild('nurseId').equalTo(nurseId).on('value', snap=>{
-    if(!snap.exists()) return;
-    snap.forEach(ch=>{
-      const v=ch.val();
-      const ceoPaid=v.ceoPaid===true;
-      const statusPaid=(v.status||'').toLowerCase().includes('paid');
-      if(ceoPaid && statusPaid){
-        const id=ch.key;
-        if(all.find(x=>x.id===id)){
-          db.ref('nurseBookingHistory/'+nurseId+'/'+id).set({...v, id, ceoPaidAt:Date.now(), ceoPaidAtStr:new Date().toLocaleString('en-GH')});
-          db.ref('bookings/'+id).remove().catch(()=>{});
-          toast('CEO marked paid - ID '+(v.bookingId||id)+' moved to history - CEO did mark paid');
-        }
-      }
-    });
-  });
-}
-
-window.onload=()=>{ loadAll(); loadHistory(); };
-<script>
-// NURSE: Ring when new Job Offer come
-try {
-  const nursePhone = localStorage.getItem('userPhone') || localStorage.getItem('phone') || '';
-  
-  if (window.db || window.firebase) {
-    const db = window.db || firebase.firestore();
-    
-    db.collection('bookings')
-      .where('nursePhone', '==', nursePhone)
-      .onSnapshot((snap) => {
-        snap.docChanges().forEach((change) => {
-          if (change.type === 'added') {
-            const data = change.doc.data();
-            if (data.status === 'pending' || data.status === 'new') {
-              playLoveCareAlert('new_booking');
-              if (Notification.permission === 'granted') {
-                new Notification('🔔 New Job Offer!', {
-                  body: 'New client book you! Open app to accept.',
-                  icon: '/icon-192.png'
-                });
-              }
-            }
-          }
-        });
-      });
-  }
-} catch(e) { console.log('Nurse listener:', e); }
-            </script>
-</body></html>
+async function acceptOffer(id){ const b=all.find(x=>x.bookingId===id); const now=Date.now(); await db.ref('bookings/'+id).update({status:'accepted', acceptedAt:now, acceptedAtStr:new Date().toLocaleString('en-GH')}); toast('Accepted - Client notified'); }
+async function rejectOffer(id){ if(!confirm('Reject '+id+'? Client will be told to book another nurse or increase via Paystack.')) return; const b=all.find(x=>x.bookingId===id); const now=Date.now(); await db.ref('bookings/'+id).update({status:'rejected_by_nurse', rejectedAt:now, rejectedByNurseName:b.nurseName}); toast('Rejected - Client told to increase or book another'); }
+async function markOnWay(id){ await db.ref('bookings/'+id).update({status:'on_the_way'}); toast('On the way'); }
+async function markClose(id){ await db.ref('bookings/'+id).update({status:'close'}); toast('Close - Near client'); }
+async function markCompleted(id){ await db.ref('bookings/'+id).update({status:'completed'}); toast('Completed - Waiting CEO paid'); }
+window.onload=function(){ loadAll(); }; </script></body></html>
