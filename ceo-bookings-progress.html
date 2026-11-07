@@ -1,216 +1,64 @@
-<!DOCTYPE html><html lang="en"><head><script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script src="onesignal-setup.js" defer></script>
-<script src="lovecare-alerts.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CEO Bookings Progress - Rejected Flow</title>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;padding-bottom:90px}
-.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px 14px}
-.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}
-.badge-rejected{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}
-.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}
-.btn{border:none;border-radius:14px;padding:10px 14px;font-weight:800;cursor:pointer;font-size:11px;min-height:40px}
-.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
-.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;display:none}
-
-    .photoRow{display:flex;gap:12px;margin:10px 0}
-    .photoBox{flex:1;background:#1e1e2f;border-radius:12px;padding:10px;text-align:center;border:2px solid #333}
-    .photoBox img{width:90px;height:90px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 6px}
-    .photoBox.client{border-color:#7c4dff}
-    .photoBox.nurse{border-color:#00c853}
-</style>
-<script>
-function openBothPhotosModal(bookingId){
-  const b=all.find(x=>x.id===bookingId);
-  if(!b) return;
-  getClientPhoto(b.clientId||b.clientPhone, cUrl=>{
-    getNursePhoto(b.nurseId, b.nursePhone, nUrl=>{
-      const modal = document.createElement('div');
-      modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
-      modal.innerHTML=`
-        <div style="background:#12122a;border-radius:16px;padding:16px;max-width:420px;width:100%;border:2px solid #444">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <div style="font-weight:bold;color:#fff;font-size:14px">Booking ID: ${b.bookingId||b.id}</div>
-            <button onclick="this.closest('div').parentElement.parentElement.remove()" style="background:#ff5252;color:#fff;border:none;border-radius:8px;padding:6px 12px">Close</button>
-          </div>
-          <div class="photoRow">
-            <div class="photoBox client">
-              ${cUrl?`<img src="${cUrl}">`:`<div style="width:90px;height:90px;border-radius:50%;background:#333;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:40px">ðŸ‘¤</div>`}
-              <div style="font-size:12px;color:#b39ddb;font-weight:bold">CLIENT</div>
-              <div style="font-size:13px;color:#fff;font-weight:bold;margin-top:4px">${b.clientName||b.clientUsername||'Client'}</div>
-              <div style="font-size:11px;color:#ccc">${b.clientPhone||''}</div>
-              <div style="font-size:10px;color:#aaa;margin-top:4px">Email: ${b.clientEmail||'-'}</div>
-              <div style="font-size:10px;color:#aaa">Location: ${b.clientLocation||b.location||'-'}</div>
-            </div>
-            <div class="photoBox nurse">
-              ${nUrl?`<img src="${nUrl}">`:`<div style="width:90px;height:90px;border-radius:50%;background:#333;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:40px">ðŸ‘©â€âš•ï¸</div>`}
-              <div style="font-size:12px;color:#a5d6a7;font-weight:bold">NURSE</div>
-              <div style="font-size:13px;color:#fff;font-weight:bold;margin-top:4px">${b.nurseName||'Nurse'}</div>
-              <div style="font-size:11px;color:#ccc">${b.nursePhone||''}</div>
-              <div style="font-size:10px;color:#aaa;margin-top:4px">Earns: GHS ${b.nurse80||Math.round((b.amount||0)*0.8)} (80%)</div>
-              <div style="font-size:10px;color:#aaa">Total: GHS ${b.amount||'-'}</div>
-            </div>
-          </div>
-          <div style="background:#1e1e2f;border-radius:8px;padding:8px;margin-top:8px">
-            <div style="font-size:11px;color:#aaa">Status: <span style="color:#FFD700">${b.status||'pending'}</span> | Amount: GHS ${b.amount||'-'} | Date: ${new Date(b.createdAt||Date.now()).toLocaleString()}</div>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:10px">
-            <button onclick="if(navigator.geolocation){alert('Opening navigation for CEO view - Client: ${b.clientLocation||b.location} Nurse: ${b.nurseLocation||b.nurseLat||''}'); window.open('https://www.google.com/maps/dir/?api=1&origin=${b.nurseLat||''},${b.nurseLng||''}&destination=${b.clientLat||b.clientLocation||b.location||''}','_blank')}" style="flex:1;background:#00c853;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:bold">View Route</button>
-            <button onclick="this.closest('div').parentElement.parentElement.remove()" style="flex:1;background:#333;color:#fff;border:none;border-radius:8px;padding:10px">Close</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-      modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
-    });
-  });
-}
-</script>
-
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO Bookings Progress - LoveCare Global</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-</head><body>
-<div style="padding:12px 16px;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12);display:flex;justify-content:space-between"><b>CEO Bookings Progress - Rejected Flow Fixed</b><small style="color:#22c55e">Live - Shows rejected - CEO clears after seeing</small></div>
-<div style="max-width:900px;margin:0 auto;padding:10px">
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 14px"><button class="btn btnGray" onclick="filter='all';load()">All</button><button class="btn btnRed" style="flex:none" onclick="filter='rejected';load()">ALL Progress - Pending, Accepted, Rejected, Completed - CEO View Both Photos</button><button class="btn btnGray" onclick="filter='accepted';load()">Accepted</button></div>
-<div id="list" style="display:grid;gap:12px"></div>
-</div>
+<style>
+:root{--bg:#0c0a1e;--card:#1a1633;--line:rgba(255,255,255,.08);--text:#ece8ff;--muted:#9a95b8;--gold:#facc15;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Instrument Sans,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.top{position:sticky;top:0;z-index:20;background:rgba(12,10,30,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.brand{font-family:Fraunces,serif;font-weight:800;font-size:18px}
+.badge{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:11px;font-weight:700}
+.tabs{display:flex;gap:8px;padding:12px 18px;overflow-x:auto;background:rgba(26,22,51,.5);border-bottom:1px solid var(--line)}
+.tab{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.tab.active{background:var(--gold);color:#000}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:14px 18px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.list{padding:0 18px 100px;display:flex;flex-direction:column;gap:12px}
+.bookingCard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.statusBadge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;display:inline-block}
+.btn{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;gap:6px}
+.btnGold{background:var(--gold);color:#000;border:0}
+.toast{position:fixed;right:16px;bottom:20px;z-index:100;background:#1e1a38;border:1px solid var(--line);padding:12px 16px;border-radius:12px;font-size:12px;display:none}
+</style></head><body>
+<div style="margin:12px 14px"><a href="sound-settings.html" style="display:block;text-align:center;padding:14px;border-radius:999px;background:linear-gradient(135deg,#ef4444,#a855f7);color:#fff;text-decoration:none;font-weight:900;font-size:13px">🔔 Sound Settings</a></div>
+<audio id="customAudio" preload="auto" playsinline></audio>
+<script>
+(function(){ window.__soundChoice=localStorage.getItem('lcg_sound_choice')||'bell'; window.__customSong=localStorage.getItem('lcg_custom_song')||''; window.__soundEnabled=false;
+function beep(f,d,t){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); var o=c.createOscillator(); var g=c.createGain(); o.type=t||'sine'; o.frequency.value=f; g.gain.setValueAtTime(0.0001,c.currentTime); g.gain.exponentialRampToValueAtTime(0.5,c.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+d); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+d); }catch(e){} }
+function builtIn(k){ if(k==='bell'){ beep(880,0.4,'sine'); setTimeout(()=>beep(1174,0.5,'sine'),250); setTimeout(()=>beep(1568,0.6,'sine'),500);} else if(k==='chime'){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.5,'sine'),i*200)); } else if(k==='alarm'){ for(let i=0;i<6;i++){ setTimeout(()=>beep(1000,0.2,'square'),i*300); setTimeout(()=>beep(700,0.2,'square'),i*300+150);} } else if(k==='gospel'){ [392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,0.6,'triangle'),i*250)); setTimeout(()=>beep(1046,0.9,'triangle'),1100);} else if(k==='highlife'){ [440,554,659,880,659,554].forEach((f,i)=>setTimeout(()=>beep(f,0.3,'triangle'),i*180)); } else if(k==='siren'){ for(let i=0;i<4;i++){ setTimeout(()=>beep(600,0.3,'sawtooth'),i*400); setTimeout(()=>beep(1200,0.3,'sawtooth'),i*400+200);} } }
+window.playCustomSound=function(){ var choice=localStorage.getItem('lcg_sound_choice')||'bell'; var song=localStorage.getItem('lcg_custom_song')||''; function one(){ if(choice==='custom'&&song){ var a=document.getElementById('customAudio'); if(a){ a.src=song; a.volume=1; a.play().catch(()=>builtIn('bell')); } } else builtIn(choice); if(navigator.vibrate) navigator.vibrate([300,100,300,100,300]); } for(let i=0;i<3;i++) setTimeout(one,i*1200); };
+// Unlock on first tap anywhere (browser rule) - no button needed, tapping page unlocks
+document.addEventListener('touchstart', function(){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(c.state==='suspended') c.resume(); window.__soundEnabled=true; }catch(e){} }, {passive:true});
+document.addEventListener('click', function(){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(c.state==='suspended') c.resume(); window.__soundEnabled=true; }catch(e){} });
+window.notifyWithSound=function(t,b){ window.playCustomSound(); };
+})();
+</script>
+
+<div class="top"><div><div class="brand">CEO Bookings Progress - All Live Bookings</div><small style="color:var(--muted);font-size:10px">Real-time: Pending, Accepted, On the way, Close, Completed, Rejected</small></div><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="badge" id="totalBadge">0 Total</span><a href="ceo-dashboard.html" class="badge" style="text-decoration:none;color:var(--text)">CEO Dashboard</a><a href="ceo-notification-room.html" class="badge" style="text-decoration:none;background:rgba(167,139,250,.15);color:#c4b5fd">Notification Room</a><button class="badge" onclick="location.reload()">Refresh</button></div></div>
+<div class="tabs"><button class="tab active" onclick="filterStatus('all')" id="tab-all">All (<span id="c-all">0</span>)</button><button class="tab" onclick="filterStatus('pending')" id="tab-pending">Pending (<span id="c-pending">0</span>)</button><button class="tab" onclick="filterStatus('accepted')" id="tab-accepted">Accepted (<span id="c-accepted">0</span>)</button><button class="tab" onclick="filterStatus('on_the_way')" id="tab-on_the_way">On The Way (<span id="c-on_the_way">0</span>)</button><button class="tab" onclick="filterStatus('close')" id="tab-close">Close (<span id="c-close">0</span>)</button><button class="tab" onclick="filterStatus('completed')" id="tab-completed">Completed (<span id="c-completed">0</span>)</button><button class="tab" onclick="filterStatus('client_confirmed')" id="tab-client_confirmed">Client Confirmed (<span id="c-client_confirmed">0</span>)</button><button class="tab" onclick="filterStatus('rejected')" id="tab-rejected">Rejected (<span id="c-rejected">0</span>)</button></div>
+<div class="stats"><div class="stat"><small>Pending</small><b id="s-pending">0</b><small id="s-pending-amount">GHS 0</small></div><div class="stat"><small>Accepted</small><b id="s-accepted">0</b><small id="s-accepted-amount">GHS 0</small></div><div class="stat"><small>Completed</small><b id="s-completed">0</b><small id="s-completed-amount">GHS 0</small></div><div class="stat"><small>Total Revenue</small><b id="s-revenue">GHS 0</b><small>All bookings</small></div><div class="stat"><small>Active Nurses</small><b id="s-nurses">0</b><small>On jobs</small></div><div class="stat"><small>Today</small><b id="s-today">0</b><small>Bookings today</small></div></div>
+<div id="bookingsList" class="list"><div style="text-align:center;padding:40px;color:var(--muted)">Loading all bookings...</div></div>
 <div id="toast" class="toast"></div>
 <script>
 const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"};
-firebase.initializeApp(firebaseConfig); const db=firebase.database();
-let filter='all'; let all=[];
-function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',4000); }
-function load(){
-  // Load from BOTH ceoBookingsProgress AND bookings (so CEO sees ALL even if progress node empty)
-  db.ref('bookings').on('value', snapBookings=>{
-    const bookingsList=[];
-    if(snapBookings.exists()){
-      snapBookings.forEach(ch=>{
-        const v=ch.val();
-        v.id=ch.key;
-        bookingsList.push(v);
-      });
-    }
-    window._bookingsAll=bookingsList;
-    combineAndRender();
-  });
-  db.ref('ceoBookingsProgress').on('value', snap=>{
-
-    const arr=[]; if(snap.exists()){ snap.forEach(ch=>{ arr.push({...ch.val(), id:ch.key}); }); }
-    // Also check bookings with rejected status that CEO hasn't seen
-    db.ref('bookings').once('value').then(bSnap=>{
-      if(bSnap.exists()){
-        bSnap.forEach(ch=>{
-          const v=ch.val(); const st=(v.status||'').toLowerCase();
-          if(st.includes('rejected')){
-            const exists=arr.find(a=>a.id===ch.key||a.bookingId===(v.bookingId||ch.key));
-            if(!exists){
-              arr.push({...v, id:ch.key, bookingId:v.bookingId||ch.key, status:'rejected', type:'rejected', rejectedBy:'nurse', time:v.rejectedAt||v.time});
-            }
-          }
-        });
-      }
-      all=arr.sort((a,b)=>(b.time||b.createdAt||0)-(a.time||a.createdAt||0));
-      render();
-    });
-  });
-}
-function render(){
-  const area=document.getElementById('list');
-  let filtered=all;
-  if(filter==='rejected') filtered=all.filter(b=>(b.status||'').toLowerCase().includes('rejected'));
-  if(filter==='accepted') filtered=all.filter(b=>(b.status||'').toLowerCase().includes('accepted'));
-  if(filtered.length===0){ area.innerHTML='<div class="card">No bookings - When nurse rejects, shows here - CEO sees then clears - Auto delete from client and nurse</div>'; return; }
-  area.innerHTML=filtered.map(b=>{
-    const st=(b.status||'').toLowerCase();
-    const isRejected=st.includes('rejected');
-    return `<div class="card" style="border-left:3px solid ${isRejected?'#ef4444':'#22c55e'}">
-      <div style="display:flex;justify-content:space-between"><b>Booking ID ${b.bookingId||b.id}</b><span class="badge ${isRejected?'badge-rejected':'badge-accepted'}">${(b.status||'').toUpperCase()} - ${isRejected?'Nurse rejected':'Accepted'}</span></div>
-      <div style="margin-top:8px;font-size:11px">
-        Client: ${b.clientName||''} - ${b.clientPhone||''}<br>
-        Nurse: ${b.nurseName||''} - ${b.nursePhone||''}<br>
-        Amount: GHS ${b.amount||''} - 80% Nurse: GHS ${b.nurse80||Math.round((b.amount||20)*0.8)} - 20% CEO: GHS ${b.ceo20||Math.round((b.amount||20)*0.2)}<br>
-        Rejected At: ${b.rejectedAtStr||new Date(b.rejectedAt||b.time||Date.now()).toLocaleString('en-GH')}<br>
-        ${isRejected?`<span style="color:#fca5a5">Client was told: Nurse ${b.nurseName||''} has rejected your offer - Please book another nurse or increase your payment rate - Booking ID: ${b.bookingId||b.id}</span>`:''}
-      </div>
-      <div style="margin-top:12px;display:flex;gap:6px">
-        ${isRejected?`<button class="btn btnRed" onclick="clearRejected('${b.id}','${b.bookingId||b.id}')">CEO Seen Rejected - Clear All - Delete from client and nurse</button>`:`<button class="btn btnGray" onclick="clearAny('${b.id}')">Clear</button>`}
-        <button class="btn btnGray" onclick="viewRaw('${b.id}')">View Raw</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-async function clearRejected(id, bookingId){
-  if(!confirm('CEO seen rejected booking '+bookingId+'? This will delete it all from client and nurse active lists - After CEO sees that booking ID '+bookingId+' is rejected by nurse')) return;
-  const now=Date.now();
-  // 1. Remove from ceoBookingsProgress
-  await db.ref('ceoBookingsProgress/'+id).remove().catch(()=>{});
-  await db.ref('ceoBookingsProgress/'+bookingId).remove().catch(()=>{});
-  // 2. Remove from bookings - so it disappears from my-bookings and my-job-offer
-  // But first save to history as rejected_cleared
-  try{
-    const snap=await db.ref('bookings/'+id).once('value');
-    if(snap.exists()){
-      const v=snap.val();
-      const clientKey=(v.clientPhone||'').replace(/[^0-9]/g,'').slice(-9)||v.clientId;
-      const nurseKey=v.nurseId||v.nursePhone;
-      if(clientKey){
-        await db.ref('clientBookingHistory/'+clientKey+'/'+id).set({...v, status:'rejected_cleared_by_ceo', clearedAt:now, clearedAtStr:new Date().toLocaleString('en-GH')});
-        await db.ref('clientAlerts/'+clientKey+'/REJECTED_CLEARED-'+id+'-'+now).set({type:'rejected_cleared',title:'Rejected booking cleared',message:`Booking ID ${bookingId} rejected by nurse has been cleared by CEO - Please book another nurse or increase payment - Booking ID: ${bookingId}`,bookingId:bookingId,time:now,read:false});
-      }
-      if(nurseKey){
-        await db.ref('nurseBookingHistory/'+nurseKey+'/'+id).set({...v, status:'rejected_cleared_by_ceo', clearedAt:now});
-      }
-    }
-  }catch(e){ console.log(e); }
-  // 3. Delete from bookings - this auto removes from client and nurse
-  await db.ref('bookings/'+id).remove().catch(async()=>{
-    // Try by bookingId
-    const snap=await db.ref('bookings').orderByChild('bookingId').equalTo(bookingId).once('value');
-    if(snap.exists()){
-      snap.forEach(ch=>{ db.ref('bookings/'+ch.key).remove(); });
-    }
-  });
-  await db.ref('bookings/'+bookingId).remove().catch(()=>{});
-  toast('CEO cleared rejected '+bookingId+' - Deleted from client and nurse - Client told to book another or increase payment');
-  load();
-}
-async function clearAny(id){ if(!confirm('Clear '+id+'?')) return; await db.ref('ceoBookingsProgress/'+id).remove(); toast('Cleared'); }
-function viewRaw(id){ const b=all.find(x=>x.id===id); alert(JSON.stringify(b,null,2)); }
-window.onload=()=>{ load(); };
-<script>
-// CEO: Ring for new booking + new payment
-try {
-  if (window.db || window.firebase) {
-    const db = window.db || firebase.firestore();
-    
-    // 1. New Booking
-    db.collection('bookings').onSnapshot((snap) => {
-      snap.docChanges().forEach((change) => {
-        if (change.type === 'added') {
-          playLoveCareAlert('new_booking');
-          if (Notification.permission === 'granted') {
-            new Notification('💰 CEO: New Booking!', {
-              body: 'New booking don enter! Check dashboard.',
-              icon: '/icon-192.png'
-            });
-          }
-        }
-        if (change.type === 'modified') {
-          const data = change.doc.data();
-          if (data.status === 'paid' || data.paymentStatus === 'paid') {
-            playLoveCareAlert('paid');
-            if (Notification.permission === 'granted') {
-              new Notification('💰 CEO: Payment Don Come!', {
-                body: 'Client don pay! Check am.',
-                icon: '/icon-192.png'
-              });
-            }
-          }
-        }
-      });
-    });
-  }
-} catch(e) { console.log('CEO listener:', e); }
-</script>
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+let allBookings=[]; let currentFilter='all';
+function toastM(m){const e=document.getElementById('toast'); e.textContent=m; e.style.display='block'; setTimeout(()=>e.style.display='none',3000);}
+function filterStatus(s){currentFilter=s; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('tab-'+s)?.classList.add('active'); render();}
+function loadAll(){['bookings','ceoBookings','allBookings'].forEach(path=>{db.ref(path).on('value', snap=>{if(!snap.exists()) return; snap.forEach(ch=>{const v=ch.val(); const id=ch.key; if(id==='LCG-20251016-ABC123') return; if(!allBookings.find(b=>b.id===id)){allBookings.push({...v,id,bookingId:v.bookingId||id});} else {const idx=allBookings.findIndex(b=>b.id===id); allBookings[idx]={...allBookings[idx],...v,id};}}); updateCounts(); render();});});}
+function updateCounts(){const counts={all:allBookings.length,pending:0,accepted:0,on_the_way:0,close:0,completed:0,client_confirmed:0,rejected:0}; let revenue=0,pendingAmt=0,acceptedAmt=0,completedAmt=0,todayCount=0; const todayStr=new Date().toDateString(); allBookings.forEach(b=>{const s=(b.status||'pending').toLowerCase(); const amt=parseFloat(b.amount||0); revenue+=amt; if(s.includes('pending')){counts.pending++; pendingAmt+=amt;} else if(s==='accepted'||s.includes('on_the_way')||s.includes('close')){if(s.includes('on_the_way')) counts.on_the_way++; else if(s.includes('close')) counts.close++; else counts.accepted++; acceptedAmt+=amt;} else if(s.includes('completed')||s==='finished'){counts.completed++; completedAmt+=amt;} else if(s.includes('client_confirmed')){counts.client_confirmed++; completedAmt+=amt;} else if(s.includes('rejected')){counts.rejected++;} const bDate=new Date(b.time||b.createdAt||Date.now()).toDateString(); if(bDate===todayStr) todayCount++;}); document.getElementById('c-all').textContent=counts.all; document.getElementById('c-pending').textContent=counts.pending; document.getElementById('c-accepted').textContent=counts.accepted; document.getElementById('c-on_the_way').textContent=counts.on_the_way; document.getElementById('c-close').textContent=counts.close; document.getElementById('c-completed').textContent=counts.completed+counts.client_confirmed; document.getElementById('c-client_confirmed').textContent=counts.client_confirmed; document.getElementById('c-rejected').textContent=counts.rejected; document.getElementById('s-pending').textContent=counts.pending; document.getElementById('s-accepted').textContent=counts.accepted+counts.on_the_way+counts.close; document.getElementById('s-completed').textContent=counts.completed+counts.client_confirmed; document.getElementById('s-revenue').textContent='GHS '+revenue.toFixed(2); document.getElementById('s-pending-amount').textContent='GHS '+pendingAmt.toFixed(2); document.getElementById('s-accepted-amount').textContent='GHS '+acceptedAmt.toFixed(2); document.getElementById('s-completed-amount').textContent='GHS '+completedAmt.toFixed(2); document.getElementById('s-today').textContent=todayCount; document.getElementById('totalBadge').textContent=counts.all+' Total'; const unique=new Set(allBookings.filter(b=>{const s=(b.status||'').toLowerCase(); return s==='accepted'||s.includes('on_the_way')||s.includes('close');}).map(b=>b.nurseId)); document.getElementById('s-nurses').textContent=unique.size;}
+function render(){const list=document.getElementById('bookingsList'); let filtered=allBookings; if(currentFilter!=='all'){if(currentFilter==='completed'){filtered=allBookings.filter(b=>{const s=(b.status||'').toLowerCase(); return s.includes('completed')||s.includes('finished')||s.includes('client_confirmed');});} else if(currentFilter==='client_confirmed'){filtered=allBookings.filter(b=> (b.status||'').toLowerCase().includes('client_confirmed'));} else {filtered=allBookings.filter(b=> (b.status||'').toLowerCase()===currentFilter || (b.status||'').toLowerCase().includes(currentFilter));}} filtered.sort((a,b)=>(b.time||0)-(a.time||0)); if(filtered.length===0){list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted)">No ${currentFilter} bookings</div>`; return;} list.innerHTML=filtered.slice(0,100).map(b=>{const s=(b.status||'').toLowerCase(); let badgeClass='pending', statusText=s.toUpperCase(), cardClass='pending'; if(s==='accepted'){badgeClass='accepted'; statusText='ACCEPTED'; cardClass='accepted';} else if(s.includes('on_the_way')){badgeClass='accepted'; statusText='ON THE WAY';} else if(s.includes('close')){badgeClass='accepted'; statusText='CLOSE';} else if(s.includes('completed')||s==='finished'){badgeClass='completed'; statusText='COMPLETED'; cardClass='completed';} else if(s.includes('client_confirmed')){badgeClass='completed'; statusText='CLIENT CONFIRMED - WORK COMPLETED'; cardClass='confirmed';} else if(s.includes('rejected')){badgeClass='rejected'; statusText='REJECTED';} else if(s.includes('cancelled')){badgeClass='rejected'; statusText='CANCELLED';} const timeStr=b.time?new Date(b.time).toLocaleString('en-GH'):(b.createdAt?new Date(b.createdAt).toLocaleString('en-GH'):''); const completedAt=b.clientConfirmedAt?new Date(b.clientConfirmedAt).toLocaleString('en-GH'):(b.completedAt?new Date(b.completedAt).toLocaleString('en-GH'):''); const bookingId=b.bookingId||b.id||'Unknown'; return `<div class="bookingCard ${cardClass}" style="border-left:4px solid ${s.includes('client_confirmed')?'#22c55e':s==='accepted'?'#22c55e':s.includes('rejected')?'#ef4444':'#f59e0b'}"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b style="font-size:14px">Booking: ${bookingId}</b><br><span class="statusBadge" style="margin-top:6px;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;background:${s.includes('client_confirmed')?'#22c55e;color:#fff':s==='accepted'?'rgba(34,197,94,.15);color:#86efac':'rgba(245,158,11,.15);color:#fde68a'}">${statusText}</span><div style="margin-top:8px;font-size:12px"><div>Nurse: <b>${b.nurseName||'Unknown'}</b></div><div>Client: <b>${b.clientName||'Client'}</b></div><div>Location: ${b.patientLocation||'N/A'}</div><div>Amount: <b>${b.currency||'GHS'} ${b.amount||0}</b></div><div>Booked: ${timeStr}</div>${completedAt?`<div style="background:rgba(34,197,94,.15);padding:6px 10px;border-radius:8px;margin-top:6px">Work Completed: <b>${completedAt}</b></div>`:''}</div></div><div style="display:flex;flex-direction:column;gap:6px"><span class="badge">ID: ${bookingId.slice(-8)}</span></div></div><div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap"><button class="btn" onclick="viewDetails('${b.id}')">View Details</button><button class="btn btnGold" onclick="trackNurse('${b.nurseId||''}','${b.id}')">Track Nurse</button></div></div>`;}).join('');}
+function viewDetails(id){const b=allBookings.find(x=>x.id===id); if(!b){toastM('Not found'); return;} alert(`Booking Details:
+ID: ${b.bookingId||b.id}
+Status: ${b.status}
+Nurse: ${b.nurseName}
+Client: ${b.clientName}
+Amount: ${b.currency||'GHS'} ${b.amount}
+Time: ${new Date(b.time||b.createdAt).toLocaleString('en-GH')}
+Completed: ${b.clientConfirmedAt?new Date(b.clientConfirmedAt).toLocaleString('en-GH'):'Not yet'}`);}
+function trackNurse(nurseId, bookingId){if(!nurseId){toastM('No nurse ID'); return;} window.open(`ceo-live-tracking-map.html?nurseId=${nurseId}&bookingId=${bookingId}`, '_blank');}
+window.onload=()=>{loadAll();};
+</script><script>(function(){ function start(){ if(typeof db==='undefined') return; var seen={}; function ring(m){ window.playCustomSound && window.playCustomSound(); } try{ db.ref('bookings').on('child_changed', function(s){ var v=s.val(); if(!v) return; var st=(v.status||'').toLowerCase(); var k=s.key+'_'+st; if(seen[k]) return; seen[k]=1; ring(st); }); }catch(e){} try{ db.ref('bookings').on('child_added', function(s){ var v=s.val(); if(!v) return; var tt=v.time||v.createdAt||0; if(Date.now()-tt>120000) return; ring('new'); }); }catch(e){} } setTimeout(start,2000); })();</script>
 </body></html>
