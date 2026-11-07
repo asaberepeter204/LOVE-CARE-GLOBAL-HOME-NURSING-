@@ -1,114 +1,18 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My Job Offers - UNIFIED FINAL - Pending Shows</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding-bottom:90px}.top{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.98);border-bottom:1px solid rgba(168,85,247,.12);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}.card{background:rgba(28,18,56,.92);border:1px solid rgba(168,85,247,.15);border-radius:20px;padding:16px;margin:12px 14px}.badge{padding:5px 10px;border-radius:999px;font-size:10px;font-weight:900;display:inline-block}.badge-pending{background:rgba(245,158,11,.15);color:#fde68a;border:1px solid rgba(245,158,11,.3)}.badge-accepted{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.35)}.badge-rejected{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}.btn{border:none;border-radius:999px;padding:11px 14px;font-weight:800;cursor:pointer;font-size:11px;min-height:40px;flex:1;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center}.btnGreen{background:linear-gradient(135deg,#22c55e,#16a34a);color:white}.btnBlue{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white}.btnRed{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}.btnYellow{background:linear-gradient(135deg,#facc15,#eab308);color:#000}.btnGray{background:rgba(255,255,255,.07);border:1px solid rgba(168,85,247,.18);color:#d8b4fe}.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#120a23;padding:12px 18px;border-radius:30px;z-index:9999;font-weight:700;font-size:12px;display:none;max-width:90%;text-align:center}.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}.modalBox{background:#1c1238;border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:20px;max-width:420px;width:100%;max-height:85vh;overflow:auto}.histId{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.15);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}</style><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script></head><body>
-
-<!-- ============ CUSTOM SONG SOUND NOTIFICATIONS - OWNER SETS HIS OWN SONG ============ -->
-<div id="soundBar" style="margin:12px 14px;background:linear-gradient(135deg,rgba(239,68,68,.15),rgba(168,85,247,.15));border:2px solid rgba(239,68,68,.35);border-radius:20px;padding:14px">
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-    <div><b style="font-size:14px">🔔 Sound Notifications - Your Own Song</b><br><small style="font-size:11px;color:#d8b4fe">Any reply on this page will RING your song - even if you are far from phone - Nurse rejects, accepts, on way, close, completed, CEO paid, new booking, new message</small></div>
-    <button id="enableSoundBtn" onclick="enableSound()" style="background:#22c55e;color:#fff;border:none;padding:12px 16px;border-radius:999px;font-weight:900;cursor:pointer;font-size:12px">🔊 TAP TO ENABLE SOUND</button>
-  </div>
-  <div id="soundStatus" style="margin-top:8px;font-size:11px;color:#fde68a">Sound OFF - Tap ENABLE SOUND once (browser blocks sound until you tap). After that, every new alert will ring.</div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
-    <select id="soundPick" onchange="pickBuiltIn(this.value)" style="flex:1;padding:10px;border-radius:999px;background:#1c1238;color:#fff;border:1px solid rgba(168,85,247,.3)">
-      <option value="bell">🔔 Bell - Default</option>
-      <option value="chime">🎵 Chime - Soft</option>
-      <option value="alarm">⏰ Alarm - Loud - For far away</option>
-      <option value="gospel">🎶 Gospel Tone</option>
-      <option value="highlife">🎶 Highlife Tone</option>
-      <option value="siren">🚨 Siren - Urgent</option>
-      <option value="custom">🎤 My Own Song - Upload below</option>
-    </select>
-    <button onclick="testSound()" style="padding:10px 16px;border-radius:999px;background:#facc15;color:#000;border:none;font-weight:900;cursor:pointer">▶ Test My Song</button>
-    <button onclick="stopSound()" style="padding:10px 16px;border-radius:999px;background:#ef4444;color:#fff;border:none;font-weight:900;cursor:pointer">⏹ Stop</button>
-  </div>
-  <div style="margin-top:10px">
-    <label style="font-size:11px;font-weight:800">Upload your own song (MP3) - This is YOUR song that will ring:</label><br>
-    <input type="file" id="customSongFile" accept="audio/*" onchange="uploadCustomSong(this)" style="margin-top:6px;width:100%;padding:8px;background:rgba(255,255,255,.06);border-radius:12px;color:#fff">
-    <small style="font-size:10px;color:#aaa">Your song is saved on THIS phone only (localStorage). Upload again on other phone if you use 2 phones. Max ~3MB - Use short song / ringtone.</small>
-  </div>
-  <div style="margin-top:10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-    <label style="font-size:11px"><input type="checkbox" id="soundRepeat" checked> Ring 3 times (so you hear from far)</label>
-    <label style="font-size:11px"><input type="checkbox" id="soundVibrate" checked> Vibrate phone</label>
-    <label style="font-size:11px"><input type="checkbox" id="soundKeepRinging" onchange="localStorage.setItem('lcg_keep_ringing', this.checked?'1':'0')"> Keep ringing until I tap STOP (for sleeping / far)</label>
-  </div>
-  <div id="soundLog" style="margin-top:8px;font-size:10px;color:#86efac"></div>
-</div>
+<div style="margin:12px 14px"><a href="sound-settings.html" style="display:block;text-align:center;padding:14px;border-radius:999px;background:linear-gradient(135deg,#ef4444,#a855f7);color:#fff;text-decoration:none;font-weight:900;font-size:13px">🔔 Sound Settings</a></div>
 <audio id="customAudio" preload="auto" playsinline></audio>
 <script>
-(function(){
-  window.__soundEnabled=false; window.__soundChoice=localStorage.getItem('lcg_sound_choice')||'bell';
-  window.__customSong=localStorage.getItem('lcg_custom_song')||'';
-  var sel=document.getElementById('soundPick'); if(sel) sel.value=window.__soundChoice;
-  function log(m){ var el=document.getElementById('soundLog'); if(el) el.textContent=m; }
-  function beep(freq, dur, type){ try{ var ctx=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); var o=ctx.createOscillator(); var g=ctx.createGain(); o.type=type||'sine'; o.frequency.value=freq; g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.5, ctx.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+dur); o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur); }catch(e){} }
-  function playBuiltIn(kind){
-    if(kind==='bell'){ beep(880,0.4,'sine'); setTimeout(()=>beep(1174,0.5,'sine'),250); setTimeout(()=>beep(1568,0.6,'sine'),500); }
-    else if(kind==='chime'){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.5,'sine'), i*200)); }
-    else if(kind==='alarm'){ for(let i=0;i<6;i++){ setTimeout(()=>beep(1000,0.2,'square'), i*300); setTimeout(()=>beep(700,0.2,'square'), i*300+150); } }
-    else if(kind==='gospel'){ [392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,0.6,'triangle'), i*250)); setTimeout(()=>beep(1046,0.9,'triangle'), 1100); }
-    else if(kind==='highlife'){ [440,554,659,880,659,554].forEach((f,i)=>setTimeout(()=>beep(f,0.3,'triangle'), i*180)); }
-    else if(kind==='siren'){ for(let i=0;i<4;i++){ setTimeout(()=>beep(600,0.3,'sawtooth'), i*400); setTimeout(()=>beep(1200,0.3,'sawtooth'), i*400+200); } }
-  }
-  window.enableSound=function(){
-    try{
-      var ctx=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)());
-      if(ctx.state==='suspended') ctx.resume();
-      // Unlock: play silent then test
-      var o=ctx.createOscillator(); var g=ctx.createGain(); g.gain.value=0.001; o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.05);
-      window.__soundEnabled=true;
-      var btn=document.getElementById('enableSoundBtn'); if(btn){ btn.textContent='✅ SOUND ON - Your song will ring'; btn.style.background='#16a34a'; }
-      var st=document.getElementById('soundStatus'); if(st) st.textContent='✅ Sound ON - Choice: '+window.__soundChoice+' - Every new reply will ring your song 3 times + vibrate. Keep this page open in background.';
-      log('Sound unlocked - Test ringing now...');
-      window.playCustomSound('test');
-      if(navigator.vibrate) navigator.vibrate([200,100,200]);
-    }catch(e){ alert('Could not enable sound: '+e.message+' - Try tapping again'); }
-  };
-  window.pickBuiltIn=function(v){
-    window.__soundChoice=v; localStorage.setItem('lcg_sound_choice', v);
-    if(v==='custom' && !window.__customSong){ alert('Upload your song below first - Choose MP3 file'); }
-    log('Song choice saved: '+v);
-  };
-  window.uploadCustomSong=function(input){
-    var f=input.files[0]; if(!f) return;
-    if(f.size>3*1024*1024){ alert('Song too big - Use short ringtone under 3MB - Trim your song'); return; }
-    var r=new FileReader();
-    r.onload=function(){ window.__customSong=r.result; try{ localStorage.setItem('lcg_custom_song', r.result); localStorage.setItem('lcg_sound_choice','custom'); var sel=document.getElementById('soundPick'); if(sel) sel.value='custom'; window.__soundChoice='custom'; }catch(e){ alert('Song too big for this phone storage - Use shorter song under 1MB'); return; } log('✅ Your own song saved! Tap TEST to hear it'); window.playCustomSound('test'); };
-    r.readAsDataURL(f);
-  };
-  window.testSound=function(){ if(!window.__soundEnabled){ window.enableSound(); return; } window.playCustomSound('test'); };
-  window.stopSound=function(){
-    window.__keepRinging=false;
-    var a=document.getElementById('customAudio'); if(a){ a.pause(); a.currentTime=0; }
-    log('Stopped');
-  };
-  window.playCustomSound=function(reason){
-    if(!window.__soundEnabled) return;
-    var repeat=document.getElementById('soundRepeat')?.checked!==false;
-    var keep=document.getElementById('soundKeepRinging')?.checked||localStorage.getItem('lcg_keep_ringing')==='1';
-    var count=repeat?3:1;
-    if(keep){ window.__keepRinging=true; count=99; }
-    var choice=window.__soundChoice||'bell';
-    function oneCycle(){
-      if(choice==='custom' && window.__customSong){
-        var a=document.getElementById('customAudio'); a.src=window.__customSong; a.volume=1; a.play().catch(()=>{ playBuiltIn('bell'); });
-        a.onended=function(){ if(window.__keepRinging) setTimeout(oneCycle, 300); };
-      } else { playBuiltIn(choice); }
-      if(navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
-      log('🔔 Ringing your song - Reason: '+reason+' - '+new Date().toLocaleTimeString());
-    }
-    for(let i=0;i<Math.min(count,3);i++){ setTimeout(oneCycle, i*1200); }
-    if(keep){ setTimeout(function(){ if(window.__keepRinging) oneCycle(); }, 4000); }
-  };
-  // Auto-unlock on first tap anywhere
-  document.addEventListener('touchstart', function(){ if(!window.__soundEnabled){ /* do not auto-enable silently - user must tap ENABLE, but unlock context */ try{ var ctx=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(ctx.state==='suspended') ctx.resume(); }catch(e){} } }, {passive:true});
-  // Show banner if new alert arrives while page hidden - use Notification if permitted
-  window.notifyWithSound=function(title, body){
-    window.playCustomSound(title);
-    if('Notification' in window && Notification.permission==='granted'){ try{ new Notification(title, {body: body}); }catch(e){} }
-    else if('Notification' in window && Notification.permission!=='denied'){ Notification.requestPermission(); }
-  };
+(function(){ window.__soundChoice=localStorage.getItem('lcg_sound_choice')||'bell'; window.__customSong=localStorage.getItem('lcg_custom_song')||''; window.__soundEnabled=false;
+function beep(f,d,t){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); var o=c.createOscillator(); var g=c.createGain(); o.type=t||'sine'; o.frequency.value=f; g.gain.setValueAtTime(0.0001,c.currentTime); g.gain.exponentialRampToValueAtTime(0.5,c.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+d); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+d); }catch(e){} }
+function builtIn(k){ if(k==='bell'){ beep(880,0.4,'sine'); setTimeout(()=>beep(1174,0.5,'sine'),250); setTimeout(()=>beep(1568,0.6,'sine'),500);} else if(k==='chime'){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.5,'sine'),i*200)); } else if(k==='alarm'){ for(let i=0;i<6;i++){ setTimeout(()=>beep(1000,0.2,'square'),i*300); setTimeout(()=>beep(700,0.2,'square'),i*300+150);} } else if(k==='gospel'){ [392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,0.6,'triangle'),i*250)); setTimeout(()=>beep(1046,0.9,'triangle'),1100);} else if(k==='highlife'){ [440,554,659,880,659,554].forEach((f,i)=>setTimeout(()=>beep(f,0.3,'triangle'),i*180)); } else if(k==='siren'){ for(let i=0;i<4;i++){ setTimeout(()=>beep(600,0.3,'sawtooth'),i*400); setTimeout(()=>beep(1200,0.3,'sawtooth'),i*400+200);} } }
+window.playCustomSound=function(){ var choice=localStorage.getItem('lcg_sound_choice')||'bell'; var song=localStorage.getItem('lcg_custom_song')||''; function one(){ if(choice==='custom'&&song){ var a=document.getElementById('customAudio'); if(a){ a.src=song; a.volume=1; a.play().catch(()=>builtIn('bell')); } } else builtIn(choice); if(navigator.vibrate) navigator.vibrate([300,100,300,100,300]); } for(let i=0;i<3;i++) setTimeout(one,i*1200); };
+// Unlock on first tap anywhere (browser rule) - no button needed, tapping page unlocks
+document.addEventListener('touchstart', function(){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(c.state==='suspended') c.resume(); window.__soundEnabled=true; }catch(e){} }, {passive:true});
+document.addEventListener('click', function(){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(c.state==='suspended') c.resume(); window.__soundEnabled=true; }catch(e){} });
+window.notifyWithSound=function(t,b){ window.playCustomSound(); };
 })();
 </script>
-<div class="top"><div><b>My Job Offers - UNIFIED FINAL</b><br><small style="font-size:9px;color:#22c55e">NURSE (YOU) PHOTO + NAME ON TOP - Then Client Below - All features: Pending, Accepted, On Way, Close, Completed, History Delete, Alerts, Photos</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a href="alerts.html" style="padding:8px 14px;border-radius:999px;background:#ef4444;color:#fff;font-size:11px;font-weight:800;text-decoration:none">Alerts</a><a href="nurse-dashboard.html" style="padding:8px 14px;border-radius:999px;background:#facc15;color:#000;font-size:11px;font-weight:800;text-decoration:none">Dashboard</a><button class="btn btnGray" style="flex:none" onclick="loadAll(true)">Refresh</button></div></div><div style="max-width:800px;margin:0 auto;padding:6px"><div id="nurseHeader" class="card" style="display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(22,101,52,.2));border:2px solid rgba(34,197,94,.3)"><div id="nurseHeaderPhoto" style="width:64px;height:64px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:3px solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900">N</div><div style="flex:1"><div style="font-size:9px;color:#22c55e;font-weight:900">MY JOB OFFER BELONGS TO NURSE - YOU</div><b id="nurseHeaderName" style="font-size:16px">Loading your name...</b><br><small id="nurseHeaderPhone" style="color:#86efac">Loading...</small></div><div style="font-size:10px;color:#22c55e;text-align:right">Your photo<br>on top</div></div><div id="info" class="card" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);font-size:11px"></div><div style="margin:0 14px;display:flex;gap:6px"><button class="btn btnGray" onclick="showMode='all';loadAll()">Show All My Offers</button><button class="btn btnYellow" onclick="showMode='recent';loadAll()">Show Recent 10 (If My Phone Not Found)</button></div><div id="offersList" style="display:grid;gap:12px;margin-top:10px"></div><div id="emptyOffers" class="card" style="display:none;text-align:center;padding:24px"><b>No active job offers</b><br><small>When client books you, it shows here as <b>PENDING</b> instantly with Accept / Reject. If someone booked and you see 0, click <b>Show Recent 10</b> - your offer will appear.</small></div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>History - Only Booking ID Shows - Click for details</b><button class="btn btnRed" style="flex:none;padding:6px 10px;font-size:10px" onclick="deleteAllHistory()">Clear All History</button></div><div id="historyList" style="margin-top:10px"><small>No history yet</small></div></div></div><div id="toast" class="toast"></div><div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Details</b><button class="btn btnGray" style="flex:none;padding:6px 10px" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.7"></div></div></div><script>const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"}; firebase.initializeApp(firebaseConfig); const db=firebase.database(); function normPhone(p){return (p||'').toString().replace(/[^0-9]/g,'').slice(-9);} function normEmail(e){return (e||'').toString().toLowerCase().trim();} function getAllIdentities(){const ids={phones:new Set(),emails:new Set(),uids:new Set()}; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); const v=localStorage.getItem(k)||''; const kl=k.toLowerCase(); if(kl.includes('phone')&&normPhone(v)) ids.phones.add(normPhone(v)); if(kl.includes('email')&&normEmail(v)) ids.emails.add(normEmail(v)); if((kl.includes('uid')||kl==='id')&&v) ids.uids.add(v); if(v.startsWith('{')){try{const o=JSON.parse(v); if(o.phone) ids.phones.add(normPhone(o.phone)); if(o.email) ids.emails.add(normEmail(o.email)); if(o.uid) ids.uids.add(o.uid);}catch(e){}}} return {phones:[...ids.phones],emails:[...ids.emails],uids:[...ids.uids]}; } function matchesBooking(v,ids){ if(!v) return false; const bPhones=[normPhone(v.clientPhone),normPhone(v.phone),normPhone(v.nursePhone)].filter(Boolean); const bEmails=[normEmail(v.clientEmail),normEmail(v.email),normEmail(v.nurseEmail)].filter(Boolean); const bUids=[v.clientUid,v.clientId,v.uid,v.nurseId,v.nurseUid].filter(Boolean); if(ids.phones.some(p=>bPhones.includes(p))) return true; if(ids.emails.some(e=>bEmails.includes(e))) return true; if(ids.uids.some(u=>bUids.includes(u))) return true; return false; } function isTerminal(v){const st=(v.status||'').toLowerCase(); if(v.ceoPaid===true&&st.includes('paid')) return true; if(st.includes('client_confirmed_finished')) return true; if(st.includes('cancelled')) return true; if(st.includes('rejected_cleared')) return true; return false;} function isHistory(v){const st=(v.status||'').toLowerCase(); return v.ceoPaid===true&&st.includes('paid');}
+<div class="top"><div><b>My Job Offers - UNIFIED FINAL</b><br><small style="font-size:9px;color:#22c55e">NURSE (YOU) PHOTO + NAME ON TOP - Then Client Below - All features: Pending, Accepted, On Way, Close, Completed, History Delete, Photos</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a href="nurse-dashboard.html" style="padding:8px 14px;border-radius:999px;background:#facc15;color:#000;font-size:11px;font-weight:800;text-decoration:none">Dashboard</a><button class="btn btnGray" style="flex:none" onclick="loadAll(true)">Refresh</button></div></div><div style="max-width:800px;margin:0 auto;padding:6px"><div id="nurseHeader" class="card" style="display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(22,101,52,.2));border:2px solid rgba(34,197,94,.3)"><div id="nurseHeaderPhoto" style="width:64px;height:64px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:3px solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900">N</div><div style="flex:1"><div style="font-size:9px;color:#22c55e;font-weight:900">MY JOB OFFER BELONGS TO NURSE - YOU</div><b id="nurseHeaderName" style="font-size:16px">Loading your name...</b><br><small id="nurseHeaderPhone" style="color:#86efac">Loading...</small></div><div style="font-size:10px;color:#22c55e;text-align:right">Your photo<br>on top</div></div><div id="info" class="card" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);font-size:11px"></div><div style="margin:0 14px;display:flex;gap:6px"><button class="btn btnGray" onclick="showMode='all';loadAll()">Show All My Offers</button><button class="btn btnYellow" onclick="showMode='recent';loadAll()">Show Recent 10 (If My Phone Not Found)</button></div><div id="offersList" style="display:grid;gap:12px;margin-top:10px"></div><div id="emptyOffers" class="card" style="display:none;text-align:center;padding:24px"><b>No active job offers</b><br><small>When client books you, it shows here as <b>PENDING</b> instantly with Accept / Reject. If someone booked and you see 0, click <b>Show Recent 10</b> - your offer will appear.</small></div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>History - Only Booking ID Shows - Click for details</b><button class="btn btnRed" style="flex:none;padding:6px 10px;font-size:10px" onclick="deleteAllHistory()">Clear All History</button></div><div id="historyList" style="margin-top:10px"><small>No history yet</small></div></div></div><div id="toast" class="toast"></div><div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div class="modalBox"><div style="display:flex;justify-content:space-between"><b id="modalTitle">Details</b><button class="btn btnGray" style="flex:none;padding:6px 10px" onclick="closeModal()">Close</button></div><div id="modalBody" style="margin-top:12px;font-size:12px;line-height:1.7"></div></div></div><script>const firebaseConfig={apiKey:"AIzaSyB52-X1D8Cg-wUDWPds_tR7X3cF82dMdRg",authDomain:"web-care-618e8.firebaseapp.com",databaseURL:"https://web-care-618e8-default-rtdb.firebaseio.com",projectId:"web-care-618e8",storageBucket:"web-care-618e8.firebasestorage.app",messagingSenderId:"1062578660694",appId:"1:1062578660694:web:f94dfe12c929df05bce2f7"}; firebase.initializeApp(firebaseConfig); const db=firebase.database(); function normPhone(p){return (p||'').toString().replace(/[^0-9]/g,'').slice(-9);} function normEmail(e){return (e||'').toString().toLowerCase().trim();} function getAllIdentities(){const ids={phones:new Set(),emails:new Set(),uids:new Set()}; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); const v=localStorage.getItem(k)||''; const kl=k.toLowerCase(); if(kl.includes('phone')&&normPhone(v)) ids.phones.add(normPhone(v)); if(kl.includes('email')&&normEmail(v)) ids.emails.add(normEmail(v)); if((kl.includes('uid')||kl==='id')&&v) ids.uids.add(v); if(v.startsWith('{')){try{const o=JSON.parse(v); if(o.phone) ids.phones.add(normPhone(o.phone)); if(o.email) ids.emails.add(normEmail(o.email)); if(o.uid) ids.uids.add(o.uid);}catch(e){}}} return {phones:[...ids.phones],emails:[...ids.emails],uids:[...ids.uids]}; } function matchesBooking(v,ids){ if(!v) return false; const bPhones=[normPhone(v.clientPhone),normPhone(v.phone),normPhone(v.nursePhone)].filter(Boolean); const bEmails=[normEmail(v.clientEmail),normEmail(v.email),normEmail(v.nurseEmail)].filter(Boolean); const bUids=[v.clientUid,v.clientId,v.uid,v.nurseId,v.nurseUid].filter(Boolean); if(ids.phones.some(p=>bPhones.includes(p))) return true; if(ids.emails.some(e=>bEmails.includes(e))) return true; if(ids.uids.some(u=>bUids.includes(u))) return true; return false; } function isTerminal(v){const st=(v.status||'').toLowerCase(); if(v.ceoPaid===true&&st.includes('paid')) return true; if(st.includes('client_confirmed_finished')) return true; if(st.includes('cancelled')) return true; if(st.includes('rejected_cleared')) return true; return false;} function isHistory(v){const st=(v.status||'').toLowerCase(); return v.ceoPaid===true&&st.includes('paid');}
 let all=[], historyData=[], showMode='all', myIds=getAllIdentities();
 function toast(m){const el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(()=>el.style.display='none',5000);}
 function closeModal(){document.getElementById('modal').style.display='none';}
@@ -191,55 +95,5 @@ async function rejectOffer(id){ if(!confirm('Reject '+id+'? Client will be told 
 async function markOnWay(id){ await db.ref('bookings/'+id).update({status:'on_the_way'}); toast('On the way'); }
 async function markClose(id){ await db.ref('bookings/'+id).update({status:'close'}); toast('Close - Near client'); }
 async function markCompleted(id){ await db.ref('bookings/'+id).update({status:'completed'}); toast('Completed - Waiting CEO paid'); }
-window.onload=function(){ loadAll(); }; </script>
-<script>
-(function(){
-  // Wait for db to be ready, then watch for NEW bookings/alerts that match this user
-  function startSoundWatcher(){
-    if(typeof db==='undefined') return;
-    var lastSeen = {};
-    // Watch bookings for status changes (nurse rejects, accepts, on way, close, completed, CEO paid)
-    try{
-      db.ref('bookings').on('child_changed', function(snap){
-        var v=snap.val(); if(!v) return;
-        var bid=v.bookingId||snap.key;
-        var st=(v.status||'').toLowerCase();
-        var key=bid+'_'+st;
-        if(lastSeen[key]) return; lastSeen[key]=Date.now();
-        // Only ring if this booking is for me - check by trying to match via localStorage phone/email/uid if available, else ring anyway for alerts page
-        var msg='';
-        if(st.includes('rejected')) msg='Nurse rejected your offer - Booking '+bid;
-        else if(st.includes('accepted')) msg='Nurse accepted - Booking '+bid;
-        else if(st.includes('on_the_way')) msg='Nurse is on the way - '+bid;
-        else if(st.includes('close')) msg='Nurse is close - '+bid;
-        else if(st.includes('completed')) msg='Nurse completed work - '+bid;
-        else if(st.includes('paid')) msg='CEO marked paid - '+bid;
-        else if(st.includes('pending')) msg='New booking pending - '+bid;
-        if(msg){ window.notifyWithSound && window.notifyWithSound(msg, msg); if(window.toast) window.toast('🔔 '+msg); }
-      });
-      db.ref('bookings').on('child_added', function(snap){
-        var v=snap.val(); if(!v) return;
-        // Only ring for bookings created in last 2 minutes and not initial load
-        var t=v.time||v.createdAt||0; if(Date.now()-t>120000) return;
-        var bid=v.bookingId||snap.key;
-        window.notifyWithSound && window.notifyWithSound('New booking - '+bid, 'New booking '+bid+' - Tap to open');
-      });
-      // Watch alerts nodes - clientAlerts, nurseAlerts, ceoAlerts, alerts
-      ['clientAlerts','nurseAlerts','ceoAlerts','alerts','notifications'].forEach(function(base){
-        try{
-          db.ref(base).on('child_added', function(snap){
-            // Check inner children for new alerts in last 2 min
-            snap.forEach(function(ch){
-              var v=ch.val(); if(!v) return; var tt=v.time||v.createdAt||0; if(Date.now()-tt>120000) return;
-              var title=v.title||v.message||('New alert in '+base);
-              window.notifyWithSound && window.notifyWithSound(title, title);
-            });
-          });
-        }catch(e){}
-      });
-    }catch(e){}
-  }
-  setTimeout(startSoundWatcher, 2000);
-})();
-</script>
+window.onload=function(){ loadAll(); }; </script><script>(function(){ function start(){ if(typeof db==='undefined') return; var seen={}; function ring(m){ window.playCustomSound && window.playCustomSound(); } try{ db.ref('bookings').on('child_changed', function(s){ var v=s.val(); if(!v) return; var st=(v.status||'').toLowerCase(); var k=s.key+'_'+st; if(seen[k]) return; seen[k]=1; ring(st); }); }catch(e){} try{ db.ref('bookings').on('child_added', function(s){ var v=s.val(); if(!v) return; var tt=v.time||v.createdAt||0; if(Date.now()-tt>120000) return; ring('new'); }); }catch(e){} } setTimeout(start,2000); })();</script>
 </body></html>
