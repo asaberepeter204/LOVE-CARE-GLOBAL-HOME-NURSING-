@@ -20,6 +20,20 @@
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
 .dateBox{background:white;color:#2563eb;border-radius:8px;padding:4px 10px;font-weight:900;line-height:1.1;min-width:52px;text-align:center}
 </style></head><body>
+<div style="margin:12px 14px"><a href="sound-settings.html" style="display:block;text-align:center;padding:14px;border-radius:999px;background:linear-gradient(135deg,#ef4444,#a855f7);color:#fff;text-decoration:none;font-weight:900;font-size:13px">🔔 Sound Settings</a></div>
+<audio id="customAudio" preload="auto" playsinline></audio>
+<script>
+(function(){ window.__soundChoice=localStorage.getItem('lcg_sound_choice')||'bell'; window.__customSong=localStorage.getItem('lcg_custom_song')||''; window.__soundEnabled=false;
+function beep(f,d,t){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); var o=c.createOscillator(); var g=c.createGain(); o.type=t||'sine'; o.frequency.value=f; g.gain.setValueAtTime(0.0001,c.currentTime); g.gain.exponentialRampToValueAtTime(0.5,c.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+d); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+d); }catch(e){} }
+function builtIn(k){ if(k==='bell'){ beep(880,0.4,'sine'); setTimeout(()=>beep(1174,0.5,'sine'),250); setTimeout(()=>beep(1568,0.6,'sine'),500);} else if(k==='chime'){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.5,'sine'),i*200)); } else if(k==='alarm'){ for(let i=0;i<6;i++){ setTimeout(()=>beep(1000,0.2,'square'),i*300); setTimeout(()=>beep(700,0.2,'square'),i*300+150);} } else if(k==='gospel'){ [392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,0.6,'triangle'),i*250)); setTimeout(()=>beep(1046,0.9,'triangle'),1100);} else if(k==='highlife'){ [440,554,659,880,659,554].forEach((f,i)=>setTimeout(()=>beep(f,0.3,'triangle'),i*180)); } else if(k==='siren'){ for(let i=0;i<4;i++){ setTimeout(()=>beep(600,0.3,'sawtooth'),i*400); setTimeout(()=>beep(1200,0.3,'sawtooth'),i*400+200);} } }
+window.playCustomSound=function(){ var choice=localStorage.getItem('lcg_sound_choice')||'bell'; var song=localStorage.getItem('lcg_custom_song')||''; function one(){ if(choice==='custom'&&song){ var a=document.getElementById('customAudio'); if(a){ a.src=song; a.volume=1; a.play().catch(()=>builtIn('bell')); } } else builtIn(choice); if(navigator.vibrate) navigator.vibrate([300,100,300,100,300]); } for(let i=0;i<3;i++) setTimeout(one,i*1200); };
+// Unlock on first tap anywhere (browser rule) - no button needed, tapping page unlocks
+document.addEventListener('touchstart', function(){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(c.state==='suspended') c.resume(); window.__soundEnabled=true; }catch(e){} }, {passive:true});
+document.addEventListener('click', function(){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(c.state==='suspended') c.resume(); window.__soundEnabled=true; }catch(e){} });
+window.notifyWithSound=function(t,b){ window.playCustomSound(); };
+})();
+</script>
+
 <div class="topbar">
 <div style="display:flex;align-items:center;gap:10px"><img src="icon-transparent-512.png" style="width:38px;height:38px;border-radius:50%;background:#3b0f6e"><b style="font-size:13px;font-family:Plus Jakarta Sans">LOVE CARE GLOBAL</b></div>
 <a href="sos.html" class="sosTop">SOS</a>
@@ -49,7 +63,7 @@
 </a>
 
 <a href="client-settings.html" class="gcard dark"><div style="font-size:24px">⚙️</div><b>Client Settings</b></a>
-<a href="client-alerts.html" class="gcard orange"><div style="font-size:24px">🔔</div><b>Alerts</b></a>
+
 
 <!-- FIXED 2: COMPLAINT -> client-complaint.html -->
 <a href="client-complaint.html" class="gcard dark"><div style="font-size:24px">📝</div><b>Complaint</b></a>
@@ -148,16 +162,24 @@ function setRealDate(){
 async function loadBookingsCount(){
   const phone=localStorage.getItem('clientPhone')||localStorage.getItem('phone')||'';
   const username=localStorage.getItem('clientUsername')||localStorage.getItem('username')||'';
+  const clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||'';
   try{
     const snap=await get(ref(db,'bookings'));
-    if(!snap.exists()) return;
+    if(!snap.exists()){
+      document.getElementById('myBookingCount').textContent=0;
+      return;
+    }
     let count=0;
     snap.forEach(child=>{
       const b=child.val();
+      const status=(b.status||'').toLowerCase();
+      // When client confirmed work completed, booking is done - count becomes 0 - ID is confirmed done
+      if(status.includes('client_confirmed') || status.includes('client_confirmed_finished')) return;
       const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,''); const myPhone=phone.replace(/[^0-9]/g,'');
       const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);
       const usernameMatch=b.clientUsername&&username&&b.clientUsername.toLowerCase()===username.toLowerCase();
-      if(phoneMatch||usernameMatch) count++;
+      const uidMatch=b.clientId&&clientUid&&b.clientId===clientUid;
+      if(phoneMatch||usernameMatch||uidMatch) count++;
     });
     document.getElementById('myBookingCount').textContent=count;
     localStorage.setItem('lcg_bookings_count', count);
@@ -210,19 +232,29 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   try{
     const phone=localStorage.getItem('clientPhone')||'';
     const username=localStorage.getItem('clientUsername')||localStorage.getItem('username')||'';
+    const clientUid=localStorage.getItem('lcg_client_uid')||localStorage.getItem('clientUid')||'';
     onValue(ref(db,'bookings'), snap=>{
-      if(!snap.exists()) return;
+      if(!snap.exists()){
+        document.getElementById('myBookingCount').textContent=0;
+        return;
+      }
       let count=0;
       snap.forEach(child=>{
         const b=child.val();
+        const status=(b.status||'').toLowerCase();
+        // When client confirmed that work is completed, button 1 becomes 0 because ID is confirmed done
+        if(status.includes('client_confirmed') || status.includes('client_confirmed_finished')) return;
         const bPhone=(b.clientPhone||b.phone||'').replace(/[^0-9]/g,''); const myPhone=phone.replace(/[^0-9]/g,'');
         const phoneMatch=bPhone&&myPhone&&bPhone.slice(-9)===myPhone.slice(-9);
         const usernameMatch=b.clientUsername&&username&&b.clientUsername.toLowerCase()===username.toLowerCase();
-        if(phoneMatch||usernameMatch) count++;
+        const uidMatch=b.clientId&&clientUid&&b.clientId===clientUid;
+        if(phoneMatch||usernameMatch||uidMatch) count++;
       });
       document.getElementById('myBookingCount').textContent=count;
+      localStorage.setItem('lcg_bookings_count', count);
     });
   }catch(e){}
 });
 </script>
+<script>(function(){ function start(){ if(typeof db==='undefined') return; var seen={}; function ring(m){ window.playCustomSound && window.playCustomSound(); } try{ db.ref('bookings').on('child_changed', function(s){ var v=s.val(); if(!v) return; var st=(v.status||'').toLowerCase(); var k=s.key+'_'+st; if(seen[k]) return; seen[k]=1; ring(st); }); }catch(e){} try{ db.ref('bookings').on('child_added', function(s){ var v=s.val(); if(!v) return; var tt=v.time||v.createdAt||0; if(Date.now()-tt>120000) return; ring('new'); }); }catch(e){} } setTimeout(start,2000); })();</script>
 </body></html>
