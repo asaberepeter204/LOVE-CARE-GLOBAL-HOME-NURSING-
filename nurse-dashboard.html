@@ -149,6 +149,20 @@ if(bossApp){
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hidden}.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 380px at 14% 10%, rgba(76,29,149,.22) 0%, transparent 65%),radial-gradient(500px 340px at 86% 14%, rgba(107,33,168,.14) 0%, transparent 60%),linear-gradient(180deg,#0e0a1c 0%, #120e26 40%, #0a0714 100%)}.topbar{position:sticky;top:0;z-index:50;background:rgba(14,10,28,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,85,247,.12);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}.left{display:flex;align-items:center;gap:12px}.hamburger{width:42px;height:42px;border-radius:50%;border:1px solid rgba(168,85,247,.18);background:rgba(76,29,149,.16);display:grid;place-items:center;cursor:pointer}.hamburger span{display:block;width:18px;height:2px;background:#e9d5ff;border-radius:99px}.hamburger span+span{margin-top:4px}.logoBox{display:flex;align-items:center;gap:10px}.logoImg{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#3b0f6e;border:1px solid rgba(168,85,247,.18)}.brand{font-family:Plus Jakarta Sans,sans-serif;font-weight:800;font-size:13px;letter-spacing:.05em;line-height:1.1;color:#f3e8ff}.sosBtn{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:8px 14px;border-radius:999px;font-weight:900;font-size:11px;border:none;cursor:pointer;text-decoration:none}#overlay{position:fixed;inset:0;background:rgba(14,10,28,.65);backdrop-filter:blur(6px);z-index:80;display:none}#overlay.show{display:block}#drawer{position:fixed;left:0;top:0;bottom:0;width:310px;background:rgba(18,12,36,.98);border-right:1px solid rgba(168,85,247,.12);z-index:90;transform:translateX(-100%);transition:.32s;display:flex;flex-direction:column}#drawer.open{transform:translateX(0)}.item{padding:11px 13px;border-radius:12px;border:1px solid rgba(168,85,247,.10);background:rgba(76,29,149,.08);font-weight:700;font-size:13px;display:flex;gap:10px;color:#d8b4fe;text-decoration:none;align-items:center}.item.nurse{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.22);color:#f3e8ff}.item.consent{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none;font-weight:900}.item.sos{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;font-weight:900;justify-content:center}.wrap{max-width:480px;margin:0 auto;padding:24px 14px 80px}.card{background:rgba(28,18,56,.78);border:1px solid rgba(168,85,247,.12);border-radius:20px;padding:20px;backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);margin-bottom:16px}.btnBig{width:100%;padding:18px;border-radius:16px;border:1px solid rgba(168,85,247,.18);background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(76,29,149,.18));color:#f3e8ff;font-weight:900;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;transition:.2s;margin-bottom:12px;text-decoration:none}.btnBig:hover{transform:translateY(-2px);border-color:#a855f7}.btnBig .icon{width:48px;height:48px;border-radius:50%;background:rgba(168,85,247,.22);display:grid;place-items:center;border:1px solid rgba(168,85,247,.18);flex-shrink:0}.btnPrimary{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border:none}.photoWrap{position:relative;width:74px;height:74px;flex-shrink:0}#nursePhoto{width:74px;height:74px;border-radius:50%;object-fit:cover;background:#1e0a3a;border:2px solid rgba(168,85,247,.35);box-shadow:0 0 0 4px rgba(168,85,247,.12), 0 8px 20px rgba(0,0,0,.4);display:block}#nursePhotoInitial{position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6d28d9);display:grid;place-items:center;font-weight:900;font-size:28px;color:white}.onlineDot{position:absolute;right:2px;bottom:2px;width:16px;height:16px;border-radius:50%;background:#6b7280;border:3px solid #1c1238;transition:.3s}.onlineDot.online{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.25);animation:pulse 1.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}.badge{padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;background:rgba(168,85,247,.22);color:#d8b4fe;border:1px solid rgba(168,85,247,.18)}.badgeOnline{background:rgba(34,197,94,.15);color:#86efac;border-color:rgba(34,197,94,.3)}.badgeOffline{background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.2)}#blockScreen{position:fixed;inset:0;z-index:200;background:rgba(14,10,28,.96);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:20px}#blockScreen.show{display:flex}#sessionBar{position:fixed;bottom:0;left:0;right:0;background:rgba(28,18,56,.92);border-top:1px solid rgba(168,85,247,.15);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#a78bfa;z-index:40;backdrop-filter:blur(12px)}.switch{position:relative;display:inline-block;width:64px;height:32px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#374151;transition:.3s;border-radius:999px;border:1px solid rgba(255,255,255,.1)}.slider:before{position:absolute;content:"";height:24px;width:24px;left:4px;bottom:3px;background:white;transition:.3s;border-radius:50%}input:checked + .slider{background:linear-gradient(135deg,#22c55e,#16a34a)}input:checked + .slider:before{transform:translateX(30px)}.input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(14,10,28,.7);color:#ede9fe;font-size:13px;margin-top:6px}.label{font-size:10px;font-weight:800;margin:12px 0 6px;display:block;color:#c4b5fd;text-transform:uppercase}
 </style></head><body>
+<div style="margin:12px 14px"><a href="sound-settings.html" style="display:block;text-align:center;padding:14px;border-radius:999px;background:linear-gradient(135deg,#ef4444,#a855f7);color:#fff;text-decoration:none;font-weight:900;font-size:13px">🔔 Sound Settings</a></div>
+<audio id="customAudio" preload="auto" playsinline></audio>
+<script>
+(function(){ window.__soundChoice=localStorage.getItem('lcg_sound_choice')||'bell'; window.__customSong=localStorage.getItem('lcg_custom_song')||''; window.__soundEnabled=false;
+function beep(f,d,t){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); var o=c.createOscillator(); var g=c.createGain(); o.type=t||'sine'; o.frequency.value=f; g.gain.setValueAtTime(0.0001,c.currentTime); g.gain.exponentialRampToValueAtTime(0.5,c.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+d); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+d); }catch(e){} }
+function builtIn(k){ if(k==='bell'){ beep(880,0.4,'sine'); setTimeout(()=>beep(1174,0.5,'sine'),250); setTimeout(()=>beep(1568,0.6,'sine'),500);} else if(k==='chime'){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.5,'sine'),i*200)); } else if(k==='alarm'){ for(let i=0;i<6;i++){ setTimeout(()=>beep(1000,0.2,'square'),i*300); setTimeout(()=>beep(700,0.2,'square'),i*300+150);} } else if(k==='gospel'){ [392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,0.6,'triangle'),i*250)); setTimeout(()=>beep(1046,0.9,'triangle'),1100);} else if(k==='highlife'){ [440,554,659,880,659,554].forEach((f,i)=>setTimeout(()=>beep(f,0.3,'triangle'),i*180)); } else if(k==='siren'){ for(let i=0;i<4;i++){ setTimeout(()=>beep(600,0.3,'sawtooth'),i*400); setTimeout(()=>beep(1200,0.3,'sawtooth'),i*400+200);} } }
+window.playCustomSound=function(){ var choice=localStorage.getItem('lcg_sound_choice')||'bell'; var song=localStorage.getItem('lcg_custom_song')||''; function one(){ if(choice==='custom'&&song){ var a=document.getElementById('customAudio'); if(a){ a.src=song; a.volume=1; a.play().catch(()=>builtIn('bell')); } } else builtIn(choice); if(navigator.vibrate) navigator.vibrate([300,100,300,100,300]); } for(let i=0;i<3;i++) setTimeout(one,i*1200); };
+// Unlock on first tap anywhere (browser rule) - no button needed, tapping page unlocks
+document.addEventListener('touchstart', function(){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(c.state==='suspended') c.resume(); window.__soundEnabled=true; }catch(e){} }, {passive:true});
+document.addEventListener('click', function(){ try{ var c=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(c.state==='suspended') c.resume(); window.__soundEnabled=true; }catch(e){} });
+window.notifyWithSound=function(t,b){ window.playCustomSound(); };
+})();
+</script>
+
 <div class="bg"></div>
 <div id="blockScreen">
   <div class="card" style="max-width:360px;text-align:center">
@@ -177,7 +191,6 @@ if(bossApp){
 <a class="item nurse" href="index.html">Home</a>
 <a class="item nurse" href="nurses-dashboard.html" style="background:rgba(168,85,247,.22)">Dashboard — ONLINE Control</a>
 <a class="item nurse" href="my-job-offer.html">My Job Offers — Tone + SMS</a>
-<a class="item nurse" href="alerts.html" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fca5a5;font-weight:800">🔔 Alerts — New Booking, On Way, Close, Paid</a>
 <a class="item nurse" href="nurse-group-chat.html">Nurse Group Chat</a>
 <a class="item nurse" href="nurse-settings.html">Nurse Settings</a>
 <a class="item nurse" href="nurse-complaint.html">Nurse Complaints / Report</a>
@@ -188,7 +201,6 @@ if(bossApp){
 <a class="item sos" href="sos.html">SOS</a>
 <a href="nurse-withdrawal.html" class="item" style="background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(245,158,11,.1));border:1px solid rgba(250,204,21,.3);color:#facc15;font-weight:800">Withdraw Earnings - NEW</a>
 <a href="my-job-offer.html" class="item" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2)">My Job Offers - Completed + Congrats</a>
-<a href="alerts.html" class="item" style="background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.35);color:#fca5a5;font-weight:800">🔔 Alerts — Points to alerts.html</a>
 </div>
 <div style="padding:12px;border-top:1px solid rgba(168,85,247,.10)"><button onclick="closeD()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(168,85,247,.15);background:rgba(76,29,149,.12);color:#d8b4fe;font-weight:800;cursor:pointer">Close</button></div>
 </div>
@@ -232,7 +244,6 @@ if(bossApp){
 <!-- Other cards... -->
 <div class="card">
   <a href="my-job-offer.html" class="btnBig"><div class="icon">💼</div><div>My Job Offers<div style="font-size:11px;color:#a78bfa">Tone + SMS when client books you</div></div></a>
-<a href="alerts.html" class="btnBig" style="border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)"><div class="icon">🔔</div><div>Alerts<div style="font-size:11px;color:#a78bfa">New Booking, On Way, Close, Reached, Paid — Tap to open alerts.html</div></div></a>
   <a href="nurse-group-chat.html" class="btnBig"><div class="icon">💬</div><div>Nurse Group Chat</div></a>
   <a href="nurse-settings.html" class="btnBig" style="border-color:rgba(168,85,247,.35)"><div class="icon">⚙️</div><div>Nurse Settings<div style="font-size:11px;color:#a78bfa">Profile, preferences & account</div></div></a>
   <a href="nurse-complaint.html" class="btnBig" style="border-color:rgba(251,191,36,.25)"><div class="icon">📝</div><div>Nurse Complaints<div style="font-size:11px;color:#a78bfa">Report issues & feedback</div></div></a>
@@ -687,7 +698,105 @@ window.addEventListener('load', loadNurse);
 @keyframes pulseGold{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 </style>
 <a href="nurse-withdrawal.html" class="withdrawFloat">Withdraw Earnings</a>
-<a href="alerts.html" class="withdrawFloat" style="bottom:160px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border-color:#fca5a5">🔔 Alerts</a>
 
+
+
+<script>
+(function(){
+  // RECEIVER-ONLY SOUND - Sender never hears his own song
+  var MY_ROLE = "nurse"; // client | nurse | ceo
+  var MY_PAGE = "nurse-dashboard";
+  function getMyIds(){ var phones=[], emails=[], uids=[];
+    for(let i=0;i<localStorage.length;i++){ var k=localStorage.key(i); var v=localStorage.getItem(k)||''; var kl=k.toLowerCase();
+      if(kl.includes('phone')){ var p=v.replace(/[^0-9]/g,'').slice(-9); if(p) phones.push(p); }
+      if(kl.includes('email')) emails.push(v.toLowerCase().trim());
+      if(kl.includes('uid')||kl==='id') uids.push(v);
+      if(v.startsWith('{')){ try{ var o=JSON.parse(v); if(o.phone) phones.push(o.phone.replace(/[^0-9]/g,'').slice(-9)); if(o.email) emails.push(o.email.toLowerCase()); if(o.uid) uids.push(o.uid); }catch(e){} }
+    }
+    return {phones:phones, emails:emails, uids:uids};
+  }
+  function isMyBooking(v){
+    if(!v) return false;
+    var ids=getMyIds();
+    // CEO sees all bookings
+    if(MY_ROLE==='ceo') return true;
+    // If no identity stored, do not ring on bookings - only on soundTriggers addressed to me
+    if(!ids.phones.length && !ids.emails.length && !ids.uids.length) return false;
+    var bPhones=[(v.clientPhone||''),(v.phone||''),(v.nursePhone||'')].map(function(x){ return x.toString().replace(/[^0-9]/g,'').slice(-9); });
+    var bEmails=[(v.clientEmail||''),(v.email||''),(v.nurseEmail||'')].map(function(x){ return x.toString().toLowerCase().trim(); });
+    var bUids=[v.clientUid,v.clientId,v.uid,v.nurseId,v.nurseUid];
+    if(ids.phones.some(function(p){ return bPhones.includes(p); })) return true;
+    if(ids.emails.some(function(e){ return bEmails.includes(e); })) return true;
+    if(ids.uids.some(function(u){ return bUids.includes(u); })) return true;
+    return false;
+  }
+  function shouldRing(v){
+    if(!v) return false;
+    // 1. Never ring for my own change
+    if(v.lastChangedBy && v.lastChangedBy===MY_ROLE) return false;
+    // 2. Never ring if I am the sender (fromUid matches my uid/phone)
+    var ids=getMyIds();
+    if(v.lastChangedUid && ids.uids.includes(v.lastChangedUid)) return false;
+    if(v.lastChangedPhone && ids.phones.includes(v.lastChangedPhone.replace(/[^0-9]/g,'').slice(-9))) return false;
+    // 3. Only ring if booking is mine (or CEO = all)
+    if(!isMyBooking(v)) return false;
+    // 4. Only ring for changes in last 2 minutes (avoid old bookings ringing on load)
+    var t=v.lastChangedAt||v.time||v.createdAt||0;
+    if(Date.now()-t>120000) return false;
+    return true;
+  }
+  function start(){
+    if(typeof db==='undefined') return;
+    var seen={};
+    // A) Listen to bookings changes - receiver only
+    try{
+      db.ref('bookings').on('child_changed', function(s){
+        var v=s.val(); if(!v) return;
+        var k=s.key+'_'+(v.status||'')+'_'+(v.lastChangedAt||0);
+        if(seen[k]) return; seen[k]=1;
+        if(shouldRing(v)){
+          window.playCustomSound && window.playCustomSound();
+          if(window.toast) window.toast('🔔 New reply - '+(v.status||''));
+        }
+      });
+    }catch(e){}
+    // B) Listen to soundTriggers addressed to ME - most reliable
+    // soundTriggers/<myRole> or soundTriggers/<myPhone> or soundTriggers/<myEmailKey>
+    try{
+      var ids=getMyIds();
+      var keys=[MY_ROLE].concat(ids.phones).concat(ids.uids).concat(ids.emails.map(function(e){ return e.replace(/[.@]/g,'_'); }));
+      keys.forEach(function(key){
+        if(!key) return;
+        db.ref('soundTriggers/'+key).limitToLast(5).on('child_added', function(s){
+          var v=s.val(); if(!v) return;
+          if(Date.now()-(v.time||0)>120000) return;
+          // Never ring if I sent it
+          if(v.fromRole===MY_ROLE) return;
+          if(v.fromUid && ids.uids.includes(v.fromUid)) return;
+          window.playCustomSound && window.playCustomSound();
+          if(window.toast) window.toast('🔔 '+(v.title||v.status||'New reply'));
+          // Delete after ringing so it does not ring again on reload
+          setTimeout(function(){ db.ref('soundTriggers/'+key+'/'+s.key).remove().catch(function(){}); }, 5000);
+        });
+      });
+    }catch(e){}
+  }
+  setTimeout(start, 2000);
+  // Expose helper for sender functions: call window.sendSoundTrigger('client', {bookingId, status, title})
+  window.sendSoundTrigger=function(toRole, data){
+    try{
+      if(typeof db==='undefined') return;
+      var ids=getMyIds();
+      var payload={ to:toRole, fromRole:MY_ROLE, fromUid:ids.uids[0]||'', fromPhone:ids.phones[0]||'', bookingId:data.bookingId||'', status:data.status||'', title:data.title||data.status||'', time:Date.now() };
+      // 1. To role inbox (client / nurse / ceo)
+      db.ref('soundTriggers/'+toRole).push(payload).catch(function(){});
+      // 2. To specific receiver phone / uid if known from booking
+      if(data.toPhone) db.ref('soundTriggers/'+data.toPhone.replace(/[^0-9]/g,'').slice(-9)).push(payload).catch(function(){});
+      if(data.toUid) db.ref('soundTriggers/'+data.toUid).push(payload).catch(function(){});
+      if(data.toEmail) db.ref('soundTriggers/'+data.toEmail.replace(/[.@]/g,'_')).push(payload).catch(function(){});
+    }catch(e){}
+  };
+})();
+</script>
 </body>
 </html>
