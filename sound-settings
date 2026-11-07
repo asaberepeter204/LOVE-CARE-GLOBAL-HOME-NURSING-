@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sound Settings</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;min-height:100vh;padding:14px}.top{max-width:640px;margin:0 auto}.back{color:#facc15;text-decoration:none;font-weight:800;font-size:13px}.card{background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(168,85,247,.15));border:2px solid rgba(239,68,68,.35);border-radius:24px;padding:20px;margin-top:12px}.bigBtn{width:100%;border:none;padding:18px;border-radius:999px;font-weight:900;font-size:15px;cursor:pointer;margin-top:12px}.green{background:#22c55e;color:#fff}.greenOn{background:#16a34a;color:#fff}select{width:100%;padding:14px;border-radius:999px;background:#1c1238;color:#fff;border:1px solid rgba(168,85,247,.4);font-size:14px;margin-top:12px}.row{display:flex;gap:8px;margin-top:12px}.row button{flex:1;padding:14px;border-radius:999px;border:none;font-weight:900;cursor:pointer;font-size:13px}.yellow{background:#facc15;color:#000}.red{background:#ef4444;color:#fff}input[type=file]{width:100%;margin-top:12px;padding:10px;background:rgba(255,255,255,.06);border-radius:12px;color:#fff}.chk{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:13px}.chk input{width:20px;height:20px}#soundStatus,#soundLog,#savedBox{margin-top:10px;font-size:11px;color:#86efac}</style></head>
+<body><div class="top">
+<a class="back" href="javascript:history.back()">← Back</a>
+<div class="card">
+<button id="enableSoundBtn" onclick="enableSound()" class="bigBtn green">🔊 TAP TO ENABLE SOUND</button>
+<div id="soundStatus"></div>
+<select id="soundPick" onchange="pickBuiltIn(this.value)">
+<option value="bell">🔔 Bell</option><option value="chime">🎵 Chime</option><option value="alarm">⏰ Alarm</option><option value="gospel">🎶 Gospel</option><option value="highlife">🎶 Highlife</option><option value="siren">🚨 Siren</option><option value="custom">🎤 My Song</option>
+</select>
+<div class="row"><button class="yellow" onclick="testSound()">▶ Test</button><button class="red" onclick="stopSound()">⏹ Stop</button></div>
+<input type="file" id="customSongFile" accept="audio/*" onchange="uploadCustomSong(this)">
+<div class="chk"><input type="checkbox" id="soundRepeat" checked> Ring 3 times</div>
+<div class="chk"><input type="checkbox" id="soundVibrate" checked> Vibrate</div>
+<div class="chk"><input type="checkbox" id="soundKeepRinging"> Keep ringing</div>
+<div id="soundLog"></div>
+<div id="savedBox"></div>
+</div>
+</div>
+<audio id="customAudio" preload="auto" playsinline></audio>
+<script>
+(function(){ window.__soundEnabled=false; window.__soundChoice=localStorage.getItem('lcg_sound_choice')||'bell'; window.__customSong=localStorage.getItem('lcg_custom_song')||''; var sel=document.getElementById('soundPick'); if(sel) sel.value=window.__soundChoice; function showSaved(){ var b=document.getElementById('savedBox'); if(b) b.textContent='Saved: '+window.__soundChoice; } showSaved();
+function log(m){ var el=document.getElementById('soundLog'); if(el) el.textContent=m; }
+function beep(f,d,type){ try{ var ctx=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); var o=ctx.createOscillator(); var g=ctx.createGain(); o.type=type||'sine'; o.frequency.value=f; g.gain.setValueAtTime(0.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.5,ctx.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+d); o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+d); }catch(e){} }
+function playBuiltIn(k){ if(k==='bell'){ beep(880,0.4,'sine'); setTimeout(()=>beep(1174,0.5,'sine'),250); setTimeout(()=>beep(1568,0.6,'sine'),500); } else if(k==='chime'){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.5,'sine'),i*200)); } else if(k==='alarm'){ for(let i=0;i<6;i++){ setTimeout(()=>beep(1000,0.2,'square'),i*300); setTimeout(()=>beep(700,0.2,'square'),i*300+150); } } else if(k==='gospel'){ [392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,0.6,'triangle'),i*250)); setTimeout(()=>beep(1046,0.9,'triangle'),1100); } else if(k==='highlife'){ [440,554,659,880,659,554].forEach((f,i)=>setTimeout(()=>beep(f,0.3,'triangle'),i*180)); } else if(k==='siren'){ for(let i=0;i<4;i++){ setTimeout(()=>beep(600,0.3,'sawtooth'),i*400); setTimeout(()=>beep(1200,0.3,'sawtooth'),i*400+200); } } }
+window.enableSound=function(){ try{ var ctx=window.__audioCtx||(window.__audioCtx=new (window.AudioContext||window.webkitAudioContext)()); if(ctx.state==='suspended') ctx.resume(); window.__soundEnabled=true; var b=document.getElementById('enableSoundBtn'); if(b){ b.textContent='✅ SOUND ON'; b.className='bigBtn greenOn'; } log('ON'); window.playCustomSound('test'); if(navigator.vibrate) navigator.vibrate([200,100,200]); }catch(e){} };
+window.pickBuiltIn=function(v){ window.__soundChoice=v; localStorage.setItem('lcg_sound_choice',v); log(v); showSaved(); };
+window.uploadCustomSong=function(inp){ var f=inp.files[0]; if(!f) return; if(f.size>3*1024*1024){ alert('Too big'); return; } var r=new FileReader(); r.onload=function(){ window.__customSong=r.result; try{ localStorage.setItem('lcg_custom_song',r.result); localStorage.setItem('lcg_sound_choice','custom'); var s=document.getElementById('soundPick'); if(s) s.value='custom'; window.__soundChoice='custom'; }catch(e){ alert('Too big'); return; } log('Saved'); showSaved(); window.playCustomSound('test'); }; r.readAsDataURL(f); };
+window.testSound=function(){ if(!window.__soundEnabled){ window.enableSound(); return; } window.playCustomSound('test'); };
+window.stopSound=function(){ window.__keepRinging=false; var a=document.getElementById('customAudio'); if(a){ a.pause(); a.currentTime=0; } log('Stopped'); };
+window.playCustomSound=function(reason){ if(!window.__soundEnabled) return; var repeat=document.getElementById('soundRepeat')?.checked!==false; var keep=document.getElementById('soundKeepRinging')?.checked||false; var count=repeat?3:1; if(keep){ window.__keepRinging=true; count=99; } var choice=window.__soundChoice||'bell'; function one(){ if(choice==='custom'&&window.__customSong){ var a=document.getElementById('customAudio'); a.src=window.__customSong; a.volume=1; a.play().catch(()=>{ playBuiltIn('bell'); }); a.onended=function(){ if(window.__keepRinging) setTimeout(one,300); }; } else playBuiltIn(choice); if(navigator.vibrate) navigator.vibrate([300,100,300,100,300]); log('Ringing'); } for(let i=0;i<Math.min(count,3);i++) setTimeout(one,i*1200); };
+})();
+</script></body></html>
