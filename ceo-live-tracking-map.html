@@ -18,33 +18,27 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow:hidd
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .btnSmall{padding:7px 12px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(28,18,56,.6);color:#d8b4fe;font-size:11px;font-weight:800;cursor:pointer;text-decoration:none;transition:.15s}
-.btnSmall:hover{background:rgba(168,85,247,.25)}
-.btnSmall.active{background:linear-gradient(135deg,#a855f7,#d8b4fe);color:#1e0a3a;border-color:#a855f7}
-.inputSmall{padding:7px 10px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(14,10,28,.6);color:#fff;font-size:11px;min-width:180px}
-.badge{padding:4px 8px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid;display:inline-flex;gap:4px;align-items:center}
-.badgeLive{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.25)}
-.badgeEnRoute{background:rgba(251,191,36,.15);color:#fbbf24;border-color:rgba(251,191,36,.3)}
-.badgeArrived{background:rgba(59,130,246,.15);color:#93c5fd;border-color:rgba(59,130,246,.3)}
-.badgeInService{background:rgba(168,85,247,.15);color:#d8b4fe;border-color:rgba(168,85,247,.3)}
-.badgeAccepted{background:rgba(34,197,94,.15);color:#4ade80;border-color:#22c55e}
-.main{flex:1;display:flex;overflow:hidden;position:relative}
-.sidebar{width:380px;background:rgba(14,10,28,.92);border-right:1px solid rgba(168,85,247,.15);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;z-index:20}
-.sidebarHeader{padding:12px;border-bottom:1px solid rgba(168,85,247,.15);flex-shrink:0}
-.bookingList{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
-.bookingCard{background:rgba(28,18,56,.85);border:1px solid rgba(168,85,247,.15);border-radius:14px;padding:10px;cursor:pointer;transition:.15s;position:relative}
-.bookingCard:hover{border-color:rgba(168,85,247,.35);transform:translateY(-1px)}
-.bookingCard.active{border-color:#a855f7;background:rgba(76,29,149,.25);box-shadow:0 0 0 2px rgba(168,85,247,.2)}
-.bookingHead{display:flex;gap:10px;align-items:center}
-.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-weight:900;color:#1e0a3a;flex-shrink:0;font-size:16px;overflow:hidden}
-.meta{flex:1;min-width:0}.meta h4{font-size:12px;font-weight:800;color:#f3e8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta small{font-size:10px;color:#a78bfa;display:block;line-height:1.3}
-.row{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.details{font-size:10px;color:#c4b5fd;line-height:1.4;margin-top:6px;background:rgba(14,10,28,.4);border-radius:8px;padding:6px}
-.mapWrap{flex:1;position:relative;overflow:hidden}#map{width:100%;height:100%;background:#120e26}
-.mapOverlay{position:absolute;top:10px;left:10px;right:10px;z-index:500;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;pointer-events:none}.mapOverlay > *{pointer-events:auto}
-.statsBox{background:rgba(14,10,28,.92);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:10px 12px;font-size:11px;backdrop-filter:blur(12px);box-shadow:0 8px 20px rgba(0,0,0,.4)}
-.trackingInfo{position:absolute;bottom:10px;left:10px;right:10px;z-index:500;background:rgba(14,10,28,.95);border:1px solid rgba(168,85,247,.25);border-radius:14px;padding:12px;display:none;backdrop-filter:blur(16px);box-shadow:0 12px 30px rgba(0,0,0,.5);max-height:48%;overflow-y:auto}
+.btnSmall.active{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff}
+.inputSmall{padding:7px 12px;border-radius:999px;border:1px solid rgba(168,85,247,.2);background:rgba(28,18,56,.6);color:#fff;font-size:11px;outline:none}
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:340px;background:rgba(14,10,28,.95);border-right:1px solid rgba(168,85,247,.2);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sidebarHeader{padding:14px;border-bottom:1px solid rgba(168,85,247,.2)}
+.bookingList{flex:1;overflow-y:auto;padding:10px}
+.bookingCard{background:#1a1633;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;margin-bottom:10px;cursor:pointer}
+.bookingCard.selected{border-color:#a855f7;background:rgba(168,85,247,.15)}
+.badge{padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;display:inline-block}
+.badgeLive{background:rgba(34,197,94,.15);color:#4ade80}
+.badgeAccepted{background:rgba(34,197,94,.15);color:#4ade80}
+.badgeEnRoute{background:rgba(250,204,21,.15);color:#facc15}
+.badgeArrived{background:rgba(59,130,246,.15);color:#93c5fd}
+.badgeInService{background:rgba(168,85,247,.15);color:#d8b4fe}
+.mapWrap{flex:1;position:relative}
+#map{width:100%;height:100%}
+.mapOverlay{position:absolute;top:12px;left:12px;z-index:500;display:flex;flex-direction:column;gap:10px}
+.statsBox{background:rgba(14,10,28,.9);border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:12px;font-size:12px;backdrop-filter:blur(10px)}
+.trackingInfo{position:absolute;bottom:12px;left:12px;right:12px;z-index:500;background:rgba(14,10,28,.95);border:1px solid rgba(168,85,247,.3);border-radius:14px;padding:14px;display:none}
 .trackingInfo.active{display:block}
-.trackingActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.btnAction{flex:1;min-width:100px;padding:10px;border-radius:10px;font-weight:800;font-size:11px;border:none;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:4px}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#d8b4fe);display:grid;place-items:center;font-weight:900;color:#1e0a3a}
 .btnCall{background:linear-gradient(135deg,#22c55e,#16a34a);color:#052e16}
 .btnSOS{background:linear-gradient(135deg,#ef4444,#991b1b);color:white;box-shadow:0 4px 12px rgba(239,68,68,.3);animation:blinkSOS 1.2s infinite}
 @keyframes blinkSOS{0%,100%{opacity:1}50%{opacity:.7}}
@@ -119,6 +113,34 @@ function setStatusFilter(status){currentFilter=status;document.querySelectorAll(
 function formatTime(ts){if(!ts)return'';const diff=Date.now()-ts;if(diff<60000)return'just now';if(diff<3600000)return Math.floor(diff/60000)+'m ago';if(diff<86400000)return Math.floor(diff/3600000)+'h ago';return new Date(ts).toLocaleString();}
 function calcDistance(lat1,lon1,lat2,lon2){if(!lat1||!lon1||!lat2||!lon2)return null;const R=6371;const dLat=(lat2-lat1)*Math.PI/180;const dLon=(lon2-lon1)*Math.PI/180;const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));return R*c;}
 function calcETA(distanceKm){if(!distanceKm)return'--';const avgSpeed=30;const hours=distanceKm/avgSpeed;if(hours<1)return Math.ceil(hours*60)+' min';return hours.toFixed(1)+' hr';}
+
+// 🚀 REAL SPEED + ETA - LoveCare CEO
+let speedHistory={};
+function calcSpeedETA(bookingId, nurseLat, nurseLng, clientLat, clientLng, lastUpdate){
+  if(!nurseLat||!nurseLng||!clientLat||!clientLng) return {speed:0, eta:'--', etaMin:0, distance:null};
+  const distance=calcDistance(nurseLat,nurseLng,clientLat,clientLng);
+  let speed=0;
+  const prev=speedHistory[bookingId];
+  if(prev && prev.lastLat && lastUpdate && prev.lastTime){
+    const movedKm=calcDistance(prev.lastLat, prev.lastLng, nurseLat, nurseLng);
+    const timeH=(lastUpdate - prev.lastTime)/1000/3600;
+    if(timeH>0 && movedKm<2){
+      let instant=movedKm/timeH;
+      if(instant<120){
+        if(!prev.speed) prev.speed=instant;
+        else prev.speed=prev.speed*0.7+instant*0.3;
+      }
+    }
+    speed=prev.speed||0;
+  }
+  speedHistory[bookingId]={lastLat:nurseLat,lastLng:nurseLng,lastTime:lastUpdate,speed:speed};
+  let etaMin=0, eta='--';
+  if(distance<0.3){eta='📍 ARRIVED / CLOSE';etaMin=0;}
+  else if(speed>3){etaMin=Math.round((distance/speed)*60);eta=etaMin<=1?'1 min':etaMin+' min';}
+  else{etaMin=Math.round((distance/25)*60);eta=etaMin<=1?'1 min*':etaMin+' min*';}
+  return {speed:Math.round(speed), eta, etaMin, distance};
+}
+
 function initMap(){map=L.map('map').setView([5.6037, -0.1870], 11);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);toast('🗺️ NEW CEO Live Tracking Map — FINAL — SOS → sos.html + Nurse GPS LIVE');}
 function normalizeBooking(id, v){
   if(!v||typeof v!=='object')return null;
@@ -134,7 +156,8 @@ function normalizeBooking(id, v){
   const clientLat=v.clientLat||v.client?.lat||v.lat||null;
   const clientLng=v.clientLng||v.client?.lng||v.lng||null;
   const distance=calcDistance(nurseLat,nurseLng,clientLat,clientLng);
-  return{id,nurseName:v.nurseName||'Nurse',nursePhone:v.nursePhone||'',clientName:v.clientName||'Client',service:v.service||'Nursing Care',bookingType:v.bookingType||'Full Payment',status,nurseLat,nurseLng,clientLat,clientLng,distance,eta:calcETA(distance),hours:v.hours||'8',totalGHS:v.totalGHS||0,totalUSD:v.totalUSD||0,acceptedAt:v.acceptedAt||Date.now(),lastUpdate:v.lastUpdate||Date.now(),raw:v};
+  const live=calcSpeedETA(id, nurseLat, nurseLng, clientLat, clientLng, v.lastUpdate||Date.now());
+  return{id,nurseName:v.nurseName||'Nurse',nursePhone:v.nursePhone||'',clientName:v.clientName||'Client',service:v.service||'Nursing Care',bookingType:v.bookingType||'Full Payment',status,nurseLat,nurseLng,clientLat,clientLng,distance:live.distance||distance,eta:live.eta,speed:live.speed,etaMin:live.etaMin,hours:v.hours||'8',totalGHS:v.totalGHS||0,totalUSD:v.totalUSD||0,acceptedAt:v.acceptedAt||Date.now(),lastUpdate:v.lastUpdate||Date.now(),raw:v};
 }
 async function loadAllBookings(){
   toast('🔄 Loading bookings after accept — NEW CEO LIVE TRACKING...');
@@ -181,19 +204,34 @@ function renderList(){
   filteredBookings.forEach(b=>{
     const statusBadgeClass={accepted:'badgeAccepted',enRoute:'badgeEnRoute',arrived:'badgeArrived',inService:'badgeInService'}[b.status]||'badgeLive';
     const statusText={accepted:'✅ Accepted',enRoute:'🚗 En Route',arrived:'📍 Arrived',inService:'👩‍⚕️ In Service'}[b.status]||b.status;
-    const card=document.createElement('div');card.className='bookingCard'+(selectedBookingId===b.id?' active':'');card.onclick=()=>selectBooking(b.id);
-    card.innerHTML=`<div class="bookingHead"><div class="avatar">${(b.nurseName||'N').charAt(0)}</div><div class="meta"><h4>${b.nurseName} → ${b.clientName}</h4><small>📋 ${b.id.slice(0,8)} • ${b.service} • ${b.hours}h</small><small>🕒 Accepted: ${formatTime(b.acceptedAt)} • Last GPS: ${formatTime(b.lastUpdate)}</small></div></div><div class="row"><span class="badge ${statusBadgeClass}">${statusText}</span><span class="badge badgeLive">🛰️ ${formatTime(b.lastUpdate)} • GPS LIVE</span>${b.distance?`<span class="badge badgeEnRoute">📏 ${b.distance.toFixed(1)} km • ETA ${b.eta}</span>`:''}</div><div class="details">👩‍⚕️ Nurse: ${b.nurseName}<br>👤 Client: ${b.clientName}<br>${b.nurseLat?`📍 Nurse GPS LIVE: ${b.nurseLat.toFixed(4)}, ${b.nurseLng.toFixed(4)}<br>`:''}<small style="color:#fca5a5">🚨 SOS → sos.html?bookingId=${b.id}</small> • <small style="color:#a78bfa">Click to track LIVE</small></div>`;
-    listEl.appendChild(card);
+    const div=document.createElement('div');
+    div.className='bookingCard'+(b.id===selectedBookingId?' selected':'');
+    div.onclick=()=>selectBooking(b.id);
+    div.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:12px">👩‍⚕️ ${b.nurseName} → ${b.clientName}</b><span class="badge ${statusBadgeClass}">${statusText}</span></div>
+      <div style="font-size:11px;color:#a78bfa;margin-top:6px">${b.service} • ${b.hours}h • ${b.bookingType}</div>
+      <div style="font-size:10px;color:#9a95b8;margin-top:4px">ID: ${b.id.slice(0,8)} • 🕒 ${formatTime(b.lastUpdate)}</div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        ${b.distance?`<span class="badge badgeEnRoute">📏 ${b.distance.toFixed(1)} km • ⏱️ ${b.eta}</span><span class="badge" style="background:rgba(250,204,21,.15);color:#facc15">🏍️ ${b.speed||0} km/h</span>`:''}
+        <span class="badge badgeLive">🛰️ LIVE</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        ${b.nursePhone?`<a class="btnSmall btnCall" href="tel:${b.nursePhone}" onclick="event.stopPropagation()">📞 Call Nurse</a>`:''}
+        <a class="btnSmall btnSOS" href="sos.html?bookingId=${b.id}" onclick="event.stopPropagation()">🚨 SOS</a>
+      </div>`;
+    listEl.appendChild(div);
   });
 }
 function renderMapMarkers(){
+  if(!map)return;
   Object.values(nurseMarkers).forEach(m=>map.removeLayer(m));Object.values(clientMarkers).forEach(m=>map.removeLayer(m));Object.values(routeLines).forEach(l=>map.removeLayer(l));
-  nurseMarkers={};clientMarkers={};routeLines={};const bounds=L.latLngBounds();let hasBounds=false;
-  filteredBookings.forEach(b=>{
+  nurseMarkers={};clientMarkers={};routeLines={};
+  let bounds=L.latLngBounds([]);let hasBounds=false;
+  activeBookings.forEach(b=>{
     if(b.nurseLat&&b.nurseLng){
-      const nurseIcon=L.divIcon({className:'custom-div-icon',html:`<div class="customNurseIcon"><div class="pulseRing"></div>👩‍⚕️</div>`,iconSize:[44,44],iconAnchor:[22,22]});
+      const nurseIcon=L.divIcon({className:'',html:`<div class="customNurseIcon"><div class="pulseRing"></div>👩‍⚕️</div>`,iconSize:[44,44],iconAnchor:[22,22]});
       const marker=L.marker([b.nurseLat,b.nurseLng],{icon:nurseIcon}).addTo(map);
-      marker.bindPopup(`<div style="min-width:180px"><b>👩‍⚕️ ${b.nurseName}</b><br><small>LIVE GPS from my-job-offer.html</small><br>📋 ${b.id.slice(0,8)}<br>📍 ${b.nurseLat.toFixed(5)}, ${b.nurseLng.toFixed(5)}<br>🕒 Last GPS: ${formatTime(b.lastUpdate)}<br><a href="sos.html?bookingId=${b.id}&nurseName=${encodeURIComponent(b.nurseName)}&nurseLat=${b.nurseLat}&nurseLng=${b.nurseLng}" style="color:#ef4444;font-weight:800">🚨 SOS → sos.html</a></div>`);
+      marker.bindPopup(`<div style="min-width:180px"><b>👩‍⚕️ ${b.nurseName}</b><br><small>LIVE GPS from my-job-offer.html</small><br>📋 ${b.id.slice(0,8)}<br>📍 ${b.nurseLat.toFixed(5)}, ${b.nurseLng.toFixed(5)}<br>🏍️ ${b.speed||0} km/h • ⏱️ ${b.eta} • 📏 ${b.distance?b.distance.toFixed(1)+' km':''}<br>🕒 Last GPS: ${formatTime(b.lastUpdate)}<br><a href="sos.html?bookingId=${b.id}&nurseName=${encodeURIComponent(b.nurseName)}&nurseLat=${b.nurseLat}&nurseLng=${b.nurseLng}" style="color:#ef4444;font-weight:800">🚨 SOS → sos.html</a></div>`);
       nurseMarkers[b.id]=marker;bounds.extend([b.nurseLat,b.nurseLng]);hasBounds=true;
     }
     if(b.clientLat&&b.clientLng){
@@ -215,7 +253,7 @@ function selectBooking(id){
   showTrackingInfo(booking);
   document.getElementById('selectedStats').style.display='block';
   document.getElementById('selectedTitle').textContent=`📍 Tracking: ${booking.nurseName} → ${booking.clientName} — GPS LIVE`;
-  document.getElementById('selectedInfo').innerHTML=`Status: ${booking.status} • ${booking.distance?booking.distance.toFixed(1)+' km • ETA '+booking.eta:''}<br>Last GPS: ${formatTime(booking.lastUpdate)}<br><a href="sos.html?bookingId=${booking.id}" style="color:#ef4444;font-weight:800">🚨 SOS → sos.html</a>`;
+  document.getElementById('selectedInfo').innerHTML=`Status: ${booking.status} • ${booking.distance?booking.distance.toFixed(1)+' km • ⏱️ '+booking.eta+' • 🏍️ '+(booking.speed||0)+' km/h':''}<br>Last GPS: ${formatTime(booking.lastUpdate)}<br><a href="sos.html?bookingId=${booking.id}" style="color:#ef4444;font-weight:800">🚨 SOS → sos.html</a>`;
 }
 function showTrackingInfo(b){
   const el=document.getElementById('trackingInfo');const content=document.getElementById('trackingContent');
@@ -232,46 +270,35 @@ function showTrackingInfo(b){
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:11px">
       <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.15);border-radius:10px;padding:8px">
-        <b style="color:#4ade80">👩‍⚕️ Nurse LIVE GPS — From my-job-offer.html</b><br>
-        ${b.nurseLat&&b.nurseLng?`📍 ${b.nurseLat.toFixed(5)}, ${b.nurseLng.toFixed(5)}<br>🕒 ${formatTime(b.lastUpdate)}<br>🛰️ Updates every 10 seconds`: 'Waiting for GPS...'}
+        <b style="color:#4ade80">👩‍⚕️ Nurse LIVE GPS —</b><br>
+        ${b.nurseLat&&b.nurseLng?`📍 ${b.nurseLat.toFixed(5)}, ${b.nurseLng.toFixed(5)}<br>🏍️ <b style="color:#facc15;font-size:13px">${b.speed||0} km/h</b> • ⏱️ <b style="color:#22c55e">${b.eta}</b> • 📏 ${b.distance?b.distance.toFixed(1)+' km':''}<br>🕒 ${formatTime(b.lastUpdate)}<br>🛰️ Updates every 10 seconds`: 'Waiting for GPS...'}
       </div>
       <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:8px">
-        <b style="color:#93c5fd">👤 Client</b><br>
-        ${b.clientLat&&b.clientLng?`🏠 ${b.clientLat.toFixed(5)}, ${b.clientLng.toFixed(5)}<br>👤 ${b.clientName}`:'No location'}<br>
-        ${b.distance?`📏 ${b.distance.toFixed(2)}km • ETA ${b.eta}`:''}
+        <b style="color:#93c5fd">👤 Client Location —</b><br>
+        ${b.clientLat&&b.clientLng?`📍 ${b.clientLat.toFixed(5)}, ${b.clientLng.toFixed(5)}<br>${b.distance?`📏 ${b.distance.toFixed(2)}km • ⏱️ ETA ${b.eta} • 🏍️ ${b.speed||0} km/h`:''}`:'No client location'}
       </div>
     </div>
-    <div class="trackingActions">
-      <button class="btnAction btnCall" onclick="window.open('tel:${b.nursePhone}')">📞 Call Nurse</button>
-      <a href="${sosUrl}" class="btnAction btnSOS">🚨 SOS → sos.html</a>
-      <button class="btnAction" style="background:rgba(168,85,247,.15);color:#d8b4fe" onclick="updateBookingStatus('${b.id}','enRoute')">🚗 En Route</button>
-      <button class="btnAction" style="background:rgba(59,130,246,.15);color:#93c5fd" onclick="updateBookingStatus('${b.id}','arrived')">📍 Arrived</button>
-      <button class="btnAction" style="background:rgba(168,85,247,.15);color:#d8b4fe" onclick="updateBookingStatus('${b.id}','inService')">👩‍⚕️ In Service</button>
-    </div>
-  `;
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      ${b.nursePhone?`<a class="btnSmall btnCall" href="tel:${b.nursePhone}">📞 Call Nurse</a>`:''}
+      <a class="btnSmall btnSOS" href="${sosUrl}">🚨 SOS → sos.html</a>
+      <button class="btnSmall" onclick="loadAllBookings()">🔄 Refresh</button>
+    </div>`;
   el.classList.add('active');
 }
-async function updateBookingStatus(bookingId,newStatus){
-  if(!confirm(`Set ${bookingId.slice(0,8)} to ${newStatus}?`))return;
-  try{const updates={status:newStatus,lastUpdate:Date.now(),updatedAt:Date.now()};const paths=['bookings','acceptedBookings','activeBookings','ceoBookings'];for(const p of paths){try{await db.ref(p+'/'+bookingId).update(updates);}catch(e){}}toast(`✅ ${bookingId.slice(0,8)} → ${newStatus}`);loadAllBookings();}catch(e){toast('Failed: '+e.message);}
-}
 function attachLiveTracking(){
-  const livePaths=['bookings','acceptedBookings','activeBookings','ceoBookings','nurseLocations','liveNurseLocations'];
-  livePaths.forEach(path=>{
-    db.ref(path).on('child_changed',snap=>{
-      const v=snap.val();if(!v||typeof v!=='object')return;const id=snap.key;
-      const existing=activeBookings.find(b=>b.id===id);
-      if(existing){
-        const updated=normalizeBooking(id,{...existing.raw,...v, nurseLat: v.lat||v.nurseLat||existing.nurseLat, nurseLng: v.lng||v.nurseLng||existing.nurseLng});
-        if(updated){
-          const idx=activeBookings.findIndex(b=>b.id===id);activeBookings[idx]=updated;
-          updateStats();renderList();renderMapMarkers();if(selectedBookingId===id)showTrackingInfo(updated);
-        }
-      }
+  const paths=['bookings','acceptedBookings','activeBookings','ceoBookings','ceoAcceptedBookings'];
+  paths.forEach(path=>{
+    db.ref(path).on('child_changed', snap=>{
+      const id=snap.key; const v=snap.val();
+      const idx=activeBookings.findIndex(b=>b.id===id);
+      const nb=normalizeBooking(id, v);
+      if(!nb) return;
+      if(idx>=0) activeBookings[idx]={...activeBookings[idx], ...nb};
+      else activeBookings.unshift(nb);
+      updateStats(); renderList(); renderMapMarkers();
+      if(selectedBookingId===id) showTrackingInfo(nb);
     });
   });
 }
-window.onload=()=>{initMap();loadAllBookings();setInterval(loadAllBookings,30000);};
-</script>
-</body>
-</html>
+window.onload=()=>{initMap();loadAllBookings();};
+</script></body></html>
