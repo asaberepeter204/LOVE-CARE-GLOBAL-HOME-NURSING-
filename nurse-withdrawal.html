@@ -33,6 +33,7 @@ window.notifyWithSound=function(t,b){ window.playCustomSound(); };
 </script>
 
 <div class="top"><div class="brand">Nurse Withdrawal - Request Your Earnings</div><div style="display:flex;gap:8px"><a href="nurse-dashboard.html" style="padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;text-decoration:none">Dashboard</a><a href="my-job-offer.html" style="padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:11px;text-decoration:none">Jobs</a></div></div>
+<div class="card" style="padding:14px"><div style="display:flex;gap:12px;align-items:center;background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.3);border-radius:14px;padding:10px"><div id="nurseHeaderPhoto" style="width:56px;height:56px;border-radius:50%;background:#2a1a4a;overflow:hidden;flex-shrink:0;border:2px solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800">N</div><div style="flex:1"><div style="font-size:9px;color:#22c55e;font-weight:800">NURSE (YOU) - OWNER OF THIS WITHDRAWAL</div><div id="nurseHeaderName" style="font-size:18px;font-weight:800">Nurse</div><div id="nurseHeaderPhone" style="font-size:12px;color:var(--muted)"></div><div id="nurseHeaderEmail" style="font-size:11px;color:var(--muted)"></div></div></div><div id="identityDebug" style="font-size:10px;color:#facc15;margin-top:8px"></div></div>
 <div class="card"><div class="earningsBox"><div><small style="color:var(--muted);font-size:11px">Total Earnings Available</small><br><b id="totalEarnings" style="font-size:24px">GHS 0.00</b><br><small id="completedJobs" style="font-size:10px;color:var(--muted)">0 completed jobs</small></div><div style="text-align:right"><small style="color:var(--muted)">Pending Withdrawal</small><br><b id="pendingAmount">GHS 0.00</b><br><button class="btn" style="width:auto;padding:6px 12px;font-size:10px;margin-top:6px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text)" onclick="loadEarnings()">Refresh</button></div></div>
 <h3 style="font-family:Fraunces,serif;margin-bottom:4px">Request Withdrawal</h3><p style="font-size:11px;color:var(--muted);margin-bottom:12px">Your request will be sent to CEO/HR for approval. CEO receives all details (MoMo, Bank, Card + Amount)</p>
 <label class="label">Select Completed Booking ID to Withdraw From</label><select id="bookingIdSelect" class="input" onchange="onBookingSelect()"><option value="">Loading completed bookings...</option></select><small id="bookingSelectHint" style="font-size:10px;color:var(--muted)">Pick the Completed booking you want to withdraw. That booking will move to History at My Job Offer once you send.</small>
@@ -56,46 +57,141 @@ let totalEarnings=0;
 function toastM(m){const e=document.getElementById('toast'); e.textContent=m; e.style.display='block'; setTimeout(()=>e.style.display='none',3000);}
 function showMethodFields(){const method=document.getElementById('method').value; document.getElementById('momoFields').style.display=method==='momo'?'block':'none'; document.getElementById('bankFields').style.display=method==='bank'?'block':'none'; document.getElementById('cardFields').style.display=method==='card'?'block':'none';}
 function validateAmount(){const amount=parseFloat(document.getElementById('amount').value||0); const msg=document.getElementById('validationMsg'); if(amount>totalEarnings){msg.style.display='block'; msg.style.background='rgba(239,68,68,.12)'; msg.style.border='1px solid rgba(239,68,68,.3)'; msg.style.color='#fca5a5'; msg.textContent=`Amount exceeds available earnings (GHS ${totalEarnings.toFixed(2)})`;} else if(amount>0&&amount<10){msg.style.display='block'; msg.style.background='rgba(245,158,11,.12)'; msg.style.border='1px solid rgba(245,158,11,.3)'; msg.style.color='#fde68a'; msg.textContent='Minimum withdrawal is GHS 10';} else if(amount>0){msg.style.display='block'; msg.style.background='rgba(34,197,94,.12)'; msg.style.border='1px solid rgba(34,197,94,.3)'; msg.style.color='#86efac'; msg.textContent=`Valid - You will receive GHS ${amount.toFixed(2)}`;} else {msg.style.display='none';}}
-function loadEarnings(){if(!currentNurseId){document.getElementById('totalEarnings').textContent='GHS 0.00'; return;} db.ref('bookings').orderByChild('nurseId').equalTo(currentNurseId).once('value').then(snap=>{let total=0,completed=0; if(snap.exists()){snap.forEach(ch=>{const b=ch.val(); const s=(b.status||'').toLowerCase(); if(s.includes('completed')||s.includes('client_confirmed')||s==='finished'){if(b.clientConfirmed||s.includes('client_confirmed')){total+=parseFloat(b.livelyAmount||b.amount||0*0.8); completed++;}}});} db.ref('nurseWithdrawals').orderByChild('nurseId').equalTo(currentNurseId).once('value').then(wSnap=>{let withdrawn=0,pendingW=0; if(wSnap.exists()){wSnap.forEach(ch=>{const w=ch.val(); if(w.status==='approved'||w.status==='completed') withdrawn+=parseFloat(w.amount||0); if(w.status==='pending') pendingW+=parseFloat(w.amount||0);});} const available=total-withdrawn; totalEarnings=available; document.getElementById('totalEarnings').textContent='GHS '+available.toFixed(2); document.getElementById('completedJobs').textContent=completed+' completed jobs - Total earned: GHS '+total.toFixed(2)+' - Withdrawn: GHS '+withdrawn.toFixed(2); document.getElementById('pendingAmount').textContent='GHS '+pendingW.toFixed(2);});}); loadHistory(); loadCompletedBookings();}
+async function loadEarnings(){
+  fillNurseHeader();
+  var ids=getMyIdsForWithdrawal();
+  var total=0, completed=0;
+  try{
+    var map=new Map();
+    var paths=['bookings','allBookings','ceoBookings','bookingsByFull'];
+    for(var pi=0; pi<paths.length; pi++){ try{ var s=await db.ref(paths[pi]).once('value'); if(s.exists()){ s.forEach(function(ch){ var v=ch.val(); var bid=v.bookingId||ch.key; if(!map.has(bid)) map.set(bid, Object.assign({}, v, {bookingId:bid})); }); } }catch(e){} }
+    try{ var local=JSON.parse(localStorage.getItem('myBookings')||'[]'); local.forEach(function(v){ var bid=v.bookingId||v.id; if(bid && !map.has(bid)) map.set(bid, Object.assign({}, v, {bookingId:bid})); }); }catch(e){}
+    map.forEach(function(b){
+      var st=(b.status||'').toLowerCase();
+      if(!(st.includes('completed')||st.includes('client_confirmed')||st==='finished')) return;
+      if(b.paid===true || st.includes('paid')) return;
+      if(b.withdrawalRequested===true) return;
+      if(ids.phones.length===0 && ids.emails.length===0 && ids.uids.length===0){ }
+      else if(!matchesBookingForWithdrawal(b, ids)) return;
+      total+=parseFloat(b.livelyAmount||b.amount||0)*0.8; completed++;
+    });
+  }catch(e){}
+  try{
+    var wSnap=await db.ref('nurseWithdrawals').once('value');
+    var withdrawn=0, pendingW=0;
+    if(wSnap.exists()){
+      wSnap.forEach(function(ch){
+        var w=ch.val(); if(!w) return;
+        var wPhone=(w.nursePhone||w.momoNumber||'').replace(/[^0-9]/g,'').slice(-9);
+        var wEmail=(w.nurseEmail||'').toLowerCase();
+        var isMine = ids.phones.includes(wPhone) || ids.emails.includes(wEmail) || ids.uids.includes(w.nurseId||'');
+        if(!isMine && (ids.phones.length||ids.emails.length||ids.uids.length)) {
+          // If withdrawal has no phone/email/uid to match, count it only if nurseId equals current
+          if(w.nurseId && w.nurseId!==currentNurseId) return;
+        }
+        if(w.status==='approved'||w.status==='completed'||w.paid) withdrawn+=parseFloat(w.amount||0);
+        if(w.status==='pending') pendingW+=parseFloat(w.amount||0);
+      });
+    }
+    var available=Math.max(0, total-withdrawn);
+    totalEarnings=available;
+    document.getElementById('totalEarnings').textContent='GHS '+available.toFixed(2);
+    document.getElementById('completedJobs').textContent=completed+' completed jobs - Total earned: GHS '+total.toFixed(2)+' - Withdrawn: GHS '+withdrawn.toFixed(2);
+    document.getElementById('pendingAmount').textContent='GHS '+pendingW.toFixed(2);
+  }catch(e){}
+  loadHistory(); loadCompletedBookings();
+}
 
 let _completedBookings=[];
+function normPhone(v){ if(!v) return ''; var s=String(v).replace(/[^0-9]/g,''); if(s.length>9) s=s.slice(-9); return s||''; }
+function normEmail(v){ return (v||'').toString().toLowerCase().trim(); }
 function getMyIdsForWithdrawal(){
-  var phones=[], emails=[], uids=[];
-  var phone=localStorage.getItem('nursePhone')||localStorage.getItem('phone')||''; if(phone) phones.push(phone.replace(/[^0-9]/g,'').slice(-9));
-  var email=localStorage.getItem('nurseEmail')||localStorage.getItem('email')||''; if(email) emails.push(email.toLowerCase());
-  var uid=localStorage.getItem('nurseUid')||localStorage.getItem('uid')||localStorage.getItem('lcg_nurse_uid')||''; if(uid) uids.push(uid);
-  if(currentNurseId) uids.push(currentNurseId);
-  return {phones:phones, emails:emails, uids:uids};
+  // SAME as My Job Offer - scan ALL localStorage keys, not just 3 keys
+  var phones=new Set(), emails=new Set(), uids=new Set();
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i); var v=localStorage.getItem(k)||''; var kl=k.toLowerCase();
+    if(kl.includes('phone') && normPhone(v)) phones.add(normPhone(v));
+    if(kl.includes('email') && normEmail(v)) emails.add(normEmail(v));
+    if((kl.includes('uid')||kl==='id') && v) uids.add(v);
+    if(v.startsWith('{')){ try{ var o=JSON.parse(v); if(o.phone) phones.add(normPhone(o.phone)); if(o.email) emails.add(normEmail(o.email)); if(o.uid) uids.add(o.uid); if(o.nursePhone) phones.add(normPhone(o.nursePhone)); if(o.nurseEmail) emails.add(normEmail(o.nurseEmail)); }catch(e){} }
+  }
+  if(currentNurseId) uids.add(currentNurseId);
+  // Also try to recover phone/email from any JSON in localStorage
+  return {phones:[...phones], emails:[...emails], uids:[...uids]};
 }
+function matchesBookingForWithdrawal(v, ids){
+  if(!v) return false;
+  // SAME as My Job Offer - check ALL phone/email/uid fields, not just nursePhone
+  var bPhones=[normPhone(v.clientPhone), normPhone(v.phone), normPhone(v.nursePhone)].filter(Boolean);
+  var bEmails=[normEmail(v.clientEmail), normEmail(v.email), normEmail(v.nurseEmail)].filter(Boolean);
+  var bUids=[v.clientUid, v.clientId, v.uid, v.nurseId, v.nurseUid].filter(Boolean);
+  if(ids.phones.some(function(p){ return bPhones.includes(p); })) return true;
+  if(ids.emails.some(function(e){ return bEmails.includes(e); })) return true;
+  if(ids.uids.some(function(u){ return bUids.includes(u); })) return true;
+  return false;
+}
+async function fillNurseHeader(){
+  var name = localStorage.getItem('nurseName')||localStorage.getItem('fullName')||localStorage.getItem('name')||'';
+  var phone = localStorage.getItem('nursePhone')||localStorage.getItem('phone')||'';
+  var email = localStorage.getItem('nurseEmail')||localStorage.getItem('email')||'';
+  var photo = localStorage.getItem('nursePhoto')||localStorage.getItem('nursePhotoUrl')||localStorage.getItem('photoUrl')||localStorage.getItem('photoURL')||'';
+  // If any missing, try allowedNurses / nurses by email
+  if(email && (!photo || !name)){
+    try{ var key=email.replace(/[.@]/g,'_'); var s=await db.ref('allowedNurses/'+key).once('value'); if(s.exists()){ var v=s.val(); name=v.fullName||v.name||name; phone=v.phone||phone; photo=v.photoUrl||v.photo||v.nursePhoto||photo; } }catch(e){}
+    try{ var s2=await db.ref('nurses').orderByChild('email').equalTo(email).once('value'); if(s2.exists()){ s2.forEach(function(ch){ var v=ch.val(); name=v.fullName||v.name||name; phone=v.phone||phone; photo=v.photoURL||v.photo||photo; }); } }catch(e){}
+  }
+  // Also try to recover from any localStorage JSON that has nurse info
+  if(!name || !photo){
+    for(var i=0;i<localStorage.length;i++){ var v2=localStorage.getItem(localStorage.key(i))||''; if(v2.startsWith('{')){ try{ var o=JSON.parse(v2); if(o.fullName||o.name) name=name||o.fullName||o.name; if(o.phone) phone=phone||o.phone; if(o.photoUrl||o.photo) photo=photo||o.photoUrl||o.photo; }catch(e){} } }
+  }
+  if(name) document.getElementById('nurseHeaderName').textContent=name;
+  if(phone) document.getElementById('nurseHeaderPhone').textContent=phone + (email ? ' - ' + email : '');
+  if(email) document.getElementById('nurseHeaderEmail').textContent=email;
+  if(photo) document.getElementById('nurseHeaderPhoto').innerHTML='<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover">';
+  else if(name) document.getElementById('nurseHeaderPhoto').textContent=name.charAt(0).toUpperCase();
+  var ids=getMyIdsForWithdrawal();
+  var dbg=document.getElementById('identityDebug');
+  if(dbg) dbg.textContent='Identity found: Phones: '+(ids.phones.join(', ')||'NONE')+' | Emails: '+(ids.emails.join(', ')||'NONE')+' | UIDs: '+(ids.uids.join(', ')||'NONE');
+}
+
 async function loadCompletedBookings(){
   var sel=document.getElementById('bookingIdSelect'); if(!sel) return;
+  sel.innerHTML='<option value="">Loading completed bookings...</option>';
   try{
     var ids=getMyIdsForWithdrawal();
     var map=new Map();
-    var snap=await db.ref('bookings').once('value');
-    if(snap.exists()){
-      snap.forEach(function(ch){
-        var b=ch.val(); if(!b) return;
-        var bid=b.bookingId||ch.key;
-        var st=(b.status||'').toLowerCase();
-        // Only completed / client_confirmed that are NOT yet withdrawn / NOT yet in history / NOT ceo_paid
-        var isCompleted = st.includes('completed') || st.includes('client_confirmed');
-        if(!isCompleted) return;
-        if(b.paid===true || st.includes('paid')) return;
-        if(b.withdrawalRequested===true) return;
-        // Must be mine
-        var bp=(b.nursePhone||'').replace(/[^0-9]/g,'').slice(-9);
-        var isMine = ids.phones.includes(bp) || ids.emails.includes((b.nurseEmail||'').toLowerCase()) || ids.uids.includes(b.nurseId||b.nurseUid||b.uid||'') || (currentNurseId && b.nurseId===currentNurseId);
-        // If no identity stored, show all completed (fallback - nurse can pick)
-        if(ids.phones.length===0 && ids.emails.length===0 && ids.uids.length===0) isMine=true;
-        if(!isMine) return;
-        if(!map.has(bid)) map.set(bid, Object.assign({}, b, {bookingId:bid}));
-      });
+    // SAME paths as My Job Offer - bookings + allBookings + ceoBookings + bookingsByFull + per-user + per-phone + localStorage
+    var paths=['bookings','allBookings','ceoBookings','bookingsByFull'];
+    for(var pi=0; pi<paths.length; pi++){
+      try{ var s=await db.ref(paths[pi]).once('value'); if(s.exists()){ s.forEach(function(ch){ var v=ch.val(); var bid=v.bookingId||ch.key; if(!map.has(bid)) map.set(bid, Object.assign({}, v, {bookingId:bid})); }); } }catch(e){}
     }
-    // Also check nurseBookingHistory for completed not yet withdrawn? No - history already moved, don't show again
-    _completedBookings=[...map.values()].sort(function(a,b){ return (b.time||b.createdAt||0)-(a.time||a.createdAt||0); });
+    // Per-user paths
+    var userKeys=[...ids.uids, ...ids.emails.map(function(e){ return e.replace(/[.@]/g,'_'); })];
+    for(var ui=0; ui<userKeys.length; ui++){ for(var bi=0; bi<['clientBookings','myBookings','bookingsByClient'].length; bi++){ try{ var s2=await db.ref(['clientBookings','myBookings','bookingsByClient'][bi]+'/'+userKeys[ui]).once('value'); if(s2.exists()){ s2.forEach(function(ch){ var v=ch.val(); var bid=v.bookingId||ch.key; if(!map.has(bid)) map.set(bid, Object.assign({}, v, {bookingId:bid})); }); } }catch(e){} } }
+    for(var ph=0; ph<ids.phones.length; ph++){ try{ var s3=await db.ref('bookingsByPhone/'+ids.phones[ph]).once('value'); if(s3.exists()){ s3.forEach(function(ch){ var v=ch.val(); var bid=v.bookingId||ch.key; if(!map.has(bid)) map.set(bid, Object.assign({}, v, {bookingId:bid})); }); } }catch(e){} }
+    // localStorage myBookings (My Job Offer also reads this)
+    try{ var local=JSON.parse(localStorage.getItem('myBookings')||'[]'); local.forEach(function(v){ var bid=v.bookingId||v.id; if(bid && !map.has(bid)) map.set(bid, Object.assign({}, v, {bookingId:bid})); }); }catch(e){}
+    // Filter to Completed only
+    _completedBookings=[];
+    map.forEach(function(b){
+      var st=(b.status||'').toLowerCase();
+      var isCompleted = st.includes('completed') || st.includes('client_confirmed') || st==='finished' || b.clientConfirmed===true;
+      if(!isCompleted) return;
+      if(b.paid===true || st.includes('paid')) return;
+      if(b.withdrawalRequested===true) return;
+      // If we have identity, must match. If NO identity at all, show all completed so nurse can still pick (same as My Job Offer fallback)
+      if(ids.phones.length===0 && ids.emails.length===0 && ids.uids.length===0){
+        // no identity - show all
+      } else if(!matchesBookingForWithdrawal(b, ids)){
+        return;
+      }
+      _completedBookings.push(b);
+    });
+    _completedBookings.sort(function(a,b){ return (b.time||b.createdAt||0)-(a.time||a.createdAt||0); });
     if(!_completedBookings.length){
       sel.innerHTML='<option value="">No Completed booking yet - Complete a job first</option>';
+      var dbg=document.getElementById('identityDebug');
+      if(dbg) dbg.textContent += ' | Checked ' + map.size + ' bookings, 0 matched as Completed for you. If My Job Offer shows Completed, tap Refresh - your phone/email in that booking may be different from this page.';
       return;
     }
     sel.innerHTML='<option value="">-- Select Completed Booking ID --</option>' + _completedBookings.map(function(b){
@@ -103,7 +199,7 @@ async function loadCompletedBookings(){
       var total=(parseFloat(b.livelyAmount||b.amount||0)).toFixed(2);
       return '<option value="'+b.bookingId+'">'+b.bookingId+' - GHS '+total+' - You get GHS '+nurseShare+' - '+(b.clientName||'Client')+'</option>';
     }).join('');
-  }catch(e){ sel.innerHTML='<option value="">Could not load - Refresh</option>'; }
+  }catch(e){ sel.innerHTML='<option value="">Could not load - Tap Refresh</option>'; }
 }
 function onBookingSelect(){
   var sel=document.getElementById('bookingIdSelect');
@@ -119,8 +215,43 @@ function onBookingSelect(){
   hint.textContent='Selected: '+bid+' - Total: GHS '+(parseFloat(b.livelyAmount||b.amount||0)).toFixed(2)+' - You get (80%): GHS '+nurseShare.toFixed(2)+' - This booking will move to History at My Job Offer when you submit.';
 }
 
-function loadHistory(){if(!currentNurseId) return; db.ref('nurseWithdrawals').orderByChild('nurseId').equalTo(currentNurseId).on('value', snap=>{const list=document.getElementById('historyList'); if(!snap.exists()){list.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">No withdrawals yet</div>'; return;} const items=[]; snap.forEach(ch=>{items.push({...ch.val(),id:ch.key});}); items.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)); list.innerHTML=items.map(w=>{let statusClass='pending', statusText='PENDING'; if(w.status==='approved'){statusClass='approved'; statusText='APPROVED';} if(w.paid){statusText='PAID';} else if(w.status==='rejected'){statusClass='rejected'; statusText='REJECTED';} else if(w.status==='completed'){statusClass='approved'; statusText='COMPLETED';} let methodDetails=''; if(w.method==='momo') methodDetails=`MoMo ${w.momoNetwork||''} - ${w.momoNumber||''} - ${w.momoName||''}`; else if(w.method==='bank') methodDetails=`Bank ${w.bankName||''} - ${w.bankAccount||''} - ${w.bankAccountName||''}`; else if(w.method==='card') methodDetails=`Card ${w.cardType||''} - ****${w.cardNumber||''} - ${w.cardName||''}`; const timeStr=w.createdAt?new Date(w.createdAt).toLocaleString('en-GH'):''; return `<div style="background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px"><div style="display:flex;justify-content:space-between"><b>GHS ${parseFloat(w.amount||0).toFixed(2)}</b><span style="padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;background:${w.status==='pending'?'rgba(245,158,11,.15)':w.status==='approved'?'rgba(34,197,94,.15)':'rgba(239,68,68,.15)'}">${statusText}</span></div><div style="font-size:11px;margin-top:6px">Method: ${methodDetails}</div><div style="font-size:10px;color:var(--muted);margin-top:4px">${timeStr} - ID: ${w.id.slice(-8)}<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">${w.receipt?`<button onclick="viewWithdrawalReceipt('${w.id}')" style="flex:1;padding:9px;border-radius:999px;background:#facc15;color:#000;border:none;font-weight:900;font-size:11px;cursor:pointer">View Receipt</button>`:''}<button onclick="deleteWithdrawalHistory('${w.id}')" style="flex:1;padding:9px;border-radius:999px;background:#ef4444;color:#fff;border:none;font-weight:900;font-size:11px;cursor:pointer">🗑 Delete</button></div></div>`;}).join('');});}
-
+function loadHistory(){
+  db.ref('nurseWithdrawals').once('value').then(function(snap){
+    const list=document.getElementById('historyList');
+    var ids=getMyIdsForWithdrawal();
+    const items=[];
+    if(snap.exists()){
+      snap.forEach(function(ch){
+        var w=ch.val(); if(!w) return;
+        var wPhone=(w.nursePhone||w.momoNumber||'').replace(/[^0-9]/g,'').slice(-9);
+        var wEmail=(w.nurseEmail||'').toLowerCase();
+        var isMine = false;
+        if(ids.phones.length===0 && ids.emails.length===0 && ids.uids.length===0) isMine=true;
+        else if(ids.phones.includes(wPhone)) isMine=true;
+        else if(ids.emails.includes(wEmail)) isMine=true;
+        else if(ids.uids.includes(w.nurseId||'')) isMine=true;
+        else if(w.nurseId===currentNurseId) isMine=true;
+        if(!isMine) return;
+        items.push(Object.assign({}, w, {id:ch.key}));
+      });
+    }
+    if(items.length===0){ list.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">No withdrawals yet</div>'; return; }
+    items.sort(function(a,b){ return (b.createdAt||0)-(a.createdAt||0); });
+    list.innerHTML=items.map(function(w){
+      var statusClass='pending', statusText='PENDING';
+      if(w.status==='approved'){statusClass='approved'; statusText='APPROVED';}
+      if(w.paid){statusText='PAID';}
+      else if(w.status==='rejected'){statusClass='rejected'; statusText='REJECTED';}
+      else if(w.status==='completed'){statusClass='approved'; statusText='COMPLETED';}
+      var methodDetails='';
+      if(w.method==='momo') methodDetails='MoMo '+(w.momoNetwork||'')+' - '+(w.momoNumber||'')+' - '+(w.momoName||'');
+      else if(w.method==='bank') methodDetails='Bank '+(w.bankName||'')+' - '+(w.bankAccount||'')+' - '+(w.bankAccountName||'');
+      else if(w.method==='card') methodDetails='Card '+(w.cardType||'')+' - ****'+(w.cardNumber||'')+' - '+(w.cardName||'');
+      var timeStr=w.createdAt?new Date(w.createdAt).toLocaleString('en-GH'):'';
+      return '<div style="background:rgba(12,10,30,.6);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px"><div style="display:flex;justify-content:space-between"><b>GHS '+parseFloat(w.amount||0).toFixed(2)+'</b><span style="padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;background:'+(w.status==='pending'?'rgba(245,158,11,.15)':w.status==='approved'?'rgba(34,197,94,.15)':'rgba(239,68,68,.15)')+'">'+statusText+'</span></div>'+(w.bookingId?'<div style="font-size:11px;margin-top:6px;background:rgba(250,204,21,.12);border-radius:8px;padding:6px">Booking ID: <b style="color:#facc15">'+w.bookingId+'</b></div>':'')+'<div style="font-size:11px;margin-top:6px">Method: '+methodDetails+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">'+timeStr+' - ID: '+w.id.slice(-8)+'<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'+(w.receipt?'<button onclick="viewWithdrawalReceipt(\''+w.id+'\')" style="flex:1;padding:9px;border-radius:999px;background:#facc15;color:#000;border:none;font-weight:900;font-size:11px;cursor:pointer">View Receipt</button>':'')+'<button onclick="deleteWithdrawalHistory(\''+w.id+'\')" style="flex:1;padding:9px;border-radius:999px;background:#ef4444;color:#fff;border:none;font-weight:900;font-size:11px;cursor:pointer">🗑 Delete</button></div></div></div>';
+    }).join('');
+  });
+}
 function viewWithdrawalReceipt(id){
   // Find receipt from currently displayed history - reload from DB if needed
   db.ref('nurseWithdrawals/'+id).once('value').then(function(snap){
