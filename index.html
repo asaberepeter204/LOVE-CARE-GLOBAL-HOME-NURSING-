@@ -245,15 +245,70 @@ body{font-family:Inter,sans-serif;background:#0e0a1c;color:#e8e0ff;overflow-x:hi
     }
     if(data.videos && data.videos.length>0){
       data.videos.forEach(v=>{
+        const wrap=document.createElement('div');
+        wrap.style.position='relative';
+        wrap.style.background='#000';
+        wrap.style.borderRadius='12px';
+        wrap.style.overflow='hidden';
         const vd=document.createElement('video');
-        vd.src=v.data||v.url;
+        vd.src=v.data||v.url||v.videoURL||v.video;
         vd.controls=true;
+        vd.playsInline=true;
+        vd.muted=false;
+        vd.volume=1.0;
+        vd.preload='metadata';
         vd.style.maxWidth='100%';
         vd.style.borderRadius='12px';
         vd.style.maxHeight='500px';
         vd.style.width='100%';
-        mediaEl.appendChild(vd);
+        vd.style.background='#000';
+        vd.setAttribute('playsinline','');
+        vd.onloadeddata=()=>{ vd.volume=1.0; vd.muted=false; };
+        vd.onplay=()=>{ vd.volume=1.0; vd.muted=false; };
+        wrap.appendChild(vd);
+        const soundBar=document.createElement('div');
+        soundBar.style.cssText='display:flex;gap:6px;padding:8px;background:rgba(0,0,0,.7);align-items:center;justify-content:space-between';
+        soundBar.innerHTML='<span style="font-size:10px;color:#86efac;font-weight:700">🔊 Sound ON - Tap 🔊 if no sound</span><button style="padding:6px 10px;border-radius:8px;background:#22c55e;color:#000;font-weight:800;border:none;font-size:10px;cursor:pointer">▶️ Play with Sound</button>';
+        soundBar.querySelector('button').onclick=()=>{ vd.muted=false; vd.volume=1.0; vd.play().catch(()=>{}); };
+        wrap.appendChild(soundBar);
+        mediaEl.appendChild(wrap);
       });
+    }
+    // FIX: Also handle single videoURL / video field from CEO Control (Storage URL)
+    if((data.videoURL || data.video || data.videoUrl) && !(data.videos && data.videos.length>0)){
+      const vUrl=data.videoURL||data.video||data.videoUrl;
+      const wrap=document.createElement('div');
+      wrap.style.cssText='position:relative;background:#000;border-radius:12px;overflow:hidden;margin-top:10px';
+      const vd=document.createElement('video');
+      vd.src=vUrl;
+      vd.controls=true;
+      vd.playsInline=true;
+      vd.muted=false;
+      vd.volume=1.0;
+      vd.preload='metadata';
+      vd.style.cssText='width:100%;max-height:500px;border-radius:12px;background:#000';
+      vd.setAttribute('playsinline','');
+      vd.onloadeddata=()=>{ vd.volume=1.0; vd.muted=false; };
+      wrap.appendChild(vd);
+      const bar=document.createElement('div');
+      bar.style.cssText='display:flex;gap:6px;padding:8px;background:rgba(0,0,0,.7);justify-content:space-between;align-items:center';
+      bar.innerHTML='<span style="font-size:10px;color:#86efac;font-weight:700">🔊 CEO Video - Sound ON</span><button style="padding:6px 10px;border-radius:8px;background:#22c55e;color:#000;font-weight:800;border:none;font-size:10px;cursor:pointer">▶️ Play with Sound</button>';
+      bar.querySelector('button').onclick=()=>{ vd.muted=false; vd.volume=1.0; vd.play().catch(()=>{}); };
+      wrap.appendChild(bar);
+      mediaEl.appendChild(wrap);
+    }
+    if(data.videoMessage){
+      const vd=document.createElement('video');
+      vd.src=data.videoMessage;
+      vd.controls=true; vd.playsInline=true; vd.muted=false; vd.volume=1.0;
+      vd.style.cssText='width:100%;max-height:400px;border-radius:12px;background:#000';
+      vd.onloadeddata=()=>{ vd.volume=1.0; vd.muted=false; };
+      mediaEl.appendChild(vd);
+    }
+    if(data.voice){
+      const au=document.createElement('audio');
+      au.src=data.voice; au.controls=true; au.style.width='100%';
+      mediaEl.appendChild(au);
     }
     
     // Ticker mode
